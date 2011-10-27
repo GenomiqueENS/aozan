@@ -1,0 +1,25 @@
+<classpath>
+  <classpathentry kind="src" path="src/test/java" output="target/test-classes" including="**/*.java"/>
+  <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/amazonaws/aws-java-sdk/1.2.3/aws-java-sdk-1.2.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.4/commons-codec-1.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-compress/1.1/commons-compress-1.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar"/>
+  <classpathentry kind="src" path="/eoulsan"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/guava/guava/r07/guava-r07.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/mahout/hadoop/hadoop-core/0.20.1/hadoop-core-0.20.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpclient/4.1.1/httpclient-4.1.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpcore/4.1.2/httpcore-4.1.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.9.0/jackson-core-asl-1.9.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/RoSuDA/JRclient/RF503/JRclient-RF503.jar"/>
+  <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/jython/jython/2.1/jython-2.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/poi/poi/3.7/poi-3.7.jar"/>
+  <classpathentry kind="var" path="M2_REPO/net/sourceforge/picard/sam/1.36/sam-1.36.jar"/>
+  <classpathentry kind="var" path="M2_REPO/stax/stax-api/1.0.1/stax-api-1.0.1.jar"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+</classpath>

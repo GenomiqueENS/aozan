@@ -1,0 +1,202 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>fr.ens.transcriptome</groupId>
+  <artifactId>aozan</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>aozan</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>fr.ens.transcriptome</groupId>
+      <artifactId>eoulsan</artifactId>
+      <version>1.1-SNAPSHOT</version>
+    </dependency> 
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>
+      <version>3.7</version>
+    </dependency> 
+    <dependency>
+      <groupId>jython</groupId>
+      <artifactId>jython</artifactId>
+      <version>2.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>create-dist</id>
+            <phase>package</phase>
+            <configuration>
+              <tasks>
+
+                <!-- Package binary distribution -->
+
+                <mkdir dir="${basedir}/target/dist/lib"/>
+                <mkdir dir="${basedir}/target/dist/python"/>
+
+                <copy file="${basedir}/src/main/bin/${pom.artifactId}.sh" todir="${basedir}/target/dist/" />
+                <chmod file="${basedir}/target/dist/${pom.artifactId}.sh" perm="ugo+rx" />
+                <copy file="${basedir}/src/main/bin/jython.sh" todir="${basedir}/target/dist/" />
+                <chmod file="${basedir}/target/dist/jython.sh" perm="ugo+rx" />
+
+                <copy todir="${basedir}/target/dist/python">
+                  <fileset dir="${basedir}/src/main/python">
+                    <include name="*"/>
+                  </fileset>
+                </copy>
+            
+                <copy file="${basedir}/target/${pom.artifactId}-${pom.version}.jar" todir="${basedir}/target/dist/lib" />
+                <move file="${basedir}/target/dist/" tofile="${basedir}/target/dist/${pom.artifactId}-${pom.version}"/>
+
+                <!-- Package source distribution -->
+
+                <mkdir dir="${basedir}/target/dist-src/"/>
+                <copy todir="${basedir}/target/dist-src/">
+                  <fileset dir="${basedir}">
+                    <include name="src/**"/>
+                    <include name="pom.xml"/>
+                    <include name="checkstyle.xml"/>
+                    <include name="checkstyle-license.txt"/>
+                    <include name="COMPILING.txt"/>
+                    <include name="INSTALL.txt"/>
+                    <include name="LICENSE-LGPL.txt"/>
+                    <include name="LICENSE-CeCILL-C.txt"/>
+                  </fileset>
+                </copy>
+                <move file="${basedir}/target/dist-src/" tofile="${basedir}/target/dist-src/${pom.artifactId}-${pom.version}"/>
+    
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>compress-dists</id>
+            <phase>package</phase>
+            <configuration>
+              <tasks unless="distrib.package.compression.skip">
+
+                <!-- skip this task with command: mvn -Ddistrib.package.compression.skip=true -->
+                <!-- Compress dist-src -->
+
+
+                <tar longfile="gnu" destfile="${basedir}/target/${pom.artifactId}-${pom.version}.tar">
+                  <tarfileset dir="${basedir}/target/dist"  mode="644" dirmode="755" username="nobody" group="nobody">
+                    <include name="*/**"/>
+                    <exclude name="${pom.artifactId}-${pom.version}/${pom.artifactId}.sh" />
+                  </tarfileset>
+                  <tarfileset dir="${basedir}/target/dist"  mode="755" dirmode="755" username="nobody" group="nobody">
+                    <include name="${pom.artifactId}-${pom.version}/${pom.artifactId}.sh" />
+                  </tarfileset>
+                </tar>
+                <gzip zipfile="${basedir}/target/${artifactId}-${version}.tar.gz"
+                      src="${basedir}/target/${artifactId}-${version}.tar"/>
+                <bzip2 destfile="${basedir}/target/${artifactId}-${version}.tar.bz2"
+                       src="${basedir}/target/${artifactId}-${version}.tar"/>
+                <untar src="${basedir}/target/${pom.artifactId}-${pom.version}.tar" 
+                       dest="${basedir}/target/tar-bin"/>
+                <zip destfile="${basedir}/target/${artifactId}-${version}.zip"
+                     basedir="${basedir}/target/tar-bin"/>
+
+                <!-- Compress dist-src -->
+                <tar longfile="gnu" tarfile="${basedir}/target/${artifactId}-src-${version}.tar">
+                  <tarfileset dir="${basedir}/target/dist-src"  mode="755" username="nobody" group="nobody">
+                    <include name="*/**"/>
+                  </tarfileset>
+                </tar>
+
+                <gzip zipfile="${basedir}/target/${artifactId}-src-${version}.tar.gz"
+                      src="${basedir}/target/${artifactId}-src-${version}.tar"/>
+                <bzip2 destfile="${basedir}/target/${artifactId}-src-${version}.tar.bz2"
+                       src="${basedir}/target/${artifactId}-src-${version}.tar"/>
+
+                <untar src="${basedir}/target/${pom.artifactId}-src-${pom.version}.tar" 
+                       dest="${basedir}/target/tar-src"/>
+                <zip destfile="${basedir}/target/${artifactId}-src-${version}.zip"
+                     basedir="${basedir}/target/tar-src"/>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>fr.ens.transcriptome</groupId>
+                  <artifactId>eoulsan</artifactId>
+                  <version>1.1-SNAPSHOT</version>
+                  <!--type></type-->
+                  <!--classifier> [classifier - optional] </classifier-->
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
+                  <destFileName>eoulsan.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.apache.poi</groupId>
+                  <artifactId>poi</artifactId>
+                  <version>3.7</version>
+                  <!--type></type-->
+                  <!--classifier> [classifier - optional] </classifier-->
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
+                  <destFileName>poi.jar</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
