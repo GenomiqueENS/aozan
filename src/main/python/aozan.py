@@ -6,7 +6,7 @@ Created on 25 oct. 2011
 '''
 
 import sys, os
-import common, hiseq, sync_run, demux_run
+import common, hiseq_run, sync_run, demux_run, qc_run
 
 def create_lock_file(lock_file_path):
     """Create the lock file.
@@ -28,21 +28,28 @@ def delete_lock_file(lock_file_path):
     os.unlink(lock_file_path)
 
 # Enable debug mode 
-debug = True
+debug = False
 
 # Main function
 if __name__ == "__main__":
 
+    # Create configuration
     conf = {}
+    common.set_default_conf(conf)
 
     if debug:
-        conf = common.load_test_conf()
+        conf = common.set_test_conf(conf)
     else:
-        if len(sys.argv) < 2:
-            print "No configuration file set in command line.\nSyntax: aozan.py conf_file"
+        if len(sys.argv) < 1:
+            print "No configuration file define in command line.\nSyntax: aozan.py conf_file"
             sys.exit(1)
         else:
-            conf = common.load_conf(sys.argv[1])
+            conf = common.load_conf(conf, sys.argv[0])
+
+    print conf
+
+    # Check critical free space available
+    hiseq_run.send_mail_if_critical_free_space_available(conf)
 
     lock_file_path = conf['lock.file']
 
@@ -52,29 +59,60 @@ if __name__ == "__main__":
         create_lock_file(lock_file_path)
 
         print "Aozan v0.01"
+
+
+        #
+        # Discover hiseq run done
+        #
+
+        hiseq_run_ids_done = hiseq_run.load_processed_run_ids(conf)
+
+        for run_id in (hiseq_run_ids_done - hiseq_run.get_available_run_ids(conf)):
+            print "Find a new run " + run_id
+            hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
+            hiseq_run.add_run_id_to_processed_run_ids(run_id)
+            hiseq_run_ids_done.add(run_id)
+
+        #
+        # Sync hiseq and storage
+        #
+
         sync_run_ids_done = sync_run.load_processed_run_ids(conf)
 
-
         # Get the list of run available on HiSeq output
-        for run_id in hiseq.get_available_run_ids(conf):
-            print "Found " + run_id
-            if hiseq.check_run_id(run_id, conf) and run_id not in sync_run_ids_done:
-                print "Synchronize " + run_id
-                #os.system(process_run_script + " " + str(run_id) + " " + hiseq_data_path + " " + work_data_path + " " + storage_data_path)
-                #if sync_run.sync(run_id, conf):
-                    #sync_run.add_run_id_to_processed_run_ids(run_id)
-                    #sync_run_ids_done.add(run_id)
+        for run_id in (hiseq_run_ids_done - sync_run_ids_done):
+            print "Synchronize " + run_id
+            if sync_run.sync(run_id, conf):
+                    sync_run.add_run_id_to_processed_run_ids(run_id)
+                    sync_run_ids_done.add(run_id)
+
+        #
+        # Demultiplexing
+        #
 
         demux_run_ids_done = demux_run.load_processed_run_ids(conf)
 
         for run_id in (sync_run_ids_done - demux_run_ids_done):
                 print "Demux " + run_id
-                if not demux_run.demux(run_id, conf):
-                    print "Error in demux"
-                    break
+                if demux_run.demux(run_id, conf):
+                    demux_run.add_run_id_to_processed_run_ids(run_id)
+                    demux_run_ids_done.add(run_id)
+
+        #
+        # Quality control
+        #
+
+        qc_run_ids_done = qc_run.load_processed_run_ids(conf)
+        for run_id in (demux_run_ids_done - qc_run_ids_done):
+                print "Qc " + run_id
+                if qc_run.qc(run_id, conf):
+                    qc_run.add_run_id_to_processed_run_ids(run_id)
+                    qc_run_ids_done.add(run_id)
 
         delete_lock_file(lock_file_path)
 
         print "End of Aozan."
     else:
         print "A lock file exists."
+        common.error('[Aozan] A lock file exists', 'A lock file exist on gna at ' + conf['lock.file'] +
+                     ". Please investigate last error and then remove the lock file.", conf['aozan.var.path'] + '/aozan.lasterr', conf)

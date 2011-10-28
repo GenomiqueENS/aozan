@@ -21,9 +21,9 @@ def df(path):
     #s = os.statvfs('/')
     #return (s.f_bavail * s.f_frsize)
     if os.path.exists(path):
-        return File(path).getFreeSpace()
-    
-    return 0
+        return long(File(path).getFreeSpace())
+
+    return 0L
 
 def du(path):
     """Get the disk usage of a directory.
@@ -36,8 +36,8 @@ def du(path):
     lines = child_stdout.readlines()
     child_stdin.close()
     child_stdout.close()
-            
-    return lines[0].split('\t')[0]
+
+    return long(lines[0].split('\t')[0])
 
 
 def send_msg(subject, message, conf):
@@ -101,18 +101,18 @@ def error(short_message, message, last_error_file_path, conf):
     """
 
     new_error = short_message + message
-    new_error.replace('\n','')
+    new_error.replace('\n', '')
 
     if os.path.exists(last_error_file_path):
         f = open(last_error_file_path, 'r')
         last_error = f.readline()
         f.close()
-        
+
         if not new_error == last_error:
             send_msg(short_message, message, conf)
     else:
-        send_msg(short_message, message, conf) 
-            
+        send_msg(short_message, message, conf)
+
     f = open(last_error_file_path, 'w')
     f.write(new_error)
     f.close()
@@ -155,66 +155,60 @@ def add_run_id_to_processed_run_ids(run_id, done_file_path):
     f.close()
 
 
-def load_conf(conf_file_path):
+def load_conf(conf, conf_file_path):
     """Load configuration file"""
-
-    result = {}
 
     f = open(conf_file_path, 'r')
 
     for l in f:
         s = l[:-1].strip()
-        if len(s) == 0 or l[0]=='#' :
+        if len(s) == 0 or l[0] == '#' :
             continue
         fields = s.split('=')
         if len(fields) == 2:
-            result[fields[0].strip()] = fields[1].strip()
+            conf[fields[0].strip()] = fields[1].strip()
 
     f.close()
 
-    return result
 
-def load_test_conf():
-
-    result = {}
-
-    # HiSeq
-    result['hiseq.sn'] = 'SNL110'
-
-    # Mail configuration
-    result['send.mail'] = 'False'
-    result['smtp.server'] = 'smtp.biologie.ens.fr'
-    result['mail.from'] = 'jourdren@biologie.ens.fr'
-    result['mail.to'] = 'jourdren@biologie.ens.fr'
-
-    # Data paths
-    result['hiseq.data.path'] = '/import/freki01'
-    result['work.data.path'] = '/import/bara02/aozan_work'
-    result['fastq.data.path'] = '/import/bara02/aozan_work'
-    result['storage.data.path'] = '/import/mimir03/sequencages/runs'
-    result['casava.designs.path'] = '/import/mimir03/sequencages/casava_designs'
-    result['tmp.path'] = '/tmp'
+def set_default_conf(conf):
 
     # Lock file
-    result['lock.file'] = '/var/lock/aozan.lock'
+    conf['lock.file'] = '/var/lock/aozan.lock'
 
     # Casava
-    result['casava.path'] = '/usr/local/casava'
-    result['casava.compression'] = 'bzip2'
-    result['casava.fastq.cluster.count'] = '1000000000'
-    result['casava.compression.level'] = '9'
-    result['casava.mismatches'] = '0'
-    result['casava.threads'] = '4'
+    conf['casava.path'] = '/usr/local/casava'
+    conf['casava.compression'] = 'bzip2'
+    conf['casava.fastq.cluster.count'] = '1000000000'
+    conf['casava.compression.level'] = '9'
+    conf['casava.mismatches'] = '0'
+    conf['casava.threads'] = '4'
 
-    # Achievement files
-    result['sync.done.file'] = '/home/jourdren/tmp/sync.done'
-    result['demux.done.file'] = '/home/jourdren/tmp/demux.done'
-    result['qc.done.file'] = '/home/jourdren/tmp/qc.done'
-    
-    # Last error files
-    result['sync.last.error.file'] = '/home/jourdren/tmp/sync.lasterr'
-    result['demux.last.error.file'] = '/home/jourdren/tmp/demux.lasterr'
-    result['qc.last.error.file'] = '/home/jourdren/tmp/qc.lasterr'
-    
+    # Data path
+    conf['tmp.path'] = '/tmp'
 
-    return result
+    # Space needed
+    conf['hiseq.warning.min.space'] = str(3 * 1024 * 1024 * 1024 * 1024)
+    conf['hiseq.critical.min.space'] = str(1 * 1024 * 1024 * 1024 * 1024)
+    conf['sync.space.factor'] = str(0.2)
+    conf['demux.space.factor'] = str(0.6)
+
+def set_test_conf(conf):
+
+    # HiSeq
+    conf['hiseq.sn'] = 'SNL110'
+
+    # Mail configuration
+    conf['send.mail'] = 'False'
+    conf['smtp.server'] = 'smtp.biologie.ens.fr'
+    conf['mail.from'] = 'jourdren@biologie.ens.fr'
+    conf['mail.to'] = 'jourdren@biologie.ens.fr'
+
+    # Data paths
+    conf['aozan.var.path'] = '/home/jourdren/tmp'
+    conf['hiseq.data.path'] = '/import/freki01'
+    conf['work.data.path'] = '/import/bara02/aozan_work'
+    conf['fastq.data.path'] = '/import/bara02/aozan_work'
+    conf['reports.data.path'] = '/import/mimir03/sequencages/runs'
+    conf['casava.designs.path'] = '/import/mimir03/sequencages/casava_designs'
+
