@@ -44,7 +44,7 @@ def send_msg(subject, message, conf):
     """Send a message to the user about the data extraction."""
 
 
-    send_mail = conf['send.mail'] == 'true'
+    send_mail = conf['send.mail'].lower() == 'true'
     smtp_server = conf['smtp.server']
     mail_to = conf['mail.to']
     mail_from = conf['mail.from']
@@ -164,7 +164,7 @@ def load_conf(conf_file_path):
 
     for l in f:
         s = l[:-1].strip()
-        if len(s) == 0:
+        if len(s) == 0 or l[0]=='#' :
             continue
         fields = s.split('=')
         if len(fields) == 2:
