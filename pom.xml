@@ -121,9 +121,11 @@
                   <tarfileset dir="${basedir}/target/dist"  mode="644" dirmode="755" username="nobody" group="nobody">
                     <include name="*/**"/>
                     <exclude name="${pom.artifactId}-${pom.version}/${pom.artifactId}.sh" />
+                    <exclude name="${pom.artifactId}-${pom.version}/jython.sh" />
                   </tarfileset>
                   <tarfileset dir="${basedir}/target/dist"  mode="755" dirmode="755" username="nobody" group="nobody">
                     <include name="${pom.artifactId}-${pom.version}/${pom.artifactId}.sh" />
+                    <include name="${pom.artifactId}-${pom.version}/jython.sh" />
                   </tarfileset>
                 </tar>
                 <gzip zipfile="${basedir}/target/${artifactId}-${version}.tar.gz"
@@ -185,8 +187,6 @@
                   <groupId>org.apache.poi</groupId>
                   <artifactId>poi</artifactId>
                   <version>3.7</version>
-                  <!--type></type-->
-                  <!--classifier> [classifier - optional] </classifier-->
                   <overWrite>true</overWrite>
                   <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
                   <destFileName>poi.jar</destFileName>
