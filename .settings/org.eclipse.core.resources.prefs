@@ -1,7 +1,6 @@
-#Tue Oct 25 18:33:48 CEST 2011
+#Fri Oct 28 14:35:29 CEST 2011
 eclipse.preferences.version=1
 encoding//src/main/python/common.py=utf-8
 encoding//src/main/python/demux_run.py=utf-8
-encoding//src/main/python/hiseq.py=utf-8
+encoding//src/main/python/hiseq_run.py=utf-8
 encoding//src/main/python/sync_run.py=utf-8
-encoding//src/main/python/test.py=utf-8
