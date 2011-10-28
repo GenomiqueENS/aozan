@@ -27,8 +27,7 @@ done
 
 
 MAIN_CLASS=fr.ens.transcriptome.aozan.Main
-#CMD="$JAVA_ARGS -cp $CLASSPATH -Djython.home=$JYTHON_HOME -Dpython.module.path=$PYTHON_MODULE_PATH $MAIN_CLASS"
-CMD="$JAVA_ARGS -cp $CLASSPATH -Djython.home=$JYTHON_HOME $MAIN_CLASS"
+CMD="$JAVA_ARGS -cp $CLASSPATH -Djython.home=$JYTHON_HOME -Dpython.module.path=$PYTHON_MODULE_PATH $MAIN_CLASS"
 
 foo=0
 while [ "$foo" -le $(($BASH_ARGC-1)) ]

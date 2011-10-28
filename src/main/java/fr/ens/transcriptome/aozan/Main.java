@@ -25,6 +25,7 @@ public class Main {
     final Properties props = new Properties();
 
     props.setProperty("python.home", System.getProperty("jython.home"));
+    props.setProperty("python.path", System.getProperty("python.module.path"));
     props.setProperty("python.cachedir", System.getProperty("user.home")
         + File.separator + (File.separator.equals("/") ? "." : "") + "jython");
 
@@ -32,7 +33,7 @@ public class Main {
     final PythonInterpreter interp = new PythonInterpreter();
 
     try {
-      interp.execfile(new FileInputStream(scriptFile));
+      interp.execfile(new FileInputStream(scriptFile),scriptFile.toString());
 
     } catch (FileNotFoundException e) {
       System.err.println("File not found: " + scriptFile);
