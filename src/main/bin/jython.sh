@@ -5,7 +5,7 @@ me=$(dirname $0)
 AOZAN_HOME=$(dirname $0)
 SGDB_LIB_HOME=/import/mimir03/lib
 JYTHON_HOME=$SGDB_LIB_HOME/jython
-EOULSAN_HOME=$SGDB_LIB_HOME/eoulsan
+PYTHON_MODULE_PATH=$me/python
 
 JAVA_ARGS="-client -Xmx2048m"
 JAVA_CMD=java
@@ -17,7 +17,7 @@ if [ `uname` = "Darwin" ]; then
 fi
 
 export JYTHONPATH=$JYTHONPATH:.
-CLASSPATH="$EOULSAN_HOME/lib/eoulsan.jar:$JYTHON_HOME/jython.jar"
+CLASSPATH="$JYTHON_HOME/jython.jar"
 
 for j in `ls $AOZAN_HOME/lib/*.jar`
 do
@@ -27,6 +27,7 @@ done
 
 
 MAIN_CLASS=fr.ens.transcriptome.aozan.Main
+#CMD="$JAVA_ARGS -cp $CLASSPATH -Djython.home=$JYTHON_HOME -Dpython.module.path=$PYTHON_MODULE_PATH $MAIN_CLASS"
 CMD="$JAVA_ARGS -cp $CLASSPATH -Djython.home=$JYTHON_HOME $MAIN_CLASS"
 
 foo=0
@@ -39,5 +40,5 @@ do
 done
 
 
-
+echo $CMD
 echo $CMD | xargs java
