@@ -6,8 +6,7 @@ Created on 25 oct. 2011
 @author: Laurent Jourdren
 '''
 
-import smtplib
-import os.path
+import smtplib, os.path, time
 from java.io import File
 
 
@@ -51,6 +50,7 @@ def send_msg(subject, message, conf):
     mail_cc = None
     mail_bcc = None
 
+    message = conf['mail.header'].replace('\\n','\n') + message + conf['mail.footer'].replace('\\n','\n')
     message = message.replace('\n', '\r\n')
     msg = ''
 
@@ -118,6 +118,42 @@ def error(short_message, message, last_error_file_path, conf):
     f.close()
 
 
+def log(level, message, conf):
+    """Log message.
+    
+    Arguments:
+        level: log level
+        message: message to log
+        conf: configuration dictionary
+    """
+    
+    print(level+": " + message)
+
+
+def duration_to_human_readable(time):
+    """Convert a number of seconds in human readable string.
+    
+    Arguments:
+        time: the number of seconds
+    """    
+    
+    hours = int(time / 3600)
+    hours_rest = time % 3600
+    minutes = int(hours_rest / 60)
+    minutes_rest = time % 60
+    seconds = int(minutes_rest)
+
+    return "%02d:%02d:%02d" % (hours, minutes, seconds)
+
+def time_to_human_readable(time_since_epoch):
+    """Convert a number of seconds since epoch in a human readable string.
+
+    Arguments:
+        time: the number of seconds
+    """   
+
+    return time.strftime("%a %b %d %H:%M:%S %Z %Y", time.localtime(time_since_epoch))
+
 def load_processed_run_ids(done_file_path):
     """Load the list of the processed run ids.
 
@@ -169,6 +205,7 @@ def load_conf(conf, conf_file_path):
             conf[fields[0].strip()] = fields[1].strip()
 
     f.close()
+    return conf
 
 
 def set_default_conf(conf):
@@ -192,6 +229,11 @@ def set_default_conf(conf):
     conf['hiseq.critical.min.space'] = str(1 * 1024 * 1024 * 1024 * 1024)
     conf['sync.space.factor'] = str(0.2)
     conf['demux.space.factor'] = str(0.6)
+    
+    # Mail configuration
+    conf['mail.header'] = 'This is an automated message.\\n\\n'
+    conf['mail.footer'] = '\\n\\nThe Aozan team.\\n'
+    
 
 def set_test_conf(conf):
 

@@ -36,7 +36,7 @@ import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignWriter;
 public class CasavaDesignXLSToCSV {
 
   public static final void convertCasavaDesignXLSToCSV(final String inputPath,
-      final String outputPath) throws EoulsanException {
+      final String outputPath, final String flowCellId) throws EoulsanException {
 
     final File fileIn = new File(inputPath);
     final File fileOut = new File(outputPath);
@@ -49,7 +49,7 @@ public class CasavaDesignXLSToCSV {
       throw new EoulsanException(e.getMessage());
     }
 
-    CasavaDesignUtil.checkCasavaDesign(design);
+    CasavaDesignUtil.checkCasavaDesign(design, flowCellId);
 
     try {
       final CasavaDesignWriter writer = new CasavaDesignCSVWriter(fileOut);

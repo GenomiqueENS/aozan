@@ -157,12 +157,12 @@ def get_available_run_ids(conf):
 	"""
 
 	hiseq_data_path = conf['hiseq.data.path']
-	result = []
+	result = set()
 
 	files = os.listdir(hiseq_data_path)
 	for f in files:
 		if os.path.isdir(hiseq_data_path + '/' + f) and check_run_id(f, conf):
-			result.append(f)
+			result.add(f)
 
 	return result
 
@@ -175,14 +175,24 @@ def get_run_number(run_id):
 
 	return int(run_id.split('_')[2])
 
+def get_flow_cell(run_id):
+	"""Get the flow cell id from the run id.
+
+	Arguments:
+		run_id: the run id
+	"""
+
+	return run_id.split('_')[3][1:]
+	
+
 def send_mail_if_critical_free_space_available(conf):
 
-	df = common.du(conf['hiseq.data.path'])
+	df = common.df(conf['hiseq.data.path'])
 	free_space_threshold = long(conf['hiseq.critical.min.space'])
 	if df < free_space_threshold:
 		common.send_msg('[Aozan] Critical: Not enough disk space on Hiseq storage for current run',
 					'There is only %.2f' % (df / (1024 * 1024 * 1024)) + ' Gb left for Hiseq run storage.' +
-					' The current warning threshold is set to %.2f' % (df / (1024 * 1024 * 1024)) + ' Gb.', conf)
+					' The current warning threshold is set to %.2f' % (free_space_threshold / (1024 * 1024 * 1024)) + ' Gb.', conf)
 
 def send_mail_if_recent_run(run_id, secs, conf):
 
@@ -193,7 +203,7 @@ def send_mail_if_recent_run(run_id, secs, conf):
 	if df < free_space_threshold:
 		common.send_msg('[Aozan] WARNING: Not enough disk space on Hiseq storage to save a 100b indexed pair-end run',
 					'There is only %.2f' % (df / (1024 * 1024 * 1024)) + ' Gb left for Hiseq run storage.' +
-					' The current warning threshold is set to %.2f' % (df / (1024 * 1024 * 1024)) + ' Gb.', conf)
+					' The current warning threshold is set to %.2f' % (free_space_threshold / (1024 * 1024 * 1024)) + ' Gb.', conf)
 
 	last = check_end_run_since(run_id, secs, conf)
 
@@ -201,6 +211,6 @@ def send_mail_if_recent_run(run_id, secs, conf):
 		df = common.df(run_path) / (1024 * 1024 * 1024)
 		du = common.du(run_path) / (1024 * 1024)
 		common.send_msg('[Aozan] End of HiSeq run %04d' % get_run_number(run_id), 'A new run (' + run_id + ') has been terminated at ' +
-					time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime(last)) + '.\n' +
+					common.time_to_human_readable(last) + '.\n' +
 					'Data for this run can be found at: ' + run_path +
 					'\n\n%.2f Gb has been used,' % du + ' %.2f Gb still free.' % df, conf)

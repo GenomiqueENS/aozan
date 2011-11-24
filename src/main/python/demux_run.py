@@ -52,12 +52,47 @@ def demux(run_id, conf):
     """
 
     start_time = time.time()
+    
+    reports_data_base_path = conf['reports.data.path']
+    reports_data_path = reports_data_base_path + '/' + run_id
+    
+    
     run_number = hiseq_run.get_run_number(run_id)
+    flow_cell_id = hiseq_run.get_flow_cell(run_id)
     design_xls_path = conf['casava.designs.path'] + '/design-%04d.xls' % run_number
     design_csv_path = conf['tmp.path'] + '/design-%04d.csv' % run_number
+    fastq_output_dir = conf['fastq.data.path'] + '/fastq_%04d' % hiseq_run.get_run_number(run_id)
+    
+    basecall_stats_prefix = 'basecall_stats_'
+    basecall_stats_file =  basecall_stats_prefix + run_id + '.tar.bz2'
+    
 
-    #fastq_output_dir = conf['fastq.data.path'] + '/' + run_id
-    fastq_output_dir = conf['fastq.data.path'] + '/result_casava_%04d' % hiseq_run.get_run_number(run_id)
+    common.log("DEBUG", "Flowcell id: " + flow_cell_id, conf)
+    
+    # Check if input data exists
+    if not os.path.exists(conf['work.data.path']):
+        error("Input data directory does not exists", "Input data directory does not exists: " + conf['work.data.path'], conf)
+        return False
+
+    # Check if casava designs path exists
+    if not os.path.exists(conf['casava.designs.path']):
+        error("Casava designs directory does not exists", "Casava designs does not exists: " + conf['casava.designs.path'], conf)
+        return False
+    
+    # Check if temporary directory exists
+    if not os.path.exists(conf['tmp.path']):
+        error("Temporary directory does not exists", "Temporary directory does not exists: " + conf['tmp.path'], conf)
+        return False
+    
+    # Check if reports_data_path exists
+    if not os.path.exists(reports_data_base_path):
+        error("Report directory does not exists", "Report directory does not exists: " + reports_data_base_path, conf)
+        return False
+    
+    # Create if not exists archive directory for the run
+    if not os.path.exists(reports_data_base_path + '/' + run_id):
+        os.mkdir(reports_data_base_path + '/' + run_id)    
+
 
     # Check if the xls design exists
     if not os.path.exists(design_xls_path):
@@ -74,18 +109,25 @@ def demux(run_id, conf):
 
     # Compute disk usage and disk free to check if enough disk space is available 
     input_path_du = common.du(conf['work.data.path'] + '/' + run_id)
-    output_df = common.df(fastq_output_dir)
+    output_df = common.df(conf['fastq.data.path'])
     du_factor = float(conf['sync.space.factor'])
     space_needed = input_path_du * du_factor
 
+    common.log("DEBUG", "Demux step: input disk usage: " + str(input_path_du), conf)
+    common.log("DEBUG", "Demux step: output disk free: " + str(output_df), conf)
+    common.log("DEBUG", "Demux step: space needed: " + str(space_needed), conf)
+
     # Check if free space is available 
     if output_df < space_needed:
-        error("Not enough disk space to perform synchronization for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id +
-              '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + du_factor + ') on ' + fastq_output_dir + '.', conf)
+        error("Not enough disk space to perform demultiplexing for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id +
+              '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + fastq_output_dir + '.', conf)
+        return False
+
+    
 
     # Convert design in XLS format to CSV format
     try:
-        CasavaDesignXLSToCSV.convertCasavaDesignXLSToCSV(design_xls_path, design_csv_path)
+        CasavaDesignXLSToCSV.convertCasavaDesignXLSToCSV(design_xls_path, design_csv_path, flow_cell_id)
     except EoulsanException, exp:
         error("error while converting design-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
         return False
@@ -99,6 +141,7 @@ def demux(run_id, conf):
           '--input-dir ' + conf['work.data.path'] + '/' + run_id + '/Data/Intensities/BaseCalls ' + \
           '--sample-sheet ' + design_csv_path + ' ' + \
           '--output-dir ' + fastq_output_dir
+    common.log("DEBUG", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while creating Casava makefile for run " + run_id, 'Error while creating Casava makefile.\nCommand line:\n' + cmd, conf)
         return False
@@ -108,24 +151,40 @@ def demux(run_id, conf):
 
     # Launch casava
     cmd = "cd " + fastq_output_dir + " && make -j " + str(cpu_count)
+    common.log("DEBUG", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while running Casava for run " + run_id, 'Error while creating Casava makefile.\nCommand line:\n' + cmd, conf)
         return False
 
     # Copy design to output directory
     cmd = "cp -p " + design_csv_path + ' ' + fastq_output_dir
+    common.log("DEBUG", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while copying design file to the fastq directory for run " + run_id, 'Error while copying design file to fastq directory.\nCommand line:\n' + cmd, conf)
         return False
 
+    # Archive basecall stats
+    cmd = 'cd ' + fastq_output_dir + ' &&  mv Basecall_Stats_' + flow_cell_id + ' ' + basecall_stats_prefix + run_id + ' && ' + \
+        'tar cjf ' + reports_data_path + '/' + basecall_stats_file + ' ' + basecall_stats_prefix + run_id + ' && ' + \
+        'cp -rp ' + basecall_stats_prefix + run_id + ' ' + reports_data_path + ' && ' + \
+        'mv ' + basecall_stats_prefix + run_id + ' Basecall_Stats_' + flow_cell_id
+    common.log("DEBUG", "exec: " + cmd, conf)
+    if os.system(cmd) != 0:
+        error("error while saving the basecall stats file for " + run_id, 'Error while saving the basecall stats files.\nCommand line:\n' + cmd, conf)
+        return False
+
     # The output directory must be read only
-    cmd = 'chmod -R ugo-w ' + fastq_output_dir
+    cmd = 'chmod -R ugo-w ' + fastq_output_dir + '/Project_*'
+    common.log("DEBUG", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while setting read only the output fastq directory for run " + run_id, 'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
         return False
 
+
+
     # Add design to the archive of designs
     cmd = 'zip ' + conf['casava.designs.path'] + '/designs.zip ' + design_csv_path
+    common.log("DEBUG", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while archiving the design file for " + run_id, 'Error while archiving the design file for.\nCommand line:\n' + cmd, conf)
         return False
@@ -138,7 +197,10 @@ def demux(run_id, conf):
     du = common.du(fastq_output_dir) / (1024 * 1024)
 
     common.send_msg("[Aozan] End of demultiplexing for run " + run_id, \
-                    'End of demultiplexing for run ' + run_id + 'with no error in ' + str(duration) + ' seconds.\nFastq files for this run ' +
+                    'End of demultiplexing for run ' + run_id + '.' +
+                    'Job finished at ' + common.time_to_human_readable(time.time()) +
+                    ' with no error in ' + common.duration_to_human_readable(duration) + '.\n\n' + 
+                    'Fastq files for this run ' +
                     'can be found in the following directory:\n  ' + fastq_output_dir + \
-                    '\n\n%.2f Gb has been used,' % du + ' %.2f Gb still free.' % df, conf)
+                    '\n\n%.For this task 2f GB has been used and %.2f GB still free.' % (du, df), conf)
     return True

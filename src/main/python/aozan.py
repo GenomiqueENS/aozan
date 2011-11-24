@@ -7,6 +7,7 @@ Created on 25 oct. 2011
 
 import sys, os
 import common, hiseq_run, sync_run, demux_run, qc_run
+from java.util import Locale
 
 def create_lock_file(lock_file_path):
     """Create the lock file.
@@ -36,17 +37,18 @@ if __name__ == "__main__":
     # Create configuration
     conf = {}
     common.set_default_conf(conf)
+    
+    # Use default (C) locale
+    Locale.setDefault(Locale.US)
 
     if debug:
-        conf = common.set_test_conf(conf)
+        common.set_test_conf(conf)
     else:
         if len(sys.argv) < 1:
             print "No configuration file define in command line.\nSyntax: aozan.py conf_file"
             sys.exit(1)
         else:
-            conf = common.load_conf(conf, sys.argv[0])
-
-    print conf
+            common.load_conf(conf, sys.argv[0])
 
     # Check critical free space available
     hiseq_run.send_mail_if_critical_free_space_available(conf)
@@ -70,7 +72,7 @@ if __name__ == "__main__":
         for run_id in (hiseq_run_ids_done - hiseq_run.get_available_run_ids(conf)):
             print "Find a new run " + run_id
             hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
-            hiseq_run.add_run_id_to_processed_run_ids(run_id)
+            hiseq_run.add_run_id_to_processed_run_ids(run_id, conf)
             hiseq_run_ids_done.add(run_id)
 
         #
@@ -83,7 +85,7 @@ if __name__ == "__main__":
         for run_id in (hiseq_run_ids_done - sync_run_ids_done):
             print "Synchronize " + run_id
             if sync_run.sync(run_id, conf):
-                    sync_run.add_run_id_to_processed_run_ids(run_id)
+                    sync_run.add_run_id_to_processed_run_ids(run_id, conf)
                     sync_run_ids_done.add(run_id)
 
         #
@@ -95,7 +97,7 @@ if __name__ == "__main__":
         for run_id in (sync_run_ids_done - demux_run_ids_done):
                 print "Demux " + run_id
                 if demux_run.demux(run_id, conf):
-                    demux_run.add_run_id_to_processed_run_ids(run_id)
+                    demux_run.add_run_id_to_processed_run_ids(run_id, conf)
                     demux_run_ids_done.add(run_id)
 
         #
@@ -106,7 +108,7 @@ if __name__ == "__main__":
         for run_id in (demux_run_ids_done - qc_run_ids_done):
                 print "Qc " + run_id
                 if qc_run.qc(run_id, conf):
-                    qc_run.add_run_id_to_processed_run_ids(run_id)
+                    qc_run.add_run_id_to_processed_run_ids(run_id, conf)
                     qc_run_ids_done.add(run_id)
 
         delete_lock_file(lock_file_path)
