@@ -223,6 +223,7 @@ def set_default_conf(conf):
 
     # Data path
     conf['tmp.path'] = '/tmp'
+    conf['index.sequences'] = ''
 
     # Space needed
     conf['hiseq.warning.min.space'] = str(3 * 1024 * 1024 * 1024 * 1024)

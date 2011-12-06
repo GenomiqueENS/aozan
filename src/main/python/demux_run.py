@@ -7,9 +7,13 @@ Created on 25 oct. 2011
 '''
 import os.path
 import common, hiseq_run, time
+from java.io import IOException
 from java.lang import Runtime
-from fr.ens.transcriptome.aozan import CasavaDesignXLSToCSV
+from java.util import HashMap
 from fr.ens.transcriptome.eoulsan import EoulsanException
+from fr.ens.transcriptome.aozan.io import CasavaDesignXLSReader
+from fr.ens.transcriptome.eoulsan.illumina import CasavaDesignUtil
+from fr.ens.transcriptome.eoulsan.illumina.io import CasavaDesignCSVWriter
 
 def load_processed_run_ids(conf):
     """Load the list of the processed run ids.
@@ -42,6 +46,35 @@ def error(short_message, message, conf):
 
     common.error('[Aozan] demultiplexer: ' + short_message, message, conf['aozan.var.path'] + '/demux.lasterr', conf)
 
+
+def load_index_sequences(conf):
+    """Load the map of the index sequences.
+
+    Arguments:
+        index_shortcut_path: the path to the index sequences
+    """
+
+    result = HashMap()
+
+    if conf['index.sequences'] == '' or not os.path.exists(conf['index.sequences']):
+            return result
+            
+    
+
+    f = open(conf['index.sequences'], 'r')
+
+    for l in f:
+        l = l[:-1]
+        if len(l) == 0:
+            continue
+        fields = l.split('=')
+        if len(fields)==2:
+            result[fields[0].strip().lower()]=fields[1].strip().upper()
+
+    f.close()
+
+    return result
+   
 
 def demux(run_id, conf):
     """Add a processed run id to the list of the run ids.
@@ -123,11 +156,23 @@ def demux(run_id, conf):
               '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + fastq_output_dir + '.', conf)
         return False
 
-    
-
     # Convert design in XLS format to CSV format
     try:
-        CasavaDesignXLSToCSV.convertCasavaDesignXLSToCSV(design_xls_path, design_csv_path, flow_cell_id)
+        # Load XLS design file
+        design = CasavaDesignXLSReader(design_xls_path).read()
+
+        # Replace index sequence shortcuts by sequences
+        CasavaDesignUtil.replaceIndexShortcutsBySequences(design, load_index_sequences(conf))
+        
+        # Check values of design file
+        CasavaDesignUtil.checkCasavaDesign(design, flow_cell_id)
+        
+        # Write CSV design file
+        CasavaDesignCSVWriter(design_csv_path).writer(design)
+        
+    except IOException, exp:
+        error("error while converting design-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
+        return False        
     except EoulsanException, exp:
         error("error while converting design-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
         return False

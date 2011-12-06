@@ -117,4 +117,14 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
     this.is = new FileInputStream(file);
   }
 
+  /**
+   * Public constructor
+   * @param filename Filename to use
+   */
+  public CasavaDesignXLSReader(final String filename)
+      throws FileNotFoundException {
+
+    this(new File(filename));
+  }
+
 }
