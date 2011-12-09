@@ -264,6 +264,9 @@ def load_processed_run_ids(done_file_path):
 
     result = set()
 
+    if not os.path.exists(done_file_path):
+        return result
+
     f = open(done_file_path, 'r')
 
     for l in f:
@@ -367,6 +370,7 @@ def set_default_conf(conf):
     # Global
     conf['aozan.enable'] = 'True'
     conf['send.mail'] = 'False'
+    conf['first.base.report.step'] = 'True'
     conf['hiseq.step'] = 'True'
     conf['sync.step'] = 'True'
     conf['demux.step'] = 'True'

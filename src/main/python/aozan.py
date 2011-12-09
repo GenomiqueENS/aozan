@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Aozan main file.
 Created on 25 oct. 2011
@@ -8,6 +9,7 @@ Created on 25 oct. 2011
 import sys, os
 import common, hiseq_run, sync_run, demux_run, qc_run
 from java.util import Locale
+import first_base_report
 
 def create_lock_file(lock_file_path):
     """Create the lock file.
@@ -28,6 +30,7 @@ def delete_lock_file(lock_file_path):
 
     os.unlink(lock_file_path)
 
+aozan_version = "0.2-SNAPSHOT"
 
 # Main function
 if __name__ == "__main__":
@@ -59,21 +62,35 @@ if __name__ == "__main__":
 
         create_lock_file(lock_file_path)
 
-        print "Aozan v0.1"
+        print "Aozan v" + aozan_version
 
+        #
+        # Discover first base report
+        #
+
+        first_base_report_sent = first_base_report.load_processed_run_ids(conf)
+
+        if conf['first.base.report.step'].lower().strip() == 'true':
+            for run_id in (first_base_report.get_available_run_ids(conf) - first_base_report_sent):
+                print first_base_report.get_available_run_ids(conf)
+                first_base_report.send_report(run_id, conf)
+                first_base_report.add_run_id_to_processed_run_ids(run_id, conf)
+                first_base_report_sent.add(run_id)
+            
 
         #
         # Discover hiseq run done
         #
 
         hiseq_run_ids_done = hiseq_run.load_processed_run_ids(conf)
-        
+         
         if conf['hiseq.step'].lower().strip() == 'true':
-            for run_id in (hiseq_run_ids_done - hiseq_run.get_available_run_ids(conf)):
+            for run_id in (hiseq_run.get_available_run_ids(conf) - hiseq_run_ids_done):
                 print "Find a new run " + run_id
                 hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
                 hiseq_run.add_run_id_to_processed_run_ids(run_id, conf)
                 hiseq_run_ids_done.add(run_id)
+
 
         #
         # Sync hiseq and storage
