@@ -46,7 +46,7 @@ def load_pid_in_lock_file(lock_file_path):
     return pid
    
 
-aozan_version = "0.3"
+aozan_version = "0.4"
 
 # Main function
 if __name__ == "__main__":

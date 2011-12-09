@@ -36,6 +36,11 @@
                         Fix issue when zip design files.
             </action>
         </release>
+        <release version="0.4" description="" date="2011-12-09">
+            <action dev="jourdren" type="fix">
+                        Fix issue with pid checking of already running aozan process.
+            </action>
+        </release> 
 		
 	</body>
 </document>
