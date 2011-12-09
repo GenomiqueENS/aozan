@@ -19,6 +19,7 @@ def create_lock_file(lock_file_path):
     """
 
     f = open(lock_file_path, 'w')
+    f.write(os.getpid())
     f.close()
 
 
@@ -32,37 +33,18 @@ def delete_lock_file(lock_file_path):
     os.unlink(lock_file_path)
 
 
-def create_pid_file(pid_file_path):
-    """Create the pid file.
+def load_pid_in_lock_file(lock_file_path):
+    """Load the pid in the lock file.
 
     Arguments:
-        pid_file_path path of the pid file
+        lock_file_path path of the pid file
     """
 
-    f = open(pid_file_path, 'w')
-    f.write(os.getpid())
-    f.close()
-   
-def load_pid_file(pid_file_path):
-    """Load the pid file.
-
-    Arguments:
-        pid_file_path path of the pid file
-    """
-
-    f = open(pid_file_path, 'r')
-    pid = int(f.readline())
+    f = open(lock_file_path, 'r')
+    pid = int(f.readline().strip())
     f.close()
     return pid
    
-def delete_pid_file(pid_file_path):
-    """Create the pid file.
-
-    Arguments:
-        pid_file_path path of the pid file
-    """
-
-    os.unlink(pid_file_path)
 
 aozan_version = "0.3"
 
@@ -90,15 +72,11 @@ if __name__ == "__main__":
     hiseq_run.send_mail_if_critical_free_space_available(conf)
 
     lock_file_path = conf['lock.file']
-    pid_file_path = conf['pid.file']
-    
 
     # Run only if there is no lock
     if not os.path.exists(lock_file_path):
 
         create_lock_file(lock_file_path)
-        
-
         print "Aozan v" + aozan_version
 
         #
@@ -174,11 +152,10 @@ if __name__ == "__main__":
                         qc_run_ids_done.add(run_id)
 
         delete_lock_file(lock_file_path)
-        delete_pid_file(pid_file_path)
 
         print "End of Aozan."
     else:
         print "A lock file exists."
-        if not os.path.exists('/proc//proc/%d' % (load_pid_file())):
+        if not os.path.exists('/proc/%d' % (load_pid_in_lock_file())):
             common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf['lock.file'] +
                          ". Please investigate last error and then remove the lock file.", conf['aozan.var.path'] + '/aozan.lasterr', conf)
