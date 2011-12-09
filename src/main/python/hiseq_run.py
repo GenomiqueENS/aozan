@@ -1,22 +1,8 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 import os, time
 from xml.etree.ElementTree import ElementTree
 import common
-
-# Globals
-#hiseq_data_path = '/import/freki01'
-#work_data_path = '/import/bara02/aozan_work'
-#storage_data_path = '/import/mimir03/sequencages/runs'
-
-#hiseq_sn = "SNL110"
-#hiseq_sn = "SN501"
-#base_path = '/usr/local/aozan'
-#processed_file_path = base_path + '/processed.txt'
-#lock_file_path = base_path + '/sync.lock'
-#lock_file_path = '/var/lock/aozan-sync.lock'
-#process_run_script = base_path + '/sync_run.sh'
 
 def load_processed_run_ids(conf):
 	"""Load the list of the processed run ids.
@@ -35,7 +21,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-	common.add_run_id_to_processed_run_ids(conf['aozan.var.path'] + '/hiseq.done')
+	common.add_run_id_to_processed_run_ids(run_id, conf['aozan.var.path'] + '/hiseq.done')
 
 
 
@@ -53,17 +39,8 @@ def get_reads_number(run_id, conf):
 	tree.parse(hiseq_data_path + '/' + run_id + "/runParameters.xml")
 
 	reads = tree.find("Setup/Reads")
-	list_reads = list(reads.iter("Read"))
 
-	print len(list_reads)
-
-	read_count = 0
-	for r in list_reads:
-		read_count += 1
-		print("\t" + str(read_count) + '\t' + 'NumCycles=' + r.get('NumCycles') + "\t" + 'IsIndexedRead=' + r.get('IsIndexedRead'))
-
-
-	return len(list_reads)
+	return len(reads)
 
 
 def check_end_run(run_id, conf):
@@ -75,7 +52,7 @@ def check_end_run(run_id, conf):
 	"""
 
 	hiseq_data_path = conf['hiseq.data.path']
-	reads_number = get_reads_number(run_id)
+	reads_number = get_reads_number(run_id, conf)
 
 	for i in range(reads_number):
 		if not os.path.exists(hiseq_data_path + '/' + run_id + '/Basecalling_Netcopy_complete_Read' + str(i + 1) + '.txt'):
@@ -93,7 +70,7 @@ def check_end_run_since(run_id, secs, conf):
 	"""
 
 	hiseq_data_path = conf['hiseq.data.path']
-	reads_number = get_reads_number(run_id)
+	reads_number = get_reads_number(run_id, conf)
 	last = 0
 
 	for i in range(reads_number):
@@ -118,23 +95,17 @@ def check_run_id(run_id, conf):
 		conf: configuration dictionary
 	"""
 
-	hiseq_sn = conf['hiseq.sn']
 	fields = run_id.strip().split("_")
 
 	if len(fields) != 4:
 		return False
 
 	date = fields[0]
-	sn = fields[1]
 	count = fields[2]
 	flow_cell_id = fields[3]
 
 	# Test the date
 	if not date.isdigit() or len(date) != 6:
-		return False
-
-	# test if the sn is the serial number of our HiSeq
-	if sn != hiseq_sn:
 		return False
 
 	# Test the run count
@@ -161,7 +132,7 @@ def get_available_run_ids(conf):
 
 	files = os.listdir(hiseq_data_path)
 	for f in files:
-		if os.path.isdir(hiseq_data_path + '/' + f) and check_run_id(f, conf):
+		if os.path.isdir(hiseq_data_path + '/' + f) and check_run_id(f, conf) and check_end_run(f, conf):
 			result.add(f)
 
 	return result
@@ -194,6 +165,11 @@ def get_instrument_sn(run_id):
 	return run_id.split('_')[1]	
 
 def send_mail_if_critical_free_space_available(conf):
+	"""Check if disk free space is critical. If true send a mail.
+
+    Arguments:
+        conf: configuration dictionary
+    """
 
 	df = common.df(conf['hiseq.data.path'])
 	free_space_threshold = long(conf['hiseq.critical.min.space'])
@@ -205,13 +181,6 @@ def send_mail_if_critical_free_space_available(conf):
 def send_mail_if_recent_run(run_id, secs, conf):
 
 	run_path = conf['hiseq.data.path'] + '/' + run_id
-
-	df = common.du(run_path)
-	free_space_threshold = long(conf['hiseq.warning.min.space'])
-	if df < free_space_threshold:
-		common.send_msg('[Aozan] WARNING: Not enough disk space on Hiseq storage to save a 100b indexed pair-end run',
-					'There is only %.2f' % (df / (1024 * 1024 * 1024)) + ' Gb left for Hiseq run storage.' +
-					' The current warning threshold is set to %.2f' % (free_space_threshold / (1024 * 1024 * 1024)) + ' Gb.', conf)
 
 	last = check_end_run_since(run_id, secs, conf)
 
