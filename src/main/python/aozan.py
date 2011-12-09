@@ -64,7 +64,7 @@ def delete_pid_file(pid_file_path):
 
     os.unlink(pid_file_path)
 
-aozan_version = "0.3-SNAPSHOT"
+aozan_version = "0.3"
 
 # Main function
 if __name__ == "__main__":

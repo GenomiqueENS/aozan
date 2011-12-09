@@ -20,6 +20,22 @@
                         While a run is running on HiSeq, send the first base report when available.
             </action>
         </release>
+        
+        <release version="0.3" description="" date="2011-12-09">
+            <action dev="jourdren" type="add">
+                        Add a hiseq.deny file that contains all the run ids to not process.
+            </action>
+            <action dev="jourdren" type="fix">
+                        Now save a file with the pid of aozan. Now send a mail with the lock error only when the lock pid no more exists.
+            </action>
+                        <action dev="jourdren" type="fix">
+                        Remove temporary files (design, hiseq_log_ directory).
+            </action>
+            </action>
+                        <action dev="jourdren" type="fix">
+                        Fix issue when zip design files.
+            </action>
+        </release>
 		
 	</body>
 </document>
