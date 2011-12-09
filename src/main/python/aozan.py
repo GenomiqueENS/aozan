@@ -21,6 +21,7 @@ def create_lock_file(lock_file_path):
     f = open(lock_file_path, 'w')
     f.close()
 
+
 def delete_lock_file(lock_file_path):
     """Create the lock file.
 
@@ -30,7 +31,40 @@ def delete_lock_file(lock_file_path):
 
     os.unlink(lock_file_path)
 
-aozan_version = "0.2"
+
+def create_pid_file(pid_file_path):
+    """Create the pid file.
+
+    Arguments:
+        pid_file_path path of the pid file
+    """
+
+    f = open(pid_file_path, 'w')
+    f.write(os.getpid())
+    f.close()
+   
+def load_pid_file(pid_file_path):
+    """Load the pid file.
+
+    Arguments:
+        pid_file_path path of the pid file
+    """
+
+    f = open(pid_file_path, 'r')
+    pid = int(f.readline())
+    f.close()
+    return pid
+   
+def delete_pid_file(pid_file_path):
+    """Create the pid file.
+
+    Arguments:
+        pid_file_path path of the pid file
+    """
+
+    os.unlink(pid_file_path)
+
+aozan_version = "0.3-SNAPSHOT"
 
 # Main function
 if __name__ == "__main__":
@@ -56,11 +90,14 @@ if __name__ == "__main__":
     hiseq_run.send_mail_if_critical_free_space_available(conf)
 
     lock_file_path = conf['lock.file']
+    pid_file_path = conf['pid.file']
+    
 
     # Run only if there is no lock
     if not os.path.exists(lock_file_path):
 
         create_lock_file(lock_file_path)
+        
 
         print "Aozan v" + aozan_version
 
@@ -72,7 +109,6 @@ if __name__ == "__main__":
 
         if conf['first.base.report.step'].lower().strip() == 'true':
             for run_id in (first_base_report.get_available_run_ids(conf) - first_base_report_sent):
-                print first_base_report.get_available_run_ids(conf)
                 first_base_report.send_report(run_id, conf)
                 first_base_report.add_run_id_to_processed_run_ids(run_id, conf)
                 first_base_report_sent.add(run_id)
@@ -86,12 +122,17 @@ if __name__ == "__main__":
          
         if conf['hiseq.step'].lower().strip() == 'true':
             for run_id in (hiseq_run.get_available_run_ids(conf) - hiseq_run_ids_done):
-                print "Find a new run " + run_id
                 hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
                 hiseq_run.add_run_id_to_processed_run_ids(run_id, conf)
                 hiseq_run_ids_done.add(run_id)
 
 
+        #
+        # Load run do not process
+        #
+
+        hiseq_run_ids_do_not_process = hiseq_run.load_deny_run_ids(conf)
+        
         #
         # Sync hiseq and storage
         #
@@ -100,7 +141,7 @@ if __name__ == "__main__":
 
         # Get the list of run available on HiSeq output
         if conf['sync.step'].lower().strip() == 'true':
-            for run_id in (hiseq_run_ids_done - sync_run_ids_done):
+            for run_id in (hiseq_run_ids_done - sync_run_ids_done - hiseq_run_ids_do_not_process):
                 print "Synchronize " + run_id
                 if sync_run.sync(run_id, conf):
                         sync_run.add_run_id_to_processed_run_ids(run_id, conf)
@@ -133,9 +174,11 @@ if __name__ == "__main__":
                         qc_run_ids_done.add(run_id)
 
         delete_lock_file(lock_file_path)
+        delete_pid_file(pid_file_path)
 
         print "End of Aozan."
     else:
         print "A lock file exists."
-        common.error('[Aozan] A lock file exists', 'A lock file exist on gna at ' + conf['lock.file'] +
-                     ". Please investigate last error and then remove the lock file.", conf['aozan.var.path'] + '/aozan.lasterr', conf)
+        if not os.path.exists('/proc//proc/%d' % (load_pid_file())):
+            common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf['lock.file'] +
+                         ". Please investigate last error and then remove the lock file.", conf['aozan.var.path'] + '/aozan.lasterr', conf)

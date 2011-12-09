@@ -378,6 +378,7 @@ def set_default_conf(conf):
 
     # Lock file
     conf['lock.file'] = '/var/lock/aozan.lock'
+    conf['pid.file'] = '/var/lock/azan.pid'
 
     # Casava
     conf['casava.path'] = '/usr/local/casava'

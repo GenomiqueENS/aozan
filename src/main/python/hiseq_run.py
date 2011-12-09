@@ -13,6 +13,15 @@ def load_processed_run_ids(conf):
 
 	return common.load_processed_run_ids(conf['aozan.var.path'] + '/hiseq.done')
 
+def load_deny_run_ids(conf):
+	"""Load the list of the run ids to not process.
+
+    Arguments:
+        conf: configuration dictionary
+    """
+
+	return common.load_processed_run_ids(conf['aozan.var.path'] + '/hiseq.deny')
+
 def add_run_id_to_processed_run_ids(run_id, conf):
 	"""Add a processed run id to the list of the run ids.
 
