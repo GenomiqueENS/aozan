@@ -208,6 +208,59 @@ def load_conf(conf, conf_file_path):
     return conf
 
 
+def create_html_index_file(conf, output_file_path, run_id):
+    """Create an index.html file that contains links to all the generated reports.
+
+    Arguments:
+        conf: configuration dictionary
+        output_file_path: path of the index.html file to create
+        run_id: The run id
+    """
+    
+    text = """<html>
+        <head>
+                <title>Run ###RUN_ID###</title>
+        </head>
+        <body>
+                <h1>Run ###RUN_ID### reports</h1>
+
+                <h2>HiSeq reports</h2>
+
+                <ul>
+                        <li><a href="report_###RUN_ID###/First_Base_Report.htm">First base report</a></li>
+                        <li><a href="report_###RUN_ID###/Status.htm">Run info</a></li>
+                        <li><a href="report_###RUN_ID###.tar.bz2">All reports(compressed archive)</a></li>
+                        <li><a href="hiseq_log_###RUN_ID###.tar.bz2">HiSeq log (compressed archive)</a></li>
+                </ul>
+
+                <h2>Demultiplexing reports (Only available after demultiplexing)</h2>
+
+                <ul>
+                        <li><a href="basecall_stats_###RUN_ID###/All.htm">All</a></li>
+                        <li><a href="basecall_stats_###RUN_ID###/IVC.htm">IVC</a></li>
+                        <li><a href="basecall_stats_###RUN_ID###/Demultiplex_Stats.htm">Demultiplex stats</a></li>
+                        <li><a href="basecall_stats_###RUN_ID###.tar.bz2">All reports(compressed archive)</a></li>
+                </ul>
+
+        </body>
+</html>"""
+
+    print "output_file_path:", output_file_path
+    print "run_id: ", run_id
+    print "template: ",  conf['index.html.template']
+    print "text: ", text.replace('###RUN_ID###', run_id)
+
+    template_path = conf['index.html.template']
+    if template_path!=None and template_path!='' and os.path.exists(template_path):
+        f_in = open(template_path, 'r')
+        text = ''.join(f_in.readlines())
+        f_in.close()
+        
+    f_out = open(output_file_path, 'w')
+    f_out.write(text.replace('###RUN_ID###', run_id))
+    f_out.close()
+
+
 def set_default_conf(conf):
 
     # Lock file
@@ -224,6 +277,8 @@ def set_default_conf(conf):
     # Data path
     conf['tmp.path'] = '/tmp'
     conf['index.sequences'] = ''
+    conf['index.html.template'] = ''
+    conf['reports.url'] = ''
 
     # Space needed
     conf['hiseq.warning.min.space'] = str(3 * 1024 * 1024 * 1024 * 1024)

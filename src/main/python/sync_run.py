@@ -96,7 +96,6 @@ def sync(run_id, conf):
         error("Not enough disk space to store aozan reports for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
               '.\nNeed more than 10 Gb on ' + reports_data_base_path + '.', conf)
 
-
     # Copy data from hiseq path to work path
     cmd = "rsync  -a --exclude '*.cif' --exclude '*_pos.txt' --exclude '*.errorMap' --exclude '*.FWHMMap' " + input_path + ' ' + work_data_path
     common.log("DEBUG", "exec: " + cmd, conf)
@@ -149,6 +148,9 @@ def sync(run_id, conf):
         error("error while saving Illumina html reports for run " + run_id, 'Error saving Illumina html reports.\nCommand line:\n' + cmd, conf)
         return False
 
+    # Create index.hml file
+    common.create_html_index_file(conf, reports_data_path + '/index.html', run_id)
+
     # Set read only archives files
     os.chmod(reports_data_path + '/' + report_archive_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
     os.chmod(reports_data_path + '/' + hiseq_log_archive_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
@@ -157,12 +159,18 @@ def sync(run_id, conf):
     df = common.df(work_data_path) / (1024 * 1024 * 1024)
     du = common.du(work_data_path + '/' + run_id) / (1024 * 1024)
 
-    common.send_msg("[Aozan] End of synchronization for run " + run_id, \
-                    'End of synchronization for run ' + run_id + '.\n' + 
-                    'Job finished at ' + common.time_to_human_readable(time.time()) + 
-                    ' with no error in ' + common.duration_to_human_readable(duration) + '.\n\n' +
-                    'Run output files (without .cif files) can be found in the following directory:\n  ' + work_data_path + '/' + run_id + \
-                    '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df), conf)
+    msg = 'End of synchronization for run ' + run_id + '.\n' + \
+        'Job finished at ' + common.time_to_human_readable(time.time()) + \
+        ' with no error in ' + common.duration_to_human_readable(duration) + '.\n\n' + \
+        'Run output files (without .cif files) can be found in the following directory:\n  ' + work_data_path + '/' + run_id
+        
+    # Add path to report if reports.url exists
+    if conf['reports.url'] != None and conf['reports.url'] != '':
+        msg += '\n\nRun reports can be found at following location:\n  ' +  conf['reports.url'] + '/' + run_id
+
+    msg += '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df)
+
+    common.send_msg('[Aozan] End of synchronization for run ' + run_id, msg, conf)
 
     return True
 

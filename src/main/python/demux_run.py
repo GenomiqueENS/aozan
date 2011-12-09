@@ -228,7 +228,7 @@ def demux(run_id, conf):
 
 
     # Add design to the archive of designs
-    cmd = 'zip ' + conf['casava.designs.path'] + '/designs.zip ' + design_csv_path
+    cmd = 'zip ' + conf['casava.designs.path'] + '/designs.zip ' + design_csv_path + ' ' + design_xls_path
     common.log("DEBUG", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while archiving the design file for " + run_id, 'Error while archiving the design file for.\nCommand line:\n' + cmd, conf)
@@ -241,11 +241,18 @@ def demux(run_id, conf):
     df = common.df(fastq_output_dir) / (1024 * 1024 * 1024)
     du = common.du(fastq_output_dir) / (1024 * 1024)
 
-    common.send_msg("[Aozan] End of demultiplexing for run " + run_id, \
-                    'End of demultiplexing for run ' + run_id + '.' +
-                    'Job finished at ' + common.time_to_human_readable(time.time()) +
-                    ' with no error in ' + common.duration_to_human_readable(duration) + '.\n\n' + 
-                    'Fastq files for this run ' +
-                    'can be found in the following directory:\n  ' + fastq_output_dir + \
-                    '\n\n%.For this task 2f GB has been used and %.2f GB still free.' % (du, df), conf)
+
+    msg = 'End of demultiplexing for run ' + run_id + '.' + \
+        'Job finished at ' + common.time_to_human_readable(time.time()) + \
+        ' with no error in ' + common.duration_to_human_readable(duration) + '.\n\n' + \
+        'Fastq files for this run ' + \
+        'can be found in the following directory:\n  ' + fastq_output_dir
+
+    # Add path to report if reports.url exists
+    if conf['reports.url'] != None and conf['reports.url'] != '':
+        msg += '\n\nRun reports can be found at following location:\n  ' +  conf['reports.url'] + '/' + run_id
+
+    msg += '\n\n%.For this task 2f GB has been used and %.2f GB still free.' % (du, df)
+
+    common.send_msg('[Aozan] End of demultiplexing for run ' + run_id, msg, conf)
     return True
