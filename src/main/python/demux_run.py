@@ -91,10 +91,11 @@ def demux(run_id, conf):
     
     
     run_number = hiseq_run.get_run_number(run_id)
+    instrument_sn = hiseq_run.get_instrument_sn(run_id)
     flow_cell_id = hiseq_run.get_flow_cell(run_id)
-    design_xls_path = conf['casava.designs.path'] + '/design-%04d.xls' % run_number
-    design_csv_path = conf['tmp.path'] + '/design-%04d.csv' % run_number
-    fastq_output_dir = conf['fastq.data.path'] + '/fastq_%04d' % hiseq_run.get_run_number(run_id)
+    design_xls_path = conf['casava.designs.path'] + '/design_' + instrument_sn +  '_%04d.xls' % run_number
+    design_csv_path = conf['tmp.path'] + '/design_' + instrument_sn +  '_%04d.csv' % run_number
+    fastq_output_dir = conf['fastq.data.path'] + '/' + run_id
     
     basecall_stats_prefix = 'basecall_stats_'
     basecall_stats_file =  basecall_stats_prefix + run_id + '.tar.bz2'
@@ -103,8 +104,8 @@ def demux(run_id, conf):
     common.log("DEBUG", "Flowcell id: " + flow_cell_id, conf)
     
     # Check if input data exists
-    if not os.path.exists(conf['work.data.path']):
-        error("Input data directory does not exists", "Input data directory does not exists: " + conf['work.data.path'], conf)
+    if not os.path.exists(conf['bcl.data.path']):
+        error("Basecalling data directory does not exists", "Basecalling data directory does not exists: " + conf['bcl.data.path'], conf)
         return False
 
     # Check if casava designs path exists
@@ -141,7 +142,7 @@ def demux(run_id, conf):
         return False
 
     # Compute disk usage and disk free to check if enough disk space is available 
-    input_path_du = common.du(conf['work.data.path'] + '/' + run_id)
+    input_path_du = common.du(conf['bcl.data.path'] + '/' + run_id)
     output_df = common.df(conf['fastq.data.path'])
     du_factor = float(conf['sync.space.factor'])
     space_needed = input_path_du * du_factor
@@ -183,7 +184,7 @@ def demux(run_id, conf):
           '--compression ' + conf['casava.compression'] + ' ' + \
           '--gz-level ' + conf['casava.compression.level'] + ' ' \
           '--mismatches ' + conf['casava.mismatches'] + ' ' + \
-          '--input-dir ' + conf['work.data.path'] + '/' + run_id + '/Data/Intensities/BaseCalls ' + \
+          '--input-dir ' + conf['bcl.data.path'] + '/' + run_id + '/Data/Intensities/BaseCalls ' + \
           '--sample-sheet ' + design_csv_path + ' ' + \
           '--output-dir ' + fastq_output_dir
     common.log("DEBUG", "exec: " + cmd, conf)
@@ -228,7 +229,9 @@ def demux(run_id, conf):
 
 
     # Add design to the archive of designs
-    cmd = 'zip ' + conf['casava.designs.path'] + '/designs.zip ' + design_csv_path + ' ' + design_xls_path
+    cmd = 'cp ' + design_xls_path +  ' ' + conf['tmp.path'] + \
+        ' && zip ' + conf['casava.designs.path'] + '/designs.zip ' + \
+        os.path.basename(design_csv_path) + ' ' + os.path.basename(design_xls_path)
     common.log("DEBUG", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while archiving the design file for " + run_id, 'Error while archiving the design file for.\nCommand line:\n' + cmd, conf)

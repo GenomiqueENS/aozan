@@ -45,7 +45,7 @@ def sync(run_id, conf):
 
     start_time = time.time()
     hiseq_data_path = conf['hiseq.data.path']
-    work_data_path = conf['work.data.path']
+    bcl_data_path = conf['bcl.data.path']
     reports_data_base_path = conf['reports.data.path']
     tmp_base_path = conf['tmp.path']
     
@@ -61,9 +61,9 @@ def sync(run_id, conf):
         error("HiSeq directory does not exists", "HiSeq directory does not exists: " + hiseq_data_path, conf)
         return False
 
-    # Check if work_data_path exists
-    if not os.path.exists(work_data_path):
-        error("Working directory does not exists", "Working directory does not exists: " + work_data_path, conf)
+    # Check if bcl_data_path exists
+    if not os.path.exists(bcl_data_path):
+        error("Basecalling directory does not exists", "Basecalling directory does not exists: " + bcl_data_path, conf)
         return False
         
     # Check if reports_data_path exists
@@ -78,7 +78,7 @@ def sync(run_id, conf):
         
     input_path = hiseq_data_path + '/' + run_id
     input_path_du = common.du(input_path)
-    output_df = common.df(work_data_path)
+    output_df = common.df(bcl_data_path)
     du_factor = float(conf['sync.space.factor'])
     space_needed = input_path_du * du_factor
 
@@ -89,15 +89,15 @@ def sync(run_id, conf):
     # Check if free space is available on 
     if output_df < space_needed:
         error("Not enough disk space to perform synchronization for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id +
-              '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + work_data_path + '.', conf)
+              '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + bcl_data_path + '.', conf)
         return False
 
     if common.df(reports_data_base_path) < 10 * 1024 * 1024 * 1024:
         error("Not enough disk space to store aozan reports for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
               '.\nNeed more than 10 Gb on ' + reports_data_base_path + '.', conf)
 
-    # Copy data from hiseq path to work path
-    cmd = "rsync  -a --exclude '*.cif' --exclude '*_pos.txt' --exclude '*.errorMap' --exclude '*.FWHMMap' " + input_path + ' ' + work_data_path
+    # Copy data from hiseq path to bcl path
+    cmd = "rsync  -a --exclude '*.cif' --exclude '*_pos.txt' --exclude '*.errorMap' --exclude '*.FWHMMap' " + input_path + ' ' + bcl_data_path
     common.log("DEBUG", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while executing rsync for run " + run_id, 'Error while executing rsync.\nCommand line:\n' + cmd, conf)
@@ -116,7 +116,7 @@ def sync(run_id, conf):
             error("error while removing existing temporary directory", 'Error while removing existing temporary directory.\nCommand line:\n' + cmd, conf)
             return False
     os.mkdir(tmp_path)
-    cmd = 'cd ' + work_data_path + '/' + run_id + ' && ' + \
+    cmd = 'cd ' + bcl_data_path + '/' + run_id + ' && ' + \
         'cp -rp InterOp RunInfo.xml runParameters.xml ' + tmp_path + ' && ' + \
         'cd ' + tmp_base_path + ' && ' + \
         'mv ' + run_id + ' ' + hiseq_log_prefix + run_id + ' && ' + \
@@ -135,7 +135,7 @@ def sync(run_id, conf):
             error("error while removing existing temporary directory", 'Error while removing existing temporary directory.\nCommand line:\n' + cmd, conf)
             return False
     os.mkdir(tmp_path)
-    cmd = 'cd ' + work_data_path + '/' + run_id + '/Data' + ' && ' + \
+    cmd = 'cd ' + bcl_data_path + '/' + run_id + '/Data' + ' && ' + \
         'cp -rp Status_Files reports Status.htm ../First_Base_Report.htm ' + tmp_path + ' && ' + \
         'cd ' + tmp_base_path + ' && ' + \
         'mv ' + run_id + ' ' + report_prefix + run_id + ' && ' + \
@@ -156,13 +156,13 @@ def sync(run_id, conf):
     os.chmod(reports_data_path + '/' + hiseq_log_archive_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
 
     duration = time.time() - start_time
-    df = common.df(work_data_path) / (1024 * 1024 * 1024)
-    du = common.du(work_data_path + '/' + run_id) / (1024 * 1024)
+    df = common.df(bcl_data_path) / (1024 * 1024 * 1024)
+    du = common.du(bcl_data_path + '/' + run_id) / (1024 * 1024)
 
     msg = 'End of synchronization for run ' + run_id + '.\n' + \
         'Job finished at ' + common.time_to_human_readable(time.time()) + \
         ' with no error in ' + common.duration_to_human_readable(duration) + '.\n\n' + \
-        'Run output files (without .cif files) can be found in the following directory:\n  ' + work_data_path + '/' + run_id
+        'Run output files (without .cif files) can be found in the following directory:\n  ' + bcl_data_path + '/' + run_id
         
     # Add path to report if reports.url exists
     if conf['reports.url'] != None and conf['reports.url'] != '':

@@ -183,7 +183,15 @@ def get_flow_cell(run_id):
 	"""
 
 	return run_id.split('_')[3][1:]
-	
+
+def get_instrument_sn(run_id):
+	"""Get the instrument serial number from the run id.
+
+	Arguments:
+		run_id: the run id
+	"""
+
+	return run_id.split('_')[1]	
 
 def send_mail_if_critical_free_space_available(conf):
 
