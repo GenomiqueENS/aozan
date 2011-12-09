@@ -61,5 +61,5 @@ def send_report(run_id, conf):
     
     attachment_file = conf['hiseq.data.path'] + '/' + run_id + '/First_Base_Report.htm'
     message = 'You will find attached to this message the first base report for the run ' + run_id + '.'
-    common.send_msg_with_attachment('[Aozan] First base report of HiSeq run %04d' % hiseq_run.get_run_number(run_id), message, attachment_file, conf)
+    common.send_msg_with_attachment('[Aozan] First base report for HiSeq run ' + run_id, message, attachment_file, conf)
     
