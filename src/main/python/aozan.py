@@ -30,7 +30,7 @@ def delete_lock_file(lock_file_path):
 
     os.unlink(lock_file_path)
 
-aozan_version = "0.2-SNAPSHOT"
+aozan_version = "0.2"
 
 # Main function
 if __name__ == "__main__":

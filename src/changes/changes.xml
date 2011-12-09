@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<document>
+	<properties>
+		<title>Change log</title>
+		<author email="jourdren@biologie.ens.fr">
+			Laurent Jourdren
+		</author>
+	</properties>
+	<body>
+
+		<release version="0.1" description="" date="2011-12-08">
+			<action dev="jourdren" type="update">
+		                Initial version.
+			</action>
+		</release>
+		
+		<release version="0.2" description="" date="2011-12-09">
+            <action dev="jourdren" type="add">
+                        While a run is running on HiSeq, send the first base report when available.
+            </action>
+        </release>
+		
+	</body>
+</document>
