@@ -243,7 +243,7 @@ def demux(run_id, conf):
 
 
     msg = 'End of demultiplexing for run ' + run_id + '.' + \
-        'Job finished at ' + common.time_to_human_readable(time.time()) + \
+        '\nJob finished at ' + common.time_to_human_readable(time.time()) + \
         ' with no error in ' + common.duration_to_human_readable(duration) + '.\n\n' + \
         'Fastq files for this run ' + \
         'can be found in the following directory:\n  ' + fastq_output_dir
@@ -252,7 +252,7 @@ def demux(run_id, conf):
     if conf['reports.url'] != None and conf['reports.url'] != '':
         msg += '\n\nRun reports can be found at following location:\n  ' +  conf['reports.url'] + '/' + run_id
 
-    msg += '\n\n%.For this task 2f GB has been used and %.2f GB still free.' % (du, df)
+    msg += '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df)
 
     common.send_msg('[Aozan] End of demultiplexing for run ' + run_id, msg, conf)
     return True
