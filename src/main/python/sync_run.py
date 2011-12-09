@@ -121,7 +121,7 @@ def sync(run_id, conf):
         'cd ' + tmp_base_path + ' && ' + \
         'mv ' + run_id + ' ' + hiseq_log_prefix + run_id + ' && ' + \
         'tar cjf ' + reports_data_path + '/' + hiseq_log_archive_file + ' ' + hiseq_log_prefix + run_id + ' && ' + \
-        'rm -rf ' + tmp_path
+        'rm -rf ' + tmp_path + ' && rm -rf ' + hiseq_log_prefix + run_id
     common.log("DEBUG", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while saving Illumina quality control for run " + run_id, 'Error saving Illumina quality control.\nCommand line:\n' + cmd, conf)
