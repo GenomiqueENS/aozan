@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
         create_lock_file(lock_file_path)
 
-        print "Aozan v0.01"
+        print "Aozan v0.1"
 
 
         #
