@@ -5,7 +5,7 @@ Created on 25 oct. 2011
 
 @author: Laurent Jourdren
 '''
-import os.path
+import os.path, stat
 import common, hiseq_run, time
 from java.io import IOException
 from java.lang import Runtime
@@ -219,6 +219,9 @@ def demux(run_id, conf):
         error("error while saving the basecall stats file for " + run_id, 'Error while saving the basecall stats files.\nCommand line:\n' + cmd, conf)
         return False
 
+    # Set read only basecall stats archives files
+    os.chmod(reports_data_path + '/' + basecall_stats_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+
     # The output directory must be read only
     cmd = 'chmod -R ugo-w ' + fastq_output_dir + '/Project_*'
     common.log("DEBUG", "exec: " + cmd, conf)
@@ -230,6 +233,7 @@ def demux(run_id, conf):
 
     # Add design to the archive of designs
     cmd = 'cp ' + design_xls_path +  ' ' + conf['tmp.path'] + \
+        ' && cd ' + conf['tmp.path'] + \
         ' && zip ' + conf['casava.designs.path'] + '/designs.zip ' + \
         os.path.basename(design_csv_path) + ' ' + os.path.basename(design_xls_path)
     common.log("DEBUG", "exec: " + cmd, conf)
