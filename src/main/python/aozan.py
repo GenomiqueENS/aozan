@@ -28,8 +28,6 @@ def delete_lock_file(lock_file_path):
 
     os.unlink(lock_file_path)
 
-# Enable debug mode 
-debug = False
 
 # Main function
 if __name__ == "__main__":
@@ -41,14 +39,15 @@ if __name__ == "__main__":
     # Use default (C) locale
     Locale.setDefault(Locale.US)
 
-    if debug:
-        common.set_test_conf(conf)
+    if len(sys.argv) < 1:
+        print "No configuration file define in command line.\nSyntax: aozan.py conf_file"
+        sys.exit(1)
     else:
-        if len(sys.argv) < 1:
-            print "No configuration file define in command line.\nSyntax: aozan.py conf_file"
-            sys.exit(1)
-        else:
-            common.load_conf(conf, sys.argv[0])
+        common.load_conf(conf, sys.argv[0])
+
+    # End of Aozan if aozan is not enable
+    if conf['aozan.enable'].lower().strip() == 'false':
+        sys.exit(0)
 
     # Check critical free space available
     hiseq_run.send_mail_if_critical_free_space_available(conf)
@@ -68,12 +67,13 @@ if __name__ == "__main__":
         #
 
         hiseq_run_ids_done = hiseq_run.load_processed_run_ids(conf)
-
-        for run_id in (hiseq_run_ids_done - hiseq_run.get_available_run_ids(conf)):
-            print "Find a new run " + run_id
-            hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
-            hiseq_run.add_run_id_to_processed_run_ids(run_id, conf)
-            hiseq_run_ids_done.add(run_id)
+        
+        if conf['hiseq.step'].lower().strip() == 'true':
+            for run_id in (hiseq_run_ids_done - hiseq_run.get_available_run_ids(conf)):
+                print "Find a new run " + run_id
+                hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
+                hiseq_run.add_run_id_to_processed_run_ids(run_id, conf)
+                hiseq_run_ids_done.add(run_id)
 
         #
         # Sync hiseq and storage
@@ -82,11 +82,12 @@ if __name__ == "__main__":
         sync_run_ids_done = sync_run.load_processed_run_ids(conf)
 
         # Get the list of run available on HiSeq output
-        for run_id in (hiseq_run_ids_done - sync_run_ids_done):
-            print "Synchronize " + run_id
-            if sync_run.sync(run_id, conf):
-                    sync_run.add_run_id_to_processed_run_ids(run_id, conf)
-                    sync_run_ids_done.add(run_id)
+        if conf['sync.step'].lower().strip() == 'true':
+            for run_id in (hiseq_run_ids_done - sync_run_ids_done):
+                print "Synchronize " + run_id
+                if sync_run.sync(run_id, conf):
+                        sync_run.add_run_id_to_processed_run_ids(run_id, conf)
+                        sync_run_ids_done.add(run_id)
 
         #
         # Demultiplexing
@@ -94,22 +95,25 @@ if __name__ == "__main__":
 
         demux_run_ids_done = demux_run.load_processed_run_ids(conf)
 
-        for run_id in (sync_run_ids_done - demux_run_ids_done):
-                print "Demux " + run_id
-                if demux_run.demux(run_id, conf):
-                    demux_run.add_run_id_to_processed_run_ids(run_id, conf)
-                    demux_run_ids_done.add(run_id)
+        if conf['demux.step'].lower().strip() == 'true':
+            for run_id in (sync_run_ids_done - demux_run_ids_done):
+                    print "Demux " + run_id
+                    if demux_run.demux(run_id, conf):
+                        demux_run.add_run_id_to_processed_run_ids(run_id, conf)
+                        demux_run_ids_done.add(run_id)
 
         #
         # Quality control
         #
 
         qc_run_ids_done = qc_run.load_processed_run_ids(conf)
-        for run_id in (demux_run_ids_done - qc_run_ids_done):
-                print "Qc " + run_id
-                if qc_run.qc(run_id, conf):
-                    qc_run.add_run_id_to_processed_run_ids(run_id, conf)
-                    qc_run_ids_done.add(run_id)
+        
+        if conf['qc.step'].lower().strip() == 'true':
+            for run_id in (demux_run_ids_done - qc_run_ids_done):
+                    print "Qc " + run_id
+                    if qc_run.qc(run_id, conf):
+                        qc_run.add_run_id_to_processed_run_ids(run_id, conf)
+                        qc_run_ids_done.add(run_id)
 
         delete_lock_file(lock_file_path)
 

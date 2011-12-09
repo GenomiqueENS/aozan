@@ -8,6 +8,13 @@ Created on 25 oct. 2011
 
 import smtplib, os.path, time
 from java.io import File
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.audio import MIMEAudio
+from email.mime.base import MIMEBase
+from email.mime.image import MIMEImage
+import mimetypes
+from email import encoders
 
 
 
@@ -49,6 +56,7 @@ def send_msg(subject, message, conf):
     mail_from = conf['mail.from']
     mail_cc = None
     mail_bcc = None
+    COMMASPACE = ', '
 
     message = conf['mail.header'].replace('\\n','\n') + message + conf['mail.footer'].replace('\\n','\n')
     message = message.replace('\n', '\r\n')
@@ -57,23 +65,20 @@ def send_msg(subject, message, conf):
     if mail_to != None :
         if type(mail_to) == str:
             mail_to = [mail_to]
-        msg = msg + ("To: %s\r\n" % ", ".join(mail_to))
+        msg = msg + ("To: %s\r\n" % COMMASPACE.join(mail_to))
 
     if mail_cc != None :
         if type(mail_cc) == str:
             mail_cc = [mail_cc]
-        msg = msg + ("Cc: %s\r\n" % ", ".join(mail_cc))
+        msg = msg + ("Cc: %s\r\n" % COMMASPACE.join(mail_cc))
 
     if mail_bcc != None :
         if type(mail_bcc) == str:
             mail_bcc = [mail_bcc]
-        msg = msg + ("Bcc: %s\r\n" % ", ".join(mail_bcc))
+        msg = msg + ("Bcc: %s\r\n" % COMMASPACE.join(mail_bcc))
 
 
     msg = msg + "Subject: " + subject + "\r\n" + message
-
-
-
 
     if send_mail:
         server = smtplib.SMTP(smtp_server)
@@ -88,6 +93,102 @@ def send_msg(subject, message, conf):
     else:
         print '-------------'
         print msg
+        print '-------------'
+        
+        
+def send_msg_with_attachment(subject, message, attachment_file, conf):
+    """Send a message to the user about the data extraction."""
+
+
+    send_mail = conf['send.mail'].lower() == 'true'
+    smtp_server = conf['smtp.server']
+    mail_to = conf['mail.to']
+    mail_from = conf['mail.from']
+    mail_cc = None
+    mail_bcc = None
+    COMMASPACE = ', '
+
+    message = conf['mail.header'].replace('\\n','\n') + message + conf['mail.footer'].replace('\\n','\n')
+    
+       
+    
+    msg = MIMEMultipart()
+
+    if mail_to != None :
+        if type(mail_to) == str:
+            mail_to = [mail_to]
+        msg['To'] = COMMASPACE.join(mail_to)
+
+    if mail_cc != None :
+        if type(mail_cc) == str:
+            mail_cc = [mail_cc]
+        msg['Cc'] = COMMASPACE.join(mail_cc)
+
+    if mail_bcc != None :
+        if type(mail_bcc) == str:
+            mail_bcc = [mail_bcc]
+        msg['Bcc'] = COMMASPACE.join(mail_bcc)
+
+    msg['Subject'] = subject
+    
+    # Not seen
+    msg.preamble = message
+    
+    # The message
+    part1 = MIMEText(message, 'plain')
+    msg.attach(part1)
+    
+    
+    ctype, encoding = mimetypes.guess_type(attachment_file)
+
+    if ctype is None or encoding is not None:
+        # No guess could be made, or the file is encoded (compressed), so
+        # use a generic bag-of-bits type.
+        ctype = 'application/octet-stream'
+
+    maintype, subtype = ctype.split('/', 1)
+    if maintype == 'text':
+        fp = open(attachment_file, 'r')
+        # Note: we should handle calculating the charset
+        part2 = MIMEText(fp.read(), _subtype=subtype)
+        fp.close()
+    elif maintype == 'image':
+        fp = open(attachment_file, 'rb')
+        part2 = MIMEImage(fp.read(), _subtype=subtype)
+        fp.close()
+    elif maintype == 'audio':
+        fp = open(attachment_file, 'rb')
+        part2 = MIMEAudio(fp.read(), _subtype=subtype)
+        fp.close()
+    else:
+        fp = open(attachment_file, 'rb')
+        part2 = MIMEBase(maintype, subtype)
+        part2.set_payload(fp.read())
+        fp.close()
+        # Encode the payload using Base64
+        encoders.encode_base64(part2)
+
+    # Set the filename parameter
+    part2.add_header('Content-Disposition', 'attachment', filename=os.path.basename(attachment_file))
+    msg.attach(part2)
+
+
+    # Now send or store the message
+    composed = msg.as_string()
+
+    if send_mail:
+        server = smtplib.SMTP(smtp_server)
+        dests = []
+        dests.extend(mail_to)
+        if  mail_cc != None :
+            dests.extend(mail_cc)
+        if mail_bcc != None :
+            dests.extend(mail_bcc)
+        server.sendmail(mail_from, dests, composed)
+        server.quit()
+    else:
+        print '-------------'
+        print composed
         print '-------------'
 
 
@@ -263,6 +364,14 @@ def create_html_index_file(conf, output_file_path, run_id):
 
 def set_default_conf(conf):
 
+    # Global
+    conf['aozan.enable'] = 'True'
+    conf['send.mail'] = 'False'
+    conf['hiseq.step'] = 'True'
+    conf['sync.step'] = 'True'
+    conf['demux.step'] = 'True'
+    conf['qc.step'] = 'False'
+
     # Lock file
     conf['lock.file'] = '/var/lock/aozan.lock'
 
@@ -287,26 +396,7 @@ def set_default_conf(conf):
     conf['demux.space.factor'] = str(0.6)
     
     # Mail configuration
-    conf['mail.header'] = 'This is an automated message.\\n\\n'
-    conf['mail.footer'] = '\\n\\nThe Aozan team.\\n'
-    
+    conf['mail.header'] = 'THIS IS AN AUTOMATED MESSAGE.\\n\\n'
+    conf['mail.footer'] = '\\n\\nThe Aozan team.\\n' 
 
-def set_test_conf(conf):
-
-    # HiSeq
-    conf['hiseq.sn'] = 'SNL110'
-
-    # Mail configuration
-    conf['send.mail'] = 'False'
-    conf['smtp.server'] = 'smtp.biologie.ens.fr'
-    conf['mail.from'] = 'jourdren@biologie.ens.fr'
-    conf['mail.to'] = 'jourdren@biologie.ens.fr'
-
-    # Data paths
-    conf['aozan.var.path'] = '/home/jourdren/tmp'
-    conf['hiseq.data.path'] = '/import/freki01'
-    conf['work.data.path'] = '/import/bara02/aozan_work'
-    conf['fastq.data.path'] = '/import/bara02/aozan_work'
-    conf['reports.data.path'] = '/import/mimir03/sequencages/runs'
-    conf['casava.designs.path'] = '/import/mimir03/sequencages/casava_designs'
 
