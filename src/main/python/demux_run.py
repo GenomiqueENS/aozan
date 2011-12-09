@@ -241,8 +241,9 @@ def demux(run_id, conf):
         error("error while archiving the design file for " + run_id, 'Error while archiving the design file for.\nCommand line:\n' + cmd, conf)
         return False
 
-    # Remove temporary design file
+    # Remove temporary design files
     os.remove(design_csv_path)
+    os.remove(conf['tmp.path'] + '/' + os.path.basename(design_xls_path))
 
     duration = time.time() - start_time
     df = common.df(fastq_output_dir) / (1024 * 1024 * 1024)
