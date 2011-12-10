@@ -202,7 +202,8 @@ def error(short_message, message, last_error_file_path, conf):
     """
 
     new_error = short_message + message
-    new_error.replace('\n', '')
+    new_error.replace('\n', ' ')
+    log('CRITICAL', new_error, conf)
 
     if os.path.exists(last_error_file_path):
         f = open(last_error_file_path, 'r')

@@ -159,7 +159,7 @@ if __name__ == "__main__":
             common.log('INFO', 'End of Aozan', conf)
         except:
                 common.log('CRITICAL', 'Exception: ' +  sys.exc_info()[0] + ' (' + sys.exc_info()[1] + ')' , conf)
-                common.log('TRACEBACK', traceback.format_exc(sys.exc_info()[2]), conf)
+                common.log('TRACEBACK', traceback.format_exc(sys.exc_info()[2]).replace('\n', ' '), conf)
     else:
         print "A lock file exists."
         if not os.path.exists('/proc/%d' % (load_pid_in_lock_file(lock_file_path))):
