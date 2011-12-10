@@ -228,7 +228,17 @@ def log(level, message, conf):
         conf: configuration dictionary
     """
     
-    print(level+": " + message)
+    msg = time_to_human_readable(time.time()) + '\t' + level+ '\t' + message
+    
+    print(msg)
+    
+    try:
+        f = open(conf['log.file'],'a')
+        f.write(msg + '\n')
+        f.close()
+    except:
+        pass    
+    
 
 
 def duration_to_human_readable(time):
@@ -378,6 +388,9 @@ def set_default_conf(conf):
 
     # Lock file
     conf['lock.file'] = '/var/lock/aozan.lock'
+    
+    # Log file
+    conf['log.file'] = '/tmp/aozan.log'
 
     # Casava
     conf['casava.path'] = '/usr/local/casava'
