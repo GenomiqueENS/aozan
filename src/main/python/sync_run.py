@@ -84,7 +84,7 @@ def sync(run_id, conf):
     du_factor = float(conf['sync.space.factor'])
     space_needed = input_path_du * du_factor
 
-    common.log("DEBUG", "Demux step: input disk usage: " + str(input_path_du), conf)
+    common.log("DEBUG", "Sync step: input disk usage: " + str(input_path_du), conf)
     common.log("DEBUG", "Sync step: output disk free: " + str(output_df), conf)
     common.log("DEBUG", "Sync step: space needed: " + str(space_needed), conf)
     
@@ -157,9 +157,16 @@ def sync(run_id, conf):
     os.chmod(reports_data_path + '/' + report_archive_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
     os.chmod(reports_data_path + '/' + hiseq_log_archive_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
 
+    
+    df_in_bytes = common.df(bcl_data_path)
+    du_in_bytes = common.du(bcl_data_path + '/' + run_id)
+    df = df_in_bytes / (1024 * 1024 * 1024)
+    du = du_in_bytes / (1024 * 1024)
+
+    common.log("DEBUG", "Sync step: output disk free after sync: " + str(df_in_bytes), conf)
+    common.log("DEBUG", "Sync step: space used by sync: " + str(du_in_bytes), conf)
+
     duration = time.time() - start_time
-    df = common.df(bcl_data_path) / (1024 * 1024 * 1024)
-    du = common.du(bcl_data_path + '/' + run_id) / (1024 * 1024)
 
     msg = 'End of synchronization for run ' + run_id + '.\n' + \
         'Job finished at ' + common.time_to_human_readable(time.time()) + \
@@ -175,4 +182,3 @@ def sync(run_id, conf):
     common.send_msg('[Aozan] End of synchronization for run ' + run_id, msg, conf)
     common.log('INFO', 'sync step: success in ' + common.duration_to_human_readable(duration), conf)
     return True
-
