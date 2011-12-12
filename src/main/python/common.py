@@ -234,7 +234,7 @@ def log(level, message, conf):
     print(msg)
     
     try:
-        f = open(conf['log.file'],'a')
+        f = open(conf['aozan.var.path'] + '/aozan.log', 'a')
         f.write(msg + '\n')
         f.close()
     except:
@@ -390,9 +390,6 @@ def set_default_conf(conf):
     # Lock file
     conf['lock.file'] = '/var/lock/aozan.lock'
     
-    # Log file
-    conf['log.file'] = '/tmp/aozan.log'
-
     # Casava
     conf['casava.path'] = '/usr/local/casava'
     conf['casava.compression'] = 'bzip2'
