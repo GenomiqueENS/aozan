@@ -411,7 +411,7 @@ def set_default_conf(conf):
     conf['hiseq.warning.min.space'] = str(3 * 1024 * 1024 * 1024 * 1024)
     conf['hiseq.critical.min.space'] = str(1 * 1024 * 1024 * 1024 * 1024)
     conf['sync.space.factor'] = str(0.2)
-    conf['demux.space.factor'] = str(0.6)
+    conf['demux.space.factor'] = str(0.7)
     
     # Mail configuration
     conf['mail.header'] = 'THIS IS AN AUTOMATED MESSAGE.\\n\\n'
