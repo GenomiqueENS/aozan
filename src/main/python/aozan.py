@@ -78,7 +78,7 @@ if __name__ == "__main__":
         try:
             create_lock_file(lock_file_path)
             common.log('INFO', 'Start ' + Globals.WELCOME_MSG, conf)
-            sys.exit(0)
+
             #
             # Discover first base report
             #
