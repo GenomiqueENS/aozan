@@ -26,7 +26,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-    common.add_run_id_to_processed_run_ids(run_id, conf['aozan.var.path'] + '/first_base_report.done')
+    common.add_run_id_to_processed_run_ids(run_id, conf['aozan.var.path'] + '/first_base_report.done', conf)
     
     
 def get_available_run_ids(conf):

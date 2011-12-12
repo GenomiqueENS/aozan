@@ -21,7 +21,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-    common.add_run_id_to_processed_run_ids(run_id, conf['aozan.var.path'] + '/sync.done')
+    common.add_run_id_to_processed_run_ids(run_id, conf['aozan.var.path'] + '/sync.done', conf)
 
 
 def error(short_message, message, conf):
@@ -44,6 +44,8 @@ def sync(run_id, conf):
         """
 
     start_time = time.time()
+    common.log('INFO', 'Sync step: start', conf)
+    
     hiseq_data_path = conf['hiseq.data.path']
     bcl_data_path = conf['bcl.data.path']
     reports_data_base_path = conf['reports.data.path']
@@ -171,6 +173,6 @@ def sync(run_id, conf):
     msg += '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df)
 
     common.send_msg('[Aozan] End of synchronization for run ' + run_id, msg, conf)
-
+    common.log('INFO', 'sync step: success in ' + common.duration_to_human_readable(duration), conf)
     return True
 

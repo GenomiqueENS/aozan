@@ -155,10 +155,12 @@ if __name__ == "__main__":
                             qc_run_ids_done.add(run_id)
     
             delete_lock_file(lock_file_path)
+            
+            # TODO remove *.lasterr files
     
             common.log('INFO', 'End of Aozan', conf)
         except:
-                common.log('CRITICAL', 'Exception: ' +  sys.exc_info()[0] + ' (' + sys.exc_info()[1] + ')' , conf)
+                common.log('CRITICAL', 'Exception: ' +  str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')' , conf)
                 common.log('TRACEBACK', traceback.format_exc(sys.exc_info()[2]).replace('\n', ' '), conf)
     else:
         print "A lock file exists."

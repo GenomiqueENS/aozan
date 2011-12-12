@@ -7,6 +7,7 @@ Created on 25 oct. 2011
 '''
 import os.path, stat
 import common, hiseq_run, time
+from xml.etree.ElementTree import ElementTree
 from java.io import IOException
 from java.lang import Runtime
 from java.util import HashMap
@@ -32,7 +33,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-    common.add_run_id_to_processed_run_ids(conf['aozan.var.path'] + '/demux.done')
+    common.add_run_id_to_processed_run_ids(run_id, conf['aozan.var.path'] + '/demux.done', conf)
 
 
 def error(short_message, message, conf):
@@ -76,6 +77,19 @@ def load_index_sequences(conf):
     return result
    
 
+def get_flowcell_id_in_demultiplex_xml(fastq_output_dir):
+    """Get the flowcell id in DemultiplexConfig.xml.
+
+    Arguments:
+        fastq_output_dir: the path to the fastq output directory
+    """
+
+    tree = ElementTree()
+    tree.parse(fastq_output_dir + '/DemultiplexConfig.xml')
+
+    return tree.find("FlowcellInfo").attrib['ID']
+
+
 def demux(run_id, conf):
     """Add a processed run id to the list of the run ids.
 
@@ -85,6 +99,7 @@ def demux(run_id, conf):
     """
 
     start_time = time.time()
+    common.log('INFO', 'Demux step: start', conf)
     
     reports_data_base_path = conf['reports.data.path']
     reports_data_path = reports_data_base_path + '/' + run_id
@@ -210,10 +225,11 @@ def demux(run_id, conf):
         return False
 
     # Archive basecall stats
-    cmd = 'cd ' + fastq_output_dir + ' &&  mv Basecall_Stats_' + flow_cell_id + ' ' + basecall_stats_prefix + run_id + ' && ' + \
+    flow_cell_id_in_conf_xml = get_flowcell_id_in_demultiplex_xml(fastq_output_dir)
+    cmd = 'cd ' + fastq_output_dir + ' &&  mv Basecall_Stats_' + flow_cell_id_in_conf_xml + ' ' + basecall_stats_prefix + run_id + ' && ' + \
         'tar cjf ' + reports_data_path + '/' + basecall_stats_file + ' ' + basecall_stats_prefix + run_id + ' && ' + \
         'cp -rp ' + basecall_stats_prefix + run_id + ' ' + reports_data_path + ' && ' + \
-        'mv ' + basecall_stats_prefix + run_id + ' Basecall_Stats_' + flow_cell_id
+        'mv ' + basecall_stats_prefix + run_id + ' Basecall_Stats_' + flow_cell_id_in_conf_xml
     common.log("DEBUG", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while saving the basecall stats file for " + run_id, 'Error while saving the basecall stats files.\nCommand line:\n' + cmd, conf)
@@ -246,8 +262,13 @@ def demux(run_id, conf):
     os.remove(conf['tmp.path'] + '/' + os.path.basename(design_xls_path))
 
     duration = time.time() - start_time
-    df = common.df(fastq_output_dir) / (1024 * 1024 * 1024)
-    du = common.du(fastq_output_dir) / (1024 * 1024)
+    df_in_bytes = common.df(fastq_output_dir)
+    du_in_bytes = common.du(fastq_output_dir)
+    df = df_in_bytes / (1024 * 1024 * 1024)
+    du = du_in_bytes / (1024 * 1024)
+
+    common.log("DEBUG", "Demux step: output disk free after demux: " + str(df_in_bytes), conf)
+    common.log("DEBUG", "Demux step: space used by demux: " + str(du_in_bytes), conf)
 
 
     msg = 'End of demultiplexing for run ' + run_id + '.' + \
@@ -263,4 +284,5 @@ def demux(run_id, conf):
     msg += '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df)
 
     common.send_msg('[Aozan] End of demultiplexing for run ' + run_id, msg, conf)
+    common.log('INFO', 'Demux step: success in ' + common.duration_to_human_readable(duration), conf)
     return True

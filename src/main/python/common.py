@@ -291,14 +291,17 @@ def load_processed_run_ids(done_file_path):
     return result
 
 
-def add_run_id_to_processed_run_ids(run_id, done_file_path):
+def add_run_id_to_processed_run_ids(run_id, done_file_path, conf):
     """Add a processed run id to the list of the run ids.
 
     Arguments:
         run id: The run id
+        done_file_path: path of the done file
         conf: configuration dictionary
     """
-
+    
+    log('DEBUG', 'Add ' + run_id + ' to ' + os.path.basename(done_file_path), conf)
+    
     f = open(done_file_path, 'a')
 
     f.write(run_id + '\n')

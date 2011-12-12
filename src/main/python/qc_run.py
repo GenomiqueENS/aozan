@@ -23,7 +23,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-    common.add_run_id_to_processed_run_ids(conf['aozan.var.path'] + '/demux.done')
+    common.add_run_id_to_processed_run_ids(run_id, conf['aozan.var.path'] + '/demux.done', conf)
 
 
 def error(short_message, message, conf):
