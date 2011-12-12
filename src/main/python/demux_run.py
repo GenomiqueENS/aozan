@@ -159,7 +159,7 @@ def demux(run_id, conf):
     # Compute disk usage and disk free to check if enough disk space is available 
     input_path_du = common.du(conf['bcl.data.path'] + '/' + run_id)
     output_df = common.df(conf['fastq.data.path'])
-    du_factor = float(conf['sync.space.factor'])
+    du_factor = float(conf['demux.space.factor'])
     space_needed = input_path_du * du_factor
 
     common.log("DEBUG", "Demux step: input disk usage: " + str(input_path_du), conf)
@@ -261,7 +261,6 @@ def demux(run_id, conf):
     os.remove(design_csv_path)
     os.remove(conf['tmp.path'] + '/' + os.path.basename(design_xls_path))
 
-    duration = time.time() - start_time
     df_in_bytes = common.df(fastq_output_dir)
     du_in_bytes = common.du(fastq_output_dir)
     df = df_in_bytes / (1024 * 1024 * 1024)
@@ -270,6 +269,7 @@ def demux(run_id, conf):
     common.log("DEBUG", "Demux step: output disk free after demux: " + str(df_in_bytes), conf)
     common.log("DEBUG", "Demux step: space used by demux: " + str(du_in_bytes), conf)
 
+    duration = time.time() - start_time
 
     msg = 'End of demultiplexing for run ' + run_id + '.' + \
         '\nJob finished at ' + common.time_to_human_readable(time.time()) + \
