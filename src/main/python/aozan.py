@@ -10,6 +10,7 @@ import sys, os, traceback
 import common, hiseq_run, sync_run, demux_run, qc_run
 from java.util import Locale
 import first_base_report
+from fr.ens.transcriptome.aozan import Globals
 
 def create_lock_file(lock_file_path):
     """Create the lock file.
@@ -46,8 +47,6 @@ def load_pid_in_lock_file(lock_file_path):
     return pid
    
 
-aozan_version = "0.4"
-
 # Main function
 if __name__ == "__main__":
 
@@ -78,8 +77,8 @@ if __name__ == "__main__":
 
         try:
             create_lock_file(lock_file_path)
-            common.log('INFO', 'Start Aozan version ' + aozan_version, conf)
-    
+            common.log('INFO', 'Start ' + Globals.WELCOME_MSG, conf)
+            sys.exit(0)
             #
             # Discover first base report
             #
