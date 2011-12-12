@@ -36,9 +36,31 @@
                         Fix issue when zip design files.
             </action>
         </release>
+
         <release version="0.4" description="" date="2011-12-09">
             <action dev="jourdren" type="fix">
                         Fix issue with pid checking of already running aozan process.
+            </action>
+        </release>
+        
+        <release version="0.5" description="" date="2011-12-12">
+            <action dev="jourdren" type="ADD">
+                        Aozan has now a log file name aozan.log.
+            </action>
+            <action dev="jourdren" type="ADD">
+                        Trace exception in log file.
+            </action>
+            <action dev="jourdren" type="FIX">
+                        Issue with pid of currently running instance of Aozan.
+            </action>
+            <action dev="jourdren" type="FIX">
+                        Now get the good Basecall_Stats_FLOWCELLID path even for RTA 1.10.36.
+            </action>
+            <action dev="jourdren" type="ADD">
+                        Now show in log the new disk usage and disk free at the end of sync step and demux step.
+            </action>
+            <action dev="jourdren" type="FIX">
+                        Demux space estimation.
             </action>
         </release> 
 		

@@ -4,15 +4,21 @@
 
   <groupId>fr.ens.transcriptome</groupId>
   <artifactId>aozan</artifactId>
-  <version>0.4</version>
+  <version>0.5</version>
   <packaging>jar</packaging>
 
-  <name>aozan</name>
+  <name>Aozan</name>
   <url>http://maven.apache.org</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <didyouknow>Did you know that aozan is the breton word for prepare?</didyouknow>
   </properties>
+  
+  <organization>
+        <name>École normale supérieure genomic platform</name>
+        <url>http://transcriptome.ens.fr/sgdb</url>
+  </organization>
 
   <dependencies>
     <dependency>
@@ -59,6 +65,38 @@
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
+            <execution>
+                        <id>generate-ressources</id>
+                            <phase>generate-resources</phase>
+                            <configuration>
+                                    <tasks>
+                                <mkdir dir="${basedir}/target/generated-resources"/>
+                                <buildnumber file="${basedir}/build.num"/>
+                                <tstamp>
+                                    <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss z" />
+                                </tstamp>
+
+                                <manifest file="${basedir}/target/generated-resources/MANIFEST.MF">
+                                    <attribute name="Built-By" value="${user.name}"/>
+                                    <attribute name="Built-Date" value="${TODAY}"/>  
+
+                                    <attribute name="Specification-Title" value="${pom.name}"/>   
+                                    <attribute name="Specification-Version" value="${pom.version}"/>   
+                                    <attribute name="Specification-Vendor" value="${project.organization.name}"/>
+
+                                    <attribute name="Implementation-Title" value="${pom.name}"/>   
+                                    <attribute name="Implementation-Version" value="build${build.number}"/>   
+                                    <attribute name="Implementation-Vendor" value="${project.organization.name}"/>
+
+                                    <attribute name="Main-Class" value="fr.ens.transcriptome.eoulsan.Main"/>
+                                </manifest>
+                                <copy file="${basedir}/target/generated-resources/MANIFEST.MF" tofile="${basedir}/target/classes/manifest.txt"/>
+                                    </tasks>
+                            </configuration>
+                            <goals>
+                                    <goal>run</goal>
+                            </goals>
+                        </execution>
           <execution>
             <id>create-dist</id>
             <phase>package</phase>
