@@ -44,23 +44,36 @@
         </release>
         
         <release version="0.5" description="" date="2011-12-12">
-            <action dev="jourdren" type="ADD">
+            <action dev="jourdren" type="add">
                         Aozan has now a log file name aozan.log.
             </action>
-            <action dev="jourdren" type="ADD">
+            <action dev="jourdren" type="add">
                         Trace exception in log file.
             </action>
-            <action dev="jourdren" type="FIX">
+            <action dev="jourdren" type="fix">
                         Issue with pid of currently running instance of Aozan.
             </action>
-            <action dev="jourdren" type="FIX">
+            <action dev="jourdren" type="fix">
                         Now get the good Basecall_Stats_FLOWCELLID path even for RTA 1.10.36.
             </action>
-            <action dev="jourdren" type="ADD">
+            <action dev="jourdren" type="add">
                         Now show in log the new disk usage and disk free at the end of sync step and demux step.
             </action>
-            <action dev="jourdren" type="FIX">
+            <action dev="jourdren" type="fix">
                         Demux space estimation.
+            </action>
+        </release> 
+		
+		
+		 <release version="0.6" description="" date="2011-12-16">
+            <action dev="jourdren" type="fix">
+                        Fix mail message when a run is discovered.
+            </action>
+            <action dev="jourdren" type="update">
+                        Don't show Aozan welcome message when there is nothing to do.
+            </action>
+            <action dev="jourdren" type="fix">
+                        Change Eoulsan version dependency. Prevent errors with Casava design CSV file with comma in cell value.
             </action>
         </release> 
 		
