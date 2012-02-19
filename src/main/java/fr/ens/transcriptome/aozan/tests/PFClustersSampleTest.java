@@ -25,6 +25,7 @@
 package fr.ens.transcriptome.aozan.tests;
 
 import fr.ens.transcriptome.aozan.collectors.FlowcellDemuxSummaryCollector;
+import fr.ens.transcriptome.aozan.util.LongInterval;
 
 /**
  * This class define a passing filter clusters count test for samples.
@@ -65,8 +66,8 @@ public class PFClustersSampleTest extends AbstractSimpleSampleTest {
    * Public constructor.
    */
   public PFClustersSampleTest() {
-    super("pfclusterssamples", "", "Raw clusters");
+    super("pfclusterssamples", "", "PF clusters");
+    setInterval(new LongInterval(32500000, Long.MAX_VALUE));
   }
 
 }
-
