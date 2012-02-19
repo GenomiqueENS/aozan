@@ -42,7 +42,7 @@ public class FirstCycleIntensityPFLaneTest extends AbstractSimpleLaneTest {
   @Override
   protected Class<?> getValueType() {
 
-    return Double.class;
+    return Integer.class;
   }
 
   @Override
