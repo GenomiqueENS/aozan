@@ -93,11 +93,13 @@ public class QCReport {
 
     for (int read = 1; read <= readCount; read++) {
 
+      final int cycles = data.getInt("run.info.read" + read + ".cycles");
       final boolean indexedRead =
           data.getBoolean("run.info.read" + read + ".indexed");
 
       final Element readElement = doc.createElement("Read");
       readElement.setAttribute("number", Integer.toString(read));
+      readElement.setAttribute("cycles", Integer.toString(cycles));
       readElement.setAttribute("indexed", Boolean.toString(indexedRead));
       reads.appendChild(readElement);
 
@@ -138,7 +140,7 @@ public class QCReport {
     final Element columns = doc.createElement("Columns");
     root.appendChild(columns);
 
-    for (LaneTest test : laneTests) {
+    for (SampleTest test : this.sampleTests) {
       Element columnElement = doc.createElement("Column");
       columnElement.setAttribute("testname", test.getName());
       columnElement.setAttribute("description", test.getDescription());
@@ -193,7 +195,7 @@ public class QCReport {
 
     readElement.appendChild(sampleElement);
 
-    for (SampleTest test : sampleTests) {
+    for (SampleTest test : this.sampleTests) {
 
       final TestResult result = test.test(data, read, lane, sampleName);
 
@@ -224,11 +226,21 @@ public class QCReport {
       root.setAttribute("formatversion", "1.0");
       doc.appendChild(root);
 
-      XMLUtils.addTagValue(doc, root, "Date", new Date().toString());
       XMLUtils.addTagValue(doc, root, "GeneratorName",
           Globals.APP_NAME_LOWER_CASE);
       XMLUtils.addTagValue(doc, root, "GeneratorVersion",
           Globals.APP_VERSION_STRING);
+      XMLUtils
+          .addTagValue(doc, root, "RunId", this.data.get("run.info.run.id"));
+      XMLUtils.addTagValue(doc, root, "RunDate", this.data.get("run.info.date"));
+      XMLUtils.addTagValue(doc, root, "FlowcellId",
+          this.data.get("run.info.flow.cell.id"));
+      XMLUtils.addTagValue(doc, root, "InstrumentSN",
+          this.data.get("run.info.instrument"));
+      XMLUtils.addTagValue(doc, root, "InstrumentRunNumber",
+          this.data.get("run.info.run.number"));
+      XMLUtils.addTagValue(doc, root, "ReportDate",
+          new Date().toString());
 
       doLanesTests(root);
       doSamplesTests(root);
