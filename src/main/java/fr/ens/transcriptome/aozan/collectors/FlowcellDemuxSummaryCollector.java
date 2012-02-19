@@ -56,6 +56,9 @@ import fr.ens.transcriptome.eoulsan.util.XMLUtils;
  */
 public class FlowcellDemuxSummaryCollector implements Collector {
 
+  /** The collector name. */
+  public static final String COLLECTOR_NAME = "demux";
+
   private String casavaOutputPath;
 
   private static final class TileStats {
@@ -128,7 +131,7 @@ public class FlowcellDemuxSummaryCollector implements Collector {
   @Override
   public String getName() {
 
-    return "demux";
+    return COLLECTOR_NAME;
   }
 
   @Override

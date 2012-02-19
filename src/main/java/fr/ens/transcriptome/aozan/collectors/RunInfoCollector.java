@@ -47,7 +47,16 @@ import fr.ens.transcriptome.eoulsan.illumina.RunInfo;
  */
 public class RunInfoCollector implements Collector {
 
+  /** The collector name. */
+  public static final String COLLECTOR_NAME = "runinfo";
+
   private File runInfoFile;
+
+  @Override
+  public String getName() {
+
+    return COLLECTOR_NAME;
+  }
 
   @Override
   public void configure(final Properties properties) {
@@ -58,12 +67,6 @@ public class RunInfoCollector implements Collector {
     this.runInfoFile =
         new File(properties.getProperty(RunDataGenerator.RTA_OUTPUT_DIR),
             "RunInfo.xml");
-  }
-
-  @Override
-  public String getName() {
-
-    return "runinfo";
   }
 
   @Override

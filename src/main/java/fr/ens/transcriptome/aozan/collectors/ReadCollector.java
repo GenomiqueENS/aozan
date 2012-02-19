@@ -56,20 +56,23 @@ import fr.ens.transcriptome.eoulsan.util.XMLUtils;
  */
 public class ReadCollector implements Collector {
 
+  /** The collector name. */
+  public static final String COLLECTOR_NAME = "read";
+
   private String RTAOutputDirPath;
 
   @Override
   public String getName() {
 
-    return "read";
+    return COLLECTOR_NAME;
   }
 
   @Override
   public void configure(final Properties properties) {
 
-    if (properties==null)
+    if (properties == null)
       return;
-    
+
     this.RTAOutputDirPath =
         properties.getProperty(RunDataGenerator.RTA_OUTPUT_DIR);
   }

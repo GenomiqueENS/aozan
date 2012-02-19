@@ -47,12 +47,15 @@ import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignCSVReader;
  */
 public class DesignCollector implements Collector {
 
+  /** The collector name. */
+  public static final String COLLECTOR_NAME = "design";
+
   private File casavaDesignFile;
 
   @Override
   public String getName() {
 
-    return "design";
+    return COLLECTOR_NAME;
   }
 
   @Override
