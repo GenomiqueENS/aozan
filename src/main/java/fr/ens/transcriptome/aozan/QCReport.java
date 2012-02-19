@@ -25,6 +25,10 @@
 package fr.ens.transcriptome.aozan;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.List;
@@ -232,15 +236,15 @@ public class QCReport {
           Globals.APP_VERSION_STRING);
       XMLUtils
           .addTagValue(doc, root, "RunId", this.data.get("run.info.run.id"));
-      XMLUtils.addTagValue(doc, root, "RunDate", this.data.get("run.info.date"));
+      XMLUtils
+          .addTagValue(doc, root, "RunDate", this.data.get("run.info.date"));
       XMLUtils.addTagValue(doc, root, "FlowcellId",
           this.data.get("run.info.flow.cell.id"));
       XMLUtils.addTagValue(doc, root, "InstrumentSN",
           this.data.get("run.info.instrument"));
       XMLUtils.addTagValue(doc, root, "InstrumentRunNumber",
           this.data.get("run.info.run.number"));
-      XMLUtils.addTagValue(doc, root, "ReportDate",
-          new Date().toString());
+      XMLUtils.addTagValue(doc, root, "ReportDate", new Date().toString());
 
       doLanesTests(root);
       doSamplesTests(root);
@@ -289,6 +293,22 @@ public class QCReport {
    */
   public String export(final File XSLFile) throws AozanException {
 
+    try {
+      return export(new FileInputStream(XSLFile));
+    } catch (FileNotFoundException e) {
+      throw new AozanException(e);
+    }
+  }
+
+  /**
+   * Export the QC report. The XML report is transformed using an XSL style
+   * sheet.
+   * @param is XSL file as input stream
+   * @return the QC report as a String
+   * @throws AozanException if an error occurs while creating the report
+   */
+  public String export(final InputStream is) throws AozanException {
+
     doTests();
 
     try {
@@ -296,7 +316,7 @@ public class QCReport {
       // Create the transformer
       final Transformer transformer =
           TransformerFactory.newInstance().newTransformer(
-              new javax.xml.transform.stream.StreamSource(XSLFile));
+              new javax.xml.transform.stream.StreamSource(is));
 
       // Create the String writer
       final StringWriter writer = new StringWriter();
@@ -304,10 +324,15 @@ public class QCReport {
       // Transform the document
       transformer.transform(new DOMSource(this.doc), new StreamResult(writer));
 
+      // Close input stream
+      is.close();
+
       // Return the result of the transformation
       return writer.toString();
 
     } catch (TransformerException e) {
+      throw new AozanException(e);
+    } catch (IOException e) {
       throw new AozanException(e);
     }
 
