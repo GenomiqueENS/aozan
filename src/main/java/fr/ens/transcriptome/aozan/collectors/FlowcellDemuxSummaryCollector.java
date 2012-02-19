@@ -98,7 +98,7 @@ public class FlowcellDemuxSummaryCollector implements Collector {
       if (runData == null || prefix == null)
         return;
 
-      runData.put(prefix + ".yeild", this.yield);
+      runData.put(prefix + ".yield", this.yield);
       runData.put(prefix + ".yield.q30", this.yieldQ30);
       runData.put(prefix + ".cluster.count", this.clusterCount);
       runData.put(prefix + ".cluster.count.0.mismatch.barcode",
@@ -201,6 +201,8 @@ public class FlowcellDemuxSummaryCollector implements Collector {
   private void parseSample(final Element e, final int lane, final RunData data) {
 
     final String sample = getAttributeValue(e, "index").trim();
+    final Map<Integer, TileStats> rawLine = Maps.newHashMap();
+    final Map<Integer, TileStats> pfLine = Maps.newHashMap();
 
     for (final Element e1 : XMLUtils.getElementsByTagName(e, "Barcode")) {
       final String barcode = getAttributeValue(e1, "index").trim();
@@ -213,6 +215,11 @@ public class FlowcellDemuxSummaryCollector implements Collector {
 
         for (final Element e3 : XMLUtils.getElementsByTagName(e2, "Read")) {
           final int read = Integer.parseInt(getAttributeValue(e3, "index"));
+
+          if (!rawLine.containsKey(read)) {
+            rawLine.put(read, new TileStats());
+            pfLine.put(read, new TileStats());
+          }
 
           final TileStats raw;
           final TileStats pf;
@@ -239,17 +246,33 @@ public class FlowcellDemuxSummaryCollector implements Collector {
 
       }
 
-      final String prefix = "demux.lane" + lane + "." + sample;
+      final String prefix = "demux.lane" + lane + ".sample." + sample;
 
       data.put(prefix + ".barcode", barcode);
 
-      for (Map.Entry<Integer, TileStats> entry : mapRaw.entrySet())
-        entry.getValue().putData(data, prefix + ".read" + entry.getKey());
+      for (Map.Entry<Integer, TileStats> entry : mapRaw.entrySet()) {
+        final int read = entry.getKey();
+        final TileStats ts = entry.getValue();
+        rawLine.get(read).add(ts);
+        ts.putData(data, prefix + ".read" + entry.getKey() + ".raw");
+      }
 
-      for (Map.Entry<Integer, TileStats> entry : mapPF.entrySet())
-        entry.getValue().putData(data, prefix + ".read" + entry.getKey());
+      for (Map.Entry<Integer, TileStats> entry : mapPF.entrySet()) {
+        final int read = entry.getKey();
+        final TileStats ts = entry.getValue();
+        pfLine.get(read).add(ts);
+        ts.putData(data, prefix + ".read" + entry.getKey() + ".pf");
+      }
     }
 
+    // Put the line stats
+    for (Map.Entry<Integer, TileStats> entry : rawLine.entrySet())
+      entry.getValue().putData(data,
+          "demux.lane" + lane + ".all.read" + entry.getKey() + ".raw");
+
+    for (Map.Entry<Integer, TileStats> entry : pfLine.entrySet())
+      entry.getValue().putData(data,
+          "demux.lane" + lane + ".all.read" + entry.getKey() + ".pf");
   }
 
 }
