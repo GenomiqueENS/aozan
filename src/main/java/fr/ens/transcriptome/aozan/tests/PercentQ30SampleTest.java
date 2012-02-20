@@ -59,12 +59,11 @@ public class PercentQ30SampleTest extends AbstractSampleTest {
     final long raw = data.getLong(prefix + ".raw.yield");
 
     final double percent = (double) q30 / (double) raw * 100;
-    final String message = String.format(AozanTest.DOUBLE_FORMAT, percent);
 
     if (interval == null)
-      return new TestResult(message);
+      return new TestResult(percent);
 
-    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, message);
+    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent);
   }
 
   //

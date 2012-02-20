@@ -31,7 +31,8 @@ package fr.ens.transcriptome.aozan.tests;
  */
 public class TestResult {
 
-  private int score;
+  private final int score;
+  private final Class<?> type;
   private final String message;
 
   //
@@ -56,9 +57,75 @@ public class TestResult {
     return this.message;
   }
 
+  /**
+   * Get the type of the result message.
+   * @return the type of the result message as a string
+   */
+  public String getType() {
+
+    if (this.type == Long.class)
+      return "int";
+
+    if (this.type == Double.class)
+      return "float";
+
+    return "string";
+  }
+
+  //
+  // Other methods
+  //
+
+  /**
+   * Get the class of a number object.
+   * @param value number object
+   * @return the Class of this object for TestResult
+   */
+  private static final Class<?> getNumberClass(final Number value) {
+
+    if (value == null)
+      return null;
+
+    final Class<?> clazz = value.getClass();
+
+    if (clazz == Byte.class
+        || clazz == Short.class || clazz == Integer.class
+        || clazz == Long.class)
+      return Long.class;
+
+    return Double.class;
+  }
+
   //
   // Constructor
   //
+
+  /**
+   * Public constructor.
+   * @param score score of a test
+   * @param message result message of a test
+   */
+  public TestResult(final int score, final Number value) {
+
+    if (score < -1 || score > 9)
+      throw new IllegalArgumentException(
+          "The score value must be between -1 and 9");
+
+    this.score = score;
+    this.message = value == null ? "" : value.toString();
+    this.type = getNumberClass(value);
+  }
+
+  /**
+   * Public constructor.
+   * @param message result message of a test
+   */
+  public TestResult(final Number value) {
+
+    this.score = -1;
+    this.message = value.toString();
+    this.type = getNumberClass(value);
+  }
 
   /**
    * Public constructor.
@@ -73,6 +140,7 @@ public class TestResult {
 
     this.score = score;
     this.message = message == null ? "" : message;
+    this.type = String.class;
   }
 
   /**
@@ -83,6 +151,7 @@ public class TestResult {
 
     this.score = -1;
     this.message = message;
+    this.type = String.class;
   }
 
 }

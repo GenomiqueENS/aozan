@@ -95,34 +95,35 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
 
     if (clazz == Integer.class) {
 
-      final int val = data.getInt(key);
-      msg = String.format(INTEGER_FORMAT, val);
-      value = val;
+      value = data.getInt(key);
+      msg = null;
     } else if (clazz == Long.class) {
 
-      final long val = data.getLong(key);
-      msg = String.format(INTEGER_FORMAT, val);
-      value = val;
+      value = data.getLong(key);
+      msg = null;
     } else if (clazz == Float.class) {
 
-      final float val = data.getFloat(key);
-      msg = String.format(DOUBLE_FORMAT, val);
-      value = val;
+      value = data.getFloat(key);
+      msg = null;
     } else if (clazz == Double.class) {
 
-      final double val = data.getDouble(key);
-      msg = String.format(DOUBLE_FORMAT, val);
-      value = val;
+      value = data.getDouble(key);
+      msg = null;
     } else {
 
       msg = data.get(key);
       value = null;
     }
 
-    if (value == null || interval == null)
+    // Is result a string ?
+    if (value == null)
       return new TestResult(msg);
 
-    return new TestResult(interval.isInInterval(value) ? 9 : 0, msg);
+    // Do the test ?
+    if (interval == null)
+      return new TestResult(value);
+
+    return new TestResult(interval.isInInterval(value) ? 9 : 0, value);
   }
 
   //

@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 version="1.0">
+
 <xsl:template match="/">
+<xsl:decimal-format name="aozan" decimal-separator="." grouping-separator=" "/>
+
 <html>
 <head>
   <title><xsl:value-of select="/QCReport/RunId"/> run quality report</title>
@@ -42,6 +45,8 @@ version="1.0">
 </head>
 <body>
 
+
+
   <h1><xsl:value-of select="/QCReport/RunId"/> Quality report</h1> 
 
   <ul>
@@ -69,7 +74,11 @@ version="1.0">
       <tr>
        <td><xsl:value-of select="@number"/></td>
        <xsl:for-each select="Test">
-         <td class="score{@score}"><xsl:value-of select="."/></td>
+         <td class="score{@score}">
+           <xsl:if test="@type='int'"><xsl:value-of select="format-number(.,'### ### ### ### ###','aozan')"/></xsl:if>
+           <xsl:if test="@type='float'"><xsl:value-of select="format-number(.,'### ### ### ##0.00','aozan')"/></xsl:if>
+           <xsl:if test="@type='string'"><xsl:value-of select="."/></xsl:if>
+         </td>
        </xsl:for-each>
      </tr>
     </xsl:for-each>
@@ -96,7 +105,11 @@ version="1.0">
        <td><xsl:value-of select="@name"/></td>
        <td><xsl:value-of select="@index"/></td>
        <xsl:for-each select="Test">
-         <td class="score{@score}"><xsl:value-of select="."/></td>
+         <td class="score{@score}">
+           <xsl:if test="@type='int'"><xsl:value-of select="format-number(.,'### ### ### ### ###','aozan')"/></xsl:if>
+           <xsl:if test="@type='float'"><xsl:value-of select="format-number(.,'### ### ### ##0.00','aozan')"/></xsl:if>
+           <xsl:if test="@type='string'"><xsl:value-of select="."/></xsl:if>
+         </td>
        </xsl:for-each>
      </tr>
     </xsl:for-each>

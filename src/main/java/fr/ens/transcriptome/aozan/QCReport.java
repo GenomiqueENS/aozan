@@ -120,6 +120,7 @@ public class QCReport {
           testElement.setAttribute("name", test.getName());
           testElement
               .setAttribute("score", Integer.toString(result.getScore()));
+          testElement.setAttribute("type", result.getType());
           testElement.setTextContent(result.getMessage());
           laneElement.appendChild(testElement);
 
@@ -206,6 +207,7 @@ public class QCReport {
       final Element testElement = doc.createElement("Test");
       testElement.setAttribute("name", test.getName());
       testElement.setAttribute("score", Integer.toString(result.getScore()));
+      testElement.setAttribute("type", result.getType());
       testElement.setTextContent(result.getMessage());
       sampleElement.appendChild(testElement);
     }

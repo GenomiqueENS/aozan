@@ -52,7 +52,7 @@ public class ClusterDensityLaneTest extends AbstractLaneTest {
 
     final double density = clusterRaw * densityRatio;
 
-    return new TestResult(String.format(DOUBLE_FORMAT, density));
+    return new TestResult(density);
   }
 
   //

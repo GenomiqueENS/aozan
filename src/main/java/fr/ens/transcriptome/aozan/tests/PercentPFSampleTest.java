@@ -58,12 +58,11 @@ public class PercentPFSampleTest extends AbstractSampleTest {
     final long raw = data.getLong(prefix + ".raw.cluster.count");
     final long pf = data.getLong(prefix + ".pf.cluster.count");
     final double percent = (double) pf / (double) raw * 100;
-    final String message = String.format(AozanTest.DOUBLE_FORMAT, percent);
 
     if (interval == null)
-      return new TestResult(message);
+      return new TestResult(percent);
 
-    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, message);
+    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent);
   }
 
   //

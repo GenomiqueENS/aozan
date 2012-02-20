@@ -66,16 +66,12 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
     final long raw = data.getLong(rawSampleKey);
     final long all = data.getLong(rawAll);
 
-    System.err.println(read
-        + "\t" + lane + "\t" + raw + "\t" + sampleName + "\t" + all);
-
     final double percent = (double) raw / (double) all * 100;
-    final String message = String.format(AozanTest.DOUBLE_FORMAT, percent);
 
     if (interval == null)
-      return new TestResult(message);
+      return new TestResult(percent);
 
-    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, message);
+    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent);
   }
 
   //
