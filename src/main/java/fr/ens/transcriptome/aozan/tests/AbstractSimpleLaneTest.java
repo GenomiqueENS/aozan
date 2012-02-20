@@ -123,10 +123,20 @@ public abstract class AbstractSimpleLaneTest extends AbstractLaneTest {
       value = null;
     }
 
-    if (value == null || interval == null)
+    if (value == null
+        || interval == null || (indexedRead && !testIndexedRead()))
       return new TestResult(msg);
 
     return new TestResult(interval.isInInterval(value) ? 9 : 0, msg);
+  }
+
+  /**
+   * Test if indexed read test must return a score >=0.
+   * @return if indexed read must return a score
+   */
+  protected boolean testIndexedRead() {
+
+    return false;
   }
 
   //

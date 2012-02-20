@@ -56,6 +56,10 @@ public class PFClustersPercentLaneTest extends AbstractLaneTest {
 
     final double percent = (double) clusterPF / (double) clusterRaw;
 
+    // No score for indexed read
+    if (indexedRead)
+      return new TestResult(String.format(DOUBLE_FORMAT, percent));
+
     return new TestResult(this.interval.isInInterval(percent) ? 9 : 0,
         String.format(DOUBLE_FORMAT, percent));
   }

@@ -52,6 +52,10 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
             AozanTest.DOUBLE_FORMAT + " / " + AozanTest.DOUBLE_FORMAT, phasing,
             prephasing);
 
+    // No score for indexed read
+    if (indexedRead)
+      return new TestResult(message);
+
     final boolean result =
         phasingInterval.isInInterval(phasing)
             || prephasingInterval.isInInterval(prephasing);
