@@ -194,15 +194,28 @@ public class FlowcellDemuxSummaryCollector implements Collector {
 
     final int lane = Integer.parseInt(getAttributeValue(e, "index"));
 
-    for (Element e1 : XMLUtils.getElementsByTagName(e, "Sample"))
-      parseSample(e1, lane, data);
-  }
-
-  private void parseSample(final Element e, final int lane, final RunData data) {
-
-    final String sample = getAttributeValue(e, "index").trim();
     final Map<Integer, TileStats> rawLine = Maps.newHashMap();
     final Map<Integer, TileStats> pfLine = Maps.newHashMap();
+
+    // Parse samples of the line
+    for (Element e1 : XMLUtils.getElementsByTagName(e, "Sample"))
+      parseSample(e1, lane, data, rawLine, pfLine);
+
+    // Put the line stats
+    for (Map.Entry<Integer, TileStats> entry : rawLine.entrySet())
+      entry.getValue().putData(data,
+          "demux.lane" + lane + ".all.read" + entry.getKey() + ".raw");
+
+    for (Map.Entry<Integer, TileStats> entry : pfLine.entrySet())
+      entry.getValue().putData(data,
+          "demux.lane" + lane + ".all.read" + entry.getKey() + ".pf");
+  }
+
+  private void parseSample(final Element e, final int lane, final RunData data,
+      final Map<Integer, TileStats> rawLine,
+      final Map<Integer, TileStats> pfLine) {
+
+    final String sample = getAttributeValue(e, "index").trim();
 
     for (final Element e1 : XMLUtils.getElementsByTagName(e, "Barcode")) {
       final String barcode = getAttributeValue(e1, "index").trim();
@@ -264,15 +277,6 @@ public class FlowcellDemuxSummaryCollector implements Collector {
         ts.putData(data, prefix + ".read" + entry.getKey() + ".pf");
       }
     }
-
-    // Put the line stats
-    for (Map.Entry<Integer, TileStats> entry : rawLine.entrySet())
-      entry.getValue().putData(data,
-          "demux.lane" + lane + ".all.read" + entry.getKey() + ".raw");
-
-    for (Map.Entry<Integer, TileStats> entry : pfLine.entrySet())
-      entry.getValue().putData(data,
-          "demux.lane" + lane + ".all.read" + entry.getKey() + ".pf");
   }
 
 }
