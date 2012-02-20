@@ -70,9 +70,20 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
   protected abstract String getKey(final int read, final int lane,
       final String sampleName);
 
-  //
-  // AbstractLaneTest methods
-  //
+  /**
+   * Transform the value.
+   * @param value value to transform
+   * @param data run data
+   * @param read index of read
+   * @param lane lane index
+   * @param sampleName sample name
+   * @return the transformed value
+   */
+  protected Number transformValue(final Number value, final RunData data,
+      final int read, final int lane, final String sampleName) {
+
+    return value;
+  }
 
   /**
    * Get the type of the value.
@@ -119,11 +130,16 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
     if (value == null)
       return new TestResult(msg);
 
+    // Transform the value id needed
+    final Number transformedValue =
+        transformValue(value, data, read, lane, sampleName);
+
     // Do the test ?
     if (interval == null)
-      return new TestResult(value);
+      return new TestResult(transformedValue);
 
-    return new TestResult(interval.isInInterval(value) ? 9 : 0, value);
+    return new TestResult(interval.isInInterval(transformedValue) ? 9 : 0,
+        transformedValue);
   }
 
   //

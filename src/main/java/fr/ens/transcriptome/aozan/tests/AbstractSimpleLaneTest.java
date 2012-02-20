@@ -61,7 +61,7 @@ public abstract class AbstractSimpleLaneTest extends AbstractLaneTest {
   }
 
   //
-  // Protected method
+  // Protected methods
   //
 
   /**
@@ -74,9 +74,20 @@ public abstract class AbstractSimpleLaneTest extends AbstractLaneTest {
   protected abstract String getKey(final int read, final boolean indexedRead,
       final int lane);
 
-  //
-  // AbstractLaneTest methods
-  //
+  /**
+   * Transform the value.
+   * @param value value to transform
+   * @param data run data
+   * @param read index of read
+   * @param lane lane index
+   * @param indexedRead true if the read is indexed
+   * @return the transformed value
+   */
+  protected Number transformValue(final Number value, final RunData data,
+      final int read, final boolean indexedRead, final int lane) {
+
+    return value;
+  }
 
   /**
    * Get the type of the value.
@@ -124,11 +135,16 @@ public abstract class AbstractSimpleLaneTest extends AbstractLaneTest {
     if (value == null)
       return new TestResult(msg);
 
+    // Transform the value id needed
+    final Number transformedValue =
+        transformValue(value, data, read, indexedRead, lane);
+
     // Do the test ?
     if (interval == null || (indexedRead && !testIndexedRead()))
-      return new TestResult(value);
+      return new TestResult(transformedValue);
 
-    return new TestResult(interval.isInInterval(value) ? 9 : 0, value);
+    return new TestResult(interval.isInInterval(transformedValue) ? 9 : 0,
+        transformedValue);
   }
 
   /**

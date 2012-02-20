@@ -24,6 +24,7 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 
 /**
@@ -51,10 +52,20 @@ public class RawClustersLaneTest extends AbstractSimpleLaneTest {
     return Long.class;
   }
 
+  @Override
+  protected Number transformValue(final Number value, final RunData data,
+      final int read, final boolean indexedRead, final int lane) {
+
+    final int tiles =
+        data.getInt("read" + read + ".lane" + lane + ".tile.count");
+
+    return value.longValue() * tiles;
+  }
+
   //
   // Constructor
-  // 
-  
+  //
+
   /**
    * Public constructor.
    */
