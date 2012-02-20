@@ -55,8 +55,8 @@ public class PercentQ30SampleTest extends AbstractSampleTest {
     else
       prefix = "demux.lane" + lane + ".sample." + sampleName + ".read" + read;
 
-    final long q30 = data.getLong(prefix + ".raw.yield.q30");
-    final long raw = data.getLong(prefix + ".raw.yield");
+    final long q30 = data.getLong(prefix + ".pf.yield.q30");
+    final long raw = data.getLong(prefix + ".pf.yield");
 
     final double percent = (double) q30 / (double) raw;
 
@@ -75,7 +75,7 @@ public class PercentQ30SampleTest extends AbstractSampleTest {
    * Public constructor.
    */
   public PercentQ30SampleTest() {
-    super("percentq30", "", ">= Q30", "%");
+    super("percentq30", "", ">= Q30 Base PF", "%");
     this.interval = new DoubleInterval(0.75, 1.0);
   }
 
