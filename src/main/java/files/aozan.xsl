@@ -9,6 +9,10 @@ version="1.0">
 <head>
   <title><xsl:value-of select="/QCReport/RunId"/> run quality report</title>
   <style TYPE="text/css">
+    td {
+      text-align: center;
+    }
+
     .score-1 {
     }
     .score0 {
@@ -65,7 +69,7 @@ version="1.0">
     <tr>
       <th>Lane</th>
       <xsl:for-each select="/QCReport/ReadsReport/Columns/Column">
-        <th><xsl:value-of select="."/></th>
+        <th><xsl:value-of select="."/><xsl:if test="@unit!=''"> (<xsl:value-of select="@unit"/>)</xsl:if></th>
       </xsl:for-each>
     </tr>
     <xsl:for-each select="Lane">
@@ -96,7 +100,7 @@ version="1.0">
       <th>Description</th>
       <th>Index</th>
       <xsl:for-each select="/QCReport/SamplesReport/Columns/Column">
-        <th><xsl:value-of select="."/></th>
+        <th><xsl:value-of select="."/><xsl:if test="@unit!=''"> (<xsl:value-of select="@unit"/>)</xsl:if></th>
       </xsl:for-each>
     </tr>
     <xsl:for-each select="Sample">
