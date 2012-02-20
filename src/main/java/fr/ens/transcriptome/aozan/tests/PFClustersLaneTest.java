@@ -71,7 +71,7 @@ public class PFClustersLaneTest extends AbstractSimpleLaneTest {
    */
   public PFClustersLaneTest() {
 
-    super("pfclusters", "", "PF Clusters");
+    super("pfclusters", "", "PF Clusters Est.");
   }
 
 }
