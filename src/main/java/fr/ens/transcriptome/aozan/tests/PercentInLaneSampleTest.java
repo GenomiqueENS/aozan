@@ -44,24 +44,24 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
   }
 
   @Override
-  public TestResult test(final RunData data, final int read, final int lane,
-      final String sampleName) {
+  public TestResult test(final RunData data, final int read,
+      final int readSample, final int lane, final String sampleName) {
 
     final String rawSampleKey;
 
     if (sampleName == null)
       rawSampleKey =
           "demux.lane"
-              + lane + ".sample.lane" + lane + ".read" + read
+              + lane + ".sample.lane" + lane + ".read" + readSample
               + ".raw.cluster.count";
     else
       rawSampleKey =
           "demux.lane"
-              + lane + ".sample." + sampleName + ".read" + read
+              + lane + ".sample." + sampleName + ".read" + readSample
               + ".raw.cluster.count";
 
     final String rawAll =
-        "demux.lane" + lane + ".all.read" + read + ".raw.cluster.count";
+        "demux.lane" + lane + ".all.read" + readSample + ".raw.cluster.count";
 
     final long raw = data.getLong(rawSampleKey);
     final long all = data.getLong(rawAll);

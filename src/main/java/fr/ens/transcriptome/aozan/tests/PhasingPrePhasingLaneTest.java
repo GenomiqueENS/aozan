@@ -24,8 +24,13 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.List;
+
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.collectors.ReadCollector;
+import fr.ens.transcriptome.aozan.collectors.PhasingCollector;
 import fr.ens.transcriptome.aozan.util.DoubleInterval;
 import fr.ens.transcriptome.aozan.util.Interval;
 
@@ -43,14 +48,22 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
   public TestResult test(final RunData data, final int read,
       final boolean indexedRead, final int lane) {
 
-    final String keyPrefix = "read" + read + ".lane" + lane;
+    final String keyPrefix = "phasing.read" + read + ".lane" + lane;
     final double phasing = data.getDouble(keyPrefix + ".phasing");
     final double prephasing = data.getDouble(keyPrefix + ".prephasing");
 
+    final List<String> sampleNames =
+        Lists.newArrayList(Splitter.on(',').split(
+            data.get("design.lane" + lane + ".samples.names")));
+
+    final boolean control =
+        sampleNames.size() == 1
+            && data.getBoolean("design.lane"
+                + lane + "." + sampleNames.get(0) + ".control");
+
     final String message =
-        String.format(
-            AozanTest.DOUBLE_FORMAT + " / " + AozanTest.DOUBLE_FORMAT, phasing,
-            prephasing);
+        String.format("%,.3f%% / %,.3f%%", phasing * 100.0, prephasing * 100.0)
+            + (control ? " (C)" : "");
 
     // No score for indexed read
     if (indexedRead)
@@ -66,7 +79,7 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
   @Override
   public String[] getCollectorsNamesRequiered() {
 
-    return new String[] {ReadCollector.COLLECTOR_NAME};
+    return new String[] {PhasingCollector.COLLECTOR_NAME};
   }
 
   //
@@ -76,8 +89,8 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
   public PhasingPrePhasingLaneTest() {
 
     super("phasingprephasing", "", "Phasing / Prephasing");
-    this.phasingInterval = new DoubleInterval(0, 0.4);
-    this.prephasingInterval = new DoubleInterval(0, 0.5);
+    this.phasingInterval = new DoubleInterval(0, 0.004);
+    this.prephasingInterval = new DoubleInterval(0, 0.005);
   }
 
 }

@@ -41,15 +41,17 @@ public class PFClustersSampleTest extends AbstractSimpleSampleTest {
   }
 
   @Override
-  protected String getKey(final int read, final int lane,
-      final String sampleName) {
+  protected String getKey(final int read, final int readSample,
+      final int lane, final String sampleName) {
 
     if (sampleName == null)
       return "demux.lane"
-          + lane + ".sample.lane" + lane + ".read" + read + ".pf.cluster.count";
+          + lane + ".sample.lane" + lane + ".read" + readSample
+          + ".pf.cluster.count";
 
     return "demux.lane"
-        + lane + ".sample." + sampleName + ".read" + read + ".pf.cluster.count";
+        + lane + ".sample." + sampleName + ".read" + readSample
+        + ".pf.cluster.count";
   }
 
   @Override

@@ -45,15 +45,17 @@ public class PercentPFSampleTest extends AbstractSampleTest {
   }
 
   @Override
-  public TestResult test(final RunData data, final int read, final int lane,
-      final String sampleName) {
+  public TestResult test(final RunData data, final int re2ad,
+      final int readSample, final int lane, final String sampleName) {
 
     final String prefix;
 
     if (sampleName == null)
-      prefix = "demux.lane" + lane + ".sample.lane" + lane + ".read" + read;
+      prefix =
+          "demux.lane" + lane + ".sample.lane" + lane + ".read" + readSample;
     else
-      prefix = "demux.lane" + lane + ".sample." + sampleName + ".read" + read;
+      prefix =
+          "demux.lane" + lane + ".sample." + sampleName + ".read" + readSample;
 
     final long raw = data.getLong(prefix + ".raw.cluster.count");
     final long pf = data.getLong(prefix + ".pf.cluster.count");
@@ -62,7 +64,8 @@ public class PercentPFSampleTest extends AbstractSampleTest {
     if (interval == null)
       return new TestResult(percent, true);
 
-    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent, true);
+    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent,
+        true);
   }
 
   //

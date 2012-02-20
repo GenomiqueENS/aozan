@@ -62,25 +62,27 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
   /**
    * Get the the key in the RunData object for the value to test
    * @param read index of the read
+   * @param readSample index of read without indexed reads
    * @param lane index of the lane
    * @param sampleName name of the sample. If null, must return the key for
    *          undetermined indexes
    * @return a String with the required key
    */
-  protected abstract String getKey(final int read, final int lane,
-      final String sampleName);
+  protected abstract String getKey(final int read, int readSample,
+      final int lane, final String sampleName);
 
   /**
    * Transform the value.
    * @param value value to transform
    * @param data run data
    * @param read index of read
+   * @param readSample index of read without indexed reads
    * @param lane lane index
    * @param sampleName sample name
    * @return the transformed value
    */
   protected Number transformValue(final Number value, final RunData data,
-      final int read, final int lane, final String sampleName) {
+      final int read, int readSample, final int lane, final String sampleName) {
 
     return value;
   }
@@ -101,10 +103,10 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
   protected abstract Class<?> getValueType();
 
   @Override
-  public TestResult test(final RunData data, final int read, final int lane,
-      final String sampleName) {
+  public TestResult test(final RunData data, final int read, int readSample,
+      final int lane, final String sampleName) {
 
-    final String key = getKey(read, lane, sampleName);
+    final String key = getKey(read, readSample, lane, sampleName);
 
     if (key == null)
       return null;
@@ -141,7 +143,7 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
 
     // Transform the value id needed
     final Number transformedValue =
-        transformValue(value, data, read, lane, sampleName);
+        transformValue(value, data, read, readSample, lane, sampleName);
 
     // Do the test ?
     if (interval == null)

@@ -156,14 +156,17 @@ public class QCReport {
 
     final Element reads = doc.createElement("Reads");
     root.appendChild(reads);
-
+    int readSample = 0;
+    
     for (int read = 1; read <= readCount; read++) {
 
       if (data.getBoolean("run.info.read" + read + ".indexed"))
         continue;
 
+      readSample++;
+      
       final Element readElement = doc.createElement("Read");
-      readElement.setAttribute("number", Integer.toString(read));
+      readElement.setAttribute("number", Integer.toString(readSample));
       // readElement.setAttribute("indexed", Boolean.toString(indexedRead));
       reads.appendChild(readElement);
 
@@ -188,18 +191,18 @@ public class QCReport {
           final String desc =
               data.get("design.lane" + lane + "." + sampleName + ".description");
 
-          addSample(readElement, read, lane, sampleName, desc, noIndex
+          addSample(readElement, read, readSample, lane, sampleName, desc, noIndex
               ? "NoIndex" : index);
         }
 
         // Undetermined indexes
         if (!noIndex)
-          addSample(readElement, read, lane, null, null, "Undetermined");
+          addSample(readElement, read, readSample, lane, null, null, "Undetermined");
       }
     }
   }
 
-  private void addSample(final Element readElement, final int read,
+  private void addSample(final Element readElement, final int read, final int readSample,
       final int lane, final String sampleName, final String desc,
       final String index) {
 
@@ -214,7 +217,7 @@ public class QCReport {
 
     for (SampleTest test : this.sampleTests) {
 
-      final TestResult result = test.test(data, read, lane, sampleName);
+      final TestResult result = test.test(data, read, readSample, lane, sampleName);
 
       final Element testElement = doc.createElement("Test");
       testElement.setAttribute("name", test.getName());
