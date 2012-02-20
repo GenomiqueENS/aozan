@@ -83,7 +83,7 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
    * Public constructor.
    */
   public PercentInLaneSampleTest() {
-    super("percentinlanesample", "", "Ratio sample", "%");
+    super("percentinlanesample", "", "Sample in lane", "%");
     this.interval = null;
   }
 
