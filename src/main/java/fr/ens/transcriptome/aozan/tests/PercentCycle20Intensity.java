@@ -77,7 +77,7 @@ public class PercentCycle20Intensity extends AbstractSimpleLaneTest {
   public PercentCycle20Intensity() {
 
     super("percentintensitycycle20", "", "Intensity cycle 20", "%");
-    setInterval(new DoubleInterval(50, 100));
+    setInterval(new DoubleInterval(0.5, 1.0));
   }
 
 }
