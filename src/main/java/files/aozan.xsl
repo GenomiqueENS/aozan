@@ -93,6 +93,7 @@ version="1.0">
     <tr>
       <th>Lane</th>
       <th>Sample name</th>
+      <th>Description</th>
       <th>Index</th>
       <xsl:for-each select="/QCReport/SamplesReport/Columns/Column">
         <th><xsl:value-of select="."/></th>
@@ -102,6 +103,7 @@ version="1.0">
       <tr>
        <td><xsl:value-of select="@lane"/></td>
        <td><xsl:value-of select="@name"/></td>
+       <td><xsl:value-of select="@desc"/></td>
        <td><xsl:value-of select="@index"/></td>
        <xsl:for-each select="Test">
          <td class="score{@score}">

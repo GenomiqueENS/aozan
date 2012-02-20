@@ -173,28 +173,40 @@ public class QCReport {
             Lists.newArrayList(Splitter.on(',').split(
                 data.get("design.lane" + lane + ".samples.names")));
 
-        final String index =
+        final String firstIndex =
             data.get("design.lane" + lane + "." + sampleNames.get(0) + ".index");
+        final boolean noIndex =
+            sampleNames.size() == 1 && "".equals(firstIndex);
 
-        final boolean noIndex = sampleNames.size() == 1 && "".equals(index);
+        for (String sampleName : sampleNames) {
 
-        for (String sampleName : sampleNames)
-          addSample(readElement, read, lane, sampleName, noIndex
+          // Get sample index
+          final String index =
+              data.get("design.lane" + lane + "." + sampleName + ".index");
+
+          // Get sample description
+          final String desc =
+              data.get("design.lane" + lane + "." + sampleName + ".description");
+
+          addSample(readElement, read, lane, sampleName, desc, noIndex
               ? "NoIndex" : index);
+        }
 
         // Undetermined indexes
         if (!noIndex)
-          addSample(readElement, read, lane, null, "Undetermined");
+          addSample(readElement, read, lane, null, null, "Undetermined");
       }
     }
   }
 
   private void addSample(final Element readElement, final int read,
-      final int lane, final String sampleName, final String index) {
+      final int lane, final String sampleName, final String desc,
+      final String index) {
 
     final Element sampleElement = doc.createElement("Sample");
     sampleElement.setAttribute("name", sampleName == null
         ? "Undetermined" : sampleName);
+    sampleElement.setAttribute("desc", desc == null ? "No description" : desc);
     sampleElement.setAttribute("lane", Integer.toString(lane));
     sampleElement.setAttribute("index", index);
 
