@@ -24,47 +24,56 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.List;
+
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 import fr.ens.transcriptome.aozan.util.DoubleInterval;
+import fr.ens.transcriptome.aozan.util.Interval;
 
 /**
  * This class define a lane test on PhiX percent aligned.
  * @since 1.0
  * @author Laurent Jourdren
  */
-public class PercentAlignLaneTest extends AbstractSimpleLaneTest {
+public class PercentAlignLaneTest extends AbstractLaneTest {
+
+  private final Interval interval;
 
   @Override
   public String[] getCollectorsNamesRequiered() {
 
-    return new String[] {ReadCollector.COLLECTOR_NAME};
+    return new String[] {ReadCollector.COLLECTOR_NAME,
+        DesignCollector.COLLECTOR_NAME};
   }
 
   @Override
-  protected Class<?> getValueType() {
+  public TestResult test(final RunData data, final int read,
+      final boolean indexedRead, final int lane) {
 
-    return Double.class;
-  }
+    final double alignPhix =
+        data.getDouble("read" + read + ".lane" + lane + ".prc.align") / 100.0;
 
-  @Override
-  protected String getKey(final int read, final boolean indexedRead,
-      final int lane) {
+    final List<String> sampleNames =
+        Lists.newArrayList(Splitter.on(',').split(
+            data.get("design.lane" + lane + ".samples.names")));
 
-    return "read" + read + ".lane" + lane + ".prc.align";
-  }
+    final boolean control =
+        sampleNames.size() == 1
+            && data.getBoolean("design.lane"
+                + lane + "." + sampleNames.get(0) + ".control");
 
-  @Override
-  protected Number transformValue(final Number value, final RunData data,
-      final int read, final boolean indexedRead, final int lane) {
+    // No score for indexed read
+    if (indexedRead || !control)
+      return new TestResult(alignPhix, true);
 
-    return value.doubleValue() / 100.0;
-  }
+    return new TestResult(this.interval.isInInterval(alignPhix) ? 9 : 0,
+        alignPhix, true);
 
-  @Override
-  protected boolean isValuePercent() {
-
-    return true;
   }
 
   //
@@ -77,7 +86,7 @@ public class PercentAlignLaneTest extends AbstractSimpleLaneTest {
   public PercentAlignLaneTest() {
 
     super("percentalign", "", "PhiX Align", "%");
-    setInterval(new DoubleInterval(75, 100));
+    this.interval = new DoubleInterval(0.75, 1.0);
   }
 
 }
