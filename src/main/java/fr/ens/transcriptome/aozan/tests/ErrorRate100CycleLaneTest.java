@@ -76,7 +76,7 @@ public class ErrorRate100CycleLaneTest extends AbstractSimpleLaneTest {
   public ErrorRate100CycleLaneTest() {
 
     super("errorrate100cycle", "", "Error Rate 100 cycles", "%");
-    setInterval(new DoubleInterval(0, 1));
+    setInterval(new DoubleInterval(0, 0.02));
   }
 
 }
