@@ -90,6 +90,15 @@ public abstract class AbstractSimpleLaneTest extends AbstractLaneTest {
   }
 
   /**
+   * Test if the value is a percent.
+   * @return true if the value is a percent
+   */
+  protected boolean isValuePercent() {
+
+    return false;
+  }
+
+  /**
    * Get the type of the value.
    * @return a Class object with the type
    */
@@ -141,10 +150,10 @@ public abstract class AbstractSimpleLaneTest extends AbstractLaneTest {
 
     // Do the test ?
     if (interval == null || (indexedRead && !testIndexedRead()))
-      return new TestResult(transformedValue);
+      return new TestResult(transformedValue, isValuePercent());
 
     return new TestResult(interval.isInInterval(transformedValue) ? 9 : 0,
-        transformedValue);
+        transformedValue, isValuePercent());
   }
 
   /**

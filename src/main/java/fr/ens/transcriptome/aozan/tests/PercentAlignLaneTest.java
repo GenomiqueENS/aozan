@@ -24,6 +24,7 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 import fr.ens.transcriptome.aozan.util.DoubleInterval;
 
@@ -34,8 +35,6 @@ import fr.ens.transcriptome.aozan.util.DoubleInterval;
  */
 public class PercentAlignLaneTest extends AbstractSimpleLaneTest {
 
-
-  
   @Override
   public String[] getCollectorsNamesRequiered() {
 
@@ -53,6 +52,19 @@ public class PercentAlignLaneTest extends AbstractSimpleLaneTest {
       final int lane) {
 
     return "read" + read + ".lane" + lane + ".prc.align";
+  }
+
+  @Override
+  protected Number transformValue(final Number value, final RunData data,
+      final int read, final boolean indexedRead, final int lane) {
+
+    return value.doubleValue() / 100.0;
+  }
+
+  @Override
+  protected boolean isValuePercent() {
+
+    return true;
   }
 
   //

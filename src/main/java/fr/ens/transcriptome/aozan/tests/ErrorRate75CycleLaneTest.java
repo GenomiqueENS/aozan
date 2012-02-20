@@ -24,6 +24,7 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 import fr.ens.transcriptome.aozan.util.DoubleInterval;
 
@@ -52,6 +53,19 @@ public class ErrorRate75CycleLaneTest extends AbstractSimpleLaneTest {
     return Double.class;
   }
 
+  @Override
+  protected boolean isValuePercent() {
+
+    return true;
+  }
+  
+  @Override
+  protected Number transformValue(final Number value, final RunData data,
+      final int read, final boolean indexedRead, final int lane) {
+
+    return value.doubleValue() / 100.0;
+  }
+  
   //
   // Constructor
   //
@@ -62,7 +76,7 @@ public class ErrorRate75CycleLaneTest extends AbstractSimpleLaneTest {
   public ErrorRate75CycleLaneTest() {
 
     super("errorrate75cycle", "", "Error Rate 75 cyle");
-    setInterval(new DoubleInterval(0, 0.01));
+    setInterval(new DoubleInterval(0, 1));
   }
 
 }

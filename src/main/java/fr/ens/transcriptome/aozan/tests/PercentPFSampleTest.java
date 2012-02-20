@@ -57,12 +57,12 @@ public class PercentPFSampleTest extends AbstractSampleTest {
 
     final long raw = data.getLong(prefix + ".raw.cluster.count");
     final long pf = data.getLong(prefix + ".pf.cluster.count");
-    final double percent = (double) pf / (double) raw * 100;
+    final double percent = (double) pf / (double) raw;
 
     if (interval == null)
-      return new TestResult(percent);
+      return new TestResult(percent, true);
 
-    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent);
+    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent, true);
   }
 
   //
@@ -74,7 +74,7 @@ public class PercentPFSampleTest extends AbstractSampleTest {
    */
   public PercentPFSampleTest() {
     super("percentpfsample", "", "Passing filter", "%");
-    this.interval = new DoubleInterval(60.0, 100.0);
+    this.interval = new DoubleInterval(0.6, 1.0);
   }
 
 }

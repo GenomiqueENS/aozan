@@ -45,8 +45,6 @@ version="1.0">
 </head>
 <body>
 
-
-
   <h1><xsl:value-of select="/QCReport/RunId"/> Quality report</h1> 
 
   <ul>
@@ -77,6 +75,7 @@ version="1.0">
          <td class="score{@score}">
            <xsl:if test="@type='int'"><xsl:value-of select="format-number(.,'### ### ### ### ###','aozan')"/></xsl:if>
            <xsl:if test="@type='float'"><xsl:value-of select="format-number(.,'### ### ### ##0.00','aozan')"/></xsl:if>
+           <xsl:if test="@type='percent'"><xsl:value-of select="format-number(.,'#0.00%','aozan')"/></xsl:if>
            <xsl:if test="@type='string'"><xsl:value-of select="."/></xsl:if>
          </td>
        </xsl:for-each>
@@ -108,6 +107,7 @@ version="1.0">
          <td class="score{@score}">
            <xsl:if test="@type='int'"><xsl:value-of select="format-number(.,'### ### ### ### ###','aozan')"/></xsl:if>
            <xsl:if test="@type='float'"><xsl:value-of select="format-number(.,'### ### ### ##0.00','aozan')"/></xsl:if>
+           <xsl:if test="@type='percent'"><xsl:value-of select="format-number(.,'#0.00%','aozan')"/></xsl:if>
            <xsl:if test="@type='string'"><xsl:value-of select="."/></xsl:if>
          </td>
        </xsl:for-each>

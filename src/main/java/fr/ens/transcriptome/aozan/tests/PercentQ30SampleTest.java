@@ -58,12 +58,13 @@ public class PercentQ30SampleTest extends AbstractSampleTest {
     final long q30 = data.getLong(prefix + ".raw.yield.q30");
     final long raw = data.getLong(prefix + ".raw.yield");
 
-    final double percent = (double) q30 / (double) raw * 100;
+    final double percent = (double) q30 / (double) raw;
 
     if (interval == null)
-      return new TestResult(percent);
+      return new TestResult(percent, true);
 
-    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent);
+    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent,
+        true);
   }
 
   //
@@ -75,7 +76,7 @@ public class PercentQ30SampleTest extends AbstractSampleTest {
    */
   public PercentQ30SampleTest() {
     super("percentq30", "", ">= Q30", "%");
-    this.interval = new DoubleInterval(75.0, 100.0);
+    this.interval = new DoubleInterval(0.75, 1.0);
   }
 
 }

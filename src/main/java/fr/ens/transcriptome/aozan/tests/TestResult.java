@@ -32,7 +32,7 @@ package fr.ens.transcriptome.aozan.tests;
 public class TestResult {
 
   private final int score;
-  private final Class<?> type;
+  private final String type;
   private final String message;
 
   //
@@ -63,13 +63,7 @@ public class TestResult {
    */
   public String getType() {
 
-    if (this.type == Long.class)
-      return "int";
-
-    if (this.type == Double.class)
-      return "float";
-
-    return "string";
+    return this.type;
   }
 
   //
@@ -81,7 +75,7 @@ public class TestResult {
    * @param value number object
    * @return the Class of this object for TestResult
    */
-  private static final Class<?> getNumberClass(final Number value) {
+  private static final String getNumberClass(final Number value) {
 
     if (value == null)
       return null;
@@ -91,9 +85,9 @@ public class TestResult {
     if (clazz == Byte.class
         || clazz == Short.class || clazz == Integer.class
         || clazz == Long.class)
-      return Long.class;
+      return "int";
 
-    return Double.class;
+    return "float";
   }
 
   //
@@ -104,8 +98,9 @@ public class TestResult {
    * Public constructor.
    * @param score score of a test
    * @param message result message of a test
+   * @param percent true if value is a percent
    */
-  public TestResult(final int score, final Number value) {
+  public TestResult(final int score, final Number value, boolean percent) {
 
     if (score < -1 || score > 9)
       throw new IllegalArgumentException(
@@ -113,7 +108,18 @@ public class TestResult {
 
     this.score = score;
     this.message = value == null ? "" : value.toString();
-    this.type = getNumberClass(value);
+    this.type = percent ? "percent" : getNumberClass(value);
+  }
+
+  /**
+   * Public constructor.
+   * @param score score of a test
+   * @param message result message of a test
+   * @param percent true if value is a percent
+   */
+  public TestResult(final int score, final Number value) {
+
+    this(score, value, false);
   }
 
   /**
@@ -122,9 +128,17 @@ public class TestResult {
    */
   public TestResult(final Number value) {
 
-    this.score = -1;
-    this.message = value.toString();
-    this.type = getNumberClass(value);
+    this(-1, value);
+  }
+
+  /**
+   * Public constructor.
+   * @param message result message of a test
+   * @param percent true if value is a percent
+   */
+  public TestResult(final Number value, final boolean percent) {
+
+    this(-1, value, percent);
   }
 
   /**
@@ -140,7 +154,7 @@ public class TestResult {
 
     this.score = score;
     this.message = message == null ? "" : message;
-    this.type = String.class;
+    this.type = "string";
   }
 
   /**
@@ -151,7 +165,7 @@ public class TestResult {
 
     this.score = -1;
     this.message = message;
-    this.type = String.class;
+    this.type = "string";
   }
 
 }

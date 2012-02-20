@@ -24,6 +24,7 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 import fr.ens.transcriptome.aozan.util.DoubleInterval;
 
@@ -51,6 +52,19 @@ public class PercentCycle20Intensity extends AbstractSimpleLaneTest {
       final int lane) {
 
     return "read" + read + ".lane" + lane + ".prc.intensity.after.20.cycles.pf";
+  }
+
+  @Override
+  protected Number transformValue(final Number value, final RunData data,
+      final int read, final boolean indexedRead, final int lane) {
+
+    return value.doubleValue() / 100.0;
+  }
+
+  @Override
+  protected boolean isValuePercent() {
+
+    return true;
   }
 
   //

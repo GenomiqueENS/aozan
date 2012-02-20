@@ -66,12 +66,13 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
     final long raw = data.getLong(rawSampleKey);
     final long all = data.getLong(rawAll);
 
-    final double percent = (double) raw / (double) all * 100;
+    final double percent = (double) raw / (double) all;
 
     if (interval == null)
-      return new TestResult(percent);
+      return new TestResult(percent, true);
 
-    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent);
+    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent,
+        true);
   }
 
   //
@@ -82,7 +83,7 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
    * Public constructor.
    */
   public PercentInLaneSampleTest() {
-    super("percentinlanesample", "", "Passing filter", "%");
+    super("percentinlanesample", "", "Ratio sample", "%");
     this.interval = null;
   }
 
