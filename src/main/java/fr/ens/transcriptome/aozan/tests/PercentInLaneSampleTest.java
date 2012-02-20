@@ -68,7 +68,7 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
 
     final double percent = (double) raw / (double) all;
 
-    if (interval == null)
+    if (interval == null || sampleName == null)
       return new TestResult(percent, true);
 
     return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent,

@@ -50,16 +50,18 @@ public class MeanQualityScoreSampleTest extends AbstractSampleTest {
     final String prefix;
 
     if (sampleName == null)
-      prefix = "demux.lane" + lane + ".sample.lane" + lane + ".read" + readSample;
+      prefix =
+          "demux.lane" + lane + ".sample.lane" + lane + ".read" + readSample;
     else
-      prefix = "demux.lane" + lane + ".sample." + sampleName + ".read" + readSample;
+      prefix =
+          "demux.lane" + lane + ".sample." + sampleName + ".read" + readSample;
 
     final long qualityScoreSum = data.getLong(prefix + ".pf.quality.score.sum");
     final long yield = data.getLong(prefix + ".pf.yield");
 
     final double mean = (double) qualityScoreSum / (double) yield;
 
-    if (interval == null)
+    if (interval == null || sampleName == null)
       return new TestResult(mean);
 
     return new TestResult(this.interval.isInInterval(mean) ? 9 : 0, mean);

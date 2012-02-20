@@ -146,7 +146,7 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
         transformValue(value, data, read, readSample, lane, sampleName);
 
     // Do the test ?
-    if (interval == null)
+    if (interval == null || sampleName == null)
       return new TestResult(transformedValue, isValuePercent());
 
     return new TestResult(interval.isInInterval(transformedValue) ? 9 : 0,

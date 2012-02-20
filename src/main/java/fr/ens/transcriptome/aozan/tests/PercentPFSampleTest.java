@@ -61,7 +61,7 @@ public class PercentPFSampleTest extends AbstractSampleTest {
     final long pf = data.getLong(prefix + ".pf.cluster.count");
     final double percent = (double) pf / (double) raw;
 
-    if (interval == null)
+    if (interval == null || sampleName == null)
       return new TestResult(percent, true);
 
     return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent,

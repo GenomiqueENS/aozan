@@ -62,7 +62,7 @@ public class PercentQ30SampleTest extends AbstractSampleTest {
 
     final double percent = (double) q30 / (double) raw;
 
-    if (interval == null)
+    if (interval == null || sampleName == null)
       return new TestResult(percent, true);
 
     return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent,
