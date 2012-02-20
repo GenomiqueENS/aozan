@@ -33,7 +33,7 @@ import fr.ens.transcriptome.aozan.util.DoubleInterval;
  * @since 1.0
  * @author Laurent Jourdren
  */
-public class PercentCycle20Intensity extends AbstractSimpleLaneTest {
+public class PercentCycle20IntensityLaneTest extends AbstractSimpleLaneTest {
 
   @Override
   public String[] getCollectorsNamesRequiered() {
@@ -74,7 +74,7 @@ public class PercentCycle20Intensity extends AbstractSimpleLaneTest {
   /**
    * Public constructor.
    */
-  public PercentCycle20Intensity() {
+  public PercentCycle20IntensityLaneTest() {
 
     super("percentintensitycycle20", "", "Intensity cycle 20", "%");
     setInterval(new DoubleInterval(0.5, 1.0));
