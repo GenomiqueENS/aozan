@@ -99,6 +99,7 @@ version="1.0">
       <th>Sample name</th>
       <th>Description</th>
       <th>Index</th>
+      <th>Project</th>
       <xsl:for-each select="/QCReport/SamplesReport/Columns/Column">
         <th><xsl:value-of select="."/><xsl:if test="@unit!=''"> (<xsl:value-of select="@unit"/>)</xsl:if></th>
       </xsl:for-each>
@@ -109,6 +110,7 @@ version="1.0">
        <td><xsl:value-of select="@name"/></td>
        <td><xsl:value-of select="@desc"/></td>
        <td><xsl:value-of select="@index"/></td>
+       <td><xsl:value-of select="@project"/></td>
        <xsl:for-each select="Test">
          <td class="score{@score}">
            <xsl:if test="@type='int'"><xsl:value-of select="format-number(.,'### ### ### ### ###','aozan')"/></xsl:if>

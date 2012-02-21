@@ -157,17 +157,17 @@ public class QCReport {
     final Element reads = doc.createElement("Reads");
     root.appendChild(reads);
     int readSample = 0;
-    
+
     for (int read = 1; read <= readCount; read++) {
 
       if (data.getBoolean("run.info.read" + read + ".indexed"))
         continue;
 
       readSample++;
-      
+
       final Element readElement = doc.createElement("Read");
       readElement.setAttribute("number", Integer.toString(readSample));
-      // readElement.setAttribute("indexed", Boolean.toString(indexedRead));
+
       reads.appendChild(readElement);
 
       for (int lane = 1; lane <= laneCount; lane++) {
@@ -183,33 +183,41 @@ public class QCReport {
 
         for (String sampleName : sampleNames) {
 
-          // Get sample index
+          // Get the sample index
           final String index =
               data.get("design.lane" + lane + "." + sampleName + ".index");
 
-          // Get sample description
+          // Get the sample description
           final String desc =
               data.get("design.lane" + lane + "." + sampleName + ".description");
 
-          addSample(readElement, read, readSample, lane, sampleName, desc, noIndex
-              ? "NoIndex" : index);
+          // Get the sample project
+          final String projectName =
+              data.get("design.lane"
+                  + lane + "." + sampleName + ".sample.project");
+
+          addSample(readElement, read, readSample, lane, sampleName, desc,
+              projectName, noIndex ? "NoIndex" : index);
         }
 
         // Undetermined indexes
         if (!noIndex)
-          addSample(readElement, read, readSample, lane, null, null, "Undetermined");
+          addSample(readElement, read, readSample, lane, null, null, null,
+              "Undetermined");
       }
     }
   }
 
-  private void addSample(final Element readElement, final int read, final int readSample,
-      final int lane, final String sampleName, final String desc,
-      final String index) {
+  private void addSample(final Element readElement, final int read,
+      final int readSample, final int lane, final String sampleName,
+      final String desc, final String projectName, final String index) {
 
     final Element sampleElement = doc.createElement("Sample");
     sampleElement.setAttribute("name", sampleName == null
         ? "Undetermined" : sampleName);
     sampleElement.setAttribute("desc", desc == null ? "No description" : desc);
+    sampleElement.setAttribute("project", projectName == null
+        ? "Undetermined" : projectName);
     sampleElement.setAttribute("lane", Integer.toString(lane));
     sampleElement.setAttribute("index", index);
 
@@ -217,7 +225,8 @@ public class QCReport {
 
     for (SampleTest test : this.sampleTests) {
 
-      final TestResult result = test.test(data, read, readSample, lane, sampleName);
+      final TestResult result =
+          test.test(data, read, readSample, lane, sampleName);
 
       final Element testElement = doc.createElement("Test");
       testElement.setAttribute("name", test.getName());
