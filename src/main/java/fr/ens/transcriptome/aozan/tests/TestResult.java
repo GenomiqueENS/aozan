@@ -148,13 +148,7 @@ public class TestResult {
    */
   public TestResult(final int score, final String message) {
 
-    if (score < -1 || score > 9)
-      throw new IllegalArgumentException(
-          "The score value must be between -1 and 9");
-
-    this.score = score;
-    this.message = message == null ? "" : message;
-    this.type = "string";
+    this(score, message, "string");
   }
 
   /**
@@ -163,9 +157,23 @@ public class TestResult {
    */
   public TestResult(final String message) {
 
-    this.score = -1;
-    this.message = message;
-    this.type = "string";
+    this(-1, message, "string");
+  }
+
+  /**
+   * Public constructor.
+   * @param score score of a test
+   * @param message result message of a test
+   */
+  public TestResult(final int score, final String message, final String type) {
+
+    if (score < -1 || score > 9)
+      throw new IllegalArgumentException(
+          "The score value must be between -1 and 9");
+
+    this.score = score;
+    this.message = message == null ? "" : message;
+    this.type = type;
   }
 
 }
