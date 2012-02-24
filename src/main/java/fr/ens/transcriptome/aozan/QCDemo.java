@@ -37,6 +37,7 @@ import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.collectors.DesignCollector;
+import fr.ens.transcriptome.aozan.collectors.FastQCCollector;
 import fr.ens.transcriptome.aozan.collectors.FlowcellDemuxSummaryCollector;
 import fr.ens.transcriptome.aozan.collectors.PhasingCollector;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
@@ -86,7 +87,7 @@ public class QCDemo {
     final List<Collector> collectors =
         Lists.newArrayList(new RunInfoCollector(), new ReadCollector(),
             new DesignCollector(), new FlowcellDemuxSummaryCollector(),
-            new PhasingCollector());
+            new PhasingCollector(), new FastQCCollector());
 
     // Create the run data object
     final RunData data =
@@ -144,8 +145,11 @@ public class QCDemo {
     final String bclDir = "/home/jourdren/shares-net/sequencages/bcl";
     final String fastqDir = "/home/jourdren/shares-net/sequencages/fastq";
 
-    // final String runId = "120124_SNL110_0036_AD0DM3ABXX";
+    final String runId = "120124_SNL110_0036_AD0DM3ABXX";
     // final String runId = "120210_SNL110_0037_AC0BE6ACXX";
+
+    processRun(bclDir, fastqDir, runId);
+    System.exit(0);
 
     final File[] runIdsDir = new File(fastqDir).listFiles(new FileFilter() {
 
@@ -157,7 +161,8 @@ public class QCDemo {
     });
 
     for (File runIdDir : runIdsDir) {
-      if (!runIdDir.getName().contains("0024") && !runIdDir.getName().contains("0023"))
+      if (!runIdDir.getName().contains("0024")
+          && !runIdDir.getName().contains("0023"))
         processRun(bclDir, fastqDir, runIdDir.getName());
     }
 
