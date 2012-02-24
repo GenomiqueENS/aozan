@@ -75,7 +75,24 @@
             <action dev="jourdren" type="fix">
                         Change Eoulsan version dependency. Prevent errors with Casava design CSV file with comma in cell value.
             </action>
-        </release> 
+        </release>
+        
+        <release version="0.7" description="" date="2012-02-24">
+            <action dev="jourdren" type="fix">
+                        Fix typo in mail message when the end of run is discovered.
+            </action>
+            <action dev="jourdren" type="update">
+                        Now use Eoulsan 1.2-SNAPSHOT as dependency. New Casava design check:  1) Allow the use of a sample in several lanes.
+2) new error if a sample is used by more than one project. 3) new warning if a sample exists in more than one lane. 4) new warning with the list of line where is a sample (if the number
+of lanes >1). 5) new errors if a sample is defined several time by with not the same sequence index.
+            </action>
+            <action dev="jourdren" type="update">
+                        In demux step, add Casava design warnings to log and to the success mail send to users.
+            </action>
+            <action dev="jourdren" type="update">
+                        The default number of threads is now the number of available processors/cores.
+            </action>
+        </release>
 		
 	</body>
 </document>
