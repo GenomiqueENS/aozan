@@ -4,7 +4,7 @@
 
   <groupId>fr.ens.transcriptome</groupId>
   <artifactId>aozan</artifactId>
-  <version>0.6</version>
+  <version>0.7-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Aozan</name>
@@ -24,7 +24,7 @@
     <dependency>
       <groupId>fr.ens.transcriptome</groupId>
       <artifactId>eoulsan</artifactId>
-      <version>1.1-SNAPSHOT</version>
+      <version>1.2-SNAPSHOT</version>
     </dependency> 
     <dependency>
       <groupId>org.apache.poi</groupId>
@@ -88,7 +88,7 @@
                                     <attribute name="Implementation-Version" value="build${build.number}"/>   
                                     <attribute name="Implementation-Vendor" value="${project.organization.name}"/>
 
-                                    <attribute name="Main-Class" value="fr.ens.transcriptome.eoulsan.Main"/>
+                                    <!--attribute name="Main-Class" value="fr.ens.transcriptome.eoulsan.Main"/-->
                                 </manifest>
                                 <copy file="${basedir}/target/generated-resources/MANIFEST.MF" tofile="${basedir}/target/classes/manifest.txt"/>
                                     </tasks>
@@ -214,7 +214,7 @@
                 <artifactItem>
                   <groupId>fr.ens.transcriptome</groupId>
                   <artifactId>eoulsan</artifactId>
-                  <version>1.1-SNAPSHOT</version>
+                  <version>1.2-SNAPSHOT</version>
                   <!--type></type-->
                   <!--classifier> [classifier - optional] </classifier-->
                   <overWrite>true</overWrite>
