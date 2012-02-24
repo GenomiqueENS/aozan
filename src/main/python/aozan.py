@@ -47,6 +47,16 @@ def load_pid_in_lock_file(lock_file_path):
     return pid
    
 
+def welcome():
+    """Welcome message.
+    """
+    global something_to_do
+    if something_to_do == False:
+        common.log('INFO', 'Start ' + Globals.WELCOME_MSG, conf)
+        something_to_do = True
+
+something_to_do = False
+
 # Main function
 if __name__ == "__main__":
 
@@ -77,7 +87,7 @@ if __name__ == "__main__":
 
         try:
             create_lock_file(lock_file_path)
-            common.log('INFO', 'Start ' + Globals.WELCOME_MSG, conf)
+            
 
             #
             # Discover first base report
@@ -87,6 +97,7 @@ if __name__ == "__main__":
     
             if conf['first.base.report.step'].lower().strip() == 'true':
                 for run_id in (first_base_report.get_available_run_ids(conf) - first_base_report_sent):
+                    welcome()
                     common.log('INFO', 'First base report ' + run_id, conf)
                     first_base_report.send_report(run_id, conf)
                     first_base_report.add_run_id_to_processed_run_ids(run_id, conf)
@@ -101,6 +112,7 @@ if __name__ == "__main__":
              
             if conf['hiseq.step'].lower().strip() == 'true':
                 for run_id in (hiseq_run.get_available_run_ids(conf) - hiseq_run_ids_done):
+                    welcome()
                     common.log('INFO', 'Discover ' + run_id, conf)
                     hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
                     hiseq_run.add_run_id_to_processed_run_ids(run_id, conf)
@@ -122,6 +134,7 @@ if __name__ == "__main__":
             # Get the list of run available on HiSeq output
             if conf['sync.step'].lower().strip() == 'true':
                 for run_id in (hiseq_run_ids_done - sync_run_ids_done - hiseq_run_ids_do_not_process):
+                    welcome()
                     common.log('INFO', 'Synchronize ' + run_id, conf)
                     if sync_run.sync(run_id, conf):
                             sync_run.add_run_id_to_processed_run_ids(run_id, conf)
@@ -135,10 +148,11 @@ if __name__ == "__main__":
     
             if conf['demux.step'].lower().strip() == 'true':
                 for run_id in (sync_run_ids_done - demux_run_ids_done):
-                        common.log('INFO', 'Demux ' + run_id, conf)
-                        if demux_run.demux(run_id, conf):
-                            demux_run.add_run_id_to_processed_run_ids(run_id, conf)
-                            demux_run_ids_done.add(run_id)
+                    welcome()
+                    common.log('INFO', 'Demux ' + run_id, conf)
+                    if demux_run.demux(run_id, conf):
+                        demux_run.add_run_id_to_processed_run_ids(run_id, conf)
+                        demux_run_ids_done.add(run_id)
     
             #
             # Quality control
@@ -148,16 +162,18 @@ if __name__ == "__main__":
             
             if conf['qc.step'].lower().strip() == 'true':
                 for run_id in (demux_run_ids_done - qc_run_ids_done):
-                        common.log('INFO', 'Quality control ' + run_id, conf)
-                        if qc_run.qc(run_id, conf):
-                            qc_run.add_run_id_to_processed_run_ids(run_id, conf)
-                            qc_run_ids_done.add(run_id)
+                    welcome()
+                    common.log('INFO', 'Quality control ' + run_id, conf)
+                    if qc_run.qc(run_id, conf):
+                        qc_run.add_run_id_to_processed_run_ids(run_id, conf)
+                        qc_run_ids_done.add(run_id)
     
             delete_lock_file(lock_file_path)
             
             # TODO remove *.lasterr files
     
-            common.log('INFO', 'End of Aozan', conf)
+            if something_to_do:
+                common.log('INFO', 'End of Aozan', conf)
         except:
                 common.log('CRITICAL', 'Exception: ' +  str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')' , conf)
                 common.log('TRACEBACK', traceback.format_exc(sys.exc_info()[2]).replace('\n', ' '), conf)
