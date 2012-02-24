@@ -202,6 +202,11 @@ def demux(run_id, conf):
           '--input-dir ' + conf['bcl.data.path'] + '/' + run_id + '/Data/Intensities/BaseCalls ' + \
           '--sample-sheet ' + design_csv_path + ' ' + \
           '--output-dir ' + fastq_output_dir
+    if conf['casava.with.failed.reads']=='True':
+        cmd = cmd + ' --with-failed-reads'
+    if conf['casava.adapter.fasta.file.path']!='':
+        cmd = cmd + ' --adapter-sequence ' + conf['casava.adapter.fasta.file.path']
+          
     common.log("DEBUG", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while creating Casava makefile for run " + run_id, 'Error while creating Casava makefile.\nCommand line:\n' + cmd, conf)
