@@ -42,6 +42,19 @@ public class AozanTestRegistry {
   private static AozanTestRegistry instance;
   private Map<String, AozanTest> tests = Maps.newHashMap();
 
+  /**
+   * Get a the test instance.
+   * @param testName name of the test.
+   * @return an AozanTest or null is the test does not exists
+   */
+  public AozanTest get(final String testName) {
+
+    if (testName == null)
+      return null;
+
+    return this.tests.get(testName.trim().toLowerCase());
+  }
+
   private void register(final AozanTest test) {
 
     if (test == null)
@@ -63,8 +76,8 @@ public class AozanTestRegistry {
   //
 
   /**
-   * Get the singleton instance of DataFormatRegistry
-   * @return the DataFormatRegistry singleton
+   * Get the singleton instance of AozanTestRegistry
+   * @return the AozanTestRegistry singleton
    */
   public static AozanTestRegistry getInstance() {
 
@@ -89,8 +102,8 @@ public class AozanTestRegistry {
     while (it.hasNext()) {
 
       register(it.next());
-
     }
+
   }
 
 }
