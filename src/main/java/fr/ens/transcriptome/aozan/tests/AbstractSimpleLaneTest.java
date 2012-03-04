@@ -24,6 +24,9 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.Map;
+
+import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.util.Interval;
 
@@ -58,6 +61,19 @@ public abstract class AbstractSimpleLaneTest extends AbstractLaneTest {
    */
   public void setInterval(final Interval interval) {
     this.interval = interval;
+  }
+
+  //
+  // Other methods
+  //
+
+  @Override
+  public void configure(final Map<String, String> properties)
+      throws AozanException {
+
+    if (properties == null)
+      throw new NullPointerException("The properties object is null");
+
   }
 
   //

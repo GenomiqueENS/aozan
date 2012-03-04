@@ -65,6 +65,14 @@ public abstract class AbstractSampleTest implements SampleTest {
   }
 
   //
+  // Other methods
+  //
+
+  @Override
+  public void init() {
+  }
+
+  //
   // Constructor
   //
 

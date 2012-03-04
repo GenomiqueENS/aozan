@@ -24,18 +24,16 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.Map;
+
+import fr.ens.transcriptome.aozan.AozanException;
+
 /**
  * This interface define an Aozan QC test.
  * @since 1.0
  * @author Laurent Jourdren
  */
 public interface AozanTest {
-
-  /** Integer result data format. */
-  public String INTEGER_FORMAT = "%,d";
-
-  /** Double result data format. */
-  public String DOUBLE_FORMAT = "%,.2f";
 
   /**
    * Get the name of the test.
@@ -67,4 +65,16 @@ public interface AozanTest {
    */
   public String[] getCollectorsNamesRequiered();
 
+  /**
+   * Configure the test.
+   * @param properties a map with the configuration of the test
+   */
+  public void configure(final Map<String, String> properties)
+      throws AozanException;
+
+  /**
+   * Initialize the test.
+   * @throws AozanException if an error occurs while initialize the test.
+   */
+  public void init() throws AozanException;
 }

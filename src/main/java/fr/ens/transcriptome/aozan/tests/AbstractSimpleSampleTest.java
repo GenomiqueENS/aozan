@@ -24,6 +24,9 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.Map;
+
+import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.util.Interval;
 
@@ -151,6 +154,19 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
 
     return new TestResult(interval.isInInterval(transformedValue) ? 9 : 0,
         transformedValue, isValuePercent());
+  }
+
+  //
+  // Other methods
+  //
+
+  @Override
+  public void configure(final Map<String, String> properties)
+      throws AozanException {
+
+    if (properties == null)
+      throw new NullPointerException("The properties object is null");
+
   }
 
   //
