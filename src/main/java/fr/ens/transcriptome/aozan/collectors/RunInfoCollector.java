@@ -59,6 +59,12 @@ public class RunInfoCollector implements Collector {
   }
 
   @Override
+  public String[] getCollectorsNamesRequiered() {
+
+    return null;
+  }
+
+  @Override
   public void configure(final Properties properties) {
 
     if (properties == null)
