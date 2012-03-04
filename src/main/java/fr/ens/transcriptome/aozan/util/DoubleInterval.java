@@ -24,6 +24,8 @@
 
 package fr.ens.transcriptome.aozan.util;
 
+import fr.ens.transcriptome.aozan.AozanException;
+
 /**
  * This class define a double interval
  * @since 1.0
@@ -81,6 +83,70 @@ public class DoubleInterval implements Interval {
     this.minInclude = minIncluded;
     this.max = max;
     this.maxInclude = maxIncluded;
+  }
+
+  public DoubleInterval(final String s) throws AozanException {
+
+    if (s == null)
+      throw new NullPointerException("The interval string is null");
+
+    final String trimmed = s.trim();
+
+    // Exclude minimal end point ?
+    switch (trimmed.charAt(0)) {
+
+    case '[':
+      this.minInclude = true;
+      break;
+    case ']':
+    case '(':
+      this.minInclude = false;
+      break;
+    default:
+      throw new AozanException("Invalid interval: " + s);
+    }
+
+    // Exclude maximal end point ?
+    switch (trimmed.charAt(trimmed.length() - 1)) {
+
+    case ']':
+      this.maxInclude = true;
+      break;
+    case '[':
+    case ')':
+      this.maxInclude = false;
+      break;
+    default:
+      throw new AozanException("Invalid interval: " + s);
+    }
+
+    // Get the values of end points
+    final String[] values =
+        trimmed.substring(1, trimmed.length() - 1).split(",");
+
+    if (values == null || values.length != 2)
+      throw new AozanException("Invalid interval: " + s);
+
+    // Trim the values
+    final String minString = values[0].trim();
+    final String maxString = values[0].trim();
+
+    try {
+      
+      if ("".equals(minString))
+        this.min = Double.NEGATIVE_INFINITY;
+      else
+        this.min = Double.parseDouble(minString);
+
+      if ("".equals(maxString))
+        this.max = Double.POSITIVE_INFINITY;
+      else
+        this.max = Double.parseDouble(maxString);
+      
+    } catch (NumberFormatException e) {
+      throw new AozanException("Invalid interval: " + s);
+    }
+
   }
 
 }
