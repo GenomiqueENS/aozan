@@ -1,4 +1,3 @@
-fr.ens.transcriptome.aozan.collectors.Collector
 fr.ens.transcriptome.aozan.collectors.DesignCollector
 fr.ens.transcriptome.aozan.collectors.FlowcellDemuxSummaryCollector
 fr.ens.transcriptome.aozan.collectors.PhasingCollector
