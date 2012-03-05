@@ -138,6 +138,12 @@ public class QC {
 
     initCollectors();
 
+    // Initialize tests
+    for (LaneTest test : this.laneTests)
+      test.init();
+    for (SampleTest test : this.sampleTests)
+      test.init();
+
   }
 
   private final void initCollectors() throws AozanException {
