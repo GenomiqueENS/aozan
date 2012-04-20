@@ -335,6 +335,10 @@ public class QCReport {
    */
   public String export(final InputStream is) throws AozanException {
 
+    if (is == null)
+      throw new NullPointerException(
+          "The input stream for the XSL stylesheet is null.");
+
     doTests();
 
     try {
