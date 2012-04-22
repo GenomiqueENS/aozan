@@ -25,6 +25,7 @@
 package fr.ens.transcriptome.aozan;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -51,6 +52,7 @@ public class QC {
   private List<Collector> collectors = Lists.newArrayList();
   private List<LaneTest> laneTests = Lists.newArrayList();
   private List<SampleTest> sampleTests = Lists.newArrayList();
+  private File tmpDir;
 
   /**
    * Process data.
@@ -60,10 +62,34 @@ public class QC {
    * @throws AozanException if an error occurs while computing report
    */
   public final QCReport computeReport(final String bclDir,
-      final String fastqDir, final String runId) throws AozanException {
+      final String fastqDir, final String qcDir, final String runId)
+      throws AozanException {
 
-    final File RTAOutputDir = new File(bclDir, runId);
-    final File casavaOutputDir = new File(fastqDir, runId);
+    final File RTAOutputDir = new File(bclDir);
+    final File casavaOutputDir = new File(fastqDir);
+    final File QCOutputDir = new File(qcDir);
+
+    if (RTAOutputDir == null
+        || !RTAOutputDir.exists() || !RTAOutputDir.isDirectory())
+      throw new AozanException(
+          "The BCL directory does not exist or is not a directory: "
+              + RTAOutputDir);
+
+    if (casavaOutputDir == null
+        || !casavaOutputDir.exists() || !casavaOutputDir.isDirectory())
+      throw new AozanException(
+          "The Casava output directory does not exist or is not a directory: "
+              + casavaOutputDir);
+
+    if (QCOutputDir == null
+        || (QCOutputDir.exists() && !QCOutputDir.isDirectory()))
+      throw new AozanException(
+          "The QC directory does not exist or is not a directory: "
+              + QCOutputDir);
+
+    if (!QCOutputDir.exists())
+      if (!QCOutputDir.mkdirs())
+        throw new AozanException("Cannot create QC directory : " + QCOutputDir);
 
     File[] designFiles = casavaOutputDir.listFiles(new FilenameFilter() {
 
@@ -74,12 +100,27 @@ public class QC {
       }
     });
 
+    if (designFiles == null || designFiles.length == 0)
+      throw new AozanException("No Casava design file found in "
+          + casavaOutputDir);
+
     final File casavaDesignFile = designFiles[0];
 
+    // Create RunDataGenerator object
+    final RunDataGenerator rdg = new RunDataGenerator(this.collectors);
+
+    // Set the parameters of the generator
+    rdg.setRTAOutputDir(RTAOutputDir);
+    rdg.setCasavaDesignFile(casavaDesignFile);
+    rdg.setCasavaOutputDir(casavaOutputDir);
+    rdg.setQCOutputDir(QCOutputDir);
+    rdg.setTemporaryDir(this.tmpDir);
+
     // Create the run data object
-    final RunData data =
-        new RunDataGenerator(RTAOutputDir, casavaDesignFile, casavaOutputDir,
-            this.collectors).collect();
+    final RunData data = rdg.collect();
+
+    if (data.size() == 0)
+      throw new AozanException("No data collected.");
 
     // Print the content of the run data object
     // data.print();
@@ -88,16 +129,81 @@ public class QC {
     return new QCReport(data, this.laneTests, this.sampleTests);
   }
 
+  /**
+   * Write the XML in a file.
+   * @param report the QCReport object
+   * @param outputFilename the path of the XML file
+   * @throws AozanException if an error occurs while creating the report
+   */
+  public void writeXMLReport(final QCReport report, final String outputFilename)
+      throws AozanException {
+
+    writeXMLReport(report, new File(outputFilename));
+  }
+
+  /**
+   * Write the XML in a file.
+   * @param report the QCReport object
+   * @param outputFile the XML file
+   * @throws AozanException if an error occurs while creating the report
+   */
+  public void writeXMLReport(final QCReport report, final File outputFile)
+      throws AozanException {
+
+    try {
+      final Writer writer = new FileWriter(outputFile);
+
+      writer.write(report.toXML());
+
+      writer.close();
+    } catch (IOException e) {
+      throw new AozanException(e);
+    }
+
+  }
+
+  /**
+   * Write the report usually in HTML) in a file.
+   * @param report the QCReport object
+   * @param stylesheetFilename XSL stylesheet file
+   * @param outputFilename the path of the report file
+   * @throws AozanException if an error occurs while creating the report
+   */
+  public void writeReport(final QCReport report,
+      final String stylesheetFilename, final String outputFilename)
+      throws AozanException {
+
+    if (outputFilename == null)
+      throw new AozanException("The filename for the qc report is null");
+
+    try {
+      final InputStream is;
+
+      if (stylesheetFilename == null)
+        is = this.getClass().getResourceAsStream(Globals.EMBEDDED_QC_XSL);
+      else
+        is = new FileInputStream(stylesheetFilename);
+
+      writeReport(report, is, new File(outputFilename));
+    } catch (IOException e) {
+      throw new AozanException(e);
+    }
+  }
+
+  /**
+   * Write the report usually in HTML) in a file.
+   * @param report the QCReport object
+   * @param xslIs XSL stylesheet input strea,
+   * @param outputFile the report file
+   * @throws AozanException if an error occurs while creating the report
+   */
   public void writeReport(final QCReport report, final InputStream xslIs,
       final File outputFile) throws AozanException {
 
     try {
       final Writer writer = new FileWriter(outputFile);
 
-      if (xslIs == null)
-        writer.write(report.toXML());
-      else
-        writer.write(report.export(xslIs));
+      writer.write(report.export(xslIs));
 
       writer.close();
     } catch (IOException e) {
@@ -117,7 +223,8 @@ public class QC {
       final String value = e.getValue();
 
       if (key.startsWith("qc.test.")
-          && key.endsWith(".enable") && "true".equals(value.trim())) {
+          && key.endsWith(".enable") && value != null
+          && "true".equals(value.trim().toLowerCase())) {
 
         final String testName =
             key.substring("qc.test.".length(),
@@ -199,6 +306,9 @@ public class QC {
       }
     }
 
+    if (this.collectors.size() == 0)
+      throw new AozanException("No collector found.");
+
   }
 
   private Set<Collector> getCollectors(String[] collectorNames) {
@@ -242,13 +352,30 @@ public class QC {
   /**
    * Public constructor.
    * @param properties QC properties
+   * @param tmpDirname temporary directory path
    * @throws AozanException if an error occurs while initialize the QC object
    */
-  public QC(final Map<String, String> properties) throws AozanException {
+  public QC(final Map<String, String> properties, final String tmpDirname)
+      throws AozanException {
+
+    this(properties, tmpDirname == null ? null : new File(tmpDirname));
+  }
+
+  /**
+   * Public constructor.
+   * @param properties QC properties
+   * @param tmpDir temporary directory
+   * @throws AozanException if an error occurs while initialize the QC object
+   */
+  public QC(final Map<String, String> properties, final File tmpDir)
+      throws AozanException {
 
     if (properties == null)
       throw new NullPointerException("The properties object is null");
 
+    this.tmpDir =
+        tmpDir == null
+            ? new File(System.getProperty("java.io.tmpdir")) : tmpDir;
     init(properties);
   }
 

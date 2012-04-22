@@ -99,7 +99,7 @@ public class QCDemo {
     // final List<String> runIds = getRunIds(fastqDir);
 
     // Process all runs
-    final QC qc = new QC(properties);
+    final QC qc = new QC(properties, (String) null);
 
     for (final String runId : runIds) {
       if (!runId.contains("0024") && !runId.contains("0023")) {
@@ -114,13 +114,15 @@ public class QCDemo {
 
         // XSL stylesheet
         final InputStream xslIs =
-            QCDemo.class.getResourceAsStream("/files/aozan.xsl");
+            QCDemo.class.getResourceAsStream("/aozan.xsl");
 
         // Compute report
-        final QCReport report = qc.computeReport(bclDir, fastqDir, runId);
+        final QCReport report =
+            qc.computeReport(bclDir + '/' + runId, fastqDir + '/' + runId,
+                "/tmp", runId);
 
         // Save report data
-        qc.writeReport(report, null, reportXmlFile);
+        qc.writeXMLReport(report, reportXmlFile);
 
         // Save HTML report
         qc.writeReport(report, xslIs, reportHtmlFile);

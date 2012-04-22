@@ -49,10 +49,78 @@ public class RunDataGenerator {
   /** Casava output directory property key. */
   public static final String CASAVA_OUTPUT_DIR = "casava.output.dir";
 
-  private final File RTAOutputDir;
-  private final File casavaDesignFile;
-  private final File casavaOutputDir;
+  /** QC output directory property key. */
+  public static final String QC_OUTPUT_DIR = "qc.output.dir";
+
+  /** Temporary directory property key. */
+  public static final String TMP_DIR = "tmp.dir";
+
+  /** Collect done property key. */
+  private static final String COLLECT_DONE = "collect.done";
+
   private final List<Collector> collectors = Lists.newArrayList();
+  private final Properties properties = new Properties();
+
+  //
+  // Setters
+  //
+
+  /**
+   * Set the RTA output directory.
+   * @param RTAOutputDir the RTA output directory
+   */
+  public void setRTAOutputDir(final File RTAOutputDir) {
+
+    checkNotNull(RTAOutputDir, "RTA output directory is null");
+
+    properties.setProperty(RTA_OUTPUT_DIR, RTAOutputDir.getAbsolutePath());
+  }
+
+  /**
+   * Set the Casava design file path.
+   * @param casavaDesignFile the Casava design path
+   */
+  public void setCasavaDesignFile(final File casavaDesignFile) {
+
+    checkNotNull(casavaDesignFile, "Casava design file is null");
+    properties.setProperty(CASAVA_DESIGN_PATH,
+        casavaDesignFile.getAbsolutePath());
+  }
+
+  /**
+   * Set the Casava output directory.
+   * @param casavaOutputDir the Casava output directory
+   */
+  public void setCasavaOutputDir(final File casavaOutputDir) {
+
+    checkNotNull(casavaOutputDir, "Casava output directory is null");
+    properties
+        .setProperty(CASAVA_OUTPUT_DIR, casavaOutputDir.getAbsolutePath());
+  }
+
+  /**
+   * Set the QC output directory.
+   * @param QCOutputDir the QC output directory
+   */
+  public void setQCOutputDir(final File QCOutputDir) {
+
+    checkNotNull(QCOutputDir, "QC output directory is null");
+    properties.setProperty(QC_OUTPUT_DIR, QCOutputDir.getAbsolutePath());
+  }
+
+  /**
+   * Set the temporary directory.
+   * @param tmpDir the temporary output directory
+   */
+  public void setTemporaryDir(final File tmpDir) {
+
+    checkNotNull(tmpDir, "Temporary directory is null");
+    properties.setProperty(TMP_DIR, tmpDir.getAbsolutePath());
+  }
+
+  //
+  // Others methods
+  //
 
   /**
    * Collect data and return a RunData object
@@ -63,22 +131,35 @@ public class RunDataGenerator {
 
     final RunData data = new RunData();
 
-    final Properties properties = new Properties();
-    properties.setProperty(RTA_OUTPUT_DIR, this.RTAOutputDir.getAbsolutePath());
-    properties.setProperty(CASAVA_DESIGN_PATH,
-        this.casavaDesignFile.getAbsolutePath());
-    properties.setProperty(CASAVA_OUTPUT_DIR,
-        this.casavaOutputDir.getAbsolutePath());
+    if (this.properties.containsKey(COLLECT_DONE))
+      throw new AozanException("Collect has been already done.");
+
+    if (!this.properties.containsKey(RTA_OUTPUT_DIR))
+      throw new AozanException("RTA output directory is not set.");
+
+    if (!this.properties.containsKey(CASAVA_DESIGN_PATH))
+      throw new AozanException("Casava design file path is not set.");
+
+    if (!this.properties.containsKey(CASAVA_OUTPUT_DIR))
+      throw new AozanException("Casava output directory is not set.");
+
+    if (!this.properties.containsKey(QC_OUTPUT_DIR))
+      throw new AozanException("QC output directory is not set.");
+
+    if (!this.properties.containsKey(TMP_DIR))
+      throw new AozanException("Temporary directory is not set.");
 
     // For all collectors
     for (final Collector collector : this.collectors) {
 
       // Configure
-      collector.configure(new Properties(properties));
+      collector.configure(new Properties(this.properties));
 
       // And collect data
       collector.collect(data);
     }
+
+    this.properties.setProperty(COLLECT_DONE, "true");
 
     return data;
   }
@@ -89,21 +170,11 @@ public class RunDataGenerator {
 
   /**
    * Public constructor.
-   * @param RTAOutputDir
-   * @param casavaDesignFile
-   * @param casavaOutputDir
    */
-  public RunDataGenerator(final File RTAOutputDir, final File casavaDesignFile,
-      final File casavaOutputDir, final List<Collector> collectors) {
+  public RunDataGenerator(final List<Collector> collectors) {
 
-    checkNotNull(RTAOutputDir, "RTA output directory is null");
-    checkNotNull(casavaDesignFile, "Casava design file is null");
-    checkNotNull(casavaOutputDir, "Casava output directory is null");
     checkNotNull(collectors, "The list of collectors is null");
 
-    this.RTAOutputDir = RTAOutputDir;
-    this.casavaDesignFile = casavaDesignFile;
-    this.casavaOutputDir = casavaOutputDir;
     this.collectors.addAll(collectors);
   }
 
