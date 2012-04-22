@@ -217,7 +217,7 @@ public class FastQCCollector implements Collector {
         final String keyPrefix = prefix + "." + module.name().replace(' ', '.');
 
         data.put(keyPrefix + ".error", module.raisesError());
-        data.put(keyPrefix + ".warning", module.raisesError());
+        data.put(keyPrefix + ".warning", module.raisesWarning());
       }
 
       // Create report
@@ -289,8 +289,8 @@ public class FastQCCollector implements Collector {
             - ".fastq".length() - this.compressionExtension.length());
 
     final File reportFile = new File(reportDir, filename + "-fastqc.zip");
-    
-    // Force unzip of the report 
+
+    // Force unzip of the report
     System.setProperty("fastqc.unzip", "true");
 
     new HTMLReportArchive(seqFile, this.moduleList.toArray(new QCModule[] {}),
