@@ -3,8 +3,13 @@ Created on 28 oct. 2011
 
 @author: jourdren
 '''
-
-import common
+import os.path
+import common, time
+from fr.ens.transcriptome.aozan import QC
+from fr.ens.transcriptome.aozan import QCReport
+from fr.ens.transcriptome.aozan import AozanException
+from java.lang import NumberFormatException
+from java.lang import NullPointerException
 
 def load_processed_run_ids(conf):
     """Load the list of the processed run ids.
@@ -13,7 +18,7 @@ def load_processed_run_ids(conf):
         conf: configuration dictionary
     """
 
-    return common.load_processed_run_ids(conf['aozan.var.path'] + '/demux.done')
+    return common.load_processed_run_ids(conf['aozan.var.path'] + '/qc.done')
 
 def add_run_id_to_processed_run_ids(run_id, conf):
     """Add a processed run id to the list of the run ids.
@@ -23,7 +28,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-    common.add_run_id_to_processed_run_ids(run_id, conf['aozan.var.path'] + '/demux.done', conf)
+    common.add_run_id_to_processed_run_ids(run_id, conf['aozan.var.path'] + '/qc.done', conf)
 
 
 def error(short_message, message, conf):
@@ -35,16 +40,104 @@ def error(short_message, message, conf):
         conf: configuration dictionary
     """
 
-    common.error('[Aozan] demultiplexer: ' + short_message, message, conf['aozan.var.path'] + '/demux.lasterr', conf)
+    common.error('[Aozan] qc: ' + short_message, message, conf['aozan.var.path'] + '/qc.lasterr', conf)
 
 
 def qc(run_id, conf):
+    """Proceed to quality control of a run.
 
-    print "qc for " + run_id
+    Arguments:
+        run id: The run id
+        conf: configuration dictionary
+    """
 
-    reports_data_path = conf['reports.data.path']
-    tmp_path = conf['tmp.path']
+    start_time = time.time()
 
-    if common.df(reports_data_path) < 10 * 1024 * 1024 * 1024:
-        error("Not enough disk space to store aozan reports for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
-              '.\nNeed more than 10 Gb on ' + reports_data_path + '.', conf)
+    fastq_input_dir = conf['fastq.data.path'] + '/' + run_id
+    bcl_input_dir = conf['bcl.data.path'] + '/' + run_id
+    qc_output_dir = conf['qc.data.path'] + '/qc_' + run_id
+
+    # Check if input root bcl data exists
+    if not os.path.exists(conf['bcl.data.path']):
+        error("Basecalling data directory does not exists", "Basecalling data directory does not exists: " + conf['bcl.data.path'], conf)
+        return False
+
+    # Check if input root fastq root data exists
+    if not os.path.exists(conf['fastq.data.path']):
+        error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf['fastq.data.path'], conf)
+        return False
+
+    # Check if temporary directory exists
+    if not os.path.exists(conf['tmp.path']):
+        error("Temporary directory does not exists", "Temporary directory does not exists: " + conf['tmp.path'], conf)
+        return False
+
+    # Check if the output directory already exists
+    if os.path.exists(qc_output_dir):
+        error("quality control report directory already exists for run " + run_id,
+              'The quality control report directory already exists for run ' + run_id + ': ' + qc_output_dir, conf)
+        return False
+
+    # Check if enough free space is available
+    if common.df(conf['qc.data.path']) < 10 * 1024 * 1024 * 1024:
+        error("Not enough disk space to store aozan quality control for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
+              '.\nNeed more than 10 Gb on ' + conf['qc.data.path'] + '.', conf)
+        return False
+
+    # Initialize the QC object
+    qc = QC(conf, conf['tmp.path'])
+
+    # Compute the report
+    try:
+        report = qc.computeReport(bcl_input_dir, fastq_input_dir, qc_output_dir, run_id)
+    except AozanException, exp:
+        error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
+        return False
+
+
+    # Write the XML report
+    if conf['qc.report.save.report.data'].lower().strip() == 'true':
+        try:
+            qc.writeXMLReport(report, qc_output_dir + '/' + run_id + '.xml')
+        except AozanException, exp:
+            error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
+            return False
+
+    # Write the HTML report
+    html_report_file = qc_output_dir + '/' + run_id + '.html'
+    try:
+        if conf['qc.report.stylesheet'] == '':
+            qc.writeReport(report, None, html_report_file)
+        else:
+            qc.writeReport(report, conf['qc.report.stylesheet'], html_report_file)
+    except AozanException, exp:
+        error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
+        return False
+
+    df_in_bytes = common.df(qc_output_dir)
+    du_in_bytes = common.du(qc_output_dir)
+    df = df_in_bytes / (1024 * 1024 * 1024)
+    du = du_in_bytes / (1024 * 1024)
+
+    common.log("DEBUG", "QC step: output disk free after qc: " + str(df_in_bytes), conf)
+    common.log("DEBUG", "QC step: space used by qc: " + str(du_in_bytes), conf)
+
+    duration = time.time() - start_time
+
+    msg = 'End of quality control for run ' + run_id + '.' + \
+        '\nJob finished at ' + common.time_to_human_readable(time.time()) + \
+        ' with no error in ' + common.duration_to_human_readable(duration) + '. ' + \
+        'You will find attached to this message the quality control report.\n\n' + \
+        'QC files for this run ' + \
+        'can be found in the following directory:\n  ' + qc_output_dir
+
+    # Add path to report if reports.url exists
+    if conf['reports.url'] != None and conf['reports.url'] != '':
+        msg += '\n\nRun reports can be found at following location:\n  ' + conf['reports.url'] + '/' + run_id
+
+    msg += '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df)
+
+
+    common.send_msg_with_attachment('[Aozan] End of quality control for run ' + run_id, msg, html_report_file, conf)
+    common.log('INFO', 'QC step: success in ' + common.duration_to_human_readable(duration), conf)
+    return True
