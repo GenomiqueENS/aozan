@@ -75,7 +75,8 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
       }
 
       // Parse the fields
-      parseLine(fields);
+      if (!isFieldsEmpty(fields))
+        parseLine(fields);
       fields.clear();
 
     }
@@ -83,6 +84,23 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
     this.is.close();
 
     return getDesign();
+  }
+
+  /**
+   * Test if all the elements of a list are empty.
+   * @param list the list to test
+   * @return true if all the elements of the list are empty
+   */
+  private static final boolean isFieldsEmpty(final List<String> list) {
+
+    if (list == null)
+      return true;
+
+    for (String e : list)
+      if (e != null && !"".equals(e.trim()))
+        return false;
+
+    return true;
   }
 
   //
