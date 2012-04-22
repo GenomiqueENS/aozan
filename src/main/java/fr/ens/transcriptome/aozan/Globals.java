@@ -98,6 +98,9 @@ public class Globals {
       + "\n" + "Copyright " + COPYRIGHT_DATE + " IBENS genomic platform\n"
       + LICENSE_TXT + "\n";
 
+  /** Embedded XSL QC stylesheet. */
+  public static final String EMBEDDED_QC_XSL = "/aozan.xsl";
+
   //
   // Private constants
   //
