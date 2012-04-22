@@ -4,7 +4,7 @@
 
   <groupId>fr.ens.transcriptome</groupId>
   <artifactId>aozan</artifactId>
-  <version>0.6</version>
+  <version>0.7</version>
   <packaging>jar</packaging>
 
   <name>Aozan</name>
@@ -24,7 +24,7 @@
     <dependency>
       <groupId>fr.ens.transcriptome</groupId>
       <artifactId>eoulsan</artifactId>
-      <version>1.1-SNAPSHOT</version>
+      <version>1.2-SNAPSHOT</version>
     </dependency> 
     <dependency>
       <groupId>org.apache.poi</groupId>
@@ -38,6 +38,12 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>r07</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
@@ -46,6 +52,27 @@
   </dependencies>
 
   <build>
+    <directory>target</directory>
+    <outputDirectory>target/classes</outputDirectory>
+    <finalName>${artifactId}-${version}</finalName>
+    <testOutputDirectory>target/test-classes</testOutputDirectory>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
+    <testSourceDirectory>src/test/java</testSourceDirectory>
+    <resources>
+      <resource>
+        <directory>src/main/java/files</directory>
+      </resource>
+      <resource>
+        <directory>src/main/java/META-INF</directory>
+        <targetPath>META-INF</targetPath>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>src/test/java/files</directory>
+      </testResource>
+    </testResources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -88,7 +115,7 @@
                                     <attribute name="Implementation-Version" value="build${build.number}"/>   
                                     <attribute name="Implementation-Vendor" value="${project.organization.name}"/>
 
-                                    <attribute name="Main-Class" value="fr.ens.transcriptome.eoulsan.Main"/>
+                                    <!--attribute name="Main-Class" value="fr.ens.transcriptome.eoulsan.Main"/-->
                                 </manifest>
                                 <copy file="${basedir}/target/generated-resources/MANIFEST.MF" tofile="${basedir}/target/classes/manifest.txt"/>
                                     </tasks>
@@ -214,7 +241,7 @@
                 <artifactItem>
                   <groupId>fr.ens.transcriptome</groupId>
                   <artifactId>eoulsan</artifactId>
-                  <version>1.1-SNAPSHOT</version>
+                  <version>1.2-SNAPSHOT</version>
                   <!--type></type-->
                   <!--classifier> [classifier - optional] </classifier-->
                   <overWrite>true</overWrite>
@@ -228,6 +255,14 @@
                   <overWrite>true</overWrite>
                   <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
                   <destFileName>poi.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.google.guava</groupId>
+                  <artifactId>guava</artifactId>
+                  <version>r07</version>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
+                  <destFileName>guava.jar</destFileName>
                 </artifactItem>
               </artifactItems>
             </configuration>

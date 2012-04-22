@@ -65,6 +65,14 @@ public abstract class AbstractLaneTest implements LaneTest {
   }
 
   //
+  // Other methods
+  //
+
+  @Override
+  public void init() {
+  }
+
+  //
   // Constructor
   //
 

@@ -204,6 +204,15 @@ public class RunData {
   // Other methods
   //
 
+  /**
+   * Get the number of entries in RunData.
+   * @return the number of entries
+   */
+  public int size() {
+
+    return this.map.size();
+  }
+
   @Override
   public String toString() {
 

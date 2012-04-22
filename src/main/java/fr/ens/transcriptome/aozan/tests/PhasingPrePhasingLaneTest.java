@@ -25,10 +25,12 @@
 package fr.ens.transcriptome.aozan.tests;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
+import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.PhasingCollector;
 import fr.ens.transcriptome.aozan.util.DoubleInterval;
@@ -80,6 +82,19 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
   public String[] getCollectorsNamesRequiered() {
 
     return new String[] {PhasingCollector.COLLECTOR_NAME};
+  }
+
+  //
+  // Other methods
+  //
+
+  @Override
+  public void configure(final Map<String, String> properties)
+      throws AozanException {
+
+    if (properties == null)
+      throw new NullPointerException("The properties object is null");
+
   }
 
   //

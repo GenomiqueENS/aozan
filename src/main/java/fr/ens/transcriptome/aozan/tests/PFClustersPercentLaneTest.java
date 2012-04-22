@@ -24,6 +24,9 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.Map;
+
+import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 import fr.ens.transcriptome.aozan.util.DoubleInterval;
@@ -60,7 +63,21 @@ public class PFClustersPercentLaneTest extends AbstractLaneTest {
     if (indexedRead)
       return new TestResult(percent, true);
 
-    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent, true);
+    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent,
+        true);
+  }
+
+  //
+  // Other methods
+  //
+
+  @Override
+  public void configure(final Map<String, String> properties)
+      throws AozanException {
+
+    if (properties == null)
+      throw new NullPointerException("The properties object is null");
+
   }
 
   //

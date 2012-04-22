@@ -24,132 +24,23 @@
 
 package fr.ens.transcriptome.aozan;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.File;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
+import java.io.FileFilter;
 import java.io.IOException;
-import java.io.Writer;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
-import java.io.FileFilter;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
 
-import fr.ens.transcriptome.aozan.collectors.Collector;
-import fr.ens.transcriptome.aozan.collectors.DesignCollector;
-import fr.ens.transcriptome.aozan.collectors.FastQCCollector;
-import fr.ens.transcriptome.aozan.collectors.FlowcellDemuxSummaryCollector;
-import fr.ens.transcriptome.aozan.collectors.PhasingCollector;
-import fr.ens.transcriptome.aozan.collectors.ReadCollector;
-import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
-import fr.ens.transcriptome.aozan.tests.ClusterDensityLaneTest;
-import fr.ens.transcriptome.aozan.tests.ErrorRate100CycleLaneTest;
-import fr.ens.transcriptome.aozan.tests.ErrorRate35CycleLaneTest;
-import fr.ens.transcriptome.aozan.tests.ErrorRate75CycleLaneTest;
-import fr.ens.transcriptome.aozan.tests.ErrorRateLaneTest;
-import fr.ens.transcriptome.aozan.tests.FirstCycleIntensityPFLaneTest;
-import fr.ens.transcriptome.aozan.tests.LaneTest;
-import fr.ens.transcriptome.aozan.tests.MeanQualityScoreSampleTest;
-import fr.ens.transcriptome.aozan.tests.PFClustersLaneTest;
-import fr.ens.transcriptome.aozan.tests.PFClustersPercentLaneTest;
-import fr.ens.transcriptome.aozan.tests.PFClustersSampleTest;
-import fr.ens.transcriptome.aozan.tests.PercentAlignLaneTest;
-import fr.ens.transcriptome.aozan.tests.PercentCycle20IntensityLaneTest;
-import fr.ens.transcriptome.aozan.tests.PercentInLaneSampleTest;
-import fr.ens.transcriptome.aozan.tests.PercentPFSampleTest;
-import fr.ens.transcriptome.aozan.tests.PercentQ30SampleTest;
-import fr.ens.transcriptome.aozan.tests.PhasingPrePhasingLaneTest;
-import fr.ens.transcriptome.aozan.tests.RawClustersLaneTest;
-import fr.ens.transcriptome.aozan.tests.RawClustersSampleTest;
-import fr.ens.transcriptome.aozan.tests.SampleTest;
+import com.google.common.collect.Maps;
 
 public class QCDemo {
 
-  private static final void processRun(final String bclDir,
-      final String fastqDir, final String runId) throws IOException,
-      AozanException {
-
-    final File RTAOutputDir = new File(bclDir, runId);
-    final File casavaOutputDir = new File(fastqDir, runId);
-
-    File[] designFiles = casavaOutputDir.listFiles(new FilenameFilter() {
-
-      @Override
-      public boolean accept(File dir, String name) {
-
-        return name.endsWith(".csv");
-      }
-    });
-
-    final File casavaDesignFile = designFiles[0];
-
-    // Define the collectors
-    final List<Collector> collectors =
-        Lists.newArrayList(new RunInfoCollector(), new ReadCollector(),
-            new DesignCollector(), new FlowcellDemuxSummaryCollector(),
-            new PhasingCollector(), new FastQCCollector());
-
-    // Create the run data object
-    final RunData data =
-        new RunDataGenerator(RTAOutputDir, casavaDesignFile, casavaOutputDir,
-            collectors).collect();
-
-    // Print the content of the run data object
-    data.print();
-
-    // Define the read tests
-    final List<LaneTest> laneTests = Lists.newArrayList();
-    laneTests.add(new RawClustersLaneTest());
-    laneTests.add(new PFClustersLaneTest());
-    laneTests.add(new PFClustersPercentLaneTest());
-    laneTests.add(new ClusterDensityLaneTest());
-    laneTests.add(new PercentAlignLaneTest());
-    laneTests.add(new ErrorRateLaneTest());
-    laneTests.add(new ErrorRate35CycleLaneTest());
-    laneTests.add(new ErrorRate75CycleLaneTest());
-    laneTests.add(new ErrorRate100CycleLaneTest());
-    laneTests.add(new FirstCycleIntensityPFLaneTest());
-    laneTests.add(new PercentCycle20IntensityLaneTest());
-    laneTests.add(new PhasingPrePhasingLaneTest());
-
-    // Define the sample tests
-    final List<SampleTest> sampleTests = Lists.newArrayList();
-    sampleTests.add(new RawClustersSampleTest());
-    sampleTests.add(new PFClustersSampleTest());
-    sampleTests.add(new PercentPFSampleTest());
-    sampleTests.add(new PercentInLaneSampleTest());
-    sampleTests.add(new PercentQ30SampleTest());
-    sampleTests.add(new MeanQualityScoreSampleTest());
-
-    // Create the report
-    final QCReport report = new QCReport(data, laneTests, sampleTests);
-    // System.out.println(report.toXML());
-
-    Writer writer =
-        new FileWriter(new File("/home/jourdren/qc-" + runId + ".xml"));
-    writer.write(report.toXML());
-    writer.close();
-
-    writer = new FileWriter(new File("/home/jourdren/qc-" + runId + ".html"));
-    writer.write(report.export(QCDemo.class
-        .getResourceAsStream("/files/aozan.xsl")));
-    writer.close();
-
-  }
-
-  public static final void main(String[] args) throws AozanException,
-      IOException {
-
-    Locale.setDefault(Locale.US);
-
-    final String bclDir = "/home/jourdren/shares-net/sequencages/bcl";
-    final String fastqDir = "/home/jourdren/shares-net/sequencages/fastq";
-
-    final String runId = "120124_SNL110_0036_AD0DM3ABXX";
-    // final String runId = "120210_SNL110_0037_AC0BE6ACXX";
-
-    processRun(bclDir, fastqDir, runId);
-    System.exit(0);
+  private static List<String> getRunIds(final String fastqDir) {
 
     final File[] runIdsDir = new File(fastqDir).listFiles(new FileFilter() {
 
@@ -160,10 +51,84 @@ public class QCDemo {
       }
     });
 
-    for (File runIdDir : runIdsDir) {
-      if (!runIdDir.getName().contains("0024")
-          && !runIdDir.getName().contains("0023"))
-        processRun(bclDir, fastqDir, runIdDir.getName());
+    List<String> result = Lists.newArrayList();
+
+    if (result != null)
+      for (File dir : runIdsDir)
+        result.add(dir.getName());
+
+    return result;
+  }
+
+  public static final void main(String[] args) throws AozanException,
+      IOException {
+
+    Locale.setDefault(Locale.US);
+
+    final String bclDir = "/home/jourdren/shares-net/sequencages/bcl";
+    final String fastqDir = "/home/jourdren/shares-net/sequencages/fastq";
+
+    final Map<String, String> properties = Maps.newHashMap();
+
+    // Lanes tests
+    properties.put("qc.test.rawclusters.enable", "true");
+    properties.put("qc.test.pfclusters.enable", "true");
+    properties.put("qc.test.pfclusterspercent.enable", "true");
+    properties.put("qc.test.clusterdensity.enable", "true");
+    properties.put("qc.test.percentalign.enable", "true");
+    properties.put("qc.test.errorrate.enable", "true");
+    properties.put("qc.test.errorrate35cycle.enable", "true");
+    properties.put("qc.test.errorrate75cycle.enable", "true");
+    properties.put("qc.test.errorrate100cycle.enable", "true");
+    properties.put("qc.test.firstcycleintensity.enable", "true");
+    properties.put("qc.test.percentintensitycycle20.enable", "true");
+    properties.put("qc.test.phasingprephasing.enable", "true");
+
+    // Sample tests
+    properties.put("qc.test.rawclusterssamples.enable", "true");
+    properties.put("qc.test.pfclusterssamples.enable", "true");
+    properties.put("qc.test.percentpfsample.enable", "true");
+    properties.put("qc.test.percentinlanesample.enable", "true");
+    properties.put("qc.test.percentq30.enable", "true");
+    properties.put("qc.test.meanqualityscore.enable", "true");
+
+    // final List<String> runIds =
+    // newArrayList("120124_SNL110_0036_AD0DM3ABXX");
+    // final List<String> runIds =
+    // newArrayList("120210_SNL110_0037_AC0BE6ACXX");
+    final List<String> runIds = newArrayList("120301_SNL110_0038_AD0EJRABXX");
+    // final List<String> runIds = getRunIds(fastqDir);
+
+    // Process all runs
+    final QC qc = new QC(properties, (String) null);
+
+    for (final String runId : runIds) {
+      if (!runId.contains("0024") && !runId.contains("0023")) {
+
+        // Output xml file
+        final File reportXmlFile =
+            new File("/home/jourdren/qc-" + runId + ".xml");
+
+        // Output html file
+        final File reportHtmlFile =
+            new File("/home/jourdren/qc-" + runId + ".html");
+
+        // XSL stylesheet
+        final InputStream xslIs =
+            QCDemo.class.getResourceAsStream("/aozan.xsl");
+
+        // Compute report
+        final QCReport report =
+            qc.computeReport(bclDir + '/' + runId, fastqDir + '/' + runId,
+                "/tmp", runId);
+
+        // Save report data
+        qc.writeXMLReport(report, reportXmlFile);
+
+        // Save HTML report
+        qc.writeReport(report, xslIs, reportHtmlFile);
+      }
+
     }
 
   }

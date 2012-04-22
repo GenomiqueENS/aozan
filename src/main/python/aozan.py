@@ -10,7 +10,9 @@ import sys, os, traceback
 import common, hiseq_run, sync_run, demux_run, qc_run
 from java.util import Locale
 import first_base_report
+from java.util import LinkedHashMap
 from fr.ens.transcriptome.aozan import Globals
+
 
 def create_lock_file(lock_file_path):
     """Create the lock file.
@@ -61,7 +63,7 @@ something_to_do = False
 if __name__ == "__main__":
 
     # Create configuration
-    conf = {}
+    conf = LinkedHashMap()
     common.set_default_conf(conf)
     
     # Use default (C) locale
@@ -159,7 +161,7 @@ if __name__ == "__main__":
             #
     
             qc_run_ids_done = qc_run.load_processed_run_ids(conf)
-            
+
             if conf['qc.step'].lower().strip() == 'true':
                 for run_id in (demux_run_ids_done - qc_run_ids_done):
                     welcome()

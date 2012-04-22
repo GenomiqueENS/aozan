@@ -65,6 +65,12 @@ public class PhasingCollector implements Collector {
   }
 
   @Override
+  public String[] getCollectorsNamesRequiered() {
+
+    return new String[] {RunInfoCollector.COLLECTOR_NAME};
+  }
+
+  @Override
   public void configure(final Properties properties) {
 
     if (properties == null)

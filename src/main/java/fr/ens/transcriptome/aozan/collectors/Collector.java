@@ -43,6 +43,12 @@ public interface Collector {
   public String getName();
 
   /**
+   * Get the name of the collectors required to run this collector.
+   * @return an array of String with the name of the required collectors
+   */
+  public String[] getCollectorsNamesRequiered();
+
+  /**
    * Configure the collector with the path of the run data
    * @param properties object with the collector configuration
    */

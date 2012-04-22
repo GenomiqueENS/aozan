@@ -24,6 +24,9 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.Map;
+
+import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 
@@ -53,6 +56,15 @@ public class ClusterDensityLaneTest extends AbstractLaneTest {
     final double density = clusterRaw * densityRatio / 1000.0;
 
     return new TestResult(density);
+  }
+
+  //
+  // Other methods
+  //
+
+  @Override
+  public void configure(final Map<String, String> properties)
+      throws AozanException {
   }
 
   //
