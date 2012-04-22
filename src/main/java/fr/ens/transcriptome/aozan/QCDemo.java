@@ -67,8 +67,9 @@ public class QCDemo {
 
     final String bclDir = "/home/jourdren/shares-net/sequencages/bcl";
     final String fastqDir = "/home/jourdren/shares-net/sequencages/fastq";
+    final String qcDir = "/tmp";
 
-    final Map<String, String> properties = Maps.newHashMap();
+    final Map<String, String> properties = Maps.newLinkedHashMap();
 
     // Lanes tests
     properties.put("qc.test.rawclusters.enable", "true");
@@ -92,6 +93,8 @@ public class QCDemo {
     properties.put("qc.test.percentq30.enable", "true");
     properties.put("qc.test.meanqualityscore.enable", "true");
 
+    properties.put("qc.test.basicstats.enable", "true");
+
     // final List<String> runIds =
     // newArrayList("120124_SNL110_0036_AD0DM3ABXX");
     // final List<String> runIds =
@@ -100,33 +103,27 @@ public class QCDemo {
     // final List<String> runIds = getRunIds(fastqDir);
 
     // Process all runs
-    final QC qc = new QC(properties, (String) null);
+    final QC qc = new QC(properties, "/tmp");
 
     for (final String runId : runIds) {
       if (!runId.contains("0024") && !runId.contains("0023")) {
 
         // Output xml file
-        final File reportXmlFile =
-            new File("/home/jourdren/qc-" + runId + ".xml");
+        final File reportXmlFile = new File(qcDir + "/qc-" + runId + ".xml");
 
         // Output html file
-        final File reportHtmlFile =
-            new File("/home/jourdren/qc-" + runId + ".html");
-
-        // XSL stylesheet
-        final InputStream xslIs =
-            QCDemo.class.getResourceAsStream("/aozan.xsl");
+        final File reportHtmlFile = new File(qcDir + "/qc-" + runId + ".html");
 
         // Compute report
         final QCReport report =
             qc.computeReport(bclDir + '/' + runId, fastqDir + '/' + runId,
-                "/tmp", runId);
+                qcDir, runId);
 
         // Save report data
         qc.writeXMLReport(report, reportXmlFile);
 
         // Save HTML report
-        qc.writeReport(report, xslIs, reportHtmlFile);
+        qc.writeReport(report, (String) null, reportHtmlFile.getAbsolutePath());
       }
 
     }

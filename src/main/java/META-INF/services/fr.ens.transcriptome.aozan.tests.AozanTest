@@ -16,3 +16,4 @@ fr.ens.transcriptome.aozan.tests.PercentQ30SampleTest
 fr.ens.transcriptome.aozan.tests.PhasingPrePhasingLaneTest
 fr.ens.transcriptome.aozan.tests.RawClustersLaneTest
 fr.ens.transcriptome.aozan.tests.RawClustersSampleTest
+fr.ens.transcriptome.aozan.tests.BasicStatsFastQCSampleTest
