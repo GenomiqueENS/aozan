@@ -65,7 +65,7 @@ public class FastQCCollector implements Collector {
   public static final String COLLECTOR_NAME = "fastqc";
 
   private String casavaOutputPath;
-  private String qcReportOutputPath = "/home/jourdren/tmp/fastqcreports";
+  private String qcReportOutputPath;
   private String compressionExtension = ".bz2";
   private boolean ignoreFilteredSequences = false;
   private List<QCModule> moduleList;
@@ -74,6 +74,13 @@ public class FastQCCollector implements Collector {
   public String getName() {
 
     return COLLECTOR_NAME;
+  }
+
+  @Override
+  public String[] getCollectorsNamesRequiered() {
+
+    return new String[] {RunInfoCollector.COLLECTOR_NAME,
+        DesignCollector.COLLECTOR_NAME};
   }
 
   @Override
@@ -87,6 +94,9 @@ public class FastQCCollector implements Collector {
 
     this.casavaOutputPath =
         properties.getProperty(RunDataGenerator.CASAVA_OUTPUT_DIR);
+    
+    this.qcReportOutputPath =
+        properties.getProperty(RunDataGenerator.QC_OUTPUT_DIR);
   }
 
   @Override
