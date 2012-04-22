@@ -28,10 +28,10 @@ version="1.0">
       background: red;
     }
     .score4 {
-      background: red;
+      background: yellow;
     }
     .score5 {
-      background: green;
+      background: yellow;
     }
     .score6 {
       background: green;
@@ -81,6 +81,7 @@ version="1.0">
            <xsl:if test="@type='float'"><xsl:value-of select="format-number(.,'### ### ### ##0.00','aozan')"/></xsl:if>
            <xsl:if test="@type='percent'"><xsl:value-of select="format-number(.,'#0.00%','aozan')"/></xsl:if>
            <xsl:if test="@type='string'"><xsl:value-of select="."/></xsl:if>
+           <xsl:if test="@type='url'"><a href="{.}">link</a></xsl:if>
          </td>
        </xsl:for-each>
      </tr>
@@ -117,6 +118,7 @@ version="1.0">
            <xsl:if test="@type='float'"><xsl:value-of select="format-number(.,'### ### ### ##0.00','aozan')"/></xsl:if>
            <xsl:if test="@type='percent'"><xsl:value-of select="format-number(.,'#0.00%','aozan')"/></xsl:if>
            <xsl:if test="@type='string'"><xsl:value-of select="."/></xsl:if>
+           <xsl:if test="@type='url'"><a href="{.}">link</a></xsl:if>
          </td>
        </xsl:for-each>
      </tr>
