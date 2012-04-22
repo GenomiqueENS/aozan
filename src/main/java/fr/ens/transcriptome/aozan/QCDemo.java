@@ -95,6 +95,21 @@ public class QCDemo {
 
     properties.put("qc.test.basicstats.enable", "true");
 
+    properties.put("qc.test.perbasequalityscores.enable", "true");
+    properties.put("qc.test.persequencequalityscores.enable", "true");
+    properties.put("qc.test.perbasesequencecontent.enable", "true");
+    properties.put("qc.test.perbasegccontent.enable", "true");
+ 
+    properties.put("qc.test.perSequencegccontent.enable", "true");
+    properties.put("qc.test.ncontent.enable", "true");
+    properties.put("qc.test.sequencelengthdistribution.enable", "true");
+    properties.put("qc.test.duplicationlevel.enable", "true");
+    
+    properties.put("qc.test.overrepresentedseqs.enable", "true");
+    properties.put("qc.test.kmercontent.enable", "true");
+
+
+    
     // final List<String> runIds =
     // newArrayList("120124_SNL110_0036_AD0DM3ABXX");
     // final List<String> runIds =

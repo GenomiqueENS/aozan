@@ -17,3 +17,13 @@ fr.ens.transcriptome.aozan.tests.PhasingPrePhasingLaneTest
 fr.ens.transcriptome.aozan.tests.RawClustersLaneTest
 fr.ens.transcriptome.aozan.tests.RawClustersSampleTest
 fr.ens.transcriptome.aozan.tests.BasicStatsFastQCSampleTest
+fr.ens.transcriptome.aozan.tests.PerBaseQualityScoresFastQCSampleTest
+fr.ens.transcriptome.aozan.tests.PerSequenceQualityScoresFastQCSampleTest
+fr.ens.transcriptome.aozan.tests.PerBaseSequenceContentFastQCSampleTest
+fr.ens.transcriptome.aozan.tests.PerBaseGCContentFastQCSampleTest
+fr.ens.transcriptome.aozan.tests.PerSequenceGCContentFastQCSampleTest
+fr.ens.transcriptome.aozan.tests.NContentFastQCSampleTest
+fr.ens.transcriptome.aozan.tests.SequenceLengthDistributionFastQCSampleTest
+fr.ens.transcriptome.aozan.tests.DuplicationLevelFastQCSampleTest
+fr.ens.transcriptome.aozan.tests.OverRepresentedSeqsFastQCSampleTest
+fr.ens.transcriptome.aozan.tests.KmerContentFastQCSampleTest
