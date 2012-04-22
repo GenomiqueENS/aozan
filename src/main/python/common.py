@@ -8,6 +8,7 @@ Created on 25 oct. 2011
 
 import smtplib, os.path, time
 from java.io import File
+from java.lang import Runtime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.audio import MIMEAudio
@@ -399,7 +400,7 @@ def set_default_conf(conf):
     conf['casava.fastq.cluster.count'] = '1000000000'
     conf['casava.compression.level'] = '9'
     conf['casava.mismatches'] = '0'
-    conf['casava.threads'] = '4'
+    conf['casava.threads'] = str(Runtime.getRuntime().availableProcessors())
 
     # Data path
     conf['tmp.path'] = '/tmp'

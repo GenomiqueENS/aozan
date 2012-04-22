@@ -118,11 +118,16 @@ def demux(run_id, conf):
 
     common.log("DEBUG", "Flowcell id: " + flow_cell_id, conf)
     
-    # Check if input data exists
+    # Check if root input bcl data directory exists
     if not os.path.exists(conf['bcl.data.path']):
         error("Basecalling data directory does not exists", "Basecalling data directory does not exists: " + conf['bcl.data.path'], conf)
         return False
 
+    # Check if root input fastq data directory exists
+    if not os.path.exists(conf['fastq.data.path']):
+        error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf['fastq.data.path'], conf)
+        return False
+    
     # Check if casava designs path exists
     if not os.path.exists(conf['casava.designs.path']):
         error("Casava designs directory does not exists", "Casava designs does not exists: " + conf['casava.designs.path'], conf)
@@ -181,7 +186,7 @@ def demux(run_id, conf):
         CasavaDesignUtil.replaceIndexShortcutsBySequences(design, load_index_sequences(conf))
         
         # Check values of design file
-        CasavaDesignUtil.checkCasavaDesign(design, flow_cell_id)
+        design_warnings = CasavaDesignUtil.checkCasavaDesign(design, flow_cell_id)
         
         # Write CSV design file
         CasavaDesignCSVWriter(design_csv_path).writer(design)
@@ -192,6 +197,18 @@ def demux(run_id, conf):
     except EoulsanException, exp:
         error("error while converting design-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
         return False
+
+    # Log Casava design warning
+    if (design_warnings>0):
+        msg = ''
+        first = True
+        for warn in design_warnings:
+            if first:
+                first = False
+            else:
+                msg += ' '
+            msg += warn
+        common.log("INFO", "casava design warnings: " + msg, conf)
 
     # Create casava makefile
     cmd = conf['casava.path'] + '/bin/configureBclToFastq.pl ' + \
@@ -276,6 +293,11 @@ def demux(run_id, conf):
         ' with no error in ' + common.duration_to_human_readable(duration) + '.\n\n' + \
         'Fastq files for this run ' + \
         'can be found in the following directory:\n  ' + fastq_output_dir
+
+    if design_warnings.size()>0:
+        msg+='\n\nDesign warnings:'
+        for warn in design_warnings:
+            msg+="\n  - " + warn 
 
     # Add path to report if reports.url exists
     if conf['reports.url'] != None and conf['reports.url'] != '':

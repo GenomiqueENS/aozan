@@ -4,7 +4,7 @@
 
   <groupId>fr.ens.transcriptome</groupId>
   <artifactId>aozan</artifactId>
-  <version>0.6</version>
+  <version>0.7</version>
   <packaging>jar</packaging>
 
   <name>Aozan</name>
@@ -115,7 +115,7 @@
                                     <attribute name="Implementation-Version" value="build${build.number}"/>   
                                     <attribute name="Implementation-Vendor" value="${project.organization.name}"/>
 
-                                    <attribute name="Main-Class" value="fr.ens.transcriptome.eoulsan.Main"/>
+                                    <!--attribute name="Main-Class" value="fr.ens.transcriptome.eoulsan.Main"/-->
                                 </manifest>
                                 <copy file="${basedir}/target/generated-resources/MANIFEST.MF" tofile="${basedir}/target/classes/manifest.txt"/>
                                     </tasks>
