@@ -44,16 +44,28 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
     final String prefixKey =
         "fastqc.lane"
             + lane + ".sample." + sampleName + ".read" + read + "."
-            + sampleName + getQCModuleName().replace(' ', '.').toLowerCase();
+            + sampleName + "."
+            + getQCModuleName().replace(' ', '.').toLowerCase();
 
     final boolean errorRaise = data.getBoolean(prefixKey + ".error");
     final boolean warningRaise = data.getBoolean(prefixKey + ".warning");
 
-    final int score = errorRaise ? 0 : (warningRaise ? 4 : 0);
+    final int score = errorRaise ? 0 : (warningRaise ? 4 : 9);
 
-    // Get URL prefix or file:///
+    // Get HTML report URL
+    final String projectName =
+        data.get("design.lane" + lane + "." + sampleName + ".sample.project");
+    final String index =
+        data.get("design.lane" + lane + "." + sampleName + ".index");
+    final String dirname =
+        String.format("%s_%s_L%03d_R%d_001-fastqc", sampleName,
+            "".equals(index) ? "NoIndex" : index, lane, read);
+    final String url =
+        "Project_"
+            + projectName + "/" + dirname + "/fastqc_report.html#M"
+            + getHTMLAnchorIndex();
 
-    return new TestResult(score, "http://", "url");
+    return new TestResult(score, url, "url");
   }
 
   @Override
@@ -62,7 +74,17 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
     return new String[] {FastQCCollector.COLLECTOR_NAME};
   }
 
+  /**
+   * Get the name of the FastQC module.
+   * @return the name of the FastQC module
+   */
   protected abstract String getQCModuleName();
+
+  /**
+   * Get the anchor index of for the module in FastQC HTML report.
+   * @return the position anchor
+   */
+  protected abstract int getHTMLAnchorIndex();
 
   //
   // Constructor
