@@ -213,6 +213,11 @@ public class QC {
     }
   }
 
+  /**
+   * Init the QC.
+   * @param properties Aozan configuration
+   * @throws AozanException if an error occurs while initialize the QC
+   */
   private final void init(final Map<String, String> properties)
       throws AozanException {
 
@@ -241,7 +246,8 @@ public class QC {
             this.laneTests.add((LaneTest) test);
           else if (test instanceof SampleTest)
             this.sampleTests.add((SampleTest) test);
-        }
+        } else
+          throw new AozanException("No test found for property: " + key);
       }
 
       if (key.startsWith("qc.conf."))
@@ -259,6 +265,10 @@ public class QC {
 
   }
 
+  /**
+   * Initialize the collectors.
+   * @throws AozanException if an error occurs while initialize a collector
+   */
   private final void initCollectors() throws AozanException {
 
     final Set<Collector> collectors = Sets.newHashSet();
@@ -317,7 +327,14 @@ public class QC {
 
   }
 
-  private Set<Collector> getCollectors(String[] collectorNames) {
+  /**
+   * Transform a list of collector names in a set collectors objects.
+   * @param collectorNames list of collectors names
+   * @return a set of collectors objects
+   * @throws AozanException if an error occurs while creating a collector
+   */
+  private Set<Collector> getCollectors(String[] collectorNames)
+      throws AozanException {
 
     if (collectorNames == null)
       return Collections.emptySet();
@@ -332,7 +349,7 @@ public class QC {
       final Collector c = registry.get(collectorName);
 
       if (c == null)
-        continue;
+        throw new AozanException("Unable to found collector: " + collectorName);
 
       result.add(c);
     }
@@ -340,8 +357,14 @@ public class QC {
     return result;
   }
 
+  /**
+   * Add collectors from a list of name in a set.
+   * @param collectorNamesRequired list of the collectors required
+   * @param collectors a set of collector
+   * @throws AozanException if an error occurs while creating a collector
+   */
   private void addCollectors(final String[] collectorNamesRequired,
-      final Set<Collector> collectors) {
+      final Set<Collector> collectors) throws AozanException {
 
     for (final Collector c : getCollectors(collectorNamesRequired)) {
 
