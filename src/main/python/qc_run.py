@@ -6,10 +6,7 @@ Created on 28 oct. 2011
 import os.path
 import common, time
 from fr.ens.transcriptome.aozan import QC
-from fr.ens.transcriptome.aozan import QCReport
 from fr.ens.transcriptome.aozan import AozanException
-from java.lang import NumberFormatException
-from java.lang import NullPointerException
 
 def load_processed_run_ids(conf):
     """Load the list of the processed run ids.
@@ -79,7 +76,7 @@ def qc(run_id, conf):
         return False
 
     # Check if enough free space is available
-    if common.df(conf['qc.data.path']) < 10 * 1024 * 1024 * 1024:
+    if common.df(conf['qc.data.path']) < 1 * 1024 * 1024 * 1024:
         error("Not enough disk space to store aozan quality control for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
               '.\nNeed more than 10 Gb on ' + conf['qc.data.path'] + '.', conf)
         return False
@@ -129,7 +126,7 @@ def qc(run_id, conf):
     df_in_bytes = common.df(qc_output_dir)
     du_in_bytes = common.du(qc_output_dir)
     df = df_in_bytes / (1024 * 1024 * 1024)
-    du = du_in_bytes / (1024 * 1024)
+    du = du_in_bytes / (1024 * 1024 * 1024)
 
     common.log("DEBUG", "QC step: output disk free after qc: " + str(df_in_bytes), conf)
     common.log("DEBUG", "QC step: space used by qc: " + str(du_in_bytes), conf)
