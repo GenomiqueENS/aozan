@@ -161,7 +161,7 @@ def sync(run_id, conf):
     df_in_bytes = common.df(bcl_data_path)
     du_in_bytes = common.du(bcl_data_path + '/' + run_id)
     df = df_in_bytes / (1024 * 1024 * 1024)
-    du = du_in_bytes / (1024 * 1024)
+    du = du_in_bytes / (1024 * 1024 * 1024)
 
     common.log("DEBUG", "Sync step: output disk free after sync: " + str(df_in_bytes), conf)
     common.log("DEBUG", "Sync step: space used by sync: " + str(du_in_bytes), conf)
