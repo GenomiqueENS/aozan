@@ -214,6 +214,41 @@ public class QC {
   }
 
   /**
+   * Write the raw data of the QC.
+   * @param report the QCReport object
+   * @param outputFile the raw data file
+   * @throws AozanException if an error occurs while writing the file
+   */
+  public void writeRawData(final QCReport report, final String outputFilename)
+      throws AozanException {
+
+    if (outputFilename == null)
+      throw new AozanException("The filename for the qc report is null");
+
+    writeRawData(report, new File(outputFilename));
+  }
+
+  /**
+   * Write the raw data of the QC.
+   * @param report the QCReport object
+   * @param outputFile the raw data file
+   * @throws AozanException if an error occurs while writing the file
+   */
+  public void writeRawData(final QCReport report, final File outputFile)
+      throws AozanException {
+
+    try {
+      final Writer writer = new FileWriter(outputFile);
+
+      writer.write(report.getData().toString());
+
+      writer.close();
+    } catch (IOException e) {
+      throw new AozanException(e);
+    }
+  }
+
+  /**
    * Init the QC.
    * @param properties Aozan configuration
    * @throws AozanException if an error occurs while initialize the QC

@@ -216,7 +216,15 @@ public class RunData {
   @Override
   public String toString() {
 
-    return this.map.toString();
+    final StringBuilder sb = new StringBuilder();
+    for (Map.Entry<String, String> e : this.map.entrySet()) {
+      sb.append(e.getKey());
+      sb.append('=');
+      sb.append(e.getValue());
+      sb.append('\n');
+    }
+
+    return sb.toString();
   }
 
   /**

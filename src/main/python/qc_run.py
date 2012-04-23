@@ -111,10 +111,20 @@ def qc(run_id, conf):
         error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
         return False
 
+    # Write qc data
+    if conf['qc.report.save.raw.data'].lower().strip() == 'true':
+        try:
+            qc.writeRawData(report, qc_output_dir + '/data-' + run_id + '.txt')
+        except AozanException, exp:
+            error("error while computing qc raw data for run " + run_id + ".", exp.getMessage(), conf)
+            return False
+
     # Check if the report has been generated
     if not os.path.exists(html_report_file):
         error("error while computing qc report for run " + run_id + ".", "No html report generated", conf)
         return False
+
+
 
     # The output directory must be read only
     cmd = 'chmod -R ugo-w ' + qc_output_dir

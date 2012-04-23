@@ -68,6 +68,15 @@ public class QCReport {
   private Document doc;
 
   /**
+   * Get the data.
+   * @return the RunData object
+   */
+  public RunData getData() {
+
+    return this.data;
+  }
+
+  /**
    * Generate the QC report for lane tests.
    * @param parentElement parent Element
    */
