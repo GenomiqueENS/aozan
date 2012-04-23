@@ -113,10 +113,17 @@ def qc(run_id, conf):
     except AozanException, exp:
         error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
         return False
-    
+
     # Check if the report has been generated
     if not os.path.exists(html_report_file):
-        error("error while computing qc report for run " + run_id + ".", "No html report generated",conf)
+        error("error while computing qc report for run " + run_id + ".", "No html report generated", conf)
+        return False
+
+    # The output directory must be read only
+    cmd = 'chmod -R ugo-w ' + qc_output_dir
+    common.log("DEBUG", "exec: " + cmd, conf)
+    if os.system(cmd) != 0:
+        error("error while setting read only the output qc directory for run " + run_id, 'Error while setting read only the output qc directory.\nCommand line:\n' + cmd, conf)
         return False
 
     df_in_bytes = common.df(qc_output_dir)
