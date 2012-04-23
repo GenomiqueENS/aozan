@@ -113,6 +113,11 @@ def qc(run_id, conf):
     except AozanException, exp:
         error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
         return False
+    
+    # Check if the report has been generated
+    if not os.path.exists(html_report_file):
+        error("error while computing qc report for run " + run_id + ".", "No html report generated",conf)
+        return False
 
     df_in_bytes = common.df(qc_output_dir)
     du_in_bytes = common.du(qc_output_dir)
