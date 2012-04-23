@@ -44,6 +44,12 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>uk.ac.bbsrc.babraham</groupId>
+      <artifactId>fastqc</artifactId>
+      <version>0.10.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
@@ -263,6 +269,22 @@
                   <overWrite>true</overWrite>
                   <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
                   <destFileName>guava.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>uk.ac.bbsrc.babraham</groupId>
+                  <artifactId>fastqc</artifactId>
+                  <version>0.10.0</version>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
+                  <destFileName>fastqc.jar</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>itadaki</groupId>
+                  <artifactId>jbzip2</artifactId>
+                  <version>0.9</version>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
+                  <destFileName>jbzip2.jar</destFileName>
                 </artifactItem>
               </artifactItems>
             </configuration>
