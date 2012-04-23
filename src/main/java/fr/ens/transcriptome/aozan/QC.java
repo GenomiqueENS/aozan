@@ -52,6 +52,7 @@ public class QC {
   private List<Collector> collectors = Lists.newArrayList();
   private List<LaneTest> laneTests = Lists.newArrayList();
   private List<SampleTest> sampleTests = Lists.newArrayList();
+  private Map<String, String> additionalConf = Maps.newHashMap();
   private File tmpDir;
 
   /**
@@ -115,6 +116,7 @@ public class QC {
     rdg.setCasavaOutputDir(casavaOutputDir);
     rdg.setQCOutputDir(QCOutputDir);
     rdg.setTemporaryDir(this.tmpDir);
+    rdg.setAdditionnalConf(this.additionalConf);
 
     // Create the run data object
     final RunData data = rdg.collect();
@@ -241,6 +243,10 @@ public class QC {
             this.sampleTests.add((SampleTest) test);
         }
       }
+
+      if (key.startsWith("qc.conf."))
+        this.additionalConf.put(key, value);
+
     }
 
     initCollectors();

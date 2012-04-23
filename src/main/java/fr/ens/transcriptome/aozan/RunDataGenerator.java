@@ -28,6 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import com.google.common.collect.Lists;
@@ -116,6 +117,19 @@ public class RunDataGenerator {
 
     checkNotNull(tmpDir, "Temporary directory is null");
     properties.setProperty(TMP_DIR, tmpDir.getAbsolutePath());
+  }
+
+  /**
+   * Set additional configuration for collectors and tests.
+   * @param conf additional configuration object
+   */
+  public void setAdditionnalConf(final Map<String, String> conf) {
+
+    if (conf == null)
+      return;
+
+    for (Map.Entry<String, String> e : conf.entrySet())
+      properties.setProperty(e.getKey(), e.getValue());
   }
 
   //
