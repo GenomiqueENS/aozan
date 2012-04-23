@@ -64,17 +64,17 @@ def send_msg(subject, message, conf):
     msg = ''
 
     if mail_to != None :
-        if type(mail_to) == str:
+        if type(mail_to) == str or type(mail_to) == unicode:
             mail_to = [mail_to]
         msg = msg + ("To: %s\r\n" % COMMASPACE.join(mail_to))
 
     if mail_cc != None :
-        if type(mail_cc) == str:
+        if type(mail_cc) == str or type(mail_cc) == unicode:
             mail_cc = [mail_cc]
         msg = msg + ("Cc: %s\r\n" % COMMASPACE.join(mail_cc))
 
     if mail_bcc != None :
-        if type(mail_bcc) == str:
+        if type(mail_bcc) == str or type(mail_bcc) == unicode:
             mail_bcc = [mail_bcc]
         msg = msg + ("Bcc: %s\r\n" % COMMASPACE.join(mail_bcc))
 
@@ -116,17 +116,17 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
     msg = MIMEMultipart()
 
     if mail_to != None :
-        if type(mail_to) == str:
+        if type(mail_to) == str or type(mail_to) == unicode:
             mail_to = [mail_to]
         msg['To'] = COMMASPACE.join(mail_to)
 
     if mail_cc != None :
-        if type(mail_cc) == str:
+        if type(mail_cc) == str or type(mail_cc) == unicode:
             mail_cc = [mail_cc]
         msg['Cc'] = COMMASPACE.join(mail_cc)
 
     if mail_bcc != None :
-        if type(mail_bcc) == str:
+        if type(mail_bcc) == str or type(mail_bcc) == unicode:
             mail_bcc = [mail_bcc]
         msg['Bcc'] = COMMASPACE.join(mail_bcc)
 
