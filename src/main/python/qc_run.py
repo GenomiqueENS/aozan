@@ -3,7 +3,7 @@ Created on 28 oct. 2011
 
 @author: jourdren
 '''
-import os.path
+import os.path, stat
 import common, time
 from fr.ens.transcriptome.aozan import QC
 from fr.ens.transcriptome.aozan import AozanException
@@ -52,7 +52,9 @@ def qc(run_id, conf):
 
     fastq_input_dir = conf['fastq.data.path'] + '/' + run_id
     bcl_input_dir = conf['bcl.data.path'] + '/' + run_id
-    qc_output_dir = conf['qc.data.path'] + '/qc_' + run_id
+    reports_data_base_path = conf['reports.data.path']
+    reports_data_path = reports_data_base_path + '/' + run_id
+    qc_output_dir = reports_data_path + '/qc_' + run_id
 
     # Check if input root bcl data exists
     if not os.path.exists(conf['bcl.data.path']):
@@ -62,6 +64,11 @@ def qc(run_id, conf):
     # Check if input root fastq root data exists
     if not os.path.exists(conf['fastq.data.path']):
         error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf['fastq.data.path'], conf)
+        return False
+    
+    # Check if reports path directory exists
+    if not os.path.exists(reports_data_path):
+        error("Report directory does not exists", "Report directory does not exists: " + reports_data_path, conf)
         return False
 
     # Check if temporary directory exists
@@ -76,7 +83,7 @@ def qc(run_id, conf):
         return False
 
     # Check if enough free space is available
-    if common.df(conf['qc.data.path']) < 1 * 1024 * 1024 * 1024:
+    if common.df(conf['reports.data.path']) < 1 * 1024 * 1024 * 1024:
         error("Not enough disk space to store aozan quality control for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
               '.\nNeed more than 10 Gb on ' + conf['qc.data.path'] + '.', conf)
         return False
@@ -118,6 +125,17 @@ def qc(run_id, conf):
         except AozanException, exp:
             error("error while computing qc raw data for run " + run_id + ".", exp.getMessage(), conf)
             return False
+
+    # Archive the reports
+    cmd = 'cd ' + reports_data_path + '  && ' + \
+       'tar cjf ' + reports_data_path + '/qc_' + run_id + '.tar.bz2 ' + qc_output_dir
+    common.log("DEBUG", "exec: " + cmd, conf)
+    if os.system(cmd) != 0:
+        error("error while saving the qc archive file for " + run_id, 'Error while saving the  qc archive file.\nCommand line:\n' + cmd, conf)
+        return False
+
+    # Set read only basecall stats archives files
+    os.chmod(reports_data_path + '/qc_' +  run_id + '.tar.bz2', stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
 
     # Check if the report has been generated
     if not os.path.exists(html_report_file):
