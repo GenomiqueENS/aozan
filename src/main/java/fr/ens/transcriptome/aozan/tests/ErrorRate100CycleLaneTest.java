@@ -26,7 +26,6 @@ package fr.ens.transcriptome.aozan.tests;
 
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
-import fr.ens.transcriptome.aozan.util.DoubleInterval;
 
 /**
  * This class define a test on error rate on 100 cycle.
@@ -76,7 +75,6 @@ public class ErrorRate100CycleLaneTest extends AbstractSimpleLaneTest {
   public ErrorRate100CycleLaneTest() {
 
     super("errorrate100cycle", "", "Error Rate 100 cycles", "%");
-    setInterval(new DoubleInterval(0, 0.02));
   }
 
 }

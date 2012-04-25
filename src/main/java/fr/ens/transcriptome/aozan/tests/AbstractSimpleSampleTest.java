@@ -28,39 +28,11 @@ import java.util.Map;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.util.Interval;
+import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
 public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
 
-  private Interval interval;
-
-  //
-  // Getters
-  //
-
-  /**
-   * Get the interval.
-   * @return Returns the interval
-   */
-  public Interval getInterval() {
-    return interval;
-  }
-
-  //
-  // Setters
-  //
-
-  /**
-   * Set the interval.
-   * @param interval The interval to set
-   */
-  public void setInterval(final Interval interval) {
-    this.interval = interval;
-  }
-
-  //
-  // Protected method
-  //
+  private ScoreInterval interval = new ScoreInterval();
 
   /**
    * Get the the key in the RunData object for the value to test
@@ -152,7 +124,7 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
     if (interval == null || sampleName == null)
       return new TestResult(transformedValue, isValuePercent());
 
-    return new TestResult(interval.isInInterval(transformedValue) ? 9 : 0,
+    return new TestResult(this.interval.getScore(transformedValue),
         transformedValue, isValuePercent());
   }
 
@@ -167,6 +139,7 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
     if (properties == null)
       throw new NullPointerException("The properties object is null");
 
+    this.interval.configureDoubleInterval(properties);
   }
 
   //

@@ -28,7 +28,7 @@ import java.util.Map;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.util.Interval;
+import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
 /**
  * This class define a simple lane test.
@@ -37,35 +37,7 @@ import fr.ens.transcriptome.aozan.util.Interval;
  */
 public abstract class AbstractSimpleLaneTest extends AbstractLaneTest {
 
-  private Interval interval;
-
-  //
-  // Getters
-  //
-
-  /**
-   * Get the interval.
-   * @return Returns the interval
-   */
-  public Interval getInterval() {
-    return interval;
-  }
-
-  //
-  // Setters
-  //
-
-  /**
-   * Set the interval.
-   * @param interval The interval to set
-   */
-  public void setInterval(final Interval interval) {
-    this.interval = interval;
-  }
-
-  //
-  // Other methods
-  //
+  private ScoreInterval interval = new ScoreInterval();
 
   @Override
   public void configure(final Map<String, String> properties)
@@ -74,6 +46,7 @@ public abstract class AbstractSimpleLaneTest extends AbstractLaneTest {
     if (properties == null)
       throw new NullPointerException("The properties object is null");
 
+    this.interval.configureDoubleInterval(properties);
   }
 
   //
@@ -168,7 +141,7 @@ public abstract class AbstractSimpleLaneTest extends AbstractLaneTest {
     if (interval == null || (indexedRead && !testIndexedRead()))
       return new TestResult(transformedValue, isValuePercent());
 
-    return new TestResult(interval.isInInterval(transformedValue) ? 9 : 0,
+    return new TestResult(this.interval.getScore(transformedValue),
         transformedValue, isValuePercent());
   }
 

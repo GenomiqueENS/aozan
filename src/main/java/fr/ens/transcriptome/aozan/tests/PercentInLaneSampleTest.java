@@ -29,7 +29,7 @@ import java.util.Map;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.FlowcellDemuxSummaryCollector;
-import fr.ens.transcriptome.aozan.util.Interval;
+import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
 /**
  * This class define a sample percent in lane test.
@@ -38,7 +38,7 @@ import fr.ens.transcriptome.aozan.util.Interval;
  */
 public class PercentInLaneSampleTest extends AbstractSampleTest {
 
-  private Interval interval;
+  private ScoreInterval interval = new ScoreInterval();
 
   @Override
   public String[] getCollectorsNamesRequiered() {
@@ -74,8 +74,7 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
     if (interval == null || sampleName == null)
       return new TestResult(percent, true);
 
-    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent,
-        true);
+    return new TestResult(this.interval.getScore(percent), percent, true);
   }
 
   //
@@ -89,6 +88,7 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
     if (properties == null)
       throw new NullPointerException("The properties object is null");
 
+    this.interval.configureDoubleInterval(properties);
   }
 
   //
@@ -100,7 +100,6 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
    */
   public PercentInLaneSampleTest() {
     super("percentinlanesample", "", "Sample in lane", "%");
-    this.interval = null;
   }
 
 }

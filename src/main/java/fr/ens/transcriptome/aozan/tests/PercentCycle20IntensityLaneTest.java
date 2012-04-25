@@ -26,7 +26,6 @@ package fr.ens.transcriptome.aozan.tests;
 
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
-import fr.ens.transcriptome.aozan.util.DoubleInterval;
 
 /**
  * This class define a test on percent of intensity at cycle 20.
@@ -77,7 +76,6 @@ public class PercentCycle20IntensityLaneTest extends AbstractSimpleLaneTest {
   public PercentCycle20IntensityLaneTest() {
 
     super("percentintensitycycle20", "", "Intensity cycle 20", "%");
-    setInterval(new DoubleInterval(0.5, Double.POSITIVE_INFINITY));
   }
 
 }

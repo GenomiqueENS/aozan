@@ -62,7 +62,6 @@ public class FirstCycleIntensityPFLaneTest extends AbstractSimpleLaneTest {
   public FirstCycleIntensityPFLaneTest() {
 
     super("firstcycleintensity", "", "First cyle intensity");
-    setInterval(null);
   }
 
 }

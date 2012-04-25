@@ -68,7 +68,8 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
             + (control ? " (C)" : "");
 
     // No score for indexed read
-    if (indexedRead)
+    if (indexedRead
+        || this.phasingInterval == null || this.prephasingInterval == null)
       return new TestResult(message);
 
     final boolean result =
@@ -95,6 +96,15 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
     if (properties == null)
       throw new NullPointerException("The properties object is null");
 
+    for (Map.Entry<String, String> e : properties.entrySet()) {
+
+      if ("phasing.interval".equals(e.getKey().trim().toLowerCase()))
+        this.phasingInterval = new DoubleInterval(e.getValue());
+
+      if ("prephasing.interval".equals(e.getKey().trim().toLowerCase()))
+        this.prephasingInterval = new DoubleInterval(e.getValue());
+    }
+
   }
 
   //
@@ -104,8 +114,6 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
   public PhasingPrePhasingLaneTest() {
 
     super("phasingprephasing", "", "Phasing / Prephasing");
-    this.phasingInterval = new DoubleInterval(0, 0.004);
-    this.prephasingInterval = new DoubleInterval(0, 0.005);
   }
 
 }

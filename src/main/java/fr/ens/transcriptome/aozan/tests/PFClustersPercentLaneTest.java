@@ -29,8 +29,7 @@ import java.util.Map;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
-import fr.ens.transcriptome.aozan.util.DoubleInterval;
-import fr.ens.transcriptome.aozan.util.Interval;
+import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
 /**
  * This class a test on passing filter cluster in a lane.
@@ -39,7 +38,7 @@ import fr.ens.transcriptome.aozan.util.Interval;
  */
 public class PFClustersPercentLaneTest extends AbstractLaneTest {
 
-  private final Interval interval;
+  private final ScoreInterval interval = new ScoreInterval();
 
   @Override
   public String[] getCollectorsNamesRequiered() {
@@ -63,8 +62,7 @@ public class PFClustersPercentLaneTest extends AbstractLaneTest {
     if (indexedRead)
       return new TestResult(percent, true);
 
-    return new TestResult(this.interval.isInInterval(percent) ? 9 : 0, percent,
-        true);
+    return new TestResult(this.interval.getScore(percent), percent, true);
   }
 
   //
@@ -78,6 +76,7 @@ public class PFClustersPercentLaneTest extends AbstractLaneTest {
     if (properties == null)
       throw new NullPointerException("The properties object is null");
 
+    this.interval.configureDoubleInterval(properties);
   }
 
   //
@@ -90,7 +89,6 @@ public class PFClustersPercentLaneTest extends AbstractLaneTest {
   public PFClustersPercentLaneTest() {
 
     super("pfclusterspercent", "", "PF Clusters", "%");
-    this.interval = new DoubleInterval(0.6, 1);
   }
 
 }

@@ -139,7 +139,7 @@ public class FastQCCollector implements Collector {
       final List<QCModule> modules = this.moduleList;
 
       try {
-
+        int count = 0;
         while (seqFile.hasNext()) {
 
           final Sequence seq = seqFile.next();
@@ -151,7 +151,10 @@ public class FastQCCollector implements Collector {
 
             module.processSequence(seq);
           }
-
+          if (count>100000)
+            break;
+          count++;
+          
         }
 
       } catch (SequenceFormatException e) {

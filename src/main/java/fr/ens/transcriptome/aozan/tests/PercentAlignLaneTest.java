@@ -34,8 +34,7 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
-import fr.ens.transcriptome.aozan.util.DoubleInterval;
-import fr.ens.transcriptome.aozan.util.Interval;
+import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
 /**
  * This class define a lane test on PhiX percent aligned.
@@ -44,7 +43,7 @@ import fr.ens.transcriptome.aozan.util.Interval;
  */
 public class PercentAlignLaneTest extends AbstractLaneTest {
 
-  private final Interval interval;
+  private final ScoreInterval interval = new ScoreInterval();
 
   @Override
   public String[] getCollectorsNamesRequiered() {
@@ -73,8 +72,7 @@ public class PercentAlignLaneTest extends AbstractLaneTest {
     if (indexedRead || !control)
       return new TestResult(alignPhix, true);
 
-    return new TestResult(this.interval.isInInterval(alignPhix) ? 9 : 0,
-        alignPhix, true);
+    return new TestResult(this.interval.getScore(alignPhix), alignPhix, true);
 
   }
 
@@ -88,7 +86,8 @@ public class PercentAlignLaneTest extends AbstractLaneTest {
 
     if (properties == null)
       throw new NullPointerException("The properties object is null");
-
+    
+    this.interval.configureDoubleInterval(properties);
   }
 
   //
@@ -101,7 +100,6 @@ public class PercentAlignLaneTest extends AbstractLaneTest {
   public PercentAlignLaneTest() {
 
     super("percentalign", "", "PhiX Align", "%");
-    this.interval = new DoubleInterval(0.75, 1.0);
   }
 
 }

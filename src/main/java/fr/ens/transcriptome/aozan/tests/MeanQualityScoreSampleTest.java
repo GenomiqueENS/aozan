@@ -29,7 +29,7 @@ import java.util.Map;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.FlowcellDemuxSummaryCollector;
-import fr.ens.transcriptome.aozan.util.Interval;
+import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
 /**
  * This class define a percent quality mean score sample test.
@@ -38,7 +38,7 @@ import fr.ens.transcriptome.aozan.util.Interval;
  */
 public class MeanQualityScoreSampleTest extends AbstractSampleTest {
 
-  private Interval interval;
+  private ScoreInterval interval = new ScoreInterval();
 
   @Override
   public String[] getCollectorsNamesRequiered() {
@@ -67,7 +67,7 @@ public class MeanQualityScoreSampleTest extends AbstractSampleTest {
     if (interval == null || sampleName == null)
       return new TestResult(mean);
 
-    return new TestResult(this.interval.isInInterval(mean) ? 9 : 0, mean);
+    return new TestResult(this.interval.getScore(mean), mean);
   }
 
   //
@@ -81,6 +81,7 @@ public class MeanQualityScoreSampleTest extends AbstractSampleTest {
     if (properties == null)
       throw new NullPointerException("The properties object is null");
 
+    this.interval.configureDoubleInterval(properties);
   }
 
   //
@@ -92,7 +93,6 @@ public class MeanQualityScoreSampleTest extends AbstractSampleTest {
    */
   public MeanQualityScoreSampleTest() {
     super("meanqualityscore", "", "Mean Quality Score Base PF", "");
-    this.interval = null;
   }
 
 }

@@ -49,6 +49,9 @@ import fr.ens.transcriptome.aozan.tests.SampleTest;
 
 public class QC {
 
+  private static final String TEST_KEY_ENABLED_SUFFIX = ".enable";
+  private static final String TEST_KEY_PREFIX = "qc.test.";
+
   private List<Collector> collectors = Lists.newArrayList();
   private List<LaneTest> laneTests = Lists.newArrayList();
   private List<SampleTest> sampleTests = Lists.newArrayList();
@@ -264,23 +267,28 @@ public class QC {
       final String key = e.getKey();
       final String value = e.getValue();
 
-      if (key.startsWith("qc.test.")
-          && key.endsWith(".enable") && value != null
+      if (key.startsWith(TEST_KEY_PREFIX)
+          && key.endsWith(TEST_KEY_ENABLED_SUFFIX) && value != null
           && "true".equals(value.trim().toLowerCase())) {
 
         final String testName =
-            key.substring("qc.test.".length(),
-                key.length() - ".enable".length());
+            key.substring(TEST_KEY_PREFIX.length(), key.length()
+                - TEST_KEY_ENABLED_SUFFIX.length());
 
         final AozanTest test = registry.get(testName);
 
         if (test != null) {
           mapTests.put(key, test);
 
+          // Add the test to laneTests or sampleTests
           if (test instanceof LaneTest)
             this.laneTests.add((LaneTest) test);
           else if (test instanceof SampleTest)
             this.sampleTests.add((SampleTest) test);
+
+          // Configure the test
+          configureTest(test, properties, TEST_KEY_PREFIX + testName + ".");
+
         } else
           throw new AozanException("No test found for property: " + key);
       }
@@ -298,6 +306,35 @@ public class QC {
     for (SampleTest test : this.sampleTests)
       test.init();
 
+  }
+
+  /**
+   * Configure an Aozan Test.
+   * @param test Aozan test to configure
+   * @param properties Aozan configuration
+   * @param enableKey key that enable the test
+   * @throws AozanException if an error occurs while configuring the test
+   */
+  private final void configureTest(final AozanTest test,
+      final Map<String, String> properties, final String prefix)
+      throws AozanException {
+
+    final Map<String, String> conf = Maps.newHashMap();
+
+    for (final Map.Entry<String, String> e : properties.entrySet()) {
+
+      final String key = e.getKey();
+
+      if (key.startsWith(prefix) && !key.endsWith(TEST_KEY_ENABLED_SUFFIX)) {
+
+        final String confKey = key.substring(prefix.length());
+        final String confValue = e.getValue();
+
+        conf.put(confKey, confValue);
+      }
+    }
+
+    test.configure(conf);
   }
 
   /**
