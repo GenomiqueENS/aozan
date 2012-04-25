@@ -29,6 +29,7 @@ import java.util.Map;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
+import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
 /**
  * This class define a lane test on cluster density.
@@ -36,6 +37,8 @@ import fr.ens.transcriptome.aozan.collectors.ReadCollector;
  * @author Laurent Jourdren
  */
 public class ClusterDensityLaneTest extends AbstractLaneTest {
+
+  private ScoreInterval interval = new ScoreInterval();
 
   @Override
   public String[] getCollectorsNamesRequiered() {
@@ -55,7 +58,10 @@ public class ClusterDensityLaneTest extends AbstractLaneTest {
 
     final double density = clusterRaw * densityRatio / 1000.0;
 
-    return new TestResult(density);
+    if (interval == null || indexedRead)
+      return new TestResult(density);
+
+    return new TestResult(this.interval.getScore(density), density);
   }
 
   //
@@ -65,6 +71,11 @@ public class ClusterDensityLaneTest extends AbstractLaneTest {
   @Override
   public void configure(final Map<String, String> properties)
       throws AozanException {
+
+    if (properties == null)
+      throw new NullPointerException("The properties object is null");
+
+    this.interval.configureDoubleInterval(properties);
   }
 
   //
