@@ -24,11 +24,14 @@
 
 package fr.ens.transcriptome.aozan.util;
 
+import java.util.Map;
+
 import fr.ens.transcriptome.aozan.AozanException;
 
 public class ScoreInterval {
 
   private final Interval[] intervals = new Interval[9];
+  private int intervalsDefined = 0;
 
   public void setInterval(final int score, final Interval interval) {
 
@@ -38,8 +41,11 @@ public class ScoreInterval {
     if (interval == null)
       throw new NullPointerException("Interval is null");
 
-    this.intervals[score - 1] = interval;
+    final int index = score - 1;
 
+    if (this.intervals[index] == null)
+      this.intervalsDefined++;
+    this.intervals[index] = interval;
   }
 
   public int getScore(final Number value) {
@@ -47,17 +53,36 @@ public class ScoreInterval {
     if (value == null)
       return 0;
 
-    for (int i = 9; i > 0; i--)
+    if (this.intervalsDefined == 0)
+      return -1;
+
+    for (int i = 8; i >= 0; i--)
       if (this.intervals[i] != null && this.intervals[i].isInInterval(value))
-        return i;
+        return i + 1;
 
     return 0;
+  }
+
+  public void configureLongInterval(final Map<String, String> properties)
+      throws AozanException {
+
+    if (properties != null)
+      for (Map.Entry<String, String> e : properties.entrySet())
+        configureLongInterval(e.getKey(), e.getValue());
   }
 
   public boolean configureLongInterval(final String key, final String value)
       throws AozanException {
 
     return configure(key, value, false);
+  }
+
+  public void configureDoubleInterval(final Map<String, String> properties)
+      throws AozanException {
+
+    if (properties != null)
+      for (Map.Entry<String, String> e : properties.entrySet())
+        configureDoubleInterval(e.getKey(), e.getValue());
   }
 
   public boolean configureDoubleInterval(final String key, final String value)

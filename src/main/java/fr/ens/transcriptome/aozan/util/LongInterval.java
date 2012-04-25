@@ -24,6 +24,8 @@
 
 package fr.ens.transcriptome.aozan.util;
 
+import com.google.common.base.Objects;
+
 import fr.ens.transcriptome.aozan.AozanException;
 
 public class LongInterval implements Interval {
@@ -33,6 +35,50 @@ public class LongInterval implements Interval {
   private final long max;
   private final boolean maxInclude;
 
+  //
+  // Getters
+  //
+
+  /**
+   * Get the minimal value of the interval.
+   * @return the minimal value of the interval
+   */
+  public long getMin() {
+
+    return this.min;
+  }
+
+  /**
+   * Test if the minimal value is included in the interval.
+   * @return true if the minimal value is included in the interval.
+   */
+  public boolean isMinIncluded() {
+
+    return this.minInclude;
+  }
+
+  /**
+   * Get the maximal value of the interval.
+   * @return the maximal value of the interval
+   */
+  public long getMax() {
+
+    return this.max;
+  }
+
+  /**
+   * Test if the maximal value is included in the interval.
+   * @return true if the maximal value is included in the interval.
+   */
+  public boolean isMaxIncluded() {
+
+    return this.maxInclude;
+  }
+
+  //
+  // Other methods
+  //
+
   @Override
   public boolean isInInterval(final Number value) {
 
@@ -41,25 +87,27 @@ public class LongInterval implements Interval {
 
     final long val = value.longValue();
 
-    if (this.min != Double.NEGATIVE_INFINITY) {
+    if (this.minInclude && val < min)
+      return false;
 
-      if (this.minInclude && val < min)
-        return false;
+    if (!this.minInclude && val <= min)
+      return false;
 
-      if (!this.minInclude && val <= min)
-        return false;
-    }
+    if (this.maxInclude && val > max)
+      return false;
 
-    if (this.max != Double.POSITIVE_INFINITY) {
-
-      if (this.maxInclude && val > max)
-        return false;
-
-      if (!this.maxInclude && val >= max)
-        return false;
-    }
+    if (!this.maxInclude && val >= max)
+      return false;
 
     return true;
+  }
+
+  @Override
+  public String toString() {
+
+    return Objects.toStringHelper(this).add("min", min)
+        .add("minInclude", minInclude).add("max", max)
+        .add("maxInclude", maxInclude).toString();
   }
 
   //
@@ -74,9 +122,9 @@ public class LongInterval implements Interval {
   public LongInterval(final long min, final boolean minIncluded,
       final long max, final boolean maxIncluded) {
 
-    this.min = min;
+    this.min = Math.min(min, max);
     this.minInclude = minIncluded;
-    this.max = max;
+    this.max = Math.max(min, max);
     this.maxInclude = maxIncluded;
   }
 
@@ -123,7 +171,7 @@ public class LongInterval implements Interval {
       throw new AozanException("Invalid interval: " + s);
 
     final String minString = values[0].trim();
-    final String maxString = values[0].trim();
+    final String maxString = values[1].trim();
 
     try {
 
