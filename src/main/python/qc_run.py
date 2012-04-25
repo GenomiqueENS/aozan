@@ -128,7 +128,7 @@ def qc(run_id, conf):
 
     # Archive the reports
     cmd = 'cd ' + reports_data_path + '  && ' + \
-       'tar cjf ' + reports_data_path + '/qc_' + run_id + '.tar.bz2 ' + qc_output_dir
+       'tar cjf qc_' + run_id + '.tar.bz2 qc_' + run_id
     common.log("DEBUG", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while saving the qc archive file for " + run_id, 'Error while saving the  qc archive file.\nCommand line:\n' + cmd, conf)
