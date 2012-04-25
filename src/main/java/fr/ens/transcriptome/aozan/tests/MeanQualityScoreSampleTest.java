@@ -92,7 +92,7 @@ public class MeanQualityScoreSampleTest extends AbstractSampleTest {
    * Public constructor.
    */
   public MeanQualityScoreSampleTest() {
-    super("meanqualityscore", "", "Mean Quality Score Base PF", "");
+    super("meanqualityscorepf", "", "Mean quality score base PF");
   }
 
 }
