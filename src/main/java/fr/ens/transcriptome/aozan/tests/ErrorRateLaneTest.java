@@ -27,6 +27,11 @@ package fr.ens.transcriptome.aozan.tests;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 
+/**
+ * This class define a test on error rate.
+ * @since 1.0
+ * @author Laurent Jourdren
+ */
 public class ErrorRateLaneTest extends AbstractSimpleLaneTest {
 
   @Override
