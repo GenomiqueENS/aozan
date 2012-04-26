@@ -27,3 +27,4 @@ fr.ens.transcriptome.aozan.tests.SequenceLengthDistributionFastQCSampleTest
 fr.ens.transcriptome.aozan.tests.DuplicationLevelFastQCSampleTest
 fr.ens.transcriptome.aozan.tests.OverRepresentedSeqsFastQCSampleTest
 fr.ens.transcriptome.aozan.tests.KmerContentFastQCSampleTest
+fr.ens.transcriptome.aozan.tests.BadTilesFastQCSampleTest
