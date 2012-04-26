@@ -58,6 +58,7 @@ import com.google.common.collect.Lists;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.RunDataGenerator;
+import fr.ens.transcriptome.aozan.fastqc.BadTiles;
 
 /**
  * This class define a FastQC Collector
@@ -139,7 +140,7 @@ public class FastQCCollector implements Collector {
       final List<QCModule> modules = this.moduleList;
 
       try {
-        int count = 0;
+
         while (seqFile.hasNext()) {
 
           final Sequence seq = seqFile.next();
@@ -151,10 +152,7 @@ public class FastQCCollector implements Collector {
 
             module.processSequence(seq);
           }
-          if (count>100000)
-            break;
-          count++;
-          
+
         }
 
       } catch (SequenceFormatException e) {
@@ -268,7 +266,8 @@ public class FastQCCollector implements Collector {
                 new PerSequenceQualityScores(), new PerBaseSequenceContent(),
                 new PerBaseGCContent(), new PerSequenceGCContent(),
                 new NContent(), new SequenceLengthDistribution(),
-                os.duplicationLevelModule(), os, new KmerContent());
+                os.duplicationLevelModule(), os, new KmerContent(),
+                new BadTiles());
 
       } catch (SequenceFormatException e) {
         throw new AozanException(e);
