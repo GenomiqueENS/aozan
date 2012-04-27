@@ -65,7 +65,7 @@ def qc(run_id, conf):
     if not os.path.exists(conf['fastq.data.path']):
         error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf['fastq.data.path'], conf)
         return False
-    
+
     # Check if reports path directory exists
     if not os.path.exists(reports_data_path):
         error("Report directory does not exists", "Report directory does not exists: " + reports_data_path, conf)
@@ -80,6 +80,12 @@ def qc(run_id, conf):
     if os.path.exists(qc_output_dir):
         error("quality control report directory already exists for run " + run_id,
               'The quality control report directory already exists for run ' + run_id + ': ' + qc_output_dir, conf)
+        return False
+
+    # Check if the output directory already exists
+    if os.path.exists(reports_data_path + '/qc_' + run_id + '.tar.bz2'):
+        error("quality control report archive already exists for run " + run_id,
+              'The quality control report archive already exists for run ' + run_id + ': ' + reports_data_path + '/qc_' + run_id + '.tar.bz2', conf)
         return False
 
     # Check if enough free space is available
@@ -135,7 +141,7 @@ def qc(run_id, conf):
         return False
 
     # Set read only basecall stats archives files
-    os.chmod(reports_data_path + '/qc_' +  run_id + '.tar.bz2', stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+    os.chmod(reports_data_path + '/qc_' + run_id + '.tar.bz2', stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
 
     # Check if the report has been generated
     if not os.path.exists(html_report_file):
