@@ -178,7 +178,7 @@ def sync(run_id, conf):
         return False
 
     # Create index.hml file
-    common.create_html_index_file(conf, reports_data_path + '/index.html', run_id)
+    common.create_html_index_file(conf, reports_data_path + '/index.html', run_id, ['sync'])
 
     # Set read only archives files
     os.chmod(reports_data_path + '/' + report_archive_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
