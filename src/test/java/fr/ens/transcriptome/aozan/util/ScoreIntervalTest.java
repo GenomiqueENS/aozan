@@ -1,0 +1,157 @@
+/*
+ *                  Eoulsan development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public License version 2.1 or
+ * later and CeCILL-C. This should be distributed with the code.
+ * If you do not have a copy, see:
+ *
+ *      http://www.gnu.org/licenses/lgpl-2.1.txt
+ *      http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.txt
+ *
+ * Copyright for this code is held jointly by the Genomic platform
+ * of the Institut de Biologie de l'École Normale Supérieure and
+ * the individual authors. These should be listed in @author doc
+ * comments.
+ *
+ * For more information on the Eoulsan project and its aims,
+ * or to join the Eoulsan Google group, visit the home page
+ * at:
+ *
+ *      http://www.transcriptome.ens.fr/eoulsan
+ *
+ */
+
+package fr.ens.transcriptome.aozan.util;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import junit.framework.TestCase;
+import fr.ens.transcriptome.aozan.AozanException;
+
+public class ScoreIntervalTest extends TestCase {
+
+  public void testSetInterval() {
+
+    ScoreInterval si = new ScoreInterval();
+
+    assertEquals(-1, si.getScore(0));
+    assertEquals(-1, si.getScore(0.0));
+    assertEquals(-1, si.getScore(Double.NaN));
+    assertEquals(-1, si.getScore(Double.NEGATIVE_INFINITY));
+    assertEquals(-1, si.getScore(Double.POSITIVE_INFINITY));
+
+    si.setInterval(9, new DoubleInterval(10, 20));
+    assertEquals(0, si.getScore(5));
+    assertEquals(0, si.getScore(9));
+    assertEquals(9, si.getScore(15));
+    assertEquals(0, si.getScore(21));
+    assertEquals(0, si.getScore(25));
+
+    si.setInterval(5, new DoubleInterval(8, 22));
+    assertEquals(0, si.getScore(5));
+    assertEquals(5, si.getScore(9));
+    assertEquals(9, si.getScore(15));
+    assertEquals(5, si.getScore(21));
+    assertEquals(0, si.getScore(25));
+
+    si.setInterval(8, new DoubleInterval(12, 18));
+    assertEquals(0, si.getScore(5));
+    assertEquals(5, si.getScore(9));
+    assertEquals(9, si.getScore(15));
+    assertEquals(5, si.getScore(21));
+    assertEquals(0, si.getScore(25));
+
+    si.setInterval(1, new DoubleInterval(2, 28));
+    assertEquals(1, si.getScore(5));
+    assertEquals(5, si.getScore(9));
+    assertEquals(9, si.getScore(15));
+    assertEquals(5, si.getScore(21));
+    assertEquals(1, si.getScore(25));
+
+    si.setInterval(9, new DoubleInterval(16, 17));
+    assertEquals(1, si.getScore(5));
+    assertEquals(5, si.getScore(9));
+    assertEquals(8, si.getScore(15));
+    assertEquals(9, si.getScore(16));
+    assertEquals(5, si.getScore(21));
+    assertEquals(1, si.getScore(25));
+
+    try {
+      si.setInterval(0, new DoubleInterval(12, 18));
+      assertTrue(false);
+    } catch (IllegalArgumentException e) {
+      assertTrue(true);
+    }
+
+    try {
+      si.setInterval(10, new DoubleInterval(12, 18));
+      assertTrue(false);
+    } catch (IllegalArgumentException e) {
+      assertTrue(true);
+    }
+
+  }
+
+  public void testSetIntervalConstructor() {
+
+    Map<String, String> map = new HashMap<String, String>();
+    map.put("score9.interval", "[10,20]");
+    map.put("score5.interval", "[8,22]");
+    map.put("score8.interval", "[12,18]");
+    map.put("score1.interval", "[2,28]");
+    map.put("score9.interval", "[16,17]");
+
+    ScoreInterval si = new ScoreInterval();
+    try {
+      si.configureDoubleInterval(map);
+      assertTrue(true);
+    } catch (AozanException e) {
+      assertTrue(false);
+    }
+    
+    assertEquals(1, si.getScore(5));
+    assertEquals(5, si.getScore(9));
+    assertEquals(8, si.getScore(15));
+    assertEquals(9, si.getScore(16));
+    assertEquals(5, si.getScore(21));
+    assertEquals(1, si.getScore(25));
+    
+    map = new HashMap<String, String>();
+    map.put("interval", "[10,20]");
+
+    
+    si = new ScoreInterval();
+    try {
+      si.configureDoubleInterval(map);
+      assertTrue(true);
+    } catch (AozanException e) {
+      assertTrue(false);
+    }
+    
+    assertEquals(0, si.getScore(5));
+    assertEquals(0, si.getScore(9));
+    assertEquals(9, si.getScore(15));
+    assertEquals(0, si.getScore(21));
+    assertEquals(0, si.getScore(25));
+    
+    map = new HashMap<String, String>();
+    map.put("toto", "[10,20]");
+
+    
+    si = new ScoreInterval();
+    try {
+      si.configureDoubleInterval(map);
+      assertTrue(true);
+    } catch (AozanException e) {
+      assertTrue(false);
+    }
+    
+    assertEquals(-1, si.getScore(5));
+    assertEquals(-1, si.getScore(9));
+    assertEquals(-1, si.getScore(15));
+    assertEquals(-1, si.getScore(21));
+    assertEquals(-1, si.getScore(25));
+  }
+}
