@@ -225,6 +225,10 @@ public class FastQCCollector implements Collector {
 
       new HTMLReportArchive(seqFile,
           this.moduleList.toArray(new QCModule[] {}), reportFile);
+
+      // Keep only the uncompressed data
+      if (reportFile.exists())
+        reportFile.delete();
     }
 
     //
