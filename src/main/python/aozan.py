@@ -10,7 +10,9 @@ import sys, os, traceback
 import common, hiseq_run, sync_run, demux_run, qc_run
 from java.util import Locale
 import first_base_report
+from java.util import LinkedHashMap
 from fr.ens.transcriptome.aozan import Globals
+
 
 def create_lock_file(lock_file_path):
     """Create the lock file.
@@ -163,7 +165,7 @@ def launch_steps():
 if __name__ == "__main__":
 
     # Create configuration
-    conf = {}
+    conf = LinkedHashMap()
     common.set_default_conf(conf)
 
     # Use default (C) locale

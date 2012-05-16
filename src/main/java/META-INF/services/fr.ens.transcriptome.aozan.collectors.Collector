@@ -1,0 +1,6 @@
+fr.ens.transcriptome.aozan.collectors.DesignCollector
+fr.ens.transcriptome.aozan.collectors.FlowcellDemuxSummaryCollector
+fr.ens.transcriptome.aozan.collectors.PhasingCollector
+fr.ens.transcriptome.aozan.collectors.ReadCollector
+fr.ens.transcriptome.aozan.collectors.RunInfoCollector
+fr.ens.transcriptome.aozan.collectors.FastQCCollector
