@@ -118,11 +118,16 @@ def demux(run_id, conf):
 
     common.log("DEBUG", "Flowcell id: " + flow_cell_id, conf)
     
-    # Check if input data exists
+    # Check if root input bcl data directory exists
     if not os.path.exists(conf['bcl.data.path']):
         error("Basecalling data directory does not exists", "Basecalling data directory does not exists: " + conf['bcl.data.path'], conf)
         return False
 
+    # Check if root input fastq data directory exists
+    if not os.path.exists(conf['fastq.data.path']):
+        error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf['fastq.data.path'], conf)
+        return False
+    
     # Check if casava designs path exists
     if not os.path.exists(conf['casava.designs.path']):
         error("Casava designs directory does not exists", "Casava designs does not exists: " + conf['casava.designs.path'], conf)
