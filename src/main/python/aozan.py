@@ -45,7 +45,7 @@ def load_pid_in_lock_file(lock_file_path):
     pid = int(f.readline().strip())
     f.close()
     return pid
-   
+
 
 def welcome():
     """Welcome message.
@@ -57,13 +57,115 @@ def welcome():
 
 something_to_do = False
 
+def discover_new_run():
+
+    #
+    # Discover first base report
+    #
+
+    first_base_report_sent = first_base_report.load_processed_run_ids(conf)
+
+    if conf['first.base.report.step'].lower().strip() == 'true':
+        for run_id in (first_base_report.get_available_run_ids(conf) - first_base_report_sent):
+            welcome()
+            common.log('INFO', 'First base report ' + run_id, conf)
+            first_base_report.send_report(run_id, conf)
+            first_base_report.add_run_id_to_processed_run_ids(run_id, conf)
+            first_base_report_sent.add(run_id)
+
+
+    #
+    # Discover hiseq run done
+    #
+
+    hiseq_run_ids_done = hiseq_run.load_processed_run_ids(conf)
+
+    if conf['hiseq.step'].lower().strip() == 'true':
+        for run_id in (hiseq_run.get_available_run_ids(conf) - hiseq_run_ids_done):
+            welcome()
+            common.log('INFO', 'Discover ' + run_id, conf)
+            hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
+            hiseq_run.add_run_id_to_processed_run_ids(run_id, conf)
+            hiseq_run_ids_done.add(run_id)
+
+    return hiseq_run_ids_done
+
+def launch_steps():
+    """Launch steps.
+    """
+
+    # Discover new runs
+    hiseq_run_ids_done = discover_new_run()
+
+    # Load run do not process
+    hiseq_run_ids_do_not_process = hiseq_run.load_deny_run_ids(conf)
+
+    #
+    # Sync hiseq and storage
+    #
+
+    sync_run_ids_done = sync_run.load_processed_run_ids(conf)
+
+    # Get the list of run available on HiSeq output
+    if conf['sync.step'].lower().strip() == 'true':
+        for run_id in (hiseq_run_ids_done - sync_run_ids_done - hiseq_run_ids_do_not_process):
+            welcome()
+            common.log('INFO', 'Synchronize ' + run_id, conf)
+            if sync_run.sync(run_id, conf):
+                    sync_run.add_run_id_to_processed_run_ids(run_id, conf)
+                    sync_run_ids_done.add(run_id)
+
+
+    # Check if new run appears while sync step
+    if len(discover_new_run() - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
+        launch_steps()
+        return
+
+    #
+    # Demultiplexing
+    #
+
+    demux_run_ids_done = demux_run.load_processed_run_ids(conf)
+
+    if conf['demux.step'].lower().strip() == 'true':
+        for run_id in (sync_run_ids_done - demux_run_ids_done):
+            welcome()
+            common.log('INFO', 'Demux ' + run_id, conf)
+            if demux_run.demux(run_id, conf):
+                demux_run.add_run_id_to_processed_run_ids(run_id, conf)
+                demux_run_ids_done.add(run_id)
+
+    # Check if new run appears while demux step
+    if len(discover_new_run() - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
+        launch_steps()
+        return
+
+    #
+    # Quality control
+    #
+
+    qc_run_ids_done = qc_run.load_processed_run_ids(conf)
+
+    if conf['qc.step'].lower().strip() == 'true':
+        for run_id in (demux_run_ids_done - qc_run_ids_done):
+            welcome()
+            common.log('INFO', 'Quality control ' + run_id, conf)
+            if qc_run.qc(run_id, conf):
+                qc_run.add_run_id_to_processed_run_ids(run_id, conf)
+                qc_run_ids_done.add(run_id)
+
+    # Check if new run appears while quality control step
+    if len(discover_new_run() - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
+        launch_steps()
+        return
+
 # Main function
 if __name__ == "__main__":
 
     # Create configuration
     conf = {}
     common.set_default_conf(conf)
-    
+
     # Use default (C) locale
     Locale.setDefault(Locale.US)
 
@@ -86,96 +188,21 @@ if __name__ == "__main__":
     if not os.path.exists(lock_file_path):
 
         try:
+            # Create lock file
             create_lock_file(lock_file_path)
-            
 
-            #
-            # Discover first base report
-            #
-    
-            first_base_report_sent = first_base_report.load_processed_run_ids(conf)
-    
-            if conf['first.base.report.step'].lower().strip() == 'true':
-                for run_id in (first_base_report.get_available_run_ids(conf) - first_base_report_sent):
-                    welcome()
-                    common.log('INFO', 'First base report ' + run_id, conf)
-                    first_base_report.send_report(run_id, conf)
-                    first_base_report.add_run_id_to_processed_run_ids(run_id, conf)
-                    first_base_report_sent.add(run_id)
-                
-    
-            #
-            # Discover hiseq run done
-            #
-    
-            hiseq_run_ids_done = hiseq_run.load_processed_run_ids(conf)
-             
-            if conf['hiseq.step'].lower().strip() == 'true':
-                for run_id in (hiseq_run.get_available_run_ids(conf) - hiseq_run_ids_done):
-                    welcome()
-                    common.log('INFO', 'Discover ' + run_id, conf)
-                    hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
-                    hiseq_run.add_run_id_to_processed_run_ids(run_id, conf)
-                    hiseq_run_ids_done.add(run_id)
-    
-    
-            #
-            # Load run do not process
-            #
-    
-            hiseq_run_ids_do_not_process = hiseq_run.load_deny_run_ids(conf)
-            
-            #
-            # Sync hiseq and storage
-            #
-    
-            sync_run_ids_done = sync_run.load_processed_run_ids(conf)
-    
-            # Get the list of run available on HiSeq output
-            if conf['sync.step'].lower().strip() == 'true':
-                for run_id in (hiseq_run_ids_done - sync_run_ids_done - hiseq_run_ids_do_not_process):
-                    welcome()
-                    common.log('INFO', 'Synchronize ' + run_id, conf)
-                    if sync_run.sync(run_id, conf):
-                            sync_run.add_run_id_to_processed_run_ids(run_id, conf)
-                            sync_run_ids_done.add(run_id)
-    
-            #
-            # Demultiplexing
-            #
-    
-            demux_run_ids_done = demux_run.load_processed_run_ids(conf)
-    
-            if conf['demux.step'].lower().strip() == 'true':
-                for run_id in (sync_run_ids_done - demux_run_ids_done):
-                    welcome()
-                    common.log('INFO', 'Demux ' + run_id, conf)
-                    if demux_run.demux(run_id, conf):
-                        demux_run.add_run_id_to_processed_run_ids(run_id, conf)
-                        demux_run_ids_done.add(run_id)
-    
-            #
-            # Quality control
-            #
-    
-            qc_run_ids_done = qc_run.load_processed_run_ids(conf)
-            
-            if conf['qc.step'].lower().strip() == 'true':
-                for run_id in (demux_run_ids_done - qc_run_ids_done):
-                    welcome()
-                    common.log('INFO', 'Quality control ' + run_id, conf)
-                    if qc_run.qc(run_id, conf):
-                        qc_run.add_run_id_to_processed_run_ids(run_id, conf)
-                        qc_run_ids_done.add(run_id)
-    
+            # Launch steps
+            launch_steps()
+
+            # Remove lock file
             delete_lock_file(lock_file_path)
-            
+
             # TODO remove *.lasterr files
-    
+
             if something_to_do:
                 common.log('INFO', 'End of Aozan', conf)
         except:
-                common.log('CRITICAL', 'Exception: ' +  str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')' , conf)
+                common.log('CRITICAL', 'Exception: ' + str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')' , conf)
                 common.log('TRACEBACK', traceback.format_exc(sys.exc_info()[2]).replace('\n', ' '), conf)
     else:
         print "A lock file exists."
