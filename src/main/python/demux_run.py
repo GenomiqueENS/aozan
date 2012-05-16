@@ -281,7 +281,7 @@ def demux(run_id, conf):
     df_in_bytes = common.df(fastq_output_dir)
     du_in_bytes = common.du(fastq_output_dir)
     df = df_in_bytes / (1024 * 1024 * 1024)
-    du = du_in_bytes / (1024 * 1024)
+    du = du_in_bytes / (1024 * 1024 * 1024)
 
     common.log("DEBUG", "Demux step: output disk free after demux: " + str(df_in_bytes), conf)
     common.log("DEBUG", "Demux step: space used by demux: " + str(du_in_bytes), conf)
