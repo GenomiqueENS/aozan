@@ -59,8 +59,8 @@ def load_index_sequences(conf):
 
     if conf['index.sequences'] == '' or not os.path.exists(conf['index.sequences']):
             return result
-            
-    
+
+
 
     f = open(conf['index.sequences'], 'r')
 
@@ -69,13 +69,13 @@ def load_index_sequences(conf):
         if len(l) == 0:
             continue
         fields = l.split('=')
-        if len(fields)==2:
-            result[fields[0].strip().lower()]=fields[1].strip().upper()
+        if len(fields) == 2:
+            result[fields[0].strip().lower()] = fields[1].strip().upper()
 
     f.close()
 
     return result
-   
+
 
 def get_flowcell_id_in_demultiplex_xml(fastq_output_dir):
     """Get the flowcell id in DemultiplexConfig.xml.
@@ -100,24 +100,24 @@ def demux(run_id, conf):
 
     start_time = time.time()
     common.log('INFO', 'Demux step: start', conf)
-    
+
     reports_data_base_path = conf['reports.data.path']
     reports_data_path = reports_data_base_path + '/' + run_id
-    
-    
+
+
     run_number = hiseq_run.get_run_number(run_id)
     instrument_sn = hiseq_run.get_instrument_sn(run_id)
     flow_cell_id = hiseq_run.get_flow_cell(run_id)
-    design_xls_path = conf['casava.designs.path'] + '/design_' + instrument_sn +  '_%04d.xls' % run_number
-    design_csv_path = conf['tmp.path'] + '/design_' + instrument_sn +  '_%04d.csv' % run_number
+    design_xls_path = conf['casava.designs.path'] + '/design_' + instrument_sn + '_%04d.xls' % run_number
+    design_csv_path = conf['tmp.path'] + '/design_' + instrument_sn + '_%04d.csv' % run_number
     fastq_output_dir = conf['fastq.data.path'] + '/' + run_id
-    
+
     basecall_stats_prefix = 'basecall_stats_'
-    basecall_stats_file =  basecall_stats_prefix + run_id + '.tar.bz2'
-    
+    basecall_stats_file = basecall_stats_prefix + run_id + '.tar.bz2'
+
 
     common.log("DEBUG", "Flowcell id: " + flow_cell_id, conf)
-    
+
     # Check if root input bcl data directory exists
     if not os.path.exists(conf['bcl.data.path']):
         error("Basecalling data directory does not exists", "Basecalling data directory does not exists: " + conf['bcl.data.path'], conf)
@@ -127,25 +127,30 @@ def demux(run_id, conf):
     if not os.path.exists(conf['fastq.data.path']):
         error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf['fastq.data.path'], conf)
         return False
-    
+
     # Check if casava designs path exists
     if not os.path.exists(conf['casava.designs.path']):
         error("Casava designs directory does not exists", "Casava designs does not exists: " + conf['casava.designs.path'], conf)
         return False
-    
+
     # Check if temporary directory exists
     if not os.path.exists(conf['tmp.path']):
         error("Temporary directory does not exists", "Temporary directory does not exists: " + conf['tmp.path'], conf)
         return False
-    
+
     # Check if reports_data_path exists
     if not os.path.exists(reports_data_base_path):
         error("Report directory does not exists", "Report directory does not exists: " + reports_data_base_path, conf)
         return False
-    
+
+    # Check if basecall stats archive exists
+    if os.path.exists(reports_data_path + '/' + basecall_stats_file):
+        error('Basecall stats archive already exists for run ' + run_id, 'Basecall stats archive already exists for run ' + run_id + ': ' + basecall_stats_file, conf)
+        return False
+
     # Create if not exists archive directory for the run
     if not os.path.exists(reports_data_base_path + '/' + run_id):
-        os.mkdir(reports_data_base_path + '/' + run_id)    
+        os.mkdir(reports_data_base_path + '/' + run_id)
 
 
     # Check if the xls design exists
@@ -184,22 +189,22 @@ def demux(run_id, conf):
 
         # Replace index sequence shortcuts by sequences
         CasavaDesignUtil.replaceIndexShortcutsBySequences(design, load_index_sequences(conf))
-        
+
         # Check values of design file
         design_warnings = CasavaDesignUtil.checkCasavaDesign(design, flow_cell_id)
-        
+
         # Write CSV design file
         CasavaDesignCSVWriter(design_csv_path).writer(design)
-        
+
     except IOException, exp:
         error("error while converting design-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
-        return False        
+        return False
     except EoulsanException, exp:
         error("error while converting design-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
         return False
 
     # Log Casava design warning
-    if (design_warnings>0):
+    if (design_warnings > 0):
         msg = ''
         first = True
         for warn in design_warnings:
@@ -265,7 +270,7 @@ def demux(run_id, conf):
 
 
     # Add design to the archive of designs
-    cmd = 'cp ' + design_xls_path +  ' ' + conf['tmp.path'] + \
+    cmd = 'cp ' + design_xls_path + ' ' + conf['tmp.path'] + \
         ' && cd ' + conf['tmp.path'] + \
         ' && zip ' + conf['casava.designs.path'] + '/designs.zip ' + \
         os.path.basename(design_csv_path) + ' ' + os.path.basename(design_xls_path)
@@ -294,14 +299,14 @@ def demux(run_id, conf):
         'Fastq files for this run ' + \
         'can be found in the following directory:\n  ' + fastq_output_dir
 
-    if design_warnings.size()>0:
-        msg+='\n\nDesign warnings:'
+    if design_warnings.size() > 0:
+        msg += '\n\nDesign warnings:'
         for warn in design_warnings:
-            msg+="\n  - " + warn 
+            msg += "\n  - " + warn
 
     # Add path to report if reports.url exists
     if conf['reports.url'] != None and conf['reports.url'] != '':
-        msg += '\n\nRun reports can be found at following location:\n  ' +  conf['reports.url'] + '/' + run_id
+        msg += '\n\nRun reports can be found at following location:\n  ' + conf['reports.url'] + '/' + run_id
 
     msg += '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df)
 
