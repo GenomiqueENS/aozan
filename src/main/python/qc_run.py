@@ -163,7 +163,7 @@ def qc(run_id, conf):
     df_in_bytes = common.df(qc_output_dir)
     du_in_bytes = common.du(qc_output_dir)
     df = df_in_bytes / (1024 * 1024 * 1024)
-    du = du_in_bytes / (1024 * 1024 * 1024)
+    du = du_in_bytes / (1024 * 1024)
 
     common.log("DEBUG", "QC step: output disk free after qc: " + str(df_in_bytes), conf)
     common.log("DEBUG", "QC step: space used by qc: " + str(du_in_bytes), conf)
@@ -181,7 +181,7 @@ def qc(run_id, conf):
     if conf['reports.url'] != None and conf['reports.url'] != '':
         msg += '\n\nRun reports can be found at following location:\n  ' + conf['reports.url'] + '/' + run_id
 
-    msg += '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df)
+    msg += '\n\nFor this task %.2f MB has been used and %.2f GB still free.' % (du, df)
 
 
     common.send_msg_with_attachment('[Aozan] End of quality control for run ' + run_id, msg, html_report_file, conf)
