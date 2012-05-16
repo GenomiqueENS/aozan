@@ -351,6 +351,9 @@ def demux(run_id, conf):
     if conf['casava.design.format'].strip().lower() == 'xls':
         os.remove(conf['tmp.path'] + '/' + os.path.basename(input_design_xls_path))
 
+    # Create index.hml file
+    common.create_html_index_file(conf, reports_data_path + '/index.html', run_id, ['sync', 'demux'])
+
     df_in_bytes = common.df(fastq_output_dir)
     du_in_bytes = common.du(fastq_output_dir)
     df = df_in_bytes / (1024 * 1024 * 1024)

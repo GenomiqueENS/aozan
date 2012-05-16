@@ -157,6 +157,9 @@ def qc(run_id, conf):
         error("error while setting read only the output qc directory for run " + run_id, 'Error while setting read only the output qc directory.\nCommand line:\n' + cmd, conf)
         return False
 
+    # Create index.hml file
+    common.create_html_index_file(conf, reports_data_path + '/index.html', run_id, ['sync', 'demux', 'qc'])
+
     df_in_bytes = common.df(qc_output_dir)
     du_in_bytes = common.du(qc_output_dir)
     df = df_in_bytes / (1024 * 1024 * 1024)
