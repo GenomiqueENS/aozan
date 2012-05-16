@@ -43,7 +43,7 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
 
     final String prefixKey =
         "fastqc.lane"
-            + lane + ".sample." + sampleName + ".read" + read + "."
+            + lane + ".sample." + sampleName + ".read" + readSample + "."
             + sampleName + "."
             + getQCModuleName().replace(' ', '.').toLowerCase();
 
@@ -59,7 +59,7 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
         data.get("design.lane" + lane + "." + sampleName + ".index");
     final String dirname =
         String.format("%s_%s_L%03d_R%d_001-fastqc", sampleName,
-            "".equals(index) ? "NoIndex" : index, lane, read);
+            "".equals(index) ? "NoIndex" : index, lane, readSample);
     final String url =
         "Project_"
             + projectName + "/" + dirname + "/fastqc_report.html#M"
