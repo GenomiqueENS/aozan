@@ -110,8 +110,14 @@ def sync(run_id, conf):
         error("Not enough disk space to store aozan reports for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
               '.\nNeed more than 10 Gb on ' + reports_data_base_path + '.', conf)
 
+    # exclude CIF files ?
+    if conf['rsync.exclude.cif'].lower().strip() == 'true':
+        exclude_cif_params = "--exclude '*.cif' --exclude '*_pos.txt' --exclude '*.errorMap' --exclude '*.FWHMMap'"
+    else:
+        exclude_cif_params = ""
+
     # Copy data from hiseq path to bcl path
-    cmd = "rsync  -a --exclude '*.cif' --exclude '*_pos.txt' --exclude '*.errorMap' --exclude '*.FWHMMap' " + input_path + ' ' + bcl_data_path
+    cmd = 'rsync  -a ' + exclude_cif_params + ' ' + input_path + ' ' + bcl_data_path
     common.log("DEBUG", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while executing rsync for run " + run_id, 'Error while executing rsync.\nCommand line:\n' + cmd, conf)

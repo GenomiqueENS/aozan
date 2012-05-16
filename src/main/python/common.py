@@ -394,6 +394,9 @@ def set_default_conf(conf):
     # Lock file
     conf['lock.file'] = '/var/lock/aozan.lock'
     
+    # Rsync
+    conf['rsync.exclude.cif'] = 'true'
+
     # Casava
     conf['casava.path'] = '/usr/local/casava'
     conf['casava.compression'] = 'bzip2'
