@@ -59,7 +59,7 @@ def send_msg(subject, message, conf):
     mail_bcc = None
     COMMASPACE = ', '
 
-    message = conf['mail.header'].replace('\\n','\n') + message + conf['mail.footer'].replace('\\n','\n')
+    message = conf['mail.header'].replace('\\n', '\n') + message + conf['mail.footer'].replace('\\n', '\n')
     message = message.replace('\n', '\r\n')
     msg = ''
 
@@ -95,8 +95,8 @@ def send_msg(subject, message, conf):
         print '-------------'
         print msg
         print '-------------'
-        
-        
+
+
 def send_msg_with_attachment(subject, message, attachment_file, conf):
     """Send a message to the user about the data extraction."""
 
@@ -109,10 +109,10 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
     mail_bcc = None
     COMMASPACE = ', '
 
-    message = conf['mail.header'].replace('\\n','\n') + message + conf['mail.footer'].replace('\\n','\n')
-    
-       
-    
+    message = conf['mail.header'].replace('\\n', '\n') + message + conf['mail.footer'].replace('\\n', '\n')
+
+
+
     msg = MIMEMultipart()
 
     if mail_to != None :
@@ -131,15 +131,15 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
         msg['Bcc'] = COMMASPACE.join(mail_bcc)
 
     msg['Subject'] = subject
-    
+
     # Not seen
     msg.preamble = message
-    
+
     # The message
     part1 = MIMEText(message, 'plain')
     msg.attach(part1)
-    
-    
+
+
     ctype, encoding = mimetypes.guess_type(attachment_file)
 
     if ctype is None or encoding is not None:
@@ -229,18 +229,18 @@ def log(level, message, conf):
         message: message to log
         conf: configuration dictionary
     """
-    
-    msg = time_to_human_readable(time.time()) + '\t' + level+ '\t' + message
-    
+
+    msg = time_to_human_readable(time.time()) + '\t' + level + '\t' + message
+
     print(msg)
-    
+
     try:
         f = open(conf['aozan.var.path'] + '/aozan.log', 'a')
         f.write(msg + '\n')
         f.close()
     except:
-        pass    
-    
+        pass
+
 
 
 def duration_to_human_readable(time):
@@ -248,8 +248,8 @@ def duration_to_human_readable(time):
     
     Arguments:
         time: the number of seconds
-    """    
-    
+    """
+
     hours = int(time / 3600)
     hours_rest = time % 3600
     minutes = int(hours_rest / 60)
@@ -263,7 +263,7 @@ def time_to_human_readable(time_since_epoch):
 
     Arguments:
         time: the number of seconds
-    """   
+    """
 
     return time.strftime("%a %b %d %H:%M:%S %Z %Y", time.localtime(time_since_epoch))
 
@@ -300,9 +300,9 @@ def add_run_id_to_processed_run_ids(run_id, done_file_path, conf):
         done_file_path: path of the done file
         conf: configuration dictionary
     """
-    
+
     log('DEBUG', 'Add ' + run_id + ' to ' + os.path.basename(done_file_path), conf)
-    
+
     f = open(done_file_path, 'a')
 
     f.write(run_id + '\n')
@@ -336,7 +336,7 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
         run_id: The run id
         sections: The list of section to write
     """
-    
+
     text = """<html>
         <head>
                 <title>Run ###RUN_ID###</title>
@@ -378,10 +378,11 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
 </html>"""
 
     template_path = conf['index.html.template']
-    if template_path!=None and template_path!='' and os.path.exists(template_path):
+    if template_path != None and template_path != '' and os.path.exists(template_path):
         f_in = open(template_path, 'r')
         text = ''.join(f_in.readlines())
         f_in.close()
+
     
     lines = text.split('\n');
     write_lines = True
@@ -425,10 +426,12 @@ def set_default_conf(conf):
     conf['casava.design.format'] = 'xls'
     conf['casava.path'] = '/usr/local/casava'
     conf['casava.compression'] = 'bzip2'
-    conf['casava.fastq.cluster.count'] = '1000000000'
+    conf['casava.fastq.cluster.count'] = '0'
     conf['casava.compression.level'] = '9'
     conf['casava.mismatches'] = '0'
     conf['casava.threads'] = str(Runtime.getRuntime().availableProcessors())
+    conf['casava.adapter.fasta.file.path'] = ''
+    conf['casava.with.failed.reads'] = 'True'
 
     # Data path
     conf['tmp.path'] = '/tmp'
@@ -441,9 +444,9 @@ def set_default_conf(conf):
     conf['hiseq.critical.min.space'] = str(1 * 1024 * 1024 * 1024 * 1024)
     conf['sync.space.factor'] = str(0.2)
     conf['demux.space.factor'] = str(0.7)
-    
+
     # Mail configuration
     conf['mail.header'] = 'THIS IS AN AUTOMATED MESSAGE.\\n\\n'
-    conf['mail.footer'] = '\\n\\nThe Aozan team.\\n' 
+    conf['mail.footer'] = '\\n\\nThe Aozan team.\\n'
 
 
