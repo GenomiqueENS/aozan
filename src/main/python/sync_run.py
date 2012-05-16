@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os, stat, time
-import common
+import common, hiseq_run
 
 
 def load_processed_run_ids(conf):
@@ -35,18 +35,21 @@ def error(short_message, message, conf):
 
     common.error('[Aozan] synchronizer: ' + short_message, message, conf['aozan.var.path'] + '/sync.lasterr', conf)
 
+
+
+
 def sync(run_id, conf):
     """Synchronize a run.
 
         Arguments:
                 runtId: the run id
                 conf: configuration dictionary
-        """
+    """
 
     start_time = time.time()
     common.log('INFO', 'Sync step: start', conf)
 
-    hiseq_data_path = conf['hiseq.data.path']
+    hiseq_data_path = hiseq_run.find_hiseq_run_path(run_id, conf)
     bcl_data_path = conf['bcl.data.path']
     reports_data_base_path = conf['reports.data.path']
     tmp_base_path = conf['tmp.path']
@@ -56,6 +59,12 @@ def sync(run_id, conf):
     hiseq_log_prefix = 'hiseq_log_'
     report_archive_file = report_prefix + run_id + '.tar.bz2'
     hiseq_log_archive_file = hiseq_log_prefix + run_id + '.tar.bz2'
+
+
+    # Check if hiseq_data_path exists
+    if hiseq_data_path == False:
+        error("HiSeq directory does not exists", "HiSeq directory does not exists in paths: " + conf['hiseq.data.path'], conf)
+        return False
 
 
     # Check if hiseq_data_path exists

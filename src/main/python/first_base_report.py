@@ -27,8 +27,8 @@ def add_run_id_to_processed_run_ids(run_id, conf):
     """
 
     common.add_run_id_to_processed_run_ids(run_id, conf['aozan.var.path'] + '/first_base_report.done', conf)
-    
-    
+
+
 def get_available_run_ids(conf):
     """Get the list of the available runs.
 
@@ -36,17 +36,18 @@ def get_available_run_ids(conf):
         conf: configuration dictionary
     """
 
-    hiseq_data_path = conf['hiseq.data.path']
     result = set()
 
-    files = os.listdir(hiseq_data_path)
-    for f in files:
-        if os.path.isdir(hiseq_data_path + '/' + f) and \
-           hiseq_run.check_run_id(f, conf) and \
-           not hiseq_run.check_end_run(f, conf) and \
-           os.path.exists(hiseq_data_path + '/' + f + '/First_Base_Report.htm'):
-           
-            result.add(f)
+    for hiseq_data_path in hiseq_run.get_hiseq_data_paths(conf):
+
+        files = os.listdir(hiseq_data_path)
+        for f in files:
+            if os.path.isdir(hiseq_data_path + '/' + f) and \
+                hiseq_run.check_run_id(f, conf) and \
+                not hiseq_run.check_end_run(f, conf) and \
+                os.path.exists(hiseq_data_path + '/' + f + '/First_Base_Report.htm'):
+
+                result.add(f)
 
     return result
 
@@ -58,8 +59,7 @@ def send_report(run_id, conf):
         run_id: the run id
         conf: configuration dictionary
     """
-    
-    attachment_file = conf['hiseq.data.path'] + '/' + run_id + '/First_Base_Report.htm'
+
+    attachment_file = hiseq_run.find_hiseq_run_path(run_id, conf) + '/' + run_id + '/First_Base_Report.htm'
     message = 'You will find attached to this message the first base report for the run ' + run_id + '.'
     common.send_msg_with_attachment('[Aozan] First base report for HiSeq run ' + run_id, message, attachment_file, conf)
-    

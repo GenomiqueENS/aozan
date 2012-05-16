@@ -42,7 +42,7 @@ def get_reads_number(run_id, conf):
 		conf: configuration dictionary
 	"""
 
-	hiseq_data_path = conf['hiseq.data.path']
+	hiseq_data_path = find_hiseq_run_path(run_id, conf)
 
 	tree = ElementTree()
 	tree.parse(hiseq_data_path + '/' + run_id + "/runParameters.xml")
@@ -60,7 +60,10 @@ def check_end_run(run_id, conf):
 		conf: configuration dictionary
 	"""
 
-	hiseq_data_path = conf['hiseq.data.path']
+	hiseq_data_path = find_hiseq_run_path(run_id, conf)
+	if hiseq_data_path == False:
+		return False
+
 	reads_number = get_reads_number(run_id, conf)
 
 	for i in range(reads_number):
@@ -78,7 +81,10 @@ def check_end_run_since(run_id, secs, conf):
 		conf: configuration dictionary
 	"""
 
-	hiseq_data_path = conf['hiseq.data.path']
+	hiseq_data_path = find_hiseq_run_path(run_id, conf)
+	if hiseq_data_path == False:
+		return 0
+
 	reads_number = get_reads_number(run_id, conf)
 	last = 0
 
@@ -136,13 +142,14 @@ def get_available_run_ids(conf):
 		conf: configuration dictionary
 	"""
 
-	hiseq_data_path = conf['hiseq.data.path']
 	result = set()
 
-	files = os.listdir(hiseq_data_path)
-	for f in files:
-		if os.path.isdir(hiseq_data_path + '/' + f) and check_run_id(f, conf) and check_end_run(f, conf):
-			result.add(f)
+	for hiseq_data_path in get_hiseq_data_paths(conf):
+
+		files = os.listdir(hiseq_data_path)
+		for f in files:
+			if os.path.isdir(hiseq_data_path + '/' + f) and check_run_id(f, conf) and check_end_run(f, conf):
+				result.add(f)
 
 	return result
 
@@ -171,7 +178,7 @@ def get_instrument_sn(run_id):
 		run_id: the run id
 	"""
 
-	return run_id.split('_')[1]	
+	return run_id.split('_')[1]
 
 def send_mail_if_critical_free_space_available(conf):
 	"""Check if disk free space is critical. If true send a mail.
@@ -180,16 +187,20 @@ def send_mail_if_critical_free_space_available(conf):
         conf: configuration dictionary
     """
 
-	df = common.df(conf['hiseq.data.path'])
-	free_space_threshold = long(conf['hiseq.critical.min.space'])
-	if df < free_space_threshold:
-		common.send_msg('[Aozan] Critical: Not enough disk space on Hiseq storage for current run',
-					'There is only %.2f' % (df / (1024 * 1024 * 1024)) + ' Gb left for Hiseq run storage.' +
-					' The current warning threshold is set to %.2f' % (free_space_threshold / (1024 * 1024 * 1024)) + ' Gb.', conf)
+	for path in get_hiseq_data_paths(conf):
+
+		df = common.df(path)
+		free_space_threshold = long(conf['hiseq.critical.min.space'])
+		if df < free_space_threshold:
+			common.send_msg('[Aozan] Critical: Not enough disk space on Hiseq storage for current run',
+						'There is only %.2f' % (df / (1024 * 1024 * 1024)) + ' Gb left for Hiseq run storage in ' + path + '. '
+						' The current warning threshold is set to %.2f' % (free_space_threshold / (1024 * 1024 * 1024)) + ' Gb.', conf)
 
 def send_mail_if_recent_run(run_id, secs, conf):
 
-	run_path = conf['hiseq.data.path'] + '/' + run_id
+	run_path = find_hiseq_run_path(run_id, conf)
+	if run_path == False:
+		return
 
 	last = check_end_run_since(run_id, secs, conf)
 
@@ -200,3 +211,20 @@ def send_mail_if_recent_run(run_id, secs, conf):
 					common.time_to_human_readable(last) + '.\n' +
 					'Data for this run can be found at: ' + run_path +
 					'\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df), conf)
+
+
+def get_hiseq_data_paths(conf):
+
+	paths = conf['hiseq.data.path'].split(':')
+	for i in range(len(paths)):
+		paths[i] = paths[i].strip()
+
+	return paths
+
+def find_hiseq_run_path(run_id, conf):
+
+	for path in get_hiseq_data_paths(conf):
+		if (os.path.exists(path.strip() + '/' + run_id)):
+			return path.strip()
+
+	return False
