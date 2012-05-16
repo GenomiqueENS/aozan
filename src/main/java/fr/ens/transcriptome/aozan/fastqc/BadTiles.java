@@ -355,6 +355,9 @@ public class BadTiles implements QCModule {
   @Override
   public boolean raisesError() {
 
+    if (!this.calculated)
+      computeResults();
+
     if (this.badTiles.size() > 0) {
 
       final double ratio =
@@ -369,6 +372,9 @@ public class BadTiles implements QCModule {
 
   @Override
   public boolean raisesWarning() {
+
+    if (!this.calculated)
+      computeResults();
 
     return this.badTiles.size() > 0;
   }
