@@ -398,6 +398,7 @@ def set_default_conf(conf):
     conf['rsync.exclude.cif'] = 'true'
 
     # Casava
+    conf['casava.design.format'] = 'xls'
     conf['casava.path'] = '/usr/local/casava'
     conf['casava.compression'] = 'bzip2'
     conf['casava.fastq.cluster.count'] = '1000000000'

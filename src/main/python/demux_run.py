@@ -14,6 +14,7 @@ from java.util import HashMap
 from fr.ens.transcriptome.eoulsan import EoulsanException
 from fr.ens.transcriptome.aozan.io import CasavaDesignXLSReader
 from fr.ens.transcriptome.eoulsan.illumina import CasavaDesignUtil
+from fr.ens.transcriptome.eoulsan.illumina.io import CasavaDesignCSVReader
 from fr.ens.transcriptome.eoulsan.illumina.io import CasavaDesignCSVWriter
 
 def load_processed_run_ids(conf):
@@ -108,7 +109,9 @@ def demux(run_id, conf):
     run_number = hiseq_run.get_run_number(run_id)
     instrument_sn = hiseq_run.get_instrument_sn(run_id)
     flow_cell_id = hiseq_run.get_flow_cell(run_id)
-    design_xls_path = conf['casava.designs.path'] + '/design_' + instrument_sn + '_%04d.xls' % run_number
+
+    input_design_xls_path = conf['casava.designs.path'] + '/design_' + instrument_sn + '_%04d.xls' % run_number
+    input_design_csv_path = conf['casava.designs.path'] + '/design_' + instrument_sn + '_%04d.csv' % run_number
     design_csv_path = conf['tmp.path'] + '/design_' + instrument_sn + '_%04d.csv' % run_number
     fastq_output_dir = conf['fastq.data.path'] + '/' + run_id
 
@@ -152,14 +155,6 @@ def demux(run_id, conf):
     if not os.path.exists(reports_data_base_path + '/' + run_id):
         os.mkdir(reports_data_base_path + '/' + run_id)
 
-
-    # Check if the xls design exists
-    if not os.path.exists(design_xls_path):
-        error("no casava design found", "No casava design found for " + run_id + " run.\n" + \
-              'You must provide a design-%04d.xls file' % run_number + ' in ' + conf['casava.designs.path'] + \
-              ' directory to demultiplex and create fastq files for this run.\n', conf)
-        return False
-
     # Check if the output directory already exists
     if os.path.exists(fastq_output_dir):
         error("fastq output directory already exists for run " + run_id,
@@ -182,19 +177,85 @@ def demux(run_id, conf):
               '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + fastq_output_dir + '.', conf)
         return False
 
-    # Convert design in XLS format to CSV format
+    if conf['casava.design.format'].strip().lower() == 'xls':
+
+        # Convert design in XLS format to CSV format
+
+        # Check if the xls design exists
+        if not os.path.exists(input_design_xls_path):
+            error("no casava design found", "No casava design found for " + run_id + " run.\n" + \
+              'You must provide a design-%04d.xls file' % run_number + ' in ' + conf['casava.designs.path'] + \
+              ' directory to demultiplex and create fastq files for this run.\n', conf)
+            return False
+
+        try:
+            # Load XLS design file
+            design = CasavaDesignXLSReader(input_design_xls_path).read()
+
+            # Replace index sequence shortcuts by sequences
+            CasavaDesignUtil.replaceIndexShortcutsBySequences(design, load_index_sequences(conf))
+
+            # Write CSV design file
+            CasavaDesignCSVWriter(design_csv_path).writer(design)
+
+        except IOException, exp:
+            error("error while converting design-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
+            return False
+        except EoulsanException, exp:
+            error("error while converting design-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
+            return False
+
+    elif conf['casava.design.format'].strip().lower() == 'csv':
+
+        # Copy the CSV file
+
+        # Check if the xls design exists
+        if not os.path.exists(input_design_csv_path):
+            error("no casava design found", "No casava design found for " + run_id + " run.\n" + \
+              'You must provide a design-%04d.csv file' % run_number + ' in ' + conf['casava.designs.path'] + \
+              ' directory to demultiplex and create fastq files for this run.\n', conf)
+            return False
+
+        cmd = 'cp ' + input_design_csv_path + ' ' + design_csv_path
+        common.log("DEBUG", "exec: " + cmd, conf)
+        if os.system(cmd) != 0:
+            error("error while copying Casava CSV design file to temporary directory for run " + run_id,
+                  'Error while copying Casava CSV design file to temporary directory.\nCommand line:\n' + cmd, conf)
+            return False
+        
+    elif conf['casava.design.format'].strip().lower() == 'command':
+        
+        if conf['casava.design.generator.command'] == None or conf['casava.design.generator.command'].strip() == '':
+            error("error while creating Casava CSV design file for run " + run_id,
+                  'Error while creating Casava CSV design file, the command is empty.', conf)
+            return False
+        
+        cmd = conf['casava.design.generator.command'] + ' ' + run_id + ' ' + design_csv_path
+        common.log("DEBUG", "exec: " + cmd, conf)
+        if os.system(cmd) != 0:
+            error("error while creating Casava CSV design file for run " + run_id,
+                  'Error while creating Casava CSV design file.\nCommand line:\n' + cmd, conf)
+            
+        if not os.path.exists(design_csv_path):
+            error("error while creating Casava CSV design file for run " + run_id,
+                  'Error while creating Casava CSV design file, the external command did not create Casava CSV file:\n' + cmd, conf)
+    else:
+        error("error while creating Casava CSV design file for run " + run_id,
+                  'No method to get Casava design file has been defined. Please, set the "casava.design.format" property.\n', conf)
+
+
+    # Check if Casava CSV design file has been created
+    if not os.path.exists(design_csv_path):
+            error("error while reading Casava CSV design file for run " + run_id,
+                  'Error while reading Casava CSV design file, the file file does not exist: \n' + design_csv_path, conf)            
+
+    # Check Casava CSV design file
     try:
         # Load XLS design file
-        design = CasavaDesignXLSReader(design_xls_path).read()
-
-        # Replace index sequence shortcuts by sequences
-        CasavaDesignUtil.replaceIndexShortcutsBySequences(design, load_index_sequences(conf))
+        design = CasavaDesignCSVReader(design_csv_path).read()
 
         # Check values of design file
         design_warnings = CasavaDesignUtil.checkCasavaDesign(design, flow_cell_id)
-
-        # Write CSV design file
-        CasavaDesignCSVWriter(design_csv_path).writer(design)
 
     except IOException, exp:
         error("error while converting design-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
@@ -270,10 +331,16 @@ def demux(run_id, conf):
 
 
     # Add design to the archive of designs
-    cmd = 'cp ' + design_xls_path + ' ' + conf['tmp.path'] + \
+    if conf['casava.design.format'].strip().lower() == 'xls':
+        cmd = 'cp ' + input_design_xls_path + ' ' + conf['tmp.path'] + \
         ' && cd ' + conf['tmp.path'] + \
         ' && zip ' + conf['casava.designs.path'] + '/designs.zip ' + \
-        os.path.basename(design_csv_path) + ' ' + os.path.basename(design_xls_path)
+        os.path.basename(design_csv_path) + ' ' + os.path.basename(input_design_xls_path)
+    else:
+        cmd = 'cd ' + conf['tmp.path'] + \
+        ' && zip ' + conf['casava.designs.path'] + '/designs.zip ' + \
+        os.path.basename(design_csv_path)
+        
     common.log("DEBUG", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while archiving the design file for " + run_id, 'Error while archiving the design file for.\nCommand line:\n' + cmd, conf)
@@ -281,7 +348,8 @@ def demux(run_id, conf):
 
     # Remove temporary design files
     os.remove(design_csv_path)
-    os.remove(conf['tmp.path'] + '/' + os.path.basename(design_xls_path))
+    if conf['casava.design.format'].strip().lower() == 'xls':
+        os.remove(conf['tmp.path'] + '/' + os.path.basename(input_design_xls_path))
 
     df_in_bytes = common.df(fastq_output_dir)
     du_in_bytes = common.du(fastq_output_dir)
