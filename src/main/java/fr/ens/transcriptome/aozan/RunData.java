@@ -200,6 +200,19 @@ public class RunData {
     put(key, Joiner.on(',').join(strings));
   }
 
+  /**
+   * Set the key and values of a RunData object in the current RunData.
+   * @param data Data to add
+   */
+  public void put(final RunData data) {
+
+    if (data == null)
+      return;
+
+    for (final Map.Entry<String, String> e : data.map.entrySet())
+      this.map.put(e.getKey(), e.getValue());
+  }
+
   //
   // Other methods
   //
