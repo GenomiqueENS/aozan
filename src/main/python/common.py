@@ -438,6 +438,7 @@ def set_default_conf(conf):
     conf['index.sequences'] = ''
     conf['index.html.template'] = ''
     conf['reports.url'] = ''
+    conf['qc.report.stylesheet'] = ''
 
     # Space needed
     conf['hiseq.warning.min.space'] = str(3 * 1024 * 1024 * 1024 * 1024)
