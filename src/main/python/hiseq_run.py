@@ -189,12 +189,13 @@ def send_mail_if_critical_free_space_available(conf):
 
 	for path in get_hiseq_data_paths(conf):
 
-		df = common.df(path)
-		free_space_threshold = long(conf['hiseq.critical.min.space'])
-		if df < free_space_threshold:
-			common.send_msg('[Aozan] Critical: Not enough disk space on Hiseq storage for current run',
-						'There is only %.2f' % (df / (1024 * 1024 * 1024)) + ' Gb left for Hiseq run storage in ' + path + '. '
-						' The current warning threshold is set to %.2f' % (free_space_threshold / (1024 * 1024 * 1024)) + ' Gb.', conf)
+		if os.path.exists(path):
+			df = common.df(path)
+			free_space_threshold = long(conf['hiseq.critical.min.space'])
+			if df < free_space_threshold:
+				common.send_msg('[Aozan] Critical: Not enough disk space on Hiseq storage for current run',
+							'There is only %.2f' % (df / (1024 * 1024 * 1024)) + ' Gb left for Hiseq run storage in ' + path + '. '
+							' The current warning threshold is set to %.2f' % (free_space_threshold / (1024 * 1024 * 1024)) + ' Gb.', conf)
 
 def send_mail_if_recent_run(run_id, secs, conf):
 
