@@ -35,6 +35,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JViewport;
+import javax.swing.table.TableModel;
+
 import uk.ac.bbsrc.babraham.FastQC.Modules.BasicStats;
 import uk.ac.bbsrc.babraham.FastQC.Modules.KmerContent;
 import uk.ac.bbsrc.babraham.FastQC.Modules.NContent;
@@ -179,6 +184,47 @@ public class FastQCCollector implements Collector {
     }
 
     /**
+     * Get the number of reads in the fastq file(s).
+     * @param bs BasicStats module
+     * @return the number of reads in the fastq file(s)
+     * @throws AozanException if the implementation of BasicStat has changed and
+     *           is incompatible this method
+     */
+    private static final int getClusterNumberFromBasicStatsModule(
+        final BasicStats bs) throws AozanException {
+
+      try {
+
+        final JScrollPane jsp =
+            (JScrollPane) bs.getResultsPanel().getComponent(1);
+        final JViewport jvp = (JViewport) jsp.getComponent(0);
+        final TableModel tm = ((JTable) jvp.getComponent(0)).getModel();
+
+        final String value = (String) tm.getValueAt(3, 1);
+
+        if (value == null)
+          throw new AozanException(
+              "The results panel of Basic Stats FastQC module has changed."
+                  + " Update Aozan code to handle this.");
+
+        return Integer.parseInt(value);
+
+      } catch (ClassCastException e) {
+
+        e.printStackTrace();
+
+        throw new AozanException(
+            "The results panel of Basic Stats FastQC module has changed."
+                + " Update Aozan code to handle this.");
+      } catch (NumberFormatException e) {
+        throw new AozanException(
+            "The results panel of Basic Stats FastQC module has changed."
+                + " Update Aozan code to handle this.");
+      }
+
+    }
+
+    /**
      * Process results after the end of the thread.
      * @throws AozanException if an error occurs while generate FastQC reports
      */
@@ -190,21 +236,33 @@ public class FastQCCollector implements Collector {
               + lane + ".sample." + sampleName + ".read" + read + "."
               + sampleName;
 
+      int nClusters = -1;
+
       // Fill the run data object
       for (final QCModule module : this.moduleList) {
 
         final String keyPrefix = prefix + "." + module.name().replace(' ', '.');
+
+        if (module instanceof BasicStats) {
+
+          nClusters = getClusterNumberFromBasicStatsModule((BasicStats) module);
+
+          // If no read read don't go further
+          if (nClusters == 0)
+            break;
+        }
 
         this.results.put(keyPrefix + ".error", module.raisesError());
         this.results.put(keyPrefix + ".warning", module.raisesWarning());
       }
 
       // Create report
-      try {
-        createReportFile();
-      } catch (IOException e) {
-        throw new AozanException(e);
-      }
+      if (nClusters > 0)
+        try {
+          createReportFile();
+        } catch (IOException e) {
+          throw new AozanException(e);
+        }
 
     }
 
@@ -485,7 +543,7 @@ public class FastQCCollector implements Collector {
           } catch (InterruptedException e) {
             // LOGGER.warning("InterruptedException: " + e.getMessage());
           } catch (ExecutionException e) {
-            // LOGGER.warning("ExecutionException: " + e.getMessage());
+            throw new AozanException(e);
           }
 
         } else {
