@@ -24,6 +24,10 @@
 
 package fr.ens.transcriptome.aozan;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -247,6 +251,44 @@ public class RunData {
 
     for (Map.Entry<String, String> e : this.map.entrySet())
       System.out.println(e.getKey() + "=" + e.getValue());
+  }
+
+  //
+  // Constructor
+  //
+
+  /**
+   * Public constructor.
+   */
+  public RunData() {
+  }
+
+  /**
+   * Public constructor.
+   * @param file file to read
+   * @throws IOException if an error occurs while reading the data file
+   */
+  public RunData(File file) throws IOException {
+
+    if (file == null)
+      throw new NullPointerException("The file parameter is null");
+
+    final BufferedReader br = new BufferedReader(new FileReader(file));
+
+    String line = null;
+
+    while ((line = br.readLine()) != null) {
+
+      final int pos = line.indexOf('=');
+      if (pos == -1)
+        continue;
+
+      final String key = line.substring(0, pos);
+      final String value = line.substring(pos + 1);
+
+      put(key, value);
+    }
+
   }
 
 }
