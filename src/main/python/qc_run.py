@@ -7,6 +7,8 @@ import os.path, stat
 import common, time
 from fr.ens.transcriptome.aozan import QC
 from fr.ens.transcriptome.aozan import AozanException
+from fr.ens.transcriptome.eoulsan.util import StringUtils
+from java.lang import Throwable
 
 def load_processed_run_ids(conf):
     """Load the list of the processed run ids.
@@ -103,7 +105,18 @@ def qc(run_id, conf):
     except AozanException, exp:
         error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
         return False
+    except Throwable, exp:
+        error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + exp.getMessage() + '\n' 
+              + StringUtils.join(exp.getStackTrace(), '\n\t'), conf)
+        return False
 
+    # Write qc data
+    if conf['qc.report.save.raw.data'].lower().strip() == 'true':
+        try:
+            qc.writeRawData(report, qc_output_dir + '/data-' + run_id + '.txt')
+        except AozanException, exp:
+            error("error while computing qc raw data for run " + run_id + ".", exp.getMessage(), conf)
+            return False
 
     # Write the XML report
     if conf['qc.report.save.report.data'].lower().strip() == 'true':
@@ -111,6 +124,10 @@ def qc(run_id, conf):
             qc.writeXMLReport(report, qc_output_dir + '/' + run_id + '.xml')
         except AozanException, exp:
             error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
+            return False
+        except Throwable, exp:
+            error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + exp.getMessage() + '\n' 
+                  + StringUtils.join(exp.getStackTrace(), '\n\t'), conf)
             return False
 
     # Write the HTML report
@@ -123,14 +140,10 @@ def qc(run_id, conf):
     except AozanException, exp:
         error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
         return False
-
-    # Write qc data
-    if conf['qc.report.save.raw.data'].lower().strip() == 'true':
-        try:
-            qc.writeRawData(report, qc_output_dir + '/data-' + run_id + '.txt')
-        except AozanException, exp:
-            error("error while computing qc raw data for run " + run_id + ".", exp.getMessage(), conf)
-            return False
+    except Throwable, exp:
+        error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + exp.getMessage() + '\n' 
+              + StringUtils.join(exp.getStackTrace(), '\n\t'), conf)
+        return False
 
     # Archive the reports
     cmd = 'cd ' + reports_data_path + '  && ' + \
@@ -147,8 +160,6 @@ def qc(run_id, conf):
     if not os.path.exists(html_report_file):
         error("error while computing qc report for run " + run_id + ".", "No html report generated", conf)
         return False
-
-
 
     # The output directory must be read only
     cmd = 'chmod -R ugo-w ' + qc_output_dir
