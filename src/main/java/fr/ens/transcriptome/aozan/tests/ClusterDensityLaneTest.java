@@ -50,18 +50,24 @@ public class ClusterDensityLaneTest extends AbstractLaneTest {
   public TestResult test(final RunData data, final int read,
       final boolean indexedRead, final int lane) {
 
-    final long clusterRaw =
-        data.getLong("read" + read + ".lane" + lane + ".clusters.raw");
+    try {
+      final long clusterRaw =
+          data.getLong("read" + read + ".lane" + lane + ".clusters.raw");
 
-    final double densityRatio =
-        data.getDouble("read" + read + ".density.ratio");
+      final double densityRatio =
+          data.getDouble("read" + read + ".density.ratio");
 
-    final double density = clusterRaw * densityRatio / 1000.0;
+      final double density = clusterRaw * densityRatio / 1000.0;
 
-    if (interval == null || indexedRead)
-      return new TestResult(density);
+      if (interval == null || indexedRead)
+        return new TestResult(density);
 
-    return new TestResult(this.interval.getScore(density), density);
+      return new TestResult(this.interval.getScore(density), density);
+
+    } catch (NumberFormatException e) {
+
+      return new TestResult("NA");
+    }
   }
 
   //

@@ -47,6 +47,9 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
             + sampleName + "."
             + getQCModuleName().replace(' ', '.').toLowerCase();
 
+    if (data.get(prefixKey + ".error") == null)
+      return new TestResult("NA");
+
     final boolean errorRaise = data.getBoolean(prefixKey + ".error");
     final boolean warningRaise = data.getBoolean(prefixKey + ".warning");
 

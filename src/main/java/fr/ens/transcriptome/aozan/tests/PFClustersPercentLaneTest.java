@@ -50,19 +50,26 @@ public class PFClustersPercentLaneTest extends AbstractLaneTest {
   public TestResult test(final RunData data, final int read,
       final boolean indexedRead, final int lane) {
 
-    final long clusterRaw =
-        data.getLong("read" + read + ".lane" + lane + ".clusters.raw");
+    try {
 
-    final long clusterPF =
-        data.getLong("read" + read + ".lane" + lane + ".clusters.pf");
+      final long clusterRaw =
+          data.getLong("read" + read + ".lane" + lane + ".clusters.raw");
 
-    final double percent = (double) clusterPF / (double) clusterRaw;
+      final long clusterPF =
+          data.getLong("read" + read + ".lane" + lane + ".clusters.pf");
 
-    // No score for indexed read
-    if (indexedRead)
-      return new TestResult(percent, true);
+      final double percent = (double) clusterPF / (double) clusterRaw;
 
-    return new TestResult(this.interval.getScore(percent), percent, true);
+      // No score for indexed read
+      if (indexedRead)
+        return new TestResult(percent, true);
+
+      return new TestResult(this.interval.getScore(percent), percent, true);
+
+    } catch (NumberFormatException e) {
+
+      return new TestResult("NA");
+    }
   }
 
   //

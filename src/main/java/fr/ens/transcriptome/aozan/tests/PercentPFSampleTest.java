@@ -59,14 +59,20 @@ public class PercentPFSampleTest extends AbstractSampleTest {
       prefix =
           "demux.lane" + lane + ".sample." + sampleName + ".read" + readSample;
 
-    final long raw = data.getLong(prefix + ".raw.cluster.count");
-    final long pf = data.getLong(prefix + ".pf.cluster.count");
-    final double percent = (double) pf / (double) raw;
+    try {
+      final long raw = data.getLong(prefix + ".raw.cluster.count");
+      final long pf = data.getLong(prefix + ".pf.cluster.count");
+      final double percent = (double) pf / (double) raw;
 
-    if (interval == null || sampleName == null)
-      return new TestResult(percent, true);
+      if (interval == null || sampleName == null)
+        return new TestResult(percent, true);
 
-    return new TestResult(this.interval.getScore(percent), percent, true);
+      return new TestResult(this.interval.getScore(percent), percent, true);
+
+    } catch (NumberFormatException e) {
+
+      return new TestResult("NA");
+    }
   }
 
   //

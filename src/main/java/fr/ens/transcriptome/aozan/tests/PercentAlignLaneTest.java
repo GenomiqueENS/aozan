@@ -56,24 +56,30 @@ public class PercentAlignLaneTest extends AbstractLaneTest {
   public TestResult test(final RunData data, final int read,
       final boolean indexedRead, final int lane) {
 
-    final double alignPhix =
-        data.getDouble("read" + read + ".lane" + lane + ".prc.align") / 100.0;
+    try {
 
-    final List<String> sampleNames =
-        Lists.newArrayList(Splitter.on(',').split(
-            data.get("design.lane" + lane + ".samples.names")));
+      final double alignPhix =
+          data.getDouble("read" + read + ".lane" + lane + ".prc.align") / 100.0;
 
-    final boolean control =
-        sampleNames.size() == 1
-            && data.getBoolean("design.lane"
-                + lane + "." + sampleNames.get(0) + ".control");
+      final List<String> sampleNames =
+          Lists.newArrayList(Splitter.on(',').split(
+              data.get("design.lane" + lane + ".samples.names")));
 
-    // No score for indexed read
-    if (indexedRead || !control)
-      return new TestResult(alignPhix, true);
+      final boolean control =
+          sampleNames.size() == 1
+              && data.getBoolean("design.lane"
+                  + lane + "." + sampleNames.get(0) + ".control");
 
-    return new TestResult(this.interval.getScore(alignPhix), alignPhix, true);
+      // No score for indexed read
+      if (indexedRead || !control)
+        return new TestResult(alignPhix, true);
 
+      return new TestResult(this.interval.getScore(alignPhix), alignPhix, true);
+
+    } catch (NumberFormatException e) {
+
+      return new TestResult("NA");
+    }
   }
 
   //
@@ -86,7 +92,7 @@ public class PercentAlignLaneTest extends AbstractLaneTest {
 
     if (properties == null)
       throw new NullPointerException("The properties object is null");
-    
+
     this.interval.configureDoubleInterval(properties);
   }
 

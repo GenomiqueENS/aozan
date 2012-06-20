@@ -59,15 +59,21 @@ public class PercentQ30SampleTest extends AbstractSampleTest {
       prefix =
           "demux.lane" + lane + ".sample." + sampleName + ".read" + readSample;
 
-    final long q30 = data.getLong(prefix + ".pf.yield.q30");
-    final long raw = data.getLong(prefix + ".pf.yield");
+    try {
+      final long q30 = data.getLong(prefix + ".pf.yield.q30");
+      final long raw = data.getLong(prefix + ".pf.yield");
 
-    final double percent = (double) q30 / (double) raw;
+      final double percent = (double) q30 / (double) raw;
 
-    if (interval == null || sampleName == null)
-      return new TestResult(percent, true);
+      if (interval == null || sampleName == null)
+        return new TestResult(percent, true);
 
-    return new TestResult(this.interval.getScore(percent), percent, true);
+      return new TestResult(this.interval.getScore(percent), percent, true);
+
+    } catch (NumberFormatException e) {
+
+      return new TestResult("NA");
+    }
   }
 
   //

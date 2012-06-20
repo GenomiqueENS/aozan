@@ -90,42 +90,48 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
     final String msg;
     final Number value;
 
-    if (clazz == Integer.class) {
+    try {
+      if (clazz == Integer.class) {
 
-      value = data.getInt(key);
-      msg = null;
-    } else if (clazz == Long.class) {
+        value = data.getInt(key);
+        msg = null;
+      } else if (clazz == Long.class) {
 
-      value = data.getLong(key);
-      msg = null;
-    } else if (clazz == Float.class) {
+        value = data.getLong(key);
+        msg = null;
+      } else if (clazz == Float.class) {
 
-      value = data.getFloat(key);
-      msg = null;
-    } else if (clazz == Double.class) {
+        value = data.getFloat(key);
+        msg = null;
+      } else if (clazz == Double.class) {
 
-      value = data.getDouble(key);
-      msg = null;
-    } else {
+        value = data.getDouble(key);
+        msg = null;
+      } else {
 
-      msg = data.get(key);
-      value = null;
+        msg = data.get(key);
+        value = null;
+      }
+
+      // Is result a string ?
+      if (value == null)
+        return new TestResult(msg);
+
+      // Transform the value id needed
+      final Number transformedValue =
+          transformValue(value, data, read, readSample, lane, sampleName);
+
+      // Do the test ?
+      if (interval == null || sampleName == null)
+        return new TestResult(transformedValue, isValuePercent());
+
+      return new TestResult(this.interval.getScore(transformedValue),
+          transformedValue, isValuePercent());
+
+    } catch (NumberFormatException e) {
+
+      return new TestResult("NA");
     }
-
-    // Is result a string ?
-    if (value == null)
-      return new TestResult(msg);
-
-    // Transform the value id needed
-    final Number transformedValue =
-        transformValue(value, data, read, readSample, lane, sampleName);
-
-    // Do the test ?
-    if (interval == null || sampleName == null)
-      return new TestResult(transformedValue, isValuePercent());
-
-    return new TestResult(this.interval.getScore(transformedValue),
-        transformedValue, isValuePercent());
   }
 
   //
