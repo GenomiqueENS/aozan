@@ -204,8 +204,16 @@ if __name__ == "__main__":
             if something_to_do:
                 common.log('INFO', 'End of Aozan', conf)
         except:
-                common.log('CRITICAL', 'Exception: ' + str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')' , conf)
-                common.log('TRACEBACK', traceback.format_exc(sys.exc_info()[2]).replace('\n', ' '), conf)
+                # Get exception info
+                exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
+                traceback_msg = traceback.format_exc(sys.exc_info()[2]).replace('\n', ' ')
+                
+                # Log the exception
+                common.log('CRITICAL', 'Exception: ' +  exception_msg, conf)
+                common.log('TRACEBACK', traceback_msg, conf)
+                
+                # Send a mail with the exception
+                common.send_msg("Exception: " + exception_msg, traceback_msg, conf)
     else:
         print "A lock file exists."
         if not os.path.exists('/proc/%d' % (load_pid_in_lock_file(lock_file_path))):
