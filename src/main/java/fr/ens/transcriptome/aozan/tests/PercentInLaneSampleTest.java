@@ -66,15 +66,22 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
     final String rawAll =
         "demux.lane" + lane + ".all.read" + readSample + ".raw.cluster.count";
 
-    final long raw = data.getLong(rawSampleKey);
-    final long all = data.getLong(rawAll);
+    try {
 
-    final double percent = (double) raw / (double) all;
+      final long raw = data.getLong(rawSampleKey);
+      final long all = data.getLong(rawAll);
 
-    if (interval == null || sampleName == null)
-      return new TestResult(percent, true);
+      final double percent = (double) raw / (double) all;
 
-    return new TestResult(this.interval.getScore(percent), percent, true);
+      if (interval == null || sampleName == null)
+        return new TestResult(percent, true);
+
+      return new TestResult(this.interval.getScore(percent), percent, true);
+
+    } catch (NumberFormatException e) {
+
+      return new TestResult("NA");
+    }
   }
 
   //

@@ -59,15 +59,22 @@ public class MeanQualityScoreSampleTest extends AbstractSampleTest {
       prefix =
           "demux.lane" + lane + ".sample." + sampleName + ".read" + readSample;
 
-    final long qualityScoreSum = data.getLong(prefix + ".pf.quality.score.sum");
-    final long yield = data.getLong(prefix + ".pf.yield");
+    try {
+      final long qualityScoreSum =
+          data.getLong(prefix + ".pf.quality.score.sum");
+      final long yield = data.getLong(prefix + ".pf.yield");
 
-    final double mean = (double) qualityScoreSum / (double) yield;
+      final double mean = (double) qualityScoreSum / (double) yield;
 
-    if (interval == null || sampleName == null)
-      return new TestResult(mean);
+      if (interval == null || sampleName == null)
+        return new TestResult(mean);
 
-    return new TestResult(this.interval.getScore(mean), mean);
+      return new TestResult(this.interval.getScore(mean), mean);
+
+    } catch (NumberFormatException e) {
+
+      return new TestResult("NA");
+    }
   }
 
   //

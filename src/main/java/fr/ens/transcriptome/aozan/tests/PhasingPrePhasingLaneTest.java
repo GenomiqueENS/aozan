@@ -50,33 +50,40 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
   public TestResult test(final RunData data, final int read,
       final boolean indexedRead, final int lane) {
 
-    final String keyPrefix = "phasing.read" + read + ".lane" + lane;
-    final double phasing = data.getDouble(keyPrefix + ".phasing");
-    final double prephasing = data.getDouble(keyPrefix + ".prephasing");
+    try {
 
-    final List<String> sampleNames =
-        Lists.newArrayList(Splitter.on(',').split(
-            data.get("design.lane" + lane + ".samples.names")));
+      final String keyPrefix = "phasing.read" + read + ".lane" + lane;
+      final double phasing = data.getDouble(keyPrefix + ".phasing");
+      final double prephasing = data.getDouble(keyPrefix + ".prephasing");
 
-    final boolean control =
-        sampleNames.size() == 1
-            && data.getBoolean("design.lane"
-                + lane + "." + sampleNames.get(0) + ".control");
+      final List<String> sampleNames =
+          Lists.newArrayList(Splitter.on(',').split(
+              data.get("design.lane" + lane + ".samples.names")));
 
-    final String message =
-        String.format("%,.3f%% / %,.3f%%", phasing * 100.0, prephasing * 100.0)
-            + (control ? " (C)" : "");
+      final boolean control =
+          sampleNames.size() == 1
+              && data.getBoolean("design.lane"
+                  + lane + "." + sampleNames.get(0) + ".control");
 
-    // No score for indexed read
-    if (indexedRead
-        || this.phasingInterval == null || this.prephasingInterval == null)
-      return new TestResult(message);
+      final String message =
+          String.format("%,.3f%% / %,.3f%%", phasing * 100.0,
+              prephasing * 100.0) + (control ? " (C)" : "");
 
-    final boolean result =
-        phasingInterval.isInInterval(phasing)
-            || prephasingInterval.isInInterval(prephasing);
+      // No score for indexed read
+      if (indexedRead
+          || this.phasingInterval == null || this.prephasingInterval == null)
+        return new TestResult(message);
 
-    return new TestResult(result ? 9 : 0, message);
+      final boolean result =
+          phasingInterval.isInInterval(phasing)
+              || prephasingInterval.isInInterval(prephasing);
+
+      return new TestResult(result ? 9 : 0, message);
+
+    } catch (NumberFormatException e) {
+
+      return new TestResult("NA");
+    }
   }
 
   @Override
