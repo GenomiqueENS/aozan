@@ -103,6 +103,30 @@ of lanes >1). 5) new errors if a sample is defined several time by with not the 
                 Add Quality control report step.
             </action>
         </release>
+        
+        <release version="0.9" description="" date="2012-06-20">
+            <action dev="jourdren" type="update">
+                When an exception is thrown, send a mail with the exception message and traceback.
+            </action>
+            <action dev="jourdren" type="fix">
+                When checking critical space available on HiSeq computer at every Aozan startup do not send a message if the HiSeq data path is not reachable.
+            </action>
+            <action dev="jourdren" type="fix">
+                In Casava design checking now only allow strings using ascii charset.
+            </action>
+			<action dev="jourdren" type="fix">
+                Aozan qc test do not fail if data to test does not exist.
+            </action>
+            <action dev="jourdren" type="fix">
+                FastQC don't throw exception if no read read.
+            </action>
+            <action dev="jourdren" type="update">
+                No write the qc raw data before the xml qc report.
+            </action>
+            <action dev="jourdren" type="update">
+                If an unexcepted exception is thrown in qc step, now send a mail.
+            </action>
+        </release>
 		
 	</body>
 </document>
