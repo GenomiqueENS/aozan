@@ -125,8 +125,10 @@ def launch_steps(conf):
             welcome(conf)
             common.log('INFO', 'Synchronize ' + run_id, conf)
             if sync_run.sync(run_id, conf):
-                    sync_run.add_run_id_to_processed_run_ids(run_id, conf)
-                    sync_run_ids_done.add(run_id)
+                sync_run.add_run_id_to_processed_run_ids(run_id, conf)
+                sync_run_ids_done.add(run_id)
+            else:
+                return
 
 
     # Check if new run appears while sync step
@@ -147,6 +149,8 @@ def launch_steps(conf):
             if demux_run.demux(run_id, conf):
                 demux_run.add_run_id_to_processed_run_ids(run_id, conf)
                 demux_run_ids_done.add(run_id)
+            else:
+                return
 
     # Check if new run appears while demux step
     if len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
@@ -166,6 +170,8 @@ def launch_steps(conf):
             if qc_run.qc(run_id, conf):
                 qc_run.add_run_id_to_processed_run_ids(run_id, conf)
                 qc_run_ids_done.add(run_id)
+            else:
+                return
 
     # Check if new run appears while quality control step
     if len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
