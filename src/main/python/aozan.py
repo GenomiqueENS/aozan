@@ -49,8 +49,11 @@ def load_pid_in_lock_file(lock_file_path):
     return pid
 
 
-def welcome():
+def welcome(conf):
     """Welcome message.
+
+    Arguments:
+        conf: configuration object    
     """
     global something_to_do
     if something_to_do == False:
@@ -59,7 +62,12 @@ def welcome():
 
 something_to_do = False
 
-def discover_new_run():
+def discover_new_run(conf):
+    """Discover new runs.
+
+    Arguments:
+        conf: configuration object  
+    """
 
     #
     # Discover first base report
@@ -69,7 +77,7 @@ def discover_new_run():
 
     if conf['first.base.report.step'].lower().strip() == 'true':
         for run_id in (first_base_report.get_available_run_ids(conf) - first_base_report_sent):
-            welcome()
+            welcome(conf)
             common.log('INFO', 'First base report ' + run_id, conf)
             first_base_report.send_report(run_id, conf)
             first_base_report.add_run_id_to_processed_run_ids(run_id, conf)
@@ -84,7 +92,7 @@ def discover_new_run():
 
     if conf['hiseq.step'].lower().strip() == 'true':
         for run_id in (hiseq_run.get_available_run_ids(conf) - hiseq_run_ids_done):
-            welcome()
+            welcome(conf)
             common.log('INFO', 'Discover ' + run_id, conf)
             hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
             hiseq_run.add_run_id_to_processed_run_ids(run_id, conf)
@@ -92,12 +100,15 @@ def discover_new_run():
 
     return hiseq_run_ids_done
 
-def launch_steps():
+def launch_steps(conf):
     """Launch steps.
+
+    Arguments:
+        conf: configuration object  
     """
 
     # Discover new runs
-    hiseq_run_ids_done = discover_new_run()
+    hiseq_run_ids_done = discover_new_run(conf)
 
     # Load run do not process
     hiseq_run_ids_do_not_process = hiseq_run.load_deny_run_ids(conf)
@@ -111,7 +122,7 @@ def launch_steps():
     # Get the list of run available on HiSeq output
     if conf['sync.step'].lower().strip() == 'true':
         for run_id in (hiseq_run_ids_done - sync_run_ids_done - hiseq_run_ids_do_not_process):
-            welcome()
+            welcome(conf)
             common.log('INFO', 'Synchronize ' + run_id, conf)
             if sync_run.sync(run_id, conf):
                     sync_run.add_run_id_to_processed_run_ids(run_id, conf)
@@ -119,8 +130,8 @@ def launch_steps():
 
 
     # Check if new run appears while sync step
-    if len(discover_new_run() - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
-        launch_steps()
+    if len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
+        launch_steps(conf)
         return
 
     #
@@ -131,15 +142,15 @@ def launch_steps():
 
     if conf['demux.step'].lower().strip() == 'true':
         for run_id in (sync_run_ids_done - demux_run_ids_done):
-            welcome()
+            welcome(conf)
             common.log('INFO', 'Demux ' + run_id, conf)
             if demux_run.demux(run_id, conf):
                 demux_run.add_run_id_to_processed_run_ids(run_id, conf)
                 demux_run_ids_done.add(run_id)
 
     # Check if new run appears while demux step
-    if len(discover_new_run() - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
-        launch_steps()
+    if len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
+        launch_steps(conf)
         return
 
     #
@@ -150,32 +161,36 @@ def launch_steps():
 
     if conf['qc.step'].lower().strip() == 'true':
         for run_id in (demux_run_ids_done - qc_run_ids_done):
-            welcome()
+            welcome(conf)
             common.log('INFO', 'Quality control ' + run_id, conf)
             if qc_run.qc(run_id, conf):
                 qc_run.add_run_id_to_processed_run_ids(run_id, conf)
                 qc_run_ids_done.add(run_id)
 
     # Check if new run appears while quality control step
-    if len(discover_new_run() - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
-        launch_steps()
+    if len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
+        launch_steps(conf)
         return
 
-# Main function
-if __name__ == "__main__":
 
-    # Create configuration
+def aozan_main(conf_file_path):
+    """Aozan main method.
+
+    Arguments:
+        conf: configuration object  
+    """
+
+    # Create configuration object
     conf = LinkedHashMap()
+
+    # Set the default value in the configuration object
     common.set_default_conf(conf)
 
     # Use default (C) locale
     Locale.setDefault(Locale.US)
 
-    if len(sys.argv) < 1:
-        print "No configuration file define in command line.\nSyntax: aozan.py conf_file"
-        sys.exit(1)
-    else:
-        common.load_conf(conf, sys.argv[0])
+    # Load Aozan conf file
+    common.load_conf(conf, sys.argv[0])
 
     # End of Aozan if aozan is not enable
     if conf['aozan.enable'].lower().strip() == 'false':
@@ -194,7 +209,7 @@ if __name__ == "__main__":
             create_lock_file(lock_file_path)
 
             # Launch steps
-            launch_steps()
+            launch_steps(conf)
 
             # Remove lock file
             delete_lock_file(lock_file_path)
@@ -219,3 +234,14 @@ if __name__ == "__main__":
         if not os.path.exists('/proc/%d' % (load_pid_in_lock_file(lock_file_path))):
             common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf['lock.file'] +
                          ". Please investigate last error and then remove the lock file.", conf['aozan.var.path'] + '/aozan.lasterr', conf)
+
+
+# Launch Aozan main
+if __name__ == "__main__":
+    
+    if len(sys.argv) < 1:
+        print "No configuration file define in command line.\nSyntax: aozan.py conf_file"
+        sys.exit(1)
+    else:
+        aozan_main(sys.argv[0])
+
