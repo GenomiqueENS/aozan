@@ -190,7 +190,7 @@ def aozan_main(conf_file_path):
     Locale.setDefault(Locale.US)
 
     # Load Aozan conf file
-    common.load_conf(conf, sys.argv[0])
+    common.load_conf(conf, conf_file_path)
 
     # End of Aozan if aozan is not enable
     if conf['aozan.enable'].lower().strip() == 'false':
