@@ -63,7 +63,7 @@ def sync(run_id, conf):
 
     # Check if hiseq_data_path exists
     if hiseq_data_path == False:
-        error('HiSeq data for run ' + run_id + 'not found in HiSeq directories (' + conf['hiseq.data.path'] + ')', conf)
+        error('HiSeq run data not found', 'HiSeq data for run ' + run_id + 'not found in HiSeq directories (' + conf['hiseq.data.path'] + ')', conf)
         return False
 
 
