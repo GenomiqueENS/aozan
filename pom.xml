@@ -139,19 +139,10 @@
                 <!-- Package binary distribution -->
 
                 <mkdir dir="${basedir}/target/dist/lib"/>
-                <mkdir dir="${basedir}/target/dist/python"/>
 
                 <copy file="${basedir}/src/main/bin/${pom.artifactId}.sh" todir="${basedir}/target/dist/" />
                 <chmod file="${basedir}/target/dist/${pom.artifactId}.sh" perm="ugo+rx" />
-                <copy file="${basedir}/src/main/bin/jython.sh" todir="${basedir}/target/dist/" />
-                <chmod file="${basedir}/target/dist/jython.sh" perm="ugo+rx" />
-
-                <copy todir="${basedir}/target/dist/python">
-                  <fileset dir="${basedir}/src/main/python">
-                    <include name="*"/>
-                  </fileset>
-                </copy>
-            
+          
                 <copy file="${basedir}/target/${pom.artifactId}-${pom.version}.jar" todir="${basedir}/target/dist/lib" />
                 <move file="${basedir}/target/dist/" tofile="${basedir}/target/dist/${pom.artifactId}-${pom.version}"/>
 
@@ -230,6 +221,45 @@
               <goal>run</goal>
             </goals>
           </execution>
+          <execution>
+            <id>jython-packaging</id>
+            <phase>package</phase>
+            <configuration>
+              <tasks>
+
+           	    <property environment="env"/>
+
+                <fail message="JYTHON_HOME environment variable is not set">
+                  <condition>
+                    <or>
+                      <not>
+                        <isset property="env.JYTHON_HOME"/>
+                      </not>
+                      <equals arg1="${env.JYTHON_HOME}" arg2="" />
+                    </or>
+                  </condition>
+                </fail>
+
+                <echo message="${env.JYTHON_HOME}"/>
+
+                <fileset id="aozan.classpath.files" dir="${basedir}/target/dist/${artifactId}-${version}/lib" includes="*" />
+
+                <pathconvert pathsep=" " property="aozan.classpath" refid="aozan.classpath.files">
+                  <mapper type="flatten"/>
+                </pathconvert>
+
+                <copy file="${env.JYTHON_HOME}/jython.jar" tofile="${basedir}/target/dist/${artifactId}-${version}/lib/jythonlib.jar" />
+                <jar jarfile="${basedir}/target/dist/${artifactId}-${version}/lib/jythonlib.jar" update="true">
+	              <fileset dir="${env.JYTHON_HOME}" includes="Lib/**" />
+	              <fileset dir="${basedir}/src/main/python" includes="*" />
+                </jar>
+
+             </tasks> 
+            </configuration>
+            <goals>
+              <goal>run</goal>  
+            </goals>
+          </execution>	
         </executions>
       </plugin>
       <plugin>
