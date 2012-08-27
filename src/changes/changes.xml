@@ -127,6 +127,12 @@ of lanes >1). 5) new errors if a sample is defined several time by with not the 
                 If an unexcepted exception is thrown in qc step, now send a mail.
             </action>
         </release>
+        
+        <release version="0.10" description="" date="TBD">
+            <action dev="jourdren" type="add">
+                Jython is now bundled in Aozan.
+            </action>
+        </release>
 		
 	</body>
 </document>
