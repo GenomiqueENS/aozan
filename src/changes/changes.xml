@@ -128,7 +128,7 @@ of lanes >1). 5) new errors if a sample is defined several time by with not the 
             </action>
         </release>
         
-        <release version="0.10" description="" date="TBD">
+        <release version="0.10" description="" date="2012-10-08">
             <action dev="jourdren" type="add">
                 Jython is now bundled in Aozan.
             </action>
