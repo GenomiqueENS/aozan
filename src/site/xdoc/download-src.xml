@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+/*
+ *                  Eoulsan development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public License version 2.1 or
+ * later and CeCILL-C. This should be distributed with the code.
+ * If you do not have a copy, see:
+ *
+ *      http://www.gnu.org/licenses/lgpl-2.1.txt
+ *      http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.txt
+ *
+ * Copyright for this code is held jointly by the Genomic platform
+ * of the Institut de Biologie de l'École Normale Supérieure and
+ * the individual authors. These should be listed in @author doc
+ * comments.
+ *
+ * For more information on the Eoulsan project and its aims,
+ * or to join the Eoulsan Google group, visit the home page
+ * at:
+ *
+ *      http://www.transcriptome.ens.fr/eoulsan
+ *
+ */
+-->
+<document>
+  <properties>
+    <title>Download Aozan @@@VERSION@@@ source</title>
+    <author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
+  </properties>
+  <body>
+    <section name="Download Aozan source">
+      <p>
+        Aozan source is distributed in several formats for your convenience.
+      </p>
+      <ul>
+        <li>
+          <a href="@@@APPNAMEMIN@@@-src-@@@VERSION@@@.tar.gz">
+            <code>.tar.gz</code> archive
+          </a>
+        </li>
+        <li>
+          <a href="@@@APPNAMEMIN@@@-src-@@@VERSION@@@.tar.bz2">
+            <code>.tar.bz2</code> archive
+          </a>
+        </li>
+	<li>
+          <a href="@@@APPNAMEMIN@@@-src-@@@VERSION@@@.zip">
+            <code>.zip</code> archive
+          </a>
+        </li>
+      </ul>
+      <p>
+        Aozan is distributed under the
+        <a href="license.html">General Public License v3 or later</a> and <a href="license.html">CeCILL</a>.
+      </p>
+
+      <subsection name="Code repository">
+        <p>You can also download the Aozan source from our <a href="http://code.google.com/p/aozan/source/checkout">code repository</a> hosted by <a href="http://code.google.com/hosting">Google code hosting</a>. On the <a href="http://code.google.com/p/aozan">main page of Eoulsan on this forge</a> (<a href="http://code.google.com/p/aozan">http://code.google.com/p/aozan</a>) you have access to the <a href="http://code.google.com/p/aozan/issues">issue tracker</a>, to the <a href="http://code.google.com/p/aozan/source/browse/">source browser</a> of the project and a <a href="http://code.google.com/p/aozan/wiki/MainPage">wiki dedicated to developers</a>.</p>
+      </subsection>
+
+      <subsection name="Compilation">
+        <p>You'll find more information about how compile Eoulsan in the <a href="compiling.html">compiling section</a>.</p>
+      </subsection>
+    </section>
+  </body>
+</document>
