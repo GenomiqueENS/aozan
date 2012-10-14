@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+/*
+ *                  Eoulsan development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public License version 2.1 or
+ * later and CeCILL-C. This should be distributed with the code.
+ * If you do not have a copy, see:
+ *
+ *      http://www.gnu.org/licenses/lgpl-2.1.txt
+ *      http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.txt
+ *
+ * Copyright for this code is held jointly by the Genomic platform
+ * of the Institut de Biologie de l'École Normale Supérieure and
+ * the individual authors. These should be listed in @author doc
+ * comments.
+ *
+ * For more information on the Eoulsan project and its aims,
+ * or to join the Eoulsan Google group, visit the home page
+ * at:
+ *
+ *      http://www.transcriptome.ens.fr/eoulsan
+ *
+ */
+-->
+<document>
+  <properties>
+    <title>Download latest Aozan version</title>
+    <author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
+  </properties>
+  <body>
+  
+    <link rel="alternate" type="application/rss+xml" title="Aozan updates" href="aozan.rss" />
+  
+    <section name="Download Aozan version @@@VERSION@@@">
+      <p>
+        Aozan is distributed in several formats for your convenience.
+      </p>
+      <ul>
+        <li>
+          <a href="@@@APPNAMEMIN@@@-@@@VERSION@@@.tar.gz">	
+            <code>.tar.gz</code> archive
+          </a>
+        </li>
+        <li>
+          <a href="@@@APPNAMEMIN@@@-@@@VERSION@@@.tar.bz2">
+            <code>.tar.bz2</code> archive
+          </a>
+        </li>
+        <li>
+          <a href="@@@APPNAMEMIN@@@-@@@VERSION@@@.zip">
+            <code>.zip</code> archive
+          </a>
+        </li>
+      </ul>
+      <p>
+        Aozan is distributed under the
+        <a href="license.html">GNU General Public License</a> and <a href="license.html">CeCill</a>.
+      </p>
+      <p>A full changelog is available in the <a href="changes-report.html">release note page</a>.</p>
+      <a name="requirements"/>
+      <subsection name="System Requirements">
+        <table>
+	  <tr>
+	    <th>Component</th>
+	    <th>Comment</th>
+	  </tr>
+	  <tr>
+	    <td>Operating system</td>
+	    <td>Currently Aozan runs only under Linux (due to mappers binaries dependencies). However Eoulsan core is 
+	    compatible with all *nix where Java is available.</td>
+	  </tr>
+	  <tr>
+            <td>Memory</td>
+            <td>By default 2048 MiB are allocated to the JVM for running Eoulsan.
+            You can edit this value in the <code>aozan.sh</code> file with the 
+            <b>-Xmx</b> option of the JVM. However Aozan use external tools 
+            like Casava or Bowtie that also need memory, 8 GiB seem to be
+            a good amount of memory to run Eoulsan.</td>
+          </tr>
+	  <tr>
+            <td>Processor architecture</td>
+            <td>Currently Aozan can only run under x86-64 architecture (due to mappers requirements). 
+            Multi processors or multi cores system (SMP) are strongly recommended.</td>
+          </tr>
+	  <tr>
+            <td>Java Runtime Environment (J2SE)</td>
+            <td>6.0 or above. We strongly recommend 
+            the sun/oracle version of the jre (or openJDK). 
+            You can check your installed jre version with: <source>$ java -version</source></td>
+          </tr>
+	  <!--tr>
+            <td>Hadoop</td>
+            <td>In distributed mode (local cluster or on Amazon Elastic MapReduce), 
+            Hadoop 0.20.x/1.0.x is required (later versions has not been yet tested).</td>
+          </tr-->
+	  <tr>
+            <td>Casvava</td>
+            <td>1.8.2 or above.</td>
+          </tr>
+	  <tr>
+            <td>rsync</td>
+            <td>3.0.x or above.</td>
+          </tr>
+        </table>
+      </subsection>
+    </section>
+  </body>
+</document>
+
