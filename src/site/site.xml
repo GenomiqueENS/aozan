@@ -24,7 +24,7 @@
  *
  */
 -->
-<project name="Eoulsan">
+<project name="Aozan">
 
 	<publishDate position="left" format="yyyy-MM-dd HH:mm"/>
 
@@ -35,7 +35,7 @@
 	</bannerLeft>
 	<bannerRight>
 		<name>Eoulsan</name>
-		<src>images/eoulsan.png</src>
+		<src>images/aozan.png</src>
 		<href>@@@WEBSITE@@@</href>	
 	</bannerRight>
 	<body>
