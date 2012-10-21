@@ -279,6 +279,9 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
 	   <tr><td>index.html.template</td><td>string</td><td>No set</td><td>HTML page template that 
 	     describe a run. (working ???)</td></tr>
 	   <tr><td>reports.url</td><td>string</td><td>No set</td><td>Run reports URL</td></tr>
+	   <tr><td>hiseq.critical.min.space</td><td>integer</td><td>1099511627776</td><td>Threshold before sending 
+	     a email at each Aozan start if not enough space is available on HiSeq output disk</td></tr>
+	   <!-- tr>hiseq.critical.min.space<td></td><td>integer</td><td>3298534883328</td><td>Not used</td></tr-->
 	 </table>
    
    </subsection>
@@ -345,12 +348,67 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
    </subsection>
    
    <subsection name="Synchronization step">
+
+    <p>This step copy output run files from the HiSeq computer to another place (usually a safe storage). 
+    CIF files can be excluded from the copy.</p>
+     
+       <h4>Configuration parameters</h4>
+	 
+	 <p>The next table contains the parameters of this step.</p>
+	 
+         <table>
+	   <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+	   <tr><td>sync.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
+	   <tr><td>sync.space.factor</td><td>double</td><td>0.2</td><td>Factor to use to get the estimation of space needed 
+	     in bcl directory for the run from the space used in hiSeq directory by the run.</td></tr>
+	   <tr><td>rsync.exclude.cif</td><td>boolean</td><td>True</td><td>Do not copy CIF files</td></tr>
+         </table>
+     
    </subsection>   
  
    <subsection name="Demultiplexing step">
+     
+     <p>This step allow to launch demultiplexing using CASVASA. Aozan can use samplesheet in XLS format or generated
+     by an external tool in addition of samplesheet in CSV format. Using samplesheet in XLS format allow
+     to use alias for adapters sequences indexes</p>
+
+      <h4>Configuration parameters</h4>
+	 
+	 <p>The next table contains the parameters of this step.</p>
+	 
+         <table>
+	   <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+	   <tr><td>demux.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
+	   <tr><td>demux.space.factor</td><td>double</td><td>0.7</td><td>Factor to use to get the estimation of space needed 
+	     in fastq directory for the run from the space used in bcl directory by the run.</td></tr>
+	   <tr><td>index.sequences</td><td>string</td><td>Not set</td><td>Path to a file that contains alias 
+	     for adapters sequences indexes</td></tr>
+	     <tr><td>casava.adapter.fasta.file.path</td><td>string</td><td>Not set</td><td>Adapter sequence file to use when launch CASAVA</td></tr>
+	  <tr><td>casava.compression</td><td>string</td><td>bzip2</td><td>Compression to use (gzip or bzip2)</td></tr>
+	  <tr><td>casava.compression.level</td><td>integer</td><td>9</td><td>Compression level</td></tr>
+	  <tr><td>casava.design.format</td><td>string</td><td>xls</td><td>CASAVA samplesheet format ("csv", "xls" or "command")</td></tr>
+	  <tr><td>casava.design.generator.command</td><td>String</td><td>Not set</td><td>command to execute to generate the CASAVA samplesheet 
+  in CSV format when <b>casava.design.format</b> parameter is set to "command"</td></tr>
+	  <tr><td>casava.designs.path</td><td>string</td><td>Not set</td><td>Path to CSV/XLS samplesheet files</td></tr>
+	  <tr><td>casava.fastq.cluster.count</td><td>integer</td><td>0</td><td>Cluster number by fastq file. When set to 0 no limit 
+  will be set</td></tr>
+	  <tr><td>casava.mismatches</td><td>integer</td><td>0</td><td>Number of mismatches allowed in adapters indexes</td></tr>
+	  <tr><td>casava.path</td><td>string</td><td>/usr/local/casava</td><td>Path to CASAVA basedir</td></tr>
+	  <tr><td>casava.with.failed.reads</td><td>boolean</td><td>True</td><td>Add reads that not pass Illumina filter in fastq files</td></tr>   
+	 </table>
+     
    </subsection>
    
    <subsection name="Quality control step">
+     
+     
+
+qc.data.path
+qc.report.save.raw.data
+qc.report.save.report.data
+qc.report.stylesheet
+  
+     
    </subsection>  
    
  </section>
