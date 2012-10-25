@@ -56,6 +56,18 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <repositories>
+    <repository>
+       <snapshots>
+          <enabled>true</enabled>
+       </snapshots>
+          <id>ens</id>
+          <name>ENS repository</name>
+          <!--url>https://maven-repository.dev.java.net/nonav/repository</url-->
+          <url>http://transcriptome.ens.fr/maven2</url>
+    </repository>
+  </repositories>
 
   <build>
     <directory>target</directory>
