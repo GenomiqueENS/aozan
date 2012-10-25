@@ -93,7 +93,7 @@ def qc(run_id, conf):
     # Check if enough free space is available
     if common.df(conf['reports.data.path']) < 1 * 1024 * 1024 * 1024:
         error("Not enough disk space to store aozan quality control for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
-              '.\nNeed more than 10 Gb on ' + conf['qc.data.path'] + '.', conf)
+              '.\nNeed more than 10 Gb on ' + conf['reports.data.path'] + '.', conf)
         return False
 
     # Initialize the QC object
