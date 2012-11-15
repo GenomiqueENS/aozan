@@ -51,6 +51,7 @@ import fr.ens.transcriptome.eoulsan.bio.io.FastqReader;
 import fr.ens.transcriptome.eoulsan.bio.io.FastqWriter;
 import fr.ens.transcriptome.eoulsan.bio.readsfilters.IlluminaFilterFlagReadFilter;
 import fr.ens.transcriptome.eoulsan.bio.readsfilters.ReadFilter;
+import fr.ens.transcriptome.eoulsan.bio.readsmappers.AbstractBowtieReadsMapper;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.BowtieReadsMapper;
 import fr.ens.transcriptome.eoulsan.data.DataFile;
 import fr.ens.transcriptome.eoulsan.illumina.CasavaDesign;
@@ -259,7 +260,7 @@ public final class ReadsLaneStatsGenerator {
 
     final File tmpDir = EoulsanRuntime.getRuntime().getTempDirectory();
 
-    final BowtieReadsMapper bowtie = new BowtieReadsMapper();
+    final AbstractBowtieReadsMapper bowtie = new BowtieReadsMapper();
     bowtie.setTempDirectory(tmpDir);
     bowtie.setThreadsNumber(Runtime.getRuntime().availableProcessors());
 
@@ -286,11 +287,11 @@ public final class ReadsLaneStatsGenerator {
     }
 
     // Init mapper
-    bowtie.init(false, FastqFormat.FASTQ_SANGER, new FakeReporter(),
+    bowtie.init(false, FastqFormat.FASTQ_SANGER, archiveFile, archiveDir, new FakeReporter(),
         "fakeCounterGroup");
 
     // Map the reads
-    bowtie.map(fastqFile, archiveFile, archiveDir);
+    bowtie.map(fastqFile);
 
     // Parse the result SAM file
     return parseSamFile(bowtie.getSAMFile(new GenomeDescription()));

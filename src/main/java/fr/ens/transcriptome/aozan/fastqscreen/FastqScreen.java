@@ -1,26 +1,36 @@
+/*                  Aozan development code 
+ * 
+ * 
+ * 
+ */
+
 package fr.ens.transcriptome.aozan.fastqscreen;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
+import fr.ens.transcriptome.eoulsan.EoulsanException;
+import fr.ens.transcriptome.eoulsan.EoulsanRuntimeDebug;
 import fr.ens.transcriptome.eoulsan.Globals;
 import fr.ens.transcriptome.eoulsan.bio.FastqFormat;
+import fr.ens.transcriptome.eoulsan.bio.readsmappers.AbstractBowtieReadsMapper;
+import fr.ens.transcriptome.eoulsan.bio.readsmappers.Bowtie2ReadsMapper;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.BowtieReadsMapper;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.SequenceReadsMapper;
 import fr.ens.transcriptome.eoulsan.util.Reporter;
 import fr.ens.transcriptome.eoulsan.util.StringUtils;
 
 public class FastqScreen {
+
+  // name index file
+  // /home/sperrin/shares-net/ressources/sequencages/mappers_indexes
+  // Drosophile : dmel-all-chromosome-r5
 
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
@@ -29,18 +39,24 @@ public class FastqScreen {
   // file path bowtie (local)
   final static String bowtiePath = "/home/sperrin/Programmes/bowtie/bowtie";
 
-  final static File fastqFile = new File(
+  final static File fastqFileZip = new File(
+      "/home/sperrin/Documents/FastqScreenTest/extrait.fastq.gz");
+
+  static File fastqFile = new File(
       "/home/sperrin/Documents/FastqScreenTest/extrait.txt");
-  final static File fastqFilePaired = new File(
-      "/home/sperrin/Documents/FastqScreenTest/extraitDoublon.txt");
 
-  final static File indexDirAdapters = new File(
-      "/home/sperrin/shares-net/ressources/sequencages/fastq_screen/Adapters");
-  final static String indexFileAdapters = "Adapters";
+  final static File indexFileAdapters_method2 =
+      new File(
+          "/home/sperrin/shares-net/ressources/sequencages/fastq_screen/Adapters/Adapters.1.ebwt");
+  final static File indexFilePhix_method2 =
+      new File(
+          "/home/sperrin/shares-net/ressources/sequencages/fastq_screen/PhiX/PhiX.1.ebwt");
 
-  final static File indexDirPhix = new File(
-      "/home/sperrin/shares-net/ressources/sequencages/fastq_screen/PhiX");
-  final static String indexFilePhix = "PhiX";
+  final static File indexFileAdapters_method1 =
+      new File(
+          "/home/sperrin/shares-net/ressources/sequencages/fastq_screen/Adapters/Adapters");
+  final static File indexFilePhix_method1 = new File(
+      "/home/sperrin/shares-net/ressources/sequencages/fastq_screen/PhiX/PhiX");
 
   static File outputFile = null;
   static List<File> listOutputFile = new ArrayList<File>();
@@ -51,120 +67,41 @@ public class FastqScreen {
   final static long startTime = System.currentTimeMillis();
 
   public static final void main(final String[] args) throws IOException,
-      InterruptedException {
+      InterruptedException, EoulsanException {
 
+    EoulsanRuntimeDebug.initDebugEoulsanRuntime();
     // eoulsan runtime exception method2();
-    method1();
+    method2();
 
   }
 
-  static void method1() throws IOException, InterruptedException {
-    ProcessBuilder pb;
+  // launch fastq screen with bowtieReadsMapper
+  static void method2() throws IOException, InterruptedException {
 
-    Map<String, File> listGenome = new HashMap<String, File>();
-    listGenome.put(indexFilePhix, indexDirPhix);
-    listGenome.put(indexFileAdapters, indexDirAdapters);
-
-    FastqScreenPseudoMapReduce pmr =
-        new FastqScreenPseudoMapReduce(readsprocessed);
-
-    Process p = null;
-
-    for (Map.Entry<String, File> e : listGenome.entrySet()) {
-
-      // use option -S to generate SAM output format
-
-      StringBuilder index = new StringBuilder(e.getValue().getAbsolutePath());
-      index.append("/");
-      index.append(e.getKey());
-
-      String paramFileFastq =
-          StringUtils.bashEscaping(fastqFile.getAbsolutePath());
-      if (paired) {
-        paramFileFastq = paramFileFastq + " "+
-            StringUtils.bashEscaping(fastqFilePaired.getAbsolutePath());
-      }
-      
-      String cmd =
-          bowtiePath
-              + " -l 40 -k 2 --chunkmbs 512 -p 2 " + index.toString() + " "
-              + paramFileFastq + " -S";
-
-      StringTokenizer tmp = new StringTokenizer(cmd, " ");
-      List<String> cmdBowtie = new ArrayList<String>();
-      while (tmp.hasMoreTokens())
-        cmdBowtie.add(tmp.nextToken());
-
-      printList(cmdBowtie);
-      
-      pb = new ProcessBuilder(cmdBowtie);
-
-      // pb =
-      // new ProcessBuilder(bowtiePath, "-l", "40", "-k", "2", "--chunkmbs",
-      // "512", "-p", "2", index.toString(),
-      // StringUtils.bashEscaping(fastqFile.getAbsolutePath()), "-S");
-
-      //LOGGER.info("Command bowtie " + cmdBowtie);
-
-      // pb.directory(e.getValue());
-      pb.redirectErrorStream();
-
-      p = pb.start();
-
-      // pmr.setMapReduceTemporaryDirectory(new File("/home/sperrin"));
-      pmr.setGenomeReference(e.getKey());
-      pmr.doMap(p.getInputStream());
-    }
-
-    pmr.doReduce(p.getOutputStream());
-
-    final long endTime = System.currentTimeMillis();
-
-    // System.out.println("count=" + count);
-    System.out.println((endTime - startTime));
-
-    System.out.println("\n\n" + pmr.statisticalTableToString());
-
-    // create file screen.txt
-    try {
-      FileWriter f =
-          new FileWriter(StringUtils.bashEscaping(fastqFile.getAbsolutePath())
-              + "_screen.txt");
-      f.write(pmr.statisticalTableToString());
-
-      //LOGGER.info("Create file result FastqScreen "
-      //    + fastqFile.getAbsolutePath() + "_screen.txt");
-
-      f.close();
-    } catch (IOException ioe) {
-    }
-
-  }
-
-  static void method2() {
-
-    SequenceReadsMapper bowtie = new BowtieReadsMapper();
+    AbstractBowtieReadsMapper bowtie = new BowtieReadsMapper();
     Reporter reporter = new Reporter();
 
-    final File[] listArchiveIndexFileDir = {indexDirPhix, indexDirAdapters};
     final File[] listArchiveIndexFile =
-        {new File(indexFilePhix), new File(indexFileAdapters)};
+        {indexFilePhix_method2, indexFileAdapters_method2};
+    final File[] listArchiveIndexDir =
+        {
+            new File(
+                "/home/sperrin/shares-net/ressources/sequencages/fastq_screen/PhiX"),
+            new File(
+                "/home/sperrin/shares-net/ressources/sequencages/fastq_screen/Adapters")};
 
-    try {
-      mapSingleEnd(FastqFormat.FASTQ_SANGER, bowtie, fastqFile,
-          listArchiveIndexFile, listArchiveIndexFileDir, reporter);
-    } catch (IOException ioe) {
-
-    }
+    mapSingleEnd(FastqFormat.FASTQ_SANGER, bowtie, fastqFile,
+        listArchiveIndexFile, listArchiveIndexDir, reporter);
   }
 
+  // change : use table of file instead of one file
+  // method from ReadsMapperLocalStep
   private static void mapSingleEnd(FastqFormat fastqFormat,
       final SequenceReadsMapper bowtie, final File inFile,
       final File[] archiveIndexFile, final File[] indexDir,
       final Reporter reporter) throws IOException {
 
     // Init mapper
-    bowtie.init(false, fastqFormat, reporter, COUNTER_GROUP);
 
     // Set mapper arguments
     /*
@@ -176,30 +113,116 @@ public class FastqScreen {
     // Mapper change defaults arguments
     final int seed = 40;
 
-    final String newArgumentsMapper =
-        " -l " + seed + " -k 2 --chunkmbs 512  -p 2 -S";
-    bowtie.setMapperArguments(newArgumentsMapper);
+    final String newArgumentsMapper = " -l " + seed + " --chunkmbs 512";
 
-    LOGGER
-        .info("Map file: "
-            + inFile + ", Fastq format: " + fastqFormat + ", use "
-            + bowtie.getMapperName() + " with " + mapperThreads
-            + " threads option");
+    // " -l " + seed + " -k 2 --chunkmbs 512 -p 2 -S";
+
+    // LOGGER
+    // .info("Map file: "
+    // + inFile + ", Fastq format: " + fastqFormat + ", use "
+    // + bowtie.getMapperName() + " with " + mapperThreads
+    // + " threads option");
 
     // loop : Process to mapping for each library
     for (int i = 0; i < indexDir.length; i++) {
-      bowtie.map(inFile, archiveIndexFile[i], indexDir[i]);
+      bowtie.init(false, fastqFormat, archiveIndexFile[i], indexDir[i],
+          reporter, COUNTER_GROUP);
+      bowtie.setMapperArguments(newArgumentsMapper);
+      bowtie.setThreadsNumber(mapperThreads);
+
+      bowtie.map(inFile);
+
     }
+    /*
+     * listOutputFile.add(bowtie.getSAMFile(null)); for (File f :
+     * listOutputFile) System.out.println("SAM de bowtie " + f.getName());
+     */
+  }
 
-    listOutputFile.add(bowtie.getSAMFile(null));
+  static void method1() throws IOException, InterruptedException {
 
-    for (File f : listOutputFile)
-      System.out.println("SAM de bowtie " + f.getName());
+    List<File> listGenome = new ArrayList<File>();
+    listGenome.add(indexFilePhix_method1);
+    listGenome.add(indexFileAdapters_method1);
 
+    // fastqFile = new File("/home/sperrin/Documents/FastqScreenTest");
+    // FileUtils.unzip(fastqFileZip, fastqFile);
+
+    FastqScreenPseudoMapReduce pmr =
+        new FastqScreenPseudoMapReduce(readsprocessed);
+
+    ProcessBuilder pb;
+    Process p = null;
+
+    for (File index : listGenome) {
+
+      // use option -S to generate SAM output format
+      System.out.println("name index : " + index.toString());
+
+      String paramFileFastq =
+          StringUtils.bashEscaping(fastqFile.getAbsolutePath());
+
+      List<String> cmd = new ArrayList<String>();
+      cmd.add(bowtiePath);
+      cmd.add("-l");
+      cmd.add("40");
+      cmd.add("-k");
+      cmd.add("2");
+      cmd.add("--chunkmbs");
+      cmd.add("512");
+      cmd.add("-p");
+      cmd.add("2");
+      cmd.add(index.getAbsolutePath());
+      cmd.add(paramFileFastq);
+      cmd.add("-S");
+
+      pb = new ProcessBuilder(cmd);
+
+      // ProcessBuilder pb =
+      // new ProcessBuilder(bowtiePath, "--phred33", "-p", "2", "-x", "genome",
+      // "-", "2>", "/dev/null");
+
+      // pb =
+      // new ProcessBuilder(bowtiePath, "-l", "40", "-k", "2", "--chunkmbs",
+      // "512", "-p", "2", index.toString(),
+      // fastqFile.getAbsolutePath(), "-S");
+
+      System.out.println("Command bowtie " + cmd.toString().replace(',', ' '));
+      // LOGGER.info("Command bowtie " + cmd);
+
+      // pb.directory(e.getValue());
+
+      pb.redirectErrorStream();
+      p = pb.start();
+
+      pmr.setMapReduceTemporaryDirectory(new File("/home/sperrin"));
+      pmr.setGenomeReference(index.getName().toString());
+      pmr.doMap(p.getInputStream());
+
+    } // loop for listGenome
+
+    pmr.doReduce(p.getOutputStream());
+    pmr.getStatisticalTable();
+
+    final long endTime = System.currentTimeMillis();
+
+    // System.out.println("count=" + count);
+    System.out.println((endTime - startTime));
+
+    String stat = pmr.statisticalTableToString();
+    System.out.println("\n\n" + stat);
+
+    /*
+     * create file screen.txt try { FileWriter f = new
+     * FileWriter(fastqFile.getAbsolutePath() + "_screen.txt"); f.write(stat);
+     * // LOGGER.info("Create file result FastqScreen " // +
+     * fastqFile.getAbsolutePath() + "_screen.txt"); f.close(); } catch
+     * (IOException ioe) { }
+     */
   }
 
   /**
-   * TODO : value probably exist in data in fastQC
+   * TODO : value probably exist in data in RunData
    * @return number of read in fastq file
    */
   private static int defineReadsprocessed(File fastqFile, boolean paired) {
@@ -227,13 +250,5 @@ public class FastqScreen {
     }
     return (paired ? countRead * 2 : countRead);
   }// defineReadsprocessed
-  
-  
-  static void printList(List<String> l){
-    System.out.println("Contenu liste : ");
-    for (String s :l){
-      System.out.print(s+" ");
-    }
-    System.out.println();
-    }
+
 }
