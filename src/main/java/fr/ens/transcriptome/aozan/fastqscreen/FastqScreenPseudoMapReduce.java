@@ -1,3 +1,9 @@
+/*                  Aozan development code 
+ * 
+ * 
+ * 
+ */
+
 package fr.ens.transcriptome.aozan.fastqscreen;
 
 import java.io.IOException;
@@ -23,12 +29,13 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   private float readsprocessed;
 
   private boolean succesMapping = false;
+  private boolean tableStatisticExist = false;
   private int nbReadMapped = 0;
   private Pattern pattern = Pattern.compile("\t");
 
   /**
-   * Mapper
-   * Receive value in SAM format, only the read mapped are added in output with genome reference used
+   * Mapper Receive value in SAM format, only the read mapped are added in
+   * output with genome reference used
    * @param value input of the mapper
    * @param output List of output of the mapper
    * @param reporter reporter
@@ -39,12 +46,11 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     if (value == null || value.length() == 0 || value.charAt(0) == '@')
       return;
-     
-    
+
     succesMapping = true;
     String[] tokens = pattern.split(value, 3);
     String nameRead = null;
-    
+
     // flag of SAM format are in case 2 and flag = 4 for read unmapped
     if (Integer.parseInt(tokens[1]) != 4)
       nameRead = tokens[0];
@@ -52,16 +58,12 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     if (nameRead == null)
       return;
     output.add(nameRead + "\t" + genomeReference);
-    System.out.println("output map " + output);
+    // System.out.println("output map " + output);
 
   }// map
 
-  
-
-
   /**
-   * Reducer
-   * Receive for each read list mapped genome
+   * Reducer Receive for each read list mapped genome
    * @param key input key of the reducer
    * @param values values for the key
    * @param output list of output values of the reducer : here not use
@@ -81,9 +83,9 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     while (values.hasNext()) {
 
       genomeCourant = values.next();
-      System.out.println(genomeCourant+" idem "+genomePrecedent+" : "+
-          genomeCourant.equals(genomePrecedent));
-      
+      // System.out.println(genomeCourant+" idem "+genomePrecedent+" : "+
+      // genomeCourant.equals(genomePrecedent));
+
       if (genomeCourant.equals(genomePrecedent)) {
         oneHit = false;
       } else {
@@ -96,7 +98,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     // last genome
     countHitPerGenome(genomePrecedent, oneHit, oneGenome);
-    
+
   } // reduce
 
   /**
@@ -109,37 +111,33 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     // indices for table tabHitsPerLibraries
     // position 0 of the table for UNMAPPED ;
 
-//    System.out.println("genome : "
-  //      + genome + " hit " + oneHit + " gen " + oneGenome);
+    // System.out.println("genome : "
+    // + genome + " hit " + oneHit + " gen " + oneGenome);
 
     final int ONE_HIT_ONE_LIBRARY = 1;
     final int MULTIPLE_HITS_ONE_LIBRARY = 2;
     final int ONE_HIT_MULTIPLE_LIBRARIES = 3;
     final int MUTILPLE_HITS_MULTIPLE_LIBRARIES = 4;
-
+    float[] tab;
     // genome must be contained in map
-    if (! (percentHitsPerGenome.containsKey(genome)))
+    if (!(percentHitsPerGenome.containsKey(genome)))
       return;
-    
+
     if (oneHit && oneGenome) {
-      float[] tab = percentHitsPerGenome.get(genome);
+      tab = percentHitsPerGenome.get(genome);
       tab[ONE_HIT_ONE_LIBRARY] += 1.0;
-      percentHitsPerGenome.put(genome, tab);
-    
-    } else if (!oneHit && oneGenome) {
-      float[] tab = percentHitsPerGenome.get(genome);
-      tab[MULTIPLE_HITS_ONE_LIBRARY] += 1.0;
-      percentHitsPerGenome.put(genome, tab);
 
     } else if (!oneHit && oneGenome) {
-      float[] tab = percentHitsPerGenome.get(genome);
+      tab = percentHitsPerGenome.get(genome);
+      tab[MULTIPLE_HITS_ONE_LIBRARY] += 1.0;
+
+    } else if (!oneHit && oneGenome) {
+      tab = percentHitsPerGenome.get(genome);
       tab[ONE_HIT_MULTIPLE_LIBRARIES] += 1.0;
-      percentHitsPerGenome.put(genome, tab);
 
     } else if (!oneHit && !oneGenome) {
-      float[] tab = percentHitsPerGenome.get(genome);
+      tab = percentHitsPerGenome.get(genome);
       tab[MUTILPLE_HITS_MULTIPLE_LIBRARIES] += 1.0;
-      percentHitsPerGenome.put(genome, tab);
     }
   }// countHitPerGenome
 
@@ -147,9 +145,11 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * calculating as a percentage, without rounding
    */
   void getStatisticalTable() {
-    
+
     if (nbReadMapped > readsprocessed)
       return;
+
+    tableStatisticExist = true;
 
     for (Map.Entry<String, float[]> e : percentHitsPerGenome.entrySet()) {
       float unmapped = 100.f;
@@ -163,7 +163,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         // + e.getKey() + " i : " + i + " val : " + n + " unmap " + unmapped);
       }
       tab[0] = unmapped;
-      percentHitsPerGenome.put(e.getKey(), tab);
     }
   }
 
@@ -172,19 +171,20 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @return
    */
   public String statisticalTableToString() {
-    
-    if ( ! succesMapping){
-      
+
+    if (!succesMapping) {
+
       return "ERROR mapping : no value receive !";
     }
-    
+
+    if (!tableStatisticExist)
+      getStatisticalTable();
+
     StringBuilder s =
         new StringBuilder(
             "Library \t %Unmapped \t %One_hit_one_library"
                 + "\t %Multiple_hits_one_library \t %One_hit_multiple_libraries \t "
                 + "%Multiple_hits_multiple_libraries");
-
-    getStatisticalTable();
 
     double percentHitNoLibraries =
         (readsprocessed - nbReadMapped) / readsprocessed * 100.0;
@@ -195,6 +195,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
       for (double n : tab) {
         // n = ((int) (n * 100.0)) / 100.0;
+        // n = Math.ceil(n);
         n = DoubleMath.roundToInt((n * 100.0), RoundingMode.HALF_DOWN) / 100.0;
         s.append("\t" + n);
       }
