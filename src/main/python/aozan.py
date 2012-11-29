@@ -234,7 +234,7 @@ def aozan_main(conf_file_path):
                 common.log('TRACEBACK', traceback_msg, conf)
                 
                 # Send a mail with the exception
-                common.send_msg("Exception: " + exception_msg, traceback_msg, conf)
+                common.send_msg("[Aozan] Exception: " + exception_msg, traceback_msg, conf)
     else:
         print "A lock file exists."
         if not os.path.exists('/proc/%d' % (load_pid_in_lock_file(lock_file_path))):
