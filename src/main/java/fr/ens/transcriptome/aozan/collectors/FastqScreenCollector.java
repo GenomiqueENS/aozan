@@ -156,7 +156,7 @@ public class FastqScreenCollector implements Collector {
         result.getPercentHitNoLibraries());
 
     print("add in runData \t"
-        + prefix + result.getFinalLineRunData()+"="
+        + prefix + "."+ result.getFinalLineRunData()+"="
         + result.getPercentHitNoLibraries());
   }// processResults
 

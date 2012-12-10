@@ -35,20 +35,17 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
   protected static final String COUNTER_GROUP = "reads_mapping";
-
   private final int NB_STAT_VALUES = 5;
+
   private final AbstractBowtieReadsMapper bowtie;
   private final Reporter reporter;
-  private final FastqScreenResult fastqScreenResult;
 
-  private Map<String, float[]> percentHitsPerGenome =
+  private Map<String, float[]> valueHitsPerGenome =
       new HashMap<String, float[]>();
-  private int readsprocessed;
+  private int readsprocessed = 0;
   private int readsMapped = 0;
-
   private String genomeReference;
   private boolean succesMapping = false;
-
   private Pattern pattern = Pattern.compile("\t");
 
   // TODO : override method doMap() of PseudoMapReduce
@@ -79,10 +76,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
             new FastsqScreenSAMParser(this.getMapOutputTempFile(), genome);
 
         this.setGenomeReference(genome);
-
-        // System.out.println(new SimpleDateFormat("h:m a").format(new Date())
-        // + " name genome : " + nameGenome + " path "
-        // + genome.getAbsolutePath());
 
         bowtie.setThreadsNumber(mapperThreads);
         bowtie.setMapperArguments(newArgumentsMapper);
@@ -153,7 +146,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     if (nameRead == null)
       return;
     output.add(nameRead + "\t" + genomeReference);
-    // System.out.println("output map " + output);
 
   }// map
 
@@ -176,37 +168,93 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     String nextGenome = null;
     readsMapped++;
 
-    // System.out.println("reduce : value of key "+ key);
-
     // values format : a number 1 or 2 which represent the number of hits for
     // the read on one genome and after name of the genome
     while (values.hasNext()) {
       String s = values.next();
       oneHit = s.charAt(0) == '1' ? true : false;
       nextGenome = s.substring(1);
-      // System.out.println("read"+key+"\t genome "+genome+"\t onegenome "+oneGenome+"\t hits \t"+oneHit);
 
-      this.fastqScreenResult.countHitPerGenome(nextGenome, oneHit, oneGenome);
+      this.countHitPerGenome(nextGenome, oneHit, oneGenome);
       oneGenome = !nextGenome.equals(currentGenome);
       currentGenome = nextGenome;
     }// while
 
   } // reduce
 
-  public FastqScreenResult getFastqScreenResult() {
-    return this.fastqScreenResult.getFastqScreenResult();
-  }
+  /**
+   * Called by method reduce for each read mapped and filled intermediate table
+   * @param genome
+   * @param oneHit
+   * @param oneGenome
+   */
+  void countHitPerGenome(String genome, boolean oneHit, boolean oneGenome) {
+    // indices for table tabHitsPerLibraries
+    // position 0 of the table for UNMAPPED ;
 
-  //
-  // SETTERS
-  //
+    final int ONE_HIT_ONE_LIBRARY = 1;
+    final int MULTIPLE_HITS_ONE_LIBRARY = 2;
+    final int ONE_HIT_MULTIPLE_LIBRARIES = 3;
+    final int MUTILPLE_HITS_MULTIPLE_LIBRARIES = 4;
+    float[] tab;
+    // genome must be contained in map
+    if (!(valueHitsPerGenome.containsKey(genome)))
+      return;
 
+    if (oneHit && oneGenome) {
+      tab = valueHitsPerGenome.get(genome);
+      tab[ONE_HIT_ONE_LIBRARY] += 1.0;
+
+    } else if (!oneHit && oneGenome) {
+      tab = valueHitsPerGenome.get(genome);
+      tab[MULTIPLE_HITS_ONE_LIBRARY] += 1.0;
+
+    } else if (oneHit && !oneGenome) {
+      tab = valueHitsPerGenome.get(genome);
+      tab[ONE_HIT_MULTIPLE_LIBRARIES] += 1.0;
+
+    } else if (!oneHit && !oneGenome) {
+      tab = valueHitsPerGenome.get(genome);
+      tab[MUTILPLE_HITS_MULTIPLE_LIBRARIES] += 1.0;
+    }
+  }// countHitPerGenome
+
+  /**
+   * update list genomeReference : create a new entry for the new reference
+   * genome
+   */
   public void setGenomeReference(String genome) {
     this.genomeReference = genome;
+    valueHitsPerGenome.put(genome, new float[NB_STAT_VALUES]);
+  }
 
-    // update list genomeReference : create a new entry for the new reference
-    // genome
-    percentHitsPerGenome.put(genome, new float[NB_STAT_VALUES]);
+  /**
+   * compute percent for each count of hits per reference genome without
+   * rounding
+   * @return FastqScreenResult result of FastqScreen
+   */
+  public FastqScreenResult getFastqScreenResult() {
+
+    System.out.println("nb read mapped "
+        + readsMapped + " / nb read " + readsprocessed);
+
+    if (readsMapped > readsprocessed)
+      return null;
+
+    for (Map.Entry<String, float[]> e : valueHitsPerGenome.entrySet()) {
+      float unmapped = 100.f;
+      float[] tab = e.getValue();
+
+      for (int i = 1; i < tab.length; i++) {
+        float n = tab[i] * 100.f / readsprocessed;
+        tab[i] = n;
+        unmapped -= n;
+
+      }
+      tab[0] = unmapped;
+    }
+    return new FastqScreenResult(valueHitsPerGenome, readsMapped,
+        readsprocessed);
   }
 
   //
@@ -216,13 +264,5 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   public FastqScreenPseudoMapReduce() {
     this.bowtie = new BowtieReadsMapper();
     this.reporter = new Reporter();
-    this.fastqScreenResult = new FastqScreenResult();
-  }
-
-  public FastqScreenPseudoMapReduce(int readsprocessed) {
-    this.bowtie = new BowtieReadsMapper();
-    this.reporter = new Reporter();
-    this.fastqScreenResult = new FastqScreenResult();
-    this.readsprocessed = readsprocessed;
   }
 }

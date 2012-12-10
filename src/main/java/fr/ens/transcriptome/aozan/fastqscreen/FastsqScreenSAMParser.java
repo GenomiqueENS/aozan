@@ -123,8 +123,8 @@ public class FastsqScreenSAMParser implements SAMParserLine {
   }
 
   public void closeMapOutpoutFile() {
-    try {
       // processing read buffer - end of input stream bowtie execution
+    try {
       List<SAMRecord> records = buffer.getFilteredAlignments();
       if (records.size() != 0) {
         String nameRead = records.get(0).getReadName();
@@ -142,10 +142,11 @@ public class FastsqScreenSAMParser implements SAMParserLine {
     }
   }
 
-  
+  @Override
   public void cleanup(){
   }    
   
+  @Override
   public void setup() {
   }
 
