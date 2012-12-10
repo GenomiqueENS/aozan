@@ -6,65 +6,98 @@
 
 package fr.ens.transcriptome.aozan;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import fr.ens.transcriptome.aozan.collectors.Collector;
-import fr.ens.transcriptome.aozan.collectors.FastQScreenCollector;
-import fr.ens.transcriptome.aozan.fastqscreen.FastqScreen;
+import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
 import fr.ens.transcriptome.eoulsan.EoulsanException;
+import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
 import fr.ens.transcriptome.eoulsan.EoulsanRuntimeDebug;
+import fr.ens.transcriptome.eoulsan.Settings;
 
 public class FastqScreenDemo {
-
+  
+  public static final Map<String, String> properties = Maps.newLinkedHashMap();
+  public static final String RESOURCE_ROOT = "/home/sperrin/Documents/FastqScreenTest/resources";
+  // public static final String RACINE = "/home/sperrin/shares-net/ressources/sequencages";
+  public static final String SRC_RUN = "/home/sperrin/Documents/FastqScreenTest/runtest58";
+  //public static final String SRC_RUN = "/home/sperrin/shares-net/sequencages/runs";
+  public static final String TMP_DIR = "/tmp";
+  
   public static final void main(String[] args) throws AozanException,
       IOException, EoulsanException {
+
     EoulsanRuntimeDebug.initDebugEoulsanRuntime();
+    Settings settings = EoulsanRuntime.getSettings();
+
+    settings
+        .setGenomeDescStoragePath(RESOURCE_ROOT+"/genomes_descs");
+    settings
+        .setGenomeMapperIndexStoragePath(RESOURCE_ROOT+"/mappers_indexes");
+    settings
+        .setGenomeStoragePath(RESOURCE_ROOT+"/genomes");
     Locale.setDefault(Locale.US);
 
-    // inlude in RunDataGenerator
-    final String fastqDir = "/home/sperrin/Documents/FastqScreenTest/runtest58";
-    final String bclDir = "/home/jourdren/shares-net/sequencages/bcl";
-    final String qcDir = "/tmp";
-    final String indexDir =
-        "/home/sperrin/shares-net/ressources/sequencages/fastq_screen";
+    String runId = "121116_SNL110_0058_AC11HRACXX";
 
-    final Map<String, String> properties = Maps.newLinkedHashMap();
-
+    // include in RunDataGenerator
+    final String fastqDir = SRC_RUN + "/" + runId;
+    final String indexDir = RESOURCE_ROOT + "/genomes";
+    
     // Sample tests
-    properties.put("qc.fastqscreen.PhiX.enable", "true");
-    properties.put("qc.fastqscreen.Adapters.enable", "true");
-//    properties.put("qc.fastqscreen.Silva_ribosomes/LSURef.enable", "true");
+    properties.put("qc.fastqscreen.genomes", "phix,lsuref_dna,adapters2");
+    properties.put("qc.fastqscreen.fastqDir", fastqDir);
+    properties.put("qc.fastqscreen.indexDir", indexDir);
+    properties.put("tmp.dir", TMP_DIR);
+    
 
     // process for one run
-
-    FastQScreenCollector fsqCollector = new FastQScreenCollector();
+    FastqScreenCollector fsqCollector = new FastqScreenCollector();
 
     RunData data = null;
-    String runId = "121116_SNL110_0058_AC11HRACXX";
-    
-    File f = new File(fastqDir + "/data-"+runId+".txt");
-    
+
+    File f = new File(fastqDir + "/data-" + runId + ".txt");
+
     try {
       data = new RunData(f);
     } catch (IOException io) {
-      io.getMessage();
+      System.out.println(io.getMessage());
     }
-
+    
     // Configure : create list of reference genome
-    fsqCollector.configure(properties, indexDir);
-
+    fsqCollector.configure(properties);
+    
     // And collect data
     fsqCollector.collect(data);
+
+    // TODO test method
+    // print completed rundata with results of fastqscreen
+    try {
+      FileWriter fw =
+          new FileWriter(new File(SRC_RUN + "/RunDataCompleted.txt"));
+      BufferedWriter bw = new BufferedWriter(fw);
+      bw.write(data.toString());
+      bw.close();
+      fw.close();
+    } catch (IOException io) {
+      System.out.println(io.getMessage());
+    }
+  }
+  
+  
+  /**
+   * 
+   */
+  public static void printProperties(){
+    for (Map.Entry<String, String> e : properties.entrySet()){
+      System.out.println("key "+e.getKey()+"  value "+e.getValue());
+    }
   }
 
 }

@@ -8,9 +8,6 @@ package fr.ens.transcriptome.aozan.fastqscreen;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.RoundingMode;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -18,8 +15,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import com.google.common.math.DoubleMath;
-
+import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.eoulsan.EoulsanException;
 import fr.ens.transcriptome.eoulsan.Globals;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
@@ -28,10 +24,11 @@ import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.AbstractBowtieReadsMapper;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.BowtieReadsMapper;
 import fr.ens.transcriptome.eoulsan.data.DataFile;
+import fr.ens.transcriptome.eoulsan.steps.generators.GenomeDescriptionCreator;
 import fr.ens.transcriptome.eoulsan.steps.generators.GenomeMapperIndexer;
-import fr.ens.transcriptome.eoulsan.steps.mapping.AbstractReadsMapperStep;
 import fr.ens.transcriptome.eoulsan.util.PseudoMapReduce;
 import fr.ens.transcriptome.eoulsan.util.Reporter;
+import fr.ens.transcriptome.eoulsan.util.StringUtils;
 
 public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
@@ -40,105 +37,97 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   protected static final String COUNTER_GROUP = "reads_mapping";
 
   private final int NB_STAT_VALUES = 5;
-  private final AbstractBowtieReadsMapper bowtie;;
+  private final AbstractBowtieReadsMapper bowtie;
   private final Reporter reporter;
+  private final FastqScreenResult fastqScreenResult;
 
   private Map<String, float[]> percentHitsPerGenome =
       new HashMap<String, float[]>();
-  private float readsprocessed;
-
-  private final String[] headerColumns = {"library", "unmapped",
-      "one_hit_one_library", "multiple_hits_one_library",
-      "one_hit_multiple_libraries", "multiple_hits_multiple_libraries"};
+  private int readsprocessed;
+  private int readsMapped = 0;
 
   private String genomeReference;
-  private float percentHitNoLibraries = 0.f;
   private boolean succesMapping = false;
-  private boolean tableStatisticExist = false;
-  private int nbReadMapped = 0;
 
   private Pattern pattern = Pattern.compile("\t");
 
   // TODO : override method doMap() of PseudoMapReduce
   /**
    * @param readsFile fastq file
-   * @param listGenome
+   * @param listGenomes
    * @throws IOException
    * @throws EoulsanException
    * @throws BadBioEntryException
    */
-  public void doMap(File readsFile, List<File> listGenome) throws IOException,
-      EoulsanException, BadBioEntryException {
+  public void doMap(File readsFile, List<String> listGenomes)
+      throws AozanException, BadBioEntryException {
 
     final int mapperThreads = Runtime.getRuntime().availableProcessors();
 
     // Mapper change defaults arguments
     // seed use by bowtie already define to 40
     final String newArgumentsMapper = "-l 40 --chunkmbs 512 ";
+    for (String genome : listGenomes) {
 
-    for (File genome : listGenome) {
+      try {
+        DataFile genomeFile = new DataFile("genome://" + genome);
 
-      // test if index Genome reference exists
-      //createIndex(bowtie, genome);
-      String nameGenome = genome.getParentFile().getName();
-      
-      FastsqScreenSAMParser parser =
-          new FastsqScreenSAMParser(this.getMapOutputTempFile(),
-              nameGenome);
-      this.setGenomeReference(nameGenome);
+        // test if index Genome reference exists
+        File archiveIndexFile = createIndex(bowtie, genomeFile);
 
-      System.out.println(new SimpleDateFormat("h:m a").format(new Date())
-          + " nom genome : " + nameGenome + " chemin genome "
-          + genome.getAbsolutePath());
+        FastsqScreenSAMParser parser =
+            new FastsqScreenSAMParser(this.getMapOutputTempFile(), genome);
 
-      bowtie.setThreadsNumber(mapperThreads);
-      bowtie.setMapperArguments(newArgumentsMapper);
+        this.setGenomeReference(genome);
 
-      bowtie.init(false, FastqFormat.FASTQ_SANGER, genome,
-          genome.getParentFile(), reporter, COUNTER_GROUP);
-      bowtie.map(readsFile, parser);
+        // System.out.println(new SimpleDateFormat("h:m a").format(new Date())
+        // + " name genome : " + nameGenome + " path "
+        // + genome.getAbsolutePath());
 
-      this.readsprocessed = (float) parser.getReadsprocessed();
-      succesMapping = (readsprocessed > 0);
+        bowtie.setThreadsNumber(mapperThreads);
+        bowtie.setMapperArguments(newArgumentsMapper);
 
-      parser.cleanup();
+        final File indexDir =
+            new File(StringUtils.filenameWithoutExtension(archiveIndexFile
+                .getPath()));
+
+        bowtie.init(false, FastqFormat.FASTQ_SANGER, archiveIndexFile,
+            indexDir, reporter, COUNTER_GROUP);
+
+        bowtie.map(readsFile, parser);
+        this.readsprocessed = parser.getReadsprocessed();
+        succesMapping = (readsprocessed > 0);
+
+        parser.closeMapOutpoutFile();
+
+      } catch (IOException e) {
+        e.printStackTrace();
+        throw new AozanException(e.getMessage());
+      }
 
     } // for
   } // doMap
 
-  private void createIndex(AbstractBowtieReadsMapper bowtie, File genome)
-      throws BadBioEntryException, IOException {
+  private File createIndex(AbstractBowtieReadsMapper bowtie,
+      DataFile genomeDataFile) throws BadBioEntryException, IOException {
 
-    // ===== src mapFilteredFastq() in ReadsLaneStatsGenerator
-    // File genomeName = genome[0].getAbsolutePath();
+    final DataFile result =
+        new DataFile("/tmp/aozan-bowtie-index-"
+            + genomeDataFile.getName() + ".zip");
 
-    System.out.println("in method createIndex");
+    // Create genome description
+    GenomeDescriptionCreator descCreator = new GenomeDescriptionCreator();
 
-    String nameGenome =
-        "/home/sperrin/Documents/FastqScreenTest/index/saccharomyces";
-    final File archiveFile = new File(nameGenome + ".zip");
-    final File archiveDir =
-        new File("/home/sperrin/Documents/FastqScreenTest/indexs");
+    GenomeDescription desc =
+        descCreator.createGenomeDescription(genomeDataFile);
 
-    if (!archiveDir.exists()) {
-      // Get the genome file
-      final DataFile genomeFile = new DataFile("genome:/" + nameGenome);
+    GenomeMapperIndexer indexer = new GenomeMapperIndexer(bowtie);
+    indexer.createIndex(genomeDataFile, desc, result);
 
-      System.out.println("index create");
-
-      // Create genome description
-      final GenomeDescription desc =
-          GenomeDescription.createGenomeDescFromFasta(genomeFile.open(),
-              nameGenome + ".fasta");
-
-      GenomeMapperIndexer indexer = new GenomeMapperIndexer(bowtie);
-      indexer.createIndex(genomeFile, desc, new DataFile(archiveFile));
-
-      // bowtie.makeArchiveIndex(genomeFile, archiveFile);
-    }
-
+    return result.toFile();
   }
 
+  @Override
   /**
    * Mapper Receive value in SAM format, only the read mapped are added in
    * output with genome reference used
@@ -170,8 +159,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
   /**
    * Reducer Receive for each read list mapped genome Values first character
-   * represent the number of hits for a read : 1 or 2 (for several hits) the end
-   * represent the name of referenced genome
+   * represent the number of hits for a read : 1 or 2 (for several hits) and the
+   * end represent the name of reference genome
    * @param key input key of the reducer
    * @param values values for the key
    * @param output list of output values of the reducer : here not use
@@ -185,149 +174,27 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     boolean oneGenome = true;
     String currentGenome = null;
     String nextGenome = null;
-    nbReadMapped++;
+    readsMapped++;
 
     // System.out.println("reduce : value of key "+ key);
 
-    // values format : a number 1 or 2 which represent the number of hits for the read on one genome
-    // and name of the genome
+    // values format : a number 1 or 2 which represent the number of hits for
+    // the read on one genome and after name of the genome
     while (values.hasNext()) {
       String s = values.next();
       oneHit = s.charAt(0) == '1' ? true : false;
       nextGenome = s.substring(1);
       // System.out.println("read"+key+"\t genome "+genome+"\t onegenome "+oneGenome+"\t hits \t"+oneHit);
 
-      countHitPerGenome(nextGenome, oneHit, oneGenome);
-      oneGenome = ! nextGenome.equals(currentGenome);
+      this.fastqScreenResult.countHitPerGenome(nextGenome, oneHit, oneGenome);
+      oneGenome = !nextGenome.equals(currentGenome);
       currentGenome = nextGenome;
     }// while
 
   } // reduce
 
-  /**
-   * Called by method reduce for each read and filled intermediate table
-   * @param genome
-   * @param oneHit
-   * @param oneGenome
-   */
-  void countHitPerGenome(String genome, boolean oneHit, boolean oneGenome) {
-    // indices for table tabHitsPerLibraries
-    // position 0 of the table for UNMAPPED ;
-
-    // System.out.println("genome : "
-    // + genome + " hit " + oneHit + " gen " + oneGenome);
-
-    final int ONE_HIT_ONE_LIBRARY = 1;
-    final int MULTIPLE_HITS_ONE_LIBRARY = 2;
-    final int ONE_HIT_MULTIPLE_LIBRARIES = 3;
-    final int MUTILPLE_HITS_MULTIPLE_LIBRARIES = 4;
-    float[] tab;
-    // genome must be contained in map
-    if (!(percentHitsPerGenome.containsKey(genome)))
-      return;
-
-    if (oneHit && oneGenome) {
-      tab = percentHitsPerGenome.get(genome);
-      tab[ONE_HIT_ONE_LIBRARY] += 1.0;
-
-    } else if (!oneHit && oneGenome) {
-      tab = percentHitsPerGenome.get(genome);
-      tab[MULTIPLE_HITS_ONE_LIBRARY] += 1.0;
-
-    } else if (oneHit && !oneGenome) {
-      tab = percentHitsPerGenome.get(genome);
-      tab[ONE_HIT_MULTIPLE_LIBRARIES] += 1.0;
-
-    } else if (!oneHit && !oneGenome) {
-      tab = percentHitsPerGenome.get(genome);
-      tab[MUTILPLE_HITS_MULTIPLE_LIBRARIES] += 1.0;
-    }
-  }// countHitPerGenome
-
-  /**
-   * calculating as a percentage, without rounding
-   */
-  public void createStatisticalTable() {
-    System.out.println("nb mapped "
-        + nbReadMapped + " nb read " + readsprocessed);
-
-    if (nbReadMapped > readsprocessed)
-      return;
-
-    tableStatisticExist = true;
-
-    for (Map.Entry<String, float[]> e : percentHitsPerGenome.entrySet()) {
-      float unmapped = 100.f;
-      float[] tab = e.getValue();
-
-      for (int i = 1; i < tab.length; i++) {
-        float n = tab[i] * 100.f / readsprocessed;
-        tab[i] = n;
-        unmapped -= n;
-        // System.out.println("genome "
-        // + e.getKey() + " i : " + i + " val : " + n + " unmap " +
-        // unmapped);
-      }
-      tab[0] = unmapped;
-    }
-  }
-
-  public Map<String, float[]> getStatisticalTable() {
-    return this.percentHitsPerGenome;
-  }
-
-  public String[] getHeaderColumns() {
-    return this.headerColumns;
-  }
-
-  /**
-   * print table percent in format use by fastqscreen program
-   * @return
-   */
-  public String statisticalTableToString() {
-
-    if (!succesMapping) {
-      return "ERROR mapping : no value receive ! (in method statisticalTableToString)";
-    }
-
-    if (!tableStatisticExist)
-      createStatisticalTable();
-
-    StringBuilder s =
-        new StringBuilder(
-            "Library \t %Unmapped \t %One_hit_one_library"
-                + "\t %Multiple_hits_one_library \t %One_hit_multiple_libraries \t "
-                + "%Multiple_hits_multiple_libraries");
-
-    percentHitNoLibraries =
-        (readsprocessed - nbReadMapped) / readsprocessed * 100.f;
-    percentHitNoLibraries = ((int) (percentHitNoLibraries * 100)) / 100.f;
-    for (Map.Entry<String, float[]> e : percentHitsPerGenome.entrySet()) {
-      float[] tab = e.getValue();
-      s.append("\n" + e.getKey());
-
-      for (float n : tab) {
-        // n = ((int) (n * 100.0)) / 100.0;
-        // n = Math.ceil(n);
-        n = DoubleMath.roundToInt((n * 100.f), RoundingMode.HALF_DOWN) / 100.f;
-        s.append("\t" + n);
-      }
-    }
-
-    s.append("\n\n% Hit_no_libraries : " + percentHitNoLibraries + "\n");
-    return s.toString();
-  }
-
-  //
-  // GETTERS
-  //
-
-  public float getReadsprocessed() {
-    return (float) this.readsprocessed;
-  }
-
-  public float getPercentHitNoLibraries() {
-    return this.percentHitNoLibraries;
+  public FastqScreenResult getFastqScreenResult() {
+    return this.fastqScreenResult.getFastqScreenResult();
   }
 
   //
@@ -337,7 +204,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   public void setGenomeReference(String genome) {
     this.genomeReference = genome;
 
-    // update list genomeReference
+    // update list genomeReference : create a new entry for the new reference
+    // genome
     percentHitsPerGenome.put(genome, new float[NB_STAT_VALUES]);
   }
 
@@ -348,12 +216,13 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   public FastqScreenPseudoMapReduce() {
     this.bowtie = new BowtieReadsMapper();
     this.reporter = new Reporter();
+    this.fastqScreenResult = new FastqScreenResult();
   }
 
   public FastqScreenPseudoMapReduce(int readsprocessed) {
     this.bowtie = new BowtieReadsMapper();
     this.reporter = new Reporter();
-
-    this.readsprocessed = (float) readsprocessed;
+    this.fastqScreenResult = new FastqScreenResult();
+    this.readsprocessed = readsprocessed;
   }
 }
