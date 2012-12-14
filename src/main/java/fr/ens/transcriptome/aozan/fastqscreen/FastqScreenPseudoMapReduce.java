@@ -36,6 +36,9 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
   protected static final String COUNTER_GROUP = "reads_mapping";
   private final int NB_STAT_VALUES = 5;
+  private static final String KEY_NUMBER_THREAD = "qc.conf.fastqscreen.threads";
+  private static final String KEY_TMP_DIR = "tmp.dir";
+  
 
   private final AbstractBowtieReadsMapper bowtie;
   private final Reporter reporter;
@@ -48,6 +51,15 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   private boolean succesMapping = false;
   private Pattern pattern = Pattern.compile("\t");
 
+  
+  
+  public void doMap(File fastqRead, List<String> listGenomes,
+      Map<String, String> properties) throws AozanException,
+      BadBioEntryException {
+    
+    this.doMap(fastqRead, null, listGenomes, properties);
+  }
+
   // TODO : override method doMap() of PseudoMapReduce
   /**
    * @param readsFile fastq file
@@ -56,38 +68,50 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @throws EoulsanException
    * @throws BadBioEntryException
    */
-  public void doMap(File readsFile, List<String> listGenomes)
-      throws AozanException, BadBioEntryException {
+  public void doMap(File fastqRead1,File fastqRead2, List<String> listGenomes,
+      Map<String, String> properties) throws AozanException,
+      BadBioEntryException {
 
-    final int mapperThreads = Runtime.getRuntime().availableProcessors();
-
+    final int mapperThreads =
+        Integer.parseInt(properties.get(KEY_NUMBER_THREAD));
+    final String tmpDir = properties.get(KEY_TMP_DIR);
+    final boolean pairEnd = fastqRead2 == null ? false : true;
+    
     // Mapper change defaults arguments
     // seed use by bowtie already define to 40
-    final String newArgumentsMapper = "-l 40 --chunkmbs 512 ";
+    final String newArgumentsMapper = bowtie.getDefaultArguments()+" -l 40 --chunkmbs 512" + (pairEnd ? " --maxins 1000" : "");
+    
+
     for (String genome : listGenomes) {
 
       try {
         DataFile genomeFile = new DataFile("genome://" + genome);
 
         // test if index Genome reference exists
-        File archiveIndexFile = createIndex(bowtie, genomeFile);
+        File archiveIndexFile = createIndex(bowtie, genomeFile, tmpDir);
 
         FastsqScreenSAMParser parser =
-            new FastsqScreenSAMParser(this.getMapOutputTempFile(), genome);
-
+            new FastsqScreenSAMParser(this.getMapOutputTempFile(), genome, pairEnd);
         this.setGenomeReference(genome);
-
-        bowtie.setThreadsNumber(mapperThreads);
-        bowtie.setMapperArguments(newArgumentsMapper);
 
         final File indexDir =
             new File(StringUtils.filenameWithoutExtension(archiveIndexFile
                 .getPath()));
-
-        bowtie.init(false, FastqFormat.FASTQ_SANGER, archiveIndexFile,
+        
+        bowtie.setMapperArguments("");
+        
+        bowtie.init(pairEnd, FastqFormat.FASTQ_SANGER, archiveIndexFile,
             indexDir, reporter, COUNTER_GROUP);
-
-        bowtie.map(readsFile, parser);
+        bowtie.setMapperArguments(newArgumentsMapper);
+        bowtie.setThreadsNumber(mapperThreads);
+        
+        if (fastqRead2 == null){
+          // mode single-end
+          bowtie.map(fastqRead1, parser);          
+        } else {
+          // mode pair-end
+          bowtie.map(fastqRead1, fastqRead2, parser);
+        }
         this.readsprocessed = parser.getReadsprocessed();
         succesMapping = (readsprocessed > 0);
 
@@ -102,10 +126,10 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   } // doMap
 
   private File createIndex(AbstractBowtieReadsMapper bowtie,
-      DataFile genomeDataFile) throws BadBioEntryException, IOException {
+      DataFile genomeDataFile, String tmpDir) throws BadBioEntryException, IOException {
 
     final DataFile result =
-        new DataFile("/tmp/aozan-bowtie-index-"
+        new DataFile(tmpDir + "/aozan-bowtie-index-"
             + genomeDataFile.getName() + ".zip");
 
     // Create genome description

@@ -23,12 +23,10 @@ public class FastqScreen {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
   protected static final String COUNTER_GROUP = "fastqscreen";
-  private Map<String, String> properties;
   private static final String KEY_TMP_DIR = "tmp.dir";
 
-  private static String indexDir;
-  final static boolean paired = false;
-  final static long startTime = System.currentTimeMillis();
+  private Map<String, String> properties;
+  private final static long startTime = System.currentTimeMillis();
 
   /**
    * mode pair-end : execute fastqscreen calcul
@@ -38,9 +36,11 @@ public class FastqScreen {
    * @return FastqScreenResult object contains results for each reference genome
    * @throws AozanException
    */
-  public FastqScreenResult execute(String fastqRead1, String fastqRead2,
-      List<String> listGenome) throws AozanException {
-    return null;
+  public FastqScreenResult execute(File fastqRead,
+      List<String> listGenomes) throws AozanException {
+   
+    return this.execute(fastqRead, null, listGenomes);
+   
   }
 
   /**
@@ -50,7 +50,7 @@ public class FastqScreen {
    * @return FastqScreenResult object contains results for each reference genome
    * @throws AozanException
    */
-  public FastqScreenResult execute(String fastqFile, List<String> listGenomes)
+  public FastqScreenResult execute(File fastqRead1, File fastqRead2, List<String> listGenomes)
       throws AozanException {
 
     String tmpDir = properties.get(KEY_TMP_DIR);
@@ -59,7 +59,11 @@ public class FastqScreen {
 
     try {
 
-      pmr.doMap(new File(fastqFile), listGenomes);
+      if (fastqRead2 == null)
+        pmr.doMap(fastqRead1, listGenomes, properties);
+      else 
+        pmr.doMap(fastqRead1, fastqRead2, listGenomes, properties);
+        
       pmr.doReduce(new File(tmpDir + "/outputDoReduce.txt"));
 
     } catch (IOException e) {

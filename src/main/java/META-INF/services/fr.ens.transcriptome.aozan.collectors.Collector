@@ -4,3 +4,4 @@ fr.ens.transcriptome.aozan.collectors.PhasingCollector
 fr.ens.transcriptome.aozan.collectors.ReadCollector
 fr.ens.transcriptome.aozan.collectors.RunInfoCollector
 fr.ens.transcriptome.aozan.collectors.FastQCCollector
+fr.ens.transcriptome.aozan.collectors.FastqScreenCollector

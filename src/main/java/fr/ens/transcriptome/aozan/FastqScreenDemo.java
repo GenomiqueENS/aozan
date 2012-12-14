@@ -26,9 +26,11 @@ public class FastqScreenDemo {
   public static final Map<String, String> properties = Maps.newLinkedHashMap();
   public static final String RESOURCE_ROOT = "/home/sperrin/Documents/FastqScreenTest/resources";
   // public static final String RACINE = "/home/sperrin/shares-net/ressources/sequencages";
-  public static final String SRC_RUN = "/home/sperrin/Documents/FastqScreenTest/runtest58";
+  public static final String SRC_RUN = "/home/sperrin/Documents/FastqScreenTest/runtest";
   //public static final String SRC_RUN = "/home/sperrin/shares-net/sequencages/runs";
-  public static final String TMP_DIR = "/tmp";
+  public static final String TMP_DIR = "/home/sperrin/Documents/FastqScreenTest/tmp";
+  
+  public static boolean paired = false;
   
   public static final void main(String[] args) throws AozanException,
       IOException, EoulsanException {
@@ -44,10 +46,19 @@ public class FastqScreenDemo {
         .setGenomeStoragePath(RESOURCE_ROOT+"/genomes");
     Locale.setDefault(Locale.US);
 
-    String runId = "121116_SNL110_0058_AC11HRACXX";
-
+    
+    
+    String runId;
+    if (paired) {
+      // run test pair-end
+      runId = "120830_SNL110_0055_AD16D9ACXX";
+    } else {
+      //run test single-end
+      runId = "121116_SNL110_0058_AC11HRACXX";
+    }
+    
     // include in RunDataGenerator
-    final String fastqDir = SRC_RUN + "/" + runId;
+    final String fastqDir = SRC_RUN + "/qc_" + runId+"/"+runId;
     final String indexDir = RESOURCE_ROOT + "/genomes";
     
     // Sample tests
@@ -55,7 +66,8 @@ public class FastqScreenDemo {
     properties.put("qc.fastqscreen.fastqDir", fastqDir);
     properties.put("qc.fastqscreen.indexDir", indexDir);
     properties.put("tmp.dir", TMP_DIR);
-    
+    // number threads used for fastqscreen is define in aozan.conf
+    properties.put("qc.conf.fastqscreen.threads","4");
 
     // process for one run
     FastqScreenCollector fsqCollector = new FastqScreenCollector();
