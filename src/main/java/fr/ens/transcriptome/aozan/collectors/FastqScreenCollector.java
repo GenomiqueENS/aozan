@@ -6,6 +6,8 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
+import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -23,19 +26,24 @@ import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreen;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreenResult;
 import fr.ens.transcriptome.aozan.io.FastqStorage;
+import fr.ens.transcriptome.eoulsan.Globals;
 
 public class FastqScreenCollector implements Collector {
 
-  /** The collector name. */
+  /** Logger */
+  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+
   public static final String COLLECTOR_NAME = "fastqscreen";
+
   private static final String KEY_GENOMES = "qc.fastqscreen.genomes";
   private static final String KEY_FASTQ_DIR = "qc.fastqscreen.fastqDir";
-  private static final String KEY_PAIRED = "run.info.read3.cycles";
+  private static final String KEY_READ_COUNT = "run.info.read.count";
+  private static final String KEY_READ_X_INDEXED = "run.info.read";
   private static final String KEY_TMP_DIR = "tmp.dir";
-  private static final String COMPRESSION_EXTENSION = ".bz2";
-  
+  private static final String COMPRESSION_EXTENSION = "fq.bz2";
+
   private FastqScreen fastqscreen;
-  private static FastqStorage fastqStorage;
+  private FastqStorage fastqStorage;
   private List<String> listGenomes = new ArrayList<String>();
 
   private String pathDirTest;
@@ -46,26 +54,33 @@ public class FastqScreenCollector implements Collector {
     return COLLECTOR_NAME;
   }
 
+  /**
+   * Collectors to execute before fastqscreen Collector
+   */
   @Override
   public String[] getCollectorsNamesRequiered() {
-    // TODO Auto-generated method stub
-    return null;
+    return new String[] {RunInfoCollector.COLLECTOR_NAME,
+        DesignCollector.COLLECTOR_NAME};
   }
 
   @Override
-  public void configure(Properties properties) {
+  public void configure(final Properties properties) {
 
   }
 
-  public void configure(Map<String, String> properties) {
+  public void configure(final Map<String, String> properties) {
 
-    fastqscreen = new FastqScreen(properties);
-    fastqStorage = FastqStorage.getFastqStorage(properties.get(KEY_TMP_DIR));
+    this.fastqscreen = new FastqScreen(properties);
+
+    String tmpDir = properties.get(KEY_TMP_DIR);
+    this.fastqStorage = FastqStorage.getFastqStorage(tmpDir);
+
+    System.out.println("In properties, the tmp directory is "
+        + properties.get(KEY_TMP_DIR) + " space free : "
+        + (new File(tmpDir).getFreeSpace() / 1048576) + "Go");
 
     pathDirTest = properties.get(KEY_FASTQ_DIR);
     final Splitter s = Splitter.on(',').trimResults().omitEmptyStrings();
-
-    paired = FastqScreenDemo.paired;
 
     for (String genome : s.split(properties.get(KEY_GENOMES))) {
       this.listGenomes.add(genome);
@@ -79,21 +94,30 @@ public class FastqScreenCollector implements Collector {
   }
 
   @Override
-  public void collect(RunData data) throws AozanException {
+  public void collect(final RunData data) throws AozanException {
 
     FastqScreenResult resultsFastqscreen = null;
 
-    final int readCount = data.getInt("run.info.read.count");
+    final long startTime = System.currentTimeMillis();
+
+    // mode paired or single-end present in Rundata
+    final int readCount = data.getInt(KEY_READ_COUNT);
+    final boolean lastReadIndexed =
+        data.getBoolean(KEY_READ_X_INDEXED + readCount + ".indexed");
+    File read1 = null;
+    File read2 = null;
+
     final int laneCount = data.getInt("run.info.flow.cell.lane.count");
-    
-    for (int read = 1; read <= readCount-1; read++) {
+
+    paired = readCount > 1 && !lastReadIndexed;
+    System.out.println("mode paired " + paired);
+
+    for (int read = 1; read <= readCount - 1; read++) {
 
       if (data.getBoolean("run.info.read" + read + ".indexed"))
         continue;
 
       for (int lane = 1; lane <= laneCount; lane++) {
-
-        // print("lane current " + lane);
 
         final List<String> sampleNames =
             Lists.newArrayList(Splitter.on(',').split(
@@ -101,7 +125,6 @@ public class FastqScreenCollector implements Collector {
 
         for (String sampleName : sampleNames) {
 
-          // print("lane current " + lane +"\tsample current " + sampleName);
           // Get the sample index
           final String index =
               data.get("design.lane" + lane + "." + sampleName + ".index");
@@ -116,101 +139,60 @@ public class FastqScreenCollector implements Collector {
               + projectName);
 
           // Set the prefix of the file
-          final String prefix = 
+          final String prefixRead1 =
               String.format("%s_%s_L%03d_R%d_", sampleName, "".equals(index)
                   ? "NoIndex" : index, lane, read);
 
           final String fastqDir =
               String.format("/Project_%s/Sample_%s", projectName, sampleName);
 
-          if (!paired && lane == 4 || lane == 5 ) {
-            // Set the list of the files for the FASTQ data
-            final File[] fastqFiles =
-                new File(pathDirTest + fastqDir + "/")
-                    .listFiles(new FileFilter() {
+          // Set the list of the files for the FASTQ data
+          final File[] fastqFiles = createListFastqFiles(fastqDir, prefixRead1);
 
-                      @Override
-                      public boolean accept(final File pathname) {
+          if (fastqFiles.length == 0)
+            continue;
 
-                        return pathname.getName().startsWith(prefix)
-                            && pathname.getName().endsWith(
-                                /*".fq" +*/ COMPRESSION_EXTENSION);
-                      }
-                    });
+          // concatenate fastq files of one sample
+          read1 = fastqStorage.getFastqFile(fastqFiles);
+          if (read1 == null || !read1.exists())
+            continue;
 
-            if (fastqFiles.length == 0)
-              continue;
-            
-            // concatenate fastq files of one sample
-            final File f = fastqStorage.getFastqFile(fastqFiles);
+          if (paired) {
+            // mode paired
 
-            if (f == null || !f.exists())
-              continue;
-
-            resultsFastqscreen = fastqscreen.execute(f, this.listGenomes);
-            processResults(data, resultsFastqscreen, lane, sampleName, read);
-
-            if (resultsFastqscreen == null)
-              throw new AozanException(
-                  "fastqscreen return no result for sample " + fastqDir);
-
-            fastqStorage.clear();
-
-          } else if (paired && sampleName.equals("2012-0159")) {
-
-            final File[] fastqFilesRead1 =
-                new File(pathDirTest + fastqDir + "/")
-                    .listFiles(new FileFilter() {
-
-                      @Override
-                      public boolean accept(final File pathname) {
-
-                        return pathname.getName().startsWith(prefix)
-                            && pathname.getName().endsWith(
-                                ".fq" + COMPRESSION_EXTENSION);
-                      }
-                    });
-            
-            if (fastqFilesRead1.length == 0)
-              continue;
-            
-            // concatenate fastq files of one sample
-            final File read1 = fastqStorage.getFastqFile(fastqFilesRead1);
-
-            if (read1 == null || ! read1.exists())
-              continue;
-            
-            final String prefixRead2 = 
+            final String prefixRead2 =
                 String.format("%s_%s_L%03d_R%d_", sampleName, "".equals(index)
-                    ? "NoIndex" : index, lane, read+1);
-            
+                    ? "NoIndex" : index, lane, read + 1);
             final File[] fastqFilesRead2 =
-                new File(pathDirTest + fastqDir + "/")
-                    .listFiles(new FileFilter() {
+                createListFastqFiles(fastqDir, prefixRead2);
 
-                      @Override
-                      public boolean accept(final File pathname) {
-
-                        return pathname.getName().startsWith(prefixRead2)
-                            && pathname.getName().endsWith(
-                                ".fq" + COMPRESSION_EXTENSION);
-                      }
-                    });
-            
             if (fastqFilesRead2.length == 0)
               continue;
-            
-            // concatenate fastq files of one sample
-            final File read2 = fastqStorage.getFastqFile(fastqFilesRead2);
 
-            if (read2 == null || ! read2.exists())
+            // concatenate fastq files of one sample
+            read2 = fastqStorage.getFastqFile(fastqFilesRead2);
+            if (read2 == null || !read2.exists())
               continue;
-            
-            // add read2 in command line
-            resultsFastqscreen =
-                fastqscreen.execute(read1, read2, this.listGenomes);
-            processResults(data, resultsFastqscreen, lane, sampleName, read);
           }
+
+          // add read2 in command line
+          resultsFastqscreen =
+              fastqscreen.execute(read1, read2, this.listGenomes);
+
+          if (resultsFastqscreen == null)
+            throw new AozanException("Fastqscreen return no result for sample "
+                + fastqDir);
+
+          processResults(data, resultsFastqscreen, lane, sampleName, read);
+
+          fastqStorage.clear();
+
+          final long endTime = System.currentTimeMillis();
+          LOGGER.info("End test with sample "
+              + sampleName + " " + toTimeHumanReadable(endTime - startTime));
+
+          System.out.println("End test with sample "
+              + sampleName + " " + toTimeHumanReadable(endTime - startTime));
 
         } // sample
       } // lane
@@ -218,13 +200,40 @@ public class FastqScreenCollector implements Collector {
 
   }// end method collect
 
+  private File[] createListFastqFiles(final String dirPath, final String prefix) {
+
+    // test parameters
+    String projetTestSingle = "Project_microbrain_A2012";
+    String projetTestPaired = "Project_accepi_2012a";
+
+    if (!(dirPath.startsWith(projetTestPaired) || dirPath
+        .startsWith(projetTestSingle)))
+      return null;
+
+    return new File(pathDirTest + dirPath + "/").listFiles(new FileFilter() {
+
+      @Override
+      public boolean accept(final File pathname) {
+
+        return pathname.getName().startsWith(prefix)
+            && pathname.getName().endsWith(COMPRESSION_EXTENSION);
+      }
+    });
+  }
+
   /**
    * Process results after the end of the thread.
+   * @param data
+   * @param result
+   * @param lane
+   * @param sampleName
+   * @param read
    * @throws AozanException if an error occurs while generate FastqScreen
    *           results
    */
-  private void processResults(RunData data, FastqScreenResult result, int lane,
-      String sampleName, int read) throws AozanException {
+  private void processResults(final RunData data,
+      final FastqScreenResult result, final int lane, final String sampleName,
+      final int read) throws AozanException {
 
     // Set the prefix for the run data entries
     String prefix =
@@ -232,11 +241,11 @@ public class FastqScreenCollector implements Collector {
             + lane + ".sample." + sampleName + ".read" + read + "."
             + sampleName;
 
-    Map<String, float[]> resultPerGenome = result.getResultsPerGenome();
+    Map<String, double[]> resultPerGenome = result.getResultsPerGenome();
     String[] legend = result.getLegendRunData();
 
     // for each reference genome
-    for (Map.Entry<String, float[]> e : resultPerGenome.entrySet()) {
+    for (Map.Entry<String, double[]> e : resultPerGenome.entrySet()) {
       String genome = "." + e.getKey();
 
       // 5 values per genome
@@ -251,18 +260,18 @@ public class FastqScreenCollector implements Collector {
       }
     }
     // print last line of report FastqScreen
-    data.put(prefix +"."+ result.getFinalLineRunData(),
+    data.put(prefix + "." + result.getFinalLineRunData(),
         result.getPercentHitNoLibraries());
 
     print("add in runData \t"
         + prefix + "." + result.getFinalLineRunData() + "="
         + result.getPercentHitNoLibraries());
-    
+
     print(result.statisticalTableToString());
   }// processResults
 
   /**
-   * remove temporary files created in temporary directory which is defined in
+   * Remove temporary files created in temporary directory which is defined in
    * properties of Aozan
    */
   public void clean() {
@@ -270,7 +279,7 @@ public class FastqScreenCollector implements Collector {
   }
 
   //
-  // COLLECTORS
+  // Constructor
   //
 
   public FastqScreenCollector() {

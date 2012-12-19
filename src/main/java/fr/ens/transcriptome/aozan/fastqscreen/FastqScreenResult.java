@@ -21,49 +21,49 @@ import com.google.common.math.DoubleMath;
 
 public class FastqScreenResult {
 
-  private final String[] HEADER_COLUMNS_TAB = {"library", "unmapped",
+  private static final String[] HEADER_COLUMNS_TAB = {"library", "unmapped",
       "one_hit_one_library", "multiple_hits_one_library",
       "one_hit_multiple_libraries", "multiple_hits_multiple_libraries"};
 
   // specific legend : represent key in rundata
-  private final String[] LEGEND_RUNDATA = {"unmapped", "one.hit.one.library",
-      "multiple.hits.one.library", "one.hit.multiple.libraries",
-      "multiple.hits.multiple.libraries"};
-  private final String FINAL_LINE_RUNDATA = "hit.no.libraries";
+  private static final String[] LEGEND_RUNDATA = {"unmapped",
+      "one.hit.one.library", "multiple.hits.one.library",
+      "one.hit.multiple.libraries", "multiple.hits.multiple.libraries"};
+  private static final String FINAL_LINE_RUNDATA = "hit.no.libraries";
 
   // legend for file result
-  private final String HEADER_COLUMNS_TEXT =
+  private static final String HEADER_COLUMNS_TEXT =
       "Library \t %Unmapped \t %One_hit_one_library"
           + "\t %Multiple_hits_one_library \t %One_hit_multiple_libraries \t "
           + "%Multiple_hits_multiple_libraries";
-  private final String FINAL_TEXT = "Hit_no_libraries";
+  private static final String FINAL_TEXT = "Hit_no_libraries";
 
-  private Map<String, float[]> resultsPerGenome;
-  private float percentHitNoLibraries = 0.f;
+  private Map<String, double[]> resultsPerGenome;
+  private double percentHitNoLibraries = 0.0;
   private boolean paired = false;
   private int readsprocessed;
   private int readsMapped;
 
   /**
-   * print table percent in format use by fastqscreen program with rounding
+   * Print table percent in format use by fastqscreen program with rounding
    * @return
    */
   public String statisticalTableToString() {
 
     StringBuilder s = new StringBuilder().append(HEADER_COLUMNS_TEXT);
 
-    for (Map.Entry<String, float[]> e : this.resultsPerGenome.entrySet()) {
-      float[] tab = e.getValue();
+    for (Map.Entry<String, double[]> e : this.resultsPerGenome.entrySet()) {
+      double[] tab = e.getValue();
       s.append("\n" + e.getKey());
 
-      for (float n : tab) {
-        n = DoubleMath.roundToInt((n * 100.f), RoundingMode.HALF_DOWN) / 100.f;
+      for (double n : tab) {
+        n = DoubleMath.roundToInt((n * 100.0), RoundingMode.HALF_DOWN) / 100.0;
         s.append("\t" + n);
       }
     }
-    float percentHitNoLibrariesRounding =
-        DoubleMath.roundToInt((this.percentHitNoLibraries * 100.f),
-            RoundingMode.HALF_DOWN) / 100.f;
+    double percentHitNoLibrariesRounding =
+        DoubleMath.roundToInt((this.percentHitNoLibraries * 100.0),
+            RoundingMode.HALF_DOWN) / 100.0;
     s.append("\n\n% Hit_no_libraries : " + percentHitNoLibrariesRounding + "\n");
     return s.toString();
   }
@@ -77,7 +77,7 @@ public class FastqScreenResult {
     return new ArrayList<String>(set);
   }
 
-  public File createFileResultFastqScreen(String outputFilePath) {
+  public File createFileResultFastqScreen(final String outputFilePath) {
     String result = outputFilePath + "_screen.txt";
     try {
       FileWriter fr = new FileWriter(result);
@@ -98,11 +98,11 @@ public class FastqScreenResult {
   // Getter
   //
 
-  public Map<String, float[]> getResultsPerGenome() {
+  public Map<String, double[]> getResultsPerGenome() {
     return this.resultsPerGenome;
   }
 
-  public boolean getPaired() {
+  public boolean isPaired() {
     return this.paired;
   }
 
@@ -122,11 +122,11 @@ public class FastqScreenResult {
     return this.FINAL_TEXT;
   }
 
-  public float getReadsprocessed() {
+  public double getReadsprocessed() {
     return this.readsprocessed;
   }
 
-  public float getPercentHitNoLibraries() {
+  public double getPercentHitNoLibraries() {
     return this.percentHitNoLibraries;
   }
 
@@ -136,14 +136,14 @@ public class FastqScreenResult {
 
   public void setPercentHitNoLibraries() {
     this.percentHitNoLibraries =
-        ((float) (readsprocessed - readsMapped)) / readsprocessed * 100.f;
+        ((double) (readsprocessed - readsMapped)) / readsprocessed * 100.0;
   }
 
-  public void setPaired(boolean paired) {
+  public void setPaired(final boolean paired) {
     this.paired = paired;
   }
 
-  public void setReadsprocessed(int readsprocessed) {
+  public void setReadsprocessed(final int readsprocessed) {
     this.readsprocessed = readsprocessed;
   }
 
@@ -151,8 +151,8 @@ public class FastqScreenResult {
   // CONSTRUCTOR
   //
 
-  public FastqScreenResult(Map<String, float[]> result, int readsMapped,
-      int readsprocessed) {
+  public FastqScreenResult(final Map<String, double[]> result,
+      final int readsMapped, final int readsprocessed) {
     this.resultsPerGenome = result;
     this.readsMapped = readsMapped;
     this.readsprocessed = readsprocessed;
