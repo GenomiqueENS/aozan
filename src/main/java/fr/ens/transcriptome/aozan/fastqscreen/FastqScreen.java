@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -37,7 +38,7 @@ public class FastqScreen {
       "conf.settings.mappers.indexes.path";
   private static final String KEY_GENOMES_PATH = "conf.settings.genomes";
 
-  private Map<String, String> properties;
+  private Properties properties;
 
   /**
    * mode pair-end : execute fastqscreen calcul
@@ -67,7 +68,7 @@ public class FastqScreen {
 
     final long startTime = System.currentTimeMillis();
 
-    String tmpDir = properties.get(KEY_TMP_DIR);
+    String tmpDir = properties.getProperty(KEY_TMP_DIR);
     FastqScreenPseudoMapReduce pmr = new FastqScreenPseudoMapReduce();
     pmr.setMapReduceTemporaryDirectory(new File(tmpDir));
 
@@ -113,17 +114,18 @@ public class FastqScreen {
    * @throws EoulsanException
    * @throws IOException
    */
-  public FastqScreen(final Map<String, String> properties) {
+  public FastqScreen(final Properties properties) {
     this.properties = properties;
 
     try {
       EoulsanRuntimeDebug.initDebugEoulsanRuntime();
       Settings settings = EoulsanRuntime.getSettings();
 
-      settings.setGenomeDescStoragePath(properties.get(KEY_GENOMES_DESC_PATH));
+      settings.setGenomeDescStoragePath(properties
+          .getProperty(KEY_GENOMES_DESC_PATH));
       settings.setGenomeMapperIndexStoragePath(properties
-          .get(KEY_MAPPERS_INDEXES_PATH));
-      settings.setGenomeStoragePath(properties.get(KEY_GENOMES_PATH));
+          .getProperty(KEY_MAPPERS_INDEXES_PATH));
+      settings.setGenomeStoragePath(properties.getProperty(KEY_GENOMES_PATH));
 
     } catch (IOException e) {
       e.printStackTrace();

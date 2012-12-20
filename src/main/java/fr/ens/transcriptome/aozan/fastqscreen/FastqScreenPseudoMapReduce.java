@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -57,7 +58,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   private Pattern pattern = Pattern.compile("\t");
 
   /**
-   * 
    * @param fastqRead
    * @param listGenomes
    * @param properties
@@ -65,8 +65,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @throws BadBioEntryException
    */
   public void doMap(File fastqRead, List<String> listGenomes,
-      Map<String, String> properties) throws AozanException,
-      BadBioEntryException {
+      Properties properties) throws AozanException, BadBioEntryException {
 
     this.doMap(fastqRead, null, listGenomes, properties);
   }
@@ -80,12 +79,11 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @throws BadBioEntryException
    */
   public void doMap(File fastqRead1, File fastqRead2, List<String> listGenomes,
-      Map<String, String> properties) throws AozanException,
-      BadBioEntryException {
+      Properties properties) throws AozanException, BadBioEntryException {
 
     final int mapperThreads =
-        Integer.parseInt(properties.get(KEY_NUMBER_THREAD));
-    final String tmpDir = properties.get(KEY_TMP_DIR);
+        Integer.parseInt(properties.getProperty(KEY_NUMBER_THREAD));
+    final String tmpDir = properties.getProperty(KEY_TMP_DIR);
     final boolean pairEnd = fastqRead2 == null ? false : true;
 
     // Mapper change arguments and ignore default arguments
@@ -148,7 +146,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   } // doMap
 
   /**
-   * 
    * @param bowtie
    * @param genomeDataFile
    * @param tmpDir
@@ -185,7 +182,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   }
 
   /**
-   * 
    * @param genomeFile
    * @return
    * @throws BadBioEntryException
@@ -277,7 +273,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   } // reduce
 
   /**
-   * Called by the reduce method for each read mapped and filled intermediate table
+   * Called by the reduce method for each read mapped and filled intermediate
+   * table
    * @param genome
    * @param oneHit
    * @param oneGenome
@@ -313,10 +310,10 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       tab = valueHitsPerGenome.get(genome);
       tab[MUTILPLE_HITS_MULTIPLE_LIBRARIES] += 1.0;
     }
-  }// countHitPerGenome
+  }
 
   /**
-   * update list genomeReference : create a new entry for the new reference
+   * Update list genomeReference : create a new entry for the new reference
    * genome
    */
   public void setGenomeReference(final String genome) {
@@ -325,7 +322,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   }
 
   /**
-   * compute percent for each count of hits per reference genome without
+   * Compute percent for each count of hits per reference genome without
    * rounding
    * @return FastqScreenResult result of FastqScreen
    */
@@ -338,11 +335,11 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       return null;
 
     for (Map.Entry<String, double[]> e : valueHitsPerGenome.entrySet()) {
-      double unmapped = 100.f;
+      double unmapped = 100.0;
       double[] tab = e.getValue();
 
       for (int i = 1; i < tab.length; i++) {
-        double n = tab[i] * 100.f / readsprocessed;
+        double n = tab[i] * 100.0 / readsprocessed;
         tab[i] = n;
         unmapped -= n;
 
@@ -352,7 +349,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     return new FastqScreenResult(valueHitsPerGenome, readsMapped,
         readsprocessed);
   }
-
+  
   //
   // Constructor
   //

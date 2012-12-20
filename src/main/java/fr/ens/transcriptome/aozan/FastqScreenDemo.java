@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import com.google.common.collect.Maps;
@@ -27,7 +28,8 @@ public class FastqScreenDemo {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
-  public static final Map<String, String> properties = Maps.newLinkedHashMap();
+  public static final Properties properties = new Properties();
+
   public static final String RESOURCE_ROOT =
       "/home/sperrin/Documents/FastqScreenTest/resources";
   public static final String SRC_RUN =
@@ -92,29 +94,21 @@ public class FastqScreenDemo {
       // TODO test method
       // print completed rundata with results of fastqscreen
       FileWriter fw =
-          new FileWriter(new File(fastqDir + "/RunDataCompleted_" + runId +".txt"));
+          new FileWriter(new File(fastqDir
+              + "/RunDataCompleted_" + runId + ".txt"));
       BufferedWriter bw = new BufferedWriter(fw);
       bw.write(data.toString());
       bw.close();
     } catch (IOException io) {
       System.out.println(io.getMessage());
     }
-    
+
     final long endTime = System.currentTimeMillis();
-    LOGGER.info("Runtime for demo with a run "+runId+ " "
-        + toTimeHumanReadable(endTime - startTime));
+    LOGGER.info("Runtime for demo with a run "
+        + runId + " " + toTimeHumanReadable(endTime - startTime));
 
-    System.out.println("Runtime for demo with a run "+runId+ " "
-        + toTimeHumanReadable(endTime - startTime));
-  }
-
-  /**
-   * 
-   */
-  public static void printProperties() {
-    for (Map.Entry<String, String> e : properties.entrySet()) {
-      System.out.println("key " + e.getKey() + "  value " + e.getValue());
-    }
+    System.out.println("Runtime for demo with a run "
+        + runId + " " + toTimeHumanReadable(endTime - startTime));
   }
 
 }

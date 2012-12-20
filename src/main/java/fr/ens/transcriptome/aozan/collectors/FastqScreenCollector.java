@@ -66,23 +66,19 @@ public class FastqScreenCollector implements Collector {
   @Override
   public void configure(final Properties properties) {
 
-  }
-
-  public void configure(final Map<String, String> properties) {
-
     this.fastqscreen = new FastqScreen(properties);
 
-    String tmpDir = properties.get(KEY_TMP_DIR);
+    String tmpDir = properties.getProperty(KEY_TMP_DIR);
     this.fastqStorage = FastqStorage.getFastqStorage(tmpDir);
 
     System.out.println("In properties, the tmp directory is "
         + properties.get(KEY_TMP_DIR) + " space free : "
         + (new File(tmpDir).getFreeSpace() / 1048576) + "Go");
 
-    pathDirTest = properties.get(KEY_FASTQ_DIR);
+    pathDirTest = properties.getProperty(KEY_FASTQ_DIR);
     final Splitter s = Splitter.on(',').trimResults().omitEmptyStrings();
 
-    for (String genome : s.split(properties.get(KEY_GENOMES))) {
+    for (String genome : s.split(properties.getProperty(KEY_GENOMES))) {
       this.listGenomes.add(genome);
     }
   }
