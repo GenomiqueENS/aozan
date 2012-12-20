@@ -6,27 +6,39 @@
 
 package fr.ens.transcriptome.aozan.fastqscreen;
 
+import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.eoulsan.EoulsanException;
+import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
+import fr.ens.transcriptome.eoulsan.EoulsanRuntimeDebug;
 import fr.ens.transcriptome.eoulsan.Globals;
+import fr.ens.transcriptome.eoulsan.Settings;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 
 public class FastqScreen {
 
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+
   protected static final String COUNTER_GROUP = "fastqscreen";
   private static final String KEY_TMP_DIR = "tmp.dir";
+  private static final String KEY_GENOMES_DESC_PATH =
+      "conf.settings.genomes.desc.path";
+  private static final String KEY_MAPPERS_INDEXES_PATH =
+      "conf.settings.mappers.indexes.path";
+  private static final String KEY_GENOMES_PATH = "conf.settings.genomes";
 
-  private Map<String, String> properties;
-  private final static long startTime = System.currentTimeMillis();
+  private Properties properties;
 
   /**
    * mode pair-end : execute fastqscreen calcul
@@ -36,11 +48,11 @@ public class FastqScreen {
    * @return FastqScreenResult object contains results for each reference genome
    * @throws AozanException
    */
-  public FastqScreenResult execute(File fastqRead,
-      List<String> listGenomes) throws AozanException {
-   
+  public FastqScreenResult execute(final File fastqRead,
+      final List<String> listGenomes) throws AozanException {
+
     return this.execute(fastqRead, null, listGenomes);
-   
+
   }
 
   /**
@@ -50,10 +62,13 @@ public class FastqScreen {
    * @return FastqScreenResult object contains results for each reference genome
    * @throws AozanException
    */
-  public FastqScreenResult execute(File fastqRead1, File fastqRead2, List<String> listGenomes)
+  public FastqScreenResult execute(final File fastqRead1,
+      final File fastqRead2, final List<String> listGenomes)
       throws AozanException {
 
-    String tmpDir = properties.get(KEY_TMP_DIR);
+    final long startTime = System.currentTimeMillis();
+
+    String tmpDir = properties.getProperty(KEY_TMP_DIR);
     FastqScreenPseudoMapReduce pmr = new FastqScreenPseudoMapReduce();
     pmr.setMapReduceTemporaryDirectory(new File(tmpDir));
 
@@ -61,9 +76,9 @@ public class FastqScreen {
 
       if (fastqRead2 == null)
         pmr.doMap(fastqRead1, listGenomes, properties);
-      else 
+      else
         pmr.doMap(fastqRead1, fastqRead2, listGenomes, properties);
-        
+
       pmr.doReduce(new File(tmpDir + "/outputDoReduce.txt"));
 
     } catch (IOException e) {
@@ -77,9 +92,15 @@ public class FastqScreen {
     }
 
     final long endTime = System.currentTimeMillis();
+    LOGGER.info("Execute fastqscreen for genome "
+        + listGenomes.toString() + " in mode "
+        + (fastqRead2 == null ? "single" : "paired")
+        + toTimeHumanReadable(endTime - startTime));
 
-    System.out.println((endTime - startTime)
-        + " -- " + new SimpleDateFormat("h:m a").format(new Date()));
+    System.out.println("Execute fastqscreen for genome "
+        + listGenomes.toString() + " in mode "
+        + (fastqRead2 == null ? "single in " : "paired in ")
+        + toTimeHumanReadable(endTime - startTime));
 
     return pmr.getFastqScreenResult();
   }
@@ -90,9 +111,28 @@ public class FastqScreen {
 
   /**
    * @param properties properties defines in configuration of aozan
+   * @throws EoulsanException
+   * @throws IOException
    */
-  public FastqScreen(Map<String, String> properties) {
+  public FastqScreen(final Properties properties) {
     this.properties = properties;
-  }
 
+    try {
+      EoulsanRuntimeDebug.initDebugEoulsanRuntime();
+      Settings settings = EoulsanRuntime.getSettings();
+
+      settings.setGenomeDescStoragePath(properties
+          .getProperty(KEY_GENOMES_DESC_PATH));
+      settings.setGenomeMapperIndexStoragePath(properties
+          .getProperty(KEY_MAPPERS_INDEXES_PATH));
+      settings.setGenomeStoragePath(properties.getProperty(KEY_GENOMES_PATH));
+
+    } catch (IOException e) {
+      e.printStackTrace();
+
+    } catch (EoulsanException ee) {
+      ee.printStackTrace();
+    }
+
+  }
 }

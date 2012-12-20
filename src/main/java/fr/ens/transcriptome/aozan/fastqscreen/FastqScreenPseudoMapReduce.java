@@ -6,25 +6,31 @@
 
 package fr.ens.transcriptome.aozan.fastqscreen;
 
+import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.eoulsan.EoulsanException;
+import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
 import fr.ens.transcriptome.eoulsan.Globals;
+import fr.ens.transcriptome.eoulsan.Settings;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.eoulsan.bio.FastqFormat;
 import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
-import fr.ens.transcriptome.eoulsan.bio.readsmappers.AbstractBowtieReadsMapper;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.BowtieReadsMapper;
+import fr.ens.transcriptome.eoulsan.bio.readsmappers.SequenceReadsMapper;
 import fr.ens.transcriptome.eoulsan.data.DataFile;
-import fr.ens.transcriptome.eoulsan.steps.generators.GenomeDescriptionCreator;
+import fr.ens.transcriptome.eoulsan.data.storages.GenomeDescStorage;
+import fr.ens.transcriptome.eoulsan.data.storages.SimpleGenomeDescStorage;
 import fr.ens.transcriptome.eoulsan.steps.generators.GenomeMapperIndexer;
 import fr.ens.transcriptome.eoulsan.util.PseudoMapReduce;
 import fr.ens.transcriptome.eoulsan.util.Reporter;
@@ -34,29 +40,33 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+
   protected static final String COUNTER_GROUP = "reads_mapping";
-  private final int NB_STAT_VALUES = 5;
+  private static final int NB_STAT_VALUES = 5;
   private static final String KEY_NUMBER_THREAD = "qc.conf.fastqscreen.threads";
   private static final String KEY_TMP_DIR = "tmp.dir";
-  
 
-  private final AbstractBowtieReadsMapper bowtie;
+  private final SequenceReadsMapper bowtie;
   private final Reporter reporter;
+  private GenomeDescStorage storage;
 
-  private Map<String, float[]> valueHitsPerGenome =
-      new HashMap<String, float[]>();
+  private Map<String, double[]> valueHitsPerGenome;
   private int readsprocessed = 0;
   private int readsMapped = 0;
   private String genomeReference;
   private boolean succesMapping = false;
   private Pattern pattern = Pattern.compile("\t");
 
-  
-  
+  /**
+   * @param fastqRead
+   * @param listGenomes
+   * @param properties
+   * @throws AozanException
+   * @throws BadBioEntryException
+   */
   public void doMap(File fastqRead, List<String> listGenomes,
-      Map<String, String> properties) throws AozanException,
-      BadBioEntryException {
-    
+      Properties properties) throws AozanException, BadBioEntryException {
+
     this.doMap(fastqRead, null, listGenomes, properties);
   }
 
@@ -68,19 +78,18 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @throws EoulsanException
    * @throws BadBioEntryException
    */
-  public void doMap(File fastqRead1,File fastqRead2, List<String> listGenomes,
-      Map<String, String> properties) throws AozanException,
-      BadBioEntryException {
+  public void doMap(File fastqRead1, File fastqRead2, List<String> listGenomes,
+      Properties properties) throws AozanException, BadBioEntryException {
 
     final int mapperThreads =
-        Integer.parseInt(properties.get(KEY_NUMBER_THREAD));
-    final String tmpDir = properties.get(KEY_TMP_DIR);
+        Integer.parseInt(properties.getProperty(KEY_NUMBER_THREAD));
+    final String tmpDir = properties.getProperty(KEY_TMP_DIR);
     final boolean pairEnd = fastqRead2 == null ? false : true;
-    
-    // Mapper change defaults arguments
-    // seed use by bowtie already define to 40
-    final String newArgumentsMapper = bowtie.getDefaultArguments()+" -l 40 --chunkmbs 512" + (pairEnd ? " --maxins 1000" : "");
-    
+
+    // Mapper change arguments and ignore default arguments
+    // Option -l 40 : seed use by bowtie already define to 40
+    final String newArgumentsMapper =
+        " -l 40 --chunkmbs 512" + (pairEnd ? " --maxins 1000" : "");
 
     for (String genome : listGenomes) {
 
@@ -90,58 +99,115 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         // test if index Genome reference exists
         File archiveIndexFile = createIndex(bowtie, genomeFile, tmpDir);
 
+        final long startTime = System.currentTimeMillis();
+
         FastsqScreenSAMParser parser =
-            new FastsqScreenSAMParser(this.getMapOutputTempFile(), genome, pairEnd);
+            new FastsqScreenSAMParser(this.getMapOutputTempFile(), genome,
+                pairEnd);
         this.setGenomeReference(genome);
 
         final File indexDir =
             new File(StringUtils.filenameWithoutExtension(archiveIndexFile
                 .getPath()));
-        
+
         bowtie.setMapperArguments("");
-        
+
         bowtie.init(pairEnd, FastqFormat.FASTQ_SANGER, archiveIndexFile,
             indexDir, reporter, COUNTER_GROUP);
         bowtie.setMapperArguments(newArgumentsMapper);
         bowtie.setThreadsNumber(mapperThreads);
-        
-        if (fastqRead2 == null){
+
+        if (fastqRead2 == null) {
           // mode single-end
-          bowtie.map(fastqRead1, parser);          
+          bowtie.map(fastqRead1, parser);
         } else {
           // mode pair-end
           bowtie.map(fastqRead1, fastqRead2, parser);
         }
+
         this.readsprocessed = parser.getReadsprocessed();
         succesMapping = (readsprocessed > 0);
 
         parser.closeMapOutpoutFile();
 
+        final long endTime = System.currentTimeMillis();
+        LOGGER.info("Mapping with genome "
+            + genome + "  in " + toTimeHumanReadable(endTime - startTime));
+
+        System.out.println("Mapping with genome "
+            + genome + "  in " + toTimeHumanReadable(endTime - startTime)
+            + "\n");
+
       } catch (IOException e) {
         e.printStackTrace();
         throw new AozanException(e.getMessage());
       }
-
     } // for
   } // doMap
 
-  private File createIndex(AbstractBowtieReadsMapper bowtie,
-      DataFile genomeDataFile, String tmpDir) throws BadBioEntryException, IOException {
+  /**
+   * @param bowtie
+   * @param genomeDataFile
+   * @param tmpDir
+   * @return
+   * @throws BadBioEntryException
+   * @throws IOException
+   */
+  private File createIndex(final SequenceReadsMapper bowtie,
+      final DataFile genomeDataFile, final String tmpDir)
+      throws BadBioEntryException, IOException {
+
+    final long startTime = System.currentTimeMillis();
 
     final DataFile result =
-        new DataFile(tmpDir + "/aozan-bowtie-index-"
-            + genomeDataFile.getName() + ".zip");
+        new DataFile(tmpDir
+            + "/aozan-bowtie-index-" + genomeDataFile.getName() + ".zip");
 
     // Create genome description
-    GenomeDescriptionCreator descCreator = new GenomeDescriptionCreator();
-
-    GenomeDescription desc =
-        descCreator.createGenomeDescription(genomeDataFile);
+    GenomeDescription desc = createGenomeDescription(genomeDataFile);
 
     GenomeMapperIndexer indexer = new GenomeMapperIndexer(bowtie);
     indexer.createIndex(genomeDataFile, desc, result);
 
+    final long endTime = System.currentTimeMillis();
+    LOGGER.info("Get back index for "
+        + genomeDataFile.getName() + " in "
+        + toTimeHumanReadable(endTime - startTime));
+
+    System.out.println("Get back index for "
+        + genomeDataFile.getName() + " in "
+        + toTimeHumanReadable(endTime - startTime));
+
     return result.toFile();
+  }
+
+  /**
+   * @param genomeFile
+   * @return
+   * @throws BadBioEntryException
+   * @throws IOException
+   */
+  private GenomeDescription createGenomeDescription(final DataFile genomeFile)
+      throws BadBioEntryException, IOException {
+
+    GenomeDescription desc = null;
+
+    if (storage != null) {
+      desc = storage.get(genomeFile);
+    }
+
+    if (desc == null) {
+
+      // Compute the genome description
+      desc =
+          GenomeDescription.createGenomeDescFromFasta(genomeFile.open(),
+              genomeFile.getName());
+
+      if (storage != null)
+        storage.put(genomeFile, desc);
+    }
+
+    return desc;
   }
 
   @Override
@@ -183,7 +249,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @param reporter reporter
    * @throws IOException if an error occurs while executing the reducer
    */
-  public void reduce(final String key, Iterator<String> values,
+  public void reduce(final String key, final Iterator<String> values,
       final List<String> output, final Reporter reporter) throws IOException {
 
     boolean oneHit = true;
@@ -207,12 +273,14 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   } // reduce
 
   /**
-   * Called by method reduce for each read mapped and filled intermediate table
+   * Called by the reduce method for each read mapped and filled intermediate
+   * table
    * @param genome
    * @param oneHit
    * @param oneGenome
    */
-  void countHitPerGenome(String genome, boolean oneHit, boolean oneGenome) {
+  void countHitPerGenome(final String genome, final boolean oneHit,
+      final boolean oneGenome) {
     // indices for table tabHitsPerLibraries
     // position 0 of the table for UNMAPPED ;
 
@@ -220,7 +288,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     final int MULTIPLE_HITS_ONE_LIBRARY = 2;
     final int ONE_HIT_MULTIPLE_LIBRARIES = 3;
     final int MUTILPLE_HITS_MULTIPLE_LIBRARIES = 4;
-    float[] tab;
+    double[] tab;
+
     // genome must be contained in map
     if (!(valueHitsPerGenome.containsKey(genome)))
       return;
@@ -241,19 +310,19 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       tab = valueHitsPerGenome.get(genome);
       tab[MUTILPLE_HITS_MULTIPLE_LIBRARIES] += 1.0;
     }
-  }// countHitPerGenome
-
-  /**
-   * update list genomeReference : create a new entry for the new reference
-   * genome
-   */
-  public void setGenomeReference(String genome) {
-    this.genomeReference = genome;
-    valueHitsPerGenome.put(genome, new float[NB_STAT_VALUES]);
   }
 
   /**
-   * compute percent for each count of hits per reference genome without
+   * Update list genomeReference : create a new entry for the new reference
+   * genome
+   */
+  public void setGenomeReference(final String genome) {
+    this.genomeReference = genome;
+    valueHitsPerGenome.put(genome, new double[NB_STAT_VALUES]);
+  }
+
+  /**
+   * Compute percent for each count of hits per reference genome without
    * rounding
    * @return FastqScreenResult result of FastqScreen
    */
@@ -265,12 +334,12 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     if (readsMapped > readsprocessed)
       return null;
 
-    for (Map.Entry<String, float[]> e : valueHitsPerGenome.entrySet()) {
-      float unmapped = 100.f;
-      float[] tab = e.getValue();
+    for (Map.Entry<String, double[]> e : valueHitsPerGenome.entrySet()) {
+      double unmapped = 100.0;
+      double[] tab = e.getValue();
 
       for (int i = 1; i < tab.length; i++) {
-        float n = tab[i] * 100.f / readsprocessed;
+        double n = tab[i] * 100.0 / readsprocessed;
         tab[i] = n;
         unmapped -= n;
 
@@ -280,13 +349,24 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     return new FastqScreenResult(valueHitsPerGenome, readsMapped,
         readsprocessed);
   }
-
+  
   //
-  // CONSTRUCTOR
+  // Constructor
   //
 
   public FastqScreenPseudoMapReduce() {
     this.bowtie = new BowtieReadsMapper();
     this.reporter = new Reporter();
+
+    Settings settings = EoulsanRuntime.getSettings();
+    DataFile genomeDescStoragePath =
+        new DataFile(settings.getGenomeDescStoragePath());
+
+    if (genomeDescStoragePath != null)
+      this.storage = SimpleGenomeDescStorage.getInstance(genomeDescStoragePath);
+
+    this.valueHitsPerGenome = new HashMap<String, double[]>();
+
   }
+
 }
