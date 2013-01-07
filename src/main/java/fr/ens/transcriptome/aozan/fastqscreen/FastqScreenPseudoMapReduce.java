@@ -1,7 +1,25 @@
-/*                  Aozan development code 
- * 
- * 
- * 
+/*
+ *                  Aozan development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU Lesser General Public License version 3 or
+ * later and CeCILL. This should be distributed with the code.
+ * If you do not have a copy, see:
+ *
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+ *
+ * Copyright for this code is held jointly by the Genomic platform
+ * of the Institut de Biologie de l'École Normale Supérieure and
+ * the individual authors. These should be listed in @author doc
+ * comments.
+ *
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page
+ * at:
+ *
+ *      http://www.transcriptome.ens.fr/aozan
+ *
  */
 
 package fr.ens.transcriptome.aozan.fastqscreen;
@@ -36,6 +54,9 @@ import fr.ens.transcriptome.eoulsan.util.PseudoMapReduce;
 import fr.ens.transcriptome.eoulsan.util.Reporter;
 import fr.ens.transcriptome.eoulsan.util.StringUtils;
 
+/**
+ * @author sperrin
+ */
 public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
   /** Logger */
@@ -49,13 +70,12 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   private final SequenceReadsMapper bowtie;
   private final Reporter reporter;
   private GenomeDescStorage storage;
+  private Pattern pattern = Pattern.compile("\t");
 
-  private Map<String, double[]> valueHitsPerGenome;
+  private FastqScreenResult fastqScreenResult;
   private int readsprocessed = 0;
   private int readsMapped = 0;
   private String genomeReference;
-  private boolean succesMapping = false;
-  private Pattern pattern = Pattern.compile("\t");
 
   /**
    * @param fastqRead
@@ -126,9 +146,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         }
 
         this.readsprocessed = parser.getReadsprocessed();
-        succesMapping = (readsprocessed > 0);
 
-        parser.closeMapOutpoutFile();
+        parser.closeMapOutputFile();
 
         final long endTime = System.currentTimeMillis();
         LOGGER.info("Mapping with genome "
@@ -197,7 +216,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     }
 
     if (desc == null) {
-
       // Compute the genome description
       desc =
           GenomeDescription.createGenomeDescFromFasta(genomeFile.open(),
@@ -225,7 +243,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     if (value == null || value.length() == 0 || value.charAt(0) == '@')
       return;
 
-    succesMapping = true;
     String[] tokens = pattern.split(value, 3);
     String nameRead = null;
 
@@ -237,7 +254,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       return;
     output.add(nameRead + "\t" + genomeReference);
 
-  }// map
+  }
 
   /**
    * Reducer Receive for each read list mapped genome Values first character
@@ -265,51 +282,12 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       oneHit = s.charAt(0) == '1' ? true : false;
       nextGenome = s.substring(1);
 
-      this.countHitPerGenome(nextGenome, oneHit, oneGenome);
+      fastqScreenResult.countHitPerGenome(nextGenome, oneHit, oneGenome);
+
       oneGenome = !nextGenome.equals(currentGenome);
       currentGenome = nextGenome;
-    }// while
-
-  } // reduce
-
-  /**
-   * Called by the reduce method for each read mapped and filled intermediate
-   * table
-   * @param genome
-   * @param oneHit
-   * @param oneGenome
-   */
-  void countHitPerGenome(final String genome, final boolean oneHit,
-      final boolean oneGenome) {
-    // indices for table tabHitsPerLibraries
-    // position 0 of the table for UNMAPPED ;
-
-    final int ONE_HIT_ONE_LIBRARY = 1;
-    final int MULTIPLE_HITS_ONE_LIBRARY = 2;
-    final int ONE_HIT_MULTIPLE_LIBRARIES = 3;
-    final int MUTILPLE_HITS_MULTIPLE_LIBRARIES = 4;
-    double[] tab;
-
-    // genome must be contained in map
-    if (!(valueHitsPerGenome.containsKey(genome)))
-      return;
-
-    if (oneHit && oneGenome) {
-      tab = valueHitsPerGenome.get(genome);
-      tab[ONE_HIT_ONE_LIBRARY] += 1.0;
-
-    } else if (!oneHit && oneGenome) {
-      tab = valueHitsPerGenome.get(genome);
-      tab[MULTIPLE_HITS_ONE_LIBRARY] += 1.0;
-
-    } else if (oneHit && !oneGenome) {
-      tab = valueHitsPerGenome.get(genome);
-      tab[ONE_HIT_MULTIPLE_LIBRARIES] += 1.0;
-
-    } else if (!oneHit && !oneGenome) {
-      tab = valueHitsPerGenome.get(genome);
-      tab[MUTILPLE_HITS_MULTIPLE_LIBRARIES] += 1.0;
     }
+
   }
 
   /**
@@ -318,7 +296,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    */
   public void setGenomeReference(final String genome) {
     this.genomeReference = genome;
-    valueHitsPerGenome.put(genome, new double[NB_STAT_VALUES]);
+    fastqScreenResult.addGenome(genome);
   }
 
   /**
@@ -326,7 +304,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * rounding
    * @return FastqScreenResult result of FastqScreen
    */
-  public FastqScreenResult getFastqScreenResult() {
+  public FastqScreenResult getFastqScreenResult() throws AozanException {
 
     System.out.println("nb read mapped "
         + readsMapped + " / nb read " + readsprocessed);
@@ -334,26 +312,18 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     if (readsMapped > readsprocessed)
       return null;
 
-    for (Map.Entry<String, double[]> e : valueHitsPerGenome.entrySet()) {
-      double unmapped = 100.0;
-      double[] tab = e.getValue();
+    fastqScreenResult.countPercentValue(readsMapped, readsprocessed);
 
-      for (int i = 1; i < tab.length; i++) {
-        double n = tab[i] * 100.0 / readsprocessed;
-        tab[i] = n;
-        unmapped -= n;
-
-      }
-      tab[0] = unmapped;
-    }
-    return new FastqScreenResult(valueHitsPerGenome, readsMapped,
-        readsprocessed);
+    return fastqScreenResult;
   }
-  
+
   //
   // Constructor
   //
 
+  /**
+   * Public construction which declare the bowtie mapper used
+   */
   public FastqScreenPseudoMapReduce() {
     this.bowtie = new BowtieReadsMapper();
     this.reporter = new Reporter();
@@ -365,8 +335,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     if (genomeDescStoragePath != null)
       this.storage = SimpleGenomeDescStorage.getInstance(genomeDescStoragePath);
 
-    this.valueHitsPerGenome = new HashMap<String, double[]>();
-
+    this.fastqScreenResult = new FastqScreenResult();
   }
 
 }

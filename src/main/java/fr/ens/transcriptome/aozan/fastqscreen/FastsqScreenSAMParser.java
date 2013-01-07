@@ -1,7 +1,24 @@
-/*                  Aozan development code 
- * 
- * 
- * 
+/*
+ *                  Aozan development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU General Public License version 3 or later 
+ * and CeCILL. This should be distributed with the code. If you 
+ * do not have a copy, see:
+ *
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+ *
+ * Copyright for this code is held jointly by the Genomic platform
+ * of the Institut de Biologie de l'École Normale Supérieure and
+ * the individual authors. These should be listed in @author doc
+ * comments.
+ *
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page at:
+ *
+ *      http://www.transcriptome.ens.fr/aozan
+ *
  */
 
 package fr.ens.transcriptome.aozan.fastqscreen;
@@ -53,7 +70,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
 
   @Override
   /**
-   * call for each line of SAM file. Method create a new file, it contains a
+   * Call for each line of SAM file. Method create a new file, it contains a
    * line for each read mapped with her name and mapping data : first character
    * represent the number of hits for a read : 1 or 2 (for several hits) and the
    * end represent the name of reference genome
@@ -111,7 +128,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
   }
 
   /**
-   * parse a SAM file and create a new file, it contains a line for each read
+   * Parse a SAM file and create a new file, it contains a line for each read
    * mapped with her name and mapping data : first character represent the
    * number of hits for a read : 1 or 2 (for several hits) and the end represent
    * the name of reference genome
@@ -135,23 +152,33 @@ public class FastsqScreenSAMParser implements SAMParserLine {
     return this.mapOutputFile;
   }
 
-  public void closeMapOutpoutFile() {
+  /**
+   * Write last record and close file mapOutputFile
+   */
+  public void closeMapOutputFile() {
     // processing read buffer - end of input stream bowtie execution
     try {
       List<SAMRecord> records = buffer.getFilteredAlignments();
       if (records.size() != 0) {
         String nameRead = records.get(0).getReadName();
 
+        int nbHits;
+        // mode paired : records contains an event number of reads
+        if (paired)
+          nbHits = records.size() == 2 ? 1 : 2;
+        else
+          nbHits = records.size() == 1 ? 1 : 2;
+        
         // write in SAMmapOutputFile
         if (nameRead != null) {
-          fw.write(nameRead + "\t" + genome);
+          fw.write(nameRead + "\t" + nbHits + genome);
           fw.write("\n");
         }
       }
       fw.close();
 
     } catch (IOException io) {
-      io.printStackTrace();
+      
     }
   }
 
@@ -177,7 +204,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
   //
 
   /**
-   * initialize FastqScreenSAMParser : create the mapOutputFile and the list
+   * Initialize FastqScreenSAMParser : create the mapOutputFile and the list
    * filters used for parsing SAM file
    * @param MapOutputFile
    * @param genome
