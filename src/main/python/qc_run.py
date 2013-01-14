@@ -105,8 +105,8 @@ def qc(run_id, conf):
     except AozanException, exp:
         error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
         return False
-    except Throwable, exp:
-        error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + exp.getMessage() + '\n' 
+    except Throwable, exp:  
+        error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + str(exp.getMessage()) + '\n' 
               + StringUtils.join(exp.getStackTrace(), '\n\t'), conf)
         return False
 
@@ -126,7 +126,7 @@ def qc(run_id, conf):
             error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
             return False
         except Throwable, exp:
-            error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + exp.getMessage() + '\n' 
+            error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + str(exp.getMessage()) + '\n' 
                   + StringUtils.join(exp.getStackTrace(), '\n\t'), conf)
             return False
 
@@ -141,7 +141,7 @@ def qc(run_id, conf):
         error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
         return False
     except Throwable, exp:
-        error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + exp.getMessage() + '\n' 
+        error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + str(exp.getMessage()) + '\n' 
               + StringUtils.join(exp.getStackTrace(), '\n\t'), conf)
         return False
 
