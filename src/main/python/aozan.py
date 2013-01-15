@@ -12,6 +12,7 @@ from java.util import Locale
 import first_base_report
 from java.util import LinkedHashMap
 from fr.ens.transcriptome.aozan import Globals
+from fr.ens.transcriptome.aozan import Main
 
 
 def create_lock_file(lock_file_path):
@@ -192,8 +193,8 @@ def aozan_main(conf_file_path):
     # Set the default value in the configuration object
     common.set_default_conf(conf)
 
-    # Use default (C) locale
-    Locale.setDefault(Locale.US)
+    # Use default (US) locale
+    Locale.setDefault(Globals.DEFAULT_LOCALE)
 
     # Load Aozan conf file
     common.load_conf(conf, conf_file_path)
@@ -201,6 +202,9 @@ def aozan_main(conf_file_path):
     # End of Aozan if aozan is not enable
     if conf['aozan.enable'].lower().strip() == 'false':
         sys.exit(0)
+
+    # Init logger
+    Main.initLogger(conf['aozan.var.path'] + '/aozan.log')
 
     # Check critical free space available
     hiseq_run.send_mail_if_critical_free_space_available(conf)
