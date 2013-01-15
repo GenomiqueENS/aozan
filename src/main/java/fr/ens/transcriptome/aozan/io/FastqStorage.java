@@ -22,7 +22,7 @@ import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFactory;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFile;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFormatException;
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.eoulsan.Globals;
+import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
@@ -37,26 +37,26 @@ public final class FastqStorage {
   private static String tmpDir = null;
 
   /**
-   * 
    * @param fastqFiles
    * @return SequenceFile
    * @throws AozanException fail create sequence file
    */
-  public SequenceFile getFastqSequenceFile(final File[] fastqFiles) throws AozanException {
+  public SequenceFile getFastqSequenceFile(final File[] fastqFiles)
+      throws AozanException {
 
     if (fastqFiles.length == 0) {
       LOGGER.warning("List fastq file to uncompress and compile is empty");
       return null;
     }
 
-    SequenceFile sequenceFile = null; 
+    SequenceFile sequenceFile = null;
     try {
       sequenceFile = SequenceFactory.getSequenceFile(fastqFiles);
 
     } catch (SequenceFormatException sfe) {
       sfe.printStackTrace();
       throw new AozanException(sfe.getMessage());
-      
+
     } catch (IOException ioe) {
       ioe.printStackTrace();
       throw new AozanException(ioe.getMessage());
@@ -70,7 +70,6 @@ public final class FastqStorage {
   }
 
   /**
-   * 
    * @param fastqFiles
    * @return file compile all files of the list, compressed or none
    * @throws AozanException
@@ -119,10 +118,7 @@ public final class FastqStorage {
     setFastqFiles.put(key, tmpFastqFile);
 
     final long endTime = System.currentTimeMillis();
-    LOGGER.info("Create uncompressed for fastq File"
-        + key + " in " + toTimeHumanReadable(endTime - startTime));
-
-    System.out.println("Create uncompressed for fastq File "
+    LOGGER.info("Create uncompressed for fastq File "
         + key + " in " + toTimeHumanReadable(endTime - startTime));
 
     return tmpFastqFile;
@@ -174,26 +170,27 @@ public final class FastqStorage {
   }
 
   /**
-   * Remove specific of pair of temporaries files  
+   * Remove specific of pair of temporaries files
    * @param file1
    * @param file2
    */
   public void removeTemporaryFastq(final File file1, final File file2) {
     removeTemporaryFastq(file1);
-    
+
     if (file2 != null)
       removeTemporaryFastq(file2);
   }
-  
+
   /**
-   * Remove specific of pair of temporaries sequence files  
+   * Remove specific of pair of temporaries sequence files
    * @param seqFile1
    * @param seqFile2
    */
-  public void removeTemporaryFastq(final SequenceFile seqFile1, final SequenceFile seqFile2) {
+  public void removeTemporaryFastq(final SequenceFile seqFile1,
+      final SequenceFile seqFile2) {
     removeTemporaryFastq(seqFile1.getFile(), seqFile2.getFile());
   }
-  
+
   /**
    * Delete all temporaries files if exist
    * @throws IOException
