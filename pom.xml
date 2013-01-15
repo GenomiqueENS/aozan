@@ -57,10 +57,16 @@
     </dependency>
     <dependency>
 		<groupId>org.apache.commons</groupId>
-			<artifactId>commons-compress</artifactId>
-			<version>1.4.1</version>
-			<scope>compile</scope>
-		</dependency>
+		<artifactId>commons-compress</artifactId>
+		<version>1.4.1</version>
+		<scope>compile</scope>
+	</dependency>
+	<dependency>
+		<groupId>net.sourceforge.picard</groupId>
+		<artifactId>sam</artifactId>
+		<version>1.76</version>
+		<scope>compile</scope>
+	</dependency>
   </dependencies>
   
   <repositories>
@@ -327,6 +333,14 @@
 					<overWrite>true</overWrite>
 					<outputDirectory>${basedir}/target/dist/lib</outputDirectory>
 					<destFileName>common-compress.jar</destFileName>
+				</artifactItem>
+				<artifactItem>
+					<groupId>net.sourceforge.picard</groupId>
+					<artifactId>sam</artifactId>
+					<version>1.76</version>
+					<overWrite>true</overWrite>
+					<outputDirectory>${basedir}/target/dist/lib</outputDirectory>
+					<destFileName>sam.jar</destFileName>
 				</artifactItem>
               </artifactItems>
             </configuration>
