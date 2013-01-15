@@ -1,0 +1,40 @@
+/*                  Aozan development code 
+ * 
+ * 
+ * 
+ */
+
+package fr.ens.transcriptome.aozan.tests;
+
+import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
+
+public class HitNoLibrariesFastqScreenSampleTest extends
+    AbstractSimpleSampleTest {
+
+  @Override
+  public String[] getCollectorsNamesRequiered() {
+    return new String[] {FastqScreenCollector.COLLECTOR_NAME};
+  }
+
+  @Override
+  protected String getKey(int read, int readSample, int lane, String sampleName) {
+
+    return "fastqscreen.lane"
+        + lane + ".sample." + sampleName + ".read" + read + "." + sampleName
+        + ".hitnolibraries";
+  }
+
+  @Override
+  protected boolean isValuePercent() {
+    return true;
+  }
+
+  @Override
+  protected Class<?> getValueType() {
+    return null; // Double.class;
+  }
+
+  public HitNoLibrariesFastqScreenSampleTest() {
+    super("hitnolibraries", "", "fastqScreen bilan", "%");
+  }
+}
