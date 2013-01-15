@@ -27,19 +27,18 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import com.google.common.math.DoubleMath;
+import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
 
 public class FastqScreenResult {
+
+  /** Logger */
+  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
   private static final String FINAL_LINE_RUNDATA = "hitnolibraries";
   private static final String FINAL_TEXT = "Hit_no_libraries";
@@ -70,20 +69,19 @@ public class FastqScreenResult {
     }
 
     double percentHitNoLibrariesRounding =
-        DoubleMath.roundToInt((this.percentHitNoLibraries * 100.0),
-            RoundingMode.HALF_DOWN) / 100.0;
+        DataPerGenome.roundDouble(this.percentHitNoLibraries);
     s.append("\n% Hit_no_libraries : " + percentHitNoLibrariesRounding + "\n");
 
     return s.toString();
   }
 
   /**
-   * @param outputFilePath
+   * @param filePath
    * @return
    */
-  public File createFileResultFastqScreen(final String outputFilePath) {
+  public File createFileResultFastqScreen(final String filePath) {
 
-    String result = outputFilePath + "_screen.txt";
+    String result = filePath + "/fastqscreen.txt";
     try {
       FileWriter fr = new FileWriter(result);
       BufferedWriter br = new BufferedWriter(fr);
@@ -141,9 +139,6 @@ public class FastqScreenResult {
 
     // print last line of report FastqScreen
     data.put(prefix + "." + FINAL_LINE_RUNDATA, this.percentHitNoLibraries);
-    // TODO to remove
-    System.out.println("add in runData \t"
-        + prefix + "." + FINAL_LINE_RUNDATA + "=" + percentHitNoLibraries);
   }
 
   //
@@ -158,7 +153,7 @@ public class FastqScreenResult {
   // Internal class
   //
 
-  public class DataPerGenome {
+  public static class DataPerGenome {
 
     private String genome;
 
@@ -244,8 +239,8 @@ public class FastqScreenResult {
      * @param n
      * @return
      */
-    private double roundDouble(double n) {
-      return DoubleMath.roundToInt((n * 100.0), RoundingMode.HALF_DOWN) / 100.0;
+    private static double roundDouble(double n) {
+      return ((int) (n * 100.0)) / 100.0;
     }
 
     /**
@@ -257,7 +252,7 @@ public class FastqScreenResult {
       data.put(prefix + "." + genome + "." + unMappedLegend + ".percent",
           this.unMappedPercent);
       data.put(prefix
-          + "." + genome + "." + oneHitOneLibraryPercent + ".percent",
+          + "." + genome + "." + oneHitOneLibraryLegend + ".percent",
           this.oneHitOneLibraryPercent);
       data.put(prefix
           + "." + genome + "." + multipleHitsOneLibraryLegend + ".percent",
@@ -269,24 +264,7 @@ public class FastqScreenResult {
           + "." + genome + "." + multipleHitsMultipleLibrariesLegend
           + ".percent", this.multipleHitsMultipleLibrariesPercent);
 
-      // TODO remove print
-      System.out.println("add in runData \t"
-          + prefix + genome + "." + unMappedLegend + ".percent" + "="
-          + this.unMappedPercent);
-      System.out.println("add in runData \t"
-          + prefix + genome + "." + oneHitOneLibraryLegend + ".percent" + "="
-          + this.oneHitOneLibraryPercent);
-      System.out.println("add in runData \t"
-          + prefix + genome + "." + multipleHitsOneLibraryLegend + ".percent"
-          + "=" + this.multipleHitsOneLibraryPercent);
-      System.out.println("add in runData \t"
-          + prefix + genome + "." + oneHitMultipleLibrariesLegend + ".percent"
-          + "=" + this.oneHitMultipleLibrariesPercent);
-      System.out.println("add in runData \t"
-          + prefix + genome + "." + multipleHitsMultipleLibrariesLegend
-          + ".percent" + "=" + this.multipleHitsMultipleLibrariesPercent);
-
-    }
+          }
 
     //
     // Constructor

@@ -31,13 +31,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import net.sf.samtools.SAMParser;
 import net.sf.samtools.SAMRecord;
 
 import com.google.common.collect.Lists;
 
-import fr.ens.transcriptome.eoulsan.Globals;
+import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.eoulsan.bio.SAMParserLine;
 import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.MultiReadAlignmentsFilter;
 import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.ReadAlignmentsFilter;
@@ -65,8 +66,8 @@ public class FastsqScreenSAMParser implements SAMParserLine {
   private final ReadAlignmentsFilter filter;
   private final ReadAlignmentsFilterBuffer buffer;
 
-  int count = 0;
-  private int readsprocessed = 1;
+  private int readsprocessed = 0;
+  private int readsmapped = 0;
 
   @Override
   /**
@@ -83,9 +84,9 @@ public class FastsqScreenSAMParser implements SAMParserLine {
       return;
 
     if (SAMline.charAt(0) == '@') {
-
       genomeDescriptionList.add(SAMline);
       newGenome = true;
+
     } else {
       if (newGenome) {
         // Set the chromosomes sizes in the parser
@@ -94,17 +95,18 @@ public class FastsqScreenSAMParser implements SAMParserLine {
       }
 
       SAMRecord samRecord = parser.parseLine(SAMline);
-
+      readsprocessed++;
       boolean result = buffer.addAlignment(samRecord);
       // new read
       if (!result) {
         List<SAMRecord> records = buffer.getFilteredAlignments();
 
-        // count readsprocessed
-        readsprocessed++;
-
         if (records.size() > 0) {
+
           String nameRead = records.get(0).getReadName();
+
+          if (records.size() > 1)
+            System.out.println("read " + nameRead);
 
           // define number of hits 1 or 2 (over one)
           int nbHits;
@@ -168,7 +170,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
           nbHits = records.size() == 2 ? 1 : 2;
         else
           nbHits = records.size() == 1 ? 1 : 2;
-        
+
         // write in SAMmapOutputFile
         if (nameRead != null) {
           fw.write(nameRead + "\t" + nbHits + genome);
@@ -178,7 +180,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
       fw.close();
 
     } catch (IOException io) {
-      
+
     }
   }
 
@@ -197,6 +199,10 @@ public class FastsqScreenSAMParser implements SAMParserLine {
   public int getReadsprocessed() {
 
     return this.readsprocessed;
+  }
+
+  public int getReadsMapped() {
+    return this.readsmapped;
   }
 
   //
