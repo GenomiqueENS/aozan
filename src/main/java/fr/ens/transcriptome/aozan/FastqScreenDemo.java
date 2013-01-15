@@ -23,27 +23,29 @@
 
 package fr.ens.transcriptome.aozan;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.FileHandler;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
+import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
-import fr.ens.transcriptome.aozan.tests.HitNoLibrariesFastqScreenSampleTest;
-import fr.ens.transcriptome.aozan.tests.SampleTest;
 import fr.ens.transcriptome.eoulsan.EoulsanException;
-import fr.ens.transcriptome.eoulsan.Globals;
 
 public class FastqScreenDemo {
 
@@ -51,8 +53,6 @@ public class FastqScreenDemo {
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
   public static final Properties properties = new Properties();
-  public static final Map<String, String> propertiesTest = Maps
-      .newLinkedHashMap();
 
   public static final String RESOURCE_ROOT =
       "/home/sperrin/Documents/FastqScreenTest/resources";
@@ -67,6 +67,7 @@ public class FastqScreenDemo {
       + "/mappers_indexes";
   public static final String GENOMES_PATH = RESOURCE_ROOT + "/genomes";
 
+  public static RunData data = null;
   private static boolean paired = false;
 
   public static final void main(String[] args) throws AozanException,
@@ -86,20 +87,30 @@ public class FastqScreenDemo {
       runId = "120615_SNL110_0051_AD102YACXX";
     }
 
-    // include in RunDataGenerator
+    String date = new SimpleDateFormat("yyMMdd").format(new Date());
+
+    FileHandler fh =
+        new FileHandler("/home/sperrin/Documents/FastqScreenTest/essai/aozan_"
+            + date + "_" + runId + ".log");
+    fh.setFormatter(new SimpleFormatter());
+    LOGGER.addHandler(fh);
+
     final String fastqDir = SRC_RUN + "/qc_" + runId + "/" + runId;
 
-    String[] tabGenomes = {"phix", "lsuref_dna", "ssuref", "adapters2"};
+    String[] tabGenomes = {"phix", "adapters2", "lsuref_dna"/* , "ssuref" */};
     String genomes = "";
     for (String g : tabGenomes) {
       genomes += g + ",";
     }
-    // delete last separator character ","
+    // remove last separator character ","
     genomes = genomes.substring(0, genomes.length() - 1);
 
-    // Sample tests
-    properties.put("qc.fastqscreen.genomes", genomes);
-    properties.put("qc.fastqscreen.fastqDir", fastqDir);
+    // add new property for execute fastqscreen
+    properties.put("qc.conf.fastqscreen.genomes", genomes);
+
+    // data include in aozan.conf
+    properties.put("fastq.data.path", SRC_RUN);
+    properties.put("reports.data.path", SRC_RUN);
     properties.put("tmp.dir", TMP_DIR);
 
     // number threads used for fastqscreen is defined in aozan.conf
@@ -107,23 +118,56 @@ public class FastqScreenDemo {
 
     // elements for configuration of eoulsanRuntime settings
     // use for create index
-    properties.put("conf.settings.genomes.desc.path", GENOMES_DESC_PATH);
-    properties.put("conf.settings.genomes", GENOMES_PATH);
-    properties.put("conf.settings.mappers.indexes.path", MAPPERS_INDEXES_PATH);
+    properties.put("qc.conf.settings.genomes.desc.path", GENOMES_DESC_PATH);
+    properties.put("qc.conf.settings.genomes", GENOMES_PATH);
+    properties.put("qc.conf.settings.mappers.indexes.path",
+        MAPPERS_INDEXES_PATH);
 
-    // process for one run
-    FastqScreenCollector fsqCollector = new FastqScreenCollector();
+    Collector fsqCollector = new FastqScreenCollector();
+
+    List<Collector> collectorList = new ArrayList<Collector>();
+    collectorList.add(fsqCollector);
+
+    RunDataGenerator rdg = new RunDataGenerator(collectorList);
+
+    // set paths utils
+    rdg.setCasavaDesignFile(new File(fastqDir));
+    rdg.setRTAOutputDir(new File(fastqDir));
+    rdg.setCasavaOutputDir(new File(fastqDir));
+    rdg.setQCOutputDir(new File(fastqDir));
+    rdg.setTemporaryDir(new File(TMP_DIR));
 
     File f = new File(fastqDir + "/data-" + runId + ".txt");
-    RunData data = null;
+
     try {
+      
       data = new RunData(f);
 
       // Configure : create list of reference genome
       fsqCollector.configure(properties);
-
+      
       // And collect data
       fsqCollector.collect(data);
+
+      /*
+      rdg.collect();
+
+      QC qc = new QC(getMapAozanConf(), TMP_DIR);
+      
+      QCReport report = new QCReport(data, qc.laneTests, qc.sampleTests);
+
+      qc.writeRawData(report, TMP_DIR
+          + "/" + runId + "_" + date + "_reportRawData.txt");
+
+      // Save report data
+      qc.writeXMLReport(report, TMP_DIR
+          + "/" + runId + "_" + date + "_reportXmlFile.xml");
+
+      // Save HTML report
+      qc.writeReport(report, (String) null, TMP_DIR
+          + "/" + runId + "_" + date + "_reportHtmlFile.html");
+      */
+      
 
       // TODO test method
       // print completed rundata with results of fastqscreen
@@ -139,22 +183,44 @@ public class FastqScreenDemo {
 
     /** TEST AozanTest and compute QC report */
 
-    /*
-     * propertiesTest.put("qc.test.hitnolibraries.enable", "true"); final QC qc
-     * = new QC(propertiesTest, TMP_DIR); List<SampleTest> fsqTest =
-     * Lists.newArrayList(); // FastqScreenSampleTest fsqTest.add((SampleTest)
-     * new HitNoLibrariesFastqScreenSampleTest()); // create QC report with a
-     * rundata existed QCReport report = new QCReport(data, null, fsqTest);
-     * qc.writeXMLReport(report, new File(fastqDir + "/XMLReport_" + runId +
-     * ".xml"));
-     */
-
     final long endTime = System.currentTimeMillis();
     LOGGER.info("Runtime for demo with a run "
         + runId + " " + toTimeHumanReadable(endTime - startTime));
+  }
 
-    System.out.println("Runtime for demo with a run "
-        + runId + " " + toTimeHumanReadable(endTime - startTime));
+  public static RunData getRunData() {
+    return data;
+  }
 
+  public static Properties getPropertiesDemo() {
+    return properties;
+  }
+
+  public static Map<String, String> getMapAozanConf() {
+    Map<String, String> conf = new LinkedHashMap<String, String>();
+    String line;
+    try {
+      FileReader aozanConf =
+          new FileReader("/home/sperrin/Documents/FastqScreenTest/aozan.conf");
+      BufferedReader br = new BufferedReader(aozanConf);
+
+      while ((line = br.readLine()) != null) {
+
+        final int pos = line.indexOf('=');
+        if (pos == -1)
+          continue;
+
+        final String key = line.substring(0, pos);
+        final String value = line.substring(pos + 1);
+
+        conf.put(key, value);
+      }
+      br.close();
+      aozanConf.close();
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return conf;
   }
 }
