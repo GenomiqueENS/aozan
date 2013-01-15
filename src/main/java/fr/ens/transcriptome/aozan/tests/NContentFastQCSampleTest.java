@@ -24,6 +24,8 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import uk.ac.bbsrc.babraham.FastQC.Modules.NContent;
@@ -38,8 +40,9 @@ public class NContentFastQCSampleTest extends AbstractFastQCSampleTest {
   private static final String FASTQC_MODULE_NAME = new NContent().name();
 
   @Override
-  public void configure(final Map<String, String> properties)
+  public List<AozanTest> configure(final Map<String, String> properties)
       throws AozanException {
+    return Collections.singletonList((AozanTest) this);
   }
 
   @Override

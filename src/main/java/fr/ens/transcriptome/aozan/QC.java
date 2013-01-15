@@ -261,6 +261,7 @@ public class QC {
 
     final AozanTestRegistry registry = AozanTestRegistry.getInstance();
     final Map<String, AozanTest> mapTests = Maps.newHashMap();
+    List<AozanTest> tests;
 
     for (final Map.Entry<String, String> e : properties.entrySet()) {
 
@@ -280,14 +281,19 @@ public class QC {
         if (test != null) {
           mapTests.put(key, test);
 
+          tests =
+              configureTest(test, properties, TEST_KEY_PREFIX + testName + ".");
+
           // Add the test to laneTests or sampleTests
           if (test instanceof LaneTest)
-            this.laneTests.add((LaneTest) test);
+            for (AozanTest t : tests)
+              this.laneTests.add((LaneTest) t);
+
           else if (test instanceof SampleTest)
-            this.sampleTests.add((SampleTest) test);
+            for (AozanTest t : tests)
+              this.sampleTests.add((SampleTest) t);
 
           // Configure the test
-          configureTest(test, properties, TEST_KEY_PREFIX + testName + ".");
 
         } else
           throw new AozanException("No test found for property: " + key);
@@ -313,12 +319,14 @@ public class QC {
    * @param test Aozan test to configure
    * @param properties Aozan configuration
    * @param enableKey key that enable the test
+   * @return list of Aozan tests
    * @throws AozanException if an error occurs while configuring the test
    */
-  private final void configureTest(final AozanTest test,
+  private final List<AozanTest> configureTest(final AozanTest test,
       final Map<String, String> properties, final String prefix)
       throws AozanException {
 
+    final String additionalConf = "qc.conf.";
     final Map<String, String> conf = Maps.newHashMap();
 
     for (final Map.Entry<String, String> e : properties.entrySet()) {
@@ -331,10 +339,16 @@ public class QC {
         final String confValue = e.getValue();
 
         conf.put(confKey, confValue);
+
+      } else if (key.startsWith(additionalConf)) {
+
+        // add additional configuration in properties for collector
+        conf.put(key, e.getValue());
+
       }
     }
-
-    test.configure(conf);
+    
+    return test.configure(conf);
   }
 
   /**
