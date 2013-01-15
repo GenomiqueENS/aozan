@@ -24,8 +24,14 @@ package fr.ens.transcriptome.aozan;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Properties;
+import java.util.logging.Formatter;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 import fr.ens.transcriptome.eoulsan.util.Version;
 
@@ -100,6 +106,22 @@ public class Globals {
 
   /** Embedded XSL QC stylesheet. */
   public static final String EMBEDDED_QC_XSL = "/aozan.xsl";
+  
+  /** Default locale of the application. */
+  public static final Locale DEFAULT_LOCALE = Locale.US;
+  
+  /** Format of the log. */
+  public static final Formatter LOG_FORMATTER = new Formatter() {
+
+    private final DateFormat df = new SimpleDateFormat("yyyy.MM.dd kk:mm:ss",
+        DEFAULT_LOCALE);
+
+    public String format(final LogRecord record) {
+      return record.getLevel()
+          + "\t" + df.format(new Date(record.getMillis())) + "\t"
+          + record.getMessage() + "\n";
+    }
+  };
 
   //
   // Private constants

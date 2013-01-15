@@ -74,7 +74,7 @@ public class Main {
     eoulsanLogger.removeHandler(eoulsanLogger.getParent().getHandlers()[0]);
 
     aozanLogger.addHandler(fh);
-    eoulsanLogger.addHandler(fh);
+    // eoulsanLogger.addHandler(fh);
   }
 
   //
