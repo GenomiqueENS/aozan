@@ -234,7 +234,7 @@ def aozan_main(conf_file_path):
                 traceback_msg = traceback.format_exc(sys.exc_info()[2]).replace('\n', ' ')
                 
                 # Log the exception
-                common.log('CRITICAL', 'Exception: ' +  exception_msg, conf)
+                common.log('SEVERE', 'Exception: ' +  exception_msg, conf)
                 common.log('TRACEBACK', traceback_msg, conf)
                 
                 # Send a mail with the exception
