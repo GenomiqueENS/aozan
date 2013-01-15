@@ -1,7 +1,24 @@
-/*                  Aozan development code 
- * 
- * 
- * 
+/*
+ *                  Aozan development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU General Public License version 3 or later 
+ * and CeCILL. This should be distributed with the code. If you 
+ * do not have a copy, see:
+ *
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+ *
+ * Copyright for this code is held jointly by the Genomic platform
+ * of the Institut de Biologie de l'École Normale Supérieure and
+ * the individual authors. These should be listed in @author doc
+ * comments.
+ *
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page at:
+ *
+ *      http://www.transcriptome.ens.fr/aozan
+ *
  */
 
 package fr.ens.transcriptome.aozan.io;
@@ -34,6 +51,8 @@ public final class FastqStorage {
 
   private static FastqStorage singleton = null;
   private static Map<String, File> setFastqFiles = new HashMap<String, File>();
+  private static Map<String, SequenceFile> setFastqSequenceFiles =
+      new HashMap<String, SequenceFile>();
   private static String tmpDir = null;
 
   /**
@@ -64,7 +83,7 @@ public final class FastqStorage {
 
     // Add in list of temporary fastq sequence files
     String key = keyFiles(fastqFiles);
-    setFastqFiles.put(key, sequenceFile.getFile());
+    setFastqSequenceFiles.put(key, sequenceFile);
 
     return sequenceFile;
   }
@@ -160,16 +179,6 @@ public final class FastqStorage {
   }
 
   /**
-   * Remove specific temporary SequenceFile
-   * @param SequenceFile
-   */
-  public void removeTemporaryFastq(final SequenceFile seqFile) {
-    File file = seqFile.getFile();
-
-    removeTemporaryFastq(file);
-  }
-
-  /**
    * Remove specific of pair of temporaries files
    * @param file1
    * @param file2
@@ -182,34 +191,18 @@ public final class FastqStorage {
   }
 
   /**
-   * Remove specific of pair of temporaries sequence files
-   * @param seqFile1
-   * @param seqFile2
-   */
-  public void removeTemporaryFastq(final SequenceFile seqFile1,
-      final SequenceFile seqFile2) {
-    removeTemporaryFastq(seqFile1.getFile(), seqFile2.getFile());
-  }
-
-  /**
    * Delete all temporaries files if exist
    * @throws IOException
    */
   public void clear() {
 
-    for (Map.Entry<String, File> e : setFastqFiles.entrySet()) {
-      File f = e.getValue();
-      if (!f.exists())
-        LOGGER.warning("Doesn't exist temporary fastq file: "
-            + f.getAbsolutePath());
+    for (Map.Entry<String, File> e : setFastqFiles.entrySet())
 
-      if (!f.delete())
-        LOGGER.warning("Can't delete temporary fastq file: "
-            + f.getAbsolutePath());
-    }
+      removeTemporaryFastq(e.getValue());
   }
 
   public static FastqStorage getFastqStorage(final String tmpDirectory) {
+
     if (singleton == null) {
       tmpDir = tmpDirectory;
       singleton = new FastqStorage();
