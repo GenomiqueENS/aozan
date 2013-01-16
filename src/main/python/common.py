@@ -295,7 +295,7 @@ def add_run_id_to_processed_run_ids(run_id, done_file_path, conf):
         conf: configuration dictionary
     """
 
-    log('DEBUG', 'Add ' + run_id + ' to ' + os.path.basename(done_file_path), conf)
+    log('WARNING', 'Add ' + run_id + ' to ' + os.path.basename(done_file_path), conf)
 
     f = open(done_file_path, 'a')
 

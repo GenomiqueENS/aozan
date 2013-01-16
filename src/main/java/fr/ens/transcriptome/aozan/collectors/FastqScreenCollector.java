@@ -271,7 +271,7 @@ public class FastqScreenCollector implements Collector {
    * @param projectName name of the project
    * @param sampleName name of the sample
    * @param read read number
-   * @param fastqFileName fastq file
+   * @param fastqFileName fastq file  
    * @throws AozanException if an error occurs while generating FastqScreen
    *           results
    */

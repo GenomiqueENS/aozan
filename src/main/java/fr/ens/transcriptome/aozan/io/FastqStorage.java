@@ -61,6 +61,7 @@ public final class FastqStorage {
   private static String tmpDir = null;
 
   /**
+   * Create a sequenceFile
    * @param fastqFiles array of fastq files
    * @return SequenceFile
    * @throws AozanException if an error occurs while creating sequence file

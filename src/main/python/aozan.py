@@ -235,7 +235,7 @@ def aozan_main(conf_file_path):
                 
                 # Log the exception
                 common.log('SEVERE', 'Exception: ' +  exception_msg, conf)
-                common.log('TRACEBACK', traceback_msg, conf)
+                common.log('WARNING', traceback_msg, conf)
                 
                 # Send a mail with the exception
                 common.send_msg("[Aozan] Exception: " + exception_msg, traceback_msg, conf)
