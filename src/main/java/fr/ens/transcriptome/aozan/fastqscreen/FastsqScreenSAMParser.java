@@ -46,7 +46,9 @@ import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.ReadAlignmentsFilterBu
 import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.RemoveUnmappedReadAlignmentsFilter;
 
 /**
- * @author sperrin
+ * This class ensures alignment fastqScreen treating the output format BAM of
+ * mapper.
+ * @author Sandrine Perrin
  */
 public class FastsqScreenSAMParser implements SAMParserLine {
 
@@ -212,9 +214,9 @@ public class FastsqScreenSAMParser implements SAMParserLine {
   /**
    * Initialize FastqScreenSAMParser : create the mapOutputFile and the list
    * filters used for parsing SAM file
-   * @param MapOutputFile
-   * @param genome
-   * @throws IOException
+   * @param MapOutputFile file result from mapping
+   * @param genome name genome
+   * @throws IOException if an error occurs while initializing mapOutputFile
    */
   public FastsqScreenSAMParser(final File MapOutputFile, final String genome,
       final boolean paired) throws IOException {

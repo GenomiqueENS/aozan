@@ -47,7 +47,7 @@ import fr.ens.transcriptome.aozan.io.FastqStorage;
 /**
  * This class manages the execution of Fastq Screen for a full run according to
  * the properties defined in the configuration file Aozan, which define the list
- * of references genomes. All results are stored in an object Rundata.
+ * of references genomes.
  * @author Sandrine Perrin
  */
 public class FastqScreenCollector implements Collector {
@@ -78,6 +78,7 @@ public class FastqScreenCollector implements Collector {
 
   /**
    * Collectors to execute before fastqscreen Collector
+   * @return list of names collector
    */
   @Override
   public String[] getCollectorsNamesRequiered() {
@@ -87,7 +88,7 @@ public class FastqScreenCollector implements Collector {
 
   /**
    * Configure fastqScreen with properties from file aozan.conf
-   * @param propertiesRDG
+   * @param properties
    */
   @Override
   public void configure(Properties properties) {
@@ -125,11 +126,9 @@ public class FastqScreenCollector implements Collector {
 
     FastqScreenResult resultsFastqscreen = null;
 
-    final long startTime = System.currentTimeMillis();
-
     File read1 = null;
     File read2 = null;
-    
+
     final int laneCount = data.getInt("run.info.flow.cell.lane.count");
 
     // mode paired or single-end present in Rundata
@@ -153,6 +152,8 @@ public class FastqScreenCollector implements Collector {
 
         for (String sampleName : sampleNames) {
 
+          final long startTime = System.currentTimeMillis();
+
           // Get the sample index
           final String index =
               data.get("design.lane" + lane + "." + sampleName + ".index");
@@ -170,6 +171,8 @@ public class FastqScreenCollector implements Collector {
           final String prefixRead1 =
               String.format("%s_%s_L%03d_R%d_", sampleName, "".equals(index)
                   ? "NoIndex" : index, lane, read);
+
+          LOGGER.fine("Start test in collector with sample " + prefixRead1);
 
           final String fastqDir =
               String.format("/Project_%s/Sample_%s", projectName, sampleName);
@@ -212,20 +215,21 @@ public class FastqScreenCollector implements Collector {
             throw new AozanException("Fastqscreen return no result for sample "
                 + fastqDir);
 
+          // update rundata
           processResults(data, resultsFastqscreen, lane, projectName,
               sampleName, read, fastqFiles[0].getName());
 
           fastqStorage.removeTemporaryFastq(read1, read2);
 
-          final long endTime = System.currentTimeMillis();
-          LOGGER.info("End test with sample "
-              + sampleName + " " + toTimeHumanReadable(endTime - startTime));
+          LOGGER.fine("End test in collector with sample "
+              + prefixRead1 + " "
+              + toTimeHumanReadable(System.currentTimeMillis() - startTime));
 
         } // sample
       } // lane
     } // read
 
-    fastqStorage.clear();
+    clean();
 
   }// end method collect
 
@@ -259,13 +263,16 @@ public class FastqScreenCollector implements Collector {
   }
 
   /**
-   * Process results after the end of the thread.
-   * @param data
-   * @param result
-   * @param lane
-   * @param sampleName
-   * @param read
-   * @throws AozanException if an error occurs while generate FastqScreen
+   * Process results and update rundata.
+   * @param data rundata
+   * @param result object fastqScreenResult which contains all values from
+   *          fastqscreen of one sample
+   * @param lane lane number
+   * @param projectName name of the project
+   * @param sampleName name of the sample
+   * @param read read number
+   * @param fastqFileName fastq file
+   * @throws AozanException if an error occurs while generating FastqScreen
    *           results
    */
   private void processResults(final RunData data,
@@ -279,11 +286,19 @@ public class FastqScreenCollector implements Collector {
             + lane + ".sample." + sampleName + ".read" + read + "."
             + sampleName;
 
-    result.rundata(data, prefix);
+    result.updateRundata(data, prefix);
 
     createFileReportFastqScreen(result, projectName, fastqFileName);
   }
 
+  /**
+   * Save in file result from fastqscreen for one sample.
+   * @param result object fastqScreenResult which contains all values from
+   *          fastqscreen of one sample
+   * @param projectName name of the project
+   * @param fastqFileName fastq file
+   * @throws AozanException if an error occurs while creating file
+   */
   private void createFileReportFastqScreen(final FastqScreenResult result,
       final String projectName, final String fastqFileName)
       throws AozanException {
@@ -302,6 +317,9 @@ public class FastqScreenCollector implements Collector {
         throw new AozanException("Cannot create report directory: "
             + pathFile.getAbsolutePath());
 
+    LOGGER.fine("Save result resul fastqscreen for fastq "
+        + fastqFileName + " in " + pathFile.getAbsolutePath());
+
     result.createFileResultFastqScreen(pathFile.getAbsolutePath());
 
   }
@@ -311,6 +329,10 @@ public class FastqScreenCollector implements Collector {
    * properties of Aozan
    */
   public void clean() {
+
+    LOGGER.fine("Delete fastq file uncompress");
+
+    fastqStorage.clear();
 
   }
 

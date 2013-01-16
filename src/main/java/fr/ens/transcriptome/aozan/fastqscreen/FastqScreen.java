@@ -39,12 +39,17 @@ import fr.ens.transcriptome.eoulsan.LocalEoulsanRuntime;
 import fr.ens.transcriptome.eoulsan.Settings;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 
+/**
+ * This class execute fastqscreen pair-end mode or single-end
+ * @author Sandrine Perrin
+ */
 public class FastqScreen {
 
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
   protected static final String COUNTER_GROUP = "fastqscreen";
+
   private static final String KEY_TMP_DIR = "tmp.dir";
   private static final String KEY_GENOMES_DESC_PATH =
       "qc.conf.settings.genomes.desc.path";
@@ -82,6 +87,8 @@ public class FastqScreen {
 
     final long startTime = System.currentTimeMillis();
 
+    LOGGER.fine("Start : fastqscreen on " + fastqRead1.getAbsolutePath());
+
     String tmpDir = properties.getProperty(KEY_TMP_DIR);
     FastqScreenPseudoMapReduce pmr = new FastqScreenPseudoMapReduce();
     pmr.setMapReduceTemporaryDirectory(new File(tmpDir));
@@ -96,21 +103,18 @@ public class FastqScreen {
       pmr.doReduce(new File(tmpDir + "/outputDoReduce.txt"));
 
     } catch (IOException e) {
-      e.printStackTrace();
       throw new AozanException(e.getMessage());
 
     } catch (BadBioEntryException bad) {
-      bad.printStackTrace();
       throw new AozanException(bad.getMessage());
 
     }
 
-    final long endTime = System.currentTimeMillis();
-    LOGGER.info("Execute fastqscreen on "
+    LOGGER.fine("End : fastqscreen on "
         + fastqRead1.getAbsolutePath() + " for genome(s) "
         + listGenomes.toString() + " in mode "
-        + (fastqRead2 == null ? "single " : "paired ")
-        + toTimeHumanReadable(endTime - startTime));
+        + (fastqRead2 == null ? "single " : "paired ") + " in "
+        + toTimeHumanReadable(System.currentTimeMillis() - startTime));
 
     return pmr.getFastqScreenResult();
   }
@@ -120,6 +124,8 @@ public class FastqScreen {
   //
 
   /**
+   * Public constructor of fastqscreen. Initialization of settings of Eoulsan
+   * necessary for use of mapper index.
    * @param properties properties defines in configuration of aozan
    */
   public FastqScreen(final Properties properties) {

@@ -43,22 +43,27 @@ import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
-// singleton
+/**
+ * This class manages the files unzipped fastq to create temporary files and
+ * object sequenceFile for FastqC.
+ * @author Sandrine Perrin
+ */
 public final class FastqStorage {
 
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
   private static FastqStorage singleton = null;
+
   private static Map<String, File> setFastqFiles = new HashMap<String, File>();
   private static Map<String, SequenceFile> setFastqSequenceFiles =
       new HashMap<String, SequenceFile>();
   private static String tmpDir = null;
 
   /**
-   * @param fastqFiles
+   * @param fastqFiles array of fastq files
    * @return SequenceFile
-   * @throws AozanException fail create sequence file
+   * @throws AozanException if an error occurs while creating sequence file
    */
   public SequenceFile getFastqSequenceFile(final File[] fastqFiles)
       throws AozanException {
@@ -89,13 +94,15 @@ public final class FastqStorage {
   }
 
   /**
-   * @param fastqFiles
-   * @return file compile all files of the list, compressed or none
-   * @throws AozanException
+   * Uncompresses and compiles files of array.
+   * @param fastqFiles fastq files of array
+   * @return file compile all files
+   * @throws AozanException if an error occurs while creating file
    */
   public File getFastqFile(final File[] fastqFiles) throws AozanException {
 
     final long startTime = System.currentTimeMillis();
+    LOGGER.fine("Start uncompressed for fastq File ");
 
     if (fastqFiles.length == 0) {
       LOGGER.warning("List fastq file to uncompress and compile is empty");
@@ -128,7 +135,6 @@ public final class FastqStorage {
       out.close();
 
     } catch (IOException io) {
-      io.printStackTrace();
       throw new AozanException(io.getMessage());
     }
 
@@ -136,13 +142,18 @@ public final class FastqStorage {
     String key = keyFiles(fastqFiles);
     setFastqFiles.put(key, tmpFastqFile);
 
-    final long endTime = System.currentTimeMillis();
-    LOGGER.info("Create uncompressed for fastq File "
-        + key + " in " + toTimeHumanReadable(endTime - startTime));
+    LOGGER.fine("End uncompressed for fastq File "
+        + key + " in "
+        + toTimeHumanReadable(System.currentTimeMillis() - startTime));
 
     return tmpFastqFile;
   }
 
+  /**
+   * Compile name of all files of array.
+   * @param tab array of files
+   * @return string key
+   */
   private String keyFiles(final File[] tab) {
 
     StringBuilder key = new StringBuilder();
@@ -161,21 +172,15 @@ public final class FastqStorage {
 
   /**
    * Remove specific temporary file
-   * @param file
+   * @param file to remove
    */
   public void removeTemporaryFastq(final File file) {
 
-    if (!setFastqFiles.containsKey(file))
-      LOGGER.warning("Doesn't exist temporary fastq file: "
-          + file.getAbsolutePath() + " in map.");
+    if (file.exists())
 
-    if (!file.exists())
-      LOGGER.warning("Doesn't exist temporary fastq file: "
-          + file.getAbsolutePath());
-
-    if (!file.delete())
-      LOGGER.warning("Can't delete temporary fastq file: "
-          + file.getAbsolutePath());
+      if (!file.delete())
+        LOGGER.warning("Can't delete temporary fastq file: "
+            + file.getAbsolutePath());
   }
 
   /**
@@ -215,6 +220,9 @@ public final class FastqStorage {
   // Constructor
   //
 
+  /**
+   * Private constructor of FastqStorage
+   */
   private FastqStorage() {
   }
 
