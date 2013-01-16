@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -87,14 +88,11 @@ public class FastqScreenDemo {
       runId = "120615_SNL110_0051_AD102YACXX";
     }
 
-    String date = new SimpleDateFormat("yyMMdd").format(new Date());
-
-    FileHandler fh =
-        new FileHandler("/home/sperrin/Documents/FastqScreenTest/essai/aozan_"
-            + date + "_" + runId + ".log");
-    fh.setFormatter(new SimpleFormatter());
-    LOGGER.addHandler(fh);
-
+    Main.initLogger(TMP_DIR + "/aozan_test.log");
+    ConsoleHandler ch = new ConsoleHandler();
+    ch.setFormatter(Globals.LOG_FORMATTER);
+    LOGGER.addHandler(ch);
+    
     final String fastqDir = SRC_RUN + "/qc_" + runId + "/" + runId;
 
     String[] tabGenomes = {"phix", "adapters2", "lsuref_dna"/* , "ssuref" */};
@@ -112,9 +110,10 @@ public class FastqScreenDemo {
     properties.put("fastq.data.path", SRC_RUN);
     properties.put("reports.data.path", SRC_RUN);
     properties.put("tmp.dir", TMP_DIR);
+    properties.put("casava.output.dir", fastqDir);
 
     // number threads used for fastqscreen is defined in aozan.conf
-    properties.put("qc.conf.fastqscreen.threads", "4");
+    properties.put("qc.conf.fastqc.threads", "4");
 
     // elements for configuration of eoulsanRuntime settings
     // use for create index
@@ -140,34 +139,24 @@ public class FastqScreenDemo {
     File f = new File(fastqDir + "/data-" + runId + ".txt");
 
     try {
-      
+
       data = new RunData(f);
 
       // Configure : create list of reference genome
       fsqCollector.configure(properties);
-      
+
       // And collect data
       fsqCollector.collect(data);
 
       /*
-      rdg.collect();
-
-      QC qc = new QC(getMapAozanConf(), TMP_DIR);
-      
-      QCReport report = new QCReport(data, qc.laneTests, qc.sampleTests);
-
-      qc.writeRawData(report, TMP_DIR
-          + "/" + runId + "_" + date + "_reportRawData.txt");
-
-      // Save report data
-      qc.writeXMLReport(report, TMP_DIR
-          + "/" + runId + "_" + date + "_reportXmlFile.xml");
-
-      // Save HTML report
-      qc.writeReport(report, (String) null, TMP_DIR
-          + "/" + runId + "_" + date + "_reportHtmlFile.html");
-      */
-      
+       * rdg.collect(); QC qc = new QC(getMapAozanConf(), TMP_DIR); QCReport
+       * report = new QCReport(data, qc.laneTests, qc.sampleTests);
+       * qc.writeRawData(report, TMP_DIR + "/" + runId + "_" + date +
+       * "_reportRawData.txt"); // Save report data qc.writeXMLReport(report,
+       * TMP_DIR + "/" + runId + "_" + date + "_reportXmlFile.xml"); // Save
+       * HTML report qc.writeReport(report, (String) null, TMP_DIR + "/" + runId
+       * + "_" + date + "_reportHtmlFile.html");
+       */
 
       // TODO test method
       // print completed rundata with results of fastqscreen

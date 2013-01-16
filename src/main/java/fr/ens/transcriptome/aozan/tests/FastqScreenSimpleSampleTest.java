@@ -31,7 +31,13 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   }
 
   public Class<?> getValueType() {
-    return null; //Double.class;
+    return Double.class;
+  }
+
+  protected Number transformValue(final Number value, final RunData data,
+      final int read, final boolean indexedRead, final int lane) {
+
+    return value.doubleValue() / 100.0;
   }
 
   public String getNameGenome() {
@@ -71,7 +77,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   }
 
   public FastqScreenSimpleSampleTest(String genome) {
-    super("fsqummapped", "", "fsq unmapped on " + genome, "%");
+    super("fsqunmapped", "", "fastqscreen unmapped on " + genome, "%");
     this.genome = genome;
   }
 

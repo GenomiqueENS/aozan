@@ -6,6 +6,7 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
 
 public class HitNoLibrariesFastqScreenSampleTest extends
@@ -31,10 +32,16 @@ public class HitNoLibrariesFastqScreenSampleTest extends
 
   @Override
   protected Class<?> getValueType() {
-    return null; // Double.class;
+    return Double.class;
+  }
+
+  protected Number transformValue(final Number value, final RunData data,
+      final int read, final boolean indexedRead, final int lane) {
+
+    return value.doubleValue() / 100.0;
   }
 
   public HitNoLibrariesFastqScreenSampleTest() {
-    super("hitnolibraries", "", "fastqScreen bilan", "%");
+    super("hitnolibraries", "", "fastqScreen hit no libraries", "%");
   }
 }
