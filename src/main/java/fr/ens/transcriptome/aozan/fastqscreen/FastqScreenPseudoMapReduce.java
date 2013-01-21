@@ -67,6 +67,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   private static final String KEY_NUMBER_THREAD = "qc.conf.fastqc.threads";
   private static final String KEY_TMP_DIR = "tmp.dir";
 
+  private int mapperThreads = Runtime.getRuntime().availableProcessors();
   private final SequenceReadsMapper bowtie;
   private GenomeDescStorage storage;
   private FastqScreenResult fastqScreenResult;
@@ -108,8 +109,15 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     LOGGER.fine("Start mapping with "
         + fastqRead1.getName() + " on genome " + listGenomes);
 
-    final int mapperThreads =
-        Integer.parseInt(properties.getProperty(KEY_NUMBER_THREAD));
+    if (properties.containsKey(KEY_TMP_DIR)){
+      try {
+        int confThreads = 
+            Integer.parseInt(properties.getProperty(KEY_NUMBER_THREAD));
+        if (confThreads > 0)
+          this.mapperThreads = confThreads;
+      } catch (Exception e){}
+    }
+      
     final String tmpDir = properties.getProperty(KEY_TMP_DIR);
     final boolean pairEnd = fastqRead2 == null ? false : true;
 

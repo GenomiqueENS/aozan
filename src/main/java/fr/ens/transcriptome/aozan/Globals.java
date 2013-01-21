@@ -72,7 +72,7 @@ public class Globals {
       + "-" + APP_VERSION_STRING + "-" + APP_BUILD_NUMBER + "-";
 
   /** The log level of the application. */
-  public static final Level LOG_LEVEL = Level.INFO; // Level.OFF;
+  public static final Level LOG_LEVEL = Level.FINEST; // Level.OFF;
 
   /** Set the debug mode. */
   public static final boolean DEBUG = APP_VERSION_STRING.endsWith("-SNAPSHOT")

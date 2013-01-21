@@ -61,14 +61,14 @@ public class FastqScreenCollector implements Collector {
 
   private static final String KEY_READ_COUNT = "run.info.read.count";
   private static final String KEY_READ_X_INDEXED = "run.info.read";
-  private static final String COMPRESSION_EXTENSION = "fastq.bz2";
+  private static final String COMPRESSION_EXTENSION = "fq.bz2";
 
   private FastqScreen fastqscreen;
   private FastqStorage fastqStorage;
   private List<String> listGenomes = new ArrayList<String>();
 
-  private String fastqDataPath;
-  private String fileSavePath;
+  private String casavaOutputPath;
+  private String qcOutputDir;
   private boolean paired = false;
 
   @Override
@@ -91,21 +91,23 @@ public class FastqScreenCollector implements Collector {
    * @param properties
    */
   @Override
-  public void configure(Properties properties) {
+  public void configure(Properties propertiesRDG) {
 
     // TODO fix call property for constructor FastqScreen
-    // Properties propertiesRDG = FastqScreenDemo.getPropertiesDemo();
-    // System.out.println("conf " + propertiesRDG);
+    Properties properties = FastqScreenDemo.getPropertiesDemo();
+    System.out.println("conf " + properties);
 
     this.fastqscreen = new FastqScreen(properties);
 
     String tmpDir = properties.getProperty(RunDataGenerator.TMP_DIR);
-    this.fastqStorage = FastqStorage.getFastqStorage(tmpDir);
+    this.fastqStorage = FastqStorage.getFastqStorage(properties);
 
-    this.fastqDataPath =
+    this.casavaOutputPath =
         properties.getProperty(RunDataGenerator.CASAVA_OUTPUT_DIR);
-    this.fileSavePath = properties.getProperty(RunDataGenerator.QC_OUTPUT_DIR);
-
+    
+    this.qcOutputDir = properties.getProperty(RunDataGenerator.QC_OUTPUT_DIR);
+    System.out.println("qc output dir "+qcOutputDir);
+    
     final Splitter s = Splitter.on(',').trimResults().omitEmptyStrings();
 
     for (String genome : s.split(properties.getProperty(KEY_GENOMES))) {
@@ -122,7 +124,7 @@ public class FastqScreenCollector implements Collector {
   public void collect(RunData data) throws AozanException {
 
     // TODO to remove
-    // data = FastqScreenDemo.getRunData();
+    data = FastqScreenDemo.getRunData();
 
     FastqScreenResult resultsFastqscreen = null;
 
@@ -138,6 +140,12 @@ public class FastqScreenCollector implements Collector {
 
     paired = readCount > 1 && !lastReadIndexed;
     System.out.println("mode paired " + paired);
+
+    // Uncompress all fastq files of the current run
+    fastqStorage.uncompressFastqFiles(data, casavaOutputPath,
+        COMPRESSION_EXTENSION);
+
+    // ====== to review
 
     for (int read = 1; read <= readCount - 1; read++) {
 
@@ -207,6 +215,8 @@ public class FastqScreenCollector implements Collector {
               continue;
           }
 
+          // ====== to review
+
           // add read2 in command line
           resultsFastqscreen =
               fastqscreen.execute(read1, read2, this.listGenomes);
@@ -250,16 +260,17 @@ public class FastqScreenCollector implements Collector {
     // .contains(projetTestSingle)))
     // return null;
 
-    return new File(fastqDataPath + dirPath + "/").listFiles(new FileFilter() {
+    return new File(casavaOutputPath + dirPath + "/")
+        .listFiles(new FileFilter() {
 
-      @Override
-      public boolean accept(final File pathname) {
+          @Override
+          public boolean accept(final File pathname) {
 
-        return pathname.length() > 0
-            && pathname.getName().startsWith(prefix)
-            && pathname.getName().endsWith(COMPRESSION_EXTENSION);
-      }
-    });
+            return pathname.length() > 0
+                && pathname.getName().startsWith(prefix)
+                && pathname.getName().endsWith(COMPRESSION_EXTENSION);
+          }
+        });
   }
 
   /**
@@ -271,7 +282,7 @@ public class FastqScreenCollector implements Collector {
    * @param projectName name of the project
    * @param sampleName name of the sample
    * @param read read number
-   * @param fastqFileName fastq file  
+   * @param fastqFileName fastq file
    * @throws AozanException if an error occurs while generating FastqScreen
    *           results
    */
@@ -309,13 +320,16 @@ public class FastqScreenCollector implements Collector {
     String sampleDir = fastqFileName.substring(0, fastqFileName.indexOf('.'));
 
     final File pathFile =
-        new File(this.fileSavePath
+        new File(this.qcOutputDir
             + String.format("/Project_%s/%s-fastqc/", projectName, sampleDir));
 
     if (!pathFile.exists())
       if (!pathFile.mkdirs())
         throw new AozanException("Cannot create report directory: "
             + pathFile.getAbsolutePath());
+
+    System.out.println("Save result resul fastqscreen for fastq "
+        + fastqFileName + " in " + pathFile.getAbsolutePath());
 
     LOGGER.fine("Save result resul fastqscreen for fastq "
         + fastqFileName + " in " + pathFile.getAbsolutePath());
