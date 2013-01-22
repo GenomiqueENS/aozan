@@ -100,9 +100,9 @@ public class FastqScreenResult {
       io.printStackTrace();
     }
 
-    System.out.println("Save result resul fastqscreen for fastq : " + result);
+    System.out.println("Save result fastqscreen in file : " + result);
 
-    LOGGER.fine("Save result resul fastqscreen for fastq : " + result);
+    LOGGER.fine("Save result fastqscreen in file : " + result);
 
   }
 

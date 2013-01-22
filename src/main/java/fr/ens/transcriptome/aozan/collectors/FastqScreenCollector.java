@@ -95,7 +95,6 @@ public class FastqScreenCollector implements Collector {
 
     // TODO fix call property for constructor FastqScreen
     Properties properties = FastqScreenDemo.getPropertiesDemo();
-    System.out.println("conf " + properties);
 
     this.fastqscreen = new FastqScreen(properties);
 
@@ -104,10 +103,9 @@ public class FastqScreenCollector implements Collector {
 
     this.casavaOutputPath =
         properties.getProperty(RunDataGenerator.CASAVA_OUTPUT_DIR);
-    
+
     this.qcOutputDir = properties.getProperty(RunDataGenerator.QC_OUTPUT_DIR);
-    System.out.println("qc output dir "+qcOutputDir);
-    
+
     final Splitter s = Splitter.on(',').trimResults().omitEmptyStrings();
 
     for (String genome : s.split(properties.getProperty(KEY_GENOMES))) {
@@ -139,7 +137,6 @@ public class FastqScreenCollector implements Collector {
         data.getBoolean(KEY_READ_X_INDEXED + readCount + ".indexed");
 
     paired = readCount > 1 && !lastReadIndexed;
-    System.out.println("mode paired " + paired);
 
     // Uncompress all fastq files of the current run
     fastqStorage.uncompressFastqFiles(data, casavaOutputPath,
@@ -180,7 +177,8 @@ public class FastqScreenCollector implements Collector {
               String.format("%s_%s_L%03d_R%d_", sampleName, "".equals(index)
                   ? "NoIndex" : index, lane, read);
 
-          LOGGER.fine("Start test in collector with sample " + prefixRead1);
+          LOGGER.fine("Start test in collector with project "
+              + projectName + " sample " + sampleName);
 
           final String fastqDir =
               String.format("/Project_%s/Sample_%s", projectName, sampleName);
@@ -211,6 +209,7 @@ public class FastqScreenCollector implements Collector {
 
             // concatenate fastq files of one sample
             read2 = fastqStorage.getFastqFile(fastqFilesRead2);
+            
             if (read2 == null || !read2.exists())
               continue;
           }
@@ -231,8 +230,8 @@ public class FastqScreenCollector implements Collector {
 
           fastqStorage.removeTemporaryFastq(read1, read2);
 
-          LOGGER.fine("End test in collector with sample "
-              + prefixRead1 + " "
+          LOGGER.fine("End test in collector with project "
+              + projectName + " sample " + sampleName
               + toTimeHumanReadable(System.currentTimeMillis() - startTime));
 
         } // sample
@@ -327,12 +326,6 @@ public class FastqScreenCollector implements Collector {
       if (!pathFile.mkdirs())
         throw new AozanException("Cannot create report directory: "
             + pathFile.getAbsolutePath());
-
-    System.out.println("Save result resul fastqscreen for fastq "
-        + fastqFileName + " in " + pathFile.getAbsolutePath());
-
-    LOGGER.fine("Save result resul fastqscreen for fastq "
-        + fastqFileName + " in " + pathFile.getAbsolutePath());
 
     result.createFileResultFastqScreen(pathFile.getAbsolutePath());
 

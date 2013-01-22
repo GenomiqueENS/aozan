@@ -106,18 +106,16 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   public void doMap(File fastqRead1, File fastqRead2, List<String> listGenomes,
       Properties properties) throws AozanException, BadBioEntryException {
 
-    LOGGER.fine("Start mapping with "
-        + fastqRead1.getName() + " on genome " + listGenomes);
-
-    if (properties.containsKey(KEY_TMP_DIR)){
+    if (properties.containsKey(KEY_TMP_DIR)) {
       try {
-        int confThreads = 
+        int confThreads =
             Integer.parseInt(properties.getProperty(KEY_NUMBER_THREAD));
         if (confThreads > 0)
           this.mapperThreads = confThreads;
-      } catch (Exception e){}
+      } catch (Exception e) {
+      }
     }
-      
+
     final String tmpDir = properties.getProperty(KEY_TMP_DIR);
     final boolean pairEnd = fastqRead2 == null ? false : true;
 
@@ -126,6 +124,9 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         " -l 40 --chunkmbs 512" + (pairEnd ? " --maxins 1000" : "");
 
     for (String genome : listGenomes) {
+
+      LOGGER.fine("Start mapping with "
+          + fastqRead1.getName() + " on genome " + genome);
 
       try {
         DataFile genomeFile = new DataFile("genome://" + genome);

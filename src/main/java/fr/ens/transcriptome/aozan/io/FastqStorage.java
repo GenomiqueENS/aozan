@@ -130,9 +130,6 @@ public final class FastqStorage {
    */
   public File getFastqFile(final File[] fastqFiles) throws AozanException {
 
-    final long startTime = System.currentTimeMillis();
-    LOGGER.fine("Start uncompressed for fastq File ");
-
     if (fastqFiles.length == 0) {
       LOGGER.warning("List fastq file to uncompress and compile is empty");
       return null;
@@ -143,6 +140,9 @@ public final class FastqStorage {
     // Return uncompress temporary file if it exist
     if (setFastqFiles.containsKey(key))
       return setFastqFiles.get(key);
+
+    final long startTime = System.currentTimeMillis();
+    LOGGER.fine("Start uncompressed fastq Files.");
 
     // Uncompresses and compiles files of array in new temporary files
     File tmpFastqFile = null;
@@ -219,12 +219,12 @@ public final class FastqStorage {
    */
   public void removeTemporaryFastq(final File file) {
 
-    if (file.exists())
-      setFastqFiles.remove("");
+    if (file.exists()) {
 
-    if (!file.delete())
-      LOGGER.warning("Can't delete temporary fastq file: "
-          + file.getAbsolutePath());
+      if (!file.delete())
+        LOGGER.warning("Can't delete temporary fastq file: "
+            + file.getAbsolutePath());
+    }
   }
 
   /**
@@ -301,9 +301,13 @@ public final class FastqStorage {
       final String casavaOutputPath, final String compressionExtension)
       throws AozanException {
 
+    LOGGER
+        .fine("Start uncompressed all fastq Files before execute fastqscreen.");
+
     // Create the list for threads
-    final List<SeqFileThread> threads = Lists.newArrayList();
-    final List<Future<SeqFileThread>> futureThreads = Lists.newArrayList();
+    final List<UncompressFileThread> threads = Lists.newArrayList();
+    final List<Future<UncompressFileThread>> futureThreads =
+        Lists.newArrayList();
 
     // Create executor service
     final ExecutorService executor = Executors.newFixedThreadPool(this.threads);
@@ -338,7 +342,7 @@ public final class FastqStorage {
               data.get("design.lane" + lane + "." + sampleName + ".index");
 
           // Process sample FASTQ(s)
-          final SeqFileThread sft =
+          final UncompressFileThread sft =
               processFile(data, casavaOutputPath, projectName, sampleName,
                   index, lane, readSample, compressionExtension);
 
@@ -364,7 +368,7 @@ public final class FastqStorage {
    * @param read read number
    * @throws AozanException if an error occurs while processing a FASTQ file
    */
-  public SeqFileThread processFile(final RunData data,
+  public UncompressFileThread processFile(final RunData data,
       final String casavaOutputPath, final String projectName,
       final String sampleName, final String index, final int lane,
       final int read, final String compressionExtension) throws AozanException {
@@ -395,16 +399,14 @@ public final class FastqStorage {
       return null;
     }
 
-    // Verified that the fastq files have been treated, if true return null
+    // Control the fastq files have been treated, if true return null
     String key = keyFiles(fastqFiles);
     if (setFastqFiles.containsKey(key))
       return null;
 
-    System.out.println("file src : " + fastqFiles[0].getAbsolutePath());
-
     // Create the thread object
-    return new SeqFileThread(projectName, sampleName, lane, read, fastqFiles,
-        key, compressionExtension);
+    return new UncompressFileThread(projectName, sampleName, lane, read,
+        fastqFiles, key, compressionExtension);
   }
 
   /**
@@ -413,7 +415,7 @@ public final class FastqStorage {
    * @param executor the executor
    * @throws AozanException if an error occurs while executing a thread
    */
-  private void waitThreads(final List<Future<SeqFileThread>> threads,
+  private void waitThreads(final List<Future<UncompressFileThread>> threads,
       final ExecutorService executor) throws AozanException {
 
     int samplesNotProcessed = 0;
@@ -429,13 +431,13 @@ public final class FastqStorage {
 
       samplesNotProcessed = 0;
 
-      for (Future<SeqFileThread> fst : threads) {
+      for (Future<UncompressFileThread> fst : threads) {
 
         if (fst.isDone()) {
 
           try {
 
-            final SeqFileThread st = fst.get();
+            final UncompressFileThread st = fst.get();
 
             if (!st.isSuccess()) {
 
@@ -482,7 +484,7 @@ public final class FastqStorage {
   // Internal class
   //
 
-  private static final class SeqFileThread implements Runnable {
+  private static final class UncompressFileThread implements Runnable {
 
     private final String projectName;
     private final String sampleName;
@@ -493,18 +495,8 @@ public final class FastqStorage {
     private final File tmpFastqFile;
     private final String compressionExtension;
 
-    private final RunData results;
     private AozanException exception;
     private boolean success;
-
-    /**
-     * Get the results of the FastQC analysis.
-     * @return a RunData object with only the result of the thread
-     */
-    public RunData getResults() {
-
-      return this.results;
-    }
 
     /**
      * Get the exception generated by the call to processSequences in the run()
@@ -600,10 +592,10 @@ public final class FastqStorage {
      * @throws AozanException if an error occurs while creating sequence file
      *           for FastQC
      */
-    public SeqFileThread(final String projectName, final String sampleName,
-        final int lane, final int read, final File[] fastqFiles,
-        final String keyFiles, final String compressionExtension)
-        throws AozanException {
+    public UncompressFileThread(final String projectName,
+        final String sampleName, final int lane, final int read,
+        final File[] fastqFiles, final String keyFiles,
+        final String compressionExtension) throws AozanException {
 
       if (fastqFiles == null || fastqFiles.length == 0)
         throw new AozanException("No fastq file defined");
@@ -616,8 +608,6 @@ public final class FastqStorage {
         this.seqFile = SequenceFactory.getSequenceFile(fastqFiles);
         this.tmpFastqFileName = keyFiles;
         this.compressionExtension = compressionExtension;
-
-        this.results = new RunData();
 
         // Create temporary file
         this.tmpFastqFile =

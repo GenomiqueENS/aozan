@@ -87,7 +87,7 @@ public class FastqScreen {
 
     final long startTime = System.currentTimeMillis();
 
-    LOGGER.fine("Start : fastqscreen on " + fastqRead1.getAbsolutePath());
+    LOGGER.fine("Start fastqscreen on " + fastqRead1.getName());
 
     String tmpDir = properties.getProperty(KEY_TMP_DIR);
     FastqScreenPseudoMapReduce pmr = new FastqScreenPseudoMapReduce();
@@ -110,8 +110,8 @@ public class FastqScreen {
 
     }
 
-    LOGGER.fine("End : fastqscreen on "
-        + fastqRead1.getAbsolutePath() + " for genome(s) "
+    LOGGER.fine("End fastqscreen on "
+        + fastqRead1.getName() + " for genome(s) "
         + listGenomes.toString() + " in mode "
         + (fastqRead2 == null ? "single " : "paired ") + " in "
         + toTimeHumanReadable(System.currentTimeMillis() - startTime));
