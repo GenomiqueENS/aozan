@@ -84,9 +84,8 @@ public class FastqScreenResult {
   /**
    * Save result from fastqscreen in file.
    * @param dirPath directory who save file of result from fastqscreen
-   * @return file file of result from fastqscreen
    */
-  public File createFileResultFastqScreen(final String pathDir) {
+  public void createFileResultFastqScreen(final String pathDir) {
 
     String result = pathDir + "/fastqscreen.txt";
     try {
@@ -101,7 +100,10 @@ public class FastqScreenResult {
       io.printStackTrace();
     }
 
-    return new File(result);
+    System.out.println("Save result resul fastqscreen for fastq : " + result);
+
+    LOGGER.fine("Save result resul fastqscreen for fastq : " + result);
+
   }
 
   /**
@@ -143,7 +145,7 @@ public class FastqScreenResult {
     }
 
     this.percentHitNoLibraries =
-        ((double) (readsprocessed - readsMapped)) / readsprocessed * 100.0;
+        ((double) (readsprocessed - readsMapped)) / readsprocessed;
 
     countPercentOk = true;
   }
@@ -245,22 +247,22 @@ public class FastqScreenResult {
      */
     void countPercentValue(int readsprocessed) {
       this.oneHitOneLibraryPercent =
-          (double) this.oneHitOneLibraryCount * 100.0 / readsprocessed;
+          (double) this.oneHitOneLibraryCount / readsprocessed;
       this.multipleHitsOneLibraryPercent =
-          (double) this.multipleHitsOneLibraryCount * 100.0 / readsprocessed;
+          (double) this.multipleHitsOneLibraryCount / readsprocessed;
       this.oneHitMultipleLibrariesPercent =
-          (double) this.oneHitMultipleLibrariesCount * 100.0 / readsprocessed;
+          (double) this.oneHitMultipleLibrariesCount / readsprocessed;
       this.multipleHitsMultipleLibrariesPercent =
-          (double) this.multipleHitsMultipleLibrariesCount
-              * 100.0 / readsprocessed;
+          (double) this.multipleHitsMultipleLibrariesCount / readsprocessed;
 
       this.mappedPercent =
           (double) (this.oneHitOneLibraryCount
               + this.multipleHitsOneLibraryCount
               + this.oneHitMultipleLibrariesCount + this.multipleHitsMultipleLibrariesCount)
-              * 100.0 / readsprocessed;
+              / readsprocessed;
 
-      this.unMappedPercent = 100.0 - mappedPercent;
+      this.unMappedPercent = 1.0 - mappedPercent;
+
     }
 
     /**
@@ -282,7 +284,7 @@ public class FastqScreenResult {
      * @return double value rounded
      */
     private static double roundDouble(double n) {
-      return ((int) (n * 100.0)) / 100.0;
+      return ((int) (n * 10000.0)) / 100.0;
     }
 
     /**
