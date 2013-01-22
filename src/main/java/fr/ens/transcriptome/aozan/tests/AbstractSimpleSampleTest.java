@@ -34,7 +34,7 @@ import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
 public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
 
-  private ScoreInterval interval = new ScoreInterval();
+  protected ScoreInterval interval = new ScoreInterval();
 
   /**
    * Get the the key in the RunData object for the value to test
@@ -87,6 +87,10 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
 
     if (key == null)
       return null;
+
+    // case line undetermined
+    if (sampleName == null)
+      return new TestResult("NA");
 
     final Class<?> clazz = getValueType();
     final String msg;
@@ -148,6 +152,7 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
       throw new NullPointerException("The properties object is null");
 
     this.interval.configureDoubleInterval(properties);
+
     return Collections.singletonList((AozanTest) this);
   }
 
