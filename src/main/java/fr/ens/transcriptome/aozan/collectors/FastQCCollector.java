@@ -144,82 +144,38 @@ public class FastQCCollector implements Collector {
 
     @Override
     public void run() {
-
-      if (fastqStorage.tmpFileExist(fastqFiles)) {
+      
+      try {
 
         // Temporary fastq file exists
-        try {
+        if (fastqStorage.tmpFileExist(this.read, this.lane, this.projectName,
+            this.sampleName)) {
+          
           processSequences(this.seqFile);
-          this.success = true;
-        } catch (AozanException e) {
-          this.exception = e;
-        }
+        
+        } else {
 
-      } else {
+          // Create temporary fastq file
+          FileWriter outTmpFile;
 
-        // Create temporary fastq file
-        FileWriter outTmpFile;
-
-        try {
-          File tmpFastqFile =
-              File.createTempFile("aozan_fastq_", ".fastq", new File(tmpDir));
-
-          outTmpFile = new FileWriter(tmpFastqFile);
-
-          System.out.println("THREAD QC create tmp file " + tmpFastqFile);
+          // add new temparory uncompress fastq files in map
+          File f =
+              fastqStorage.createTmpFile(this.read, this.lane,
+                  this.projectName, this.sampleName);
+          outTmpFile = new FileWriter(f);
 
           processSequences(this.seqFile, outTmpFile);
           this.success = true;
 
           outTmpFile.close();
-
-          // add new temparory uncompress fastq files in map
-          fastqStorage.addTmpFile(this.fastqFiles, tmpFastqFile);
-
-        } catch (AozanException e) {
-          this.exception = e;
-
-        } catch (IOException e) {
-          this.exception = new AozanException(e);
         }
 
-      }
-    }
+        this.success = true;
 
-    /**
-     * Read FASTQ file and process the data by FastQC modules
-     * @param seqFile input file
-     * @throws AozanException if an error occurs while processing file
-     */
-    private void processSequences(final SequenceFile seqFile)
-        throws AozanException {
-
-      final boolean ignoreFiltered = this.ignoreFilteredSequences;
-      final List<QCModule> modules = this.moduleList;
-
-      try {
-
-        while (seqFile.hasNext()) {
-
-          final Sequence seq = seqFile.next();
-
-          for (final QCModule module : modules) {
-
-            if (ignoreFiltered && module.ignoreFilteredSequences())
-              continue;
-
-            module.processSequence(seq);
-          }
-        }
-
-        // Process results
-        processResults();
-
-        // Keep module data is now unnecessary
-        this.moduleList.clear();
-
-      } catch (SequenceFormatException e) {
-        throw new AozanException(e);
+      } catch (AozanException e) {
+        this.exception = e;
+      } catch (IOException oi) {
+        this.exception = new AozanException(oi.getMessage());
       }
 
     }
@@ -274,6 +230,75 @@ public class FastQCCollector implements Collector {
       } catch (IOException e) {
         throw new AozanException(e);
       }
+
+    }
+
+    /**
+     * Read FASTQ file and process the data by FastQC modules
+     * @param seqFile input file
+     * @throws AozanException if an error occurs while processing file
+     */
+    private void processSequences(final SequenceFile seqFile)
+        throws AozanException {
+
+      final boolean ignoreFiltered = this.ignoreFilteredSequences;
+      final List<QCModule> modules = this.moduleList;
+
+      try {
+
+        while (seqFile.hasNext()) {
+
+          final Sequence seq = seqFile.next();
+
+          for (final QCModule module : modules) {
+
+            if (ignoreFiltered && module.ignoreFilteredSequences())
+              continue;
+
+            module.processSequence(seq);
+          }
+        }
+
+        // Process results
+        processResults();
+
+        // Keep module data is now unnecessary
+        this.moduleList.clear();
+
+      } catch (SequenceFormatException e) {
+        throw new AozanException(e);
+      }
+
+    }
+    
+    private void processSequences() throws AozanException {
+
+      final boolean ignoreFiltered = this.ignoreFilteredSequences;
+      final List<QCModule> modules = this.moduleList;
+
+      SequenceFile nxSeqFile =
+          fastqStorage.getSequenceFile(this.fastqFiles, this.read, this.lane,
+              this.projectName, this.sampleName);
+
+      while (nxSeqFile.hasNext()) {
+
+        final Sequence seq = fastqStorage.nextSequenceFile(nxSeqFile);
+
+        // Process module fastqC
+        for (final QCModule module : modules) {
+
+          if (ignoreFiltered && module.ignoreFilteredSequences())
+            continue;
+
+          module.processSequence(seq);
+        }
+      }
+
+      // Process results
+      processResults();
+
+      // Keep module data is now unnecessary
+      this.moduleList.clear();
 
     }
 
@@ -435,8 +460,6 @@ public class FastQCCollector implements Collector {
         // Get instance of fastqStorage
         this.fastqStorage = FastqStorage.getFastqStorage(tmpDir);
         this.fastqFiles = fastqFiles;
-
-        System.out.println("fastq in qc " + fastqStorage.keyFiles(fastqFiles));
 
         this.results = new RunData();
 

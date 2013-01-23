@@ -71,6 +71,7 @@ public final class FastqStorage {
   private static final int CHECKING_DELAY_MS = 5000;
   private static final int WAIT_SHUTDOWN_MINUTES = 60;
   private static int threads = Runtime.getRuntime().availableProcessors();
+  private static final String COMPRESSION_EXTENSION = "fq.bz2";
 
   private static FastqStorage singleton = null;
 
@@ -81,61 +82,60 @@ public final class FastqStorage {
   private static String tmpDir = null;
 
   /**
-   * Create a sequenceFile
-   * @param fastqFiles array of fastq files
-   * @return SequenceFile
-   * @throws AozanException if an error occurs while creating sequence file
+   * Return file uncompressed corresponding on projectName and sampleName if it
+   * exist, else it is created
+   * @param read read number
+   * @param lane lane number
+   * @param projectName name of the project
+   * @param sampleName name of the sample
+   * @param index sequence index
+   * @return file
+   * @throws AozanException if an error occurs while creating file
    */
-  public SequenceFile getFastqSequenceFile(final File[] fastqFiles)
-      throws AozanException {
+  public File getFastqFile(final String casavaOutputPath, final int read,
+      final int lane, final String projectName, final String sampleName,
+      final String index) throws AozanException {
 
-    if (fastqFiles.length == 0) {
-      LOGGER.warning("List fastq file to uncompress and compile is empty");
+    String key = keyFiles(read, lane, projectName, sampleName);
+
+    // Return uncompress temporary file if it exist
+    if (setFastqFiles.containsKey(key))
+      return setFastqFiles.get(key);
+
+    // Set the list of the files for the FASTQ data
+    final File[] fastqFiles =
+        createListFastqFiles(casavaOutputPath, read, lane, projectName,
+            sampleName, index);
+
+    // No file passing the filter file
+    if (fastqFiles == null || fastqFiles.length == 0) {
       return null;
     }
 
-    String key = keyFiles(fastqFiles);
-    SequenceFile sequenceFile = null;
-
-    try {
-      // Verified that the fastq files have been treated
-      if (setFastqFiles.containsKey(key))
-        sequenceFile = SequenceFactory.getSequenceFile(fastqFiles);
-
-      // Add in list of temporary fastq sequence files
-
-    } catch (SequenceFormatException sfe) {
-      sfe.printStackTrace();
-      throw new AozanException(sfe.getMessage());
-
-    } catch (IOException ioe) {
-      ioe.printStackTrace();
-      throw new AozanException(ioe.getMessage());
-    }
-
-    return sequenceFile;
-  }
-
-  public Sequence nextSequence(final SequenceFile seqFile) {
-    Sequence seq = null;
-
-    return seq;
+    return getFastqFile(fastqFiles, read, lane, projectName, sampleName);
   }
 
   /**
    * Uncompresses and compiles files of array.
    * @param fastqFiles fastq files of array
+   * @param read read number
+   * @param lane lane number
+   * @param projectName name of the project
+   * @param sampleName name of the sample
+   * @param index sequence index
    * @return file compile all files
    * @throws AozanException if an error occurs while creating file
    */
-  public File getFastqFile(final File[] fastqFiles) throws AozanException {
+  public static File getFastqFile(final File[] fastqFiles, final int read,
+      final int lane, final String projectName, final String sampleName)
+      throws AozanException {
 
-    if (fastqFiles.length == 0) {
+    if (fastqFiles == null || fastqFiles.length == 0) {
       LOGGER.warning("List fastq file to uncompress and compile is empty");
       return null;
     }
 
-    String key = keyFiles(fastqFiles);
+    String key = keyFiles(read, lane, projectName, sampleName);
 
     // Return uncompress temporary file if it exist
     if (setFastqFiles.containsKey(key))
@@ -146,9 +146,10 @@ public final class FastqStorage {
 
     // Uncompresses and compiles files of array in new temporary files
     File tmpFastqFile = null;
+
     try {
-      tmpFastqFile =
-          File.createTempFile("aozan_fastq_", ".fastq", new File(tmpDir));
+
+      tmpFastqFile = createTmpFile(read, lane, projectName, sampleName);
 
       OutputStream out = new FileOutputStream(tmpFastqFile);
 
@@ -177,40 +178,108 @@ public final class FastqStorage {
     // Add in list of temporary fastq files
     setFastqFiles.put(key, tmpFastqFile);
 
+    double sizeFile = (double) (((tmpFastqFile.length() / 1024) / 1024) / 1024);
+    sizeFile = ((int) (sizeFile * 10.0)) / 10.0;
+
     LOGGER.fine("End uncompressed for fastq File "
-        + key + " in "
+        + key + "(size : " + sizeFile + " Gio) in "
         + toTimeHumanReadable(System.currentTimeMillis() - startTime));
 
     return tmpFastqFile;
   }
 
-  public void addTmpFile(final File[] files, final File tmpFile) {
-    setFastqFiles.put(keyFiles(files), tmpFile);
+  public SequenceFile getSequenceFile(final File[] fastqFiles, final int read,
+      final int lane, final String projectName, final String sampleName)
+      throws AozanException {
+
+    FileWriter outTmpFile;
+    File f;
+    SequenceFile seqFile ;
+
+    try {
+
+      // Create temporary fastq file
+      f = createTmpFile(read, lane, projectName, sampleName);
+      outTmpFile = new FileWriter(f);
+
+      seqFile = SequenceFactory.getSequenceFile(fastqFiles);
+
+    } catch (IOException io) {
+      throw new AozanException(io.getMessage());
+      
+    } catch (SequenceFormatException sfe) {
+      throw new AozanException(sfe.getMessage());
+    }
+
+    return seqFile;
   }
 
-  public boolean tmpFileExist(File[] files) {
-    return setFastqFiles.containsKey(keyFiles(files));
+  public Sequence nextSequenceFile(final SequenceFile seqFile) {
+    
+    return null;
   }
 
   /**
-   * Compile name of all files of array.
-   * @param tab array of files
-   * @return string key
+   * Create a empty temporary file correspond to projectName and sampleName if
+   * it doesn't exist
+   * @param read read number
+   * @param lane lane number
+   * @param projectName name of the project
+   * @param sampleName name of the sample
+   * @param index sequence index
+   * @return temporary file
+   * @throws AozanException if an error occurs while creating file or if
+   *           temporary file exist
    */
-  public static String keyFiles(final File[] tab) {
+  public static File createTmpFile(final int read, final int lane,
+      final String projectName, final String sampleName) throws AozanException {
 
-    StringBuilder key = new StringBuilder();
-    String separator = "\t";
+    if (tmpFileExist(read, lane, projectName, sampleName))
+      throw new AozanException("Create empty temporary file for "
+          + projectName + " " + sampleName
+          + " is impossible, it already exists");
 
-    for (File f : tab) {
-      key.append(f.getName());
-      key.append(separator);
+    File f;
+    try {
+      f = File.createTempFile("aozan_fastq_", ".fastq", new File(tmpDir));
+    } catch (IOException io) {
+      throw new AozanException(io.getMessage());
     }
+    setFastqFiles.put(keyFiles(read, lane, projectName, sampleName), f);
 
-    int end = key.length() - separator.length();
+    return f;
+  }
 
-    return key.toString().substring(0, end);
+  /**
+   * Test if a temporary file corresponding with projectName and sampleName has
+   * already created
+   * @param read read number
+   * @param lane lane number
+   * @param projectName name of the project
+   * @param sampleName name of the sample
+   * @param index sequence index
+   * @return true if map of files contains a entry with the same key or false
+   */
+  public static boolean tmpFileExist(final int read, final int lane,
+      final String projectName, final String sampleName) {
 
+    return setFastqFiles.containsKey(keyFiles(read, lane, projectName,
+        sampleName));
+  }
+
+  /**
+   * Create a key with read, lane, projectName and sampleName for adding a new
+   * temporary file in map
+   * @param read read number
+   * @param lane lane number
+   * @param projectName name of the project
+   * @param sampleName name of the sample
+   * @return string
+   */
+  private static String keyFiles(final int read, final int lane,
+      final String projectName, final String sampleName) {
+
+    return read + "\t" + lane + "\t" + projectName + "\t" + sampleName;
   }
 
   /**
@@ -244,9 +313,9 @@ public final class FastqStorage {
    * @throws IOException
    */
   public void clear() {
+    System.out.println(setFastqFiles);
 
     for (Map.Entry<String, File> e : setFastqFiles.entrySet())
-
       removeTemporaryFastq(e.getValue());
   }
 
@@ -298,11 +367,15 @@ public final class FastqStorage {
    * @throws AozanException if an error occurs while creating thread
    */
   public void uncompressFastqFiles(final RunData data,
-      final String casavaOutputPath, final String compressionExtension)
-      throws AozanException {
+      final String casavaOutputPath) throws AozanException {
 
     LOGGER
         .fine("Start uncompressed all fastq Files before execute fastqscreen.");
+
+    final long startTime = System.currentTimeMillis();
+
+    System.out
+        .println("Start uncompressed all fastq Files before execute fastqscreen.");
 
     // Create the list for threads
     final List<UncompressFileThread> threads = Lists.newArrayList();
@@ -344,7 +417,7 @@ public final class FastqStorage {
           // Process sample FASTQ(s)
           final UncompressFileThread sft =
               processFile(data, casavaOutputPath, projectName, sampleName,
-                  index, lane, readSample, compressionExtension);
+                  index, lane, readSample, COMPRESSION_EXTENSION);
 
           if (sft != null) {
             threads.add(sft);
@@ -356,6 +429,15 @@ public final class FastqStorage {
 
     // Wait for threads
     waitThreads(futureThreads, executor);
+
+    System.out.println("End uncompressed "
+        + setFastqFiles.size() + " fastq files before execute fastqscreen in "
+        + toTimeHumanReadable(System.currentTimeMillis() - startTime));
+
+    LOGGER.fine("End uncompressed "
+        + setFastqFiles.size() + " fastq Files before execute fastqscreen in "
+        + toTimeHumanReadable(System.currentTimeMillis() - startTime));
+
   }
 
   /**
@@ -373,40 +455,23 @@ public final class FastqStorage {
       final String sampleName, final String index, final int lane,
       final int read, final String compressionExtension) throws AozanException {
 
-    // Set the directory to the file
-    final File dir =
-        new File(casavaOutputPath
-            + "/Project_" + projectName + "/Sample_" + sampleName);
-
-    // Set the prefix of the file
-    final String prefix =
-        String.format("%s_%s_L%03d_R%d_", sampleName, "".equals(index)
-            ? "NoIndex" : index, lane, read);
+    // Control the fastq files have been treated, if true return null
+    String key = keyFiles(read, lane, projectName, sampleName);
+    if (setFastqFiles.containsKey(key))
+      return null;
 
     // Set the list of the files for the FASTQ data
-    final File[] fastqFiles = dir.listFiles(new FileFilter() {
-
-      @Override
-      public boolean accept(final File pathname) {
-
-        return pathname.length() > 10
-            && pathname.getName().startsWith(prefix)
-            && pathname.getName().endsWith(compressionExtension);
-      }
-    });
+    final File[] fastqFiles =
+        createListFastqFiles(casavaOutputPath, read, lane, projectName,
+            sampleName, index);
 
     if (fastqFiles == null || fastqFiles.length == 0) {
       return null;
     }
 
-    // Control the fastq files have been treated, if true return null
-    String key = keyFiles(fastqFiles);
-    if (setFastqFiles.containsKey(key))
-      return null;
-
     // Create the thread object
-    return new UncompressFileThread(projectName, sampleName, lane, read,
-        fastqFiles, key, compressionExtension);
+    return new UncompressFileThread(fastqFiles, read, lane, projectName,
+        sampleName, key);
   }
 
   /**
@@ -470,6 +535,38 @@ public final class FastqStorage {
     executor.shutdown();
   }
 
+  /**
+   * Keep files that satisfy the specified filter in this directory and
+   * beginning with this prefix
+   * @param casavaOutputPath source directory
+   * @return an array of abstract pathnames
+   */
+  public File[] createListFastqFiles(final String casavaOutputPath,
+      final int read, final int lane, final String projectName,
+      final String sampleName, final String index) {
+
+    // Set the directory to the file
+    final File dir =
+        new File(casavaOutputPath
+            + "/Project_" + projectName + "/Sample_" + sampleName);
+
+    // Set the prefix of the file
+    final String prefix =
+        String.format("%s_%s_L%03d_R%d_", sampleName, "".equals(index)
+            ? "NoIndex" : index, lane, read);
+
+    return new File(dir + "/").listFiles(new FileFilter() {
+
+      @Override
+      public boolean accept(final File pathname) {
+
+        return pathname.length() > 0
+            && pathname.getName().startsWith(prefix)
+            && pathname.getName().endsWith(COMPRESSION_EXTENSION);
+      }
+    });
+  }
+
   //
   // Constructor
   //
@@ -484,8 +581,14 @@ public final class FastqStorage {
   // Internal class
   //
 
+  /**
+   * This internal class create a thread for each array of file to uncompress
+   * and compile in temporary file.
+   * @author Sandrine Perrin
+   */
   private static final class UncompressFileThread implements Runnable {
 
+    private final File[] fastqFiles;
     private final String projectName;
     private final String sampleName;
     private final int lane;
@@ -493,7 +596,6 @@ public final class FastqStorage {
     private final SequenceFile seqFile;
     private final String tmpFastqFileName;
     private final File tmpFastqFile;
-    private final String compressionExtension;
 
     private AozanException exception;
     private boolean success;
@@ -520,6 +622,20 @@ public final class FastqStorage {
     @Override
     public void run() {
 
+      try {
+        File f = getFastqFile(fastqFiles, read, lane, projectName, sampleName);
+
+        this.success = (f != null && f.length() > 0);
+
+      } catch (AozanException e) {
+        this.exception = e;
+      }
+
+    }
+
+    // TODO to remove
+    public void run_old() {
+
       FileWriter outTmpFile;
 
       try {
@@ -531,6 +647,8 @@ public final class FastqStorage {
         outTmpFile.close();
 
         // add new temparory uncompress fastq files in map
+        System.out.println("key " + tmpFastqFileName + " name " + tmpFastqFile);
+
         setFastqFiles.put(this.tmpFastqFileName, this.tmpFastqFile);
 
       } catch (AozanException e) {
@@ -554,9 +672,6 @@ public final class FastqStorage {
         while (seqFile.hasNext()) {
 
           final Sequence seq = seqFile.next();
-
-          // System.out.println("sample "
-          // + sampleName + "\tseq " + seq.getSequence());
 
           out.write(seq.getID() + "\n");
           out.write(seq.getSequence() + "\n");
@@ -592,22 +707,21 @@ public final class FastqStorage {
      * @throws AozanException if an error occurs while creating sequence file
      *           for FastQC
      */
-    public UncompressFileThread(final String projectName,
-        final String sampleName, final int lane, final int read,
-        final File[] fastqFiles, final String keyFiles,
-        final String compressionExtension) throws AozanException {
+    public UncompressFileThread(final File[] fastqFiles, final int read,
+        final int lane, String projectName, final String sampleName,
+        final String keyFiles) throws AozanException {
 
       if (fastqFiles == null || fastqFiles.length == 0)
         throw new AozanException("No fastq file defined");
 
       try {
+        this.fastqFiles = fastqFiles;
         this.projectName = projectName;
         this.sampleName = sampleName;
         this.lane = lane;
         this.read = read;
         this.seqFile = SequenceFactory.getSequenceFile(fastqFiles);
         this.tmpFastqFileName = keyFiles;
-        this.compressionExtension = compressionExtension;
 
         // Create temporary file
         this.tmpFastqFile =
@@ -623,5 +737,4 @@ public final class FastqStorage {
     }
 
   }
-
 }

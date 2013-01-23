@@ -40,10 +40,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.collectors.FastQCCollector;
@@ -71,7 +69,12 @@ public class FastqScreenDemo {
   public static final String GENOMES_PATH = RESOURCE_ROOT + "/genomes";
 
   public static RunData data = null;
+
   private static boolean paired = false;
+
+  static String runId;
+  static String date;
+  static String fastqDir;
 
   public static final void main(String[] args) throws AozanException,
       IOException, EoulsanException {
@@ -79,7 +82,6 @@ public class FastqScreenDemo {
     Locale.setDefault(Locale.US);
     final long startTime = System.currentTimeMillis();
 
-    String runId;
     if (paired) {
       // run test pair-end
       runId = "120830_SNL110_0055_AD16D9ACXX";
@@ -90,7 +92,7 @@ public class FastqScreenDemo {
       // runId = "120615_SNL110_0051_AD102YACXX";
     }
 
-    String date = new SimpleDateFormat("yyMMdd").format(new Date());
+    date = new SimpleDateFormat("yyMMdd").format(new Date());
 
     Main.initLogger(TMP_DIR + "/" + runId + "_aozan_test.log");
     ConsoleHandler ch = new ConsoleHandler();
@@ -98,10 +100,9 @@ public class FastqScreenDemo {
     LOGGER.setLevel(Level.ALL);
     LOGGER.addHandler(ch);
 
-    final String fastqDir = SRC_RUN + "/qc_" + runId + "/" + runId;
+    fastqDir = SRC_RUN + "/qc_" + runId + "/" + runId;
 
-    String[] tabGenomes =
-        {"phix", "adapters2"/* , "lsuref_dna"/* , "ssuref" */};
+    String[] tabGenomes = {"phix", "adapters2", "lsuref_dna"/* , "ssuref" */};
     String genomes = "";
     for (String g : tabGenomes) {
       genomes += g + ",";
@@ -109,9 +110,11 @@ public class FastqScreenDemo {
     // remove last separator character ","
     genomes = genomes.substring(0, genomes.length() - 1);
 
+    Collector fsqCollector = new FastqScreenCollector();
+    Collector fqcCollector = new FastQCCollector();
     List<Collector> collectorList = new ArrayList<Collector>();
-    collectorList.add(new FastQCCollector());
-    collectorList.add(new FastqScreenCollector());
+    collectorList.add(fqcCollector);
+    collectorList.add(fsqCollector);
 
     RunDataGenerator rdg = new RunDataGenerator(collectorList);
 
@@ -130,6 +133,7 @@ public class FastqScreenDemo {
     properties.put("reports.data.path", SRC_RUN);
     properties.put("tmp.dir", TMP_DIR);
     properties.put(RunDataGenerator.CASAVA_OUTPUT_DIR, fastqDir);
+    properties.put(RunDataGenerator.QC_OUTPUT_DIR, fastqDir);
 
     // number threads used for fastqscreen is defined in aozan.conf
     properties.put("qc.conf.fastqc.threads", "4");
@@ -144,58 +148,66 @@ public class FastqScreenDemo {
     File f = new File(fastqDir + "/data-" + runId + ".txt");
 
     try {
-
-      // data = new RunData(f);
+      data = new RunData(f);
 
       // Configure : create list of reference genome
-      // fsqCollector.configure(properties);
+      fqcCollector.configure(properties);
+      fsqCollector.configure(properties);
 
       // And collect data
-      // fsqCollector.collect(data);
+      fqcCollector.collect(data);
+      fsqCollector.collect(data);
 
-      // rdg.collect();
       // completed rundata
-      data =
-          new RunData(
-              new File(
-                  "/home/sperrin/Bureau/data-120301_SNL110_0038_AD0EJRABXX_construit.txt"));
-
-      QC qc = new QC(getMapAozanConf(), TMP_DIR);
-
-      QCReport report = new QCReport(data, qc.laneTests, qc.sampleTests);
-
-      qc.writeRawData(report, TMP_DIR
-          + "/" + runId + "_" + date + "_reportRawData.txt");
-
-      // Save report data
-      qc.writeXMLReport(report, TMP_DIR
-          + "/" + runId + "_" + date + "_reportXmlFile.xml");
-
-      // Save HTML report
-      qc.writeReport(report, (String) null, TMP_DIR
-          + "/" + runId + "_" + date + "_reportHtmlFile.html");
-
-      // TODO test method
-      // print completed rundata with results of fastqscreen
+      // data =
+      // new RunData(
+      // new File(
+      // "/home/sperrin/Bureau/data-120301_SNL110_0038_AD0EJRABXX_construit.txt"));
+      // rdg.collect();
 
       System.out.println("rundata Complet "
           + fastqDir + "/RunDataCompleted_" + runId + ".txt");
-      
+
       FileWriter fw =
           new FileWriter(new File(fastqDir
               + "/RunDataCompleted_" + runId + ".txt"));
       BufferedWriter bw = new BufferedWriter(fw);
       bw.write(data.toString());
       bw.close();
-    } catch (IOException io) {
+
+      // reportQC();
+
+    } catch (Exception io) {
       System.out.println(io.getMessage());
     }
 
+    LOGGER.info("Runtime for demo with a run "
+        + runId + " "
+        + toTimeHumanReadable(System.currentTimeMillis() - startTime));
+  }
+
+  public static void reportQC() throws Exception {
+
+    QC qc = new QC(getMapAozanConf(), TMP_DIR);
+
+    QCReport report = new QCReport(data, qc.laneTests, qc.sampleTests);
+
+    qc.writeRawData(report, TMP_DIR
+        + "/" + runId + "_" + date + "_reportRawData.txt");
+
+    // Save report data
+    qc.writeXMLReport(report, TMP_DIR
+        + "/" + runId + "_" + date + "_reportXmlFile.xml");
+
+    // Save HTML report
+    qc.writeReport(report, (String) null, TMP_DIR
+        + "/" + runId + "_" + date + "_reportHtmlFile.html");
+
+    // TODO test method
+    // print completed rundata with results of fastqscreen
+
     /** TEST AozanTest and compute QC report */
 
-    final long endTime = System.currentTimeMillis();
-    LOGGER.info("Runtime for demo with a run "
-        + runId + " " + toTimeHumanReadable(endTime - startTime));
   }
 
   public static RunData getRunData() {

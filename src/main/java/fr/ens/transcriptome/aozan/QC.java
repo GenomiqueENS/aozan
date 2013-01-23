@@ -53,8 +53,8 @@ public class QC {
   private static final String TEST_KEY_PREFIX = "qc.test.";
 
   private List<Collector> collectors = Lists.newArrayList();
-  private List<LaneTest> laneTests = Lists.newArrayList();
-  private List<SampleTest> sampleTests = Lists.newArrayList();
+  /* private */public List<LaneTest> laneTests = Lists.newArrayList();
+  /* private */public List<SampleTest> sampleTests = Lists.newArrayList();
   private Map<String, String> additionalConf = Maps.newHashMap();
   private File tmpDir;
 
@@ -279,21 +279,24 @@ public class QC {
         final AozanTest test = registry.get(testName);
 
         if (test != null) {
-          mapTests.put(key, test);
 
+          // Configure the test
           tests =
               configureTest(test, properties, TEST_KEY_PREFIX + testName + ".");
 
           // Add the test to laneTests or sampleTests
-          if (test instanceof LaneTest)
-            for (AozanTest t : tests)
+          if (test instanceof LaneTest) {
+            for (AozanTest t : tests) {
               this.laneTests.add((LaneTest) t);
+              mapTests.put(key, t);
+            }
 
-          else if (test instanceof SampleTest)
-            for (AozanTest t : tests)
+          } else if (test instanceof SampleTest) {
+            for (AozanTest t : tests) {
               this.sampleTests.add((SampleTest) t);
-
-          // Configure the test
+              mapTests.put(key, t);
+            }
+          }
 
         } else
           throw new AozanException("No test found for property: " + key);
@@ -347,7 +350,7 @@ public class QC {
 
       }
     }
-    
+
     return test.configure(conf);
   }
 
