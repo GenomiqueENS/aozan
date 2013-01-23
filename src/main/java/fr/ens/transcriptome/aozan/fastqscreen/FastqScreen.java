@@ -68,9 +68,10 @@ public class FastqScreen {
    * @throws AozanException
    */
   public FastqScreenResult execute(final File fastqRead,
-      final List<String> listGenomes) throws AozanException {
+      final List<String> listGenomes, final String projectName,
+      final String sampleName) throws AozanException {
 
-    return this.execute(fastqRead, null, listGenomes);
+    return this.execute(fastqRead, null, listGenomes, projectName, sampleName);
 
   }
 
@@ -82,12 +83,13 @@ public class FastqScreen {
    * @throws AozanException
    */
   public FastqScreenResult execute(final File fastqRead1,
-      final File fastqRead2, final List<String> listGenomes)
-      throws AozanException {
+      final File fastqRead2, final List<String> listGenomes,
+      final String projectName, final String sampleName) throws AozanException {
 
     final long startTime = System.currentTimeMillis();
 
-    LOGGER.fine("Start fastqscreen on " + fastqRead1.getName());
+    LOGGER.fine("Start fastqscreen on project "
+        + projectName + " " + sampleName);
 
     String tmpDir = properties.getProperty(KEY_TMP_DIR);
     FastqScreenPseudoMapReduce pmr = new FastqScreenPseudoMapReduce();
@@ -110,8 +112,8 @@ public class FastqScreen {
 
     }
 
-    LOGGER.fine("End fastqscreen on "
-        + fastqRead1.getName() + " for genome(s) "
+    LOGGER.fine("End fastqscreen on project "
+        + projectName + " " + sampleName + " for genome(s) "
         + listGenomes.toString() + " in mode "
         + (fastqRead2 == null ? "single " : "paired ") + " in "
         + toTimeHumanReadable(System.currentTimeMillis() - startTime));
