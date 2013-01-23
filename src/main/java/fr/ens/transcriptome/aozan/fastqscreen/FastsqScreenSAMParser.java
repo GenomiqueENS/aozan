@@ -97,24 +97,22 @@ public class FastsqScreenSAMParser implements SAMParserLine {
       }
 
       SAMRecord samRecord = parser.parseLine(SAMline);
-      readsprocessed++;
       boolean result = buffer.addAlignment(samRecord);
       // new read
       if (!result) {
+        readsprocessed++;
+
         List<SAMRecord> records = buffer.getFilteredAlignments();
 
         if (records.size() > 0) {
 
           String nameRead = records.get(0).getReadName();
 
-          if (records.size() > 1)
-            System.out.println("read " + nameRead);
-
-          // define number of hits 1 or 2 (over one)
           int nbHits;
 
-          // mode paired : records contains an event number of reads
+          // define number of hits 1 or 2 (over one)
           if (paired)
+            // mode paired : records contains an event number of reads
             nbHits = records.size() == 2 ? 1 : 2;
           else
             nbHits = records.size() == 1 ? 1 : 2;
@@ -162,6 +160,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
   public void closeMapOutputFile() {
     // processing read buffer - end of input stream bowtie execution
     try {
+      readsprocessed++;
       List<SAMRecord> records = buffer.getFilteredAlignments();
       if (records.size() != 0) {
         String nameRead = records.get(0).getReadName();
