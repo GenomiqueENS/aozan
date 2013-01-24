@@ -26,7 +26,6 @@ package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
@@ -54,7 +53,6 @@ import uk.ac.bbsrc.babraham.FastQC.Modules.QCModule;
 import uk.ac.bbsrc.babraham.FastQC.Modules.SequenceLengthDistribution;
 import uk.ac.bbsrc.babraham.FastQC.Report.HTMLReportArchive;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.Sequence;
-import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFactory;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFile;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFormatException;
 
@@ -66,6 +64,7 @@ import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.RunDataGenerator;
 import fr.ens.transcriptome.aozan.fastqc.BadTiles;
 import fr.ens.transcriptome.aozan.io.FastqStorage;
+import fr.ens.transcriptome.aozan.io.SequenceFileAozan;
 
 /**
  * This class define a FastQC Collector
@@ -82,9 +81,9 @@ public class FastQCCollector implements Collector {
 
   private String casavaOutputPath;
   private String qcReportOutputPath;
-  private String tmpDir;
+  private String tmpPath;
   private int threads = Runtime.getRuntime().availableProcessors();
-  private String compressionExtension = ".bz2";
+  private String compressionExtension = "fq.bz2";
   private boolean ignoreFilteredSequences = false;
 
   /**
@@ -104,15 +103,11 @@ public class FastQCCollector implements Collector {
     private final List<QCModule> moduleList;
     private final String qcReportOutputPath;
     private final String compressionExtension;
-    private final String tmpDir;
 
+    private final FastqStorage fastqStorage;
     private final RunData results;
     private AozanException exception;
     private boolean success;
-
-    //
-    private final FastqStorage fastqStorage;
-    private final File[] fastqFiles;
 
     /**
      * Get the results of the FastQC analysis.
@@ -144,93 +139,13 @@ public class FastQCCollector implements Collector {
 
     @Override
     public void run() {
-      
+
       try {
-
-        // Temporary fastq file exists
-        if (fastqStorage.tmpFileExist(this.read, this.lane, this.projectName,
-            this.sampleName)) {
-          
-          processSequences(this.seqFile);
-        
-        } else {
-
-          // Create temporary fastq file
-          FileWriter outTmpFile;
-
-          // add new temparory uncompress fastq files in map
-          File f =
-              fastqStorage.createTmpFile(this.read, this.lane,
-                  this.projectName, this.sampleName);
-          outTmpFile = new FileWriter(f);
-
-          processSequences(this.seqFile, outTmpFile);
-          this.success = true;
-
-          outTmpFile.close();
-        }
-
+        processSequences(this.seqFile);
         this.success = true;
-
       } catch (AozanException e) {
         this.exception = e;
-      } catch (IOException oi) {
-        this.exception = new AozanException(oi.getMessage());
       }
-
-    }
-
-    /**
-     * Read FASTQ file and process the data by FastQC modules and create
-     * temporary fastq file
-     * @param seqFile input file
-     * @param fw filewriter for temporary fastq file
-     * @throws AozanException if an error occurs while processing file
-     */
-    private void processSequences(final SequenceFile seqFile,
-        final FileWriter fw) throws AozanException {
-
-      final boolean ignoreFiltered = this.ignoreFilteredSequences;
-      final List<QCModule> modules = this.moduleList;
-
-      try {
-
-        while (seqFile.hasNext()) {
-
-          final Sequence seq = seqFile.next();
-
-          // Writing in temporary file
-          fw.write(seq.getID() + "\n");
-          fw.write(seq.getSequence() + "\n");
-          if (seq.getColorspace() == null)
-            fw.write("+\n");
-          else
-            fw.write(seq.getColorspace() + "\n");
-          fw.write(seq.getQualityString() + "\n");
-
-          // Process module fastqC
-          for (final QCModule module : modules) {
-
-            if (ignoreFiltered && module.ignoreFilteredSequences())
-              continue;
-
-            module.processSequence(seq);
-          }
-        }
-
-        // Process results
-        processResults();
-
-        // Keep module data is now unnecessary
-        this.moduleList.clear();
-
-      } catch (SequenceFormatException e) {
-        throw new AozanException(e);
-
-      } catch (IOException e) {
-        throw new AozanException(e);
-      }
-
     }
 
     /**
@@ -268,37 +183,6 @@ public class FastQCCollector implements Collector {
       } catch (SequenceFormatException e) {
         throw new AozanException(e);
       }
-
-    }
-    
-    private void processSequences() throws AozanException {
-
-      final boolean ignoreFiltered = this.ignoreFilteredSequences;
-      final List<QCModule> modules = this.moduleList;
-
-      SequenceFile nxSeqFile =
-          fastqStorage.getSequenceFile(this.fastqFiles, this.read, this.lane,
-              this.projectName, this.sampleName);
-
-      while (nxSeqFile.hasNext()) {
-
-        final Sequence seq = fastqStorage.nextSequenceFile(nxSeqFile);
-
-        // Process module fastqC
-        for (final QCModule module : modules) {
-
-          if (ignoreFiltered && module.ignoreFilteredSequences())
-            continue;
-
-          module.processSequence(seq);
-        }
-      }
-
-      // Process results
-      processResults();
-
-      // Keep module data is now unnecessary
-      this.moduleList.clear();
 
     }
 
@@ -438,46 +322,37 @@ public class FastQCCollector implements Collector {
     public SeqFileThread(final String projectName, final String sampleName,
         final int lane, final int read, final File[] fastqFiles,
         final boolean ignoreFilteredSequences, final String qcReportOutputPath,
-        final String tmpDir, final String compressionExtension)
+        final String tmpPath, final String compressionExtension)
         throws AozanException {
 
       if (fastqFiles == null || fastqFiles.length == 0)
         throw new AozanException("No fastq file defined");
 
-      try {
+      this.projectName = projectName;
+      this.sampleName = sampleName;
+      this.lane = lane;
+      this.read = read;
+      this.firstFastqFileName = fastqFiles[0].getName();
+      this.ignoreFilteredSequences = ignoreFilteredSequences;
+      this.qcReportOutputPath = qcReportOutputPath;
+      this.compressionExtension = compressionExtension;
 
-        this.projectName = projectName;
-        this.sampleName = sampleName;
-        this.lane = lane;
-        this.read = read;
-        this.seqFile = SequenceFactory.getSequenceFile(fastqFiles);
-        this.firstFastqFileName = fastqFiles[0].getName();
-        this.ignoreFilteredSequences = ignoreFilteredSequences;
-        this.qcReportOutputPath = qcReportOutputPath;
-        this.compressionExtension = compressionExtension;
-        this.tmpDir = tmpDir;
+      this.fastqStorage = FastqStorage.getFastqStorage(tmpPath);
+      // this.seqFile = SequenceFactory.getSequenceFile(fastqFiles);
+      this.seqFile = this.fastqStorage.getSequenceFile(fastqFiles);
 
-        // Get instance of fastqStorage
-        this.fastqStorage = FastqStorage.getFastqStorage(tmpDir);
-        this.fastqFiles = fastqFiles;
+      this.results = new RunData();
 
-        this.results = new RunData();
+      // Define modules list
+      final OverRepresentedSeqs os = new OverRepresentedSeqs();
+      this.moduleList =
+          Lists.newArrayList(new BasicStats(), new PerBaseQualityScores(),
+              new PerSequenceQualityScores(), new PerBaseSequenceContent(),
+              new PerBaseGCContent(), new PerSequenceGCContent(),
+              new NContent(), new SequenceLengthDistribution(),
+              os.duplicationLevelModule(), os, new KmerContent(),
+              new BadTiles());
 
-        // Define modules list
-        final OverRepresentedSeqs os = new OverRepresentedSeqs();
-        this.moduleList =
-            Lists.newArrayList(new BasicStats(), new PerBaseQualityScores(),
-                new PerSequenceQualityScores(), new PerBaseSequenceContent(),
-                new PerBaseGCContent(), new PerSequenceGCContent(),
-                new NContent(), new SequenceLengthDistribution(),
-                os.duplicationLevelModule(), os, new KmerContent(),
-                new BadTiles());
-
-      } catch (SequenceFormatException e) {
-        throw new AozanException(e);
-      } catch (IOException e) {
-        throw new AozanException(e);
-      }
     }
 
   }
@@ -510,7 +385,7 @@ public class FastQCCollector implements Collector {
     this.qcReportOutputPath =
         properties.getProperty(RunDataGenerator.QC_OUTPUT_DIR);
 
-    this.tmpDir = properties.getProperty(RunDataGenerator.TMP_DIR);
+    this.tmpPath = properties.getProperty(RunDataGenerator.TMP_DIR);
 
     if (properties.containsKey("qc.conf.fastqc.threads")) {
 
@@ -529,7 +404,7 @@ public class FastQCCollector implements Collector {
   @Override
   public void collect(/* final */RunData data) throws AozanException {
 
-    // TODO to remove
+    // TODO to remove after test
     data = fr.ens.transcriptome.aozan.FastqScreenDemo.getRunData();
 
     // Create the list for threads
@@ -572,7 +447,7 @@ public class FastQCCollector implements Collector {
           final SeqFileThread sft =
               processFile(data, projectName, sampleName, index, lane,
                   readSample);
-          //TODO remove test null
+
           if (sft != null) {
             threads.add(sft);
             futureThreads.add(executor.submit(sft, sft));
@@ -619,18 +494,18 @@ public class FastQCCollector implements Collector {
       @Override
       public boolean accept(final File pathname) {
 
-        return pathname.length() > 10
+        return pathname.length() > 0
             && pathname.getName().startsWith(prefix)
             && pathname.getName().endsWith(compressionExtension);
       }
     });
 
-    if (fastqFiles.length == 0)
+    if (fastqFiles == null || fastqFiles.length == 0)
       return null;
 
     // Create the thread object
     return new SeqFileThread(projectName, sampleName, lane, read, fastqFiles,
-        this.ignoreFilteredSequences, this.qcReportOutputPath, this.tmpDir,
+        this.ignoreFilteredSequences, this.qcReportOutputPath, this.tmpPath,
         this.compressionExtension);
   }
 

@@ -102,7 +102,7 @@ public class FastqScreenDemo {
 
     fastqDir = SRC_RUN + "/qc_" + runId + "/" + runId;
 
-    String[] tabGenomes = {"phix", "adapters2", "lsuref_dna"/* , "ssuref" */};
+    String[] tabGenomes = {"phix", "adapters2", "lsuref_dna", "ssuref" /**/};
     String genomes = "";
     for (String g : tabGenomes) {
       genomes += g + ",";
@@ -152,10 +152,9 @@ public class FastqScreenDemo {
 
       // Configure : create list of reference genome
       fqcCollector.configure(properties);
-      fsqCollector.configure(properties);
-
-      // And collect data
       fqcCollector.collect(data);
+
+      fsqCollector.configure(properties);
       fsqCollector.collect(data);
 
       // completed rundata
@@ -202,11 +201,6 @@ public class FastqScreenDemo {
     // Save HTML report
     qc.writeReport(report, (String) null, TMP_DIR
         + "/" + runId + "_" + date + "_reportHtmlFile.html");
-
-    // TODO test method
-    // print completed rundata with results of fastqscreen
-
-    /** TEST AozanTest and compute QC report */
 
   }
 
