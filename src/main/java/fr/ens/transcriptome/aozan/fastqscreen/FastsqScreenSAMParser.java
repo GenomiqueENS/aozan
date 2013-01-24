@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import net.sf.samtools.SAMParser;
 import net.sf.samtools.SAMRecord;
@@ -61,7 +60,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
 
   private final List<String> genomeDescriptionList;
   private final SAMParser parser;
-  private boolean newGenome = true;
+  private boolean headerParsed = false;
   private boolean paired = false;
 
   private final List<ReadAlignmentsFilter> listFilters;
@@ -85,48 +84,57 @@ public class FastsqScreenSAMParser implements SAMParserLine {
     if (SAMline == null || SAMline.length() == 0)
       return;
 
-    if (SAMline.charAt(0) == '@') {
-      genomeDescriptionList.add(SAMline);
-      newGenome = true;
+    if (!headerParsed) {
 
-    } else {
-      if (newGenome) {
+      if (SAMline.charAt(0) == '@') {
+
+        // Store header line
+        genomeDescriptionList.add(SAMline);
+
+        return;
+
+      } else {
+
         // Set the chromosomes sizes in the parser
         parser.setGenomeDescription(genomeDescriptionList);
-        newGenome = false;
+        genomeDescriptionList.clear();
+        headerParsed = true;
+
       }
 
-      SAMRecord samRecord = parser.parseLine(SAMline);
-      boolean result = buffer.addAlignment(samRecord);
-      // new read
-      if (!result) {
-        readsprocessed++;
-
-        List<SAMRecord> records = buffer.getFilteredAlignments();
-
-        if (records.size() > 0) {
-
-          String nameRead = records.get(0).getReadName();
-
-          int nbHits;
-
-          // define number of hits 1 or 2 (over one)
-          if (paired)
-            // mode paired : records contains an event number of reads
-            nbHits = records.size() == 2 ? 1 : 2;
-          else
-            nbHits = records.size() == 1 ? 1 : 2;
-
-          // write in SAMmapOutputFile
-          if (nameRead != null) {
-            fw.write(nameRead + "\t" + nbHits + genome);
-            fw.write("\n");
-          }
-        }
-        buffer.addAlignment(samRecord);
-        records.clear();
-      }
     }
+
+    final SAMRecord samRecord = parser.parseLine(SAMline);
+    boolean result = buffer.addAlignment(samRecord);
+    // new read
+    if (!result) {
+      readsprocessed++;
+
+      List<SAMRecord> records = buffer.getFilteredAlignments();
+
+      if (records.size() > 0) {
+
+        String nameRead = records.get(0).getReadName();
+
+        int nbHits;
+
+        // define number of hits 1 or 2 (over one)
+        if (paired)
+          // mode paired : records contains an event number of reads
+          nbHits = records.size() == 2 ? 1 : 2;
+        else
+          nbHits = records.size() == 1 ? 1 : 2;
+
+        // write in SAMmapOutputFile
+        if (nameRead != null) {
+          fw.write(nameRead + "\t" + nbHits + genome);
+          fw.write("\n");
+        }
+      }
+      buffer.addAlignment(samRecord);
+      records.clear();
+    }
+
   }
 
   /**
