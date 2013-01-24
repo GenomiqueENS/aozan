@@ -91,15 +91,21 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
     for (String genome : genomes) {
 
-      AbstractSimpleSampleTest testGenome =
+      final FastqScreenSimpleSampleTest testGenome =
           new FastqScreenSimpleSampleTest(genome);
 
-      testGenome.interval.configureDoubleInterval(properties);
+      testGenome.internalConfigure(properties);
 
       list.add(testGenome);
     }
 
     return list;
+  }
+
+  private void internalConfigure(final Map<String, String> properties)
+      throws AozanException {
+
+    super.configure(properties);
   }
 
   //

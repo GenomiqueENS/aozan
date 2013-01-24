@@ -34,7 +34,7 @@ import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
 public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
 
-  protected ScoreInterval interval = new ScoreInterval();
+  private ScoreInterval interval = new ScoreInterval();
 
   /**
    * Get the the key in the RunData object for the value to test
