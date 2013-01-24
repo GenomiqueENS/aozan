@@ -1,3 +1,26 @@
+/*
+ *                  Aozan development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU General Public License version 3 or later 
+ * and CeCILL. This should be distributed with the code. If you 
+ * do not have a copy, see:
+ *
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+ *
+ * Copyright for this code is held jointly by the Genomic platform
+ * of the Institut de Biologie de l'École Normale Supérieure and
+ * the individual authors. These should be listed in @author doc
+ * comments.
+ *
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page at:
+ *
+ *      http://www.transcriptome.ens.fr/aozan
+ *
+ */
+
 package fr.ens.transcriptome.aozan.tests;
 
 import java.util.ArrayList;
@@ -37,35 +60,52 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   protected Number transformValue(final Number value, final RunData data,
       final int read, final boolean indexedRead, final int lane) {
 
-    return value.doubleValue() / 100.0;
+    return value.doubleValue() * 100.0;
   }
 
   public String getNameGenome() {
     return this.genome;
   }
 
-  public boolean isPercent() {
+  public boolean isValuePercent() {
     return true;
   }
 
   @Override
-  public List<AozanTest> configure(Map<String, String> properties)
+  public List<AozanTest> configure(final Map<String, String> properties)
       throws AozanException {
 
-    String txt = properties.get(KEY_GENOMES);
+    if (properties == null)
+      throw new NullPointerException("The properties object is null");
 
-    if (txt == null || txt.length() == 0)
+    String genomesName = properties.get(KEY_GENOMES);
+
+    if (genomesName == null || genomesName.length() == 0)
       throw new AozanException(
           "Step FastqScreen : default genome reference for tests");
 
     final Splitter s = Splitter.on(',').trimResults().omitEmptyStrings();
-    List<String> genomes = Lists.newArrayList(s.split(txt));
+    List<String> genomes = Lists.newArrayList(s.split(genomesName));
 
     List<AozanTest> list = new ArrayList<AozanTest>();
-    for (String g : genomes)
-      list.add(new FastqScreenSimpleSampleTest(g));
+
+    for (String genome : genomes) {
+
+      final FastqScreenSimpleSampleTest testGenome =
+          new FastqScreenSimpleSampleTest(genome);
+
+      testGenome.internalConfigure(properties);
+
+      list.add(testGenome);
+    }
 
     return list;
+  }
+
+  private void internalConfigure(final Map<String, String> properties)
+      throws AozanException {
+
+    super.configure(properties);
   }
 
   //
