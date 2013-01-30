@@ -284,7 +284,7 @@ public class FastqScreenResult {
      * @return double value rounded
      */
     private static double roundDouble(double n) {
-      return ((int) (n * 10000.0)) / 100.0;
+      return Math.rint(n * 10000.0) / 100.0;
     }
 
     /**
