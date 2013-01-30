@@ -23,7 +23,13 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +43,15 @@ import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
 public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
   private static final String KEY_GENOMES = "qc.conf.fastqscreen.genomes";
-  private String genome;
+  private static final String KEY_ALIAS_GENOME_PATH =
+      "qc.conf.genome.alias.path";
+
+  // map which does correspondance between genome of sample and reference genome
+  private static final Map<String, String> aliasGenome =
+      new HashMap<String, String>();
+
+  private String genomeReference;
+  private String aliasGenomePath;
 
   @Override
   public String[] getCollectorsNamesRequiered() {
@@ -49,26 +63,46 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
     return "fastqscreen.lane"
         + lane + ".sample." + sampleName + ".read" + readSample + "."
-        + sampleName + "." + genome + ".unmapped.percent";
-
+        + sampleName + "." + genomeReference + ".unmapped.percent";
   }
 
   public Class<?> getValueType() {
     return Double.class;
   }
 
-  protected Number transformValue(final Number value, final RunData data,
-      final int read, final boolean indexedRead, final int lane) {
+  /**
+   * Transform the score : if genome of sample is the same as reference genome
+   * then the score is reverse for change the color in QC report
+   * @param value value to transform
+   * @param data run data
+   * @param read index of read
+   * @param readSample index of read without indexed reads
+   * @param lane lane index
+   * @param sampleName sample name
+   * @return the transformed score
+   */
+  @Override
+  protected int transformScore(final int score, final RunData data,
+      final int read, int readSample, final int lane, final String sampleName) {
 
-    return value.doubleValue() * 100.0;
-  }
+    String keyGenomeSample =
+        "design.lane" + lane + "." + sampleName + ".sample.ref";
+    String genomeSample = data.get(keyGenomeSample);
+    genomeSample = genomeSample.trim().toLowerCase();
+    genomeSample = genomeSample.replace('"', '\0');
 
-  public String getNameGenome() {
-    return this.genome;
-  }
+    // add genome of the sample if it doesn't in reference file
+    if (!aliasGenome.containsKey(genomeSample)) {
+      System.out.println("gRef " + genomeReference + " sample " + genomeSample);
 
-  public boolean isValuePercent() {
-    return true;
+      aliasGenome.put(genomeSample, "");
+      updateAliasGenomeFile(genomeSample);
+    }
+
+    if (this.genomeReference.equals(aliasGenome.get(genomeSample)))
+      return (9 - score);
+    else
+      return score;
   }
 
   @Override
@@ -84,6 +118,11 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
       throw new AozanException(
           "Step FastqScreen : default genome reference for tests");
 
+    // retrieve the genome of sample
+    this.aliasGenomePath = properties.get(KEY_ALIAS_GENOME_PATH);
+    createMapAliasGenome();
+
+    // create an new AozanTest for each reference genome
     final Splitter s = Splitter.on(',').trimResults().omitEmptyStrings();
     List<String> genomes = Lists.newArrayList(s.split(genomesName));
 
@@ -102,23 +141,94 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     return list;
   }
 
+  @Override
+  public boolean isValuePercent() {
+    return true;
+  }
+
+  /**
+   * Get name of reference genome
+   * @return name of reference genome
+   */
+  public String getNameGenome() {
+    return this.genomeReference;
+  }
+
   private void internalConfigure(final Map<String, String> properties)
       throws AozanException {
-
+    this.aliasGenomePath = properties.get(KEY_ALIAS_GENOME_PATH);
     super.configure(properties);
+  }
+
+  /**
+   * Create a map which does correspondance between genome of sample and
+   * reference genome from a file
+   */
+  private void createMapAliasGenome() {
+    try {
+
+      if (this.aliasGenomePath != null) {
+
+        final BufferedReader br =
+            new BufferedReader(new FileReader(new File(this.aliasGenomePath)));
+        String line = null;
+
+        while ((line = br.readLine()) != null) {
+
+          final int pos = line.indexOf('=');
+          if (pos == -1)
+            continue;
+
+          final String key = line.substring(0, pos);
+          final String value = line.substring(pos + 1);
+
+          aliasGenome.put(key, value);
+        }
+        br.close();
+      }
+    } catch (IOException io) {
+    }
+  }
+
+  /**
+   * Add the genome of the sample in the file which does correspondance with
+   * reference genome
+   * @param genomeSample name genome
+   */
+  private void updateAliasGenomeFile(final String genomeSample) {
+
+    try {
+      if (this.aliasGenomePath != null) {
+
+        final FileWriter fw = new FileWriter(this.aliasGenomePath, true);
+
+        fw.write(genomeSample + "=\n");
+
+        fw.close();
+      }
+    } catch (IOException io) {
+      System.out.println(io.getMessage());
+    }
   }
 
   //
   // Constructor
   //
 
+  /**
+   * Public constructor
+   */
   public FastqScreenSimpleSampleTest() {
     this(null);
   }
 
+  /**
+   * Public constructor, specific for a reference genome
+   * @param genome name of reference genome
+   */
   public FastqScreenSimpleSampleTest(String genome) {
     super("fsqunmapped", "", "fastqscreen unmapped on " + genome, "%");
-    this.genome = genome;
+    this.genomeReference = genome;
   }
 
 }

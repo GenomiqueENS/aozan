@@ -65,6 +65,22 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
   }
 
   /**
+   * Transform the score.
+   * @param value value to transform
+   * @param data run data
+   * @param read index of read
+   * @param readSample index of read without indexed reads
+   * @param lane lane index
+   * @param sampleName sample name
+   * @return the transformed score
+   */
+  protected int transformScore(final int score, final RunData data,
+      final int read, int readSample, final int lane, final String sampleName) {
+
+    return score;
+  }
+
+  /**
    * Test if the value is a percent.
    * @return true if the value is a percent
    */
@@ -131,8 +147,11 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
       if (interval == null || sampleName == null)
         return new TestResult(transformedValue, isValuePercent());
 
-      return new TestResult(this.interval.getScore(transformedValue),
-          transformedValue, isValuePercent());
+      int score =
+          transformScore(this.interval.getScore(transformedValue), data,
+              read, readSample, lane, sampleName);
+      
+      return new TestResult(score, transformedValue, isValuePercent());
 
     } catch (NumberFormatException e) {
 
