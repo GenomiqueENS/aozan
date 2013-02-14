@@ -39,7 +39,7 @@ public class HitNoLibrariesFastqScreenSampleTest extends
 
     return "fastqscreen.lane"
         + lane + ".sample." + sampleName + ".read" + read + "." + sampleName
-        + ".hitnolibraries";
+        + ".hit";
   }
 
   @Override

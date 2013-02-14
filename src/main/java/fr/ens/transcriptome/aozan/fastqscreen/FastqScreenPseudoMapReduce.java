@@ -28,6 +28,8 @@ import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -60,6 +62,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+  private static final NumberFormat formatter = new DecimalFormat("#,###");
 
   protected static final String COUNTER_GROUP = "reads_mapping";
   private final Reporter reporter;
@@ -323,7 +326,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         + readsMapped + " / nb read " + readsprocessed);
 
     LOGGER.fine("Result of mapping : nb read mapped "
-        + readsMapped + " / nb read " + readsprocessed);
+        + formatter.format(readsMapped) + " / nb read "
+        + formatter.format(readsprocessed));
 
     fastqScreenResult.countPercentValue(readsMapped, readsprocessed);
 

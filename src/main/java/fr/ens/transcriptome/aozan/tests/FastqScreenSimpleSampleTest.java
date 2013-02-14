@@ -63,7 +63,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
     return "fastqscreen.lane"
         + lane + ".sample." + sampleName + ".read" + readSample + "."
-        + sampleName + "." + genomeReference + ".unmapped.percent";
+        + sampleName + "." + genomeReference + ".mapped.percent";
   }
 
   public Class<?> getValueType() {

@@ -44,7 +44,8 @@ public class FastqScreenResult {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
-  private static final String FINAL_LINE_RUNDATA = "hitnolibraries";
+  private static final String HIT_NO_LIBRAIRIES_LEGEND = "hitnolibraries";
+  private static final String HIT_LEGEND = "hit";
   private static final String FINAL_TEXT = "Hit_no_libraries";
   private static final String HEADER_COLUMNS_TAB =
       "library \t unmapped \t one_hit_one_library \t multiple_hits_one_library "
@@ -57,6 +58,7 @@ public class FastqScreenResult {
 
   private Map<String, DataPerGenome> resultsPerGenome;
   private double percentHitNoLibraries = 0.0;
+  private double percentHit = 0.0;
   private boolean countPercentOk = false;
 
   /**
@@ -146,7 +148,8 @@ public class FastqScreenResult {
 
     this.percentHitNoLibraries =
         ((double) (readsprocessed - readsMapped)) / readsprocessed;
-
+    this.percentHit = 1.0 - this.percentHitNoLibraries; 
+        
     countPercentOk = true;
   }
 
@@ -172,7 +175,8 @@ public class FastqScreenResult {
     }
 
     // print last line of report FastqScreen
-    data.put(prefix + "." + FINAL_LINE_RUNDATA, this.percentHitNoLibraries);
+    data.put(prefix + "." + HIT_NO_LIBRAIRIES_LEGEND, this.percentHitNoLibraries);
+    data.put(prefix + "." + HIT_LEGEND, this.percentHit);
   }
 
   //
@@ -294,6 +298,8 @@ public class FastqScreenResult {
      */
     public void updateRundata(final RunData data, final String prefix) {
       // add line in RunData
+      data.put(prefix + "." + genome + "." + mappedLegend + ".percent",
+          this.mappedPercent);
       data.put(prefix + "." + genome + "." + unMappedLegend + ".percent",
           this.unMappedPercent);
       data.put(prefix
