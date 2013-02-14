@@ -57,11 +57,11 @@ public class FastqScreenCollector implements Collector {
 
   public static final String COLLECTOR_NAME = "fastqscreen";
 
-  private static final String KEY_GENOMES = "qc.conf.fastqscreen.genomes";
+  public static final String KEY_GENOMES = "qc.conf.fastqscreen.genomes";
 
-  private static final String KEY_READ_COUNT = "run.info.read.count";
-  private static final String KEY_READ_X_INDEXED = "run.info.read";
-  private static final String COMPRESSION_EXTENSION = "fastq.bz2";
+  public static final String KEY_READ_COUNT = "run.info.read.count";
+  public static final String KEY_READ_X_INDEXED = "run.info.read";
+  // private static final String COMPRESSION_EXTENSION = "fastq.bz2";
 
   private FastqScreen fastqscreen;
   private FastqStorage fastqStorage;
@@ -99,7 +99,7 @@ public class FastqScreenCollector implements Collector {
     this.fastqscreen = new FastqScreen(properties);
 
     this.fastqStorage =
-        FastqStorage.getFastqStorage(properties
+        FastqStorage.getInstance(properties
             .getProperty(RunDataGenerator.TMP_DIR));
 
     this.fastqStorage.setThreads(Integer.parseInt(properties.getProperty(
@@ -254,41 +254,6 @@ public class FastqScreenCollector implements Collector {
   }
 
   /**
-   * Keep files that satisfy the specified filter in this directory and
-   * beginning with this prefix
-   * @param casavaOutputPath source directory
-   * @return an array of abstract pathnames
-   */
-  public File[] createListFastqFiles(final String casavaOutputPath,
-      final int read, final int lane, final String projectName,
-      final String sampleName, final String index) {
-
-    if (sampleName.endsWith("2012_0197"))
-      return null;
-
-    // Set the directory to the file
-    final File dir =
-        new File(casavaOutputPath
-            + "/Project_" + projectName + "/Sample_" + sampleName);
-
-    // Set the prefix of the file
-    final String prefix =
-        String.format("%s_%s_L%03d_R%d_", sampleName, "".equals(index)
-            ? "NoIndex" : index, lane, read);
-
-    return new File(dir + "/").listFiles(new FileFilter() {
-
-      @Override
-      public boolean accept(final File pathname) {
-
-        return pathname.length() > 0
-            && pathname.getName().startsWith(prefix)
-            && pathname.getName().endsWith(COMPRESSION_EXTENSION);
-      }
-    });
-  }
-
-  /**
    * Save in file result from fastqscreen for one sample.
    * @param result object fastqScreenResult which contains all values from
    *          fastqscreen of one sample
@@ -307,8 +272,8 @@ public class FastqScreenCollector implements Collector {
     System.out.println(result.statisticalTableToString());
 
     File[] fastqFiles =
-        createListFastqFiles(casavaOutputPath, read, lane, projectName,
-            sampleName, index);
+        fastqStorage.createListFastqFiles(casavaOutputPath, read, lane,
+            projectName, sampleName, index);
 
     String firstFile = fastqFiles[0].getName();
 

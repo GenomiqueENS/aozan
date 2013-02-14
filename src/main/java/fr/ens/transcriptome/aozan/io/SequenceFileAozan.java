@@ -28,6 +28,8 @@ import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -71,12 +73,18 @@ public class SequenceFileAozan implements SequenceFile {
       if (!seqFile.hasNext()) {
         this.fw.close();
 
-        double sizeFile = ((double) file.length()) / 1024.0 / 1024.0 / 1024.0;
-        sizeFile = ((int) (sizeFile * 10.0)) / 10.0;
+        long sizeFile = file.length();
+        // double sizeFile =
+        // ((double) tmpFastqFile.length()) / 1024.0 / 1024.0 / 1024.0;
+        // sizeFile = ((int) (sizeFile * 10.0)) / 10.0;
+
+        NumberFormat formatter = new DecimalFormat("#,###");
 
         LOGGER.fine("End uncompressed for fastq File "
-            + file.getName() + "(size : " + sizeFile + " Gio) in "
+            + file.getName() + "(size : " + formatter.format(sizeFile)
+            + ") in "
             + toTimeHumanReadable(System.currentTimeMillis() - startTime));
+
       }
 
     } catch (IOException io) {
@@ -121,7 +129,7 @@ public class SequenceFileAozan implements SequenceFile {
   public SequenceFileAozan(final File[] files, final File tmpFile)
       throws AozanException {
 
-    LOGGER.fine("Start uncompressed fastq Files.");
+    LOGGER.fine("Start uncompressed fastq Files : " + files[0].length() + ".");
 
     this.file = tmpFile;
 

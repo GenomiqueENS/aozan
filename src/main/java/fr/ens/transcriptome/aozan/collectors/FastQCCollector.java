@@ -337,7 +337,7 @@ public class FastQCCollector implements Collector {
       this.qcReportOutputPath = qcReportOutputPath;
       this.compressionExtension = compressionExtension;
 
-      this.fastqStorage = FastqStorage.getFastqStorage(tmpPath);
+      this.fastqStorage = FastqStorage.getInstance(tmpPath);
       // this.seqFile = SequenceFactory.getSequenceFile(fastqFiles);
       this.seqFile = this.fastqStorage.getSequenceFile(fastqFiles);
 

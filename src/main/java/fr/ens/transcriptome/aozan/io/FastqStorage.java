@@ -29,14 +29,14 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -44,7 +44,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import uk.ac.bbsrc.babraham.FastQC.Sequence.Sequence;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFactory;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFile;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFormatException;
@@ -70,8 +69,10 @@ public final class FastqStorage {
 
   private static final int CHECKING_DELAY_MS = 5000;
   private static final int WAIT_SHUTDOWN_MINUTES = 60;
+  private static final NumberFormat formatter = new DecimalFormat("#,###");
+  
   private static int threads;
-  private static final String COMPRESSION_EXTENSION = "fq.bz2";
+  private static String compression_extension = "fastq.bz2";
 
   private static FastqStorage singleton;
 
@@ -94,6 +95,11 @@ public final class FastqStorage {
   public File getFastqFile(final String casavaOutputPath, final int read,
       final int lane, final String projectName, final String sampleName,
       final String index) throws AozanException {
+
+    // TODO to remove
+    if (!sampleName.endsWith("2012_0051")) {
+      return null;
+    }
 
     // Set the list of the files for the FASTQ data
     final File[] fastqFiles =
@@ -129,7 +135,8 @@ public final class FastqStorage {
       return setFastqFiles.get(key);
 
     final long startTime = System.currentTimeMillis();
-    LOGGER.fine("Start uncompressed fastq Files.");
+    LOGGER.fine("Start uncompressed fastq Files, size : "
+        + formatter.format(fastqFiles[0].length()) + ".");
 
     // Uncompresses and compiles files of array in new temporary files
     File tmpFastqFile = null;
@@ -168,12 +175,18 @@ public final class FastqStorage {
 
     countFileDecompressed++;
 
-    double sizeFile = (double) (((tmpFastqFile.length() / 1024) / 1024) / 1024);
-    sizeFile = ((int) (sizeFile * 10.0)) / 10.0;
+    long sizeFile = tmpFastqFile.length();
+    // double sizeFile =
+    // ((double) tmpFastqFile.length()) / 1024.0 / 1024.0 / 1024.0;
+    // sizeFile = ((int) (sizeFile * 10.0)) / 10.0;
 
-    LOGGER.fine("End uncompressed for fastq File "
-        + key + "(size : " + sizeFile + " Gio) in "
-        + toTimeHumanReadable(System.currentTimeMillis() - startTime));
+    
+
+    LOGGER
+        .fine("End uncompressed for fastq File "
+            + tmpFastqFile.getName() + "(size : " + formatter.format(sizeFile)
+            + ") in "
+            + toTimeHumanReadable(System.currentTimeMillis() - startTime));
 
     return tmpFastqFile;
   }
@@ -280,7 +293,7 @@ public final class FastqStorage {
    * @throws IOException
    */
   public void clear() {
-    System.out.println(setFastqFiles);
+    System.out.println("delete temporaries files " + setFastqFiles);
 
     for (Map.Entry<String, File> e : setFastqFiles.entrySet())
       removeTemporaryFastq(e.getValue());
@@ -291,18 +304,13 @@ public final class FastqStorage {
    * @param tmp
    * @return instance of fastqStorage
    */
-  public static FastqStorage getFastqStorage(final String tmp) {
+  public static FastqStorage getInstance(final String tmp) {
 
     if (singleton == null) {
       tmpDir = tmp;
       singleton = new FastqStorage();
     }
     return singleton;
-  }
-
-  public void setThreads(final int nbThreads) {
-    if (nbThreads > 0)
-      threads = nbThreads;
   }
 
   /**
@@ -363,7 +371,7 @@ public final class FastqStorage {
           // Process sample FASTQ(s)
           final UncompressFileThread sft =
               processFile(data, casavaOutputPath, projectName, sampleName,
-                  index, lane, readSample, COMPRESSION_EXTENSION);
+                  index, lane, readSample, compression_extension);
 
           if (sft != null) {
             threads.add(sft);
@@ -507,9 +515,42 @@ public final class FastqStorage {
 
         return pathname.length() > 0
             && pathname.getName().startsWith(prefix)
-            && pathname.getName().endsWith(COMPRESSION_EXTENSION);
+            && pathname.getName().endsWith(compression_extension);
       }
     });
+  }
+
+  //
+  // Getter
+  //
+  public String getCompressionExtension() {
+    return compression_extension;
+  }
+
+  //
+  // Setter
+  //
+
+  public void setCompressionExtension(File file) throws AozanException {
+
+    // String nameFile = file.getName();
+    //
+    // if (nameFile.indexOf(".fastq") < 0)
+    // throw new AozanException("Compression extension unknown.");
+
+    CompressionType zType =
+        CompressionType.getCompressionTypeByFilename(file.getName());
+
+    if (zType.equals(CompressionType.NONE))
+      throw new AozanException("Compression extension unknown.");
+
+    compression_extension = zType.getExtension();
+
+  }
+
+  public void setThreads(final int nbThreads) {
+    if (nbThreads > 0)
+      threads = nbThreads;
   }
 
   //
@@ -599,7 +640,7 @@ public final class FastqStorage {
         throw new AozanException("No fastq file defined");
 
       this.fastqFiles = fastqFiles;
-      
+
       this.projectName = projectName;
       this.sampleName = sampleName;
       this.lane = lane;
