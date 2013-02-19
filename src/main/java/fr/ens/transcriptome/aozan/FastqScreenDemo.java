@@ -50,6 +50,7 @@ import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.FastQCCollector;
 import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
+import fr.ens.transcriptome.aozan.collectors.UncompressFastqCollector;
 import fr.ens.transcriptome.aozan.io.FastqStorage;
 import fr.ens.transcriptome.eoulsan.EoulsanException;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
@@ -93,8 +94,8 @@ public class FastqScreenDemo {
         runId = "120830_SNL110_0055_AD16D9ACXX";
       } else {
         // run test single-end
-        runId = "120301_SNL110_0038_AD0EJRABXX";
-        // runId = "121116_SNL110_0058_AC11HRACXX";
+        // runId = "120301_SNL110_0038_AD0EJRABXX";
+        runId = "121116_SNL110_0058_AC11HRACXX";
         // runId = "121219_SNL110_0059_AD1B1BACXX";
         // runId = "120615_SNL110_0051_AD102YACXX";
       }
@@ -114,6 +115,7 @@ public class FastqScreenDemo {
       // remove last separator character ","
       genomes = genomes.substring(0, genomes.length() - 1);
 
+      Collector uncompressFastqCollector = new UncompressFastqCollector();
       Collector fsqCollector = new FastqScreenCollector();
       Collector fqcCollector = new FastQCCollector();
       List<Collector> collectorList = new ArrayList<Collector>();
@@ -122,6 +124,7 @@ public class FastqScreenDemo {
 
       collectorList.add(fqcCollector);
       collectorList.add(fsqCollector);
+      collectorList.add(uncompressFastqCollector);
 
       RunDataGenerator rdg = new RunDataGenerator(collectorList);
 
@@ -198,14 +201,17 @@ public class FastqScreenDemo {
         fqcCollector.configure(properties);
         fqcCollector.collect(data);
 
+        uncompressFastqCollector.configure(properties);
+        uncompressFastqCollector.collect(data);
+
         fsqCollector.configure(properties);
         fsqCollector.collect(data);
 
         // completed rundata
-        data =
-            new RunData(
-                new File(
-                    "/home/sperrin/Bureau/data-120301_SNL110_0038_AD0EJRABXX_construit.txt"));
+        // data =
+        // new RunData(
+        // new File(
+        // "/home/sperrin/Bureau/data-120301_SNL110_0038_AD0EJRABXX_construit.txt"));
 
         // rdg.collect();
 
@@ -219,7 +225,7 @@ public class FastqScreenDemo {
         bw.write(data.toString());
         bw.close();
 
-        reportQC();
+        // reportQC();
 
       } catch (Exception io) {
         System.out.println(io.getMessage());
@@ -243,7 +249,7 @@ public class FastqScreenDemo {
     QC qc = new QC(getMapAozanConf(), TMP_DIR);
 
     QCReport report = new QCReport(data, qc.laneTests, qc.sampleTests);
-    
+
     // Save report data
     qc.writeXMLReport(report, TMP_DIR
         + "/" + runId + "_" + date + "_reportXmlFile.xml");
