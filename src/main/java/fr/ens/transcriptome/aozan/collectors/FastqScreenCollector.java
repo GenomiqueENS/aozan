@@ -38,6 +38,7 @@ import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreen;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreenResult;
+import fr.ens.transcriptome.aozan.io.FastqSample;
 
 /**
  * This class manages the execution of Fastq Screen for a full run according to
@@ -114,22 +115,29 @@ public class FastqScreenCollector extends AbstractFastqCollector {
       final int lane, final String projectName, final String sampleName,
       final String index, final int readSample) throws AozanException {
 
-    System.out.println("fsq collecte " + projectName);
+  }
+
+  public void collectSample(RunData data, final FastqSample fastqSample)
+      throws AozanException {
+    System.out.println("fsq collecte " + fastqSample.getProjectName());
 
     FastqScreenResult resultsFastqscreen = null;
 
     final long startTime = System.currentTimeMillis();
 
     System.out.println("lane current "
-        + lane + "\tsample current " + sampleName + "\tproject name "
-        + projectName);
+        + fastqSample.getLane() + "\tsample current "
+        + fastqSample.getSampleName() + "\tproject name "
+        + fastqSample.getProjectName());
 
     LOGGER.fine("Start test in collector with project "
-        + projectName + " sample " + sampleName);
+        + fastqSample.getProjectName() + " sample "
+        + fastqSample.getSampleName());
 
-    File read1 =
-        fastqStorage.getFastqFile(this.casavaOutputPath, read, lane,
-            projectName, sampleName, index);
+    File read1 = fastqStorage.getTemporaryFile(fastqSample.getFastqFiles());
+
+    // fastqStorage.getFastqFile(this.casavaOutputPath, read, lane,
+    // fastqSample.getProjectName(), sampleName, index);
 
     if (read1 == null || !read1.exists())
       return;
@@ -138,9 +146,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     if (paired) {
       // mode paired
       // concatenate fastq files of one sample
-      read2 =
-          fastqStorage.getFastqFile(this.casavaOutputPath, (read + 1), lane,
-              projectName, sampleName, index);
+      read2 = fastqStorage.getTemporaryFile(fastqSample.getFastqFilesRead2());
 
       if (read2 == null || !read2.exists())
         return;
@@ -148,21 +154,22 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
     // add read2 in command line
     resultsFastqscreen =
-        fastqscreen.execute(read1, read2, this.listGenomes, projectName,
-            sampleName);
+        fastqscreen.execute(read1, read2, this.listGenomes,
+            fastqSample.getProjectName(), fastqSample.getSampleName());
 
     if (resultsFastqscreen == null)
       throw new AozanException("Fastqscreen return no result for sample "
-          + String.format("/Project_%s/Sample_%s", projectName, sampleName));
+          + String.format("/Project_%s/Sample_%s",
+              fastqSample.getProjectName(), fastqSample.getSampleName()));
 
     // update rundata
-    processResults(data, resultsFastqscreen, read, lane, projectName,
-        sampleName, index);
+    processResults(data, resultsFastqscreen, fastqSample);
 
     fastqStorage.removeTemporaryFastq(read1, read2);
 
     LOGGER.fine("End test in collector with project "
-        + projectName + " sample " + sampleName + " : "
+        + fastqSample.getProjectName() + " sample "
+        + fastqSample.getSampleName() + " : "
         + toTimeHumanReadable(System.currentTimeMillis() - startTime));
 
     // clean();
@@ -187,17 +194,18 @@ public class FastqScreenCollector extends AbstractFastqCollector {
       final FastqScreenResult result, final int read, final int lane,
       final String projectName, final String sampleName, final String index)
       throws AozanException {
+  }
+
+  private void processResults(final RunData data,
+      final FastqScreenResult result, final FastqSample fastqSample)
+      throws AozanException {
 
     // Set the prefix for the run data entries
-    String prefix =
-        "fastqscreen.lane"
-            + lane + ".sample." + sampleName + ".read" + read + "."
-            + sampleName;
+    String prefix = "fastqscreen.lane" + fastqSample.getPrefixRundata();
 
     result.updateRundata(data, prefix);
 
-    createFileReportFastqScreen(result, read, lane, projectName, sampleName,
-        index);
+    createFileReportFastqScreen(result, fastqSample);
   }
 
   /**
@@ -214,21 +222,22 @@ public class FastqScreenCollector extends AbstractFastqCollector {
   private void createFileReportFastqScreen(final FastqScreenResult result,
       final int read, final int lane, final String projectName,
       final String sampleName, final String index) throws AozanException {
+  }
+
+  private void createFileReportFastqScreen(final FastqScreenResult result,
+      final FastqSample fastqSample) throws AozanException {
 
     // create a file to save result fastq screen
     System.out.println(result.statisticalTableToString());
 
-    File[] fastqFiles =
-        fastqStorage.createListFastqFiles(casavaOutputPath, read, lane,
-            projectName, sampleName, index);
-
-    String firstFile = fastqFiles[0].getName();
+    String firstFile = fastqSample.getFastqFiles()[0].getName();
 
     final String filename = firstFile.substring(0, firstFile.lastIndexOf("."));
 
     final File pathFile =
         new File(this.qcReportOutputPath
-            + String.format("/Project_%s/%s-fastqc/", projectName, filename));
+            + String.format("/Project_%s/%s-fastqc/",
+                fastqSample.getProjectName(), filename));
 
     if (!pathFile.exists())
       if (!pathFile.mkdirs())

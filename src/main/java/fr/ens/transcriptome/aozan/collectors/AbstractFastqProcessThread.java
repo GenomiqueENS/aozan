@@ -23,12 +23,12 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
-import java.io.File;
 import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.aozan.io.FastqStorage;
 
 abstract class AbstractFastqProcessThread implements Runnable {
@@ -36,12 +36,8 @@ abstract class AbstractFastqProcessThread implements Runnable {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
-  protected final File[] fastqFiles;
-  protected final String projectName;
-  protected final String sampleName;
-  protected final int lane;
-  protected final int read;
-  
+  protected final FastqSample fastqSample;
+
   protected final RunData results;
   protected final FastqStorage fastqStorage;
 
@@ -80,22 +76,22 @@ abstract class AbstractFastqProcessThread implements Runnable {
   // Constructor
   //
 
-  public AbstractFastqProcessThread(final File[] fastqFiles, final int read,
-      final int lane, String projectName, final String sampleName) throws AozanException {
+  // public AbstractFastqProcessThread(final File[] fastqFiles, final int read,
+  // final int lane, String projectName, final String sampleName) throws
+  // AozanException {
 
-    if (fastqFiles == null || fastqFiles.length == 0)
+  public AbstractFastqProcessThread(final FastqSample fastqSample)
+      throws AozanException {
+
+    this.fastqSample = fastqSample;
+
+    if (this.fastqSample.getFastqFiles() == null
+        || this.fastqSample.getFastqFiles().length == 0)
       throw new AozanException("No fastq file defined");
-    
-    this.fastqFiles = fastqFiles;
 
-    this.projectName = projectName;
-    this.sampleName = sampleName;
-    this.lane = lane;
-    this.read = read;
-    
     this.results = new RunData();
-    
-    this.fastqStorage = FastqStorage.getInstance("");
+
+    this.fastqStorage = FastqStorage.getInstance();
 
   }
 }

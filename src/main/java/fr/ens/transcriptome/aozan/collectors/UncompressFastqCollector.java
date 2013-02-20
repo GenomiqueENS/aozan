@@ -23,13 +23,13 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
-import java.io.File;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.io.FastqSample;
 
 public class UncompressFastqCollector extends AbstractFastqCollector {
 
@@ -44,12 +44,6 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     super.configure(properties);
 
     System.out.println("uncompress configure");
-    // + " " + casavaOutputPath + " " + qcOutputDir + " " + tmpPath);
-
-    // TODO define type extension
-
-    // TODO count if free space is enough
-
   }
 
   @Override
@@ -64,6 +58,36 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
       final String projectName, final String sampleName, final String index,
       final int readSample) throws AozanException {
 
+  }
+
+  //
+  // // LOGGER
+  // // .fine("Start uncompressed all fastq Files before execute fastqscreen.");
+  // //
+  // // System.out
+  // //
+  // .println("Start uncompressed all fastq Files before execute fastqscreen.");
+  //
+  // final long startTime = System.currentTimeMillis();
+  //
+  // // Process sample FASTQ(s)
+  // final AbstractFastqProcessThread uft =
+  // processFile(data, casavaOutputPath, projectName, sampleName, index,
+  // lane, readSample, COMPRESSION_EXTENSION);
+  //
+  // System.out.println("uncompress collecte "
+  // + projectName + "  nb thread " + getNumberThreads());
+  //
+  // if (uft != null) {
+  //
+  // threads.add(uft);
+  // futureThreads.add(executor.submit(uft, uft));
+  //
+  // }
+
+  public void collectSample(final RunData data, final FastqSample fastqSample)
+      throws AozanException {
+
     // LOGGER
     // .fine("Start uncompressed all fastq Files before execute fastqscreen.");
     //
@@ -73,12 +97,10 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     final long startTime = System.currentTimeMillis();
 
     // Process sample FASTQ(s)
-    final AbstractFastqProcessThread uft =
-        processFile(data, casavaOutputPath, projectName, sampleName, index,
-            lane, readSample, COMPRESSION_EXTENSION);
+    final AbstractFastqProcessThread uft = processFile(data, fastqSample);
 
     System.out.println("uncompress collecte "
-        + projectName + "  nb thread " + getNumberThreads());
+        + fastqSample.getProjectName() + "  nb thread " + getNumberThreads());
 
     if (uft != null) {
 
@@ -111,31 +133,46 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
    * @param read read number
    * @throws AozanException if an error occurs while processing a FASTQ file
    */
+  // public UncompressFastqThread processFile(final RunData data,
+  // final String casavaOutputPath, final String projectName,
+  // final String sampleName, final String index, final int lane,
+  // final int read, final String compressionExtension) throws AozanException {
+  //
+  // // System.out.println("data "
+  // // + data.size() + " " + casavaOutputPath + " " + projectName + " "
+  // // + sampleName + " " + index + " " + lane + " " + COMPRESSION_EXTENSION);
+  //
+  // // Set the list of the files for the FASTQ data
+  // final File[] fastqFiles =
+  // fastqStorage.createListFastqFiles(casavaOutputPath, read, lane,
+  // projectName, sampleName, index);
+  //
+  // if (fastqFiles == null || fastqFiles.length == 0)
+  // return null;
+  //
+  // // Control the fastq files have been treated, if true return null
+  // String key = fastqStorage.keyFiles(fastqFiles);
+  // if (fastqStorage.tmpFileExist(key))
+  // return null;
+  //
+  // // Create the thread object
+  // return new UncompressFastqThread(fastqFiles, read, lane, projectName,
+  // sampleName, key);
+  // }
+
   public UncompressFastqThread processFile(final RunData data,
-      final String casavaOutputPath, final String projectName,
-      final String sampleName, final String index, final int lane,
-      final int read, final String compressionExtension) throws AozanException {
+      final FastqSample fastqSample) throws AozanException {
 
-    // System.out.println("data "
-    // + data.size() + " " + casavaOutputPath + " " + projectName + " "
-    // + sampleName + " " + index + " " + lane + " " + COMPRESSION_EXTENSION);
-
-    // Set the list of the files for the FASTQ data
-    final File[] fastqFiles =
-        fastqStorage.createListFastqFiles(casavaOutputPath, read, lane,
-            projectName, sampleName, index);
-
-    if (fastqFiles == null || fastqFiles.length == 0)
+    if (fastqSample.getFastqFiles() == null
+        || fastqSample.getFastqFiles().length == 0) {
       return null;
+    }
 
-    // Control the fastq files have been treated, if true return null
-    String key = fastqStorage.keyFiles(fastqFiles);
-    if (fastqStorage.tmpFileExist(key))
+    if (fastqStorage.tmpFileExist(fastqSample.getKeyFastqFiles()))
       return null;
 
     // Create the thread object
-    return new UncompressFastqThread(fastqFiles, read, lane, projectName,
-        sampleName, key);
+    return new UncompressFastqThread(fastqSample);
   }
 
   @Override

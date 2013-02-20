@@ -25,46 +25,11 @@
 package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JViewport;
-import javax.swing.table.TableModel;
-
-import uk.ac.bbsrc.babraham.FastQC.Modules.BasicStats;
-import uk.ac.bbsrc.babraham.FastQC.Modules.KmerContent;
-import uk.ac.bbsrc.babraham.FastQC.Modules.NContent;
-import uk.ac.bbsrc.babraham.FastQC.Modules.OverRepresentedSeqs;
-import uk.ac.bbsrc.babraham.FastQC.Modules.PerBaseGCContent;
-import uk.ac.bbsrc.babraham.FastQC.Modules.PerBaseQualityScores;
-import uk.ac.bbsrc.babraham.FastQC.Modules.PerBaseSequenceContent;
-import uk.ac.bbsrc.babraham.FastQC.Modules.PerSequenceGCContent;
-import uk.ac.bbsrc.babraham.FastQC.Modules.PerSequenceQualityScores;
-import uk.ac.bbsrc.babraham.FastQC.Modules.QCModule;
-import uk.ac.bbsrc.babraham.FastQC.Modules.SequenceLengthDistribution;
-import uk.ac.bbsrc.babraham.FastQC.Report.HTMLReportArchive;
-import uk.ac.bbsrc.babraham.FastQC.Sequence.Sequence;
-import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFile;
-import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFormatException;
-
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.RunDataGenerator;
-import fr.ens.transcriptome.aozan.fastqc.BadTiles;
-import fr.ens.transcriptome.aozan.io.FastqStorage;
-import fr.ens.transcriptome.aozan.io.SequenceFileAozan;
+import fr.ens.transcriptome.aozan.io.FastqSample;
 
 /**
  * This class define a FastQC Collector
@@ -108,13 +73,18 @@ public class FastQCCollector extends AbstractFastqCollector {
       final String projectName, final String sampleName, final String index,
       final int readSample) throws AozanException {
 
+  }
+
+  public void collectSample(RunData data, final FastqSample fastqSample)
+      throws AozanException {
+
     // Process sample FASTQ(s)
-    final SeqFileThread sft =
-        processFile(data, projectName, sampleName, index, lane, readSample);
+    final SeqFileThread sft = processFile(data, fastqSample);
 
     if (sft != null) {
       System.out.println("fsc collect sample "
-          + projectName + "  nb thread " + getNumberThreads());
+          + fastqSample.getProjectName() + "  nb thread " + getNumberThreads());
+
       threads.add(sft);
       futureThreads.add(executor.submit(sft, sft));
     }
@@ -131,20 +101,17 @@ public class FastQCCollector extends AbstractFastqCollector {
    * @throws AozanException if an error occurs while processing a FASTQ file
    */
   public SeqFileThread processFile(final RunData data,
-      final String projectName, final String sampleName, final String index,
-      final int lane, final int read) throws AozanException {
+      final FastqSample fastqSample) throws AozanException {
 
-    final File[] fastqFiles =
-        fastqStorage.createListFastqFiles(casavaOutputPath, read, lane,
-            projectName, sampleName, index);
+    final File[] fastqFiles = fastqSample.getFastqFiles();
 
     if (fastqFiles == null || fastqFiles.length == 0) {
       return null;
     }
 
     // Create the thread object
-    return new SeqFileThread(projectName, sampleName, lane, read, fastqFiles,
-        this.ignoreFilteredSequences, this.qcReportOutputPath, this.tmpPath);
+    return new SeqFileThread(fastqSample, this.ignoreFilteredSequences,
+        this.qcReportOutputPath);
   }
 
   //

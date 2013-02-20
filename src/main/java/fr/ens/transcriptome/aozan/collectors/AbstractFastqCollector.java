@@ -24,6 +24,7 @@
 package fr.ens.transcriptome.aozan.collectors;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -32,7 +33,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -40,6 +40,7 @@ import fr.ens.transcriptome.aozan.FastqScreenDemo;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.RunDataGenerator;
+import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.aozan.io.FastqStorage;
 
 abstract class AbstractFastqCollector implements Collector {
@@ -47,13 +48,12 @@ abstract class AbstractFastqCollector implements Collector {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
-  protected FastqStorage fastqStorage;
-
   public static final String COLLECTOR_NAME = "";
-
   public static final String KEY_READ_COUNT = "run.info.read.count";
   public static final String KEY_READ_X_INDEXED = "run.info.read";
-  public static final String COMPRESSION_EXTENSION = "fastq.bz2";
+  //public static final String COMPRESSION_EXTENSION = "fastq.bz2";
+
+  protected FastqStorage fastqStorage;
 
   protected String casavaOutputPath;
   protected String qcReportOutputPath;
@@ -98,41 +98,50 @@ abstract class AbstractFastqCollector implements Collector {
 
     this.casavaOutputPath =
         properties.getProperty(RunDataGenerator.CASAVA_OUTPUT_DIR);
-    System.out.println("casava output " + this.casavaOutputPath);
 
     this.qcReportOutputPath =
         properties.getProperty(RunDataGenerator.QC_OUTPUT_DIR);
-    this.tmpPath = properties.getProperty(RunDataGenerator.TMP_DIR);
-    this.fastqStorage = FastqStorage.getInstance(this.tmpPath);
 
-    System.out.println("Abstract configure ");
-    // + " " + casavaOutputPath + " " + qcOutputDir + " " + tmpPath);
+    this.tmpPath = properties.getProperty(RunDataGenerator.TMP_DIR);
+
+    this.fastqStorage = FastqStorage.getInstance();
+    this.fastqStorage.setTmpDir(this.casavaOutputPath, this.tmpPath);
 
     this.modeMonoThreaded = this.getNumberThreads() == 1;
 
-    if (!modeMonoThreaded) {
+    System.out.println("Abstract configure  :"
+        + this.casavaOutputPath + "\tCompression Fastq File "
+        + fastqStorage.getCompressionExtension());
 
-      if (properties.containsKey("qc.conf.fastqc.threads")) {
+    if (!modeMonoThreaded)
+      configureModeMultiThread(properties);
 
-        try {
-          int confThreads =
-              Integer.parseInt(properties.getProperty("qc.conf.fastqc.threads")
-                  .trim());
-          if (confThreads > 0)
-            this.setNumberThreads(confThreads);
+  }
 
-        } catch (NumberFormatException e) {
-        }
+  /**
+   * @param properties
+   */
+  public void configureModeMultiThread(final Properties properties) {
 
-        // Create the list for threads
-        this.threads = Lists.newArrayList();
-        this.futureThreads = Lists.newArrayList();
+    if (properties.containsKey("qc.conf.fastqc.threads")) {
 
-        // Create executor service
-        this.executor = Executors.newFixedThreadPool(this.getNumberThreads());
+      try {
+        int confThreads =
+            Integer.parseInt(properties.getProperty("qc.conf.fastqc.threads")
+                .trim());
+        if (confThreads > 0)
+          this.setNumberThreads(confThreads);
+
+      } catch (NumberFormatException e) {
       }
-    }
 
+      // Create the list for threads
+      this.threads = Lists.newArrayList();
+      this.futureThreads = Lists.newArrayList();
+
+      // Create executor service
+      this.executor = Executors.newFixedThreadPool(this.getNumberThreads());
+    }
   }
 
   @Override
@@ -142,52 +151,19 @@ abstract class AbstractFastqCollector implements Collector {
    * @throws AozanException if an error occurs while collecting data
    */
   public void collect(RunData data) throws AozanException {
-
-    System.out.println("abstract collect ");
-
     // TODO to remove
     data = FastqScreenDemo.getRunData();
 
-    final int laneCount = data.getInt("run.info.flow.cell.lane.count");
+    System.out.println("abstract collect ");
 
-    // mode paired or single-end present in Rundata
-    final int readCount = data.getInt(KEY_READ_COUNT);
-    final boolean lastReadIndexed =
-        data.getBoolean(KEY_READ_X_INDEXED + readCount + ".indexed");
-    int readSample = 0;
-
-    paired = readCount > 1 && !lastReadIndexed;
-
-    for (int read = 1; read <= readCount - 1; read++) {
-
-      if (data.getBoolean("run.info.read" + read + ".indexed"))
-        continue;
-      readSample++;
-
-      for (int lane = 1; lane <= laneCount; lane++) {
-
-        final List<String> sampleNames =
-            Lists.newArrayList(Splitter.on(',').split(
-                data.get("design.lane" + lane + ".samples.names")));
-
-        for (String sampleName : sampleNames) {
-
-          // Get the sample index
-          String index =
-              data.get("design.lane" + lane + "." + sampleName + ".index");
-
-          // Get project name
-          String projectName =
-              data.get("design.lane"
-                  + lane + "." + sampleName + ".sample.project");
-
-          collectSample(data, read, lane, projectName, sampleName, index,
-              readSample);
-
-        } // sample
-      }// lane
-    }// read
-
+    fastqStorage.controlPreCollect(data);
+    
+    for (Map.Entry<String, FastqSample> e : fastqStorage.getFastqsSamples()
+        .entrySet()) {
+      System.out.println("abstract call for "+e.getKey());
+      collectSample(data, e.getValue());
+    }
+    
     if (!this.modeMonoThreaded) {
       System.out.println("multithread " + futureThreads.size());
       // Wait for threads
@@ -198,14 +174,6 @@ abstract class AbstractFastqCollector implements Collector {
         data.put(sft.getResults());
     }
   }
-
-  abstract public void collectSample(/* final */RunData data, final int read,
-      final int lane, final String projectName, final String sampleName,
-      final String index, final int readSample) throws AozanException;
-
-  abstract public int getNumberThreads();
-
-  abstract public void setNumberThreads(final int numberThreads);
 
   /**
    * Wait the end of the threads.
@@ -269,11 +237,21 @@ abstract class AbstractFastqCollector implements Collector {
     executor.shutdown();
   }
 
+  abstract public void collectSample(/* final */RunData data, final int read,
+      final int lane, final String projectName, final String sampleName,
+      final String index, final int readSample) throws AozanException;
+
+  abstract public void collectSample(/* final */RunData data,
+      final FastqSample fastqSample) throws AozanException;
+
+  abstract public int getNumberThreads();
+
+  abstract public void setNumberThreads(final int numberThreads);
+
   //
   // Constructor
   //
 
   public AbstractFastqCollector() {
-
   }
 }

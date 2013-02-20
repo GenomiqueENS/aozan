@@ -53,6 +53,7 @@ import com.google.common.collect.Lists;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.fastqc.BadTiles;
+import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.aozan.io.FastqStorage;
 
 /**
@@ -62,13 +63,6 @@ import fr.ens.transcriptome.aozan.io.FastqStorage;
  */
 public class SeqFileThread extends AbstractFastqProcessThread {
 
-  // private static final class SeqFileThread implements Runnable {
-
-  // private final String projectName;
-  // private final String sampleName;
-  // private final int lane;
-  // private final int read;
-
   private final SequenceFile seqFile;
   private final String firstFastqFileName;
   private final boolean ignoreFilteredSequences;
@@ -77,10 +71,6 @@ public class SeqFileThread extends AbstractFastqProcessThread {
   private final String compressionExtension;
 
   private final FastqStorage fastqStorage;
-
-  // private final RunData results;
-  // private AozanException exception;
-  // private boolean success;
 
   @Override
   public void run() {
@@ -181,10 +171,7 @@ public class SeqFileThread extends AbstractFastqProcessThread {
   private void processResults() throws AozanException {
 
     // Set the prefix for the run data entries
-    final String prefix =
-        "fastqc.lane"
-            + lane + ".sample." + sampleName + ".read" + read + "."
-            + sampleName;
+    final String prefix = "fastqc.lane" + this.fastqSample.getPrefixRundata();
 
     int nClusters = -1;
 
@@ -224,7 +211,8 @@ public class SeqFileThread extends AbstractFastqProcessThread {
   private void createReportFile() throws AozanException, IOException {
 
     final File reportDir =
-        new File(qcReportOutputPath + "/Project_" + projectName);
+        new File(qcReportOutputPath
+            + "/Project_" + this.fastqSample.getProjectName());
 
     if (!reportDir.exists())
       if (!reportDir.mkdirs())
@@ -255,35 +243,29 @@ public class SeqFileThread extends AbstractFastqProcessThread {
 
   /**
    * Thread constructor.
-   * @param projectName name of the project
-   * @param sampleName name of the sample
-   * @param lane lane of the sample
-   * @param read read of the sample
-   * @param fastqFiles fastq files for the sample
-   * @param ignoreFilteredSequences if true filtered sequences will be ignored
-   * @param qcReportOutputPath qc output path
-   * @param compressionExtension compression extension
    * @throws AozanException if an error occurs while creating sequence file for
    *           FastQC
    */
-  public SeqFileThread(final String projectName, final String sampleName,
-      final int lane, final int read, final File[] fastqFiles,
-      final boolean ignoreFilteredSequences, final String qcReportOutputPath,
-      final String tmpPath) throws AozanException {
+  public SeqFileThread(final FastqSample fastqSample,
+      final boolean ignoreFilteredSequences, final String qcReportOutputPath)
+      throws AozanException {
 
-    super(fastqFiles, read, lane, projectName, sampleName);
+    super(fastqSample);
 
-    this.firstFastqFileName = fastqFiles[0].getName();
+    this.firstFastqFileName = this.fastqSample.getFastqFiles()[0].getName();
     this.ignoreFilteredSequences = ignoreFilteredSequences;
     this.qcReportOutputPath = qcReportOutputPath;
 
-    this.fastqStorage = FastqStorage.getInstance(tmpPath);
-    // this.seqFile = SequenceFactory.getSequenceFile(fastqFiles);
-    this.seqFile = this.fastqStorage.getSequenceFile(fastqFiles);
+    this.fastqStorage = FastqStorage.getInstance();
+
+    this.seqFile =
+        this.fastqStorage.getSequenceFile(this.fastqSample.getFastqFiles());
+
     this.compressionExtension = this.fastqStorage.getCompressionExtension();
 
     // Define modules list
     final OverRepresentedSeqs os = new OverRepresentedSeqs();
+
     this.moduleList =
         Lists.newArrayList(new BasicStats(), new PerBaseQualityScores(),
             new PerSequenceQualityScores(), new PerBaseSequenceContent(),

@@ -51,6 +51,7 @@ import fr.ens.transcriptome.aozan.collectors.FastQCCollector;
 import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.collectors.UncompressFastqCollector;
+import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.aozan.io.FastqStorage;
 import fr.ens.transcriptome.eoulsan.EoulsanException;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
@@ -76,7 +77,7 @@ public class FastqScreenDemo {
   public static final String GENOMES_PATH = RESOURCE_ROOT + "/genomes";
 
   public static RunData data = null;
-  public static Map<String, ReferenceSample> prefixList;
+  public static Map<String, FastqSample> prefixList;
   private static boolean paired = false;
 
   static String runId;
@@ -160,36 +161,36 @@ public class FastqScreenDemo {
       try {
         data = new RunData(f);
 
-        prefixList = controlFastqFile(data);
-
-        // System.out.println("liste des fichiers Fastq et taille ");
-
-        CompressionType zType = null;
-        long sizeCompress = 0;
-        for (Map.Entry<String, ReferenceSample> e : prefixList.entrySet()) {
-          File file = new File(fastqDir + e.getValue().getFilePathInRun());
-
-          if (file.getName().indexOf(".fastq") > 0) {
-            if (zType == null)
-              zType =
-                  CompressionType.getCompressionTypeByFilename(file.getName());
-
-            sizeCompress += file.length();
-
-            // if (file.length() > 0)
-            // System.out.println("name : "
-            // + e.getValue().getFilePathInRun() + "\t size "
-            // + ((double) file.length() / 1024.0 / 1024.0 / 1024.0));
-          }
-        }
-
-        double sizeGo = (double) sizeCompress / 1024.0 / 1024.0 / 1024.0;
-        // System.out.println("size Compress " + sizeGo);
-        long sizeUncompress = (long) (sizeGo * 3.66);
-        // System.out.println("size unCompress " + (double) sizeGo * 3.66);
-
-        long freeSpace = new File(TMP_DIR).getFreeSpace();
-        freeSpace = freeSpace / 1024 / 1024 / 1024;
+        // prefixList = controlFastqFile(data);
+        //
+        // // System.out.println("liste des fichiers Fastq et taille ");
+        //
+        // CompressionType zType = null;
+        // long sizeCompress = 0;
+        // for (Map.Entry<String, FastqSample> e : prefixList.entrySet()) {
+        // File file = new File(fastqDir + e.getValue().getFilePathInRun());
+        //
+        // if (file.getName().indexOf(".fastq") > 0) {
+        // if (zType == null)
+        // zType =
+        // CompressionType.getCompressionTypeByFilename(file.getName());
+        //
+        // sizeCompress += file.length();
+        //
+        // // if (file.length() > 0)
+        // // System.out.println("name : "
+        // // + e.getValue().getFilePathInRun() + "\t size "
+        // // + ((double) file.length() / 1024.0 / 1024.0 / 1024.0));
+        // }
+        // }
+        //
+        // double sizeGo = (double) sizeCompress / 1024.0 / 1024.0 / 1024.0;
+        // // System.out.println("size Compress " + sizeGo);
+        // long sizeUncompress = (long) (sizeGo * 3.66);
+        // // System.out.println("size unCompress " + (double) sizeGo * 3.66);
+        //
+        // long freeSpace = new File(TMP_DIR).getFreeSpace();
+        // freeSpace = freeSpace / 1024 / 1024 / 1024;
 
         // long freeSpace2 = ProcessUtils.sh({"cd", TMP_DIR,"&","df","-h","."});
         // System.out.println("free space in /tmp " + freeSpace);
@@ -198,12 +199,15 @@ public class FastqScreenDemo {
         // TODO stop point
 
         // Configure : create list of reference genome
+        System.out.println("FASTQC COLLECTOR");
         fqcCollector.configure(properties);
         fqcCollector.collect(data);
 
+        System.out.println("UNCOMPRESS COLLECTOR");
         uncompressFastqCollector.configure(properties);
         uncompressFastqCollector.collect(data);
 
+        System.out.println("FASTQ SCREEN COLLECTOR");
         fsqCollector.configure(properties);
         fsqCollector.collect(data);
 
@@ -236,7 +240,8 @@ public class FastqScreenDemo {
           + toTimeHumanReadable(System.currentTimeMillis() - startTime));
 
     } catch (Exception e) {
-      FastqStorage fqs = FastqStorage.getInstance(TMP_DIR);
+      FastqStorage fqs = FastqStorage.getInstance();
+
       fqs.clear();
 
       System.out.println(e.getMessage());
@@ -297,9 +302,9 @@ public class FastqScreenDemo {
     return conf;
   }
 
-  public static Map<String, ReferenceSample> controlFastqFile(RunData data) {
-    Map<String, ReferenceSample> prefixList =
-        new LinkedHashMap<String, ReferenceSample>();
+  public static Map<String, FastqSample> controlFastqFile(RunData data) {
+    Map<String, FastqSample> prefixList =
+        new LinkedHashMap<String, FastqSample>();
 
     final int laneCount = data.getInt("run.info.flow.cell.lane.count");
 
@@ -334,8 +339,8 @@ public class FastqScreenDemo {
           final String projectName =
               data.get("design.lane"
                   + lane + "." + sampleName + ".sample.project");
-          ReferenceSample ref =
-              new ReferenceSample(read, lane, sampleName, projectName, index);
+          FastqSample ref =
+              new FastqSample(null, read, lane, sampleName, projectName, index);
 
           prefixList.put(sampleName, ref);
 
@@ -344,76 +349,6 @@ public class FastqScreenDemo {
     }// read
 
     return prefixList;
-  }
-
-  //
-  // Internal class
-  //
-
-  public static class ReferenceSample {
-    private int read;
-    private int lane;
-    private String sampleName;
-    private String projectName;
-    private String index;
-
-    ReferenceSample(final int read, final int lane, final String sampleName,
-        final String projectName, final String index) {
-      this.read = read;
-      this.lane = lane;
-      this.sampleName = sampleName;
-      this.projectName = projectName;
-      this.index = index;
-    }
-
-    public boolean equals(ReferenceSample ref) {
-      return this.sampleName.equals(ref.sampleName);
-    }
-
-    public String getPrefix() {
-      return "."
-          + this.lane + ".sample." + this.sampleName + ".read" + this.read
-          + "." + this.sampleName;
-    }
-
-    // ex :
-    // Project_microbrain_A2012/Sample_2012_0197/2012_0197_TGACCA_L004_R1_001.fastq.bz2
-
-    public String getFilePathInRun() {
-      StringBuilder s = new StringBuilder();
-
-      s.append("/Project_");
-      s.append(this.projectName);
-      s.append("/Sample_");
-      s.append(this.sampleName);
-      // prefix file
-      s.append(String.format("/%s_%s_L%03d_R%d_", sampleName, "".equals(index)
-          ? "NoIndex" : index, lane, read));
-      // format file
-      s.append("001.fastq.bz2");
-
-      return s.toString();
-    }
-
-    public int getRead() {
-      return this.read;
-    }
-
-    public int getLane() {
-      return this.lane;
-    }
-
-    public String getProjectName() {
-      return this.projectName;
-    }
-
-    public String getSampleName() {
-      return this.sampleName;
-    }
-
-    public String getIndex() {
-      return this.index;
-    }
   }
 
 }

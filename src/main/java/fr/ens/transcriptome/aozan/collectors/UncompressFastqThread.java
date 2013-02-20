@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
+import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
@@ -53,15 +54,7 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
 
   private static final NumberFormat formatter = new DecimalFormat("#,###");
 
-  private final File[] fastqFiles;
-  private final String projectName;
-  private final String sampleName;
-  private final int lane;
-  private final int read;
-
   private static int countFileDecompressed = 0;
-  private static String compression_extension;
-
   private AozanException exception;
   private boolean success;
 
@@ -88,7 +81,7 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
   public void run() {
     System.out.println("call run uncompress");
     try {
-      File f = getFastqFile(fastqFiles, read, lane, projectName, sampleName);
+      File f = uncompressFastqFile();
 
       this.success = (f != null && f.length() > 0);
 
@@ -96,34 +89,6 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
       this.exception = e;
     }
 
-  }
-
-  /**
-   * Return file uncompressed corresponding on projectName and sampleName if it
-   * exist, else it is created
-   * @param read read number
-   * @param lane lane number
-   * @param projectName name of the project
-   * @param sampleName name of the sample
-   * @param index sequence index
-   * @return file
-   * @throws AozanException if an error occurs while creating file
-   */
-  public File getFastqFile(final String casavaOutputPath, final int read,
-      final int lane, final String projectName, final String sampleName,
-      final String index) throws AozanException {
-
-    // TODO to remove
-    // if (!sampleName.endsWith("2012_0051")) {
-    // return null;
-    // }
-
-    // Set the list of the files for the FASTQ data
-    final File[] fastqFiles =
-        fastqStorage.createListFastqFiles(casavaOutputPath, read, lane,
-            projectName, sampleName, index);
-
-    return getFastqFile(fastqFiles, read, lane, projectName, sampleName);
   }
 
   /**
@@ -137,34 +102,28 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
    * @return file compile all files
    * @throws AozanException if an error occurs while creating file
    */
-  public File getFastqFile(final File[] fastqFiles, final int read,
-      final int lane, final String projectName, final String sampleName)
-      throws AozanException {
+  public File uncompressFastqFile() throws AozanException {
 
-    if (fastqFiles == null || fastqFiles.length == 0) {
-      return null;
-    }
+    if (fastqStorage.tmpFileExist(fastqSample.getKeyFastqFiles()))
 
-    if (fastqStorage.tmpFileExist(fastqFiles))
       // Return uncompress temporary file if it exist
-      return fastqStorage.getTemporaryFile(fastqFiles);
+      return fastqStorage.getTemporaryFile(fastqSample.getKeyFastqFiles());
 
     final long startTime = System.currentTimeMillis();
+
     LOGGER.fine("Start uncompressed fastq Files, size : "
-        + formatter.format(fastqFiles[0].length()) + ".");
+        + formatter.format(fastqSample.getFastqFiles()[0].length()) + ".");
 
     // Uncompresses and compiles files of array in new temporary files
     File tmpFastqFile = null;
 
     try {
 
-      tmpFastqFile =
-          File.createTempFile("aozan_fastq_", ".fastq",
-              new File(fastqStorage.getTmpDir()));
+      tmpFastqFile = fastqStorage.getNewTemporaryFile();
 
       OutputStream out = new FileOutputStream(tmpFastqFile);
 
-      for (File fastqFile : fastqFiles) {
+      for (File fastqFile : fastqSample.getFastqFiles()) {
 
         if (!fastqFile.exists()) {
           throw new IOException("Fastq file "
@@ -173,7 +132,8 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
 
         // Get compression type
         CompressionType zType =
-            CompressionType.getCompressionTypeByFilename(fastqFile.getName());
+            CompressionType.getCompressionTypeByFilename(fastqStorage
+                .getCompressionExtension());
 
         // Append compressed fastq file to uncompressed file
         final InputStream in = new FileInputStream(fastqFile);
@@ -187,50 +147,20 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
     }
 
     // Add in list of temporary fastq files
-    fastqStorage.addTemporaryFile(fastqFiles, tmpFastqFile);
+    fastqStorage.addTemporaryFile(fastqSample.getKeyFastqFiles(), tmpFastqFile);
 
     countFileDecompressed++;
 
     long sizeFile = tmpFastqFile.length();
-    // double sizeFile =
-    // ((double) tmpFastqFile.length()) / 1024.0 / 1024.0 / 1024.0;
-    // sizeFile = ((int) (sizeFile * 10.0)) / 10.0;
+    // sizeFile /= (1024L * 1024L * 1024L);
 
     LOGGER
         .fine("End uncompressed for fastq File "
-            + tmpFastqFile.getName() + "(size : " + formatter.format(sizeFile)
+            + tmpFastqFile.getName() + " (size : " + formatter.format(sizeFile)
             + ") in "
             + toTimeHumanReadable(System.currentTimeMillis() - startTime));
 
     return tmpFastqFile;
-  }
-
-  //
-  // Getter
-  //
-  public String getCompressionExtension() {
-    return compression_extension;
-  }
-
-  //
-  // Setter
-  //
-
-  public void setCompressionExtension(File file) throws AozanException {
-
-    // String nameFile = file.getName();
-    //
-    // if (nameFile.indexOf(".fastq") < 0)
-    // throw new AozanException("Compression extension unknown.");
-
-    CompressionType zType =
-        CompressionType.getCompressionTypeByFilename(file.getName());
-
-    if (zType.equals(CompressionType.NONE))
-      throw new AozanException("Compression extension unknown.");
-
-    compression_extension = zType.getExtension();
-
   }
 
   //
@@ -239,27 +169,12 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
 
   /**
    * Thread constructor.
-   * @param fastqFiles fastq files for the sample
-   * @param projectName name of the project
-   * @param sampleName name of the sample
-   * @param lane lane of the sample
-   * @param read read of the sample
    * @throws AozanException if an error occurs while creating sequence file for
    *           FastQC
    */
-  public UncompressFastqThread(final File[] fastqFiles, final int read,
-      final int lane, String projectName, final String sampleName,
-      final String keyFiles) throws AozanException {
+  public UncompressFastqThread(final FastqSample fastqSample)
+      throws AozanException {
 
-    super(fastqFiles, read, lane, projectName, sampleName);
-
-    this.fastqFiles = fastqFiles;
-
-    this.projectName = projectName;
-    this.sampleName = sampleName;
-    this.lane = lane;
-    this.read = read;
-
+    super(fastqSample);
   }
-
 }
