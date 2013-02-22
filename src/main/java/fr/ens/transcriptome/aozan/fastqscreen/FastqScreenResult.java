@@ -87,7 +87,7 @@ public class FastqScreenResult {
    * Save result from fastqscreen in file.
    * @param dirPath directory who save file of result from fastqscreen
    */
-  public void createFileResultFastqScreen(final String pathDir) {
+  public void createFileResultFastqScreen_OLD(final String pathDir) {
 
     String result = pathDir + "/fastqscreen.txt";
     try {
@@ -148,8 +148,8 @@ public class FastqScreenResult {
 
     this.percentHitNoLibraries =
         ((double) (readsprocessed - readsMapped)) / readsprocessed;
-    this.percentHit = 1.0 - this.percentHitNoLibraries; 
-        
+    this.percentHit = 1.0 - this.percentHitNoLibraries;
+
     countPercentOk = true;
   }
 
@@ -159,7 +159,7 @@ public class FastqScreenResult {
    * @param prefix name of sample
    * @throws AozanException if no value.
    */
-  public void updateRundata(final RunData data, final String prefix)
+  public void updateRundata_OLD(final RunData data, final String prefix)
       throws AozanException {
 
     if (this.resultsPerGenome.isEmpty())
@@ -175,8 +175,33 @@ public class FastqScreenResult {
     }
 
     // print last line of report FastqScreen
-    data.put(prefix + "." + HIT_NO_LIBRAIRIES_LEGEND, this.percentHitNoLibraries);
+    data.put(prefix + "." + HIT_NO_LIBRAIRIES_LEGEND,
+        this.percentHitNoLibraries);
     data.put(prefix + "." + HIT_LEGEND, this.percentHit);
+  }
+
+  public RunData updateRundata(final String prefix) throws AozanException {
+
+    if (this.resultsPerGenome.isEmpty())
+      throw new AozanException(
+          "During fastqScreen execusion : no genome receive");
+
+    if (!countPercentOk)
+      throw new AozanException(
+          "During fastqScreen execusion : no value ​for each genome");
+
+    RunData data = new RunData();
+
+    for (Map.Entry<String, DataPerGenome> e : this.resultsPerGenome.entrySet()) {
+      e.getValue().updateRundata(data, prefix);
+    }
+
+    // print last line of report FastqScreen
+    data.put(prefix + "." + HIT_NO_LIBRAIRIES_LEGEND,
+        this.percentHitNoLibraries);
+    data.put(prefix + "." + HIT_LEGEND, this.percentHit);
+
+    return data;
   }
 
   //
