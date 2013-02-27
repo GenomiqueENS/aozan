@@ -243,7 +243,7 @@ public class FastqScreenDemo {
     QC qc = new QC(getMapAozanConf(), TMP_DIR);
 
     QCReport report = new QCReport(data, qc.laneTests, qc.sampleTests);
-    
+
     // Save report data
     qc.writeXMLReport(report, TMP_DIR
         + "/" + runId + "_" + date + "_reportXmlFile.xml");

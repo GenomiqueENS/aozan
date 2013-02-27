@@ -70,7 +70,7 @@ public final class FastqStorage {
   private static final int CHECKING_DELAY_MS = 5000;
   private static final int WAIT_SHUTDOWN_MINUTES = 60;
   private static final NumberFormat formatter = new DecimalFormat("#,###");
-  
+
   private static int threads;
   private static String compression_extension = "fastq.bz2";
 
@@ -97,7 +97,7 @@ public final class FastqStorage {
       final String index) throws AozanException {
 
     // TODO to remove
-    if (!sampleName.endsWith("2012_0051")) {
+    if (!sampleName.endsWith("2012_0197")) {
       return null;
     }
 
@@ -179,8 +179,6 @@ public final class FastqStorage {
     // double sizeFile =
     // ((double) tmpFastqFile.length()) / 1024.0 / 1024.0 / 1024.0;
     // sizeFile = ((int) (sizeFile * 10.0)) / 10.0;
-
-    
 
     LOGGER
         .fine("End uncompressed for fastq File "
