@@ -24,7 +24,7 @@
     <dependency>
       <groupId>fr.ens.transcriptome</groupId>
       <artifactId>eoulsan</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <version>1.2.1-SNAPSHOT</version>
     </dependency> 
     <dependency>
       <groupId>org.apache.poi</groupId>
@@ -48,6 +48,12 @@
       <artifactId>fastqc</artifactId>
       <version>0.10.0</version>
       <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>itadaki</groupId>
+      <artifactId>jbzip2</artifactId>
+      <version>0.9</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -268,53 +274,11 @@
             <id>copy</id>
             <phase>generate-resources</phase>
             <goals>
-              <goal>copy</goal>
+              <goal>copy-dependencies</goal>
             </goals>
             <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>fr.ens.transcriptome</groupId>
-                  <artifactId>eoulsan</artifactId>
-                  <version>1.2-SNAPSHOT</version>
-                  <!--type></type-->
-                  <!--classifier> [classifier - optional] </classifier-->
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
-                  <destFileName>eoulsan.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.poi</groupId>
-                  <artifactId>poi</artifactId>
-                  <version>3.7</version>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
-                  <destFileName>poi.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>com.google.guava</groupId>
-                  <artifactId>guava</artifactId>
-                  <version>r07</version>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
-                  <destFileName>guava.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>uk.ac.bbsrc.babraham</groupId>
-                  <artifactId>fastqc</artifactId>
-                  <version>0.10.0</version>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
-                  <destFileName>fastqc.jar</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>itadaki</groupId>
-                  <artifactId>jbzip2</artifactId>
-                  <version>0.9</version>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
-                  <destFileName>jbzip2.jar</destFileName>
-                </artifactItem>
-              </artifactItems>
+              <includeArtifactIds>eoulsan,poi,guava,fastqc,jbzip2</includeArtifactIds>
+              <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
             </configuration>
           </execution>
         </executions>
