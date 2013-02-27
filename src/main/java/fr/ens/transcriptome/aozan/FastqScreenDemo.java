@@ -45,6 +45,7 @@ import java.util.logging.Logger;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
+import fr.ens.transcriptome.aozan.collectors.AbstractFastqCollector;
 import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.FastQCCollector;
@@ -53,8 +54,6 @@ import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.collectors.UncompressFastqCollector;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.aozan.io.FastqStorage;
-import fr.ens.transcriptome.eoulsan.EoulsanException;
-import fr.ens.transcriptome.eoulsan.io.CompressionType;
 
 public class FastqScreenDemo {
 
@@ -97,6 +96,7 @@ public class FastqScreenDemo {
         // run test single-end
         // runId = "120301_SNL110_0038_AD0EJRABXX";
         runId = "121116_SNL110_0058_AC11HRACXX";
+        // runId = "130214_SNL110_0062_AD1GKTACXX";
         // runId = "121219_SNL110_0059_AD1B1BACXX";
         // runId = "120615_SNL110_0051_AD102YACXX";
       }
@@ -108,7 +108,8 @@ public class FastqScreenDemo {
 
       fastqDir = SRC_RUN + "/qc_" + runId + "/" + runId;
 
-      String[] tabGenomes = {"phix", "adapters2", "lsuref_dna", "ssuref" /**/};
+      String[] tabGenomes =
+          {"phix" /* , "adapters2", "lsuref_dna", "ssuref" */};
       String genomes = "";
       for (String g : tabGenomes) {
         genomes += g + ",";
@@ -133,7 +134,7 @@ public class FastqScreenDemo {
       rdg.setCasavaDesignFile(new File(fastqDir));
       rdg.setRTAOutputDir(new File(fastqDir));
       rdg.setCasavaOutputDir(new File(fastqDir));
-      rdg.setQCOutputDir(new File(fastqDir));
+      rdg.setQCOutputDir(new File(fastqDir + "_qc"));
       rdg.setTemporaryDir(new File(TMP_DIR));
 
       // add new property for execute fastqscreen
@@ -144,7 +145,7 @@ public class FastqScreenDemo {
       properties.put("reports.data.path", SRC_RUN);
       properties.put("tmp.dir", TMP_DIR);
       properties.put(RunDataGenerator.CASAVA_OUTPUT_DIR, fastqDir);
-      properties.put(RunDataGenerator.QC_OUTPUT_DIR, fastqDir);
+      properties.put(RunDataGenerator.QC_OUTPUT_DIR, fastqDir + "_qc");
 
       // number threads used for fastqscreen is defined in aozan.conf
       properties.put("qc.conf.fastqc.threads", "4");
@@ -161,55 +162,22 @@ public class FastqScreenDemo {
       try {
         data = new RunData(f);
 
-        // prefixList = controlFastqFile(data);
-        //
-        // // System.out.println("liste des fichiers Fastq et taille ");
-        //
-        // CompressionType zType = null;
-        // long sizeCompress = 0;
-        // for (Map.Entry<String, FastqSample> e : prefixList.entrySet()) {
-        // File file = new File(fastqDir + e.getValue().getFilePathInRun());
-        //
-        // if (file.getName().indexOf(".fastq") > 0) {
-        // if (zType == null)
-        // zType =
-        // CompressionType.getCompressionTypeByFilename(file.getName());
-        //
-        // sizeCompress += file.length();
-        //
-        // // if (file.length() > 0)
-        // // System.out.println("name : "
-        // // + e.getValue().getFilePathInRun() + "\t size "
-        // // + ((double) file.length() / 1024.0 / 1024.0 / 1024.0));
-        // }
-        // }
-        //
-        // double sizeGo = (double) sizeCompress / 1024.0 / 1024.0 / 1024.0;
-        // // System.out.println("size Compress " + sizeGo);
-        // long sizeUncompress = (long) (sizeGo * 3.66);
-        // // System.out.println("size unCompress " + (double) sizeGo * 3.66);
-        //
-        // long freeSpace = new File(TMP_DIR).getFreeSpace();
-        // freeSpace = freeSpace / 1024 / 1024 / 1024;
-
-        // long freeSpace2 = ProcessUtils.sh({"cd", TMP_DIR,"&","df","-h","."});
-        // System.out.println("free space in /tmp " + freeSpace);
-        // System.out.println("space ok " + (freeSpace > sizeUncompress));
-
-        // TODO stop point
-
         // Configure : create list of reference genome
-        System.out.println("FASTQC COLLECTOR");
+        System.out.println("\nFASTQC COLLECTOR");
         fqcCollector.configure(properties);
         fqcCollector.collect(data);
+        // System.exit(1);
 
-        System.out.println("UNCOMPRESS COLLECTOR");
+        System.out.println("\nUNCOMPRESS COLLECTOR");
         uncompressFastqCollector.configure(properties);
         uncompressFastqCollector.collect(data);
 
-        System.out.println("FASTQ SCREEN COLLECTOR");
+        System.out.println("\nFASTQ SCREEN COLLECTOR");
         fsqCollector.configure(properties);
         fsqCollector.collect(data);
+
+        System.out.println("\nCLEAR QC_REPORT COLLECTOR");
+        AbstractFastqCollector.clearFactqCollector();
 
         // completed rundata
         // data =

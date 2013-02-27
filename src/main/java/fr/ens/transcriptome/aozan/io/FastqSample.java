@@ -3,6 +3,11 @@ package fr.ens.transcriptome.aozan.io;
 import java.io.File;
 import java.io.FileFilter;
 
+/**
+ * The class correspond of one entity to treat by AbstractFastqCollector, so a
+ * sample per lane.
+ * @author Sandrine Perrin
+ */
 public class FastqSample {
 
   private FastqStorage fastqStorage;
@@ -14,41 +19,51 @@ public class FastqSample {
   private String projectName;
   private String runFastqPath;
   private String keyFastqFiles;
-  private File[] fastqFiles;
+  private File[] fastqFiles = new File[] {};
 
   // TODO to remove
   private String index;
 
-  public boolean equals(FastqSample ref) {
-    return this.sampleName.equals(ref.sampleName);
+  /**
+   * Create a key unique for each fastq sample.
+   * @return key
+   */
+  public String getKeyFastqSample() {
+
+    // Case exists only during step test
+    if (fastqFiles == null || fastqFiles.length == 0)
+      return lane + " " + sampleName;
+
+    String firstFastqFileName = this.fastqFiles[0].getName();
+    return firstFastqFileName.substring(0, firstFastqFileName.length()
+        - fastqStorage.getCompressionExtension().length() - 1);
+
   }
 
+  /**
+   * Create the prefix used for add data in a RunData for each FastqSample
+   * @return prefix
+   */
   public String getPrefixRundata() {
-    return "."
+    return ".lane"
         + this.lane + ".sample." + this.sampleName + ".read" + this.read1 + "."
         + this.sampleName;
   }
 
-  public String getFilePathInRun() {
-    StringBuilder s = new StringBuilder();
-
-    s.append("/Project_");
-    s.append(this.projectName);
-    s.append("/Sample_");
-    s.append(this.sampleName);
-    // prefix file
-    s.append(String.format("/%s_%s_L%03d_R%d_", sampleName, "".equals(index)
-        ? "NoIndex" : index, lane, read1));
-    // format file
-    s.append("001.fastq.bz2");
-
-    return s.toString();
-  }
-
+  /**
+   * Return if it must uncompress fastq files else false.
+   * @return true if it must uncompress fastq files else false.
+   */
   public boolean isUncompressedNeeded() {
     return true;
   }
 
+  /**
+   * Returns a estimation of the size of uncompressed fastq files according to
+   * the type extension of files and the coefficient of uncompression
+   * corresponding.
+   * @return size if uncompressed fastq files
+   */
   public long getUncompressedSize() {
     // according to type of compressionExtension
     long sizeFastqFiles = 0;
@@ -56,7 +71,6 @@ public class FastqSample {
     for (File f : fastqFiles) {
       sizeFastqFiles += f.length();
     }
-
     return (long) (sizeFastqFiles * fastqStorage.getCoefficientUncompress());
   }
 
@@ -137,6 +151,16 @@ public class FastqSample {
   // Constructor
   //
 
+  /**
+   * PUblic constructor corresponding of a entity to treat by
+   * AbstractFastqCollector.
+   * @param casavaOutputPath path to fastq files
+   * @param read read number
+   * @param lane lane number
+   * @param sampleName name of the sample
+   * @param projectName name of the project
+   * @param index value index
+   */
   public FastqSample(final String casavaOutputPath, final int read,
       final int lane, final String sampleName, final String projectName,
       final String index) {
@@ -150,10 +174,12 @@ public class FastqSample {
     this.index = index;
 
     this.runFastqPath = casavaOutputPath;
-    this.fastqFiles = createListFastqFiles(read1);
 
-    System.out.println("create fastqSample for "
-        + sampleName + "nb fastqFiles " + fastqFiles.length);
+    if (sampleName.equals("2012_0197"))
+      this.fastqFiles = createListFastqFiles(read1);
+
+    // System.out.println("create fastqSample for "
+    // + sampleName + "nb fastqFiles " + fastqFiles.length);
 
     if (fastqFiles == null || fastqFiles.length == 0) {
       this.keyFastqFiles = null;

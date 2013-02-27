@@ -42,10 +42,11 @@ import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFormatException;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.collectors.FastQCCollector;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
 
 /**
- * This class manages the files unzipped fastq to create temporary files and
+ * This class manages the files uncompressed fastq to create temporary files and
  * object sequenceFile for FastqC.
  * @author Sandrine Perrin
  */
@@ -62,7 +63,7 @@ public final class FastqStorage {
   // Default value, redefine with setCompressionExtension
   private static String compression_extension = "fq.bz2";
 
-  // Value per default 1 for uncompress file
+  // Value per default 1 for compression coefficient
   private static double coefficientUncompress = 1;
 
   private static Map<String, File> setFastqFiles;
@@ -73,6 +74,14 @@ public final class FastqStorage {
 
   private boolean controlPreCollectOK = false;
 
+  /**
+   * Return a sequenceFile. If temporary file exists, it uses SequenceFile from
+   * FastqC library, else it uses a sequenceFile implemented in Aozan which
+   * creates a temporary file.
+   * @param fastqFiles file to treat
+   * @return SequenceFile
+   * @throws AozanException if an error occurs during creating sequenceFile
+   */
   public SequenceFile getSequenceFile(final File[] fastqFiles)
       throws AozanException {
 
@@ -109,39 +118,20 @@ public final class FastqStorage {
     return seqFile;
   }
 
-  public File getNewTemporaryFile() throws IOException {
-    return File.createTempFile("aozan_fastq_", ".fastq", new File(tmpPath));
-  }
-
-  public File getTemporaryFile(final File[] fastqFiles) {
-
-    if (fastqFiles == null || fastqFiles.length == 0)
-      return null;
-
-    return getTemporaryFile(keyFiles(fastqFiles));
-  }
-
-  // TODO create tmp file if not exists
-  public File getTemporaryFile(final String keyFastqFiles) {
-    return setFastqFiles.get(keyFastqFiles);
-  }
-
+  /**
+   * Add a temporary fastq file in map.
+   * @param keyFastqFiles key
+   * @param tmpFile value
+   */
   public void addTemporaryFile(final String keyFastqFiles, File tmpFile) {
     setFastqFiles.put(keyFastqFiles, tmpFile);
   }
 
-  public String getTmpDir() {
-    return tmpPath;
-  }
-
-  public double getCoefficientUncompress() {
-    return coefficientUncompress;
-  }
-
-  public String getCompressionExtension() {
-    return compression_extension;
-  }
-
+  /**
+   * Receive the type of compression use for fastq files.
+   * @param casavaOutputPath
+   * @throws AozanException
+   */
   public void setCompressionExtension(String casavaOutputPath)
       throws AozanException {
 
@@ -153,10 +143,6 @@ public final class FastqStorage {
             && pathname.getName().contains(new StringBuffer(".fastq."));
       }
     });
-
-    // String nameFile = file.getName();
-    // if (nameFile.indexOf(".fastq") < 0)
-    // throw new AozanException("Compression extension unknown.");
 
     CompressionType zType =
         CompressionType.getCompressionTypeByFilename(file[0].getName());
@@ -170,15 +156,21 @@ public final class FastqStorage {
   }
 
   /**
-   * @param data
+   * Realize all preliminary control before execute AbstractFastqCollector, it
+   * check if the free space in tmp directory is enough for save all
+   * uncompressed fastq files.
+   * @param data data used
+   * @param qcReportOutputPath path to save qc report
+   * @throws AozanException
    */
-  public void controlPreCollect(final RunData data) throws AozanException {
+  public void controlPreCollect(final RunData data,
+      final String qcReportOutputPath) throws AozanException {
 
     if (controlPreCollectOK)
       return;
 
     // Count size from all fastq files util
-    long uncompressedSizeNeeded = fff(data);
+    long uncompressedSizeNeeded = countUncompressedSizeFilesNeeded(data);
     uncompressedSizeNeeded /= (1024L * 1024L * 1024L);
 
     // Control if free disk space is enough for uncompress fastq files
@@ -188,7 +180,7 @@ public final class FastqStorage {
     // long sizeUncompress = (long) (sizeGo * 3.66);
     // System.out.println("size unCompress " + (double) sizeGo * 3.66);
 
-    long freeSpace = new File(this.tmpPath).getFreeSpace();
+    long freeSpace = new File(tmpPath).getFreeSpace();
     freeSpace /= (1024L * 1024L * 1024L);
 
     // long freeSpace2 = ProcessUtils.sh({"cd", TMP_DIR,"&","df","-h","."});
@@ -203,25 +195,43 @@ public final class FastqStorage {
     // + new File(this.tmpPath).getAbsolutePath()
     // + ", and we need "
     // + uncompressedSizeNeeded + ". Echec Aozan");
+    //
+    // System.out
+    // .println("Enough disk space to store uncompressed fastq files for step fastqScreen. We are "
+    // + freeSpace
+    // + " in directory "
+    // + new File(tmpPath).getAbsolutePath()
+    // + ", and we need "
+    // + uncompressedSizeNeeded);
 
-    System.out
-        .println("Enough disk space to store uncompressed fastq files for step fastqScreen. We are "
-            + freeSpace
-            + " in directory "
-            + new File(this.tmpPath).getAbsolutePath()
-            + ", and we need "
-            + uncompressedSizeNeeded);
+    // Create temporary directory who save intermediary results create by
+    // AbstractFastqCollector
+    System.out.println(qcReportOutputPath);
 
+    // Verify if directory for the run exists
+    File runDir = new File(qcReportOutputPath);
+    if (runDir.exists() && runDir.isDirectory()) {
+      FastQCCollector.isExistRunDir = true;
+
+    } else if (!(new File(qcReportOutputPath).mkdir())) {
+      // throw new AozanException(
+      System.out
+          .println("Error during create save directory for results intermediate of AbstractFastqCollector.");
+    }
     controlPreCollectOK = true;
   }
 
-  private long fff(final RunData data) {
+  /**
+   * Estimate the size needed for all uncompresses fastq files and construct the
+   * map with all samples to treat.
+   * @param data data used
+   * @return
+   */
+  private long countUncompressedSizeFilesNeeded(final RunData data) {
 
     final int laneCount = data.getInt("run.info.flow.cell.lane.count");
     // mode paired or single-end present in Rundata
     final int readCount = data.getInt(KEY_READ_COUNT);
-    final boolean lastReadIndexed =
-        data.getBoolean(KEY_READ_X_INDEXED + readCount + ".indexed");
 
     long uncompressedSizeFiles = 0l;
     Map<String, FastqSample> samples = new LinkedHashMap<String, FastqSample>();
@@ -251,13 +261,12 @@ public final class FastqStorage {
                   + lane + "." + sampleName + ".sample.project");
 
           FastqSample fs =
-              new FastqSample(this.casavaOutputPath, read, lane, sampleName,
+              new FastqSample(casavaOutputPath, read, lane, sampleName,
                   projectName, index);
 
           uncompressedSizeFiles += fs.getUncompressedSize();
 
-          // key: identifiant uniq for a sample in lane
-          samples.put(lane + "_" + sampleName, fs);
+          samples.put(fs.getKeyFastqSample(), fs);
 
         } // sample
       }// lane
@@ -266,56 +275,28 @@ public final class FastqStorage {
     // Create a unmodifiable linked map
     fastqsSamples = Collections.unmodifiableMap(samples);
 
-    System.out.println("Nb fastqSample create "
-        + fastqsSamples.size() + " size " + uncompressedSizeFiles);
-
     return uncompressedSizeFiles;
   }
 
   /**
-   * Uncompresses and compiles files of array.
-   * @param fastqFiles fastq files of array
-   * @param read read number
-   * @param lane lane number
-   * @param projectName name of the project
-   * @param sampleName name of the sample
-   * @param index sequence index
-   * @return file compile all files
-   * @throws AozanException if an error occurs while creating file
-   */
-  // public File getFastqFile(final String casavaOutputPath, final int read,
-  // final int lane, final String projectName, final String sampleName,
-  // final String index) throws AozanException {
-  //
-  // // Set the list of the files for the FASTQ data
-  // final File[] fastqFiles =
-  // createListFastqFiles(read, lane, projectName, sampleName, index);
-  //
-  // if (fastqFiles == null || fastqFiles.length == 0)
-  // return null;
-  //
-  // // Return uncompress temporary file if it exist
-  // return setFastqFiles.get(keyFiles(fastqFiles));
-  // }
-
-  /**
-   * Test if a temporary file corresponding with projectName and sampleName has
-   * already created
-   * @param read read number
-   * @param lane lane number
-   * @param projectName name of the project
-   * @param sampleName name of the sample
-   * @param index sequence index
+   * Check if a temporary file corresponding with fastq files has already
+   * created
+   * @param fastqFiles fastq files
    * @return true if map of files contains a entry with the same key or false
    */
-  public static boolean tmpFileExist(final File[] fastqFiles) {
+  public boolean tmpFileExist(final File[] fastqFiles) {
     if (fastqFiles == null || fastqFiles.length == 0)
       return false;
 
     return tmpFileExist(keyFiles(fastqFiles));
   }
 
-  public static boolean tmpFileExist(final String keyFastqFiles) {
+  /**
+   * Check if a temporary file corresponding with a key has already created.
+   * @param keyFastqFiles key
+   * @return true if temporary file exists else false
+   */
+  public boolean tmpFileExist(final String keyFastqFiles) {
 
     return setFastqFiles.containsKey(keyFastqFiles);
   }
@@ -323,7 +304,7 @@ public final class FastqStorage {
   /**
    * Compile name of all files of array.
    * @param tab array of files
-   * @return string key
+   * @return key
    */
   public static String keyFiles(final File[] tab) {
 
@@ -378,9 +359,28 @@ public final class FastqStorage {
       removeTemporaryFastq(e.getValue());
   }
 
+  //
+  // Setter
+  //
+
+  /**
+   * Define the path used for FastqStorage.
+   * @param casavaOutput path of the directory contains fastq file
+   * @param tmp path of the tmp directory
+   */
+  public void setTmpDir(final String casavaOutput, final String tmp) {
+    if (singleton != null) {
+      casavaOutputPath = casavaOutput;
+      tmpPath = tmp;
+    }
+  }
+
+  //
+  // Getter
+  //
+
   /**
    * Create a instance of fastqStorage or if it exists return instance
-   * @param tmp
    * @return instance of fastqStorage
    */
   public static FastqStorage getInstance() {
@@ -391,34 +391,56 @@ public final class FastqStorage {
     return singleton;
   }
 
-  public void setTmpDir(final String casavaOutput, final String tmp) {
-    casavaOutputPath = casavaOutput;
-    tmpPath = tmp;
+  /**
+   * Create a new empty temporary file.
+   * @return file a new empty temporary file.
+   * @throws IOException if an error occurs which creating file
+   */
+  public File getNewTemporaryFile() throws IOException {
+    return File.createTempFile("aozan_fastq_", ".fastq", new File(tmpPath));
   }
+
+  /**
+   * Return the temporary if exists which contains all fastq files in the array.
+   * @param fastqFiles array of fastq files, else null.
+   * @return File temporary file or null if it not exists
+   */
+  public File getTemporaryFile(final File[] fastqFiles) {
+
+    if (fastqFiles == null || fastqFiles.length == 0)
+      return null;
+
+    return getTemporaryFile(keyFiles(fastqFiles));
+  }
+
+  /**
+   * Return the temporary if exists which correspond to the key.
+   * @param keyFastqFiles key of a array of fastq files.
+   * @return File temporary file or null if it not exists
+   */
+  public File getTemporaryFile(final String keyFastqFiles) {
+    return setFastqFiles.get(keyFastqFiles);
+  }
+
+  //
+  // Getters
+  //
 
   public Map<String, FastqSample> getFastqsSamples() {
     return fastqsSamples;
   }
 
-  /**
-   * Keep files that satisfy the specified filter in this directory and
-   * beginning with this prefix
-   * @param casavaOutputPath source directory
-   * @return an array of abstract pathnames
-   */
-  // public File[] createListFastqFiles_OLD(final FastqSample fastqSample) {
-  //
-  // return new File(dir + "/").listFiles(new FileFilter() {
-  //
-  // @Override
-  // public boolean accept(final File pathname) {
-  // return pathname.length() > 0
-  //
-  // && pathname.getName().startsWith(prefix)
-  // && pathname.getName().endsWith(compression_extension);
-  // }
-  // });
-  // }
+  public String getTmpDir() {
+    return tmpPath;
+  }
+
+  public double getCoefficientUncompress() {
+    return coefficientUncompress;
+  }
+
+  public String getCompressionExtension() {
+    return compression_extension;
+  }
 
   //
   // Constructor

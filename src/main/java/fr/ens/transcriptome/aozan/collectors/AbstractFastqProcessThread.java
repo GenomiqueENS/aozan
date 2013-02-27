@@ -31,13 +31,16 @@ import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.aozan.io.FastqStorage;
 
+/**
+ * The abstract class define a thread, it calls by AbtractFastqCollector.
+ * @author Sandrine Perrin
+ */
 abstract class AbstractFastqProcessThread implements Runnable {
 
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
   protected final FastqSample fastqSample;
-
   protected final RunData results;
   protected final FastqStorage fastqStorage;
 
@@ -45,7 +48,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
   protected boolean success;
 
   /**
-   * Get the results of the FastQC analysis.
+   * Get the results of the analysis.
    * @return a RunData object with only the result of the thread
    */
   public RunData getResults() {
@@ -76,10 +79,11 @@ abstract class AbstractFastqProcessThread implements Runnable {
   // Constructor
   //
 
-  // public AbstractFastqProcessThread(final File[] fastqFiles, final int read,
-  // final int lane, String projectName, final String sampleName) throws
-  // AozanException {
-
+  /**
+   * Public constructor.
+   * @param fastqSample
+   * @throws AozanException if the fastqSample return none fastq file.
+   */
   public AbstractFastqProcessThread(final FastqSample fastqSample)
       throws AozanException {
 

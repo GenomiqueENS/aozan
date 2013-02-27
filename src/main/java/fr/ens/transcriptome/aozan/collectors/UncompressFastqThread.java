@@ -26,7 +26,6 @@ package fr.ens.transcriptome.aozan.collectors;
 import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -54,7 +53,6 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
 
   private static final NumberFormat formatter = new DecimalFormat("#,###");
 
-  private static int countFileDecompressed = 0;
   private AozanException exception;
   private boolean success;
 
@@ -93,19 +91,12 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
 
   /**
    * Uncompresses and compiles files of array.
-   * @param fastqFiles fastq files of array
-   * @param read read number
-   * @param lane lane number
-   * @param projectName name of the project
-   * @param sampleName name of the sample
-   * @param index sequence index
    * @return file compile all files
    * @throws AozanException if an error occurs while creating file
    */
   public File uncompressFastqFile() throws AozanException {
 
     if (fastqStorage.tmpFileExist(fastqSample.getKeyFastqFiles()))
-
       // Return uncompress temporary file if it exist
       return fastqStorage.getTemporaryFile(fastqSample.getKeyFastqFiles());
 
@@ -149,10 +140,7 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
     // Add in list of temporary fastq files
     fastqStorage.addTemporaryFile(fastqSample.getKeyFastqFiles(), tmpFastqFile);
 
-    countFileDecompressed++;
-
     long sizeFile = tmpFastqFile.length();
-    // sizeFile /= (1024L * 1024L * 1024L);
 
     LOGGER
         .fine("End uncompressed for fastq File "
@@ -169,6 +157,7 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
 
   /**
    * Thread constructor.
+   * @param FastqSample
    * @throws AozanException if an error occurs while creating sequence file for
    *           FastQC
    */
