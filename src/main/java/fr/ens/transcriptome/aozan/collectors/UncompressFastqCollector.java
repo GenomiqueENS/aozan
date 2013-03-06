@@ -47,6 +47,15 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
   private static int numberThreads = Runtime.getRuntime().availableProcessors();
 
   @Override
+  /**
+   * Get collector name
+   * @return name 
+   */
+  public String getName() {
+    return COLLECTOR_NAME;
+  }
+
+  @Override
   public void configure(Properties properties) {
     super.configure(properties);
 
@@ -54,71 +63,18 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
   }
 
   @Override
-  /**
-   * Uncompress fastq files from each sample in temporaries files
-   * @param data
-   * @param casavaOutputPath fastq file path
-   * @param compressionExtension extension of file
-   * @throws AozanException if an error occurs while creating thread
-   */
-  public void collectSample(final RunData data, final FastqSample fastqSample)
+  public AbstractFastqProcessThread collectSample(final RunData data,
+      final FastqSample fastqSample, final File reportDir)
       throws AozanException {
 
-    if (!(isExistRunDir && isExistBackupResults(data, fastqSample, false))) {
-
-      // Process sample FASTQ(s)
-      final AbstractFastqProcessThread uft = processFile(fastqSample);
-
-      if (uft != null) {
-
-        threads.add(uft);
-        futureThreads.add(executor.submit(uft, uft));
-      }
-    }
-  }
-
-  protected boolean isExistBackupResults(RunData data,
-      final FastqSample fastqSample) throws AozanException {
-
-    // Check for report file
-    File qcreportFile =
-        new File(qcReportOutputPath
-            + "/Project_" + fastqSample.getProjectName() + "/"
-            + fastqSample.getKeyFastqSample() + "-fastqscreen.txt");
-
-    // Check for data file
-    File dataFile =
-        new File(qcReportOutputPath
-            + "/Project_" + fastqSample.getProjectName() + "/fastqscreen_"
-            + fastqSample.getKeyFastqSample() + ".data");
-
-    System.out.println("verify exists back-up for \n\t"
-        + qcreportFile.getAbsolutePath() + " " + qcreportFile.exists() + "\n\t"
-        + dataFile.getAbsolutePath() + "  " + dataFile.exists());
-
-    return dataFile.exists() && qcreportFile.exists();
-
-  }
-
-  /**
-   * Process a FASTQ file. Create a thread which create a uncompressed fastq
-   * file if not exists, or null if one fastq to uncompress or if the
-   * uncompressed fastq files exists
-   * @param data
-   * @param fastqSample
-   * @return a thread uncompress object or null
-   * @throws AozanException if an error occurs while processing a FASTQ file
-   */
-  public UncompressFastqThread processFile(final FastqSample fastqSample)
-      throws AozanException {
-
-    if (fastqSample.getFastqFiles() == null
-        || fastqSample.getFastqFiles().length == 0) {
+    if (fastqSample == null
+        || fastqSample.getFastqFiles() == null
+        || fastqSample.getFastqFiles().isEmpty()) {
       return null;
     }
 
     // Check if the uncompressed fastq file exists
-    if (fastqStorage.tmpFileExist(fastqSample.getKeyFastqFiles()))
+    if (fastqStorage.tmpFileExists(fastqSample))
       return null;
 
     // Create the thread object
@@ -126,22 +82,21 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
   }
 
   @Override
-  public int getNumberThreads() {
+  /**
+   * No data file to save in UncompressCollector
+   */
+  protected void saveResultPart(final FastqSample fastqSample,
+      final RunData data) {
+  }
+
+  @Override
+  public int getThreadsNumber() {
     return numberThreads;
   }
 
   @Override
-  public void setNumberThreads(final int number_threads) {
+  public void setThreadsNumber(final int number_threads) {
     numberThreads = number_threads;
-  }
-
-  @Override
-  /**
-   * Get collector name
-   * @return name 
-   */
-  public String getName() {
-    return COLLECTOR_NAME;
   }
 
 }

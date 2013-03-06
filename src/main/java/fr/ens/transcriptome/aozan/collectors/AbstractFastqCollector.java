@@ -26,9 +26,10 @@ package fr.ens.transcriptome.aozan.collectors;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,8 +37,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import org.apache.commons.codec.net.QCodec;
-
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -60,7 +60,7 @@ abstract public class AbstractFastqCollector implements Collector {
 
   public static final String KEY_READ_COUNT = "run.info.read.count";
   public static final String KEY_READ_X_INDEXED = "run.info.read";
-  public static final String COLLECTOR_NAME = "";
+  // public static final String COLLECTOR_NAME = "";
 
   public static boolean isExistRunDir = false;
 
@@ -70,6 +70,9 @@ abstract public class AbstractFastqCollector implements Collector {
   protected static String tmpPath;
   protected static boolean paired = false;
 
+  private static Set<FastqSample> fastqSamples =
+      new LinkedHashSet<FastqSample>();
+
   // mode threaded
   private static final int CHECKING_DELAY_MS = 5000;
   private static final int WAIT_SHUTDOWN_MINUTES = 60;
@@ -77,7 +80,24 @@ abstract public class AbstractFastqCollector implements Collector {
   protected List<AbstractFastqProcessThread> threads;
   protected List<Future<? extends AbstractFastqProcessThread>> futureThreads;
   protected ExecutorService executor;
-  private boolean modeMonoThreaded;
+
+  /**
+   * Collect data for a fastqSample
+   * @param data
+   * @param fastqSample
+   * @throws AozanException if an error occurs while execution
+   */
+  abstract protected AbstractFastqProcessThread collectSample(
+      final RunData data, final FastqSample fastqSample, final File reportDir)
+      throws AozanException;
+
+  abstract public int getThreadsNumber();
+
+  abstract public void setThreadsNumber(final int numberThreads);
+
+  // TODO REVIEW: add this methods
+  // abstract public AbstractFastqProcessThread processFile(final RunData data,
+  // final FastqSample fastqSample) throws AozanException;
 
   @Override
   /**
@@ -106,27 +126,25 @@ abstract public class AbstractFastqCollector implements Collector {
     casavaOutputPath =
         properties.getProperty(RunDataGenerator.CASAVA_OUTPUT_DIR);
 
+    // TODO REVIEW: "_tmp" is unnecessary as it has already set in the python
+    // code
     qcReportOutputPath =
         properties.getProperty(RunDataGenerator.QC_OUTPUT_DIR) + "_tmp";
 
     tmpPath = properties.getProperty(RunDataGenerator.TMP_DIR);
 
     fastqStorage = FastqStorage.getInstance();
-    fastqStorage.setTmpDir(casavaOutputPath, tmpPath);
+    fastqStorage.setTmpDir(tmpPath);
 
-    this.modeMonoThreaded = this.getNumberThreads() == 1;
+    System.out.println("Abstract configure  :" + casavaOutputPath);
 
-    System.out.println("Abstract configure  :"
-        + casavaOutputPath + "\tCompression Fastq File "
-        + fastqStorage.getCompressionExtension());
-
-    if (!modeMonoThreaded)
+    if (this.getThreadsNumber() > 1)
       configureModeMultiThread(properties);
 
   }
 
   /**
-   * Configure a multitreaded mode.
+   * Configure a multi-threaded mode.
    * @param properties for the collector
    */
   public void configureModeMultiThread(final Properties properties) {
@@ -138,7 +156,7 @@ abstract public class AbstractFastqCollector implements Collector {
             Integer.parseInt(properties.getProperty("qc.conf.fastqc.threads")
                 .trim());
         if (confThreads > 0)
-          this.setNumberThreads(confThreads);
+          this.setThreadsNumber(confThreads);
 
       } catch (NumberFormatException e) {
       }
@@ -148,7 +166,7 @@ abstract public class AbstractFastqCollector implements Collector {
       this.futureThreads = Lists.newArrayList();
 
       // Create executor service
-      this.executor = Executors.newFixedThreadPool(this.getNumberThreads());
+      this.executor = Executors.newFixedThreadPool(this.getThreadsNumber());
     }
   }
 
@@ -162,20 +180,42 @@ abstract public class AbstractFastqCollector implements Collector {
     // TODO to remove
     data = FastqScreenDemo.getRunData();
 
-    fastqStorage.controlPreCollect(data, qcReportOutputPath);
+    controlPreCollect(data, qcReportOutputPath);
 
-    for (Map.Entry<String, FastqSample> e : fastqStorage.getFastqsSamples()
-        .entrySet()) {
+    // System.out.println("nb fastq Sample " + fastqSamples.size());
 
-      // TODO to remove after text
-      if (e.getValue().getFastqFiles() != null
-          && e.getValue().getFastqFiles().length > 0) {
+    RunData resultPart = null;
+    if (this.getThreadsNumber() > 1) {
 
-        collectSample(data, e.getValue());
+      for (FastqSample fs : fastqSamples) {
+        if (fs.getFastqFiles() != null && !fs.getFastqFiles().isEmpty()) {
+
+          resultPart = loadResultPart(fs);
+
+          if (resultPart != null) {
+            data.put(resultPart);
+          } else {
+
+            final File reportDir =
+                new File(qcReportOutputPath + "/Project_" + fs.getProjectName());
+
+            if (!reportDir.exists())
+              if (!reportDir.mkdirs())
+                throw new AozanException("Cannot create report directory: "
+                    + reportDir.getAbsolutePath());
+
+            AbstractFastqProcessThread thread =
+                collectSample(data, fs, reportDir);
+
+            if (thread != null) {
+              // Add thread to executor or futureThreads, I don't know
+              threads.add(thread);
+              futureThreads.add(executor.submit(thread, thread));
+            }
+          }
+        }
       }
-    }
 
-    if (!this.modeMonoThreaded && futureThreads.size() > 0) {
       System.out.println("multithread " + futureThreads.size());
       // Wait for threads
       waitThreads(futureThreads, executor);
@@ -183,8 +223,225 @@ abstract public class AbstractFastqCollector implements Collector {
       // Add results of the threads to the data object
       for (AbstractFastqProcessThread sft : threads)
         data.put(sft.getResults());
+
+    } else {
+
+      // Code without starting threads :
+      for (FastqSample fs : fastqSamples) {
+        // TODO to remove after text
+        if (fs.getFastqFiles() != null && !fs.getFastqFiles().isEmpty()) {
+
+          resultPart = loadResultPart(fs);
+
+          if (resultPart == null) {
+
+            final File reportDir =
+                new File(qcReportOutputPath + "/Project_" + fs.getProjectName());
+
+            if (!reportDir.exists())
+              if (!reportDir.mkdirs())
+                throw new AozanException("Cannot create report directory: "
+                    + reportDir.getAbsolutePath());
+
+            // This not really a thread as it will be never started
+            AbstractFastqProcessThread pseudoThread =
+                collectSample(data, fs, reportDir);
+            pseudoThread.run();
+
+            resultPart = pseudoThread.getResults();
+            saveResultPart(fs, resultPart);
+          }
+          data.put(resultPart);
+        }
+      }
     }
 
+  }
+
+  /**
+   * Realize all preliminary control before execute AbstractFastqCollector, it
+   * check if the free space in tmp directory is enough for save all
+   * uncompressed fastq files.
+   * @param data data used
+   * @param qcReportOutputPath path to save qc report
+   * @throws AozanException
+   */
+  public void controlPreCollect(final RunData data,
+      final String qcReportOutputPath) throws AozanException {
+
+    if (!fastqSamples.isEmpty())
+      return;
+
+    // Count size from all fastq files util
+    long freeSpace = new File(tmpPath).getFreeSpace();
+
+    // Estimate used space : needed space + 5%
+    long uncompressedSizeNeeded =
+        (long) ((double) countUncompressedSizeFilesNeeded(data) * 1.05);
+
+    if (uncompressedSizeNeeded > freeSpace)
+      throw new AozanException(
+          "Not enough disk space to store uncompressed fastq files for step fastqScreen. We are "
+              + freeSpace
+              + " in directory "
+              + new File(tmpPath).getAbsolutePath()
+              + ", and we need "
+              + uncompressedSizeNeeded + ". Echec Aozan");
+
+    System.out
+        .println("Enough disk space to store uncompressed fastq files for step fastqScreen. We are "
+            + freeSpace
+            + " in directory "
+            + new File(tmpPath).getAbsolutePath()
+            + ", and we need "
+            + uncompressedSizeNeeded);
+
+    // TODO to remove after test
+    // Verify if directory for the run exists
+    File runDir = new File(qcReportOutputPath);
+    if (runDir.exists() && runDir.isDirectory()) {
+      FastQCCollector.isExistRunDir = true;
+
+    } else if (!(new File(qcReportOutputPath).mkdir())) {
+      // throw new AozanException(
+      System.out
+          .println("Error during create save directory for results intermediate of AbstractFastqCollector.");
+    }
+  }
+
+  /**
+   * Estimate the size needed for all uncompresses fastq files and construct the
+   * map with all samples to treat.
+   * @param data data used
+   * @return
+   */
+  private long countUncompressedSizeFilesNeeded(final RunData data) {
+
+    final int laneCount = data.getInt("run.info.flow.cell.lane.count");
+    // mode paired or single-end present in Rundata
+    final int readCount = data.getInt(KEY_READ_COUNT);
+
+    long uncompressedSizeFiles = 0l;
+    // Map<String, FastqSample> samples = new LinkedHashMap<String,
+    // FastqSample>();
+
+    // paired = readCount > 1 && !lastReadIndexed;
+
+    for (int read = 1; read <= readCount - 1; read++) {
+
+      if (data.getBoolean("run.info.read" + read + ".indexed"))
+        continue;
+
+      for (int lane = 1; lane <= laneCount; lane++) {
+
+        final List<String> sampleNames =
+            Lists.newArrayList(Splitter.on(',').split(
+                data.get("design.lane" + lane + ".samples.names")));
+
+        for (String sampleName : sampleNames) {
+
+          // Get the sample index
+          String index =
+              data.get("design.lane" + lane + "." + sampleName + ".index");
+
+          // Get project name
+          String projectName =
+              data.get("design.lane"
+                  + lane + "." + sampleName + ".sample.project");
+
+          // System.out.println("nx fs " + sampleName);
+
+          FastqSample fs =
+              new FastqSample(casavaOutputPath, read, lane, sampleName,
+                  projectName, index);
+
+          // System.out.println("size files  : " + uncompressedSizeFiles);
+
+          uncompressedSizeFiles += fs.getUncompressedSize();
+
+          // System.out.println("size files  : " + uncompressedSizeFiles);
+
+          fastqSamples.add(fs);
+
+        } // sample
+      }// lane
+    }// read
+
+    // Create a unmodifiable linked map
+    // fastqsSamples = Collections.unmodifiableMap(samples);
+
+    return uncompressedSizeFiles;
+  }
+
+  /**
+   * Restore rundata from the save file if it exists.
+   * @param fastqSample
+   * @return RunData corresponding to the file or null
+   */
+  private RunData loadResultPart(final FastqSample fastqSample) {
+    // Check for data file
+    File dataFile =
+        new File(qcReportOutputPath
+            + "/Project_" + fastqSample.getProjectName() + "/" + getName()
+            + "_" + fastqSample.getKeyFastqSample() + ".data");
+
+    // Data file doesn't exists
+    if (!dataFile.exists())
+      return null;
+
+    // System.out.println("verify exists back-up for \n\t"
+    // + dataFile.getAbsolutePath() + "  " + dataFile.exists());
+
+    // Restore results in data
+    RunData data = null;
+    try {
+      data = new RunData(dataFile);
+
+    } catch (IOException io) {
+
+      LOGGER.warning("Error during reading data file for the sample "
+          + fastqSample.getKeyFastqSample());
+    }
+    return data;
+  }
+
+  /**
+   * Save rundata for a sample in a file in a qc report directory
+   * @param fastqSample sample
+   * @param data RunData corresponding to one sample
+   */
+  protected void saveResultPart(final FastqSample fastqSample,
+      final RunData data) {
+
+    try {
+      String dataFilePath =
+          qcReportOutputPath
+              + "/Project_" + fastqSample.getProjectName() + "/" + getName()
+              + "_" + fastqSample.getKeyFastqSample() + ".data";
+
+      boolean success = data.createRunDataFile(dataFilePath);
+
+      if (success) {
+        System.out
+            .println("Save data file for the sample here "
+                + new File(dataFilePath).getAbsolutePath() + " size "
+                + data.size());
+
+        LOGGER
+            .fine("Save data file for the sample here "
+                + new File(dataFilePath).getAbsolutePath() + " size "
+                + data.size());
+      }
+
+    } catch (IOException ae) {
+
+      System.out.println("Error during sava rundata in file "
+          + qcReportOutputPath + "/" + getName()
+          + fastqSample.getKeyFastqSample() + ".data");
+
+      LOGGER.warning("Error during writing data file for the sample "
+          + fastqSample.getKeyFastqSample());
+    }
   }
 
   /**
@@ -229,6 +486,10 @@ abstract public class AbstractFastqCollector implements Collector {
 
               // Return error Step Result
               throw new AozanException(st.getException());
+
+            } else {
+              // if success, save results
+              saveResultPart(st.getFastqSample(), st.getResults());
             }
 
           } catch (InterruptedException e) {
@@ -252,21 +513,18 @@ abstract public class AbstractFastqCollector implements Collector {
   /**
    * Clear qc directory after successfully all FastqCollector
    */
-  public static void clearFactqCollector() {
+  public void clear() {
 
     // Delete temporary uncompress fastq file
     fastqStorage.clear();
 
     // Delete all data files fastqSample per fastqSample
-    for (Map.Entry<String, FastqSample> e : fastqStorage.getFastqsSamples()
-        .entrySet()) {
+    for (FastqSample fs : fastqSamples) {
 
-      // TODO to remove after tests
-      if (e.getValue().getFastqFiles().length > 0) {
+      if (fs.getFastqFiles().size() > 0) {
 
         File projectDir =
-            new File(qcReportOutputPath
-                + "/Project_" + e.getValue().getProjectName());
+            new File(qcReportOutputPath + "/Project_" + fs.getProjectName());
 
         File[] dataFiles = projectDir.listFiles(new FileFilter() {
 
@@ -274,10 +532,6 @@ abstract public class AbstractFastqCollector implements Collector {
             return pathname.getName().endsWith(".data");
           }
         });
-
-        System.out.println("dir "
-            + projectDir.getAbsolutePath() + " nb data files "
-            + dataFiles.length);
 
         if (dataFiles != null && dataFiles.length > 0) {
 
@@ -293,82 +547,13 @@ abstract public class AbstractFastqCollector implements Collector {
       }
     }
 
-    // Rename qc Report directory
+    // TODO to remove
+    // move action to the python code -> rename qc Report directory
     int n = qcReportOutputPath.indexOf("_tmp");
     if (!new File(qcReportOutputPath).renameTo(new File(qcReportOutputPath
         .substring(0, n))))
       LOGGER.warning("Can not rename qc report directory.");
 
   }
-
-  /**
-   * Check if the data file and the report exists for the fastqSample.
-   * @param data
-   * @param fastqSample
-   * @param isRestoredData true if the data file must update data
-   * @return true if all files are exists else false
-   * @throws AozanException if an error occurs while execution
-   */
-  protected boolean isExistBackupResults(RunData data,
-      final FastqSample fastqSample, final boolean isRestoredData)
-      throws AozanException {
-
-    boolean isExist = false;
-
-    // Check if results are save in temporary directory
-    File qcreportFile =
-        new File(qcReportOutputPath
-            + "/Project_" + fastqSample.getProjectName() + "/"
-            + fastqSample.getKeyFastqSample() + "-" + getName());
-
-    if (!qcreportFile.exists() || !qcreportFile.isDirectory()) {
-      isExist = false;
-
-      System.out.println("verify exists back-up for \n\t"
-          + qcreportFile.getAbsolutePath() + " " + qcreportFile.exists());
-    } else {
-
-      // Check for data file
-      File dataFile =
-          new File(qcReportOutputPath
-              + "/Project_" + fastqSample.getProjectName() + "/" + getName()
-              + "_" + fastqSample.getKeyFastqSample() + ".data");
-
-      System.out.println("verify exists back-up for \n\t"
-          + dataFile.getAbsolutePath() + "  " + dataFile.exists());
-
-      if (!dataFile.exists()) {
-
-        isExist = false;
-      } else {
-
-        try {
-          // Restore results in data
-          System.out.print("size rundata " + data.size());
-          data.addDataFileInRundata(dataFile);
-          System.out.println("\t\t add data file " + data.size());
-
-          isExist = true;
-        } catch (IOException io) {
-          isExist = false;
-
-        }
-      }
-    }
-    return isExist;
-  }
-
-  /**
-   * Collect data for a fastqSample
-   * @param data
-   * @param fastqSample
-   * @throws AozanException if an error occurs while execution
-   */
-  abstract public void collectSample(final RunData data,
-      final FastqSample fastqSample) throws AozanException;
-
-  abstract public int getNumberThreads();
-
-  abstract public void setNumberThreads(final int numberThreads);
 
 }

@@ -47,6 +47,7 @@ public class SequenceFileAozan implements SequenceFile {
 
   private final File file;
   private final SequenceFile seqFile;
+  private final FastqSample fastqSample;
   private final FileWriter fw;
   private Exception exception;
 
@@ -72,6 +73,10 @@ public class SequenceFileAozan implements SequenceFile {
       // End of file, close the new file
       if (!seqFile.hasNext()) {
         this.fw.close();
+
+        // Rename file for remove '.tmp' final
+        file.renameTo(new File(FastqStorage.getInstance().getTemporaryFile(
+            fastqSample)));
 
         long sizeFile = file.length();
         // double sizeFile =
@@ -126,12 +131,13 @@ public class SequenceFileAozan implements SequenceFile {
   // Constructor
   //
 
-  public SequenceFileAozan(final File[] files, final File tmpFile)
-      throws AozanException {
+  public SequenceFileAozan(final File[] files, final File tmpFile,
+      final FastqSample fastqSample) throws AozanException {
 
     LOGGER.fine("Start uncompressed fastq Files : " + files[0].length() + ".");
 
     this.file = tmpFile;
+    this.fastqSample = fastqSample;
 
     try {
       this.fw = new FileWriter(this.file);

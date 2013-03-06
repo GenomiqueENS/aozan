@@ -177,7 +177,7 @@ public class FastqScreenDemo {
         fsqCollector.collect(data);
 
         System.out.println("\nCLEAR QC_REPORT COLLECTOR");
-        AbstractFastqCollector.clearFactqCollector();
+        // ((AbstractFastqCollector) fsqCollector).clear();
 
         // completed rundata
         // data =

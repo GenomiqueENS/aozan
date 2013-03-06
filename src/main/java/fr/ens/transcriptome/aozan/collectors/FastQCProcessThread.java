@@ -51,31 +51,28 @@ import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFormatException;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.fastqc.BadTiles;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.aozan.io.FastqStorage;
-import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
 /**
  * This private class define a class for a thread that read fastq file for
  * FastQC modules.
  * @author Laurent Jourdren
  */
-class SeqFileThread extends AbstractFastqProcessThread {
+class FastQCProcessThread extends AbstractFastqProcessThread {
 
   private final SequenceFile seqFile;
   private final boolean ignoreFilteredSequences;
   private final List<QCModule> moduleList;
-  private final String qcReportOutputPath;
-  private final String qcReportOutputPathTmp;
+  private final File reportDir;
 
   private final FastqStorage fastqStorage;
 
   @Override
   public void run() {
 
-    System.out.println("seqFileThread run ");
+    // System.out.println("seqFileThread run ");
 
     try {
       processSequences(this.seqFile);
@@ -168,21 +165,12 @@ class SeqFileThread extends AbstractFastqProcessThread {
    * Process results after the end of the thread.
    * @throws AozanException if an error occurs while generate FastQC reports
    */
-  private void processResults() throws AozanException {
+  protected void processResults() throws AozanException {
 
     // Set the prefix for the run data entries
     final String prefix = "fastqc" + this.fastqSample.getPrefixRundata();
 
     int nClusters = -1;
-
-    final File reportDir =
-        new File(this.qcReportOutputPath
-            + "/Project_" + this.fastqSample.getProjectName());
-
-    if (!reportDir.exists())
-      if (!reportDir.mkdirs())
-        throw new AozanException("Cannot create report directory: "
-            + reportDir.getAbsolutePath());
 
     // Fill the run data object
     for (final QCModule module : this.moduleList) {
@@ -201,20 +189,12 @@ class SeqFileThread extends AbstractFastqProcessThread {
       this.results.put(keyPrefix + ".error", module.raisesError());
       this.results.put(keyPrefix + ".warning", module.raisesWarning());
 
-      // Save rundata in temporary file
-      if (!this.results.createRunDataFile(reportDir
-          + "/" + "fastqc_" + this.fastqSample.getKeyFastqSample() + ".data"))
-
-        System.out.println("Error during sava rundata in file "
-            + this.qcReportOutputPathTmp + "/fastqc_"
-            + this.fastqSample.getKeyFastqSample() + ".data");
-
     }
 
     // Create report
     if (nClusters > 0)
       try {
-        createReportFile(reportDir);
+        createReportFile();
       } catch (IOException e) {
         throw new AozanException(e);
       }
@@ -227,8 +207,7 @@ class SeqFileThread extends AbstractFastqProcessThread {
    * @throws AozanException if an error occurs while processing data
    * @throws IOException if an error occurs while processing data
    */
-  private void createReportFile(final File reportDir) throws AozanException,
-      IOException {
+  protected void createReportFile() throws AozanException, IOException {
 
     // Set the name of the prefix of the report file
     final String filename = fastqSample.getKeyFastqSample() + "-fastqc.zip";
@@ -257,20 +236,18 @@ class SeqFileThread extends AbstractFastqProcessThread {
    * @throws AozanException if an error occurs while creating sequence file for
    *           FastQC
    */
-  public SeqFileThread(final FastqSample fastqSample,
-      final boolean ignoreFilteredSequences, final String qcReportOutputPath,
-      final String qcReportOutputPathTmp) throws AozanException {
+  public FastQCProcessThread(final FastqSample fastqSample,
+      final boolean ignoreFilteredSequences, final File reportDir)
+      throws AozanException {
 
     super(fastqSample);
 
     this.ignoreFilteredSequences = ignoreFilteredSequences;
-    this.qcReportOutputPath = qcReportOutputPath;
-    this.qcReportOutputPathTmp = qcReportOutputPathTmp;
+    this.reportDir = reportDir;
 
     this.fastqStorage = FastqStorage.getInstance();
 
-    this.seqFile =
-        this.fastqStorage.getSequenceFile(this.fastqSample.getFastqFiles());
+    this.seqFile = this.fastqStorage.getSequenceFile(this.fastqSample);
 
     // Define modules list
     final OverRepresentedSeqs os = new OverRepresentedSeqs();

@@ -23,10 +23,9 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
-import java.util.logging.Logger;
+import java.io.IOException;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.aozan.io.FastqStorage;
@@ -37,15 +36,16 @@ import fr.ens.transcriptome.aozan.io.FastqStorage;
  */
 abstract class AbstractFastqProcessThread implements Runnable {
 
-  /** Logger */
-  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
-
   protected final FastqSample fastqSample;
   protected final RunData results;
   protected final FastqStorage fastqStorage;
 
   protected AozanException exception;
   protected boolean success;
+
+  abstract protected void createReportFile() throws AozanException, IOException;
+
+  abstract protected void processResults() throws AozanException;
 
   /**
    * Get the results of the analysis.
@@ -75,6 +75,10 @@ abstract class AbstractFastqProcessThread implements Runnable {
     return this.success;
   }
 
+  public FastqSample getFastqSample() {
+    return this.fastqSample;
+  }
+
   //
   // Constructor
   //
@@ -90,7 +94,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
     this.fastqSample = fastqSample;
 
     if (this.fastqSample.getFastqFiles() == null
-        || this.fastqSample.getFastqFiles().length == 0)
+        || this.fastqSample.getFastqFiles().isEmpty())
       throw new AozanException("No fastq file defined");
 
     this.results = new RunData();

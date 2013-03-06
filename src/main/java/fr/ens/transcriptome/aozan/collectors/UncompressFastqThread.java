@@ -79,14 +79,12 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
   public void run() {
     System.out.println("call run uncompress");
     try {
-      File f = uncompressFastqFile();
-
-      this.success = (f != null && f.length() > 0);
+      processResults();
+      this.success = true;
 
     } catch (AozanException e) {
       this.exception = e;
     }
-
   }
 
   /**
@@ -94,51 +92,44 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
    * @return file compile all files
    * @throws AozanException if an error occurs while creating file
    */
-  public File uncompressFastqFile() throws AozanException {
-
-    if (fastqStorage.tmpFileExist(fastqSample.getKeyFastqFiles()))
-      // Return uncompress temporary file if it exist
-      return fastqStorage.getTemporaryFile(fastqSample.getKeyFastqFiles());
+  @Override
+  protected void processResults() throws AozanException {
 
     final long startTime = System.currentTimeMillis();
 
     LOGGER.fine("Start uncompressed fastq Files, size : "
-        + formatter.format(fastqSample.getFastqFiles()[0].length()) + ".");
+        + formatter.format(fastqSample.getFastqFiles().get(0).length()) + ".");
 
-    // Uncompresses and compiles files of array in new temporary files
-    File tmpFastqFile = null;
+    File tmpFastqFile =
+        new File(fastqStorage.getTemporaryFile(fastqSample) + ".tmp");
 
-    try {
+    if (!tmpFastqFile.exists()) {
+      // Uncompresses and compiles files of array in new temporary files
+      try {
 
-      tmpFastqFile = fastqStorage.getNewTemporaryFile();
+        OutputStream out = new FileOutputStream(tmpFastqFile);
 
-      OutputStream out = new FileOutputStream(tmpFastqFile);
+        for (File fastqFile : fastqSample.getFastqFiles()) {
 
-      for (File fastqFile : fastqSample.getFastqFiles()) {
+          if (!fastqFile.exists()) {
+            throw new IOException("Fastq file "
+                + fastqFile.getName() + " doesn't exist");
+          }
 
-        if (!fastqFile.exists()) {
-          throw new IOException("Fastq file "
-              + fastqFile.getName() + " doesn't exist");
+          // Get compression type
+          CompressionType zType = fastqSample.getCompressionType();
+
+          // Append compressed fastq file to uncompressed file
+          final InputStream in = new FileInputStream(fastqFile);
+          FileUtils.append(zType.createInputStream(in), out);
         }
 
-        // Get compression type
-        CompressionType zType =
-            CompressionType.getCompressionTypeByFilename(fastqStorage
-                .getCompressionExtension());
+        out.close();
 
-        // Append compressed fastq file to uncompressed file
-        final InputStream in = new FileInputStream(fastqFile);
-        FileUtils.append(zType.createInputStream(in), out);
+      } catch (IOException io) {
+        throw new AozanException(io.getMessage());
       }
-
-      out.close();
-
-    } catch (IOException io) {
-      throw new AozanException(io.getMessage());
     }
-
-    // Add in list of temporary fastq files
-    fastqStorage.addTemporaryFile(fastqSample.getKeyFastqFiles(), tmpFastqFile);
 
     long sizeFile = tmpFastqFile.length();
 
@@ -148,7 +139,14 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
             + ") in "
             + toTimeHumanReadable(System.currentTimeMillis() - startTime));
 
-    return tmpFastqFile;
+    // Rename file for remove '.tmp' final
+    tmpFastqFile.renameTo(new File(fastqStorage.getTemporaryFile(fastqSample)));
+
+  }
+
+  @Override
+  protected void createReportFile() throws AozanException, IOException {
+
   }
 
   //
@@ -166,4 +164,5 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
 
     super(fastqSample);
   }
+
 }

@@ -24,7 +24,7 @@
 package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -57,11 +57,6 @@ public class FastQCCollector extends AbstractFastqCollector {
   }
 
   @Override
-  public String[] getCollectorsNamesRequiered() {
-    return super.getCollectorsNamesRequiered();
-  }
-
-  @Override
   public void configure(final Properties properties) {
 
     super.configure(properties);
@@ -71,106 +66,47 @@ public class FastQCCollector extends AbstractFastqCollector {
     System.setProperty("java.awt.headless", "true");
     System.setProperty("fastqc.unzip", "true");
 
+    // TODO REVIEW: Insert here the code to set the number of threads from
   }
 
   @Override
-  public void collectSample(final RunData data, final FastqSample fastqSample)
+  public AbstractFastqProcessThread collectSample(final RunData data,
+      final FastqSample fastqSample, final File reportDir)
       throws AozanException {
 
-    if (!(isExistRunDir && isExistBackupResults(data, fastqSample, true))) {
+    final List<File> fastqFiles = fastqSample.getFastqFiles();
 
-      // Process sample FASTQ(s)
-      final SeqFileThread sft = processFile(data, fastqSample);
-
-      if (sft != null) {
-        System.out.println("fsc collect sample "
-            + fastqSample.getProjectName() + "  nb thread "
-            + getNumberThreads());
-
-        threads.add(sft);
-        futureThreads.add(executor.submit(sft, sft));
-      }
-    }
-  }
-
-  protected boolean isExistBackupResults(RunData data,
-      final FastqSample fastqSample) {
-
-    boolean isExist = false;
-
-    // Check if results are save in temporary directory
-    File qcreportFile =
-        new File(qcReportOutputPath
-            + "/Project_" + fastqSample.getProjectName() + "/"
-            + fastqSample.getKeyFastqSample() + "-" + getName());
-
-    if (!qcreportFile.exists() || !qcreportFile.isDirectory()) {
-      isExist = false;
-
-      System.out.println("verify exists back-up for \n\t"
-          + qcreportFile.getAbsolutePath() + " " + qcreportFile.exists());
-    } else {
-
-      // Check for data file
-      File dataFile =
-          new File(qcReportOutputPath
-              + "/Project_" + fastqSample.getProjectName() + "/" + getName()
-              + "_" + fastqSample.getKeyFastqSample() + ".data");
-
-      System.out.println("verify exists back-up for \n\t"
-          + dataFile.getAbsolutePath() + "  " + dataFile.exists());
-
-      if (!dataFile.exists()) {
-
-        isExist = false;
-      } else {
-
-        try {
-          // Restore results in data
-          System.out.print("size rundata " + data.size());
-          data.addDataFileInRundata(dataFile);
-          System.out.println("\t\t add data file " + data.size());
-
-          isExist = true;
-        } catch (IOException io) {
-          isExist = false;
-
-        }
-      }
-    }
-    return isExist;
-  }
-
-  /**
-   * Process a FASTQ file.
-   * @param data Run data
-   * @param fastqSample FastqSample
-   * @throws AozanException if an error occurs while processing a FASTQ file
-   */
-  public SeqFileThread processFile(final RunData data,
-      final FastqSample fastqSample) throws AozanException {
-
-    final File[] fastqFiles = fastqSample.getFastqFiles();
-
-    if (fastqFiles == null || fastqFiles.length == 0) {
+    if (fastqFiles.isEmpty()) {
       return null;
     }
 
     // Create the thread object
-    return new SeqFileThread(fastqSample, this.ignoreFilteredSequences,
-        qcReportOutputPath, qcReportOutputPath);
+    return new FastQCProcessThread(fastqSample, this.ignoreFilteredSequences,
+        reportDir);
   }
+
+  // TODO REVIEW:
+  // All the backup code must be in the super class and must be
+  // reused by all child classes
+  // A class that inherits from AbstractFastqCollector must be extremely simple:
+  // protected AbstractFastqProcessThread createFastqProcessThread(
+  // final RunData data, final FastqSample fastqSample) {
+  // return null;
+  // }
 
   //
   // Getters & Setters
   //
 
-  public int getNumberThreads() {
+  @Override
+  // TODO REVIEW: Why is this method is there and not in its super class ?
+  public int getThreadsNumber() {
     return numberThreads;
   }
 
   @Override
-  public void setNumberThreads(final int number_threads) {
+  // TODO REVIEW: Why is this method is there and not in its super class ?
+  public void setThreadsNumber(final int number_threads) {
     numberThreads = number_threads;
   }
 }
