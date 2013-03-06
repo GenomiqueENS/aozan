@@ -252,7 +252,7 @@ public class RunData {
    * @return true if creating file is success, other false
    * @throws AozanException if an error occurs while writing the data file
    */
-  public boolean createRunDataFile(final String fileName) throws AozanException {
+  public boolean createRunDataFile(final String fileName) throws IOException {
     return createRunDataFile(new File(fileName));
   }
 
@@ -262,7 +262,7 @@ public class RunData {
    * @return true if creating file is success, other false
    * @throws AozanException if an error occurs while writing the data file
    */
-  public boolean createRunDataFile(final File fileName) throws AozanException {
+  public boolean createRunDataFile(final File fileName) throws IOException {
 
     if (fileName == null)
       return false;
@@ -271,14 +271,10 @@ public class RunData {
       return false;
 
     BufferedWriter bw;
-    try {
 
-      bw = new BufferedWriter(new FileWriter(fileName));
-      bw.write(this.toString());
-      bw.close();
-    } catch (IOException oi) {
-      throw new AozanException(oi.getMessage());
-    }
+    bw = new BufferedWriter(new FileWriter(fileName));
+    bw.write(this.toString());
+    bw.close();
 
     return true;
   }
