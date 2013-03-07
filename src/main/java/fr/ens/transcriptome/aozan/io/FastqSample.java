@@ -40,10 +40,10 @@ import fr.ens.transcriptome.eoulsan.util.StringUtils;
  */
 public class FastqSample {
 
-  private static final String VALUE = ".millefq";
+  private static final String VALUE = ".fq";
 
   private final int read1;
-  private final int read2;
+  // private final int read2;
   private final int lane;
   private final String sampleName;
   private final String projectName;
@@ -87,7 +87,7 @@ public class FastqSample {
       key.append(f.getAbsolutePath());
       key.append(separator);
     }
-    System.out.println("key files " + key + " hashcode " + key.hashCode());
+    // System.out.println("key files " + key + " hashcode " + key.hashCode());
 
     return key.hashCode();
   }
@@ -194,7 +194,7 @@ public class FastqSample {
    * Set the prefix of the file of read1
    * @return
    */
-  public String prefixFileName(int read) {
+  private String prefixFileName(int read) {
     return String.format("%s_%s_L%03d_R%d_", sampleName, "".equals(index)
         ? "NoIndex" : index, lane, read);
   }
@@ -257,14 +257,8 @@ public class FastqSample {
     return this.fastqFiles;
   }
 
-  /**
-   * @return
-   */
-  public List<File> getFastqFilesRead2(boolean paired) {
-    if (this.read2 == 2)
-      return createListFastqFiles(read2);
-
-    return null;
+  public String getPrefixRead2() {
+    return keyFastqSample.replaceFirst("R1", "R2");
   }
 
   /**
@@ -313,9 +307,8 @@ public class FastqSample {
       final String index) {
 
     // this.fastqStorage = FastqStorage.getInstance();
-
-    this.read1 = read;
-    this.read2 = 0;
+    this.read1 = (read == 3 ? 2 : read);
+    // this.read2 = 0;
 
     this.lane = lane;
     this.sampleName = sampleName;
@@ -326,6 +319,7 @@ public class FastqSample {
 
     // if (sampleName.equals("2012_0197"))
     this.fastqFiles = createListFastqFiles(read1);
+
     // else
     // this.fastqFiles = Collections.emptyList();
 
@@ -334,7 +328,7 @@ public class FastqSample {
 
     if (fastqFiles.size() == 0) {
       this.keyFastqFiles = 0;
-      this.keyFastqSample = null;
+      this.keyFastqSample = "";
       this.nameTemporaryFastqFiles = null;
       this.compressionType = CompressionType.NONE;
 

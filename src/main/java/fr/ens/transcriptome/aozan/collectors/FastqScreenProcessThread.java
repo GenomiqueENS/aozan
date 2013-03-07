@@ -47,6 +47,7 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
   private final FastqScreen fastqscreen;
   private final List<String> listGenomes;
   private final boolean paired;
+  private FastqSample fastqSampleR2;
 
   private FastqScreenResult resultsFastqscreen = null;
 
@@ -63,20 +64,7 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
   @Override
   protected void createReportFile() throws AozanException, IOException {
 
-    // final File reportDir =
-    // new File(qcReportOutputPath
-    // + "/Project_" + fastqSample.getProjectName());
-    //
-    // if (!reportDir.exists())
-    // if (!reportDir.mkdirs())
-    // throw new AozanException("Cannot create report directory: "
-    // + reportDir.getAbsolutePath());
-
     System.out.println(resultsFastqscreen.statisticalTableToString());
-
-    System.out.println("fqScreen save file "
-        + reportDir.getAbsolutePath() + "/" + fastqSample.getKeyFastqSample()
-        + "-fastqscreen.txt");
 
     File fastqScreenFile =
         new File(reportDir.getAbsolutePath()
@@ -93,9 +81,6 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
         fastqScreenFile.delete();
 
     }
-
-    System.out.println("Save result fastqscreen in file : "
-        + fastqScreenFile.getAbsolutePath());
 
     LOGGER.fine("Save result fastqscreen in file : "
         + fastqScreenFile.getAbsolutePath());
@@ -117,16 +102,15 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
         + fastqSample.getSampleName());
 
     File read1 = new File(fastqStorage.getTemporaryFile(fastqSample));
-    System.out.println("read1 " + read1.getName());
 
     if (read1 == null || !read1.exists())
       return;
 
     File read2 = null;
+    // mode paired
     if (paired) {
-      // mode paired
-      // concatenate fastq files of one sample
-      read2 = new File(fastqStorage.getTemporaryFile(fastqSample));
+
+      read2 = new File(fastqStorage.getTemporaryFile(fastqSampleR2));
 
       if (read2 == null || !read2.exists())
         return;
@@ -163,12 +147,48 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
   // Constructor
   //
 
+  /**
+   * Public constructor for a thread object collector for FastqScreen in
+   * pair-end mode
+   * @param fastqSampleR1 fastqSample corresponding to the read 1
+   * @param fastqSampleR2 fastqSample corresponding to the read 2
+   * @param fastqscreen
+   * @param listGenomes list of references genomes for FastqScreen
+   * @param reportDir path for the directory who save the FastqScreen report
+   * @param paired true if a pair-end run else false
+   * @throws AozanException if an error occurs during create thread, if no fastq
+   *           file was found
+   */
+
+  public FastqScreenProcessThread(final FastqSample fastqSampleR1,
+      final FastqSample fastqSampleR2, final FastqScreen fastqscreen,
+      final List<String> listGenomes, final File reportDir, final boolean paired)
+      throws AozanException {
+
+    this(fastqSampleR1, fastqscreen, listGenomes, reportDir, paired);
+
+    this.fastqSampleR2 = fastqSampleR2;
+
+  }
+
+  /**
+   * Public constructor for a thread object collector for FastqScreen in
+   * single-end mode
+   * @param fastqSample fastqSample corresponding to the read 1
+   * @param fastqscreen
+   * @param listGenomes list of references genomes for FastqScreen
+   * @param reportDir path for the directory who save the FastqScreen report
+   * @param paired true if a pair-end run else false
+   * @throws AozanException if an error occurs during create thread, if no fastq
+   *           file was found
+   */
   public FastqScreenProcessThread(final FastqSample fastqSample,
       final FastqScreen fastqscreen, final List<String> listGenomes,
       final File reportDir, final boolean paired) throws AozanException {
 
     super(fastqSample);
 
+    this.fastqSampleR2 = null;
     this.fastqscreen = fastqscreen;
     this.listGenomes = listGenomes;
     this.reportDir = reportDir;

@@ -24,6 +24,7 @@
 package fr.ens.transcriptome.aozan.io;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
@@ -33,7 +34,6 @@ import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFile;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFormatException;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
-import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
 /**
  * This class manages the files uncompressed fastq to create temporary files and
@@ -74,17 +74,11 @@ public final class FastqStorage {
     try {
 
       if (tmpFileExists(fastqSample)) {
-
         seqFile = SequenceFactory.getSequenceFile(fastq);
-        System.out.println("create sequencefile");
 
       } else {
-
         // Create temporary fastq file
         final File f = new File(getTemporaryFile(fastqSample) + ".tmp");
-
-        System.out.println("create tmp fastq " + f.getAbsolutePath());
-
         seqFile = new SequenceFileAozan(fastq, f, fastqSample);
 
       }
@@ -161,12 +155,27 @@ public final class FastqStorage {
   }
 
   /**
-   * Delete all temporaries files if exist
+   * Delete all temporaries files
    * @throws IOException
    */
   public void clear() {
     System.out.println("delete temporaries files ");
+    File[] files = new File(tmpPath).listFiles(new FileFilter() {
 
+      public boolean accept(final File pathname) {
+        return pathname.getName().startsWith("aozan_fastq_")
+            && (pathname.getName().endsWith(".fastq") || pathname.getName()
+                .endsWith(".fastq.tmp"));
+      }
+    });
+
+    // Delete temporary files
+    for (File f : files) {
+      if (f.exists())
+        if (!f.delete())
+          LOGGER.warning("Can not delete the temporary file : "
+              + f.getAbsolutePath());
+    }
   }
 
   /**

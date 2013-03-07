@@ -70,9 +70,10 @@ abstract public class AbstractFastqCollector implements Collector {
   protected static String tmpPath;
   protected static boolean paired = false;
 
-  private static Set<FastqSample> fastqSamples =
+  protected static Set<FastqSample> fastqSamples =
       new LinkedHashSet<FastqSample>();
 
+  private long uncompressedSizeFiles = 0l;
   // mode threaded
   private static final int CHECKING_DELAY_MS = 5000;
   private static final int WAIT_SHUTDOWN_MINUTES = 60;
@@ -135,8 +136,6 @@ abstract public class AbstractFastqCollector implements Collector {
 
     fastqStorage = FastqStorage.getInstance();
     fastqStorage.setTmpDir(tmpPath);
-
-    System.out.println("Abstract configure  :" + casavaOutputPath);
 
     if (this.getThreadsNumber() > 1)
       configureModeMultiThread(properties);
@@ -246,6 +245,10 @@ abstract public class AbstractFastqCollector implements Collector {
             // This not really a thread as it will be never started
             AbstractFastqProcessThread pseudoThread =
                 collectSample(data, fs, reportDir);
+
+            if (pseudoThread == null)
+              continue;
+
             pseudoThread.run();
 
             resultPart = pseudoThread.getResults();
@@ -275,9 +278,11 @@ abstract public class AbstractFastqCollector implements Collector {
     // Count size from all fastq files util
     long freeSpace = new File(tmpPath).getFreeSpace();
 
+    createListFastqSamples(data);
+
     // Estimate used space : needed space + 5%
     long uncompressedSizeNeeded =
-        (long) ((double) countUncompressedSizeFilesNeeded(data) * 1.05);
+        (long) ((double) uncompressedSizeFiles * 1.05);
 
     if (uncompressedSizeNeeded > freeSpace)
       throw new AozanException(
@@ -315,19 +320,16 @@ abstract public class AbstractFastqCollector implements Collector {
    * @param data data used
    * @return
    */
-  private long countUncompressedSizeFilesNeeded(final RunData data) {
+  private void createListFastqSamples(final RunData data) {
 
     final int laneCount = data.getInt("run.info.flow.cell.lane.count");
     // mode paired or single-end present in Rundata
     final int readCount = data.getInt(KEY_READ_COUNT);
+    final boolean lastReadIndexed =
+        data.getBoolean(KEY_READ_X_INDEXED + readCount + ".indexed");
+    paired = readCount > 1 && !lastReadIndexed;
 
-    long uncompressedSizeFiles = 0l;
-    // Map<String, FastqSample> samples = new LinkedHashMap<String,
-    // FastqSample>();
-
-    // paired = readCount > 1 && !lastReadIndexed;
-
-    for (int read = 1; read <= readCount - 1; read++) {
+    for (int read = 1; read <= readCount; read++) {
 
       if (data.getBoolean("run.info.read" + read + ".indexed"))
         continue;
@@ -349,19 +351,12 @@ abstract public class AbstractFastqCollector implements Collector {
               data.get("design.lane"
                   + lane + "." + sampleName + ".sample.project");
 
-          // System.out.println("nx fs " + sampleName);
-
           FastqSample fs =
               new FastqSample(casavaOutputPath, read, lane, sampleName,
                   projectName, index);
-
-          // System.out.println("size files  : " + uncompressedSizeFiles);
+          fastqSamples.add(fs);
 
           uncompressedSizeFiles += fs.getUncompressedSize();
-
-          // System.out.println("size files  : " + uncompressedSizeFiles);
-
-          fastqSamples.add(fs);
 
         } // sample
       }// lane
@@ -370,7 +365,6 @@ abstract public class AbstractFastqCollector implements Collector {
     // Create a unmodifiable linked map
     // fastqsSamples = Collections.unmodifiableMap(samples);
 
-    return uncompressedSizeFiles;
   }
 
   /**
@@ -388,9 +382,6 @@ abstract public class AbstractFastqCollector implements Collector {
     // Data file doesn't exists
     if (!dataFile.exists())
       return null;
-
-    // System.out.println("verify exists back-up for \n\t"
-    // + dataFile.getAbsolutePath() + "  " + dataFile.exists());
 
     // Restore results in data
     RunData data = null;
@@ -422,11 +413,6 @@ abstract public class AbstractFastqCollector implements Collector {
       boolean success = data.createRunDataFile(dataFilePath);
 
       if (success) {
-        System.out
-            .println("Save data file for the sample here "
-                + new File(dataFilePath).getAbsolutePath() + " size "
-                + data.size());
-
         LOGGER
             .fine("Save data file for the sample here "
                 + new File(dataFilePath).getAbsolutePath() + " size "
@@ -521,8 +507,7 @@ abstract public class AbstractFastqCollector implements Collector {
     // Delete all data files fastqSample per fastqSample
     for (FastqSample fs : fastqSamples) {
 
-      if (fs.getFastqFiles().size() > 0) {
-
+      if (!fs.getFastqFiles().isEmpty()) {
         File projectDir =
             new File(qcReportOutputPath + "/Project_" + fs.getProjectName());
 
@@ -533,16 +518,12 @@ abstract public class AbstractFastqCollector implements Collector {
           }
         });
 
-        if (dataFiles != null && dataFiles.length > 0) {
-
-          for (File f : dataFiles) {
-            System.out.println("Delete file " + f.getName());
-
-            if (f.exists())
-              if (!f.delete())
-                LOGGER.warning("Can not delete data file : "
-                    + f.getAbsolutePath());
-          }
+        // delete datafile
+        for (File f : dataFiles) {
+          if (f.exists())
+            if (!f.delete())
+              LOGGER.warning("Can not delete data file : "
+                  + f.getAbsolutePath());
         }
       }
     }
@@ -555,5 +536,4 @@ abstract public class AbstractFastqCollector implements Collector {
       LOGGER.warning("Can not rename qc report directory.");
 
   }
-
 }

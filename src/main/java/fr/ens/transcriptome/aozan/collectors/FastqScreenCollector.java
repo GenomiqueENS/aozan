@@ -64,27 +64,18 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
     List<String> result =
         Lists.newArrayList(super.getCollectorsNamesRequiered());
-
     result.add(UncompressFastqCollector.COLLECTOR_NAME);
 
     return result.toArray(new String[] {});
 
   }
 
-  // @Override
-  // public AbstractFastqProcessThread processFile(final RunData data,
-  // final FastqSample fastqSample) throws AozanException {
-  // return null;
-  //
-  // }
-
   /**
    * Configure fastqScreen with properties from file aozan.conf
    * @param properties
    */
   @Override
-  public void configure(/* final */Properties properties) {
-    System.out.println("fsq configure");
+  public void configure(final Properties properties) {
 
     super.configure(properties);
 
@@ -102,12 +93,30 @@ public class FastqScreenCollector extends AbstractFastqCollector {
       final FastqSample fastqSample, final File reportDir)
       throws AozanException {
 
+    // TODO fix after test : throw an AozanException
     if (fastqSample.getFastqFiles() == null
         || fastqSample.getFastqFiles().isEmpty()) {
       return null;
     }
 
-    // Create the thread object
+    // Create the thread object only if the fastq sample correspond to a R1
+    if (fastqSample.getRead() == 2)
+      return null;
+
+    if (paired) {
+      // in mode paired FastqScreen should to use R1 and R2 together.
+
+      // Search fasqtSample which correspond to fastqSample R1
+      String prefixRead2 = fastqSample.getPrefixRead2();
+
+      for (FastqSample fs : fastqSamples) {
+        if (fs.getKeyFastqSample().equals(prefixRead2)) {
+
+          return new FastqScreenProcessThread(fastqSample, fs, fastqscreen,
+              listGenomes, reportDir, paired);
+        }
+      }
+    }
     return new FastqScreenProcessThread(fastqSample, fastqscreen, listGenomes,
         reportDir, paired);
   }

@@ -59,7 +59,6 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
   public void configure(Properties properties) {
     super.configure(properties);
 
-    System.out.println("uncompress configure");
   }
 
   @Override

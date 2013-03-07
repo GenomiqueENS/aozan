@@ -61,8 +61,6 @@ public class FastQCCollector extends AbstractFastqCollector {
 
     super.configure(properties);
 
-    System.out.println("fsqC configure");
-
     System.setProperty("java.awt.headless", "true");
     System.setProperty("fastqc.unzip", "true");
 
