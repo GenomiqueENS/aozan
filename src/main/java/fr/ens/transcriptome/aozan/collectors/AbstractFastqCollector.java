@@ -60,9 +60,6 @@ abstract public class AbstractFastqCollector implements Collector {
 
   public static final String KEY_READ_COUNT = "run.info.read.count";
   public static final String KEY_READ_X_INDEXED = "run.info.read";
-  // public static final String COLLECTOR_NAME = "";
-
-  public static boolean isExistRunDir = false;
 
   protected static FastqStorage fastqStorage;
   protected static String casavaOutputPath;
@@ -93,12 +90,6 @@ abstract public class AbstractFastqCollector implements Collector {
       throws AozanException;
 
   abstract public int getThreadsNumber();
-
-  abstract public void setThreadsNumber(final int numberThreads);
-
-  // TODO REVIEW: add this methods
-  // abstract public AbstractFastqProcessThread processFile(final RunData data,
-  // final FastqSample fastqSample) throws AozanException;
 
   @Override
   /**
@@ -137,28 +128,7 @@ abstract public class AbstractFastqCollector implements Collector {
     fastqStorage = FastqStorage.getInstance();
     fastqStorage.setTmpDir(tmpPath);
 
-    if (this.getThreadsNumber() > 1)
-      configureModeMultiThread(properties);
-
-  }
-
-  /**
-   * Configure a multi-threaded mode.
-   * @param properties for the collector
-   */
-  public void configureModeMultiThread(final Properties properties) {
-
-    if (properties.containsKey("qc.conf.fastqc.threads")) {
-
-      try {
-        int confThreads =
-            Integer.parseInt(properties.getProperty("qc.conf.fastqc.threads")
-                .trim());
-        if (confThreads > 0)
-          this.setThreadsNumber(confThreads);
-
-      } catch (NumberFormatException e) {
-      }
+    if (this.getThreadsNumber() > 1) {
 
       // Create the list for threads
       this.threads = Lists.newArrayList();
@@ -216,12 +186,16 @@ abstract public class AbstractFastqCollector implements Collector {
       }
 
       System.out.println("multithread " + futureThreads.size());
-      // Wait for threads
-      waitThreads(futureThreads, executor);
 
-      // Add results of the threads to the data object
-      for (AbstractFastqProcessThread sft : threads)
-        data.put(sft.getResults());
+      if (futureThreads.size() > 0) {
+
+        // Wait for threads
+        waitThreads(futureThreads, executor);
+
+        // Add results of the threads to the data object
+        for (AbstractFastqProcessThread sft : threads)
+          data.put(sft.getResults());
+      }
 
     } else {
 
@@ -301,17 +275,6 @@ abstract public class AbstractFastqCollector implements Collector {
             + ", and we need "
             + uncompressedSizeNeeded);
 
-    // TODO to remove after test
-    // Verify if directory for the run exists
-    File runDir = new File(qcReportOutputPath);
-    if (runDir.exists() && runDir.isDirectory()) {
-      FastQCCollector.isExistRunDir = true;
-
-    } else if (!(new File(qcReportOutputPath).mkdir())) {
-      // throw new AozanException(
-      System.out
-          .println("Error during create save directory for results intermediate of AbstractFastqCollector.");
-    }
   }
 
   /**
@@ -527,13 +490,5 @@ abstract public class AbstractFastqCollector implements Collector {
         }
       }
     }
-
-    // TODO to remove
-    // move action to the python code -> rename qc Report directory
-    int n = qcReportOutputPath.indexOf("_tmp");
-    if (!new File(qcReportOutputPath).renameTo(new File(qcReportOutputPath
-        .substring(0, n))))
-      LOGGER.warning("Can not rename qc report directory.");
-
   }
 }

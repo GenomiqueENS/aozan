@@ -81,8 +81,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
     this.fastqscreen = new FastqScreen(properties);
 
+    // Set list of reference genomes
     final Splitter s = Splitter.on(',').trimResults().omitEmptyStrings();
-
     for (String genome : s.split(properties.getProperty(KEY_GENOMES))) {
       listGenomes.add(genome);
     }
@@ -125,12 +125,9 @@ public class FastqScreenCollector extends AbstractFastqCollector {
   // Getters & Setters
   //
 
+  @Override
   public int getThreadsNumber() {
     return 1;
-  }
-
-  public void setThreadsNumber(int n) {
-    return;
   }
 
   //

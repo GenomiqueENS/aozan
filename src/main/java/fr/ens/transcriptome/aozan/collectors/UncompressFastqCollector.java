@@ -42,9 +42,9 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
-  public static final String COLLECTOR_NAME = "uncompressfastqscreen";
+  public static final String COLLECTOR_NAME = "uncompressfastq";
 
-  private static int numberThreads = Runtime.getRuntime().availableProcessors();
+  private int numberThreads = Runtime.getRuntime().availableProcessors();
 
   @Override
   /**
@@ -58,6 +58,20 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
   @Override
   public void configure(Properties properties) {
     super.configure(properties);
+
+    // Set the number of threads
+    if (properties.containsKey("qc.conf.fastqc.threads")) {
+
+      try {
+        int confThreads =
+            Integer.parseInt(properties.getProperty("qc.conf.fastqc.threads")
+                .trim());
+        if (confThreads > 0)
+          this.numberThreads = confThreads;
+
+      } catch (NumberFormatException e) {
+      }
+    }
 
   }
 
@@ -93,9 +107,4 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     return numberThreads;
   }
 
-  @Override
-  public void setThreadsNumber(final int number_threads) {
-    numberThreads = number_threads;
   }
-
-}

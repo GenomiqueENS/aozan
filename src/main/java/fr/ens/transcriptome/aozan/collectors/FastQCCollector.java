@@ -64,7 +64,19 @@ public class FastQCCollector extends AbstractFastqCollector {
     System.setProperty("java.awt.headless", "true");
     System.setProperty("fastqc.unzip", "true");
 
-    // TODO REVIEW: Insert here the code to set the number of threads from
+    // Set the number of threads
+    if (properties.containsKey("qc.conf.fastqc.threads")) {
+
+      try {
+        int confThreads =
+            Integer.parseInt(properties.getProperty("qc.conf.fastqc.threads")
+                .trim());
+        if (confThreads > 0)
+          this.numberThreads = confThreads;
+
+      } catch (NumberFormatException e) {
+      }
+    }
   }
 
   @Override
@@ -83,15 +95,6 @@ public class FastQCCollector extends AbstractFastqCollector {
         reportDir);
   }
 
-  // TODO REVIEW:
-  // All the backup code must be in the super class and must be
-  // reused by all child classes
-  // A class that inherits from AbstractFastqCollector must be extremely simple:
-  // protected AbstractFastqProcessThread createFastqProcessThread(
-  // final RunData data, final FastqSample fastqSample) {
-  // return null;
-  // }
-
   //
   // Getters & Setters
   //
@@ -102,9 +105,4 @@ public class FastQCCollector extends AbstractFastqCollector {
     return numberThreads;
   }
 
-  @Override
-  // TODO REVIEW: Why is this method is there and not in its super class ?
-  public void setThreadsNumber(final int number_threads) {
-    numberThreads = number_threads;
-  }
 }

@@ -162,6 +162,10 @@ public class FastqScreenDemo {
       try {
         data = new RunData(f);
 
+        // Create directory who save report collectors
+        if (!new File(fastqDir + "_qc_tmp").mkdir())
+          System.out.println("Error creatinf report directory for Collectors");
+
         // Configure : create list of reference genome
         System.out.println("\nFASTQC COLLECTOR");
         fqcCollector.configure(properties);
@@ -176,7 +180,7 @@ public class FastqScreenDemo {
         fsqCollector.configure(properties);
         fsqCollector.collect(data);
 
-        System.out.println("\nCLEAR QC_REPORT COLLECTOR");
+        // System.out.println("\nCLEAR QC_REPORT COLLECTOR");
         // ((AbstractFastqCollector) fsqCollector).clear();
 
         // completed rundata
@@ -196,6 +200,12 @@ public class FastqScreenDemo {
         BufferedWriter bw = new BufferedWriter(fw);
         bw.write(data.toString());
         bw.close();
+
+        // move action to the python code -> rename qc Report directory
+        int n = new String(fastqDir + "_qc_tmp").indexOf("_tmp");
+        if (!new File(fastqDir + "_qc_tmp").renameTo(new File(new String(
+            fastqDir + "_qc").substring(0, n))))
+          System.out.println("Can not rename qc report directory.");
 
         // reportQC();
 

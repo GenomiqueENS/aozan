@@ -77,7 +77,7 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
 
   @Override
   public void run() {
-    System.out.println("call run uncompress");
+
     try {
       processResults();
       this.success = true;
