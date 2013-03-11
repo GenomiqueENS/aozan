@@ -33,25 +33,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
+import fr.ens.transcriptome.aozan.fastqscreen.FastqScreen;
 
 public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
-  private static final String KEY_GENOMES = "qc.conf.fastqscreen.genomes";
   private static final String KEY_ALIAS_GENOME_PATH =
       "qc.conf.genome.alias.path";
 
-  // map which does correspondance between genome of sample and reference genome
+  // map which does correspondence between genome of sample and reference genome
   private static final Map<String, String> aliasGenome =
       new HashMap<String, String>();
+  private static String aliasGenomePath;
 
   private String genomeReference;
-  private String aliasGenomePath;
 
   @Override
   public String[] getCollectorsNamesRequiered() {
@@ -88,17 +85,18 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     String keyGenomeSample =
         "design.lane" + lane + "." + sampleName + ".sample.ref";
     String genomeSample = data.get(keyGenomeSample);
+
     genomeSample = genomeSample.trim().toLowerCase();
     genomeSample = genomeSample.replace('"', '\0');
 
     // add genome of the sample if it doesn't in reference file
     if (!aliasGenome.containsKey(genomeSample)) {
-      System.out.println("gRef " + genomeReference + " sample " + genomeSample);
 
       aliasGenome.put(genomeSample, "");
       updateAliasGenomeFile(genomeSample);
     }
 
+    // reverse the score if genome of sample is the same that reference genome
     if (this.genomeReference.equals(aliasGenome.get(genomeSample)))
       return (9 - score);
     else
@@ -112,19 +110,13 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     if (properties == null)
       throw new NullPointerException("The properties object is null");
 
-    String genomesName = properties.get(KEY_GENOMES);
-
-    if (genomesName == null || genomesName.length() == 0)
-      throw new AozanException(
-          "Step FastqScreen : default genome reference for tests");
+    // Retrieve list of reference genomes from FastqScreen class contains
+    // genomes defined in aozan.conf file and the genomes of the samples.
+    List<String> genomes = FastqScreen.getListGenomeReferenceSample();
 
     // retrieve the genome of sample
-    this.aliasGenomePath = properties.get(KEY_ALIAS_GENOME_PATH);
+    aliasGenomePath = properties.get(KEY_ALIAS_GENOME_PATH);
     createMapAliasGenome();
-
-    // create an new AozanTest for each reference genome
-    final Splitter s = Splitter.on(',').trimResults().omitEmptyStrings();
-    List<String> genomes = Lists.newArrayList(s.split(genomesName));
 
     List<AozanTest> list = new ArrayList<AozanTest>();
 
@@ -156,7 +148,8 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
   private void internalConfigure(final Map<String, String> properties)
       throws AozanException {
-    this.aliasGenomePath = properties.get(KEY_ALIAS_GENOME_PATH);
+
+    aliasGenomePath = properties.get(KEY_ALIAS_GENOME_PATH);
     super.configure(properties);
   }
 
@@ -167,10 +160,10 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   private void createMapAliasGenome() {
     try {
 
-      if (this.aliasGenomePath != null) {
+      if (aliasGenomePath != null) {
 
         final BufferedReader br =
-            new BufferedReader(new FileReader(new File(this.aliasGenomePath)));
+            new BufferedReader(new FileReader(new File(aliasGenomePath)));
         String line = null;
 
         while ((line = br.readLine()) != null) {
@@ -198,12 +191,11 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   private void updateAliasGenomeFile(final String genomeSample) {
 
     try {
-      if (this.aliasGenomePath != null) {
+      if (aliasGenomePath != null) {
 
-        final FileWriter fw = new FileWriter(this.aliasGenomePath, true);
+        final FileWriter fw = new FileWriter(aliasGenomePath, true);
 
         fw.write(genomeSample + "=\n");
-
         fw.close();
       }
     } catch (IOException io) {
@@ -227,7 +219,8 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
    * @param genome name of reference genome
    */
   public FastqScreenSimpleSampleTest(String genome) {
-    super("fsqunmapped", "", "fastqscreen unmapped on " + genome, "%");
+
+    super("fsqmapped", "", "fastqscreen mapped on " + genome, "%");
     this.genomeReference = genome;
   }
 

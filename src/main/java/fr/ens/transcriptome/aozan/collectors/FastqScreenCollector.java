@@ -96,8 +96,6 @@ public class FastqScreenCollector implements Collector {
     // TODO fix call property for constructor FastqScreen
     Properties properties = FastqScreenDemo.getPropertiesDemo();
 
-    this.fastqscreen = new FastqScreen(properties);
-
     this.fastqStorage =
         FastqStorage.getInstance(properties
             .getProperty(RunDataGenerator.TMP_DIR));
@@ -115,6 +113,8 @@ public class FastqScreenCollector implements Collector {
     for (String genome : s.split(properties.getProperty(KEY_GENOMES))) {
       this.listGenomes.add(genome);
     }
+
+    this.fastqscreen = new FastqScreen(properties, listGenomes);
   }
 
   /**
@@ -194,10 +194,15 @@ public class FastqScreenCollector implements Collector {
               continue;
           }
 
+          // TODO new
+          // receive genome name for sample
+          String genomeSample =
+              data.get("design.lane" + lane + "." + sampleName + ".sample.ref");
+
           // add read2 in command line
           resultsFastqscreen =
               fastqscreen.execute(read1, read2, this.listGenomes, projectName,
-                  sampleName);
+                  sampleName, genomeSample);
 
           if (resultsFastqscreen == null)
             throw new AozanException("Fastqscreen return no result for sample "

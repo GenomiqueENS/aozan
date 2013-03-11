@@ -72,7 +72,7 @@ public final class FastqStorage {
   private static final NumberFormat formatter = new DecimalFormat("#,###");
 
   private static int threads;
-  private static String compression_extension = "fastq.bz2";
+  private static String compression_extension = "fq.bz2";
 
   private static FastqStorage singleton;
 
@@ -97,9 +97,9 @@ public final class FastqStorage {
       final String index) throws AozanException {
 
     // TODO to remove
-    if (!sampleName.endsWith("2012_0197")) {
-      return null;
-    }
+//    if (!sampleName.endsWith("2012_0197")) {
+//      return null;
+//    }
 
     // Set the list of the files for the FASTQ data
     final File[] fastqFiles =

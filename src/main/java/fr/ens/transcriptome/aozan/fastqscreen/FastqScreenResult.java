@@ -52,7 +52,7 @@ public class FastqScreenResult {
           + "\t one_hit_multiple_libraries \t multiple_hits_multiple_libraries";
 
   private static final String HEADER_COLUMNS_TEXT =
-      "Library \t %Unmapped \t %One_hit_one_library"
+      "Library \t %Mapped \t %Unmapped \t %One_hit_one_library"
           + "\t %Multiple_hits_one_library \t %One_hit_multiple_libraries \t "
           + "%Multiple_hits_multiple_libraries";
 
@@ -79,6 +79,9 @@ public class FastqScreenResult {
     double percentHitNoLibrariesRounding =
         DataPerGenome.roundDouble(this.percentHitNoLibraries);
     s.append("\n% Hit_no_libraries : " + percentHitNoLibrariesRounding + "\n");
+
+    double percentHitRounding = DataPerGenome.roundDouble(this.percentHit);
+    s.append("% Hit_libraries : " + percentHitRounding + "\n");
 
     return s.toString();
   }
@@ -148,8 +151,8 @@ public class FastqScreenResult {
 
     this.percentHitNoLibraries =
         ((double) (readsprocessed - readsMapped)) / readsprocessed;
-    this.percentHit = 1.0 - this.percentHitNoLibraries; 
-        
+    this.percentHit = 1.0 - this.percentHitNoLibraries;
+
     countPercentOk = true;
   }
 
@@ -175,7 +178,8 @@ public class FastqScreenResult {
     }
 
     // print last line of report FastqScreen
-    data.put(prefix + "." + HIT_NO_LIBRAIRIES_LEGEND, this.percentHitNoLibraries);
+    data.put(prefix + "." + HIT_NO_LIBRAIRIES_LEGEND,
+        this.percentHitNoLibraries);
     data.put(prefix + "." + HIT_LEGEND, this.percentHit);
   }
 
@@ -275,7 +279,8 @@ public class FastqScreenResult {
      */
     String getAllPercentValues() {
       return genome
-          + "\t" + roundDouble(this.unMappedPercent) + " \t"
+          + "\t" + roundDouble(this.mappedPercent) + " \t"
+          + roundDouble(this.unMappedPercent) + " \t"
           + roundDouble(this.oneHitOneLibraryPercent) + " \t"
           + roundDouble(this.multipleHitsOneLibraryPercent) + " \t"
           + roundDouble(this.oneHitMultipleLibrariesPercent) + " \t"

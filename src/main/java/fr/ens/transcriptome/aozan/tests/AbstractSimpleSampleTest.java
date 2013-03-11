@@ -108,6 +108,9 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
     if (sampleName == null)
       return new TestResult("NA");
 
+    if (data.get(key) == null)
+      return new TestResult("NA");
+
     final Class<?> clazz = getValueType();
     final String msg;
     final Number value;

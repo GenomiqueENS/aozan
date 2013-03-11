@@ -67,6 +67,8 @@ public class FastqScreenDemo {
       "/home/sperrin/Documents/FastqScreenTest/runtest";
   public static final String TMP_DIR =
       "/home/sperrin/Documents/FastqScreenTest/tmp";
+  public static final String ALIAS_GENOME_PATH =
+      "/home/sperrin/Documents/FastqScreenTest/resources/alias_name_genome_fastqscreen.txt";
 
   public static final String GENOMES_DESC_PATH = RESOURCE_ROOT
       + "/genomes_descs";
@@ -93,8 +95,8 @@ public class FastqScreenDemo {
         runId = "120830_SNL110_0055_AD16D9ACXX";
       } else {
         // run test single-end
-        runId = "120301_SNL110_0038_AD0EJRABXX";
-        // runId = "121116_SNL110_0058_AC11HRACXX";
+        // runId = "120301_SNL110_0038_AD0EJRABXX";
+        runId = "121116_SNL110_0058_AC11HRACXX";
         // runId = "121219_SNL110_0059_AD1B1BACXX";
         // runId = "120615_SNL110_0051_AD102YACXX";
       }
@@ -106,7 +108,7 @@ public class FastqScreenDemo {
 
       fastqDir = SRC_RUN + "/qc_" + runId + "/" + runId;
 
-      String[] tabGenomes = {"phix", "adapters2", "lsuref_dna", "ssuref" /**/};
+      String[] tabGenomes = {"phix", "adapters2", /* "lsuref_dna", "ssuref" */};
       String genomes = "";
       for (String g : tabGenomes) {
         genomes += g + ",";
@@ -151,6 +153,7 @@ public class FastqScreenDemo {
       properties.put("qc.conf.settings.genomes", GENOMES_PATH);
       properties.put("qc.conf.settings.mappers.indexes.path",
           MAPPERS_INDEXES_PATH);
+      properties.put("qc.conf.genome.alias.path", ALIAS_GENOME_PATH);
 
       File f = new File(fastqDir + "/data-" + runId + ".txt");
 
@@ -202,10 +205,10 @@ public class FastqScreenDemo {
         fsqCollector.collect(data);
 
         // completed rundata
-        data =
-            new RunData(
-                new File(
-                    "/home/sperrin/Bureau/data-120301_SNL110_0038_AD0EJRABXX_construit.txt"));
+        // data =
+        // new RunData(
+        // new File(
+        // "/home/sperrin/Bureau/data-120301_SNL110_0038_AD0EJRABXX_construit.txt"));
 
         // rdg.collect();
 
