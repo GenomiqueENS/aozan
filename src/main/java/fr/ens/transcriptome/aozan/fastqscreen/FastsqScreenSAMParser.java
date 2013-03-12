@@ -239,7 +239,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
     this.listFilters.add(new RemoveUnmappedReadAlignmentsFilter());
 
     this.filter = new MultiReadAlignmentsFilter(listFilters);
-    this.buffer = new ReadAlignmentsFilterBuffer(filter);
+    this.buffer = new ReadAlignmentsFilterBuffer(filter); //, true);
 
     this.genomeDescriptionList = new ArrayList<String>();
 

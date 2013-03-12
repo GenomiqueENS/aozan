@@ -44,16 +44,17 @@ public class SequenceFileAozan implements SequenceFile {
 
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+  private static final NumberFormat formatter = new DecimalFormat("#,###");
 
-  private final File file;
+  private final File tmpFile;
   private final SequenceFile seqFile;
+  private final FastqSample fastqSample;
   private final FileWriter fw;
-  private Exception exception;
 
   final long startTime = System.currentTimeMillis();
 
   @Override
-  public Sequence next() {
+  public Sequence next() throws SequenceFormatException {
 
     Sequence seq = null;
 
@@ -73,25 +74,24 @@ public class SequenceFileAozan implements SequenceFile {
       if (!seqFile.hasNext()) {
         this.fw.close();
 
-        long sizeFile = file.length();
+        long sizeFile = tmpFile.length();
         // double sizeFile =
         // ((double) tmpFastqFile.length()) / 1024.0 / 1024.0 / 1024.0;
         // sizeFile = ((int) (sizeFile * 10.0)) / 10.0;
 
-        NumberFormat formatter = new DecimalFormat("#,###");
-
         LOGGER.fine("End uncompressed for fastq File "
-            + file.getName() + "(size : " + formatter.format(sizeFile)
+            + tmpFile.getName() + "(size : " + formatter.format(sizeFile)
             + ") in "
             + toTimeHumanReadable(System.currentTimeMillis() - startTime));
+
+        // Rename file for remove '.tmp' final
+        tmpFile.renameTo(new File(FastqStorage.getInstance().getTemporaryFile(
+            fastqSample)));
 
       }
 
     } catch (IOException io) {
-      this.exception = io;
-
-    } catch (SequenceFormatException e) {
-      this.exception = e;
+      throw new SequenceFormatException(io.getMessage());
     }
 
     return seq;
@@ -126,15 +126,17 @@ public class SequenceFileAozan implements SequenceFile {
   // Constructor
   //
 
-  public SequenceFileAozan(final File[] files, final File tmpFile)
-      throws AozanException {
+  public SequenceFileAozan(final File[] files, final File tmpFile,
+      final FastqSample fastqSample) throws AozanException {
 
-    LOGGER.fine("Start uncompressed fastq Files : " + files[0].length() + ".");
+    LOGGER.fine("Start uncompressed fastq Files : "
+        + formatter.format(files[0].length()) + ".");
 
-    this.file = tmpFile;
+    this.tmpFile = tmpFile;
+    this.fastqSample = fastqSample;
 
     try {
-      this.fw = new FileWriter(this.file);
+      this.fw = new FileWriter(this.tmpFile);
 
       this.seqFile = SequenceFactory.getSequenceFile(files);
 

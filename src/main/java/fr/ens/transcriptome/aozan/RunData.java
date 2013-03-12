@@ -25,8 +25,10 @@
 package fr.ens.transcriptome.aozan;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
@@ -245,6 +247,76 @@ public class RunData {
   }
 
   /**
+   * Create the data file
+   * @param filePath path destination
+   * @return true if creating file is success, other false
+   * @throws AozanException if an error occurs while writing the data file
+   */
+  public boolean createRunDataFile(final String fileName) throws IOException {
+    return createRunDataFile(new File(fileName));
+  }
+
+  /**
+   * Create the data file
+   * @param filePath file destination
+   * @return true if creating file is success, other false
+   * @throws AozanException if an error occurs while writing the data file
+   */
+  public boolean createRunDataFile(final File fileName) throws IOException {
+
+    if (fileName == null)
+      return false;
+
+    if (fileName.isDirectory())
+      return false;
+
+    BufferedWriter bw;
+
+    bw = new BufferedWriter(new FileWriter(fileName));
+    bw.write(this.toString());
+    bw.close();
+
+    return true;
+  }
+
+  /**
+   * Add the data file in the rundata
+   * @param file file source
+   * @throws IOException if an error occurs while reading the data file
+   */
+  public void addDataFileInRundata(String fileName) throws IOException {
+    addDataFileInRundata(new File(fileName));
+  }
+
+  /**
+   * Add the data file in the rundata
+   * @param file file source
+   * @throws IOException if an error occurs while reading the data file
+   */
+  public void addDataFileInRundata(File file) throws IOException {
+
+    if (file == null)
+      throw new NullPointerException("The file parameter is null");
+
+    final BufferedReader br = new BufferedReader(new FileReader(file));
+
+    String line = null;
+
+    while ((line = br.readLine()) != null) {
+
+      final int pos = line.indexOf('=');
+      if (pos == -1)
+        continue;
+
+      final String key = line.substring(0, pos);
+      final String value = line.substring(pos + 1);
+
+      put(key, value);
+    }
+    br.close();
+  }
+
+  /**
    * Print the content of the object on standard output.
    */
   public void print() {
@@ -288,7 +360,7 @@ public class RunData {
 
       put(key, value);
     }
-
+    br.close();
   }
 
 }

@@ -45,14 +45,15 @@ import java.util.logging.Logger;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
+import fr.ens.transcriptome.aozan.collectors.AbstractFastqCollector;
 import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.FastQCCollector;
 import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
+import fr.ens.transcriptome.aozan.collectors.UncompressFastqCollector;
+import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.aozan.io.FastqStorage;
-import fr.ens.transcriptome.eoulsan.EoulsanException;
-import fr.ens.transcriptome.eoulsan.io.CompressionType;
 
 public class FastqScreenDemo {
 
@@ -77,7 +78,7 @@ public class FastqScreenDemo {
   public static final String GENOMES_PATH = RESOURCE_ROOT + "/genomes";
 
   public static RunData data = null;
-  public static Map<String, ReferenceSample> prefixList;
+  public static Map<String, FastqSample> prefixList;
   private static boolean paired = false;
 
   static String runId;
@@ -97,6 +98,7 @@ public class FastqScreenDemo {
         // run test single-end
         // runId = "120301_SNL110_0038_AD0EJRABXX";
         runId = "121116_SNL110_0058_AC11HRACXX";
+        // runId = "130214_SNL110_0062_AD1GKTACXX";
         // runId = "121219_SNL110_0059_AD1B1BACXX";
         // runId = "120615_SNL110_0051_AD102YACXX";
       }
@@ -108,7 +110,8 @@ public class FastqScreenDemo {
 
       fastqDir = SRC_RUN + "/qc_" + runId + "/" + runId;
 
-      String[] tabGenomes = {"phix", "adapters2", /* "lsuref_dna", "ssuref" */};
+      String[] tabGenomes =
+          {"phix" /* , "adapters2", "lsuref_dna", "ssuref" */};
       String genomes = "";
       for (String g : tabGenomes) {
         genomes += g + ",";
@@ -116,6 +119,7 @@ public class FastqScreenDemo {
       // remove last separator character ","
       genomes = genomes.substring(0, genomes.length() - 1);
 
+      Collector uncompressFastqCollector = new UncompressFastqCollector();
       Collector fsqCollector = new FastqScreenCollector();
       Collector fqcCollector = new FastQCCollector();
       List<Collector> collectorList = new ArrayList<Collector>();
@@ -124,6 +128,7 @@ public class FastqScreenDemo {
 
       collectorList.add(fqcCollector);
       collectorList.add(fsqCollector);
+      collectorList.add(uncompressFastqCollector);
 
       RunDataGenerator rdg = new RunDataGenerator(collectorList);
 
@@ -131,7 +136,7 @@ public class FastqScreenDemo {
       rdg.setCasavaDesignFile(new File(fastqDir));
       rdg.setRTAOutputDir(new File(fastqDir));
       rdg.setCasavaOutputDir(new File(fastqDir));
-      rdg.setQCOutputDir(new File(fastqDir));
+      rdg.setQCOutputDir(new File(fastqDir + "_qc"));
       rdg.setTemporaryDir(new File(TMP_DIR));
 
       // add new property for execute fastqscreen
@@ -142,7 +147,7 @@ public class FastqScreenDemo {
       properties.put("reports.data.path", SRC_RUN);
       properties.put("tmp.dir", TMP_DIR);
       properties.put(RunDataGenerator.CASAVA_OUTPUT_DIR, fastqDir);
-      properties.put(RunDataGenerator.QC_OUTPUT_DIR, fastqDir);
+      properties.put(RunDataGenerator.QC_OUTPUT_DIR, fastqDir + "_qc");
 
       // number threads used for fastqscreen is defined in aozan.conf
       properties.put("qc.conf.fastqc.threads", "4");
@@ -160,49 +165,26 @@ public class FastqScreenDemo {
       try {
         data = new RunData(f);
 
-        prefixList = controlFastqFile(data);
-
-        // System.out.println("liste des fichiers Fastq et taille ");
-
-        CompressionType zType = null;
-        long sizeCompress = 0;
-        for (Map.Entry<String, ReferenceSample> e : prefixList.entrySet()) {
-          File file = new File(fastqDir + e.getValue().getFilePathInRun());
-
-          if (file.getName().indexOf(".fastq") > 0) {
-            if (zType == null)
-              zType =
-                  CompressionType.getCompressionTypeByFilename(file.getName());
-
-            sizeCompress += file.length();
-
-            // if (file.length() > 0)
-            // System.out.println("name : "
-            // + e.getValue().getFilePathInRun() + "\t size "
-            // + ((double) file.length() / 1024.0 / 1024.0 / 1024.0));
-          }
-        }
-
-        double sizeGo = (double) sizeCompress / 1024.0 / 1024.0 / 1024.0;
-        // System.out.println("size Compress " + sizeGo);
-        long sizeUncompress = (long) (sizeGo * 3.66);
-        // System.out.println("size unCompress " + (double) sizeGo * 3.66);
-
-        long freeSpace = new File(TMP_DIR).getFreeSpace();
-        freeSpace = freeSpace / 1024 / 1024 / 1024;
-
-        // long freeSpace2 = ProcessUtils.sh({"cd", TMP_DIR,"&","df","-h","."});
-        // System.out.println("free space in /tmp " + freeSpace);
-        // System.out.println("space ok " + (freeSpace > sizeUncompress));
-
-        // TODO stop point
+        // Create directory who save report collectors
+        if (!new File(fastqDir + "_qc_tmp").mkdir())
+          System.out.println("Error creating report directory for Collectors");
 
         // Configure : create list of reference genome
+        System.out.println("\nFASTQC COLLECTOR");
         fqcCollector.configure(properties);
         fqcCollector.collect(data);
+        // System.exit(1);
 
+        System.out.println("\nUNCOMPRESS COLLECTOR");
+        uncompressFastqCollector.configure(properties);
+        uncompressFastqCollector.collect(data);
+
+        System.out.println("\nFASTQ SCREEN COLLECTOR");
         fsqCollector.configure(properties);
         fsqCollector.collect(data);
+
+        // System.out.println("\nCLEAR QC_REPORT COLLECTOR");
+        // ((AbstractFastqCollector) fsqCollector).clear();
 
         // completed rundata
         // data =
@@ -222,7 +204,13 @@ public class FastqScreenDemo {
         bw.write(data.toString());
         bw.close();
 
-        reportQC();
+        // move action to the python code -> rename qc Report directory
+        int n = new String(fastqDir + "_qc_tmp").indexOf("_tmp");
+        if (!new File(fastqDir + "_qc_tmp").renameTo(new File(new String(
+            fastqDir + "_qc").substring(0, n))))
+          System.out.println("Can not rename qc report directory.");
+
+        // reportQC();
 
       } catch (Exception io) {
         System.out.println(io.getMessage());
@@ -233,7 +221,8 @@ public class FastqScreenDemo {
           + toTimeHumanReadable(System.currentTimeMillis() - startTime));
 
     } catch (Exception e) {
-      FastqStorage fqs = FastqStorage.getInstance(TMP_DIR);
+      FastqStorage fqs = FastqStorage.getInstance();
+
       fqs.clear();
 
       System.out.println(e.getMessage());
@@ -294,9 +283,9 @@ public class FastqScreenDemo {
     return conf;
   }
 
-  public static Map<String, ReferenceSample> controlFastqFile(RunData data) {
-    Map<String, ReferenceSample> prefixList =
-        new LinkedHashMap<String, ReferenceSample>();
+  public static Map<String, FastqSample> controlFastqFile(RunData data) {
+    Map<String, FastqSample> prefixList =
+        new LinkedHashMap<String, FastqSample>();
 
     final int laneCount = data.getInt("run.info.flow.cell.lane.count");
 
@@ -331,8 +320,8 @@ public class FastqScreenDemo {
           final String projectName =
               data.get("design.lane"
                   + lane + "." + sampleName + ".sample.project");
-          ReferenceSample ref =
-              new ReferenceSample(read, lane, sampleName, projectName, index);
+          FastqSample ref =
+              new FastqSample(null, read, lane, sampleName, projectName, index);
 
           prefixList.put(sampleName, ref);
 
@@ -341,76 +330,6 @@ public class FastqScreenDemo {
     }// read
 
     return prefixList;
-  }
-
-  //
-  // Internal class
-  //
-
-  public static class ReferenceSample {
-    private int read;
-    private int lane;
-    private String sampleName;
-    private String projectName;
-    private String index;
-
-    ReferenceSample(final int read, final int lane, final String sampleName,
-        final String projectName, final String index) {
-      this.read = read;
-      this.lane = lane;
-      this.sampleName = sampleName;
-      this.projectName = projectName;
-      this.index = index;
-    }
-
-    public boolean equals(ReferenceSample ref) {
-      return this.sampleName.equals(ref.sampleName);
-    }
-
-    public String getPrefix() {
-      return "."
-          + this.lane + ".sample." + this.sampleName + ".read" + this.read
-          + "." + this.sampleName;
-    }
-
-    // ex :
-    // Project_microbrain_A2012/Sample_2012_0197/2012_0197_TGACCA_L004_R1_001.fastq.bz2
-
-    public String getFilePathInRun() {
-      StringBuilder s = new StringBuilder();
-
-      s.append("/Project_");
-      s.append(this.projectName);
-      s.append("/Sample_");
-      s.append(this.sampleName);
-      // prefix file
-      s.append(String.format("/%s_%s_L%03d_R%d_", sampleName, "".equals(index)
-          ? "NoIndex" : index, lane, read));
-      // format file
-      s.append("001.fastq.bz2");
-
-      return s.toString();
-    }
-
-    public int getRead() {
-      return this.read;
-    }
-
-    public int getLane() {
-      return this.lane;
-    }
-
-    public String getProjectName() {
-      return this.projectName;
-    }
-
-    public String getSampleName() {
-      return this.sampleName;
-    }
-
-    public String getIndex() {
-      return this.index;
-    }
   }
 
 }

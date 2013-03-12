@@ -90,7 +90,7 @@ public class FastqScreenResult {
    * Save result from fastqscreen in file.
    * @param dirPath directory who save file of result from fastqscreen
    */
-  public void createFileResultFastqScreen(final String pathDir) {
+  public void createFileResultFastqScreen_OLD(final String pathDir) {
 
     String result = pathDir + "/fastqscreen.txt";
     try {
@@ -162,8 +162,7 @@ public class FastqScreenResult {
    * @param prefix name of sample
    * @throws AozanException if no value.
    */
-  public void updateRundata(final RunData data, final String prefix)
-      throws AozanException {
+  public RunData createRundata(final String prefix) throws AozanException {
 
     if (this.resultsPerGenome.isEmpty())
       throw new AozanException(
@@ -173,6 +172,8 @@ public class FastqScreenResult {
       throw new AozanException(
           "During fastqScreen execusion : no value ​for each genome");
 
+    RunData data = new RunData();
+
     for (Map.Entry<String, DataPerGenome> e : this.resultsPerGenome.entrySet()) {
       e.getValue().updateRundata(data, prefix);
     }
@@ -181,6 +182,8 @@ public class FastqScreenResult {
     data.put(prefix + "." + HIT_NO_LIBRAIRIES_LEGEND,
         this.percentHitNoLibraries);
     data.put(prefix + "." + HIT_LEGEND, this.percentHit);
+
+    return data;
   }
 
   //

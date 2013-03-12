@@ -24,7 +24,6 @@
 package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
-import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -34,35 +33,31 @@ import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
 /**
- * This class define a FastQC Collector
- * @since 1.0
- * @author Laurent Jourdren
+ * The class realize the creating of array of compressed fastq files in a
+ * temporary files, in multitasking mode.
+ * @author Sandrine Perrin
  */
-public class FastQCCollector extends AbstractFastqCollector {
+public class UncompressFastqCollector extends AbstractFastqCollector {
 
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
-  /** The collector name. */
-  public static final String COLLECTOR_NAME = "fastqc";
+  public static final String COLLECTOR_NAME = "uncompressfastq";
 
   private int numberThreads = Runtime.getRuntime().availableProcessors();
 
-  private boolean ignoreFilteredSequences = false;
-
   @Override
+  /**
+   * Get collector name
+   * @return name 
+   */
   public String getName() {
-
     return COLLECTOR_NAME;
   }
 
   @Override
-  public void configure(final Properties properties) {
-
+  public void configure(Properties properties) {
     super.configure(properties);
-
-    System.setProperty("java.awt.headless", "true");
-    System.setProperty("fastqc.unzip", "true");
 
     // Set the number of threads
     if (properties.containsKey("qc.conf.fastqc.threads")) {
@@ -77,6 +72,7 @@ public class FastQCCollector extends AbstractFastqCollector {
       } catch (NumberFormatException e) {
       }
     }
+
   }
 
   @Override
@@ -84,25 +80,31 @@ public class FastQCCollector extends AbstractFastqCollector {
       final FastqSample fastqSample, final File reportDir)
       throws AozanException {
 
-    final List<File> fastqFiles = fastqSample.getFastqFiles();
-
-    if (fastqFiles.isEmpty()) {
+    if (fastqSample == null
+        || fastqSample.getFastqFiles() == null
+        || fastqSample.getFastqFiles().isEmpty()) {
       return null;
     }
 
+    // Check if the uncompressed fastq file exists
+    if (fastqStorage.tmpFileExists(fastqSample))
+      return null;
+
     // Create the thread object
-    return new FastQCProcessThread(fastqSample, this.ignoreFilteredSequences,
-        reportDir);
+    return new UncompressFastqThread(fastqSample);
   }
 
-  //
-  // Getters & Setters
-  //
+  @Override
+  /**
+   * No data file to save in UncompressCollector
+   */
+  protected void saveResultPart(final FastqSample fastqSample,
+      final RunData data) {
+  }
 
   @Override
-  // TODO REVIEW: Why is this method is there and not in its super class ?
   public int getThreadsNumber() {
     return numberThreads;
   }
 
-}
+  }
