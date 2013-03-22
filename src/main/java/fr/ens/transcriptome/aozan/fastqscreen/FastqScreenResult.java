@@ -77,7 +77,7 @@ public class FastqScreenResult {
     }
 
     // add last lines for percentage of reads
-    s.append("\n% reads_mapped_none_genome : "
+    s.append("\n% reads_unmapped_none_genome : "
         + DataPerGenome.roundDouble(this.percentUnmappedNoneGenome) + "\n");
     s.append("% reads_mapped_at_least_one_genome : "
         + DataPerGenome.roundDouble(this.percentMappedAtLeastOneGenome) + "\n");
@@ -158,7 +158,7 @@ public class FastqScreenResult {
       e.getValue().countPercentValue(readsprocessed);
 
       percentMappedOnlyOnGenomeSample +=
-          e.getValue().getPercentMappedOnlyOnGenomeSample(readsprocessed);
+          e.getValue().getPercentMappedOnlyOnGenomeSample();
     }
 
     this.percentUnmappedNoneGenome =
@@ -351,15 +351,14 @@ public class FastqScreenResult {
      * @param readsprocessed number reads total
      * @return percent
      */
-    double getPercentMappedOnlyOnGenomeSample(int readsprocessed) {
-      double readsMappedOnlyOnGenomeSample = 0;
+    double getPercentMappedOnlyOnGenomeSample() {
 
       if (isGenomeSample) {
 
-        readsMappedOnlyOnGenomeSample =
+        double readsMappedOnlyOnGenomeSample =
             oneHitOneLibraryPercent + multipleHitsOneLibraryPercent;
-        
-        return readsMappedOnlyOnGenomeSample / readsprocessed;
+
+        return readsMappedOnlyOnGenomeSample;
 
       }
 
