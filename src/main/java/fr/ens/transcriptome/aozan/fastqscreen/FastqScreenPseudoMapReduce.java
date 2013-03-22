@@ -38,7 +38,6 @@ import java.util.regex.Pattern;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
-import fr.ens.transcriptome.eoulsan.EoulsanException;
 import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
 import fr.ens.transcriptome.eoulsan.Settings;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
@@ -86,14 +85,16 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * output with reference genome.
    * @param fastqRead fastq file
    * @param listGenomes list of reference genome
+   * @param genomeSample genome reference corresponding to sample
    * @param properties properties for mapping
    * @throws AozanException if an error occurs while mapping
    * @throws BadBioEntryException if an error occurs while creating index genome
    */
   public void doMap(File fastqRead, List<String> listGenomes,
-      Properties properties) throws AozanException, BadBioEntryException {
+      final String genomeSample, Properties properties) throws AozanException,
+      BadBioEntryException {
 
-    this.doMap(fastqRead, null, listGenomes, properties);
+    this.doMap(fastqRead, null, listGenomes, genomeSample, properties);
   }
 
   /**
@@ -102,12 +103,14 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @param fastqRead1 fastq file
    * @param fastqRead1 fastq file in mode paired
    * @param listGenomes list of genome reference
+   * @param genomeSample genome reference corresponding to sample
    * @param properties properties for mapping
    * @throws AozanException if an error occurs while mapping
    * @throws BadBioEntryException if an error occurs while creating index genome
    */
   public void doMap(File fastqRead1, File fastqRead2, List<String> listGenomes,
-      Properties properties) throws AozanException, BadBioEntryException {
+      final String genomeSample, Properties properties) throws AozanException,
+      BadBioEntryException {
 
     if (properties.containsKey(KEY_TMP_DIR)) {
       try {
@@ -141,7 +144,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         FastsqScreenSAMParser parser =
             new FastsqScreenSAMParser(this.getMapOutputTempFile(), genome,
                 pairEnd);
-        this.setGenomeReference(genome);
+
+        this.setGenomeReference(genome, genomeSample);
 
         final File indexDir =
             new File(StringUtils.filenameWithoutExtension(archiveIndexFile
@@ -306,11 +310,12 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   /**
    * Define the genome reference for mapping
    * @param genome name of the new genome
+   * @param genomeSample genome reference corresponding to sample
    */
-  public void setGenomeReference(final String genome) {
+  public void setGenomeReference(final String genome, final String genomeSample) {
     this.genomeReference = genome;
 
-    fastqScreenResult.addGenome(genome);
+    fastqScreenResult.addGenome(genome, genomeSample);
   }
 
   /**

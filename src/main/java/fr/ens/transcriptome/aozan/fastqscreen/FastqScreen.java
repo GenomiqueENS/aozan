@@ -25,20 +25,15 @@ package fr.ens.transcriptome.aozan.fastqscreen;
 
 import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
+import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.eoulsan.EoulsanException;
 import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
 import fr.ens.transcriptome.eoulsan.LocalEoulsanRuntime;
@@ -63,35 +58,22 @@ public class FastqScreen {
       "qc.conf.settings.mappers.indexes.path";
   private static final String KEY_GENOMES_PATH = "qc.conf.settings.genomes";
 
-  // map which does correspondance between genome of sample and reference genome
-  private static final Map<String, String> aliasGenome =
-      new HashMap<String, String>();
-
-  // path for file alias genome
-  private static final String KEY_ALIAS_GENOME_PATH =
-      "qc.conf.genome.alias.path";
-
   private Properties properties;
-  private String aliasGenomePath;
-  private final List<String> genomes;
-
-  private static final List<String> genomesForAozanTest =
-      new ArrayList<String>();
 
   /**
-   * Mode pair-end : execute fastqscreen calcul
+   * Mode pair-end : execute fastqscreen count
    * @param fastqRead1 fastq file input for mapper
    * @param fastqRead2 fastq file input for mapper
    * @param listGenomes list or reference genome, used by mapper
+   * @param genomeSample genome reference corresponding to sample
    * @return FastqScreenResult object contains results for each reference genome
    * @throws AozanException
    */
   public FastqScreenResult execute(final File fastqRead,
-      final List<String> listGenomes, final String projectName,
-      final String sampleName, final String genomeSample) throws AozanException {
+      final FastqSample fastqSample, final List<String> genomes,
+      final String genomeSample) throws AozanException {
 
-    return this.execute(fastqRead, null, listGenomes, projectName, sampleName,
-        genomeSample);
+    return this.execute(fastqRead, null, fastqSample, genomes, genomeSample);
 
   }
 
@@ -99,55 +81,30 @@ public class FastqScreen {
    * Mode single-end : execute fastqscreen calcul
    * @param fastqFile fastq file input for mapper
    * @param listGenomes list or reference genome, used by mapper
-   * @return FastqScreenResult object contains results for each reference genome
+   * @param genomeSample genome reference corresponding to sample
    * @throws AozanException
    */
   public FastqScreenResult execute(final File fastqRead1,
-      final File fastqRead2, final List<String> listGenomes,
-      final String projectName, final String sampleName, String genomeSample)
+      final File fastqRead2, final FastqSample fastqSample,
+      final List<String> genomes, final String genomeSample)
       throws AozanException {
 
     final long startTime = System.currentTimeMillis();
-    List<String> genomes = new ArrayList<String>();
-    genomes.addAll(listGenomes);
 
     LOGGER.fine("Start fastqscreen on project "
-        + projectName + " " + sampleName);
+        + fastqSample.getProjectName() + " " + fastqSample.getSampleName());
 
     String tmpDir = properties.getProperty(KEY_TMP_DIR);
 
     FastqScreenPseudoMapReduce pmr = new FastqScreenPseudoMapReduce();
     pmr.setMapReduceTemporaryDirectory(new File(tmpDir));
 
-    // if genomeSample is present in mapAliasGenome, it add in list of genomes
-    // reference for the mapping
-    genomeSample = genomeSample.trim().toLowerCase();
-    genomeSample = genomeSample.replace('"', '\0');
-
-    if (aliasGenome.containsKey(genomeSample)) {
-
-      String alias = aliasGenome.get(genomeSample);
-      if (!genomes.contains(alias))
-        genomes.add(alias);
-
-      if (!genomesForAozanTest.contains(alias))
-        genomesForAozanTest.add(alias);
-
-      System.out.println("list generic for a run " + genomesForAozanTest);
-
-    } else
-      updateAliasGenomeFile(genomeSample);
-
-    System.out.println(" genome of sample "
-        + genomeSample + " is present " + aliasGenome.containsKey(genomeSample)
-        + " alias " + aliasGenome.get(genomeSample));
-
     try {
 
       if (fastqRead2 == null)
-        pmr.doMap(fastqRead1, genomes, properties);
+        pmr.doMap(fastqRead1, genomes, genomeSample, properties);
       else
-        pmr.doMap(fastqRead1, fastqRead2, genomes, properties);
+        pmr.doMap(fastqRead1, fastqRead2, genomes, genomeSample, properties);
 
       pmr.doReduce(new File(tmpDir + "/outputDoReduce.txt"));
 
@@ -163,75 +120,12 @@ public class FastqScreen {
     }
 
     LOGGER.fine("End fastqscreen on project "
-        + projectName + " " + sampleName + " for genome(s) "
-        + listGenomes.toString() + " in mode "
-        + (fastqRead2 == null ? "single " : "paired ") + " in "
+        + fastqSample.getProjectName() + " " + fastqSample.getSampleName()
+        + " for genome(s) " + genomes.toString() + " in mode "
+        + (fastqRead2 == null ? "single" : "paired") + " in "
         + toTimeHumanReadable(System.currentTimeMillis() - startTime));
 
     return pmr.getFastqScreenResult();
-  }
-
-  /**
-   * Create a map which does correspondence between genome of sample and
-   * reference genome from a file, the path is in aozan.conf
-   */
-  private void createMapAliasGenome() {
-    try {
-      System.out.println("path file " + this.aliasGenomePath);
-
-      if (this.aliasGenomePath != null) {
-
-        final BufferedReader br =
-            new BufferedReader(new FileReader(new File(this.aliasGenomePath)));
-        String line = null;
-
-        while ((line = br.readLine()) != null) {
-
-          final int pos = line.indexOf('=');
-          if (pos == -1)
-            continue;
-
-          final String key = line.substring(0, pos);
-          final String value = line.substring(pos + 1);
-
-          // Retrieve only genomes identified in Aozan
-          if (value.length() > 0)
-            aliasGenome.put(key, value);
-        }
-        br.close();
-      }
-    } catch (IOException io) {
-    }
-
-    System.out.println("map alias " + aliasGenome);
-  }
-
-  /**
-   * Add the genome of the sample in the file which does correspondence with
-   * reference genome
-   * @param genomeSample name genome
-   */
-  private void updateAliasGenomeFile(final String genomeSample) {
-
-    try {
-      if (this.aliasGenomePath != null) {
-
-        final FileWriter fw = new FileWriter(this.aliasGenomePath, true);
-        fw.write(genomeSample + "=\n");
-        fw.flush();
-        fw.close();
-      }
-    } catch (IOException io) {
-      System.out.println(io.getMessage());
-    }
-  }
-
-  //
-  // Getter
-  //
-
-  public static List<String> getListGenomeReferenceSample() {
-    return genomesForAozanTest;
   }
 
   //
@@ -243,15 +137,9 @@ public class FastqScreen {
    * necessary for use of mapper index.
    * @param properties properties defines in configuration of aozan
    */
-  public FastqScreen(final Properties properties, final List<String> genomes) {
+  public FastqScreen(final Properties properties) {
 
     this.properties = properties;
-    this.aliasGenomePath = properties.getProperty(KEY_ALIAS_GENOME_PATH);
-    this.genomes = genomes;
-
-    genomesForAozanTest.addAll(genomes);
-
-    createMapAliasGenome();
 
     try {
       // init EoulsanRuntime, it is necessary to use the implementation of

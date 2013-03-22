@@ -23,11 +23,6 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,17 +31,12 @@ import java.util.Map;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
-import fr.ens.transcriptome.aozan.fastqscreen.FastqScreen;
 
 public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
-  private static final String KEY_ALIAS_GENOME_PATH =
-      "qc.conf.genome.alias.path";
-
   // map which does correspondence between genome of sample and reference genome
-  private static final Map<String, String> aliasGenome =
+  private static Map<String, String> aliasGenomes =
       new HashMap<String, String>();
-  private static String aliasGenomePath;
 
   private String genomeReference;
 
@@ -70,7 +60,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   /**
    * Transform the score : if genome of sample is the same as reference genome
    * then the score is reverse for change the color in QC report
-   * @param value value to transform
+   * @param score value to transform
    * @param data run data
    * @param read index of read
    * @param readSample index of read without indexed reads
@@ -89,18 +79,12 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     genomeSample = genomeSample.trim().toLowerCase();
     genomeSample = genomeSample.replace('"', '\0');
 
-    // add genome of the sample if it doesn't in reference file
-    if (!aliasGenome.containsKey(genomeSample)) {
-
-      aliasGenome.put(genomeSample, "");
-      updateAliasGenomeFile(genomeSample);
-    }
-
     // reverse the score if genome of sample is the same that reference genome
-    if (this.genomeReference.equals(aliasGenome.get(genomeSample)))
+    if (this.genomeReference.equals(aliasGenomes.get(genomeSample)))
       return (9 - score);
     else
       return score;
+
   }
 
   @Override
@@ -110,18 +94,16 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     if (properties == null)
       throw new NullPointerException("The properties object is null");
 
-    // Retrieve list of reference genomes from FastqScreen class contains
-    // genomes defined in aozan.conf file and the genomes of the samples.
-    List<String> genomes = FastqScreen.getListGenomeReferenceSample();
-
-    // retrieve the genome of sample
-    aliasGenomePath = properties.get(KEY_ALIAS_GENOME_PATH);
-    createMapAliasGenome();
+    // Retrieve list of reference genomes from FastqScreenCollector class
+    // contains genomes defined in aozan.conf file and all genomes from samples.
+    List<String> genomes = FastqScreenCollector.getGenomesReferenceSample();
+    aliasGenomes = FastqScreenCollector.getAliasGenomes();
 
     List<AozanTest> list = new ArrayList<AozanTest>();
 
     for (String genome : genomes) {
 
+      // for each genome reference in fastqscreen, create a specific Aozantest
       final FastqScreenSimpleSampleTest testGenome =
           new FastqScreenSimpleSampleTest(genome);
 
@@ -131,6 +113,12 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     }
 
     return list;
+  }
+
+  private void internalConfigure(final Map<String, String> properties)
+      throws AozanException {
+
+    super.configure(properties);
   }
 
   @Override
@@ -144,63 +132,6 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
    */
   public String getNameGenome() {
     return this.genomeReference;
-  }
-
-  private void internalConfigure(final Map<String, String> properties)
-      throws AozanException {
-
-    aliasGenomePath = properties.get(KEY_ALIAS_GENOME_PATH);
-    super.configure(properties);
-  }
-
-  /**
-   * Create a map which does correspondance between genome of sample and
-   * reference genome from a file
-   */
-  private void createMapAliasGenome() {
-    try {
-
-      if (aliasGenomePath != null) {
-
-        final BufferedReader br =
-            new BufferedReader(new FileReader(new File(aliasGenomePath)));
-        String line = null;
-
-        while ((line = br.readLine()) != null) {
-
-          final int pos = line.indexOf('=');
-          if (pos == -1)
-            continue;
-
-          final String key = line.substring(0, pos);
-          final String value = line.substring(pos + 1);
-
-          aliasGenome.put(key, value);
-        }
-        br.close();
-      }
-    } catch (IOException io) {
-    }
-  }
-
-  /**
-   * Add the genome of the sample in the file which does correspondance with
-   * reference genome
-   * @param genomeSample name genome
-   */
-  private void updateAliasGenomeFile(final String genomeSample) {
-
-    try {
-      if (aliasGenomePath != null) {
-
-        final FileWriter fw = new FileWriter(aliasGenomePath, true);
-
-        fw.write(genomeSample + "=\n");
-        fw.close();
-      }
-    } catch (IOException io) {
-      System.out.println(io.getMessage());
-    }
   }
 
   //
@@ -218,7 +149,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
    * Public constructor, specific for a reference genome
    * @param genome name of reference genome
    */
-  public FastqScreenSimpleSampleTest(String genome) {
+  private FastqScreenSimpleSampleTest(String genome) {
 
     super("fsqmapped", "", "fastqscreen mapped on " + genome, "%");
     this.genomeReference = genome;

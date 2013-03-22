@@ -26,6 +26,7 @@ package fr.ens.transcriptome.aozan.collectors;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
@@ -69,6 +70,8 @@ abstract public class AbstractFastqCollector implements Collector {
 
   protected static Set<FastqSample> fastqSamples =
       new LinkedHashSet<FastqSample>();
+
+  protected static List<String> genomesSample = new ArrayList<String>();
 
   private long uncompressedSizeFiles = 0l;
   // mode threaded
@@ -150,8 +153,6 @@ abstract public class AbstractFastqCollector implements Collector {
     data = FastqScreenDemo.getRunData();
 
     controlPreCollect(data, qcReportOutputPath);
-
-    // System.out.println("nb fastq Sample " + fastqSamples.size());
 
     RunData resultPart = null;
     if (this.getThreadsNumber() > 1) {
@@ -243,7 +244,7 @@ abstract public class AbstractFastqCollector implements Collector {
    * @param qcReportOutputPath path to save qc report
    * @throws AozanException
    */
-  public void controlPreCollect(final RunData data,
+  private void controlPreCollect(final RunData data,
       final String qcReportOutputPath) throws AozanException {
 
     if (!fastqSamples.isEmpty())
@@ -314,12 +315,26 @@ abstract public class AbstractFastqCollector implements Collector {
               data.get("design.lane"
                   + lane + "." + sampleName + ".sample.project");
 
-          FastqSample fs =
+          // update list of genomes samples
+          // receive genome name for sample
+          String genomeSample =
+              data.get("design.lane" + lane + "." + sampleName + ".sample.ref");
+
+          // if genomeSample is present in mapAliasGenome, it add in list of
+          // genomes reference for the mapping
+          genomeSample = genomeSample.trim().toLowerCase();
+          genomeSample = genomeSample.replace('"', '\0');
+
+          FastqSample fastqSample =
               new FastqSample(casavaOutputPath, read, lane, sampleName,
                   projectName, index);
-          fastqSamples.add(fs);
+          fastqSamples.add(fastqSample);
 
-          uncompressedSizeFiles += fs.getUncompressedSize();
+          uncompressedSizeFiles += fastqSample.getUncompressedSize();
+
+          // list of genomes from all samples
+          if (!genomesSample.contains(genomeSample))
+            genomesSample.add(genomeSample);
 
         } // sample
       }// lane

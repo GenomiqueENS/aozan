@@ -45,7 +45,6 @@ import java.util.logging.Logger;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
-import fr.ens.transcriptome.aozan.collectors.AbstractFastqCollector;
 import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.FastQCCollector;
@@ -210,7 +209,7 @@ public class FastqScreenDemo {
             fastqDir + "_qc").substring(0, n))))
           System.out.println("Can not rename qc report directory.");
 
-        // reportQC();
+        reportQC();
 
       } catch (Exception io) {
         System.out.println(io.getMessage());

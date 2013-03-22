@@ -26,7 +26,6 @@ package fr.ens.transcriptome.aozan.io;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -35,15 +34,17 @@ import fr.ens.transcriptome.eoulsan.util.StringUtils;
 
 /**
  * The class correspond of one entity to treat by AbstractFastqCollector, so a
- * sample per lane.
+ * sample per lane and in mode-paired one FastSample for each read (R1 and R2).
  * @author Sandrine Perrin
  */
 public class FastqSample {
 
+  // TODO to remove, value for test
   private static final String VALUE = ".fq";
 
-  private final int read1;
-  // private final int read2;
+  // private static final String VALUE = ".fastq";
+
+  private final int read;
   private final int lane;
   private final String sampleName;
   private final String projectName;
@@ -51,7 +52,6 @@ public class FastqSample {
 
   private final String runFastqPath;
   private final String keyFastqSample;
-  private final int keyFastqFiles;
   private final String nameTemporaryFastqFiles;
 
   private final List<File> fastqFiles;
@@ -76,32 +76,16 @@ public class FastqSample {
   }
 
   /**
-   * @return
-   */
-  private int createKeyFastqFiles() {
-
-    StringBuilder key = new StringBuilder();
-    String separator = "\t";
-
-    for (File f : fastqFiles) {
-      key.append(f.getAbsolutePath());
-      key.append(separator);
-    }
-    // System.out.println("key files " + key + " hashcode " + key.hashCode());
-
-    return key.hashCode();
-  }
-
-  /**
-   * @return
+   * Create name for temporary fastq file uncompressed
+   * @return name fastq file
    */
   private String createNameTemporaryFastqFile() {
-    // return "aozan_fastq_" + Integer.toString(keyFastqFiles) + ".fastq";
     return "aozan_fastq_" + keyFastqSample + ".fastq";
   }
 
   /**
-   * @return
+   * Get ratio compression for fastq files according to type compression
+   * @return ratio compression or 1 if not compress
    */
   private double ratioCommpression() {
 
@@ -125,7 +109,8 @@ public class FastqSample {
   }
 
   /**
-   * Receive the type of compression use for fastq files.
+   * Receive the type of compression use for fastq files, only one possible per
+   * sample
    * @throws AozanException
    */
   public CompressionType setCompressionExtension() { // throws AozanException {
@@ -149,7 +134,7 @@ public class FastqSample {
    */
   public String getPrefixRundata() {
     return ".lane"
-        + this.lane + ".sample." + this.sampleName + ".read" + this.read1 + "."
+        + this.lane + ".sample." + this.sampleName + ".read" + this.read + "."
         + this.sampleName;
   }
 
@@ -174,8 +159,6 @@ public class FastqSample {
     for (File f : fastqFiles) {
       sizeFastqFiles += f.length();
     }
-    // System.out.println("  ratio " + ratioCommpression());
-    // System.out.println("type compression " + compressionType);
 
     return (long) (sizeFastqFiles * ratioCommpression());
   }
@@ -223,67 +206,73 @@ public class FastqSample {
   //
 
   /**
-   * @return
+   * Get the number of read from the sample in run
+   * @return number read
    */
   public int getRead() {
-    return this.read1;
+    return this.read;
   }
 
   /**
-   * @return
+   * Get the number of lane from the sample in run
+   * @return number lane
    */
   public int getLane() {
     return this.lane;
   }
 
   /**
-   * @return
+   * Get the project name from the sample in run
+   * @return project name
    */
   public String getProjectName() {
     return this.projectName;
   }
 
   /**
-   * @return
+   * Get the sample name in run
+   * @return sample name
    */
   public String getSampleName() {
     return this.sampleName;
   }
 
   /**
-   * @return
+   * Get list of fastq files for this sample
+   * @return list fastq files
    */
   public List<File> getFastqFiles() {
     return this.fastqFiles;
   }
 
+  /**
+   * Get the prefix corresponding on read 2 for this sample, this value exists
+   * only in mode paire-end
+   * @return prefix for read 2
+   */
   public String getPrefixRead2() {
     return keyFastqSample.replaceFirst("R1", "R2");
   }
 
   /**
-   * @return
-   */
-  public int getKeyFastqFiles() {
-    return this.keyFastqFiles;
-  }
-
-  /**
-   * @return
+   * Get the name for temporary fastq files uncompressed
+   * @return temporary fastq file name
    */
   public String getNameTemporaryFastqFiles() {
     return this.nameTemporaryFastqFiles;
   }
 
   /**
-   * @return
+   * Get the unique key for sample
+   * @return unique key for sample
    */
   public String getKeyFastqSample() {
     return this.keyFastqSample;
   }
 
   /**
-   * @return
+   * Get the compression type for fastq files
+   * @return compression type for fastq files
    */
   public CompressionType getCompressionType() {
     return this.compressionType;
@@ -306,10 +295,7 @@ public class FastqSample {
       final int lane, final String sampleName, final String projectName,
       final String index) {
 
-    // this.fastqStorage = FastqStorage.getInstance();
-    this.read1 = (read == 3 ? 2 : read);
-    // this.read2 = 0;
-
+    this.read = (read == 3 ? 2 : read);
     this.lane = lane;
     this.sampleName = sampleName;
     this.projectName = projectName;
@@ -318,16 +304,12 @@ public class FastqSample {
     this.runFastqPath = casavaOutputPath;
 
     // if (sampleName.equals("2012_0197"))
-    this.fastqFiles = createListFastqFiles(read1);
-
+    this.fastqFiles = createListFastqFiles(read);
     // else
     // this.fastqFiles = Collections.emptyList();
 
-    // System.out.println("create fastqSample for "
-    // + sampleName + "nb fastqFiles " + fastqFiles);
-
+    // TODO to remove after test
     if (fastqFiles.size() == 0) {
-      this.keyFastqFiles = 0;
       this.keyFastqSample = "";
       this.nameTemporaryFastqFiles = null;
       this.compressionType = CompressionType.NONE;
@@ -335,17 +317,8 @@ public class FastqSample {
     } else {
 
       this.compressionType = setCompressionExtension();
-      // System.out.println("this.compressionType  " + this.compressionType);
-
       this.keyFastqSample = createKeyFastqSample();
-      // System.out.println("this.keyFastqSample " + this.keyFastqSample);
-
-      this.keyFastqFiles = createKeyFastqFiles();
-      // System.out.println("this.keyFastqFiles  " + this.keyFastqFiles);
-
       this.nameTemporaryFastqFiles = createNameTemporaryFastqFile();
-      // System.out.println("this.nameTemporaryFastqFiles  "
-      // + this.nameTemporaryFastqFiles);
 
     }
   }
