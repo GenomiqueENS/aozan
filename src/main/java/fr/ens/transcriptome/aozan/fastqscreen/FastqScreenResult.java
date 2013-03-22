@@ -24,7 +24,6 @@
 package fr.ens.transcriptome.aozan.fastqscreen;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -44,12 +43,13 @@ public class FastqScreenResult {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
-  private static final String HIT_NO_LIBRAIRIES_LEGEND = "hitnolibraries";
-  private static final String HIT_LEGEND = "hit";
-  private static final String FINAL_TEXT = "Hit_no_libraries";
-  private static final String HEADER_COLUMNS_TAB =
-      "library \t unmapped \t one_hit_one_library \t multiple_hits_one_library "
-          + "\t one_hit_multiple_libraries \t multiple_hits_multiple_libraries";
+  // Legend for global value in fastqscreen
+  private static final String PERCENT_MAPPED_NONE_GENOME =
+      "percentMappedNoneGenome";
+  private static final String PERCENT_MAPPED_AT_LEAST_ONE_GENOME =
+      "percentMappedAtLeastOneGenome";
+  private static final String PERCENT_MAPPED_EXCEPT_GENOME_SAMPLE =
+      "mappedexceptgenomesample";
 
   private static final String HEADER_COLUMNS_TEXT =
       "Library \t %Mapped \t %Unmapped \t %One_hit_one_library"
@@ -57,8 +57,9 @@ public class FastqScreenResult {
           + "%Multiple_hits_multiple_libraries";
 
   private Map<String, DataPerGenome> resultsPerGenome;
-  private double percentHitNoLibraries = 0.0;
-  private double percentHit = 0.0;
+  private double percentUnmappedNoneGenome = 0.0;
+  private double percentMappedAtLeastOneGenome = 0.0;
+  private double percentMappedExceptGenomeSample = 0.0;
   private boolean countPercentOk = false;
 
   /**
@@ -75,13 +76,14 @@ public class FastqScreenResult {
       s.append(e.getValue().getAllPercentValues() + "\n");
     }
 
-    // add last line for percentage of reads unmapped
-    double percentHitNoLibrariesRounding =
-        DataPerGenome.roundDouble(this.percentHitNoLibraries);
-    s.append("\n% Hit_no_libraries : " + percentHitNoLibrariesRounding + "\n");
-
-    double percentHitRounding = DataPerGenome.roundDouble(this.percentHit);
-    s.append("% Hit_libraries : " + percentHitRounding + "\n");
+    // add last lines for percentage of reads
+    s.append("\n% reads_mapped_none_genome : "
+        + DataPerGenome.roundDouble(this.percentUnmappedNoneGenome) + "\n");
+    s.append("% reads_mapped_at_least_one_genome : "
+        + DataPerGenome.roundDouble(this.percentMappedAtLeastOneGenome) + "\n");
+    s.append("% mapped_except_genome_sample : "
+        + DataPerGenome.roundDouble(this.percentMappedExceptGenomeSample)
+        + "\n");
 
     return s.toString();
   }
@@ -114,11 +116,16 @@ public class FastqScreenResult {
   /**
    * Update the list of reference genome used by fastqscreen.
    * @param genome name of new reference genome
+   * @param genomeSample genome reference corresponding to sample
    */
-  public void addGenome(final String genome) {
+  public void addGenome(final String genome, final String genomeSample) {
+
+    if (genome == null)
+      return;
 
     if (!this.resultsPerGenome.containsKey(genome))
-      this.resultsPerGenome.put(genome, new DataPerGenome(genome));
+      this.resultsPerGenome
+          .put(genome, new DataPerGenome(genome, genomeSample));
   }
 
   /**
@@ -145,13 +152,21 @@ public class FastqScreenResult {
       throw new AozanException(
           "During fastqScreen execusion : no genome receive");
 
+    double percentMappedOnlyOnGenomeSample = 0.0;
+
     for (Map.Entry<String, DataPerGenome> e : this.resultsPerGenome.entrySet()) {
       e.getValue().countPercentValue(readsprocessed);
+
+      percentMappedOnlyOnGenomeSample +=
+          e.getValue().getPercentMappedOnlyOnGenomeSample(readsprocessed);
     }
 
-    this.percentHitNoLibraries =
+    this.percentUnmappedNoneGenome =
         ((double) (readsprocessed - readsMapped)) / readsprocessed;
-    this.percentHit = 1.0 - this.percentHitNoLibraries;
+    this.percentMappedAtLeastOneGenome = 1.0 - this.percentUnmappedNoneGenome;
+
+    this.percentMappedExceptGenomeSample =
+        percentMappedAtLeastOneGenome - percentMappedOnlyOnGenomeSample;
 
     countPercentOk = true;
   }
@@ -179,9 +194,14 @@ public class FastqScreenResult {
     }
 
     // print last line of report FastqScreen
-    data.put(prefix + "." + HIT_NO_LIBRAIRIES_LEGEND,
-        this.percentHitNoLibraries);
-    data.put(prefix + "." + HIT_LEGEND, this.percentHit);
+    data.put(prefix + "." + PERCENT_MAPPED_NONE_GENOME,
+        this.percentUnmappedNoneGenome);
+    data.put(prefix + "." + PERCENT_MAPPED_AT_LEAST_ONE_GENOME,
+        this.percentMappedAtLeastOneGenome);
+
+    //
+    data.put(prefix + "." + PERCENT_MAPPED_EXCEPT_GENOME_SAMPLE,
+        this.percentMappedExceptGenomeSample);
 
     return data;
   }
@@ -208,6 +228,7 @@ public class FastqScreenResult {
   public static class DataPerGenome {
 
     private String genome;
+    private boolean isGenomeSample;
 
     // specific legend : represent key in rundata
     private String unMappedLegend = "unmapped";
@@ -232,7 +253,6 @@ public class FastqScreenResult {
 
     /**
      * Count for each read number of hit per reference genome
-     * @param genome genome name
      * @param oneHit true if read mapped one time on genome else false
      * @param oneGenome true if read mapped on several genome else false
      */
@@ -325,6 +345,27 @@ public class FastqScreenResult {
 
     }
 
+    /**
+     * Retrieve the percent of reads which mapped only on genome sample, zero if
+     * genome is not the genome sample
+     * @param readsprocessed number reads total
+     * @return percent
+     */
+    double getPercentMappedOnlyOnGenomeSample(int readsprocessed) {
+      double readsMappedOnlyOnGenomeSample = 0;
+
+      if (isGenomeSample) {
+
+        readsMappedOnlyOnGenomeSample =
+            oneHitOneLibraryPercent + multipleHitsOneLibraryPercent;
+        
+        return readsMappedOnlyOnGenomeSample / readsprocessed;
+
+      }
+
+      return 0.0;
+    }
+
     //
     // Constructor
     //
@@ -332,9 +373,11 @@ public class FastqScreenResult {
     /**
      * Constructor for DataPerGenome
      * @param genome genome name
+     * @param genomeSample genome reference corresponding to sample
      */
-    DataPerGenome(final String genome) {
+    DataPerGenome(final String genome, final String genomeSample) {
       this.genome = genome;
+      this.isGenomeSample = genome.equals(genomeSample);
     }
   }
 
