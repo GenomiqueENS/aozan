@@ -39,7 +39,7 @@ public class HitNoLibrariesFastqScreenSampleTest extends
 
     return "fastqscreen.lane"
         + lane + ".sample." + sampleName + ".read" + read + "." + sampleName
-        + ".hit";
+        + ".mappedexceptgenomesample";
   }
 
   @Override
@@ -59,6 +59,6 @@ public class HitNoLibrariesFastqScreenSampleTest extends
   }
 
   public HitNoLibrariesFastqScreenSampleTest() {
-    super("hitnolibraries", "", "fastqScreen hit no libraries", "%");
+    super("hitnolibraries", "", "fastqScreen mapped except genome sample", "%");
   }
 }
