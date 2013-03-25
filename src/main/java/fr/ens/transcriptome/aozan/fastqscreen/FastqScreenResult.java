@@ -81,7 +81,7 @@ public class FastqScreenResult {
         + DataPerGenome.roundDouble(this.percentUnmappedNoneGenome) + "\n");
     s.append("% reads_mapped_at_least_one_genome : "
         + DataPerGenome.roundDouble(this.percentMappedAtLeastOneGenome) + "\n");
-    s.append("% mapped_except_genome_sample : "
+    s.append("% reads_mapped_except_genome_sample : "
         + DataPerGenome.roundDouble(this.percentMappedExceptGenomeSample)
         + "\n");
 

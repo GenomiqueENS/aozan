@@ -29,8 +29,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
+import com.google.common.base.Stopwatch;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
@@ -43,6 +46,9 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
+  /** Timer */
+  private final Stopwatch timer = new Stopwatch();
+
   private final File reportDir;
   private final FastqScreen fastqscreen;
   private final List<String> genomes;
@@ -54,12 +60,24 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
   @Override
   public void run() {
+
+     timer.start();
+
     try {
       processResults();
       success = true;
     } catch (AozanException e) {
       exception = e;
+    } finally {
+
+       LOGGER.fine("End fastqscreen for "
+       + fastqSample.getName() + " in mode "
+       + (paired ? "paired" : "single") + " on genome(s) " + genomes
+       + " in " + toTimeHumanReadable(timer.elapsedMillis()));
+       
+       timer.stop();
     }
+
   }
 
   @Override
@@ -82,25 +100,17 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
         fastqScreenFile.delete();
 
     }
-
-    LOGGER.fine("Save result fastqscreen in file : "
-        + fastqScreenFile.getAbsolutePath());
-
+    LOGGER.fine("Create result fastqscreen file for " +
+    fastqSample.getName());
   }
 
   @Override
   protected void processResults() throws AozanException {
 
-    final long startTime = System.currentTimeMillis();
-
     System.out.println("lane current "
         + fastqSample.getLane() + "\tsample current "
         + fastqSample.getSampleName() + "\tproject name "
         + fastqSample.getProjectName());
-
-    LOGGER.fine("Start test in collector with project "
-        + fastqSample.getProjectName() + " sample "
-        + fastqSample.getSampleName());
 
     File read1 = new File(fastqStorage.getTemporaryFile(fastqSample));
 
@@ -129,11 +139,6 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
     // create rundata for the sample
     this.results.put(resultsFastqscreen.createRundata("fastqscreen"
         + fastqSample.getPrefixRundata()));
-
-    LOGGER.fine("End test in collector with project "
-        + fastqSample.getProjectName() + " sample "
-        + fastqSample.getSampleName() + " : "
-        + toTimeHumanReadable(System.currentTimeMillis() - startTime));
 
     try {
       createReportFile();
@@ -193,10 +198,18 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     this.fastqSampleR2 = null;
     this.fastqscreen = fastqscreen;
-    this.genomes = genomes;
     this.genomeSample = genomeSample;
     this.reportDir = reportDir;
     this.paired = paired;
+
+    // copy list genome for fastqscreen
+    this.genomes = new ArrayList<String>();
+    this.genomes.addAll(genomes);
+
+    // add genomeSample in list of genome to fastqscreen
+    if (this.genomeSample.length() > 0
+        && !this.genomes.contains(this.genomeSample))
+      this.genomes.add(this.genomeSample);
 
   }
 

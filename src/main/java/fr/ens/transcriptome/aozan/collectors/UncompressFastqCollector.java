@@ -25,10 +25,8 @@ package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
@@ -38,9 +36,6 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
  * @author Sandrine Perrin
  */
 public class UncompressFastqCollector extends AbstractFastqCollector {
-
-  /** Logger */
-  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
   public static final String COLLECTOR_NAME = "uncompressfastq";
 
@@ -100,6 +95,7 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
    */
   protected void saveResultPart(final FastqSample fastqSample,
       final RunData data) {
+    return;
   }
 
   @Override
@@ -107,4 +103,4 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     return numberThreads;
   }
 
-  }
+}

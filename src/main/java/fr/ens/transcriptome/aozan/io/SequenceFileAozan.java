@@ -28,30 +28,29 @@ import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.logging.Logger;
 
-import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.Globals;
+import com.google.common.base.Stopwatch;
 
 import uk.ac.bbsrc.babraham.FastQC.Sequence.Sequence;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFactory;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFile;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFormatException;
+import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.Globals;
 
 public class SequenceFileAozan implements SequenceFile {
 
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
-  private static final NumberFormat formatter = new DecimalFormat("#,###");
+
+  /** Timer **/
+  private Stopwatch timer;
 
   private final File tmpFile;
   private final SequenceFile seqFile;
   private final FastqSample fastqSample;
   private final FileWriter fw;
-
-  final long startTime = System.currentTimeMillis();
 
   @Override
   public Sequence next() throws SequenceFormatException {
@@ -64,10 +63,12 @@ public class SequenceFileAozan implements SequenceFile {
 
       this.fw.write(seq.getID() + "\n");
       this.fw.write(seq.getSequence() + "\n");
+
       if (seq.getColorspace() == null)
         this.fw.write("+\n");
       else
         this.fw.write(seq.getColorspace() + "\n");
+
       this.fw.write(seq.getQualityString() + "\n");
 
       // End of file, close the new file
@@ -75,18 +76,27 @@ public class SequenceFileAozan implements SequenceFile {
         this.fw.close();
 
         long sizeFile = tmpFile.length();
-        // double sizeFile =
-        // ((double) tmpFastqFile.length()) / 1024.0 / 1024.0 / 1024.0;
-        // sizeFile = ((int) (sizeFile * 10.0)) / 10.0;
-
-        LOGGER.fine("End uncompressed for fastq File "
-            + tmpFile.getName() + "(size : " + formatter.format(sizeFile)
-            + ") in "
-            + toTimeHumanReadable(System.currentTimeMillis() - startTime));
 
         // Rename file for remove '.tmp' final
         tmpFile.renameTo(new File(FastqStorage.getInstance().getTemporaryFile(
             fastqSample)));
+
+        synchronized (this) {
+          LOGGER.fine("In fastqc : end uncompress "
+              + fastqSample.getFastqFiles().size()
+              + " fastq file(s) for "
+              + fastqSample.getName()
+              + " in type compression "
+              + fastqSample.getCompressionType()
+              + " in "
+              + toTimeHumanReadable(timer.elapsedMillis())
+              + " : temporary fastq file size "
+              + Globals.FORMATTER_MILLIER.format(sizeFile)
+              + " (estimated size("
+              + Globals.FORMATTER_MILLIER.format(fastqSample
+                  .getUncompressedSize()) + "))");
+        }
+        timer.stop();
 
       }
 
@@ -129,15 +139,14 @@ public class SequenceFileAozan implements SequenceFile {
   public SequenceFileAozan(final File[] files, final File tmpFile,
       final FastqSample fastqSample) throws AozanException {
 
-    LOGGER.fine("Start uncompressed fastq Files : "
-        + formatter.format(files[0].length()) + ".");
+    // Init timer
+    this.timer = new Stopwatch().start();
 
     this.tmpFile = tmpFile;
     this.fastqSample = fastqSample;
 
     try {
       this.fw = new FileWriter(this.tmpFile);
-
       this.seqFile = SequenceFactory.getSequenceFile(files);
 
     } catch (SequenceFormatException e) {

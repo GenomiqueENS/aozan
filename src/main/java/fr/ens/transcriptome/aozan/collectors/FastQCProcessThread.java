@@ -23,9 +23,12 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
+import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -48,9 +51,11 @@ import uk.ac.bbsrc.babraham.FastQC.Sequence.Sequence;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFile;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFormatException;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.fastqc.BadTiles;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.aozan.io.FastqStorage;
@@ -62,6 +67,12 @@ import fr.ens.transcriptome.aozan.io.FastqStorage;
  */
 class FastQCProcessThread extends AbstractFastqProcessThread {
 
+  /** Logger */
+  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+
+  /** Timer **/
+  private Stopwatch timer = new Stopwatch();
+
   private final SequenceFile seqFile;
   private final boolean ignoreFilteredSequences;
   private final List<QCModule> moduleList;
@@ -72,14 +83,24 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
   @Override
   public void run() {
 
-    // System.out.println("seqFileThread run ");
+    timer.start();
 
     try {
       processSequences(this.seqFile);
       success = true;
+
     } catch (AozanException e) {
       exception = e;
+
+    } finally {
+
+      LOGGER.fine("End fastqc for "
+          + fastqSample.getName() + " in "
+          + toTimeHumanReadable(timer.elapsedMillis()));
+
+      timer.stop();
     }
+
   }
 
   /**
@@ -219,6 +240,8 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
     new HTMLReportArchive(seqFile, this.moduleList.toArray(new QCModule[] {}),
         reportFile);
+
+    LOGGER.fine("Create qc report html for " + fastqSample.getName());
 
     // Keep only the uncompressed data
     if (reportFile.exists()) {

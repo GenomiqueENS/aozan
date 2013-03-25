@@ -26,9 +26,12 @@ package fr.ens.transcriptome.aozan.io;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
 import fr.ens.transcriptome.eoulsan.util.StringUtils;
 
@@ -38,6 +41,9 @@ import fr.ens.transcriptome.eoulsan.util.StringUtils;
  * @author Sandrine Perrin
  */
 public class FastqSample {
+
+  /** Logger */
+  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
   // TODO to remove, value for test
   private static final String VALUE = ".fq";
@@ -238,6 +244,14 @@ public class FastqSample {
   }
 
   /**
+   * Get name of project and sample
+   * @return name of project and sample
+   */
+  public String getName() {
+    return this.projectName + "-" + this.sampleName;
+  }
+
+  /**
    * Get list of fastq files for this sample
    * @return list fastq files
    */
@@ -321,5 +335,11 @@ public class FastqSample {
       this.nameTemporaryFastqFiles = createNameTemporaryFastqFile();
 
     }
+
+    LOGGER.fine("Add a sample "
+        + this.getName() + " for fastq Collector with "
+        + this.getFastqFiles().size() + " in type compression "
+        + this.compressionType + " (size estimated "
+        + Globals.FORMATTER_MILLIER.format(this.getUncompressedSize()) + ")");
   }
 }

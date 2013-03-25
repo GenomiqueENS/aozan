@@ -166,6 +166,7 @@ abstract public class AbstractFastqCollector implements Collector {
             data.put(resultPart);
           } else {
 
+            // Create directory for the sample
             final File reportDir =
                 new File(qcReportOutputPath + "/Project_" + fs.getProjectName());
 
@@ -250,6 +251,8 @@ abstract public class AbstractFastqCollector implements Collector {
     if (!fastqSamples.isEmpty())
       return;
 
+    LOGGER.fine("Step : Collector fastq");
+
     // Count size from all fastq files util
     long freeSpace = new File(tmpPath).getFreeSpace();
 
@@ -268,8 +271,8 @@ abstract public class AbstractFastqCollector implements Collector {
               + ", and we need "
               + uncompressedSizeNeeded + ". Echec Aozan");
 
-    System.out
-        .println("Enough disk space to store uncompressed fastq files for step fastqScreen. We are "
+    LOGGER
+        .fine("Enough disk space to store uncompressed fastq files for step fastqScreen. We are "
             + freeSpace
             + " in directory "
             + new File(tmpPath).getAbsolutePath()
@@ -366,9 +369,15 @@ abstract public class AbstractFastqCollector implements Collector {
     try {
       data = new RunData(dataFile);
 
+      LOGGER.fine("For the "
+          + this.getName() + " : Restore data file for "
+          + fastqSample.getKeyFastqSample());
+
     } catch (IOException io) {
 
-      LOGGER.warning("Error during reading data file for the sample "
+      LOGGER.warning("In "
+          + this.getName()
+          + " : Error during reading data file for the sample "
           + fastqSample.getKeyFastqSample());
     }
     return data;
@@ -391,19 +400,16 @@ abstract public class AbstractFastqCollector implements Collector {
       boolean success = data.createRunDataFile(dataFilePath);
 
       if (success) {
-        LOGGER
-            .fine("Save data file for the sample here "
-                + new File(dataFilePath).getAbsolutePath() + " size "
-                + data.size());
+        LOGGER.fine("In "
+            + this.getName() + " : save data file for the sample here "
+            + new File(dataFilePath).getName());
       }
 
     } catch (IOException ae) {
 
-      System.out.println("Error during sava rundata in file "
-          + qcReportOutputPath + "/" + getName()
-          + fastqSample.getKeyFastqSample() + ".data");
-
-      LOGGER.warning("Error during writing data file for the sample "
+      LOGGER.warning("For the "
+          + this.getName()
+          + " : Error during writing data file for the sample "
           + fastqSample.getKeyFastqSample());
     }
   }

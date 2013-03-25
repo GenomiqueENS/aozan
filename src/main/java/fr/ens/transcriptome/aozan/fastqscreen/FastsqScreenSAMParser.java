@@ -30,14 +30,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import net.sf.samtools.SAMParser;
 import net.sf.samtools.SAMRecord;
 
 import com.google.common.collect.Lists;
 
-import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.eoulsan.bio.SAMParserLine;
 import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.MultiReadAlignmentsFilter;
 import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.ReadAlignmentsFilter;
@@ -50,9 +48,6 @@ import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.RemoveUnmappedReadAlig
  * @author Sandrine Perrin
  */
 public class FastsqScreenSAMParser implements SAMParserLine {
-
-  /** Logger. */
-  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
   private File mapOutputFile = null;
   private String genome;
@@ -189,7 +184,6 @@ public class FastsqScreenSAMParser implements SAMParserLine {
       fw.close();
 
     } catch (IOException io) {
-
     }
   }
 
@@ -221,11 +215,11 @@ public class FastsqScreenSAMParser implements SAMParserLine {
   /**
    * Initialize FastqScreenSAMParser : create the mapOutputFile and the list
    * filters used for parsing SAM file
-   * @param MapOutputFile file result from mapping
+   * @param mapOutputFile file result from mapping
    * @param genome name genome
    * @throws IOException if an error occurs while initializing mapOutputFile
    */
-  public FastsqScreenSAMParser(final File MapOutputFile, final String genome,
+  public FastsqScreenSAMParser(final File mapOutputFile, final String genome,
       final boolean paired) throws IOException {
 
     this.genome = genome;
@@ -239,11 +233,11 @@ public class FastsqScreenSAMParser implements SAMParserLine {
     this.listFilters.add(new RemoveUnmappedReadAlignmentsFilter());
 
     this.filter = new MultiReadAlignmentsFilter(listFilters);
-    this.buffer = new ReadAlignmentsFilterBuffer(filter); //, true);
+    this.buffer = new ReadAlignmentsFilterBuffer(filter); // , true);
 
     this.genomeDescriptionList = new ArrayList<String>();
 
-    this.mapOutputFile = MapOutputFile;
+    this.mapOutputFile = mapOutputFile;
     this.fw = new FileWriter(this.mapOutputFile);
 
   }

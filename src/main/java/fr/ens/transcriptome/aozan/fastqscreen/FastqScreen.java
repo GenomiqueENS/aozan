@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import com.google.common.base.Stopwatch;
+
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.io.FastqSample;
@@ -48,6 +50,9 @@ public class FastqScreen {
 
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+
+  /** Timer */
+  private final Stopwatch timer = new Stopwatch();
 
   protected static final String COUNTER_GROUP = "fastqscreen";
 
@@ -89,10 +94,7 @@ public class FastqScreen {
       final List<String> genomes, final String genomeSample)
       throws AozanException {
 
-    final long startTime = System.currentTimeMillis();
-
-    LOGGER.fine("Start fastqscreen on project "
-        + fastqSample.getProjectName() + " " + fastqSample.getSampleName());
+    timer.start();
 
     String tmpDir = properties.getProperty(KEY_TMP_DIR);
 
@@ -106,7 +108,20 @@ public class FastqScreen {
       else
         pmr.doMap(fastqRead1, fastqRead2, genomes, genomeSample, properties);
 
+      LOGGER.fine("Fastqscreen : step map for "
+          + fastqSample.getName() + " in mode "
+          + (fastqRead2 == null ? "single" : "paired") + " in "
+          + toTimeHumanReadable(timer.elapsedMillis()));
+
+      timer.reset();
+      timer.start();
+
       pmr.doReduce(new File(tmpDir + "/outputDoReduce.txt"));
+
+      LOGGER.fine("Fastqscreen : step reduce for "
+          + fastqSample.getName() + " in mode "
+          + (fastqRead2 == null ? "single" : "paired") + " in "
+          + toTimeHumanReadable(timer.elapsedMillis()));
 
       // remove temporary output file use in map-reduce step
       new File(tmpDir + "/outputDoReduce.txt").delete();
@@ -117,13 +132,9 @@ public class FastqScreen {
     } catch (BadBioEntryException bad) {
       throw new AozanException(bad.getMessage());
 
+    } finally {
+      timer.stop();
     }
-
-    LOGGER.fine("End fastqscreen on project "
-        + fastqSample.getProjectName() + " " + fastqSample.getSampleName()
-        + " for genome(s) " + genomes.toString() + " in mode "
-        + (fastqRead2 == null ? "single" : "paired") + " in "
-        + toTimeHumanReadable(System.currentTimeMillis() - startTime));
 
     return pmr.getFastqScreenResult();
   }

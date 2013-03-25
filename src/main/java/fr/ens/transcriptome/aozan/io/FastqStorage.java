@@ -26,8 +26,6 @@ package fr.ens.transcriptome.aozan.io;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -148,7 +146,8 @@ public final class FastqStorage {
    * @throws IOException
    */
   public void clear() {
-    System.out.println("delete temporaries files ");
+    LOGGER.info("Delete temporaries fastq files");
+
     File[] files = new File(tmpPath).listFiles(new FileFilter() {
 
       public boolean accept(final File pathname) {
