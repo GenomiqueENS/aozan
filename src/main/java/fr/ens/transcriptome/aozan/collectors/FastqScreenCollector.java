@@ -170,28 +170,25 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     String aliasGenome = "";
 
     if (aliasGenomes.containsKey(genomeSample)) {
-
       aliasGenome = aliasGenomes.get(genomeSample);
-      if (aliasGenome.length() > 0) {
-        if (!genomesToFastqscreenSample.contains(aliasGenome))
-          genomesToFastqscreenSample.add(aliasGenome);
-      }
     }
 
     if (paired) {
       // in mode paired FastqScreen should be launched with R1 and R2 together.
-
       // Search fasqtSample which correspond to fastqSample R1
       String prefixRead2 = fastqSample.getPrefixRead2();
 
-      for (FastqSample fs : fastqSamples) {
-        if (fs.getKeyFastqSample().equals(prefixRead2)) {
+      for (FastqSample fastqSampleR2 : fastqSamples) {
+        if (fastqSampleR2.getKeyFastqSample().equals(prefixRead2)) {
 
-          return new FastqScreenProcessThread(fastqSample, fs, fastqscreen,
-              genomesToFastqscreenSample, aliasGenome, reportDir, paired);
+          return new FastqScreenProcessThread(fastqSample, fastqSampleR2,
+              fastqscreen, genomesToFastqscreenSample, aliasGenome, reportDir,
+              paired);
         }
       }
     }
+
+    // Call in mode single-end
     return new FastqScreenProcessThread(fastqSample, fastqscreen,
         genomesToFastqscreenSample, aliasGenome, reportDir, paired);
   }
