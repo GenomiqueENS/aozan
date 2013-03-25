@@ -25,6 +25,8 @@ package fr.ens.transcriptome.aozan;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -123,6 +125,8 @@ public class Globals {
     }
   };
 
+  /** Format of the log for number **/
+  public static final NumberFormat FORMATTER_MILLIER = new DecimalFormat("#,###");
   //
   // Private constants
   //
