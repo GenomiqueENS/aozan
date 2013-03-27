@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -49,10 +50,15 @@ import fr.ens.transcriptome.aozan.tests.SampleTest;
 
 public class QC {
 
+  /** Logger */
+  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+
   private static final String TEST_KEY_ENABLED_SUFFIX = ".enable";
   private static final String TEST_KEY_PREFIX = "qc.test.";
 
   private List<Collector> collectors = Lists.newArrayList();
+
+  // TODO to remove after test
   /* private */public List<LaneTest> laneTests = Lists.newArrayList();
   /* private */public List<SampleTest> sampleTests = Lists.newArrayList();
   private Map<String, String> additionalConf = Maps.newHashMap();
@@ -73,65 +79,89 @@ public class QC {
     final File casavaOutputDir = new File(fastqDir);
     final File QCOutputDir = new File(qcDir);
 
-    if (RTAOutputDir == null
-        || !RTAOutputDir.exists() || !RTAOutputDir.isDirectory())
-      throw new AozanException(
-          "The BCL directory does not exist or is not a directory: "
-              + RTAOutputDir);
+    final File dataFile = new File(qcDir + "/data-" + runId + ".txt");
+    RunData data = null;
 
-    if (casavaOutputDir == null
-        || !casavaOutputDir.exists() || !casavaOutputDir.isDirectory())
-      throw new AozanException(
-          "The Casava output directory does not exist or is not a directory: "
-              + casavaOutputDir);
+    // Check if raw data file exists
+    if (dataFile.exists()) {
+      try {
+        data = new RunData(dataFile);
+      } catch (IOException e) {
+        dataFile.delete();
+        data = null;
+      }
+    }
 
-    if (QCOutputDir == null
-        || (QCOutputDir.exists() && !QCOutputDir.isDirectory()))
-      throw new AozanException(
-          "The QC directory does not exist or is not a directory: "
+    // If no data file or it is empty, the collector must be launch
+    if (data == null || data.size() == 0) {
+      if (RTAOutputDir == null
+          || !RTAOutputDir.exists() || !RTAOutputDir.isDirectory())
+        throw new AozanException(
+            "The BCL directory does not exist or is not a directory: "
+                + RTAOutputDir);
+
+      if (casavaOutputDir == null
+          || !casavaOutputDir.exists() || !casavaOutputDir.isDirectory())
+        throw new AozanException(
+            "The Casava output directory does not exist or is not a directory: "
+                + casavaOutputDir);
+
+      if (QCOutputDir == null || !QCOutputDir.isDirectory())
+        throw new AozanException(
+            "The QC directory does not exist or is not a directory: "
+                + QCOutputDir);
+
+      if (QCOutputDir.exists())
+        LOGGER
+            .fine("QC temporary directory already exists, restoration phase for run "
+                + runId);
+
+      if (!QCOutputDir.exists())
+        if (!QCOutputDir.mkdirs())
+          throw new AozanException("Cannot create QC directory : "
               + QCOutputDir);
 
-    if (!QCOutputDir.exists())
-      if (!QCOutputDir.mkdirs())
-        throw new AozanException("Cannot create QC directory : " + QCOutputDir);
+      File[] designFiles = casavaOutputDir.listFiles(new FilenameFilter() {
 
-    File[] designFiles = casavaOutputDir.listFiles(new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
 
-      @Override
-      public boolean accept(File dir, String name) {
+          return name.endsWith(".csv");
+        }
+      });
 
-        return name.endsWith(".csv");
-      }
-    });
+      if (designFiles == null || designFiles.length == 0)
+        throw new AozanException("No Casava design file found in "
+            + casavaOutputDir);
 
-    if (designFiles == null || designFiles.length == 0)
-      throw new AozanException("No Casava design file found in "
-          + casavaOutputDir);
+      final File casavaDesignFile = designFiles[0];
 
-    final File casavaDesignFile = designFiles[0];
+      // Create RunDataGenerator object
+      final RunDataGenerator rdg = new RunDataGenerator(this.collectors);
 
-    // Create RunDataGenerator object
-    final RunDataGenerator rdg = new RunDataGenerator(this.collectors);
+      // Set the parameters of the generator
+      rdg.setRTAOutputDir(RTAOutputDir);
+      rdg.setCasavaDesignFile(casavaDesignFile);
+      rdg.setCasavaOutputDir(casavaOutputDir);
+      rdg.setQCOutputDir(QCOutputDir);
+      rdg.setTemporaryDir(this.tmpDir);
+      rdg.setAdditionnalConf(this.additionalConf);
 
-    // Set the parameters of the generator
-    rdg.setRTAOutputDir(RTAOutputDir);
-    rdg.setCasavaDesignFile(casavaDesignFile);
-    rdg.setCasavaOutputDir(casavaOutputDir);
-    rdg.setQCOutputDir(QCOutputDir);
-    rdg.setTemporaryDir(this.tmpDir);
-    rdg.setAdditionnalConf(this.additionalConf);
+      // Create the run data object
+      data = rdg.collect();
 
-    // Create the run data object
-    final RunData data = rdg.collect();
+    }
 
     if (data.size() == 0)
       throw new AozanException("No data collected.");
 
-    // Print the content of the run data object
-    // data.print();
-
     // Create the report
-    return new QCReport(data, this.laneTests, this.sampleTests);
+    QCReport qcReport = new QCReport(data, this.laneTests, this.sampleTests);
+
+    // Create the completed raw data file
+    writeRawData(qcReport, dataFile);
+
+    return qcReport;
   }
 
   /**

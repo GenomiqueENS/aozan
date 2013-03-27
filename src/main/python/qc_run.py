@@ -57,7 +57,8 @@ def qc(run_id, conf):
     reports_data_base_path = conf['reports.data.path']
     reports_data_path = reports_data_base_path + '/' + run_id
     qc_output_dir = reports_data_path + '/qc_' + run_id
-
+    tmp_extension = '_tmp'
+    
     # Check if input root bcl data exists
     if not os.path.exists(conf['bcl.data.path']):
         error("Basecalling data directory does not exists", "Basecalling data directory does not exists: " + conf['bcl.data.path'], conf)
@@ -96,6 +97,9 @@ def qc(run_id, conf):
               '.\nNeed more than 10 Gb on ' + conf['reports.data.path'] + '.', conf)
         return False
 
+    # Create temporary temporary directory
+    qc_output_dir = qc_output_dir + tmp_extension
+     
     # Initialize the QC object
     qc = QC(conf, conf['tmp.path'])
 
@@ -110,12 +114,13 @@ def qc(run_id, conf):
               + StringUtils.join(exp.getStackTrace(), '\n\t'), conf)
         return False
 
-    # Write qc data
-    if conf['qc.report.save.raw.data'].lower().strip() == 'true':
+    # Remove qc data if not demand
+    if conf['qc.report.save.raw.data'].lower().strip() == 'false':
         try:
-            qc.writeRawData(report, qc_output_dir + '/data-' + run_id + '.txt')
+            os.remove(qc_output_dir + '/data-' + run_id + '.txt')
+            # qc.writeRawData(report, qc_output_dir + '/data-' + run_id + '.txt')
         except AozanException, exp:
-            error("error while computing qc raw data for run " + run_id + ".", exp.getMessage(), conf)
+            error("error while removing qc raw data for run " + run_id + ".", exp.getMessage(), conf)
             return False
 
     # Write the XML report
@@ -144,6 +149,9 @@ def qc(run_id, conf):
         error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + str(exp.getMessage()) + '\n' 
               + StringUtils.join(exp.getStackTrace(), '\n\t'), conf)
         return False
+
+    # Remove tmp extension of temporary qc directory
+    os.rename(qc_output_dir, qc_output_dir[:len(tmp_extension)])
 
     # Archive the reports
     cmd = 'cd ' + reports_data_path + '  && ' + \
