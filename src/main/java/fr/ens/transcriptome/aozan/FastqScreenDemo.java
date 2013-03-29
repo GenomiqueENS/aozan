@@ -256,14 +256,14 @@ public class FastqScreenDemo {
 
     QC qc = new QC(getMapAozanConf(), TMP_DIR);
 
-    QCReport report = new QCReport(data, qc.laneTests, qc.sampleTests);
-
-    // Save report data
-    qc.writeXMLReport(report, TMP_DIR + "/" + runId + "_reportXmlFile.xml");
-
-    // Save HTML report
-    qc.writeReport(report, (String) null, TMP_DIR
-        + "/" + runId + "_reportHtmlFile.html");
+    // QCReport report = new QCReport(data, qc.laneTests, qc.sampleTests);
+    //
+    // // Save report data
+    // qc.writeXMLReport(report, TMP_DIR + "/" + runId + "_reportXmlFile.xml");
+    //
+    // // Save HTML report
+    // qc.writeReport(report, (String) null, TMP_DIR
+    // + "/" + runId + "_reportHtmlFile.html");
   }
 
   public static RunData getRunData() {

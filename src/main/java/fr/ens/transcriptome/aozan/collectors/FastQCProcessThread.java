@@ -85,6 +85,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
     timer.start();
 
+    LOGGER.fine("FASTQC : start for " + fastqSample.getKeyFastqSample());
     try {
       processSequences(this.seqFile);
       success = true;
@@ -94,11 +95,12 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
     } finally {
 
-      LOGGER.fine("End fastqc for "
-          + fastqSample.getName() + " in "
+      timer.stop();
+
+      LOGGER.fine("FASTQC : end for "
+          + fastqSample.getKeyFastqSample() + " in "
           + toTimeHumanReadable(timer.elapsedMillis()));
 
-      timer.stop();
     }
 
   }
@@ -241,7 +243,8 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
     new HTMLReportArchive(seqFile, this.moduleList.toArray(new QCModule[] {}),
         reportFile);
 
-    LOGGER.fine("Create qc report html for " + fastqSample.getName());
+    LOGGER
+        .fine("FASTQC : " + fastqSample.getKeyFastqSample() + " creation qc report html");
 
     // Keep only the uncompressed data
     if (reportFile.exists()) {

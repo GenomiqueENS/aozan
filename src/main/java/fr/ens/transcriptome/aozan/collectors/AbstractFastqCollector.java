@@ -42,7 +42,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.FastqScreenDemo;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.RunDataGenerator;
@@ -123,8 +122,7 @@ abstract public class AbstractFastqCollector implements Collector {
 
     // TODO REVIEW: "_tmp" is unnecessary as it has already set in the python
     // code
-    qcReportOutputPath =
-        properties.getProperty(RunDataGenerator.QC_OUTPUT_DIR) + "_tmp";
+    qcReportOutputPath = properties.getProperty(RunDataGenerator.QC_OUTPUT_DIR);
 
     tmpPath = properties.getProperty(RunDataGenerator.TMP_DIR);
 
@@ -150,7 +148,7 @@ abstract public class AbstractFastqCollector implements Collector {
    */
   public void collect(RunData data) throws AozanException {
     // TODO to remove
-    data = FastqScreenDemo.getRunData();
+    // data = FastqScreenDemo.getRunData();
 
     controlPreCollect(data, qcReportOutputPath);
 
@@ -251,7 +249,7 @@ abstract public class AbstractFastqCollector implements Collector {
     if (!fastqSamples.isEmpty())
       return;
 
-    LOGGER.fine("Step : Collector fastq");
+    LOGGER.fine("Collector fastq : step preparation");
 
     // Count size from all fastq files util
     long freeSpace = new File(tmpPath).getFreeSpace();
@@ -273,11 +271,11 @@ abstract public class AbstractFastqCollector implements Collector {
 
     LOGGER
         .fine("Enough disk space to store uncompressed fastq files for step fastqScreen. We are "
-            + freeSpace
+            + Globals.FORMATTER_MILLIER.format(freeSpace)
             + " in directory "
             + new File(tmpPath).getAbsolutePath()
             + ", and we need "
-            + uncompressedSizeNeeded);
+            + Globals.FORMATTER_MILLIER.format(uncompressedSizeNeeded));
 
   }
 
@@ -370,13 +368,13 @@ abstract public class AbstractFastqCollector implements Collector {
       data = new RunData(dataFile);
 
       LOGGER.fine("For the "
-          + this.getName() + " : Restore data file for "
+          + this.getName().toUpperCase() + " : Restore data file for "
           + fastqSample.getKeyFastqSample());
 
     } catch (IOException io) {
 
       LOGGER.warning("In "
-          + this.getName()
+          + this.getName().toUpperCase()
           + " : Error during reading data file for the sample "
           + fastqSample.getKeyFastqSample());
     }
@@ -400,9 +398,8 @@ abstract public class AbstractFastqCollector implements Collector {
       boolean success = data.createRunDataFile(dataFilePath);
 
       if (success) {
-        LOGGER.fine("In "
-            + this.getName() + " : save data file for the sample here "
-            + new File(dataFilePath).getName());
+        LOGGER.fine(this.getName().toUpperCase()
+            + " : " + fastqSample.getKeyFastqSample() + " save data file");
       }
 
     } catch (IOException ae) {
@@ -480,6 +477,7 @@ abstract public class AbstractFastqCollector implements Collector {
     executor.shutdown();
   }
 
+  @Override
   /**
    * Clear qc directory after successfully all FastqCollector
    */

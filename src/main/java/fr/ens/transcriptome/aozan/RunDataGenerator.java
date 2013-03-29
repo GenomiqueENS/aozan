@@ -25,12 +25,15 @@
 package fr.ens.transcriptome.aozan;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Logger;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.collectors.Collector;
@@ -40,6 +43,12 @@ import fr.ens.transcriptome.aozan.collectors.Collector;
  * @author Laurent Jourdren
  */
 public class RunDataGenerator {
+
+  /** Logger */
+  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+
+  /** Timer **/
+  private Stopwatch timer = new Stopwatch();
 
   /** RTA output directory property key. */
   public static final String RTA_OUTPUT_DIR = "rta.output.dir";
@@ -145,6 +154,8 @@ public class RunDataGenerator {
 
     final RunData data = new RunData();
 
+    System.out.println(properties);
+
     if (this.properties.containsKey(COLLECT_DONE))
       throw new AozanException("Collect has been already done.");
 
@@ -163,15 +174,39 @@ public class RunDataGenerator {
     if (!this.properties.containsKey(TMP_DIR))
       throw new AozanException("Temporary directory is not set.");
 
+    // Init timer for each collector
+    long during = 0L;
+
+    timer.start();
+    LOGGER.fine("Step collector start");
+
     // For all collectors
     for (final Collector collector : this.collectors) {
+
+      timer.reset();
+      timer.start();
+
+      LOGGER.fine(collector.getName().toUpperCase() + " start");
 
       // Configure
       collector.configure(new Properties(this.properties));
 
       // And collect data
       collector.collect(data);
+
+      during += timer.elapsedMillis();
+
+      LOGGER.fine(collector.getName().toUpperCase()
+          + " end in " + toTimeHumanReadable(timer.elapsedMillis()));
+
     }
+
+    for (final Collector collector : this.collectors) {
+      collector.clear();
+    }
+
+    LOGGER.fine("Step collector end in " + toTimeHumanReadable(during));
+    timer.stop();
 
     this.properties.setProperty(COLLECT_DONE, "true");
 

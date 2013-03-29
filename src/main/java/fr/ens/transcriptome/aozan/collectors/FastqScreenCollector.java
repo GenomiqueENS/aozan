@@ -88,6 +88,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
     List<String> result =
         Lists.newArrayList(super.getCollectorsNamesRequiered());
+    result.add(FastQCCollector.COLLECTOR_NAME);
     result.add(UncompressFastqCollector.COLLECTOR_NAME);
 
     return result.toArray(new String[] {});

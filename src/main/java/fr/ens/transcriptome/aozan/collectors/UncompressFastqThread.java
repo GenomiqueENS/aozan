@@ -89,11 +89,11 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
     } finally {
 
       synchronized (this) {
-        LOGGER.fine("End uncompress "
+        LOGGER.fine("UNCOMPRESS fastq : for "
+            + fastqSample.getKeyFastqSample()
+            + " "
             + fastqSample.getFastqFiles().size()
-            + " fastq file(s) for "
-            + fastqSample.getName()
-            + " in type compression "
+            + " fastq file(s) in type compression "
             + fastqSample.getCompressionType()
             + " in "
             + toTimeHumanReadable(timer.elapsedMillis())

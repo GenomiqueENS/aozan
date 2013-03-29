@@ -82,19 +82,19 @@ public class SequenceFileAozan implements SequenceFile {
             fastqSample)));
 
         synchronized (this) {
-          LOGGER.fine("In fastqc : end uncompress "
-              + fastqSample.getFastqFiles().size()
-              + " fastq file(s) for "
-              + fastqSample.getName()
-              + " in type compression "
+          LOGGER.fine("FASTQC : uncompress for "
+              + fastqSample.getKeyFastqSample()
+              + " "
+              + +fastqSample.getFastqFiles().size()
+              + " fastq file(s), type compression "
               + fastqSample.getCompressionType()
               + " in "
               + toTimeHumanReadable(timer.elapsedMillis())
-              + " : temporary fastq file size "
+              + "(tmp fastq file size "
               + Globals.FORMATTER_MILLIER.format(sizeFile)
-              + " (estimated size("
+              + " / estimated size "
               + Globals.FORMATTER_MILLIER.format(fastqSample
-                  .getUncompressedSize()) + "))");
+                  .getUncompressedSize()) + ")");
         }
         timer.stop();
 

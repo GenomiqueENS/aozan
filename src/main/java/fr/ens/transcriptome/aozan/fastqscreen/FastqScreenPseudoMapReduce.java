@@ -43,6 +43,7 @@ import fr.ens.transcriptome.eoulsan.Settings;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.eoulsan.bio.FastqFormat;
 import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
+import fr.ens.transcriptome.eoulsan.bio.readsmappers.AbstractBowtieReadsMapper;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.BowtieReadsMapper;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.SequenceReadsMapper;
 import fr.ens.transcriptome.eoulsan.data.DataFile;
@@ -170,12 +171,15 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
           // mode pair-end
           bowtie.map(fastqRead1, fastqRead2, parser);
         }
-
+        
+        LOGGER.fine("FASTQSCREEN : command lane bowtie "
+            + ((AbstractBowtieReadsMapper) bowtie).getCmdLane());
+        
         parser.closeMapOutputFile();
 
         this.readsprocessed = parser.getReadsprocessed();
 
-        LOGGER.fine("Fastqscreen : step mapping on genome "
+        LOGGER.fine("FASTQSCREEN : mapping on genome "
             + genome + " in mode " + (pairend ? "paired" : "single") + ", in "
             + toTimeHumanReadable(timer.elapsedMillis()));
 
@@ -211,7 +215,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     GenomeMapperIndexer indexer = new GenomeMapperIndexer(bowtie);
     indexer.createIndex(genomeDataFile, desc, result);
 
-    LOGGER.fine("Create/Retrieve index for "
+    LOGGER.fine("FASTQSCREEN : create/Retrieve index for "
         + genomeDataFile.getName() + " in "
         + toTimeHumanReadable(timer.elapsedMillis()));
 
@@ -330,7 +334,10 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     if (readsmapped > readsprocessed)
       return null;
 
-    System.out.println("Result of mapping : nb read mapped "
+    System.out.println("Result of mappings : nb read mapped "
+        + readsmapped + " / nb read " + readsprocessed);
+
+    LOGGER.fine("FASTQSCREEN : result of mappings : nb read mapped "
         + readsmapped + " / nb read " + readsprocessed);
 
     fastqScreenResult.countPercentValue(readsmapped, readsprocessed);

@@ -26,7 +26,6 @@ package fr.ens.transcriptome.aozan.io;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -244,14 +243,6 @@ public class FastqSample {
   }
 
   /**
-   * Get name of project and sample
-   * @return name of project and sample
-   */
-  public String getName() {
-    return this.projectName + "-" + this.sampleName;
-  }
-
-  /**
    * Get list of fastq files for this sample
    * @return list fastq files
    */
@@ -337,9 +328,9 @@ public class FastqSample {
     }
 
     LOGGER.fine("Add a sample "
-        + this.getName() + " for fastq Collector with "
-        + this.getFastqFiles().size() + " in type compression "
-        + this.compressionType + " (size estimated "
+        + this.getKeyFastqSample() + " " + this.getFastqFiles().size()
+        + " file(s), type compression " + this.compressionType
+        + " (size estimated "
         + Globals.FORMATTER_MILLIER.format(this.getUncompressedSize()) + ")");
   }
 }

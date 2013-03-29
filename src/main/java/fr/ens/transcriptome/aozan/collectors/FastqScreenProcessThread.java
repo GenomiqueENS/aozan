@@ -61,7 +61,9 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
   @Override
   public void run() {
 
-     timer.start();
+    timer.start();
+
+    LOGGER.fine("FASTQSCREEN : start for " + fastqSample.getKeyFastqSample());
 
     try {
       processResults();
@@ -70,12 +72,13 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
       exception = e;
     } finally {
 
-       LOGGER.fine("End fastqscreen for "
-       + fastqSample.getName() + " in mode "
-       + (paired ? "paired" : "single") + " on genome(s) " + genomes
-       + " in " + toTimeHumanReadable(timer.elapsedMillis()));
-       
-       timer.stop();
+      timer.stop();
+
+      LOGGER.fine("FASTQSCREEN : end for "
+          + fastqSample.getKeyFastqSample() + " in mode "
+          + (paired ? "paired" : "single") + " on genome(s) " + genomes
+          + " in " + toTimeHumanReadable(timer.elapsedMillis()));
+
     }
 
   }
@@ -100,8 +103,8 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
         fastqScreenFile.delete();
 
     }
-    LOGGER.fine("Create result fastqscreen file for " +
-    fastqSample.getName());
+    LOGGER.fine("FASTQSCREEN : for "
+        + fastqSample.getKeyFastqSample() + " report fastqscreen");
   }
 
   @Override

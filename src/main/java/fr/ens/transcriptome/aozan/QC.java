@@ -58,9 +58,8 @@ public class QC {
 
   private List<Collector> collectors = Lists.newArrayList();
 
-  // TODO to remove after test
-  /* private */public List<LaneTest> laneTests = Lists.newArrayList();
-  /* private */public List<SampleTest> sampleTests = Lists.newArrayList();
+  private List<LaneTest> laneTests = Lists.newArrayList();
+  private List<SampleTest> sampleTests = Lists.newArrayList();
   private Map<String, String> additionalConf = Maps.newHashMap();
   private File tmpDir;
 
@@ -79,13 +78,17 @@ public class QC {
     final File casavaOutputDir = new File(fastqDir);
     final File QCOutputDir = new File(qcDir);
 
+    System.out.println("qc dir " + QCOutputDir.getAbsolutePath());
+
     final File dataFile = new File(qcDir + "/data-" + runId + ".txt");
     RunData data = null;
-
     // Check if raw data file exists
     if (dataFile.exists()) {
+
       try {
         data = new RunData(dataFile);
+        LOGGER.fine("Data file for this run already exists.");
+
       } catch (IOException e) {
         dataFile.delete();
         data = null;
@@ -106,20 +109,13 @@ public class QC {
             "The Casava output directory does not exist or is not a directory: "
                 + casavaOutputDir);
 
-      if (QCOutputDir == null || !QCOutputDir.isDirectory())
-        throw new AozanException(
-            "The QC directory does not exist or is not a directory: "
-                + QCOutputDir);
-
-      if (QCOutputDir.exists())
-        LOGGER
-            .fine("QC temporary directory already exists, restoration phase for run "
-                + runId);
-
-      if (!QCOutputDir.exists())
+      if (!QCOutputDir.exists()) {
         if (!QCOutputDir.mkdirs())
           throw new AozanException("Cannot create QC directory : "
               + QCOutputDir);
+      } else {
+        LOGGER.fine("Temporary QC directory already exists");
+      }
 
       File[] designFiles = casavaOutputDir.listFiles(new FilenameFilter() {
 

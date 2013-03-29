@@ -24,7 +24,10 @@
 package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
+import java.util.List;
 import java.util.Properties;
+
+import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
@@ -48,6 +51,21 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
    */
   public String getName() {
     return COLLECTOR_NAME;
+  }
+
+  /**
+   * Collectors to execute before fastqscreen Collector
+   * @return list of names collector
+   */
+  @Override
+  public String[] getCollectorsNamesRequiered() {
+
+    List<String> result =
+        Lists.newArrayList(super.getCollectorsNamesRequiered());
+    result.add(FastQCCollector.COLLECTOR_NAME);
+
+    return result.toArray(new String[] {});
+
   }
 
   @Override
