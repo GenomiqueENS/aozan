@@ -53,34 +53,49 @@ public class QC {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
+  /** RTA output directory property key. */
+  public static final String RTA_OUTPUT_DIR = "rta.output.dir";
+
+  /** Casava design path property key. */
+  public static final String CASAVA_DESIGN_PATH = "casava.design.path";
+
+  /** Casava output directory property key. */
+  public static final String CASAVA_OUTPUT_DIR = "casava.output.dir";
+
+  /** QC output directory property key. */
+  public static final String QC_OUTPUT_DIR = "qc.output.dir";
+
+  /** Temporary directory property key. */
+  public static final String TMP_DIR = "tmp.dir";
+
   private static final String TEST_KEY_ENABLED_SUFFIX = ".enable";
   private static final String TEST_KEY_PREFIX = "qc.test.";
+
+  private final String bclDir;
+  private final String fastqDir;
+  private final String qcDir;
+  private final String runId;
 
   private List<Collector> collectors = Lists.newArrayList();
 
   private List<LaneTest> laneTests = Lists.newArrayList();
   private List<SampleTest> sampleTests = Lists.newArrayList();
-  private Map<String, String> additionalConf = Maps.newHashMap();
+  private Map<String, String> globalConf = Maps.newHashMap();
+
   private File tmpDir;
 
   /**
    * Process data.
-   * @param bclDir BCL directory
-   * @param fastqDir fastq directory
-   * @param runId run id
    * @throws AozanException if an error occurs while computing report
    */
-  public final QCReport computeReport(final String bclDir,
-      final String fastqDir, final String qcDir, final String runId)
-      throws AozanException {
+  public final QCReport computeReport() throws AozanException {
 
-    final File RTAOutputDir = new File(bclDir);
-    final File casavaOutputDir = new File(fastqDir);
-    final File QCOutputDir = new File(qcDir);
-
-    System.out.println("qc dir " + QCOutputDir.getAbsolutePath());
+    final File RTAOutputDir = new File(this.bclDir);
+    final File casavaOutputDir = new File(this.fastqDir);
+    final File QCOutputDir = new File(this.qcDir);
 
     final File dataFile = new File(qcDir + "/data-" + runId + ".txt");
+
     RunData data = null;
     // Check if raw data file exists
     if (dataFile.exists()) {
@@ -117,31 +132,11 @@ public class QC {
         LOGGER.fine("Temporary QC directory already exists");
       }
 
-      File[] designFiles = casavaOutputDir.listFiles(new FilenameFilter() {
-
-        @Override
-        public boolean accept(File dir, String name) {
-
-          return name.endsWith(".csv");
-        }
-      });
-
-      if (designFiles == null || designFiles.length == 0)
-        throw new AozanException("No Casava design file found in "
-            + casavaOutputDir);
-
-      final File casavaDesignFile = designFiles[0];
-
       // Create RunDataGenerator object
       final RunDataGenerator rdg = new RunDataGenerator(this.collectors);
 
       // Set the parameters of the generator
-      rdg.setRTAOutputDir(RTAOutputDir);
-      rdg.setCasavaDesignFile(casavaDesignFile);
-      rdg.setCasavaOutputDir(casavaOutputDir);
-      rdg.setQCOutputDir(QCOutputDir);
-      rdg.setTemporaryDir(this.tmpDir);
-      rdg.setAdditionnalConf(this.additionalConf);
+      rdg.setGlobalConf(this.globalConf);
 
       // Create the run data object
       data = rdg.collect();
@@ -328,9 +323,6 @@ public class QC {
           throw new AozanException("No test found for property: " + key);
       }
 
-      if (key.startsWith("qc.conf."))
-        this.additionalConf.put(key, value);
-
     }
 
     initCollectors();
@@ -355,7 +347,6 @@ public class QC {
       final Map<String, String> properties, final String prefix)
       throws AozanException {
 
-    final String additionalConf = "qc.conf.";
     final Map<String, String> conf = Maps.newHashMap();
 
     for (final Map.Entry<String, String> e : properties.entrySet()) {
@@ -369,12 +360,10 @@ public class QC {
 
         conf.put(confKey, confValue);
 
-      } else if (key.startsWith(additionalConf)) {
-
-        // add additional configuration in properties for collector
-        conf.put(key, e.getValue());
-
       }
+
+      // add additional configuration in properties for collector
+      conf.putAll(globalConf);
     }
 
     return test.configure(conf);
@@ -442,6 +431,36 @@ public class QC {
 
   }
 
+  private final void initGlobalConf(final Map<String, String> properties)
+      throws AozanException {
+    
+    for (final Map.Entry<String, String> e : properties.entrySet()) {
+
+      if (e.getKey().startsWith("qc.conf."))
+        this.globalConf.put(e.getKey(), e.getValue());
+    }
+
+    File[] designFiles = new File(fastqDir).listFiles(new FilenameFilter() {
+
+      @Override
+      public boolean accept(File dir, String name) {
+
+        return name.endsWith(".csv");
+      }
+    });
+
+    if (designFiles == null || designFiles.length == 0)
+      throw new AozanException("No Casava design file found in ");
+
+    final File casavaDesignFile = designFiles[0];
+
+    this.globalConf.put(RTA_OUTPUT_DIR, bclDir);
+    this.globalConf.put(CASAVA_DESIGN_PATH, casavaDesignFile.getAbsolutePath());
+    this.globalConf.put(CASAVA_OUTPUT_DIR, fastqDir);
+    this.globalConf.put(QC_OUTPUT_DIR, qcDir);
+    this.globalConf.put(TMP_DIR, tmpDir.getAbsolutePath());
+  }
+
   /**
    * Transform a list of collector names in a set collectors objects.
    * @param collectorNames list of collectors names
@@ -496,31 +515,46 @@ public class QC {
   /**
    * Public constructor.
    * @param properties QC properties
+   * @param bclDir BCL directory
+   * @param fastqDir fastq directory
+   * @param runId run id
    * @param tmpDirname temporary directory path
    * @throws AozanException if an error occurs while initialize the QC object
    */
-  public QC(final Map<String, String> properties, final String tmpDirname)
-      throws AozanException {
+  public QC(final Map<String, String> properties, final String bclDir,
+      final String fastqDir, final String qcDir, final String tmpDirname,
+      final String runId) throws AozanException {
 
-    this(properties, tmpDirname == null ? null : new File(tmpDirname));
+    this(properties, bclDir, fastqDir, qcDir, tmpDirname == null
+        ? null : new File(tmpDirname), runId);
   }
 
   /**
    * Public constructor.
    * @param properties QC properties
+   * @param bclDir BCL directory
+   * @param fastqDir fastq directory
+   * @param runId run id
    * @param tmpDir temporary directory
    * @throws AozanException if an error occurs while initialize the QC object
    */
-  public QC(final Map<String, String> properties, final File tmpDir)
-      throws AozanException {
+  public QC(final Map<String, String> properties, final String bclDir,
+      final String fastqDir, final String qcDir, final File tmpDir,
+      final String runId) throws AozanException {
 
     if (properties == null)
       throw new NullPointerException("The properties object is null");
 
+    this.bclDir = bclDir;
+    this.fastqDir = fastqDir;
+    this.qcDir = qcDir;
+    this.runId = runId;
+
     this.tmpDir =
         tmpDir == null
             ? new File(System.getProperty("java.io.tmpdir")) : tmpDir;
+
+    initGlobalConf(properties);
     init(properties);
   }
-
 }

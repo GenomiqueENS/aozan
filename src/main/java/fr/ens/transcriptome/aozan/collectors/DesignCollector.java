@@ -34,8 +34,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.RunDataGenerator;
 import fr.ens.transcriptome.eoulsan.illumina.CasavaDesign;
 import fr.ens.transcriptome.eoulsan.illumina.CasavaSample;
 import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignCSVReader;
@@ -71,7 +71,7 @@ public class DesignCollector implements Collector {
       return;
 
     this.casavaDesignFile =
-        new File(properties.getProperty(RunDataGenerator.CASAVA_DESIGN_PATH));
+        new File(properties.getProperty(QC.CASAVA_DESIGN_PATH));
   }
 
   @Override

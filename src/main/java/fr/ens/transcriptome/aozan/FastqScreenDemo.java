@@ -127,14 +127,15 @@ public class FastqScreenDemo {
   public static void reportQC2() throws Exception {
 
     qcDir = SRC_RUN + "/qc_" + runId + "/" + runId;
-    QC qc = new QC(getMapAozanConf(), TMP_DIR);
 
     final String bclDir = "/home/sperrin/shares-net/sequencages/bcl";
-    final String fastqDir = "/home/sperrin/shares-net/sequencages/fastq";
+
+    QC qc =
+        new QC(getMapAozanConf(), bclDir + '/' + runId, qcDir, qcDir
+            + "_qc_tmp", TMP_DIR, runId);
 
     // Compute report
-    final QCReport report =
-        qc.computeReport(bclDir + '/' + runId, qcDir, qcDir + "_qc_tmp", runId);
+    final QCReport report = qc.computeReport();
 
     // Save report data
     qc.writeXMLReport(report, TMP_DIR + "/" + runId + "_reportXmlFile.xml");
@@ -170,11 +171,11 @@ public class FastqScreenDemo {
     RunDataGenerator rdg = new RunDataGenerator(collectorList);
 
     // set paths utils
-    rdg.setCasavaDesignFile(new File(qcDir));
-    rdg.setRTAOutputDir(new File(qcDir));
-    rdg.setCasavaOutputDir(new File(qcDir));
-    rdg.setQCOutputDir(new File(qcDir + "_qc"));
-    rdg.setTemporaryDir(new File(TMP_DIR));
+    // rdg.setCasavaDesignFile(new File(qcDir));
+    // rdg.setRTAOutputDir(new File(qcDir));
+    // rdg.setCasavaOutputDir(new File(qcDir));
+    // rdg.setQCOutputDir(new File(qcDir + "_qc"));
+    // rdg.setTemporaryDir(new File(TMP_DIR));
 
     // add new property for execute fastqscreen
     properties.put("qc.conf.fastqscreen.genomes", genomes);
@@ -185,8 +186,8 @@ public class FastqScreenDemo {
     properties.put("tmp.dir", TMP_DIR);
     properties.put("collect.done", "collect.done");
 
-    properties.put(RunDataGenerator.CASAVA_OUTPUT_DIR, qcDir);
-    properties.put(RunDataGenerator.QC_OUTPUT_DIR, qcDir + "_qc");
+    properties.put(QC.CASAVA_OUTPUT_DIR, qcDir);
+    properties.put(QC.QC_OUTPUT_DIR, qcDir + "_qc");
 
     // number threads used for fastqscreen is defined in aozan.conf
     properties.put("qc.conf.fastqc.threads", "4");
@@ -254,8 +255,7 @@ public class FastqScreenDemo {
       System.out.println(io.getMessage());
     }
 
-    QC qc = new QC(getMapAozanConf(), TMP_DIR);
-
+    // QC qc = new QC(getMapAozanConf(), TMP_DIR);
     // QCReport report = new QCReport(data, qc.laneTests, qc.sampleTests);
     //
     // // Save report data

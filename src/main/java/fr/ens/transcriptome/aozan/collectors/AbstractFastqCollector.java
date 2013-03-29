@@ -43,8 +43,8 @@ import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.RunDataGenerator;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.aozan.io.FastqStorage;
 
@@ -117,14 +117,9 @@ abstract public class AbstractFastqCollector implements Collector {
    */
   public void configure(Properties properties) {
 
-    casavaOutputPath =
-        properties.getProperty(RunDataGenerator.CASAVA_OUTPUT_DIR);
-
-    // TODO REVIEW: "_tmp" is unnecessary as it has already set in the python
-    // code
-    qcReportOutputPath = properties.getProperty(RunDataGenerator.QC_OUTPUT_DIR);
-
-    tmpPath = properties.getProperty(RunDataGenerator.TMP_DIR);
+    casavaOutputPath = properties.getProperty(QC.CASAVA_OUTPUT_DIR);
+    qcReportOutputPath = properties.getProperty(QC.QC_OUTPUT_DIR);
+    tmpPath = properties.getProperty(QC.TMP_DIR);
 
     fastqStorage = FastqStorage.getInstance();
     fastqStorage.setTmpDir(tmpPath);

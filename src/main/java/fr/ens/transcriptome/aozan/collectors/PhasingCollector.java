@@ -42,8 +42,8 @@ import org.xml.sax.SAXException;
 import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.RunDataGenerator;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**
@@ -76,8 +76,7 @@ public class PhasingCollector implements Collector {
     if (properties == null)
       return;
 
-    this.casavaOutputPath =
-        properties.getProperty(RunDataGenerator.CASAVA_OUTPUT_DIR);
+    this.casavaOutputPath = properties.getProperty(QC.CASAVA_OUTPUT_DIR);
   }
 
   @Override

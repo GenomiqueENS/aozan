@@ -36,8 +36,8 @@ import org.xml.sax.SAXException;
 import com.google.common.collect.Sets;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.RunDataGenerator;
 import fr.ens.transcriptome.eoulsan.illumina.RunInfo;
 
 /**
@@ -71,8 +71,7 @@ public class RunInfoCollector implements Collector {
       return;
 
     this.runInfoFile =
-        new File(properties.getProperty(RunDataGenerator.RTA_OUTPUT_DIR),
-            "RunInfo.xml");
+        new File(properties.getProperty(QC.RTA_OUTPUT_DIR), "RunInfo.xml");
   }
 
   @Override
