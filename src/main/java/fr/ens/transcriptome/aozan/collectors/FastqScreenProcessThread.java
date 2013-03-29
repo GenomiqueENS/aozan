@@ -215,5 +215,4 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
       this.genomes.add(this.genomeSample);
 
   }
-
 }

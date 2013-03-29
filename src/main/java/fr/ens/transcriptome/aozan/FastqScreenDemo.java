@@ -97,8 +97,8 @@ public class FastqScreenDemo {
       } else {
         // run test single-end
         // runId = "120301_SNL110_0038_AD0EJRABXX";
-        // runId = "121116_SNL110_0058_AC11HRACXX";
-        runId = "130214_SNL110_0062_AD1GKTACXX";
+        runId = "121116_SNL110_0058_AC11HRACXX";
+        // runId = "130214_SNL110_0062_AD1GKTACXX";
         // runId = "121219_SNL110_0059_AD1B1BACXX";
         // runId = "120615_SNL110_0051_AD102YACXX";
       }
@@ -128,21 +128,19 @@ public class FastqScreenDemo {
 
     qcDir = SRC_RUN + "/qc_" + runId + "/" + runId;
 
-    final String bclDir = "/home/sperrin/shares-net/sequencages/bcl";
-
     QC qc =
-        new QC(getMapAozanConf(), bclDir + '/' + runId, qcDir, qcDir
-            + "_qc_tmp", TMP_DIR, runId);
+        new QC(getMapAozanConf(), qcDir, qcDir, qcDir + "_qc_tmp", TMP_DIR,
+            runId);
 
     // Compute report
     final QCReport report = qc.computeReport();
 
     // Save report data
-    qc.writeXMLReport(report, TMP_DIR + "/" + runId + "_reportXmlFile.xml");
+    qc.writeXMLReport(report, qcDir + "_qc_tmp/" + runId + "_reportXmlFile.xml");
 
     // Save HTML report
-    qc.writeReport(report, (String) null, TMP_DIR
-        + "/" + runId + "_reportHtmlFile.html");
+    qc.writeReport(report, (String) null, qcDir
+        + "_qc_tmp/" + runId + "_reportHtmlFile.html");
   }
 
   public static void reportQC() throws Exception {
@@ -169,13 +167,6 @@ public class FastqScreenDemo {
     collectorList.add(uncompressFastqCollector);
 
     RunDataGenerator rdg = new RunDataGenerator(collectorList);
-
-    // set paths utils
-    // rdg.setCasavaDesignFile(new File(qcDir));
-    // rdg.setRTAOutputDir(new File(qcDir));
-    // rdg.setCasavaOutputDir(new File(qcDir));
-    // rdg.setQCOutputDir(new File(qcDir + "_qc"));
-    // rdg.setTemporaryDir(new File(TMP_DIR));
 
     // add new property for execute fastqscreen
     properties.put("qc.conf.fastqscreen.genomes", genomes);

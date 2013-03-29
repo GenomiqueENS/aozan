@@ -29,13 +29,15 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
@@ -56,23 +58,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
   private FastqScreen fastqscreen;
 
-  // path for file alias genome which which does correspondance between genome
-  // of sample and reference genome
-  private String aliasGenomePath;
-  // Key in rundata for retrieve the path of alias file
-  private static final String KEY_ALIAS_GENOME_PATH =
-      "qc.conf.genome.alias.path";
-
-  // Correspondance between genome name in casava design file and the reference
-  // genome, if it exists.
-  private static Map<String, String> aliasGenomes;
-  // List with all reference genome identified for a run used by the Aozan test
-  // for the qc report in html
-  private static List<String> genomesToAozanTest;
-  // Genome name to add in alias file
-  private static List<String> genomesToAddInAliasGenomesFile;
   // List of genome for fastqscreen specific of a sample
-  private static List<String> genomesToFastqscreenSample;
+  private static List<String> genomesConfiguration;
 
   @Override
   public String getName() {
@@ -105,45 +92,17 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     super.configure(properties);
 
     this.fastqscreen = new FastqScreen(properties);
-    this.aliasGenomePath = properties.getProperty(KEY_ALIAS_GENOME_PATH);
-
-    // Retrieve contents of alias file
-    createMapAliasGenome();
 
     final Splitter s = Splitter.on(',').trimResults().omitEmptyStrings();
 
-    // Set list of reference genome for fastqscreen and aozan test
+    // Set list of reference genome for fastqscreen
     for (String g : s.split(properties.getProperty(KEY_GENOMES))) {
-      genomesToFastqscreenSample.add(g);
-      genomesToAozanTest.add(g);
+      genomesConfiguration.add(g);
     }
 
-    // List genomesSample contains genomes for all samples to treate
-    // for each, retrieve the reference genome corresponding
-    for (String genomeSample : genomesSample) {
-
-      String alias = aliasGenomes.get(genomeSample);
-      if (aliasGenomes.containsKey(genomeSample)) {
-
-        if (alias.length() > 0) {
-          if (!genomesToAozanTest.contains(alias)) {
-            genomesToAozanTest.add(alias);
-          }
-        }
-
-      } else {
-        // add new genomes in list for update alias genomes file
-        if (!genomesToAddInAliasGenomesFile.contains(genomeSample)) {
-          genomesToAddInAliasGenomesFile.add(genomeSample);
-        }
-      }
-
-    }
-
-    // update alias genomes file
-    updateAliasGenomeFile();
   }
 
+  @Override
   public AbstractFastqProcessThread collectSample(RunData data,
       final FastqSample fastqSample, final File reportDir)
       throws AozanException {
@@ -164,15 +123,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
             + fastqSample.getLane() + "." + fastqSample.getSampleName()
             + ".sample.ref");
 
-    // if genomeSample is present in mapAliasGenome, it add in list of
-    // genomes reference for the mapping
-    genomeSample = genomeSample.trim().toLowerCase();
-    genomeSample = genomeSample.replace('"', '\0');
-    String aliasGenome = "";
-
-    if (aliasGenomes.containsKey(genomeSample)) {
-      aliasGenome = aliasGenomes.get(genomeSample);
-    }
+    String genomeReferenceSample =
+        AliasGenomeFile.getGenomeReferenceCorresponding(genomeSample);
 
     if (paired) {
       // in mode paired FastqScreen should be launched with R1 and R2 together.
@@ -183,96 +135,20 @@ public class FastqScreenCollector extends AbstractFastqCollector {
         if (fastqSampleR2.getKeyFastqSample().equals(prefixRead2)) {
 
           return new FastqScreenProcessThread(fastqSample, fastqSampleR2,
-              fastqscreen, genomesToFastqscreenSample, aliasGenome, reportDir,
-              paired);
+              fastqscreen, genomesConfiguration, genomeReferenceSample,
+              reportDir, paired);
         }
       }
     }
 
     // Call in mode single-end
     return new FastqScreenProcessThread(fastqSample, fastqscreen,
-        genomesToFastqscreenSample, aliasGenome, reportDir, paired);
-  }
-
-  /**
-   * Create a map which does correspondence between genome of sample and
-   * reference genome from a file, the path is in aozan.conf
-   */
-  private void createMapAliasGenome() {
-    try {
-
-      if (this.aliasGenomePath != null) {
-
-        final BufferedReader br =
-            new BufferedReader(new FileReader(new File(this.aliasGenomePath)));
-        String line = null;
-
-        while ((line = br.readLine()) != null) {
-
-          final int pos = line.indexOf('=');
-          if (pos == -1)
-            continue;
-
-          final String key = line.substring(0, pos);
-          final String value = line.substring(pos + 1);
-
-          // Retrieve only genomes identified in Aozan
-          // if (value.length() > 0)
-          aliasGenomes.put(key, value);
-        }
-        br.close();
-      }
-
-    } catch (IOException io) {
-    }
-
-  }
-
-  /**
-   * Add the genome of the sample in the file which does correspondence with
-   * reference genome
-   */
-  private void updateAliasGenomeFile() {
-
-    if (genomesToAddInAliasGenomesFile.isEmpty())
-      return;
-
-    try {
-      if (this.aliasGenomePath != null) {
-
-        final FileWriter fw = new FileWriter(this.aliasGenomePath, true);
-
-        for (String genomeSample : genomesToAddInAliasGenomesFile)
-          fw.write(genomeSample + "=\n");
-
-        fw.flush();
-        fw.close();
-      }
-    } catch (IOException io) {
-      System.out.println(io.getMessage());
-    }
+        genomesConfiguration, genomeReferenceSample, reportDir, paired);
   }
 
   //
   // Getters & Setters
   //
-
-  /**
-   * Get the list with reference genome and all genome from sample used for
-   * fastqscreeen
-   * @return list genome name
-   */
-  public static List<String> getGenomesReferenceSample() {
-    return genomesToAozanTest;
-  }
-
-  /**
-   * Get map with correspondance between genome name et genome reference
-   * @return map genome
-   */
-  public static Map<String, String> getAliasGenomes() {
-    return aliasGenomes;
-  }
 
   @Override
   /**
@@ -291,10 +167,141 @@ public class FastqScreenCollector extends AbstractFastqCollector {
    * Public constructor for FastqScreenCollector
    */
   public FastqScreenCollector() {
-    aliasGenomes = new HashMap<String, String>();
-    genomesToFastqscreenSample = new ArrayList<String>();
-    genomesToAozanTest = new ArrayList<String>();
-    genomesToAddInAliasGenomesFile = new ArrayList<String>();
+    genomesConfiguration = new ArrayList<String>();
   }
 
+  //
+  // Internal class
+  //
+
+  /**
+   * The internal class read the alias genome file. It make correspondence
+   * between genome name in casava design file and the genome name reference
+   * used for identified index of bowtie mapper. 
+   * @author Sandrine Perrin
+   */
+  public static class AliasGenomeFile {
+
+    // Correspondence between genome name in casava design file
+    private static Map<String, String> aliasGenomes = Maps.newHashMap();
+    // Correspondence between genome sample in run and genome name reference
+    private static Map<String, String> aliasGenomesForRun = Maps.newHashMap();
+
+    // Key in rundata for retrieve the path of alias file
+    private static final String KEY_ALIAS_GENOME_PATH =
+        "qc.conf.genome.alias.path";
+
+    public static Set<String> convertListToGenomeReferenceName(final Map<String, String> properties,
+        final Set<String> genomes) {
+
+      Set<String> genomesNameReference = Sets.newHashSet();
+      Set<String> genomesToAddInAliasGenomeFile = Sets.newHashSet();
+
+      File aliasGenomeFile = new File(properties.get(KEY_ALIAS_GENOME_PATH));
+
+      // Initialize map of alias genomes
+      if (aliasGenomeFile.exists())
+        createMapAliasGenome(aliasGenomeFile);
+
+      if (aliasGenomes.isEmpty())
+        // Return a empty set
+        return genomesNameReference;
+
+      for (String genome : genomes) {
+
+        // Check if it exists a name reference for this genome
+        if (aliasGenomes.containsKey(genome)) {
+          String genomeNameReference = aliasGenomes.get(genome);
+          if (genomeNameReference.length() > 0) {
+            genomesNameReference.add(genomeNameReference);
+
+            // Add in map for fastqscreen collector
+            aliasGenomesForRun.put(genome, genomeNameReference);
+          }
+
+        } else {
+          // Genome not present in alias genome file
+          genomesToAddInAliasGenomeFile.add(genome);
+        }
+      }
+
+      // Update alias genomes file
+      updateAliasGenomeFile(aliasGenomeFile, genomesToAddInAliasGenomeFile);
+      return genomesNameReference;
+    }
+
+    /**
+     * Create a map which does correspondence between genome of sample and
+     * reference genome from a file, the path is in aozan.conf
+     * @param aliasGenomeFile file
+     */
+    private static void createMapAliasGenome(File aliasGenomeFile) {
+      try {
+
+        if (aliasGenomeFile.exists()) {
+
+          final BufferedReader br =
+              new BufferedReader(new FileReader(aliasGenomeFile));
+          String line = null;
+
+          while ((line = br.readLine()) != null) {
+
+            final int pos = line.indexOf('=');
+            if (pos == -1)
+              continue;
+
+            final String key = line.substring(0, pos);
+            final String value = line.substring(pos + 1);
+
+            // Retrieve genomes identified in Casava design file
+            // Certain have not genome name reference
+            aliasGenomes.put(key, value);
+          }
+          br.close();
+        }
+
+      } catch (IOException io) {
+      }
+
+    }
+
+    /**
+     * Add the genome of the sample in the file which does correspondence with
+     * reference genome
+     * @param aliasGenomeFile file of alias genomes name
+     * @param genomesToAdd genomes must be added in alias genomes file
+     */
+    private static void updateAliasGenomeFile(File aliasGenomeFile,
+        Set<String> genomesToAdd) {
+
+      // None genome identified
+      if (genomesToAdd.isEmpty())
+        return;
+
+      try {
+        if (aliasGenomeFile.exists()) {
+
+          final FileWriter fw = new FileWriter(aliasGenomeFile, true);
+
+          for (String genomeSample : genomesToAdd)
+            fw.write(genomeSample + "=\n");
+
+          fw.flush();
+          fw.close();
+        }
+      } catch (IOException io) {
+        System.out.println(io.getMessage());
+      }
+    }
+
+    public static String getGenomeReferenceCorresponding(String genome) {
+
+      genome = genome.replaceAll("\"", "").trim().toLowerCase();
+
+      if (aliasGenomesForRun.containsKey(genome))
+        return aliasGenomesForRun.get(genome);
+
+      return "";
+    }
+  }
 }

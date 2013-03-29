@@ -171,10 +171,11 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
           // mode pair-end
           bowtie.map(fastqRead1, fastqRead2, parser);
         }
-        
-        LOGGER.fine("FASTQSCREEN : command lane bowtie "
+
+        LOGGER.fine("FASTQSCREEN : for "
+            + genome + " command lane bowtie "
             + ((AbstractBowtieReadsMapper) bowtie).getCmdLane());
-        
+
         parser.closeMapOutputFile();
 
         this.readsprocessed = parser.getReadsprocessed();

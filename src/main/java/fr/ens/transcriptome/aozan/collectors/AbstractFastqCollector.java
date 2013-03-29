@@ -26,7 +26,6 @@ package fr.ens.transcriptome.aozan.collectors;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
@@ -70,12 +69,11 @@ abstract public class AbstractFastqCollector implements Collector {
   protected static Set<FastqSample> fastqSamples =
       new LinkedHashSet<FastqSample>();
 
-  protected static List<String> genomesSample = new ArrayList<String>();
-
-  private long uncompressedSizeFiles = 0l;
   // mode threaded
   private static final int CHECKING_DELAY_MS = 5000;
   private static final int WAIT_SHUTDOWN_MINUTES = 60;
+
+  private long uncompressedSizeFiles = 0l;
 
   protected List<AbstractFastqProcessThread> threads;
   protected List<Future<? extends AbstractFastqProcessThread>> futureThreads;
@@ -180,7 +178,8 @@ abstract public class AbstractFastqCollector implements Collector {
         }
       }
 
-      System.out.println("multithread " + futureThreads.size());
+      System.out.println(this.getName().toUpperCase()
+          + " : multithread " + futureThreads.size());
 
       if (futureThreads.size() > 0) {
 
@@ -327,10 +326,6 @@ abstract public class AbstractFastqCollector implements Collector {
           fastqSamples.add(fastqSample);
 
           uncompressedSizeFiles += fastqSample.getUncompressedSize();
-
-          // list of genomes from all samples
-          if (!genomesSample.contains(genomeSample))
-            genomesSample.add(genomeSample);
 
         } // sample
       }// lane

@@ -66,7 +66,7 @@ public class FastqScreen {
   private Properties properties;
 
   /**
-   * Mode pair-end : execute fastqscreen count
+   * Mode pair-end : execute fastqscreen
    * @param fastqRead1 fastq file input for mapper
    * @param fastqRead2 fastq file input for mapper
    * @param listGenomes list or reference genome, used by mapper
@@ -83,7 +83,7 @@ public class FastqScreen {
   }
 
   /**
-   * Mode single-end : execute fastqscreen calcul
+   * Mode single-end : execute fastqscreen
    * @param fastqFile fastq file input for mapper
    * @param listGenomes list or reference genome, used by mapper
    * @param genomeSample genome reference corresponding to sample
@@ -123,7 +123,7 @@ public class FastqScreen {
           + (fastqRead2 == null ? "single" : "paired") + " in "
           + toTimeHumanReadable(timer.elapsedMillis()));
 
-      // remove temporary output file use in map-reduce step
+      // Remove temporary output file use in map-reduce step
       new File(tmpDir + "/outputDoReduce.txt").delete();
 
     } catch (IOException e) {

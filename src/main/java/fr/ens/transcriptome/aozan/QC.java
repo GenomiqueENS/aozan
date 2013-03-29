@@ -433,7 +433,7 @@ public class QC {
 
   private final void initGlobalConf(final Map<String, String> properties)
       throws AozanException {
-    
+
     for (final Map.Entry<String, String> e : properties.entrySet()) {
 
       if (e.getKey().startsWith("qc.conf."))
@@ -459,6 +459,7 @@ public class QC {
     this.globalConf.put(CASAVA_OUTPUT_DIR, fastqDir);
     this.globalConf.put(QC_OUTPUT_DIR, qcDir);
     this.globalConf.put(TMP_DIR, tmpDir.getAbsolutePath());
+
   }
 
   /**
