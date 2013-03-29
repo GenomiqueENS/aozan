@@ -119,4 +119,8 @@ public class DesignCollector implements Collector {
     }
   }
 
+  @Override
+  public void clear() {
+    return;
+  }
 }

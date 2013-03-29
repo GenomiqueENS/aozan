@@ -285,4 +285,8 @@ public class FlowcellDemuxSummaryCollector implements Collector {
     }
   }
 
+  @Override
+  public void clear() {
+    return;
+  }
 }

@@ -61,4 +61,9 @@ public interface Collector {
    */
   public void collect(RunData data) throws AozanException;
 
+  /**
+   * Remove temporary files
+   */
+  public void clear();
+
 }

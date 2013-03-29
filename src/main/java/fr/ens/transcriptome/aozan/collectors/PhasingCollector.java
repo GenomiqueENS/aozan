@@ -170,4 +170,8 @@ public class PhasingCollector implements Collector {
     return result;
   }
 
+  @Override
+  public void clear() {
+    return;
+  }
 }

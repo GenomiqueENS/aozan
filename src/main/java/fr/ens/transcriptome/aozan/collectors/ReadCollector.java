@@ -257,4 +257,8 @@ public class ReadCollector implements Collector {
     return sb.toString();
   }
 
+  @Override
+  public void clear() {
+    return;
+  }
 }
