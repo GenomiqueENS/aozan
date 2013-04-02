@@ -40,7 +40,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>13.0</version>
+      <version>14.0.1</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -305,7 +305,7 @@
                 <artifactItem>
                   <groupId>com.google.guava</groupId>
                   <artifactId>guava</artifactId>
-                  <version>r07</version>
+                  <version>14.0.1</version>
                   <overWrite>true</overWrite>
                   <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
                   <destFileName>guava.jar</destFileName>
