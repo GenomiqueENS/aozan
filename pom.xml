@@ -21,6 +21,13 @@
   </organization>
 
   <dependencies>
+    <!-- Warning Jython must be the first dependency -->
+    <dependency>
+      <groupId>org.python</groupId>
+      <artifactId>jython-standalone</artifactId>
+      <version>2.5.3</version>
+      <scope>compile</scope>
+    </dependency>
     <dependency>
       <groupId>fr.ens.transcriptome</groupId>
       <artifactId>eoulsan</artifactId>
@@ -31,12 +38,6 @@
       <artifactId>poi</artifactId>
       <version>3.7</version>
     </dependency> 
-    <dependency>
-      <groupId>jython</groupId>
-      <artifactId>jython</artifactId>
-      <version>2.1</version>
-      <scope>compile</scope>
-    </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
@@ -164,29 +165,8 @@
                 <copy file="${basedir}/target/${pom.artifactId}-${pom.version}.jar" todir="${basedir}/target/dist/lib" />
                 <move file="${basedir}/target/dist/" tofile="${basedir}/target/dist/${pom.artifactId}-${pom.version}"/>
 
-               <property environment="env"/>
-
-                <fail message="JYTHON_HOME environment variable is not set">
-                  <condition>
-                    <or>
-                      <not>
-                        <isset property="env.JYTHON_HOME"/>
-                      </not>
-                      <equals arg1="${env.JYTHON_HOME}" arg2="" />
-                    </or>
-                  </condition>
-                </fail>
-
-                <fileset id="aozan.classpath.files" dir="${basedir}/target/dist/${artifactId}-${version}/lib" includes="*" />
-
-                <pathconvert pathsep=" " property="aozan.classpath" refid="aozan.classpath.files">
-                  <mapper type="flatten"/>
-                </pathconvert>
-
-                <copy file="${env.JYTHON_HOME}/jython.jar" tofile="${basedir}/target/dist/${artifactId}-${version}/lib/jythonlib.jar" />
-                <jar jarfile="${basedir}/target/dist/${artifactId}-${version}/lib/jythonlib.jar" update="true">
-	              <fileset dir="${env.JYTHON_HOME}" includes="Lib/**" />
-	              <fileset dir="${basedir}/src/main/python" includes="*" />
+		<jar jarfile="${basedir}/target/dist/${artifactId}-${version}/lib/jython-standalone-${project.dependencies[0].version}.jar" update="true">
+                      <fileset dir="${basedir}/src/main/python" includes="*" />
                 </jar>
 
                 <!-- Package source distribution -->
@@ -277,7 +257,7 @@
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>eoulsan,poi,guava,fastqc,jbzip2</includeArtifactIds>
+              <includeArtifactIds>jython-standalone,eoulsan,poi,guava,fastqc,jbzip2</includeArtifactIds>
               <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
             </configuration>
           </execution>
