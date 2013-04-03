@@ -40,11 +40,17 @@ fi
 COMMON_LIBS=$(make_paths $LIBDIR)
 PLUGINS_LIBS=$(make_paths $AOZAN_PLUGINS)
 
+# Check if only jython jar exists
+if [ `ls $LIBDIR/jython-standalone-*.jar | wc -l` -ne 1 ]; then
+	echo Error: found more than one jython-standalone jar >&2
+	exit 1
+fi
+
 # Launch Aozan
 $JAVA_CMD \
         $JVM_OPTS \
         -Xmx${MEMORY}m \
         -cp $COMMON_LIBS:$PLUGINS:$PLUGINS_LIBS \
         org.python.util.jython \
-        -jar $LIBDIR/jythonlib.jar "$@"
+        -jar $LIBDIR/jython-standalone-*.jar "$@"
 
