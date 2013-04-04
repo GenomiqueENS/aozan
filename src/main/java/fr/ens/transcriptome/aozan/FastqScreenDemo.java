@@ -108,7 +108,7 @@ public class FastqScreenDemo {
       Main.initLogger(TMP_DIR + "/" + runId + "_aozan_test.log");
       LOGGER.setLevel(Level.ALL);
 
-      System.out.println("Create report qc");
+      System.out.println("Create report qc for run " + runId + "  "+ FastqSample.VALUE);
       // reportQC();
       reportQC2();
 

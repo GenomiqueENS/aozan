@@ -42,6 +42,7 @@ public interface Collector {
    */
   public String getName();
 
+  // TODO REVIEW: May be it is better to return List instead of an array
   /**
    * Get the name of the collectors required to run this collector.
    * @return an array of String with the name of the required collectors

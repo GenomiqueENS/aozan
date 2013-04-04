@@ -98,7 +98,7 @@ public class AliasGenomeFile {
 
   /**
    * Create a map which does correspondence between genome of sample and
-   * reference genome from a file, the path is in aozan.conf
+   * reference genome from a file, the path is in aozan configuration
    * @param aliasGenomeFile file
    */
   private void createMapAliasGenome(File aliasGenomeFile) {
@@ -161,7 +161,7 @@ public class AliasGenomeFile {
   }
 
   /**
-   * Return the reference genome corresponding to the genome sample if it are
+   * Return the reference genome corresponding to the genome sample if it is
    * present in alias genomes file.
    * @param genome name of genome sample
    * @return reference genome corresponding to genome if it exists or empty
@@ -178,8 +178,8 @@ public class AliasGenomeFile {
   }
 
   /**
-   * Create a instance of fastqStorage or if it exists return instance
-   * @return instance of fastqStorage
+   * Create a instance of AliasGenomeFile or if it exists return instance
+   * @return instance of AliasGenomeFile
    */
   public static AliasGenomeFile getInstance() {
 

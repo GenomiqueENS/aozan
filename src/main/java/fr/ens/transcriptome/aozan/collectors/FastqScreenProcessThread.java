@@ -27,13 +27,14 @@ import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Stopwatch;
+import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
@@ -41,13 +42,15 @@ import fr.ens.transcriptome.aozan.fastqscreen.FastqScreen;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreenResult;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
-public class FastqScreenProcessThread extends AbstractFastqProcessThread {
+/**
+ * The private class define a class for a thread that execute fastqScreen for a
+ * sample. It receive results in rundata and create a report file. 
+ * @author Sandrine Perrin
+ */
+class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
-
-  /** Timer */
-  private final Stopwatch timer = new Stopwatch();
 
   private final File reportDir;
   private final FastqScreen fastqscreen;
@@ -61,7 +64,8 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
   @Override
   public void run() {
 
-    timer.start();
+    // Timer
+    final Stopwatch timer = new Stopwatch().start();
 
     LOGGER.fine("FASTQSCREEN : start for " + fastqSample.getKeyFastqSample());
 
@@ -86,6 +90,7 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
   @Override
   protected void createReportFile() throws AozanException, IOException {
 
+    // TODO to remove after test
     System.out.println(resultsFastqscreen.statisticalTableToString());
 
     File fastqScreenFile =
@@ -93,7 +98,7 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
             + "/" + fastqSample.getKeyFastqSample() + "-fastqscreen.txt");
 
     try {
-      BufferedWriter br = new BufferedWriter(new FileWriter(fastqScreenFile));
+      BufferedWriter br = Files.newWriter(fastqScreenFile, Charsets.UTF_8);
       br.append(resultsFastqscreen.statisticalTableToString());
       br.close();
 
@@ -110,6 +115,7 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
   @Override
   protected void processResults() throws AozanException {
 
+    // TODO to remove after test
     System.out.println("lane current "
         + fastqSample.getLane() + "\tsample current "
         + fastqSample.getSampleName() + "\tproject name "
@@ -130,7 +136,7 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
         return;
     }
 
-    // add read2 in command line
+    // Add read2 in command line
     resultsFastqscreen =
         fastqscreen.execute(read1, read2, fastqSample, genomes, genomeSample);
 
@@ -139,7 +145,7 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
           + String.format("/Project_%s/Sample_%s",
               fastqSample.getProjectName(), fastqSample.getSampleName()));
 
-    // create rundata for the sample
+    // Create rundata for the sample
     this.results.put(resultsFastqscreen.createRundata("fastqscreen"
         + fastqSample.getPrefixRundata()));
 
@@ -175,9 +181,7 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
       final File reportDir, final boolean paired) throws AozanException {
 
     this(fastqSampleR1, fastqscreen, genomes, genomeSample, reportDir, paired);
-
     this.fastqSampleR2 = fastqSampleR2;
-
   }
 
   /**
@@ -205,11 +209,11 @@ public class FastqScreenProcessThread extends AbstractFastqProcessThread {
     this.reportDir = reportDir;
     this.paired = paired;
 
-    // copy list genome for fastqscreen
+    // Copy list genome for fastqscreen
     this.genomes = new ArrayList<String>();
     this.genomes.addAll(genomes);
 
-    // add genomeSample in list of genome to fastqscreen
+    // Add genomeSample in list of genome to fastqscreen
     if (this.genomeSample.length() > 0
         && !this.genomes.contains(this.genomeSample))
       this.genomes.add(this.genomeSample);

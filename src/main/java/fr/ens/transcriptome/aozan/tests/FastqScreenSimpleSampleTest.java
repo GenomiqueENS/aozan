@@ -43,12 +43,12 @@ import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignCSVReader;
 /**
  * The class add in the qc report html values from FastqScreen for each sample
  * and for each reference genomes. The list of references genomes contains
- * default references genomes defined in configuration aozan file. It was added
- * the genomes sample for the run included in casava design file, only if it can
- * be used for mapping with bowtie. The alias genomes file make the
- * correspondence between the genome sample and the reference genome used with
- * bowtie, if it exists. The class retrieve the percent of reads mapped on each
- * reference genomes.
+ * default references genomes defined in aozan configuration file. It add the
+ * genomes sample for the run included in casava design file, only if it can be
+ * used for mapping with bowtie. The alias genomes file make the correspondence
+ * between the genome sample and the reference genome used with bowtie, if it
+ * exists. The class retrieve the percent of reads mapped on each reference
+ * genomes.
  * @author Sandrine Perrin
  */
 public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
@@ -107,9 +107,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     if (this.genomeReference.equals(genomeSampleReference))
       return (9 - score);
 
-    // TODO REVIEW unnecessary statement
-    else
-      return score;
+    return score;
   }
 
   @Override
@@ -173,7 +171,8 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
   /**
    * Set reference genomes for the samples of a run. Retrieve list of genomes
-   * sample from casava design file and filtered them from alias genome file.
+   * sample from casava design file and filtered them compared to alias genome
+   * file.
    * @param casavaDesignPath absolute path of the casava design file
    * @param genomeAliasFile absolute path of the alias genomes file
    * @return list genomes references used in FastqScreenCollector

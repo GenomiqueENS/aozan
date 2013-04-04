@@ -58,7 +58,6 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.fastqc.BadTiles;
 import fr.ens.transcriptome.aozan.io.FastqSample;
-import fr.ens.transcriptome.aozan.io.FastqStorage;
 
 /**
  * This private class define a class for a thread that read fastq file for
@@ -70,20 +69,15 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
-  /** Timer **/
-  private Stopwatch timer = new Stopwatch();
-
   private final SequenceFile seqFile;
   private final boolean ignoreFilteredSequences;
   private final List<QCModule> moduleList;
   private final File reportDir;
 
-  private final FastqStorage fastqStorage;
-
   @Override
   public void run() {
-
-    timer.start();
+    // Timer
+    final Stopwatch timer = new Stopwatch().start();
 
     LOGGER.fine("FASTQC : start for " + fastqSample.getKeyFastqSample());
     try {
@@ -243,8 +237,8 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
     new HTMLReportArchive(seqFile, this.moduleList.toArray(new QCModule[] {}),
         reportFile);
 
-    LOGGER
-        .fine("FASTQC : " + fastqSample.getKeyFastqSample() + " creation qc report html");
+    LOGGER.fine("FASTQC : "
+        + fastqSample.getKeyFastqSample() + " creation qc report html");
 
     // Keep only the uncompressed data
     if (reportFile.exists()) {
@@ -270,8 +264,6 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
     this.ignoreFilteredSequences = ignoreFilteredSequences;
     this.reportDir = reportDir;
-
-    this.fastqStorage = FastqStorage.getInstance();
 
     this.seqFile = this.fastqStorage.getSequenceFile(this.fastqSample);
 

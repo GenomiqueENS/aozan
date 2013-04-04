@@ -60,14 +60,14 @@ abstract public class AbstractFastqCollector implements Collector {
   public static final String KEY_READ_COUNT = "run.info.read.count";
   public static final String KEY_READ_X_INDEXED = "run.info.read";
 
-  protected static FastqStorage fastqStorage;
-  protected static String casavaOutputPath;
-  protected static String qcReportOutputPath;
-  protected static String tmpPath;
-  protected static boolean paired = false;
+  protected FastqStorage fastqStorage;
+  protected String casavaOutputPath;
+  protected String qcReportOutputPath;
+  protected String tmpPath;
+  protected boolean paired = false;
 
-  protected static Set<FastqSample> fastqSamples =
-      new LinkedHashSet<FastqSample>();
+  // Set sample to treat
+  protected Set<FastqSample> fastqSamples = new LinkedHashSet<FastqSample>();
 
   // mode threaded
   private static final int CHECKING_DELAY_MS = 5000;
@@ -89,38 +89,42 @@ abstract public class AbstractFastqCollector implements Collector {
       final RunData data, final FastqSample fastqSample, final File reportDir)
       throws AozanException;
 
-  abstract public int getThreadsNumber();
+  /**
+   * Return the number of thread that the collector can be used for execution.
+   * @return number of thread
+   */
+  abstract protected int getThreadsNumber();
 
-  @Override
   /**
    * Get the name of the collector
    * @return the name of the collector
    */
+  @Override
   abstract public String getName();
 
-  @Override
   /**
    * Get the name of the collectors required to run this collector.
    * @return an array of String with the name of the required collectors
    */
+  @Override
   public String[] getCollectorsNamesRequiered() {
     return new String[] {RunInfoCollector.COLLECTOR_NAME,
         DesignCollector.COLLECTOR_NAME};
   }
 
-  @Override
   /**
    * Configure the collector with the path of the run data
    * @param properties object with the collector configuration
    */
+  @Override
   public void configure(Properties properties) {
 
-    casavaOutputPath = properties.getProperty(QC.CASAVA_OUTPUT_DIR);
-    qcReportOutputPath = properties.getProperty(QC.QC_OUTPUT_DIR);
-    tmpPath = properties.getProperty(QC.TMP_DIR);
+    this.casavaOutputPath = properties.getProperty(QC.CASAVA_OUTPUT_DIR);
+    this.qcReportOutputPath = properties.getProperty(QC.QC_OUTPUT_DIR);
+    this.tmpPath = properties.getProperty(QC.TMP_DIR);
 
-    fastqStorage = FastqStorage.getInstance();
-    fastqStorage.setTmpDir(tmpPath);
+    this.fastqStorage = FastqStorage.getInstance();
+    this.fastqStorage.setTmpDir(this.tmpPath);
 
     if (this.getThreadsNumber() > 1) {
 
@@ -133,22 +137,22 @@ abstract public class AbstractFastqCollector implements Collector {
     }
   }
 
-  @Override
   /**
    * Collect data : browse data for call concrete collector,
    * @param data result data object
    * @throws AozanException if an error occurs while collecting data
    */
+  @Override
   public void collect(RunData data) throws AozanException {
     // TODO to remove
     // data = FastqScreenDemo.getRunData();
 
-    controlPreCollect(data, qcReportOutputPath);
+    controlPreCollect(data, this.qcReportOutputPath);
 
     RunData resultPart = null;
     if (this.getThreadsNumber() > 1) {
 
-      for (FastqSample fs : fastqSamples) {
+      for (FastqSample fs : this.fastqSamples) {
         if (fs.getFastqFiles() != null && !fs.getFastqFiles().isEmpty()) {
 
           resultPart = loadResultPart(fs);
@@ -159,7 +163,8 @@ abstract public class AbstractFastqCollector implements Collector {
 
             // Create directory for the sample
             final File reportDir =
-                new File(qcReportOutputPath + "/Project_" + fs.getProjectName());
+                new File(this.qcReportOutputPath
+                    + "/Project_" + fs.getProjectName());
 
             if (!reportDir.exists())
               if (!reportDir.mkdirs())
@@ -171,30 +176,31 @@ abstract public class AbstractFastqCollector implements Collector {
 
             if (thread != null) {
               // Add thread to executor or futureThreads, I don't know
-              threads.add(thread);
-              futureThreads.add(executor.submit(thread, thread));
+              this.threads.add(thread);
+              this.futureThreads.add(this.executor.submit(thread, thread));
             }
           }
         }
       }
 
+      // TODO : remove after test
       System.out.println(this.getName().toUpperCase()
-          + " : multithread " + futureThreads.size());
+          + " : multithread " + this.futureThreads.size());
 
-      if (futureThreads.size() > 0) {
+      if (this.futureThreads.size() > 0) {
 
         // Wait for threads
-        waitThreads(futureThreads, executor);
+        waitThreads(this.futureThreads, this.executor);
 
         // Add results of the threads to the data object
-        for (AbstractFastqProcessThread sft : threads)
+        for (AbstractFastqProcessThread sft : this.threads)
           data.put(sft.getResults());
       }
 
     } else {
 
       // Code without starting threads :
-      for (FastqSample fs : fastqSamples) {
+      for (FastqSample fs : this.fastqSamples) {
         // TODO to remove after text
         if (fs.getFastqFiles() != null && !fs.getFastqFiles().isEmpty()) {
 
@@ -203,7 +209,8 @@ abstract public class AbstractFastqCollector implements Collector {
           if (resultPart == null) {
 
             final File reportDir =
-                new File(qcReportOutputPath + "/Project_" + fs.getProjectName());
+                new File(this.qcReportOutputPath
+                    + "/Project_" + fs.getProjectName());
 
             if (!reportDir.exists())
               if (!reportDir.mkdirs())
@@ -240,36 +247,37 @@ abstract public class AbstractFastqCollector implements Collector {
   private void controlPreCollect(final RunData data,
       final String qcReportOutputPath) throws AozanException {
 
-    if (!fastqSamples.isEmpty())
+    if (!this.fastqSamples.isEmpty())
       return;
 
     LOGGER.fine("Collector fastq : step preparation");
 
-    // Count size from all fastq files util
-    long freeSpace = new File(tmpPath).getFreeSpace();
+    // Count size from all fastq files used
+    long freeSpace = new File(this.tmpPath).getFreeSpace();
+    freeSpace = freeSpace / (1024 * 1024 * 1024);
 
     createListFastqSamples(data);
 
     // Estimate used space : needed space + 5%
-    long uncompressedSizeNeeded =
-        (long) ((double) uncompressedSizeFiles * 1.05);
+    long uncompressedSizeNeeded = (long) (this.uncompressedSizeFiles * 1.05);
+    uncompressedSizeNeeded = uncompressedSizeNeeded / (1024 * 1024 * 1024);
 
     if (uncompressedSizeNeeded > freeSpace)
       throw new AozanException(
           "Not enough disk space to store uncompressed fastq files for step fastqScreen. We are "
               + freeSpace
-              + " in directory "
-              + new File(tmpPath).getAbsolutePath()
+              + " Go in directory "
+              + new File(this.tmpPath).getAbsolutePath()
               + ", and we need "
-              + uncompressedSizeNeeded + ". Echec Aozan");
+              + uncompressedSizeNeeded + " Go. Echec Aozan");
 
     LOGGER
         .fine("Enough disk space to store uncompressed fastq files for step fastqScreen. We are "
-            + Globals.FORMATTER_MILLIER.format(freeSpace)
-            + " in directory "
-            + new File(tmpPath).getAbsolutePath()
+            + freeSpace
+            + " Go in directory "
+            + new File(this.tmpPath).getAbsolutePath()
             + ", and we need "
-            + Globals.FORMATTER_MILLIER.format(uncompressedSizeNeeded));
+            + uncompressedSizeNeeded + " Go.");
 
   }
 
@@ -277,7 +285,6 @@ abstract public class AbstractFastqCollector implements Collector {
    * Estimate the size needed for all uncompresses fastq files and construct the
    * map with all samples to treat.
    * @param data data used
-   * @return
    */
   private void createListFastqSamples(final RunData data) {
 
@@ -286,7 +293,7 @@ abstract public class AbstractFastqCollector implements Collector {
     final int readCount = data.getInt(KEY_READ_COUNT);
     final boolean lastReadIndexed =
         data.getBoolean(KEY_READ_X_INDEXED + readCount + ".indexed");
-    paired = readCount > 1 && !lastReadIndexed;
+    this.paired = readCount > 1 && !lastReadIndexed;
 
     for (int read = 1; read <= readCount; read++) {
 
@@ -321,18 +328,15 @@ abstract public class AbstractFastqCollector implements Collector {
           genomeSample = genomeSample.replace('"', '\0');
 
           FastqSample fastqSample =
-              new FastqSample(casavaOutputPath, read, lane, sampleName,
+              new FastqSample(this.casavaOutputPath, read, lane, sampleName,
                   projectName, index);
-          fastqSamples.add(fastqSample);
+          this.fastqSamples.add(fastqSample);
 
-          uncompressedSizeFiles += fastqSample.getUncompressedSize();
+          this.uncompressedSizeFiles += fastqSample.getUncompressedSize();
 
         } // sample
       }// lane
     }// read
-
-    // Create a unmodifiable linked map
-    // fastqsSamples = Collections.unmodifiableMap(samples);
 
   }
 
@@ -344,7 +348,7 @@ abstract public class AbstractFastqCollector implements Collector {
   private RunData loadResultPart(final FastqSample fastqSample) {
     // Check for data file
     File dataFile =
-        new File(qcReportOutputPath
+        new File(this.qcReportOutputPath
             + "/Project_" + fastqSample.getProjectName() + "/" + getName()
             + "_" + fastqSample.getKeyFastqSample() + ".data");
 
@@ -381,16 +385,14 @@ abstract public class AbstractFastqCollector implements Collector {
 
     try {
       String dataFilePath =
-          qcReportOutputPath
+          this.qcReportOutputPath
               + "/Project_" + fastqSample.getProjectName() + "/" + getName()
               + "_" + fastqSample.getKeyFastqSample() + ".data";
 
-      boolean success = data.createRunDataFile(dataFilePath);
+      data.createRunDataFile(dataFilePath);
 
-      if (success) {
-        LOGGER.fine(this.getName().toUpperCase()
-            + " : " + fastqSample.getKeyFastqSample() + " save data file");
-      }
+      LOGGER.fine(this.getName().toUpperCase()
+          + " : " + fastqSample.getKeyFastqSample() + " save data file");
 
     } catch (IOException ae) {
 
@@ -446,7 +448,11 @@ abstract public class AbstractFastqCollector implements Collector {
 
             } else {
               // if success, save results
-              saveResultPart(st.getFastqSample(), st.getResults());
+              if (!st.isDataSave()) {
+                saveResultPart(st.getFastqSample(), st.getResults());
+                st.setDataSave();
+              }
+
             }
 
           } catch (InterruptedException e) {
@@ -467,21 +473,22 @@ abstract public class AbstractFastqCollector implements Collector {
     executor.shutdown();
   }
 
-  @Override
   /**
    * Clear qc directory after successfully all FastqCollector
    */
+  @Override
   public void clear() {
 
     // Delete temporary uncompress fastq file
-    fastqStorage.clear();
+    this.fastqStorage.clear();
 
     // Delete all data files fastqSample per fastqSample
-    for (FastqSample fs : fastqSamples) {
+    for (FastqSample fs : this.fastqSamples) {
 
       if (!fs.getFastqFiles().isEmpty()) {
         File projectDir =
-            new File(qcReportOutputPath + "/Project_" + fs.getProjectName());
+            new File(this.qcReportOutputPath
+                + "/Project_" + fs.getProjectName());
 
         File[] dataFiles = projectDir.listFiles(new FileFilter() {
 

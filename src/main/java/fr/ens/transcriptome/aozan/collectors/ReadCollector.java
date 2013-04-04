@@ -258,6 +258,5 @@ public class ReadCollector implements Collector {
 
   @Override
   public void clear() {
-    return;
   }
 }

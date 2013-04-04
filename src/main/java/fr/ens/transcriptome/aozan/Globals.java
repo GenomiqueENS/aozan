@@ -108,10 +108,10 @@ public class Globals {
 
   /** Embedded XSL QC stylesheet. */
   public static final String EMBEDDED_QC_XSL = "/aozan.xsl";
-  
+
   /** Default locale of the application. */
   public static final Locale DEFAULT_LOCALE = Locale.US;
-  
+
   /** Format of the log. */
   public static final Formatter LOG_FORMATTER = new Formatter() {
 
@@ -125,8 +125,6 @@ public class Globals {
     }
   };
 
-  /** Format of the log for number **/
-  public static final NumberFormat FORMATTER_MILLIER = new DecimalFormat("#,###");
   //
   // Private constants
   //

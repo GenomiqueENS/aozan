@@ -76,11 +76,10 @@ public class QC {
   private final String qcDir;
   private final String runId;
 
-  private List<Collector> collectors = Lists.newArrayList();
-
-  private List<LaneTest> laneTests = Lists.newArrayList();
-  private List<SampleTest> sampleTests = Lists.newArrayList();
-  private Map<String, String> globalConf = Maps.newHashMap();
+  private final List<Collector> collectors = Lists.newArrayList();
+  private final List<LaneTest> laneTests = Lists.newArrayList();
+  private final List<SampleTest> sampleTests = Lists.newArrayList();
+  private final Map<String, String> globalConf = Maps.newHashMap();
 
   private File tmpDir;
 
@@ -140,7 +139,6 @@ public class QC {
 
       // Create the run data object
       data = rdg.collect();
-
     }
 
     if (data.size() == 0)
@@ -431,6 +429,12 @@ public class QC {
 
   }
 
+  /**
+   * Set global configuration used by collector and aozan tests. It retrieve all
+   * paths present in aozan configuration file.
+   * @param properties aozan configuration file
+   * @throws AozanException if an error occurs while searching paths
+   */
   private final void initGlobalConf(final Map<String, String> properties)
       throws AozanException {
 

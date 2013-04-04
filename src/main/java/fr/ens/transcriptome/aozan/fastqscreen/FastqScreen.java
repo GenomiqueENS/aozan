@@ -51,19 +51,19 @@ public class FastqScreen {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
-  /** Timer */
-  private final Stopwatch timer = new Stopwatch();
-
   protected static final String COUNTER_GROUP = "fastqscreen";
 
+  private static final String KEY_NUMBER_THREAD = "qc.conf.fastqc.threads";
   private static final String KEY_TMP_DIR = "tmp.dir";
+
   private static final String KEY_GENOMES_DESC_PATH =
       "qc.conf.settings.genomes.desc.path";
   private static final String KEY_MAPPERS_INDEXES_PATH =
       "qc.conf.settings.mappers.indexes.path";
   private static final String KEY_GENOMES_PATH = "qc.conf.settings.genomes";
 
-  private Properties properties;
+  private String tmpDir;
+  private int confThreads;
 
   /**
    * Mode pair-end : execute fastqscreen
@@ -94,9 +94,8 @@ public class FastqScreen {
       final List<String> genomes, final String genomeSample)
       throws AozanException {
 
-    timer.start();
-
-    String tmpDir = properties.getProperty(KEY_TMP_DIR);
+    // Timer
+    final Stopwatch timer = new Stopwatch().start();
 
     FastqScreenPseudoMapReduce pmr = new FastqScreenPseudoMapReduce();
     pmr.setMapReduceTemporaryDirectory(new File(tmpDir));
@@ -104,9 +103,10 @@ public class FastqScreen {
     try {
 
       if (fastqRead2 == null)
-        pmr.doMap(fastqRead1, genomes, genomeSample, properties);
+        pmr.doMap(fastqRead1, genomes, genomeSample, tmpDir, confThreads);
       else
-        pmr.doMap(fastqRead1, fastqRead2, genomes, genomeSample, properties);
+        pmr.doMap(fastqRead1, fastqRead2, genomes, genomeSample, tmpDir,
+            confThreads);
 
       LOGGER.fine("FASTQSCREEN : step map for "
           + fastqSample.getKeyFastqSample() + " in mode "
@@ -150,8 +150,15 @@ public class FastqScreen {
    */
   public FastqScreen(final Properties properties) {
 
-    this.properties = properties;
+    this.tmpDir = properties.getProperty(KEY_TMP_DIR);
 
+    if (properties.containsKey(KEY_TMP_DIR)) {
+      try {
+        confThreads =
+            Integer.parseInt(properties.getProperty(KEY_NUMBER_THREAD));
+      } catch (Exception e) {
+      }
+    }
     try {
       // init EoulsanRuntime, it is necessary to use the implementation of
       // bowtie in Eoulsan
