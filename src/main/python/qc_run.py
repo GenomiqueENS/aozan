@@ -135,6 +135,10 @@ def qc(run_id, conf):
                   + StringUtils.join(exp.getStackTrace(), '\n\t'), conf)
             return False
 
+    # Remove tmp extension of temporary qc directory
+    os.rename(qc_output_dir, qc_output_dir[:-len(tmp_extension)])
+    qc_output_dir = qc_output_dir[:-len(tmp_extension)]
+    
     # Write the HTML report
     html_report_file = qc_output_dir + '/' + run_id + '.html'
     try:
@@ -150,8 +154,12 @@ def qc(run_id, conf):
               + StringUtils.join(exp.getStackTrace(), '\n\t'), conf)
         return False
 
-    # Remove tmp extension of temporary qc directory
-    os.rename(qc_output_dir, qc_output_dir[:len(tmp_extension)])
+    # Check if the report has been generated
+    if not os.path.exists(html_report_file):
+        error("error while computing qc report for run " + run_id + ".", "No html report generated", conf)
+        return False
+
+    
 
     # Archive the reports
     cmd = 'cd ' + reports_data_path + '  && ' + \
