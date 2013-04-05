@@ -11,9 +11,10 @@ import common, hiseq_run, sync_run, demux_run, qc_run
 from java.util import Locale
 import first_base_report
 from java.util import LinkedHashMap
+from java.io import File
 from fr.ens.transcriptome.aozan import Globals
 from fr.ens.transcriptome.aozan import Main
-
+from fr.ens.transcriptome.eoulsan.illumina import RunInfo
 
 def create_lock_file(lock_file_path):
     """Create the lock file.
@@ -84,7 +85,42 @@ def discover_new_run(conf):
             first_base_report.add_run_id_to_processed_run_ids(run_id, conf)
             first_base_report_sent.add(run_id)
 
+    #
+    # Check space free and space needed for a current run
+    #
+    
+    # Retrieve path files
+    run62 = '130214_SNL110_0062_AD1GKTACXX'
+    run38 = '120301_SNL110_0038_AD0EJRABXX'
+    
+    hiseq_run_path = conf['hiseq.data.path'] + '/' + run62
+    bcl_run_path = conf['bcl.data.path'] + '/' + run38
+    fastq_run_path = conf['fastq.data.path'] + '/' + run38
+    space_report_file = conf['space_used_report_path']
+    
+    # Read RunInfo.xml
+    run_info_path = hiseq_run_path + "/RunInfo.xml"
+    run_info = RunInfo()
+    run_info.parse(File(run_info_path))
 
+    # TEST print info from RunInfo.xml
+    
+    read_count = run_info.getReads().size()
+    lane_count = run_info.getFlowCellLaneCount()
+    
+    cycle_count = 0
+    for read in run_info.getReads():
+        cycle_count = cycle_count + read.getNumberCycles()
+    
+    txt = 'run' + run62 + '\tread ' + str(read_count) + '\tlane' + str(lane_count) + '\tcycle' + str(cycle_count)
+    common.log('FINE', 'TEST CODE PYTHON ' + txt , conf)
+   
+    txt = 'path bcl ' + bcl_run_path + '\t path fastq ' + fastq_run_path
+    common.log('FINE', 'TEST CODE PYTHON ' + txt , conf)
+   
+    txt = 'space used for bcl ' + str(common.du(bcl_run_path)) + '\tfor space ' + str(common.du(fastq_run_path))
+    common.log('FINE', 'TEST CODE PYTHON ' + txt , conf)
+    
     #
     # Discover hiseq run done
     #
@@ -234,7 +270,7 @@ def aozan_main(conf_file_path):
                 traceback_msg = traceback.format_exc(sys.exc_info()[2]).replace('\n', ' ')
                 
                 # Log the exception
-                common.log('SEVERE', 'Exception: ' +  exception_msg, conf)
+                common.log('SEVERE', 'Exception: ' + exception_msg, conf)
                 common.log('WARNING', traceback_msg, conf)
                 
                 # Send a mail with the exception
@@ -242,7 +278,7 @@ def aozan_main(conf_file_path):
     else:
         print "A lock file exists."
         if not os.path.exists('/proc/%d' % (load_pid_in_lock_file(lock_file_path))):
-            common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf['lock.file'] +
+            common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf['lock.file'] + 
                          ". Please investigate last error and then remove the lock file.", conf['aozan.var.path'] + '/aozan.lasterr', conf)
 
 

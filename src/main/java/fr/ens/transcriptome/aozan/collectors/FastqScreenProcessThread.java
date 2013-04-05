@@ -108,6 +108,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
         fastqScreenFile.delete();
 
     }
+    
     LOGGER.fine("FASTQSCREEN : for "
         + fastqSample.getKeyFastqSample() + " report fastqscreen");
   }

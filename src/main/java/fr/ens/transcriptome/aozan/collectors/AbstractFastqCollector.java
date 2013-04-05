@@ -66,8 +66,9 @@ abstract public class AbstractFastqCollector implements Collector {
   protected String tmpPath;
   protected boolean paired = false;
 
-  // Set sample to treat
-  protected Set<FastqSample> fastqSamples = new LinkedHashSet<FastqSample>();
+  // Set samples to treat
+  protected static Set<FastqSample> fastqSamples =
+      new LinkedHashSet<FastqSample>();
 
   // mode threaded
   private static final int CHECKING_DELAY_MS = 5000;

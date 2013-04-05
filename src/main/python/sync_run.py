@@ -66,7 +66,6 @@ def sync(run_id, conf):
         error('HiSeq run data not found', 'HiSeq data for run ' + run_id + 'not found in HiSeq directories (' + conf['hiseq.data.path'] + ')', conf)
         return False
 
-
     # Check if hiseq_data_path exists
     if not os.path.exists(hiseq_data_path):
         error("HiSeq directory does not exists", "HiSeq directory does not exists: " + hiseq_data_path, conf)
@@ -118,6 +117,7 @@ def sync(run_id, conf):
     if common.df(reports_data_base_path) < 10 * 1024 * 1024 * 1024:
         error("Not enough disk space to store aozan reports for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
               '.\nNeed more than 10 Gb on ' + reports_data_base_path + '.', conf)
+        return False
 
     # exclude CIF files ?
     if conf['rsync.exclude.cif'].lower().strip() == 'true':

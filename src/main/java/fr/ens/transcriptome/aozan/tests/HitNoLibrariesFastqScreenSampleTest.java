@@ -58,6 +58,7 @@ public class HitNoLibrariesFastqScreenSampleTest extends
     return Double.class;
   }
 
+  @SuppressWarnings("unused")
   protected Number transformValue(final Number value, final RunData data,
       final int read, final boolean indexedRead, final int lane) {
 

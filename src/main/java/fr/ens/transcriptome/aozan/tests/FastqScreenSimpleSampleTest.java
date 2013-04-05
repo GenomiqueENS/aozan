@@ -195,8 +195,11 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     }
 
     // Retrieve all genome sample included in casava design file
-    for (CasavaSample casavaSample : casavaDesign)
-      genomesFromCasavaDesign.add(casavaSample.getSampleRef());
+    for (CasavaSample casavaSample : casavaDesign) {
+      String genomeSample =
+          casavaSample.getSampleRef().replaceAll("\"", "").trim().toLowerCase();
+      genomesFromCasavaDesign.add(genomeSample);
+    }
 
     // Retrieve list of corresponding reference genome from casava design file
     return AliasGenomeFile.getInstance().convertListToGenomeReferenceName(
