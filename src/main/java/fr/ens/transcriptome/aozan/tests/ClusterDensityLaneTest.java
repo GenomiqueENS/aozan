@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
@@ -47,7 +47,7 @@ public class ClusterDensityLaneTest extends AbstractLaneTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return Lists.newArrayList(ReadCollector.COLLECTOR_NAME);
+    return ImmutableList.of(ReadCollector.COLLECTOR_NAME);
   }
 
   @Override

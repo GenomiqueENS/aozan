@@ -62,7 +62,7 @@ public interface AozanTest {
 
   /**
    * Get the name of the collectors required for the test.
-   * @return an array of String with the name of the required collectors
+   * @return a list of String with the name of the required collectors
    */
   public List<String> getCollectorsNamesRequiered();
 

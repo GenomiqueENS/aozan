@@ -43,7 +43,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -72,7 +72,7 @@ public class ReadCollector implements Collector {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME);
+    return ImmutableList.of(RunInfoCollector.COLLECTOR_NAME);
   }
 
   @Override

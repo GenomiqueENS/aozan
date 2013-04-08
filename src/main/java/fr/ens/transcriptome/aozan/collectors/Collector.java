@@ -45,7 +45,7 @@ public interface Collector {
 
   /**
    * Get the name of the collectors required to run this collector.
-   * @return an array of String with the name of the required collectors
+   * @return a list of String with the name of the required collectors
    */
   public List<String> getCollectorsNamesRequiered();
 

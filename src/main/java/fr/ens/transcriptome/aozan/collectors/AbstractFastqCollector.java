@@ -105,7 +105,7 @@ abstract public class AbstractFastqCollector implements Collector {
 
   /**
    * Get the name of the collectors required to run this collector.
-   * @return an array of String with the name of the required collectors
+   * @return a list of String with the name of the required collectors
    */
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -153,7 +153,7 @@ abstract public class AbstractFastqCollector implements Collector {
     RunData resultPart = null;
     if (this.getThreadsNumber() > 1) {
 
-      for (FastqSample fs : this.fastqSamples) {
+      for (FastqSample fs : fastqSamples) {
         if (fs.getFastqFiles() != null && !fs.getFastqFiles().isEmpty()) {
 
           resultPart = loadResultPart(fs);
@@ -201,7 +201,7 @@ abstract public class AbstractFastqCollector implements Collector {
     } else {
 
       // Code without starting threads :
-      for (FastqSample fs : this.fastqSamples) {
+      for (FastqSample fs : fastqSamples) {
         // TODO to remove after text
         if (fs.getFastqFiles() != null && !fs.getFastqFiles().isEmpty()) {
 
@@ -248,7 +248,7 @@ abstract public class AbstractFastqCollector implements Collector {
   private void controlPreCollect(final RunData data,
       final String qcReportOutputPath) throws AozanException {
 
-    if (!this.fastqSamples.isEmpty())
+    if (!fastqSamples.isEmpty())
       return;
 
     LOGGER.fine("Collector fastq : step preparation");
@@ -331,7 +331,7 @@ abstract public class AbstractFastqCollector implements Collector {
           FastqSample fastqSample =
               new FastqSample(this.casavaOutputPath, read, lane, sampleName,
                   projectName, index);
-          this.fastqSamples.add(fastqSample);
+          fastqSamples.add(fastqSample);
 
           this.uncompressedSizeFiles += fastqSample.getUncompressedSize();
 
@@ -484,7 +484,7 @@ abstract public class AbstractFastqCollector implements Collector {
     this.fastqStorage.clear();
 
     // Delete all data files fastqSample per fastqSample
-    for (FastqSample fs : this.fastqSamples) {
+    for (FastqSample fs : fastqSamples) {
 
       if (!fs.getFastqFiles().isEmpty()) {
         File projectDir =

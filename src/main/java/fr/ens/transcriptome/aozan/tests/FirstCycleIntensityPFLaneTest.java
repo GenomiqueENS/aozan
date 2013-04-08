@@ -26,7 +26,7 @@ package fr.ens.transcriptome.aozan.tests;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 
@@ -40,7 +40,7 @@ public class FirstCycleIntensityPFLaneTest extends AbstractSimpleLaneTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return Lists.newArrayList(ReadCollector.COLLECTOR_NAME);
+    return ImmutableList.of(ReadCollector.COLLECTOR_NAME);
   }
 
   @Override

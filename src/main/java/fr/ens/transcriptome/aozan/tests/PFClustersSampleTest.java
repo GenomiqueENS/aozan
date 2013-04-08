@@ -26,7 +26,7 @@ package fr.ens.transcriptome.aozan.tests;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.collectors.FlowcellDemuxSummaryCollector;
 
@@ -40,7 +40,7 @@ public class PFClustersSampleTest extends AbstractSimpleSampleTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return Lists.newArrayList(FlowcellDemuxSummaryCollector.COLLECTOR_NAME);
+    return ImmutableList.of(FlowcellDemuxSummaryCollector.COLLECTOR_NAME);
   }
 
   @Override

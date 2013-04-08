@@ -25,6 +25,7 @@ package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -69,7 +70,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     result.add(FastQCCollector.COLLECTOR_NAME);
     result.add(UncompressFastqCollector.COLLECTOR_NAME);
 
-    return result;
+    return Collections.unmodifiableList(result);
 
   }
 

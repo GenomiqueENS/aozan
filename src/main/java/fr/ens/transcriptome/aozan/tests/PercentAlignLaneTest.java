@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -49,7 +50,7 @@ public class PercentAlignLaneTest extends AbstractLaneTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return Lists.newArrayList(ReadCollector.COLLECTOR_NAME,
+    return ImmutableList.of(ReadCollector.COLLECTOR_NAME,
         DesignCollector.COLLECTOR_NAME);
   }
 

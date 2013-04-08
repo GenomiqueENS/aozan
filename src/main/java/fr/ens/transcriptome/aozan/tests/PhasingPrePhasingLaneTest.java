@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -90,7 +91,7 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return Lists.newArrayList(PhasingCollector.COLLECTOR_NAME);
+    return ImmutableList.of(PhasingCollector.COLLECTOR_NAME);
   }
 
   //

@@ -26,7 +26,7 @@ package fr.ens.transcriptome.aozan.tests;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.FastQCCollector;
@@ -78,7 +78,7 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return Lists.newArrayList(FastQCCollector.COLLECTOR_NAME);
+    return ImmutableList.of(FastQCCollector.COLLECTOR_NAME);
   }
 
   /**
