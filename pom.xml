@@ -4,7 +4,7 @@
 
   <groupId>fr.ens.transcriptome</groupId>
   <artifactId>aozan</artifactId>
-  <version>0.10</version>
+  <version>0.11-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Aozan</name>
@@ -31,7 +31,7 @@
     <dependency>
       <groupId>fr.ens.transcriptome</groupId>
       <artifactId>eoulsan</artifactId>
-      <version>1.2.1-SNAPSHOT</version>
+      <version>1.2-SNAPSHOT</version>
     </dependency> 
     <dependency>
       <groupId>org.apache.poi</groupId>
@@ -177,7 +177,7 @@
                 <copy file="${basedir}/target/${pom.artifactId}-${pom.version}.jar" todir="${basedir}/target/dist/lib" />
                 <move file="${basedir}/target/dist/" tofile="${basedir}/target/dist/${pom.artifactId}-${pom.version}"/>
 
-		<jar jarfile="${basedir}/target/dist/${artifactId}-${version}/lib/jython-standalone-${project.dependencies[0].version}.jar" update="true">
+		<jar jarfile="${basedir}/target/dist/${artifactId}-${version}/lib/jython-standalone-2.5.3.jar" update="true">
                       <fileset dir="${basedir}/src/main/python" includes="*" />
                 </jar>
 
@@ -269,7 +269,7 @@
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>jython-standalone,eoulsan,poi,guava,fastqc,jbzip2</includeArtifactIds>
+              <includeArtifactIds>jython-standalone,eoulsan,poi,guava,fastqc,jbzip2,commons-compress,sam</includeArtifactIds>
               <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
             </configuration>
           </execution>
