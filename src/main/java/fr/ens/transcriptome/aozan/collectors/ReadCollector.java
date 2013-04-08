@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -42,6 +43,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -68,9 +70,9 @@ public class ReadCollector implements Collector {
   }
 
   @Override
-  public String[] getCollectorsNamesRequiered() {
+  public List<String> getCollectorsNamesRequiered() {
 
-    return new String[] {RunInfoCollector.COLLECTOR_NAME};
+    return Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME);
   }
 
   @Override

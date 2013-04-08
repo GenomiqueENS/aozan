@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Properties;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
@@ -64,14 +63,13 @@ public class FastqScreenCollector extends AbstractFastqCollector {
    * @return list of names collector
    */
   @Override
-  public String[] getCollectorsNamesRequiered() {
+  public List<String> getCollectorsNamesRequiered() {
 
-    List<String> result =
-        Lists.newArrayList(super.getCollectorsNamesRequiered());
+    List<String> result = super.getCollectorsNamesRequiered();
     result.add(FastQCCollector.COLLECTOR_NAME);
     result.add(UncompressFastqCollector.COLLECTOR_NAME);
 
-    return result.toArray(new String[] {});
+    return result;
 
   }
 
@@ -106,7 +104,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
       // TODO fix after test : throw an AozanException
       // throw new AozanException("No fastq files defined for fastqSample "
-      //    + fastqSample.getKeyFastqSample());
+      // + fastqSample.getKeyFastqSample());
     }
 
     // Create the thread object only if the fastq sample correspond to a R1

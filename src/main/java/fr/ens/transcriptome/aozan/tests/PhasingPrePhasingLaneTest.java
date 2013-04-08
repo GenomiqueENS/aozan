@@ -88,9 +88,9 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
   }
 
   @Override
-  public String[] getCollectorsNamesRequiered() {
+  public List<String> getCollectorsNamesRequiered() {
 
-    return new String[] {PhasingCollector.COLLECTOR_NAME};
+    return Lists.newArrayList(PhasingCollector.COLLECTOR_NAME);
   }
 
   //

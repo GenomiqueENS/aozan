@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -60,8 +61,8 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   private String genomeReference;
 
   @Override
-  public String[] getCollectorsNamesRequiered() {
-    return new String[] {FastqScreenCollector.COLLECTOR_NAME};
+  public List<String> getCollectorsNamesRequiered() {
+    return Lists.newArrayList(FastqScreenCollector.COLLECTOR_NAME);
   }
 
   @Override

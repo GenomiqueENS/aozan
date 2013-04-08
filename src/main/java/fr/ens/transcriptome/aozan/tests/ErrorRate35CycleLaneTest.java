@@ -24,6 +24,10 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 
@@ -35,9 +39,9 @@ import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 public class ErrorRate35CycleLaneTest extends AbstractSimpleLaneTest {
 
   @Override
-  public String[] getCollectorsNamesRequiered() {
+  public List<String> getCollectorsNamesRequiered() {
 
-    return new String[] {ReadCollector.COLLECTOR_NAME};
+    return Lists.newArrayList(ReadCollector.COLLECTOR_NAME);
   }
 
   @Override
@@ -74,7 +78,7 @@ public class ErrorRate35CycleLaneTest extends AbstractSimpleLaneTest {
    */
   public ErrorRate35CycleLaneTest() {
 
-    super("errorrate35cycle", "", "Error Rate 35 cycles","%");
+    super("errorrate35cycle", "", "Error Rate 35 cycles", "%");
   }
 
 }

@@ -59,7 +59,7 @@ public class DesignCollector implements Collector {
   }
 
   @Override
-  public String[] getCollectorsNamesRequiered() {
+  public List<String> getCollectorsNamesRequiered() {
 
     return null;
   }

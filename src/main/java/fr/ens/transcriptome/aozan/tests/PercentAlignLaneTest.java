@@ -47,10 +47,10 @@ public class PercentAlignLaneTest extends AbstractLaneTest {
   private final ScoreInterval interval = new ScoreInterval();
 
   @Override
-  public String[] getCollectorsNamesRequiered() {
+  public List<String> getCollectorsNamesRequiered() {
 
-    return new String[] {ReadCollector.COLLECTOR_NAME,
-        DesignCollector.COLLECTOR_NAME};
+    return Lists.newArrayList(ReadCollector.COLLECTOR_NAME,
+        DesignCollector.COLLECTOR_NAME);
   }
 
   @Override

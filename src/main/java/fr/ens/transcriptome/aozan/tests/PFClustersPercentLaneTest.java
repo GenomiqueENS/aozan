@@ -28,6 +28,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
+
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
@@ -43,9 +45,9 @@ public class PFClustersPercentLaneTest extends AbstractLaneTest {
   private final ScoreInterval interval = new ScoreInterval();
 
   @Override
-  public String[] getCollectorsNamesRequiered() {
+  public List<String> getCollectorsNamesRequiered() {
 
-    return new String[] {ReadCollector.COLLECTOR_NAME};
+    return Lists.newArrayList(ReadCollector.COLLECTOR_NAME);
   }
 
   @Override

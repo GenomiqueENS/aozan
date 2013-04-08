@@ -26,6 +26,7 @@ package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -59,7 +60,7 @@ public class RunInfoCollector implements Collector {
   }
 
   @Override
-  public String[] getCollectorsNamesRequiered() {
+  public List<String> getCollectorsNamesRequiered() {
 
     return null;
   }

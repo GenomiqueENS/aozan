@@ -24,6 +24,10 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.FastQCCollector;
 
@@ -72,9 +76,9 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
   }
 
   @Override
-  public String[] getCollectorsNamesRequiered() {
+  public List<String> getCollectorsNamesRequiered() {
 
-    return new String[] {FastQCCollector.COLLECTOR_NAME};
+    return Lists.newArrayList(FastQCCollector.COLLECTOR_NAME);
   }
 
   /**

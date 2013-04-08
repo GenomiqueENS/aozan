@@ -472,7 +472,7 @@ public class QC {
    * @return a set of collectors objects
    * @throws AozanException if an error occurs while creating a collector
    */
-  private Set<Collector> getCollectors(String[] collectorNames)
+  private Set<Collector> getCollectors(List<String> collectorNames)
       throws AozanException {
 
     if (collectorNames == null)
@@ -502,7 +502,7 @@ public class QC {
    * @param collectors a set of collector
    * @throws AozanException if an error occurs while creating a collector
    */
-  private void addCollectors(final String[] collectorNamesRequired,
+  private void addCollectors(final List<String> collectorNamesRequired,
       final Set<Collector> collectors) throws AozanException {
 
     for (final Collector c : getCollectors(collectorNamesRequired)) {

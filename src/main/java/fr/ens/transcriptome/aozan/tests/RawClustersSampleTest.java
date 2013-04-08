@@ -24,6 +24,10 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import fr.ens.transcriptome.aozan.collectors.FlowcellDemuxSummaryCollector;
 
 /**
@@ -34,9 +38,9 @@ import fr.ens.transcriptome.aozan.collectors.FlowcellDemuxSummaryCollector;
 public class RawClustersSampleTest extends AbstractSimpleSampleTest {
 
   @Override
-  public String[] getCollectorsNamesRequiered() {
+  public List<String> getCollectorsNamesRequiered() {
 
-    return new String[] {FlowcellDemuxSummaryCollector.COLLECTOR_NAME};
+    return Lists.newArrayList(FlowcellDemuxSummaryCollector.COLLECTOR_NAME);
   }
 
   @Override

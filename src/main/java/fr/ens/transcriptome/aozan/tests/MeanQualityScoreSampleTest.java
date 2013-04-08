@@ -28,6 +28,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
+
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.FlowcellDemuxSummaryCollector;
@@ -43,9 +45,9 @@ public class MeanQualityScoreSampleTest extends AbstractSampleTest {
   private ScoreInterval interval = new ScoreInterval();
 
   @Override
-  public String[] getCollectorsNamesRequiered() {
+  public List<String> getCollectorsNamesRequiered() {
 
-    return new String[] {FlowcellDemuxSummaryCollector.COLLECTOR_NAME};
+    return Lists.newArrayList(FlowcellDemuxSummaryCollector.COLLECTOR_NAME);
   }
 
   @Override

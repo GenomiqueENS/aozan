@@ -58,13 +58,12 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
    * @return list of names collector
    */
   @Override
-  public String[] getCollectorsNamesRequiered() {
+  public List<String> getCollectorsNamesRequiered() {
 
-    List<String> result =
-        Lists.newArrayList(super.getCollectorsNamesRequiered());
+    List<String> result = super.getCollectorsNamesRequiered();
     result.add(FastQCCollector.COLLECTOR_NAME);
 
-    return result.toArray(new String[] {});
+    return result;
 
   }
 

@@ -108,9 +108,9 @@ abstract public class AbstractFastqCollector implements Collector {
    * @return an array of String with the name of the required collectors
    */
   @Override
-  public String[] getCollectorsNamesRequiered() {
-    return new String[] {RunInfoCollector.COLLECTOR_NAME,
-        DesignCollector.COLLECTOR_NAME};
+  public List<String> getCollectorsNamesRequiered() {
+    return Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME,
+        DesignCollector.COLLECTOR_NAME);
   }
 
   /**

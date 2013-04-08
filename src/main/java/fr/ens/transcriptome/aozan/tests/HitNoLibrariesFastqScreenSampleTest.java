@@ -23,6 +23,10 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
 
@@ -36,8 +40,8 @@ public class HitNoLibrariesFastqScreenSampleTest extends
     AbstractSimpleSampleTest {
 
   @Override
-  public String[] getCollectorsNamesRequiered() {
-    return new String[] {FastqScreenCollector.COLLECTOR_NAME};
+  public List<String> getCollectorsNamesRequiered() {
+    return Lists.newArrayList(FastqScreenCollector.COLLECTOR_NAME);
   }
 
   @Override
