@@ -115,8 +115,9 @@ class UncompressFastqThread extends AbstractFastqProcessThread {
     File tmpFastqFile =
         new File(fastqStorage.getTemporaryFile(fastqSample) + ".tmp");
 
-    if (!tmpFastqFile.exists()) {
+    if (!new File(fastqStorage.getTemporaryFile(fastqSample)).exists()) {
       // Uncompresses and compiles files of array in new temporary files
+
       try {
 
         OutputStream out = new FileOutputStream(tmpFastqFile);

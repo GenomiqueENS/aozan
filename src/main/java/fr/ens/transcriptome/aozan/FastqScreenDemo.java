@@ -78,7 +78,7 @@ public class FastqScreenDemo {
 
   public static RunData data = null;
   public static Map<String, FastqSample> prefixList;
-  private static boolean paired = false;
+  private static boolean paired = true;
 
   static String runId;
   static String date;
@@ -93,7 +93,8 @@ public class FastqScreenDemo {
 
       if (paired) {
         // run test pair-end
-        runId = "120830_SNL110_0055_AD16D9ACXX";
+        // runId = "120830_SNL110_0055_AD16D9ACXX";
+        runId = "130219_SNL110_0063_AD1TNBACXX";
       } else {
         // run test single-end
         // runId = "120301_SNL110_0038_AD0EJRABXX";
@@ -108,7 +109,8 @@ public class FastqScreenDemo {
       Main.initLogger(TMP_DIR + "/" + runId + "_aozan_test.log");
       LOGGER.setLevel(Level.ALL);
 
-      System.out.println("Create report qc for run " + runId + "  "+ FastqSample.VALUE);
+      System.out.println("Create report qc for run "
+          + runId + "  " + FastqSample.VALUE);
       // reportQC();
       reportQC2();
 
@@ -127,9 +129,11 @@ public class FastqScreenDemo {
   public static void reportQC2() throws Exception {
 
     qcDir = SRC_RUN + "/qc_" + runId + "/" + runId;
+    String fastqDir = "/home/sperrin/shares-net/sequencages/fastq/" + runId;
+    // String bclDir, String fastqDir, String qcDir, File tmpDir
 
     QC qc =
-        new QC(getMapAozanConf(), qcDir, qcDir, qcDir + "_qc_tmp", TMP_DIR,
+        new QC(getMapAozanConf(), qcDir, fastqDir, qcDir + "_qc_tmp", TMP_DIR,
             runId);
 
     // Compute report

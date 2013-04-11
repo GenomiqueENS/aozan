@@ -59,12 +59,12 @@ abstract public class AbstractFastqCollector implements Collector {
 
   public static final String KEY_READ_COUNT = "run.info.read.count";
   public static final String KEY_READ_X_INDEXED = "run.info.read";
+  protected static boolean paired = false;
 
   protected FastqStorage fastqStorage;
   protected String casavaOutputPath;
   protected String qcReportOutputPath;
   protected String tmpPath;
-  protected boolean paired = false;
 
   // Set samples to treat
   protected static Set<FastqSample> fastqSamples =
@@ -294,6 +294,7 @@ abstract public class AbstractFastqCollector implements Collector {
     final int readCount = data.getInt(KEY_READ_COUNT);
     final boolean lastReadIndexed =
         data.getBoolean(KEY_READ_X_INDEXED + readCount + ".indexed");
+
     this.paired = readCount > 1 && !lastReadIndexed;
 
     for (int read = 1; read <= readCount; read++) {
@@ -336,6 +337,7 @@ abstract public class AbstractFastqCollector implements Collector {
           this.uncompressedSizeFiles += fastqSample.getUncompressedSize();
 
         } // sample
+
       }// lane
     }// read
 
@@ -372,6 +374,8 @@ abstract public class AbstractFastqCollector implements Collector {
           + this.getName().toUpperCase()
           + " : Error during reading data file for the sample "
           + fastqSample.getKeyFastqSample());
+
+      return null;
     }
     return data;
   }

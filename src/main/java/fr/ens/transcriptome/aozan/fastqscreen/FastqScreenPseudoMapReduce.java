@@ -82,15 +82,16 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @param listGenomes list of reference genome
    * @param genomeSample genome reference corresponding to sample
    * @param properties properties for mapping
+   * @param paired true if a pair-end run else false
    * @throws AozanException if an error occurs while mapping
    * @throws BadBioEntryException if an error occurs while creating index genome
    */
-  public void doMap(File fastqRead, List<String> listGenomes,
-      final String genomeSample, String tmpDir, int numberThreads)
-      throws AozanException, BadBioEntryException {
+  public void doMap(final File fastqRead, final List<String> listGenomes,
+      final String genomeSample, final String tmpDir, final int numberThreads,
+      final boolean paired) throws AozanException, BadBioEntryException {
 
     this.doMap(fastqRead, null, listGenomes, genomeSample, tmpDir,
-        numberThreads);
+        numberThreads, paired);
   }
 
   /**
@@ -101,26 +102,25 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @param listGenomes list of genome reference
    * @param genomeSample genome reference corresponding to sample
    * @param properties properties for mapping
+   * @param paired true if a pair-end run else false
    * @throws AozanException if an error occurs while mapping
    * @throws BadBioEntryException if an error occurs while creating index genome
    */
-  public void doMap(File fastqRead1, File fastqRead2, List<String> listGenomes,
-      final String genomeSample, String tmpDir, int numberThreads)
+  public void doMap(final File fastqRead1, final File fastqRead2,
+      final List<String> listGenomes, final String genomeSample,
+      final String tmpDir, final int numberThreads, final boolean paired)
       throws AozanException, BadBioEntryException {
-
-    // Timer : for step mapping on genome
-    final Stopwatch timer = new Stopwatch().start();
-
-    final boolean pairend = fastqRead2 == null ? false : true;
 
     // change mapper arguments
     final String newArgumentsMapper =
-        " -l 20 -k 2 --chunkmbs 512" + (pairend ? " --maxins 1000" : "");
+        " -l 20 -k 2 --chunkmbs 512" + (paired ? " --maxins 1000" : "");
 
     if (numberThreads > 0)
       mapperThreads = numberThreads;
 
     for (String genome : listGenomes) {
+      // Timer : for step mapping on genome
+      final Stopwatch timer = new Stopwatch().start();
 
       try {
         DataFile genomeFile = new DataFile("genome://" + genome);
@@ -130,7 +130,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
         FastsqScreenSAMParser parser =
             new FastsqScreenSAMParser(this.getMapOutputTempFile(), genome,
-                pairend);
+                paired);
 
         this.setGenomeReference(genome, genomeSample);
 
@@ -141,7 +141,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         // remove default argument
         bowtie.setMapperArguments("");
 
-        bowtie.init(pairend, FastqFormat.FASTQ_SANGER, archiveIndexFile,
+        bowtie.init(paired, FastqFormat.FASTQ_SANGER, archiveIndexFile,
             indexDir, reporter, COUNTER_GROUP);
 
         // define new argument
@@ -161,9 +161,10 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         this.readsprocessed = parser.getReadsprocessed();
 
         LOGGER.fine("FASTQSCREEN : mapping on genome "
-            + genome + " in mode " + (pairend ? "paired" : "single") + ", in "
+            + genome + " in mode " + (paired ? "paired" : "single") + ", in "
             + toTimeHumanReadable(timer.elapsedMillis()));
 
+        timer.stop();
       } catch (IOException e) {
         throw new AozanException(e.getMessage());
       }
