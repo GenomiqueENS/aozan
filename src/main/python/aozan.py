@@ -8,6 +8,7 @@ Created on 25 oct. 2011
 
 import sys, os, traceback
 import common, hiseq_run, sync_run, demux_run, qc_run
+import estimate_space_needed
 from java.util import Locale
 import first_base_report
 from java.util import LinkedHashMap
@@ -84,6 +85,9 @@ def discover_new_run(conf):
             first_base_report.add_run_id_to_processed_run_ids(run_id, conf)
             first_base_report_sent.add(run_id)
 
+            # Verify space needed during the first base report
+            #estimate_space_needed.estimate(run_id, conf)
+            estimate_space_needed.estimate('130214_SNL110_0062_AD1GKTACXX', conf)
 
     #
     # Discover hiseq run done
