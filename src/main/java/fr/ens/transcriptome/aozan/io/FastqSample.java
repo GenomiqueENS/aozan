@@ -46,9 +46,9 @@ public class FastqSample {
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
   // TODO to remove, value for test
-  // public static final String VALUE = ".fq";
+  public static final String VALUE = ".fq";
 
-  public static final String VALUE = ".fastq";
+  // public static final String VALUE = ".fastq";
 
   private final int read;
   private final int lane;
@@ -307,24 +307,23 @@ public class FastqSample {
     this.runFastqPath = casavaOutputPath;
 
     // if (sampleName.equals("2012_0197"))
-    if (sampleName.equals("Okaz-M3"))
-      this.fastqFiles = createListFastqFiles(this.read);
-    else
-      this.fastqFiles = Collections.emptyList();
+    // if (sampleName.equals("Okaz-M3"))
+    this.fastqFiles = createListFastqFiles(this.read);
+    // else
+    // this.fastqFiles = Collections.emptyList();
 
     // TODO to remove after test
     if (fastqFiles.size() == 0) {
-      this.keyFastqSample = "";
-      this.nameTemporaryFastqFiles = null;
       this.compressionType = CompressionType.NONE;
+      this.keyFastqSample = "";
 
     } else {
 
       this.compressionType = setCompressionExtension();
       this.keyFastqSample = createKeyFastqSample();
-      this.nameTemporaryFastqFiles = createNameTemporaryFastqFile();
-
     }
+
+    this.nameTemporaryFastqFiles = createNameTemporaryFastqFile();
 
     long uncompressSizeFiles =
         this.getUncompressedSize() / (1024 * 1024 * 1024);
