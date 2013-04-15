@@ -116,17 +116,17 @@ public class RunDataGenerator {
       // And collect data
       collector.collect(data);
 
-      during += timerGlobal.elapsedMillis();
       LOGGER.fine(collector.getName().toUpperCase()
           + " end in " + toTimeHumanReadable(timerCollector.elapsedMillis()));
 
     }
 
-    for (final Collector collector : this.collectors) {
-      collector.clear();
-    }
+    // for (final Collector collector : this.collectors) {
+    // collector.clear();
+    // }
 
-    LOGGER.fine("Step collector end in " + toTimeHumanReadable(during));
+    LOGGER.fine("Step collector end in "
+        + toTimeHumanReadable(timerGlobal.elapsedMillis()));
     timerGlobal.stop();
 
     this.properties.setProperty(COLLECT_DONE, "true");
