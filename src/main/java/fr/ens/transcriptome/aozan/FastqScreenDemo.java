@@ -78,7 +78,7 @@ public class FastqScreenDemo {
 
   public static RunData data = null;
   public static Map<String, FastqSample> prefixList;
-  private static boolean paired = true;
+  private static boolean paired = false;
 
   static String runId;
   static String date;
@@ -93,8 +93,7 @@ public class FastqScreenDemo {
 
       if (paired) {
         // run test pair-end
-        // runId = "120830_SNL110_0055_AD16D9ACXX";
-        runId = "130219_SNL110_0063_AD1TNBACXX";
+        runId = "120830_SNL110_0055_AD16D9ACXX";
       } else {
         // run test single-end
         // runId = "120301_SNL110_0038_AD0EJRABXX";
@@ -133,7 +132,7 @@ public class FastqScreenDemo {
     // String bclDir, String fastqDir, String qcDir, File tmpDir
 
     QC qc =
-        new QC(getMapAozanConf(), qcDir, fastqDir, qcDir + "_qc_tmp", TMP_DIR,
+        new QC(getMapAozanConf(), qcDir, qcDir, qcDir + "_qc_tmp", TMP_DIR,
             runId);
 
     // Compute report
