@@ -295,7 +295,7 @@ abstract public class AbstractFastqCollector implements Collector {
     final boolean lastReadIndexed =
         data.getBoolean(KEY_READ_X_INDEXED + readCount + ".indexed");
 
-    this.paired = readCount > 1 && !lastReadIndexed;
+    paired = readCount > 1 && !lastReadIndexed;
 
     for (int read = 1; read <= readCount; read++) {
 
@@ -334,7 +334,9 @@ abstract public class AbstractFastqCollector implements Collector {
                   projectName, index);
           fastqSamples.add(fastqSample);
 
-          this.uncompressedSizeFiles += fastqSample.getUncompressedSize();
+          // Check temporary fastq files exists
+          if (!(new File(fastqSample.getNameTemporaryFastqFiles()).exists()))
+            this.uncompressedSizeFiles += fastqSample.getUncompressedSize();
 
         } // sample
 
