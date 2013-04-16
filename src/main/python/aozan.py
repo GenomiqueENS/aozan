@@ -86,8 +86,7 @@ def discover_new_run(conf):
             first_base_report_sent.add(run_id)
 
             # Verify space needed during the first base report
-            #estimate_space_needed.estimate(run_id, conf)
-            estimate_space_needed.estimate('130214_SNL110_0062_AD1GKTACXX', conf)
+            estimate_space_needed.estimate(run_id, conf)
 
     #
     # Discover hiseq run done
@@ -238,7 +237,7 @@ def aozan_main(conf_file_path):
                 traceback_msg = traceback.format_exc(sys.exc_info()[2]).replace('\n', ' ')
                 
                 # Log the exception
-                common.log('SEVERE', 'Exception: ' +  exception_msg, conf)
+                common.log('SEVERE', 'Exception: ' + exception_msg, conf)
                 common.log('WARNING', traceback_msg, conf)
                 
                 # Send a mail with the exception
@@ -246,7 +245,7 @@ def aozan_main(conf_file_path):
     else:
         print "A lock file exists."
         if not os.path.exists('/proc/%d' % (load_pid_in_lock_file(lock_file_path))):
-            common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf['lock.file'] +
+            common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf['lock.file'] + 
                          ". Please investigate last error and then remove the lock file.", conf['aozan.var.path'] + '/aozan.lasterr', conf)
 
 

@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+'''
+Created on 15 avril 2012
+
+@author: Sandrine Perrin
+'''
 
 import common
 from java.io import File
@@ -6,18 +12,14 @@ from fr.ens.transcriptome.eoulsan.illumina import RunInfo
 
 def estimate(run_id, conf):
     """Estimate space needed in directories : hiseq, bcl and fastq
-    if it has not enough space free, mail a warning message 
+    if it has not enough space free send a warning mail 
 
     Arguments:
-        lock_file_path path of the lock file
+        run_id: the run id 
+        conf: configuration dictionary
     """
-    common.log('INFO', 'in estimate method', conf)
     
     # ratio space by cycle by informations type
-    fastq_space_per_lane_per_cycle = 223666051
-    bcl_space_per_lane_per_cycle = 415296917
-    hiseq_space_per_lane_per_cycle = 3179924808
-    
     hiseq_run_path = conf['hiseq.data.path'] + '/' + run_id
         
     # retrieve data from RunInfo.xml
@@ -27,39 +29,34 @@ def estimate(run_id, conf):
 
     # retrieve count lane
     lane_count = run_info.getFlowCellLaneCount()
-    common.log('INFO', 'count lane ' + str(lane_count), conf)
     
     # retrieve count cycle
     cycle_count = 0
     for read in run_info.getReads():
         cycle_count = cycle_count + read.getNumberCycles()
     
-    common.log('INFO', 'count cycle ' + str(cycle_count), conf)
-      
     # retrieve data from runParameters.xml 
     run_info_path = hiseq_run_path + "/runParameters.xml"
     
     # set factor
-    factor = lane_count * cycle_count * 1.15 
-    
-    common.log('INFO', 'factor ' + str(factor), conf)
+    run_factor = lane_count * cycle_count * 1.15 
     
     #
     # Estimate space needed +15%
     #
     
     # for hiseq data
-    hiseq_space_needed = hiseq_space_per_lane_per_cycle * factor
+    hiseq_space_needed = int(conf['hiseq.space.factor']) * run_factor
     hiseq_space_free = common.df(conf['hiseq.data.path'])
     
     # check if free space is available
-    if hiseq_space_needed < hiseq_space_free:
+    if hiseq_space_needed > hiseq_space_free:
         error(run_id, 'hiseq files', hiseq_space_needed, hiseq_space_free, conf)
     else:
         log_message(run_id, 'hiseq files', hiseq_space_needed, hiseq_space_free, conf)
     
     # for bcl files    
-    # bcl file : compressed or not
+    # bcl file : compressed or not, info in runParameters.xml
     compressed_bcl_file = False
 
     if compressed_bcl_file:
@@ -75,23 +72,21 @@ def estimate(run_id, conf):
     else:
         ratio_quality_compressed = 1.0
     
-    common.log('INFO', 'ratio fastq ' + str(ratio_bcl_file_compressed) + ' ratio qty ' + str(ratio_quality_compressed), conf)
-    
-    bcl_space_needed = bcl_space_per_lane_per_cycle * factor * ratio_bcl_file_compressed * ratio_quality_compressed
+    bcl_space_needed = int(conf['bcl.space.factor']) * run_factor * ratio_bcl_file_compressed * ratio_quality_compressed
     bcl_space_free = common.df(conf['bcl.data.path'])
     
     # check if free space is available
-    if bcl_space_needed < bcl_space_free:
+    if bcl_space_needed > bcl_space_free:
         error(run_id, 'bcl files', bcl_space_needed, bcl_space_free, conf)
     else:
         log_message(run_id, 'bcl files', bcl_space_needed, bcl_space_free, conf)
     
     # for fastq files
-    fastq_space_needed = fastq_space_per_lane_per_cycle * factor
+    fastq_space_needed = int(conf['fastq.space.factor']) * run_factor
     fastq_space_free = common.df(conf['fastq.data.path'])
     
     # check if free space is available
-    if fastq_space_needed < fastq_space_free:
+    if fastq_space_needed > fastq_space_free:
         error(run_id, 'fastq files', fastq_space_needed, fastq_space_free, conf) 
     else:
         log_message(run_id, 'fastq files', fastq_space_needed, fastq_space_free, conf) 
@@ -103,9 +98,9 @@ def error(run_id, type_file, space_needed, space_free, conf):
 
     Arguments:
         run_id: the run id 
-        type_file: files concerned
-        space_needed: space needed for the run id for a type of data
-        space_free: space free for the run id for a type of data
+        type_file: type file concerned
+        space_needed: space needed for the run for a type of data
+        space_free: space free for the run for a type of data
         conf: configuration dictionary
     """
 
