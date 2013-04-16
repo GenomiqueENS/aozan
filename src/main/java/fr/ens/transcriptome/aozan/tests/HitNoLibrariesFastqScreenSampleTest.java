@@ -31,7 +31,7 @@ import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
 
 /**
- * The class add in the qc report html one result from fastqScreen for each
+ * The class adds in the qc report html one result from fastqScreen for each
  * sample. It print the percent of reads which mapped on at least one genomes
  * except the genome sample.
  * @author Sandrine Perrin

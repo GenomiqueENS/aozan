@@ -60,10 +60,14 @@ public class FastqScreenResult {
    * value
    * @return string with results from fastqscreen
    */
-  public String statisticalTableToString() {
+  public String statisticalTableToString(final String header) {
 
-    StringBuilder s =
-        new StringBuilder().append("\n" + HEADER_COLUMNS_TEXT + "\n");
+    StringBuilder s = new StringBuilder();
+
+    if (header != null)
+      s.append(header + "\n");
+
+    s.append("\n" + HEADER_COLUMNS_TEXT + "\n");
 
     for (Map.Entry<String, DataPerGenome> e : this.resultsPerGenome.entrySet()) {
       s.append(e.getValue().getAllPercentValues() + "\n");
@@ -260,11 +264,11 @@ public class FastqScreenResult {
      */
     String getAllPercentValues() {
       return genome
-          + "\t" + roundDouble(this.mappedPercent) + " \t"
-          + roundDouble(this.unMappedPercent) + " \t"
-          + roundDouble(this.oneHitOneLibraryPercent) + " \t"
-          + roundDouble(this.multipleHitsOneLibraryPercent) + " \t"
-          + roundDouble(this.oneHitMultipleLibrariesPercent) + " \t"
+          + "\t" + roundDouble(this.mappedPercent) + "\t"
+          + roundDouble(this.unMappedPercent) + "\t"
+          + roundDouble(this.oneHitOneLibraryPercent) + "\t"
+          + roundDouble(this.multipleHitsOneLibraryPercent) + "\t"
+          + roundDouble(this.oneHitMultipleLibrariesPercent) + "\t"
           + roundDouble(this.multipleHitsMultipleLibrariesPercent);
     }
 

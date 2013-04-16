@@ -91,15 +91,21 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   @Override
   protected void createReportFile() throws AozanException, IOException {
 
+    String headerReport =
+        "FastqScreen : for Projet "
+            + fastqSample.getProjectName() + "\nresult for sample : "
+            + fastqSample.getSampleName();
+
     // TODO to remove after test
-    System.out.println(this.resultsFastqscreen.statisticalTableToString());
+    System.out.println("\n"
+        + this.resultsFastqscreen.statisticalTableToString(headerReport));
 
     File fastqScreenFile =
         new File(this.reportDir.getAbsolutePath()
             + "/" + this.fastqSample.getKeyFastqSample() + "-fastqscreen.txt");
 
     BufferedWriter br = Files.newWriter(fastqScreenFile, Charsets.UTF_8);
-    br.append(this.resultsFastqscreen.statisticalTableToString());
+    br.append(this.resultsFastqscreen.statisticalTableToString(headerReport));
     br.close();
 
     LOGGER.fine("FASTQSCREEN : for "
@@ -132,7 +138,8 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     // Add read2 in command line
     resultsFastqscreen =
-        fastqscreen.execute(read1, read2, fastqSample, genomes, genomeSample, paired);
+        fastqscreen.execute(read1, read2, fastqSample, genomes, genomeSample,
+            paired);
 
     if (resultsFastqscreen == null)
       throw new AozanException("Fastqscreen return no result for sample "
