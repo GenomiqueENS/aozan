@@ -28,8 +28,8 @@ def df(path):
     Arguments:
         path: file on the partition
     """
-    #s = os.statvfs('/')
-    #return (s.f_bavail * s.f_frsize)
+    # s = os.statvfs('/')
+    # return (s.f_bavail * s.f_frsize)
     if os.path.exists(path):
         return long(File(path).getFreeSpace())
 
@@ -439,6 +439,14 @@ def set_default_conf(conf):
     conf['hiseq.critical.min.space'] = str(1 * 1024 * 1024 * 1024 * 1024)
     conf['sync.space.factor'] = str(0.2)
     conf['demux.space.factor'] = str(0.7)
+    # Value for step estimated space needed during first base report
+    # count for fastq_space_per_lane_per_cycle (cmd du -b)
+    conf['fastq.space.factor'] = str(223666051)
+    # count for bcl_space_per_lane_per_cycle (cmd du -b)
+    conf['bcl.space.factor'] = str(415296917)
+    # count for hiseq_space_per_lane_per_cycle (cmd du -b)
+    conf['hiseq.space.factor'] = str(3179924808)
+    
 
     # Mail configuration
     conf['mail.header'] = 'THIS IS AN AUTOMATED MESSAGE.\\n\\n'
