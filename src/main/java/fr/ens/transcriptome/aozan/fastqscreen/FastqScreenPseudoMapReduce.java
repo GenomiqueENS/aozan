@@ -128,6 +128,9 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         // get index Genome reference exists
         File archiveIndexFile = createIndex(bowtie, genomeFile, tmpDir);
 
+        if (archiveIndexFile == null)
+          continue;
+
         FastsqScreenSAMParser parser =
             new FastsqScreenSAMParser(this.getMapOutputTempFile(), genome,
                 pairend);
@@ -193,6 +196,9 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     // Create genome description
     GenomeDescription desc = createGenomeDescription(genomeDataFile);
 
+    if (desc == null)
+      return null;
+
     GenomeMapperIndexer indexer = new GenomeMapperIndexer(bowtie);
     indexer.createIndex(genomeDataFile, desc, result);
 
@@ -220,6 +226,9 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     if (storage != null) {
       desc = storage.get(genomeFile);
     }
+
+    if (!genomeFile.exists())
+      return null;
 
     if (desc == null) {
       // Compute the genome description
