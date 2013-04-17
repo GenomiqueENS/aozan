@@ -440,12 +440,12 @@ def set_default_conf(conf):
     conf['sync.space.factor'] = str(0.2)
     conf['demux.space.factor'] = str(0.7)
     # Value for step estimated space needed during first base report
-    # count for fastq_space_per_lane_per_cycle (cmd du -b)
-    conf['fastq.space.factor'] = str(223666051)
-    # count for bcl_space_per_lane_per_cycle (cmd du -b)
-    conf['bcl.space.factor'] = str(415296917)
-    # count for hiseq_space_per_lane_per_cycle (cmd du -b)
-    conf['hiseq.space.factor'] = str(3179924808)
+    # estimation factor for fastq_space_per_lane_per_cycle (cmd du -b)
+    conf['fastq.space.factor'] = str(224000000)
+    # estimation factor for bcl_space_per_lane_per_cycle (cmd du -b)
+    conf['bcl.space.factor'] = str(416000000)
+    # estimation factor for hiseq_space_per_lane_per_cycle (cmd du -b)
+    conf['hiseq.space.factor'] = str(3180000000)
     
 
     # Mail configuration
