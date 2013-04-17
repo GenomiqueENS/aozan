@@ -335,9 +335,11 @@ abstract public class AbstractFastqCollector implements Collector {
           fastqSamples.add(fastqSample);
 
           // Check temporary fastq files exists
-          if (!(new File(fastqSample.getNameTemporaryFastqFiles()).exists()))
+          if (!(new File(tmpPath
+              + "/" + fastqSample.getNameTemporaryFastqFiles()).exists())) {
             this.uncompressedSizeFiles += fastqSample.getUncompressedSize();
 
+          }
         } // sample
 
       }// lane
