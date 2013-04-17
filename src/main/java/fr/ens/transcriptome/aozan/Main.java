@@ -63,7 +63,7 @@ public class Main {
     aozanLogger.setLevel(Globals.LOG_LEVEL);
     eoulsanLogger.setLevel(Globals.LOG_LEVEL);
 
-    final Handler fh = new FileHandler(logPath);
+    final Handler fh = new FileHandler(logPath, true);
     fh.setFormatter(Globals.LOG_FORMATTER);
 
     aozanLogger.setUseParentHandlers(false);
