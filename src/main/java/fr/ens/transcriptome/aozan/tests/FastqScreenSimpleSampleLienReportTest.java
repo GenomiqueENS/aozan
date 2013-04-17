@@ -34,8 +34,9 @@ import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
 
 /**
- * The class adds in the qc report html a link to the report fastqScreen for each
- * sample.
+ * The class adds in the qc report html a link to the report fastqScreen for
+ * each sample.
+ * @since 0.11
  * @author Sandrine Perrin
  */
 public class FastqScreenSimpleSampleLienReportTest extends AbstractSampleTest {

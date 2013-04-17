@@ -54,6 +54,7 @@ import fr.ens.transcriptome.eoulsan.util.StringUtils;
 
 /**
  * This class account reads that map to each of the reference genome.
+ * @since 0.11
  * @author Sandrine Perrin
  */
 public class FastqScreenPseudoMapReduce extends PseudoMapReduce {

@@ -32,6 +32,8 @@ import fr.ens.transcriptome.aozan.io.FastqStorage;
 
 /**
  * The abstract class define a thread, it calls by AbtractFastqCollector.
+ * @since 0.11
+ * @author Laurent Jourdren
  * @author Sandrine Perrin
  */
 abstract class AbstractFastqProcessThread implements Runnable {

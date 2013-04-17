@@ -44,6 +44,7 @@ import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 
 /**
  * This class execute fastqscreen pair-end mode or single-end
+ * @since 0.11
  * @author Sandrine Perrin
  */
 public class FastqScreen {

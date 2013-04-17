@@ -35,6 +35,7 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
 /**
  * The class realize the creating of array of compressed fastq files in a
  * temporary files, in multitasking mode.
+ * @since 0.11
  * @author Sandrine Perrin
  */
 public class UncompressFastqCollector extends AbstractFastqCollector {

@@ -50,6 +50,7 @@ import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignCSVReader;
  * between the genome sample and the reference genome used with bowtie, if it
  * exists. The class retrieve the percent of reads mapped on each reference
  * genomes.
+ * @since 0.11
  * @author Sandrine Perrin
  */
 public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {

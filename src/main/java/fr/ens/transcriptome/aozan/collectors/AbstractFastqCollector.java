@@ -50,6 +50,7 @@ import fr.ens.transcriptome.aozan.io.FastqStorage;
 /**
  * The abstract class define commons methods for the Collectors which treats
  * fastq files.
+ * @since 0.11
  * @author Sandrine Perrin
  */
 abstract public class AbstractFastqCollector implements Collector {

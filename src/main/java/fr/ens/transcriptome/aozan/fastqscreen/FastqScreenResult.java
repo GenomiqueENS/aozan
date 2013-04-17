@@ -30,7 +30,8 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 
 /**
- * This class manages results from fastqscreen
+ * This class manages results from fastqscreen.
+ * @since 0.11
  * @author Sandrine Perrin
  */
 public class FastqScreenResult {

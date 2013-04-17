@@ -38,6 +38,7 @@ import com.google.common.collect.Sets;
  * This class read the alias genome file. It make correspondence between genome
  * name in casava design file and the genome name reference used for identified
  * index of bowtie mapper.
+ * @since 0.11
  * @author Sandrine Perrin
  */
 public class AliasGenomeFile {
