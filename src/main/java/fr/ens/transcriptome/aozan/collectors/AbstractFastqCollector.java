@@ -146,8 +146,6 @@ abstract public class AbstractFastqCollector implements Collector {
    */
   @Override
   public void collect(RunData data) throws AozanException {
-    // TODO to remove
-    // data = FastqScreenDemo.getRunData();
 
     controlPreCollect(data, this.qcReportOutputPath);
 
@@ -184,10 +182,6 @@ abstract public class AbstractFastqCollector implements Collector {
           }
         }
       }
-
-      // TODO : remove after test
-      System.out.println(this.getName().toUpperCase()
-          + " : multithread " + this.futureThreads.size());
 
       if (this.futureThreads.size() > 0) {
 

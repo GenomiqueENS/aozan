@@ -97,10 +97,6 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
             + fastqSample.getProjectName() + "\nresult for sample : "
             + fastqSample.getSampleName();
 
-    // TODO to remove after test
-    System.out.println("\n"
-        + this.resultsFastqscreen.statisticalTableToString(headerReport));
-
     File fastqScreenFile =
         new File(this.reportDir.getAbsolutePath()
             + "/" + this.fastqSample.getKeyFastqSample() + "-fastqscreen.txt");
@@ -115,12 +111,6 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
   @Override
   protected void processResults() throws AozanException {
-
-    // TODO to remove after test
-    System.out.println("lane current "
-        + this.fastqSample.getLane() + "\tsample current "
-        + this.fastqSample.getSampleName() + "\tproject name "
-        + this.fastqSample.getProjectName());
 
     File read1 = new File(fastqStorage.getTemporaryFile(fastqSample));
 
