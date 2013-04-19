@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
 /*
- *                  Eoulsan development code
+ *                  Aozan development code
  *
  * This code may be freely distributed and modified under the
- * terms of the GNU Lesser General Public License version 2.1 or
- * later and CeCILL-C. This should be distributed with the code.
- * If you do not have a copy, see:
+ * terms of the GNU General Public License version 3 or later 
+ * and CeCILL. This should be distributed with the code. If you 
+ * do not have a copy, see:
  *
- *      http://www.gnu.org/licenses/lgpl-2.1.txt
- *      http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.txt
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
  *
  * Copyright for this code is held jointly by the Genomic platform
  * of the Institut de Biologie de l'École Normale Supérieure and
  * the individual authors. These should be listed in @author doc
  * comments.
  *
- * For more information on the Eoulsan project and its aims,
- * or to join the Eoulsan Google group, visit the home page
- * at:
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page at:
  *
- *      http://www.transcriptome.ens.fr/eoulsan
+ *      http://www.transcriptome.ens.fr/aozan
  *
  */
 -->
@@ -73,8 +72,14 @@
 			</div>
 
 
-			<p>
-				Here the description of the project.
+			<p>Aozan has been developped in order to automatically handle data transfert, demultiplexing conversion, quality control
+			and research contamination once a HiSeq run has been finished. Through our computer infrastructure and the creation 
+			of a run design, we are able to get at the end of each run a whole data quality reporting in order to evaluate each
+			sequencing parameter. Aozan is involved in the primary data analysis and produce compressed fastq files from 
+			an HiSeq sequencer output</p>
+			
+			<p>Aozan helps us to greatly improve our efficiency with run data management and to keep tracks of run statistics
+			with several automatic mail information and HTML web pages.				
 			</p>
 			
 
@@ -86,17 +91,18 @@
 
 			<p>
 				Aozan is distributed under the
-				<a href="license.html">General Public Licence</a> and <a href="license.html">CeCill</a>.
+				<a href="license.html">General Public License</a> and <a href="license.html">CeCill</a>.
 			</p>
 			
 		</section>
 
 		<section name="Funding">
 
-		<p>This work was supported by the Infrastructures en Biologie Santé et Agronomie (IBiSA) and Amazon Web Services research grant.</p>
+		<p>This work was supported by the Infrastructures en Biologie Santé et Agronomie (IBiSA), France Génomique and Amazon Web Services research grant.</p>
 		<a href="http://www.ibisa.net/"><img src="images/logo_ibisa-40.gif"/></a>&#160;&#160;
+		<a href="https://www.france-genomique.org/spip/"><img src="images/logo_"/></a>&#160;&#160;
 		<a href="http://aws.amazon.com/"><img src="images/logo_aws-40.gif"/></a>
-
+		
 		</section>
 		
 	

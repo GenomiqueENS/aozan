@@ -1,33 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
 /*
- *                  Eoulsan development code
+ *                  Aozan development code
  *
  * This code may be freely distributed and modified under the
- * terms of the GNU Lesser General Public License version 2.1 or
- * later and CeCILL-C. This should be distributed with the code.
- * If you do not have a copy, see:
+ * terms of the GNU General Public License version 3 or later 
+ * and CeCILL. This should be distributed with the code. If you 
+ * do not have a copy, see:
  *
- *      http://www.gnu.org/licenses/lgpl-2.1.txt
- *      http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.txt
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
  *
  * Copyright for this code is held jointly by the Genomic platform
  * of the Institut de Biologie de l'École Normale Supérieure and
  * the individual authors. These should be listed in @author doc
  * comments.
  *
- * For more information on the Eoulsan project and its aims,
- * or to join the Eoulsan Google group, visit the home page
- * at:
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page at:
  *
- *      http://www.transcriptome.ens.fr/eoulsan
+ *      http://www.transcriptome.ens.fr/aozan
  *
  */
 -->
 <document>
 
   <properties>
-    <title>Compiling Eoulsan</title>
+    <title>Compiling Aozan</title>
     <author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
   </properties>
 
@@ -40,10 +39,10 @@
 	  <p>The next commands works whatever your operating system and the "<code>$</code>" character represent the command line prompt.</p> 
           <p>To compile Aozan, the default memory allocated by Maven is not enough. Your must set the environment variable <b>MAVEN_OPTS</b> to do this. To change this variable using bash use the built-in command <b>export</b> (512MiB or 1GiB is a good amount of memory of Maven):</p>
           <source>$ export MAVEN_OPTS=-Xmx1024m</source>	  
-          <p><b>Update:</b> It seems that with last version of Maven the default memory size allocated is enough to build Eoulsan.</p>
+          <p><b>Update:</b> It seems that with last version of Maven the default memory size allocated is enough to build Aozan.</p>
           <p>Aozan need <a href="http://jython.org/">Jython</a> to compile. You need to install it and set the <code>JYTHON_HOME</code> with the path to jython before building Aozan. Aozan was developed with Jython 2.5.x, later version of Jython may also works.</p>
  
-	  <p>First set your current directory to the base directory of <b>Eoulsan</b>.</p>
+	  <p>First set your current directory to the base directory of <b>Aozan</b>.</p>
 	  
 	  <p>To build both source and binary distribution:</p>
 	  <source>$ mvn install</source>

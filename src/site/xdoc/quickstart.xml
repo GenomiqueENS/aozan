@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
 /*
- *                  Eoulsan development code
+ *                  Aozan development code
  *
  * This code may be freely distributed and modified under the
- * terms of the GNU Lesser General Public License version 2.1 or
- * later and CeCILL-C. This should be distributed with the code.
- * If you do not have a copy, see:
+ * terms of the GNU General Public License version 3 or later 
+ * and CeCILL. This should be distributed with the code. If you 
+ * do not have a copy, see:
  *
- *      http://www.gnu.org/licenses/lgpl-2.1.txt
- *      http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.txt
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
  *
  * Copyright for this code is held jointly by the Genomic platform
  * of the Institut de Biologie de l'École Normale Supérieure and
  * the individual authors. These should be listed in @author doc
  * comments.
  *
- * For more information on the Eoulsan project and its aims,
- * or to join the Eoulsan Google group, visit the home page
- * at:
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page at:
  *
- *      http://www.transcriptome.ens.fr/eoulsan
+ *      http://www.transcriptome.ens.fr/aozan
  *
  */
 -->
@@ -38,6 +37,44 @@
 	<body>
 	        <link rel="alternate" type="application/rss+xml" title="Eoulsan updates" href="aozan.rss" />
 
+		<section name="Quickstart Guide">
+			<ul>
+				<li>
+					<a href="#introduction">Introduction</a>
+				</li>
+				<li>
+					<a href="#principles">Principles</a>
+				</li>
+				<li>
+					<a href="#requirements">Requirements</a>
+				</li>
+                                  <ul>
+                                    <li><a href="#casava">Installing Casava</a></li>
+                                    <li><a href="#bcl2fastq">Installing bcl2fastq</a></li>
+                                  </ul>
+                               <li>
+					<a href="#installation">Installation</a>
+				</li>
+				<li>
+					<a href="#launchingAozan">Launching Aozan</a>
+				</li>
+				<li>
+					<a href="#hiseqdata">Accessing HiSeq Data</a>
+				</li>
+				<li>
+					<a href="#directoryAozan">Directories requiered by Aozan</a>
+				</li>
+                <li>
+                	<a href="#configuration">General configuration</a>
+                </li>
+                <li>
+                	<a href="#steps">Steps</a>
+                </li>
+			</ul>
+		
+		</section>
+
+		<a name="introduction"/>
 		<section name="Introduction">
 
 		  <p>Aozan is tool that automatically handle Illumina HiSeq generated data from the end of sequencing to the 
@@ -53,6 +90,7 @@
 		  </p>
 		</section>
 
+		<a name="principles"/>
  <section name="Principles">
    
    <p>Aozan is not an interactive tool, it communicate with users through emails. It is launched regulary (usually every hour) 
@@ -68,11 +106,13 @@
      <li>Synchronization</li>
      <li>Demultiplexing</li>
      <li>Quality control</li>
+     <li>Research contamination</li>
    </ul>  
    
  </section>
 
- <section name="Requierements">
+ <a name="requirements"/>
+ <section name="Requirements">
 
 
  <p>To run Aozan, you need to install the following software:</p>
@@ -86,7 +126,8 @@
  <pre>
 $ sudo apt-get install openjdk-6-jre-headless rsync
  </pre>
-  
+ 
+ <a name="casava"/>
  <subsection name="Installing CASAVA">
 
  <p>CASAVA can be downloaded on the Illumina website 
@@ -94,7 +135,7 @@ $ sudo apt-get install openjdk-6-jre-headless rsync
 
  <p>Next, we download and install CASAVA 1.8.2 with the following lines:</p>
  
- <pre>
+ <source>
 # Download CASAVA 1.8.2
 $ wget https://my.illumina.com/download/summary/Wr-sNFYJn0GHBVp759vFtw
 
@@ -113,7 +154,7 @@ $ VERSION=1.8.2 &amp;&amp; \
 
 # Remove CASAVA examples (not mandatory, save lot of space on the system)
 $ sudo rm -rf /usr/local/casava-$VERSION/share/CASAVA-$VERSION/examples 
- </pre>
+ </source>
    
  </subsection>
  
@@ -121,16 +162,58 @@ $ sudo rm -rf /usr/local/casava-$VERSION/share/CASAVA-$VERSION/examples
     
     <p>To enable bzip2 compression in CASAVA 1.8, you need to comment with a '<tt>#</tt>' the next lines in
       the  <tt>/usr/local/casava/share/CASAVA-1.8.2/makefiles/Config.mk</tt>:</p>
-<pre>
+<source>
 COMPRESSION:=gzip
 COMPRESSIONSUFFIX:=.gz
-</pre>    
+</source>    
 
   </subsection>
   
-  </section>
+  <a name="bcl2fastq"/>
+   <subsection name="Installing bcl2fastq">
+   <p>The Bcl2FastQ conversion software is a new tool to handle bcl conversion and demultiplexing of both unzipped and zipped bcl files.
+    bcl2fastq can be downloaded on the Illumina website 
+ <a href="http://support.illumina.com/downloads/bcl2fastq_conversion_software_183.ilmn">here</a>.</p>
+
+ <p>Next, we download and install bcl2fastq 1.8.3 with the following lines. At first we have make installing on Centos 5.9, for recompiling bcl2fastq in static mode.
+ <a href="http://centos.mirror.fr.planethoster.net/5/isos/x86_64/"> image iso here.</a></p>
+ 
+ <source>
+# Download bcl2fastq 1.8.3
+$ wget support.illumina.com/documents/MyIllumina/ce203f99-aad6-449e-938c-daa7501089a4/bcl2fastq-1.8.3-Linux-x86_64.rpm
+
+# Install runtime and compilation depenencies
+$ yum install make perl libxml2-devel libxml2 libxslt libxslt-devel gcc gcc-c++ bzip2 bzip2-devel zlib zlib-devel
+
+# Launch static compilation
+$ tar -xjf bcl2fastq-1.8.3.tar.bz2
+$ mkdir BclToFast-build
+$ cd BclToFastq-build
+$ ../BclToFastq/src/configure --static --prefix=/usr/local/bcl2fastq-1.8.3
+$ make
+$ su
+$ make install
+
+# Launch installation
+$ tar -cvjf /usr/local/bcl2fastq-1.8.3.tar.bz2 bcl2fastq-1.8.3/
+ </source>
+   
+ </subsection>
+ 
+  <subsection name="Patching bcl2fastq to allow bzip2 compression of fastq files">
+    
+    <p>To enable bzip2 compression in bcl2fastq 1.8.3, you need to comment with a '<tt>#</tt>' the next lines in
+      the  <tt>/usr/local/casava/share/bcl2fastq-1.8.3/makefiles/Config.mk</tt>:</p>
+<source>
+COMPRESSION:=gzip
+COMPRESSIONSUFFIX:=.gz
+</source>    
+
+  </subsection>
+   </section>
   
   
+  <a name="installation"/>
   <section name="Installation">
 
  <p>The installation of Aozan is very easy, you just had to uncompress the archive:</p>
@@ -143,6 +226,8 @@ $ tar xzf aozan-@@@VERSION@@@.tar.gz
  is bundled in Aozan.</p>
 
   </section>
+  
+  <a name="launchingAozan"/>
   <section name="Launching Aozan">
 
  <p>Aozan is usually launched regulary as a cron job however Aozan can also be launched manually.
@@ -160,6 +245,7 @@ $ /usr/local/aozan/aozan.sh /etc/aozan.conf
 
   </subsection>
 
+ <a name="aozan_cron_job"/>
  <subsection name="Launching aozan as cron job">
 
  <p>In the following lines, we configure our system to launch Aozan every hour using a script in
@@ -190,6 +276,7 @@ $ sudo chmod 755 /etc/cron/daily/aozan &amp;&amp; sudo chmod root:root /etc/cron
   </subsection>
 </section>
 
+  <a name="hiseqdata"/>
  <section name="Accessing HiSeq Data">
 
  <p>Aozan can handle several HiSeq instruments. For each instruments you must allow Aozan computer 
@@ -238,6 +325,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
   </subsection>
 </section>
 
+<a name="directoryAozan"/>
  <section name="Directories requiered by Aozan">
 
  <p>To work, Aozan need the following directories. The path of this directories must be set in the Aozan
@@ -253,17 +341,17 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
    <tr><td>bcl.data.path</td><td>/mnt/storage/bcl</td><td>Hiseq output data after synchronization. Usualy cif files
      are not copied in this directory.</td></tr>
    <tr><td>fastq.data.path</td><td>/mnt/storage/fastq</td><td>Directory for the output of 
-     demultiplexing with CASAVA.</td></tr>
-   <tr><td>reports.data.path</td><td>/mnt/storage/reports</td><td>Directory for the output of 
-     demultiplexing with CASAVA.</td></tr>
-   <tr><td>casava.designs.path</td><td>/mnt/storage/casava_designs</td><td>Directory with CASAVA design (real name ???)
+     demultiplexing with CASAVA or bcl2fastq.</td></tr>
+   <tr><td>reports.data.path</td><td>/mnt/storage/reports</td><td>Directory for the qc report.</td></tr>
+   <tr><td>casava.designs.path</td><td>/mnt/storage/casava_designs</td><td>Directory with CASAVA design (design_$runId.xls)
      for demultiplexing. If a custom script is used to generate CSV design files, this directory will no be used.</td></tr>
    <tr><td>tmp.path</td><td>/tmp</td><td>Temporary directory.</td></tr> 
  </table>
 
 </section>
 
- <section name="Aozan configuration">
+  <a name="configuration"/>
+ <section name="Aozan general configuration">
 
  <p>This section describe the Aozan global configuration settings. For the steps settings, see in the steps documentation.</p>
  
@@ -305,196 +393,16 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
    
  </section>
    
+   <a name="steps"/>
  <section name="Steps">
-
-   <subsection name="First base report step">
-     
-     <p>This step check if a new run is currently running and if the first base report has been generated. 
-     If true send an email with the first base report.</p>
-
-     <h4>Configuration parameters</h4>
-	 
-	 <p>The next table contains the parameters of this step.</p>
-	 
-     <table>
-	   <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-	   <tr><td>first.base.report.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
-	 </table>
-     
-   </subsection>
-
-   <subsection name="End run discovering step">
-     
-     <p>This step test if a run is completed by checking if a file called <tt>Basecalling_Netcopy_complete_ReadX.txt</tt> 
-     exists in the root of the run output directory where X if the maximal read number of the run (e.g. for an indexed 
-       paired end run, X is equals to 3). </p>
-       
-       <h4>Configuration parameters</h4>
-	 
-	 <p>The next table contains the parameters of this step.</p>
-	 
-     <table>
-	   <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-	   <tr><td>hiseq.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
-	   <!--tr><td>hiseq.step</td><td>integer</td><td>12</td><td>Set the maximal number of hour since the end of sequencing 
-	     to send an email to inform users of the end of the run.</td></tr-->
-     </table>
-	 
-       
-     
-   </subsection>
-   
-   <subsection name="Synchronization step">
-
-    <p>This step copy output run files from the HiSeq computer to another place (usually a safe storage). 
-    CIF files can be excluded from the copy.</p>
-     
-       <h4>Configuration parameters</h4>
-	 
-	 <p>The next table contains the parameters of this step.</p>
-	 
-     <table>
-	   <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-	   <tr><td>sync.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
-	   <tr><td>sync.space.factor</td><td>double</td><td>0.2</td><td>Factor to use to get the estimation of space needed 
-	     in bcl directory for the run from the space used in hiSeq directory by the run</td></tr>
-	   <tr><td>rsync.exclude.cif</td><td>boolean</td><td>True</td><td>Do not copy CIF files</td></tr>
-     </table>
-     
-   </subsection>   
- 
-   <subsection name="Demultiplexing step">
-     
-     <p>This step allow to launch demultiplexing using CASVASA. Aozan can use samplesheet in XLS format or generated
-     by an external tool in addition of samplesheet in CSV format. Using samplesheet in XLS format allow
-     to use alias for adapters sequences indexes.</p>
-
-      <h4>Configuration parameters</h4>
-	 
-	 <p>The next table contains the parameters of this step.</p>
-	 
-       <table>
-	     <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-	     <tr><td>demux.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
-	     <tr><td>demux.space.factor</td><td>double</td><td>0.7</td><td>Factor to use to get the estimation of space needed 
-	     in fastq directory for the run from the space used in bcl directory by the run</td></tr>
-	     <tr><td>index.sequences</td><td>string</td><td>Not set</td><td>Path to a file that contains alias 
-	     for adapters sequences indexes</td></tr>
-	     <tr><td>casava.adapter.fasta.file.path</td><td>string</td><td>Not set</td><td>Adapter sequence file to use when launch CASAVA</td></tr>
-	     <tr><td>casava.compression</td><td>string</td><td>bzip2</td><td>Compression to use (gzip or bzip2)</td></tr>
-	     <tr><td>casava.compression.level</td><td>integer</td><td>9</td><td>Compression level</td></tr>
-	     <tr><td>casava.design.format</td><td>string</td><td>xls</td><td>CASAVA samplesheet format ("csv", "xls" or "command")</td></tr>
-	     <tr><td>casava.design.generator.command</td><td>String</td><td>Not set</td><td>Command to execute to generate the CASAVA samplesheet 
-  in CSV format when <b>casava.design.format</b> parameter is set to "command"</td></tr>
-	     <tr><td>casava.designs.path</td><td>string</td><td>Not set</td><td>Path to CSV/XLS samplesheet files</td></tr>
-	     <tr><td>casava.fastq.cluster.count</td><td>integer</td><td>0</td><td>Cluster number by fastq file. When set to 0 no limit 
-  will be set</td></tr>
-	     <tr><td>casava.mismatches</td><td>integer</td><td>0</td><td>Number of mismatches allowed in adapters indexes</td></tr>
-	     <tr><td>casava.path</td><td>string</td><td>/usr/local/casava</td><td>Path to CASAVA basedir</td></tr>
-	     <tr><td>casava.with.failed.reads</td><td>boolean</td><td>True</td><td>Add reads that not pass Illumina filter in fastq files</td></tr>   
-	   </table>
-     
-   </subsection>
-   
-   <subsection name="Quality control step">
-     
-     <p>This step allow to perform some quality controls on the output of the runs. To do this Aozan use Illumina reports and 
-     <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC</a>. Aozan contains an additional FastQC 
-     step named "<b>Bad tiles</b>" that search tiles with BMS issues with Illumina flowcell v3.</p>  
-
-     <h4>Configuration parameters</h4>
-     
-     <p>The next table contains the globals parameters of this step.</p>
-
-       <table>
-         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-         <tr><td>qc.report.save.raw.data</td><td>boolean</td><td>False</td><td>Save raw data generated for the tests</td></tr>
-         <tr><td>qc.report.save.report.data</td><td>boolean</td><td>False</td><td>Save report data in XML format (before applying the stylesheet)</td></tr>
-         <tr><td>qc.report.stylesheet</td><td>string</td><td>Not set</td><td>Path to the stylesheet to use </td></tr>
-         <tr><td>qc.conf.fastqc.threads</td><td>integer</td><td>The number of core available on the system</td><td>The number of thread to use when running FastQC if
-         tests that need FastQC are enable</td></tr>
-       </table>
-     
-     <p>In addition to this parameters, user can add tests to perform in this steps. The order of the parameters in the Aozan configuration
-     file will be reused in the report generated by this step.  Each test can use 
-     several parameters and contains always an "<b>enable</b>" property to activate the test. Usually a property named "<b>interval</b>" exists 
-     for each test, however if this property is not set, the value will be computed but not checked if it is the correct interval.
-     You will find below all the parameters for all the available tests in Aozan:</p>
-     
-       <h5>Lanes quality tests</h5>
-       <table>
-         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-         <tr><td>qc.test.rawclusters.enable</td><td>boolean</td><td>False</td><td>Enable rawcluster test</td></tr>
-         <tr><td>qc.test.rawclusters.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of rawcluster</td></tr>
-         <tr><td>qc.test.pfclusters.enable</td><td>boolean</td><td>False</td><td>Enable pfcluster test</td></tr>
-         <tr><td>qc.test.pfclusters.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of pfclusters</td></tr>         
-         <tr><td>qc.test.pfclusterspercent.enable</td><td>boolean</td><td>False</td><td>Enable pfclusterspercent test</td></tr>
-         <tr><td>qc.test.pfclusterspercent.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of pfclusterspercent</td></tr>
-         <tr><td>qc.test.clusterdensity.enable</td><td>boolean</td><td>False</td><td>Enable clusterdensity test</td></tr>
-         <tr><td>qc.test.clusterdensity.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of clusterdensity</td></tr>
-         <tr><td>qc.test.percentalign.enable</td><td>boolean</td><td>False</td><td>Enable percentalign test</td></tr>
-         <tr><td>qc.test.percentalign.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of percentalign</td></tr>
-         <tr><td>qc.test.errorrate.enable</td><td>boolean</td><td>False</td><td>Enable errorrate test</td></tr>
-         <tr><td>qc.test.errorrate.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of errorrate</td></tr>
-         <tr><td>qc.test.errorrate35cycle.enable</td><td>boolean</td><td>False</td><td>Enable errorrate35cycle test</td></tr>
-         <tr><td>qc.test.errorrate35cycle.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of errorrate35cycle</td></tr>
-         <tr><td>qc.test.errorrate75cycle.enable</td><td>boolean</td><td>False</td><td>Enable errorrate75cycle test</td></tr>
-         <tr><td>qc.test.errorrate75cycle.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of errorrate75cycle</td></tr>
-         <tr><td>qc.test.errorrate100cycle.enable</td><td>boolean</td><td>False</td><td>Enable errorrate100cycle test</td></tr>
-         <tr><td>qc.test.errorrate100cycle.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of errorrate100cycle</td></tr>
-         <tr><td>qc.test.firstcycleintensity.enable</td><td>boolean</td><td>False</td><td>Enable firstcycleintensity test</td></tr>
-         <tr><td>qc.test.firstcycleintensity.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of firstcycleintensity</td></tr>
-         <tr><td>qc.test.percentintensitycycle20.enable</td><td>boolean</td><td>False</td><td>Enable percentintensitycycle20 test</td></tr>
-         <tr><td>qc.test.percentintensitycycle20.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of percentintensitycycle20</td></tr>
-         <tr><td>qc.test.phasingprephasing.enable</td><td>boolean</td><td>False</td><td>Enable phasingprephasing test</td></tr>
-         <tr><td>qc.test.phasingprephasing.phasing.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of phasing</td></tr>
-         <tr><td>qc.test.phasingprephasing.prephasing.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of prephasing</td></tr>
-       </table>
-       
-       
-       <h5>Sample quality tests</h5>
-       <table>
-         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-         <tr><td>qc.test.rawclusterssamples.enable</td><td>boolean</td><td>False</td><td>Enable rawclusterssamples test</td></tr>
-         <tr><td>qc.test.rawclusterssamples.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of rawclusterssamples</td></tr>
-         <tr><td>qc.test.pfclusterssamples.enable</td><td>boolean</td><td>False</td><td>Enable pfclusterssamples test</td></tr>
-         <tr><td>qc.test.pfclusterssamples.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of pfclusterssamples</td></tr>
-         <tr><td>qc.test.percentpfsample.enable</td><td>boolean</td><td>False</td><td>Enable percentpfsample test</td></tr>
-         <tr><td>qc.test.percentpfsample.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of percentpfsample</td></tr>                  
-         <tr><td>qc.test.percentinlanesample.enable</td><td>boolean</td><td>False</td><td>Enable percentinlanesample test</td></tr>
-         <tr><td>qc.test.percentinlanesample.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of percentinlanesample</td></tr>
-         <tr><td>qc.test.percentq30.enable</td><td>boolean</td><td>False</td><td>Enable percentq30 test</td></tr>
-         <tr><td>qc.test.percentq30.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of percentq30</td></tr>
-         <tr><td>qc.test.meanqualityscorepf.enable</td><td>boolean</td><td>False</td><td>Enable meanqualityscorepf test</td></tr>
-         <tr><td>qc.test.meanqualityscorepf.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of meanqualityscorepf</td></tr>     
-         <tr><td>qc.test.basicstats.enable</td><td>boolean</td><td>False</td><td>Enable FastQC basicstats test</td></tr>
-         <tr><td>qc.test.perbasequalityscores.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perbasequalityscores test</td></tr>
-         <tr><td>qc.test.persequencequalityscores.enable</td><td>boolean</td><td>False</td><td>Enable FastQC persequencequalityscores test</td></tr>
-         <tr><td>qc.test.perbasesequencecontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perbasesequencecontent test</td></tr>
-         <tr><td>qc.test.perbasegccontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perbasegccontent test</td></tr>
-         <tr><td>qc.test.perSequencegccontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perSequencegccontent test</td></tr>
-         <tr><td>qc.test.ncontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC ncontent test</td></tr>
-         <tr><td>qc.test.sequencelengthdistribution.enable</td><td>boolean</td><td>False</td><td>Enable FastQC sequencelengthdistribution test</td></tr>
-         <tr><td>qc.test.duplicationlevel.enable</td><td>boolean</td><td>False</td><td>Enable FastQC duplicationlevel test</td></tr>
-         <tr><td>qc.test.overrepresentedseqs.enable</td><td>boolean</td><td>False</td><td>Enable FastQC overrepresentedseqs test</td></tr>
-         <tr><td>qc.test.kmercontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC kmercontent test</td></tr>
-         <tr><td>qc.test.badtiles.enable</td><td>boolean</td><td>False</td><td>Enable FastQC badtiles test</td></tr>
-    </table>
-    
-    <h5>Syntax of the interval value</h5>
-    
-    <p>User can define intervals as the next examples:</p>
-    <ul>
-      <li><b>[,10]</b> From - infinite to 10 (included)</li>
-      <li><b>[,10[</b> From - infinite to 10 (excluded)</li>
-       <li><b>[,10)</b> From - infinite to 10 (excluded)</li>
-      <li><b>]2,10[</b> From 2 (excluded) to 10 (excluded)</li>
-      <li><b>(2,10[</b> From 2 (excluded) to 10 (excluded)</li>
-      <li><b>[2,10]</b> From 2 (included) to 10 (included)</li>
-      <li><b>[2,]</b> From 2 (included) to + infinite</li>      
-    </ul>      
-
-   </subsection>  
+   <ul>
+     <li><a href="first-base-report.html">First base report end step</a></li>
+     <li><a href="end-run-discovering.html">End run discovering step</a></li>
+     <li><a href="synchronization.html">Synchronization step</a></li>
+     <li><a href="demultiplexing.html">Demultiplexing step</a></li>
+     <li><a href="quality-control.html">Quality control step</a></li>
+     <li><a href="contamination.html">Research contamination step</a></li>
+   </ul>
    
  </section>
 
