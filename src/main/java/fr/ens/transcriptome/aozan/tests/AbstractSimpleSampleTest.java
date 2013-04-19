@@ -24,6 +24,8 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -63,6 +65,22 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
   }
 
   /**
+   * Transform the score.
+   * @param value value to transform
+   * @param data run data
+   * @param read index of read
+   * @param readSample index of read without indexed reads
+   * @param lane lane index
+   * @param sampleName sample name
+   * @return the transformed score
+   */
+  protected int transformScore(final int score, final RunData data,
+      final int read, int readSample, final int lane, final String sampleName) {
+
+    return score;
+  }
+
+  /**
    * Test if the value is a percent.
    * @return true if the value is a percent
    */
@@ -85,6 +103,13 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
 
     if (key == null)
       return null;
+
+    // case line undetermined
+    if (sampleName == null)
+      return new TestResult("NA");
+
+    if (data.get(key) == null)
+      return new TestResult("NA");
 
     final Class<?> clazz = getValueType();
     final String msg;
@@ -125,8 +150,11 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
       if (interval == null || sampleName == null)
         return new TestResult(transformedValue, isValuePercent());
 
-      return new TestResult(this.interval.getScore(transformedValue),
-          transformedValue, isValuePercent());
+      int score =
+          transformScore(this.interval.getScore(transformedValue), data,
+              read, readSample, lane, sampleName);
+      
+      return new TestResult(score, transformedValue, isValuePercent());
 
     } catch (NumberFormatException e) {
 
@@ -139,13 +167,15 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
   //
 
   @Override
-  public void configure(final Map<String, String> properties)
+  public List<AozanTest> configure(final Map<String, String> properties)
       throws AozanException {
 
     if (properties == null)
       throw new NullPointerException("The properties object is null");
 
     this.interval.configureDoubleInterval(properties);
+
+    return Collections.singletonList((AozanTest) this);
   }
 
   //

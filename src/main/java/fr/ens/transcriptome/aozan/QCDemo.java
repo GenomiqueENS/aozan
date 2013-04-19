@@ -99,17 +99,15 @@ public class QCDemo {
     properties.put("qc.test.persequencequalityscores.enable", "true");
     properties.put("qc.test.perbasesequencecontent.enable", "true");
     properties.put("qc.test.perbasegccontent.enable", "true");
- 
+
     properties.put("qc.test.perSequencegccontent.enable", "true");
     properties.put("qc.test.ncontent.enable", "true");
     properties.put("qc.test.sequencelengthdistribution.enable", "true");
     properties.put("qc.test.duplicationlevel.enable", "true");
-    
+
     properties.put("qc.test.overrepresentedseqs.enable", "true");
     properties.put("qc.test.kmercontent.enable", "true");
 
-
-    
     // final List<String> runIds =
     // newArrayList("120124_SNL110_0036_AD0DM3ABXX");
     // final List<String> runIds =
@@ -118,10 +116,13 @@ public class QCDemo {
     // final List<String> runIds = getRunIds(fastqDir);
 
     // Process all runs
-    final QC qc = new QC(properties, "/tmp");
 
     for (final String runId : runIds) {
       if (!runId.contains("0024") && !runId.contains("0023")) {
+
+        final QC qc =
+            new QC(properties, bclDir + '/' + runId, fastqDir + '/' + runId,
+                qcDir, runId, "/tmp");
 
         // Output xml file
         final File reportXmlFile = new File(qcDir + "/qc-" + runId + ".xml");
@@ -130,9 +131,7 @@ public class QCDemo {
         final File reportHtmlFile = new File(qcDir + "/qc-" + runId + ".html");
 
         // Compute report
-        final QCReport report =
-            qc.computeReport(bclDir + '/' + runId, fastqDir + '/' + runId,
-                qcDir, runId);
+        final QCReport report = qc.computeReport();
 
         // Save report data
         qc.writeXMLReport(report, reportXmlFile);

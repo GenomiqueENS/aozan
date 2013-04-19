@@ -24,6 +24,7 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.List;
 import java.util.Map;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -68,8 +69,9 @@ public interface AozanTest {
   /**
    * Configure the test.
    * @param properties a map with the configuration of the test
+   * @return list of Aozan tests
    */
-  public void configure(final Map<String, String> properties)
+  public List<AozanTest> configure(final Map<String, String> properties)
       throws AozanException;
 
   /**

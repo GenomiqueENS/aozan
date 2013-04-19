@@ -24,6 +24,8 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import uk.ac.bbsrc.babraham.FastQC.Modules.OverRepresentedSeqs;
@@ -40,8 +42,9 @@ public class OverRepresentedSeqsFastQCSampleTest extends
       .name();
 
   @Override
-  public void configure(final Map<String, String> properties)
+  public List<AozanTest> configure(final Map<String, String> properties)
       throws AozanException {
+    return Collections.singletonList((AozanTest) this);
   }
 
   @Override

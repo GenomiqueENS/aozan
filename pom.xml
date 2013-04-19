@@ -33,7 +33,7 @@
     <dependency>
       <groupId>fr.ens.transcriptome</groupId>
       <artifactId>eoulsan</artifactId>
-      <version>1.2.1-SNAPSHOT</version>
+      <version>1.3-SNAPSHOT</version>
     </dependency> 
     <dependency>
       <groupId>org.apache.poi</groupId>
@@ -64,6 +64,18 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>commons-compress</artifactId>
+		<version>1.4.1</version>
+		<scope>compile</scope>
+	</dependency>
+	<dependency>
+		<groupId>net.sourceforge.picard</groupId>
+		<artifactId>sam</artifactId>
+		<version>1.76</version>
+		<scope>compile</scope>
+	</dependency>
   </dependencies>
   
   <repositories>

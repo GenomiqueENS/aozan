@@ -57,7 +57,8 @@ def qc(run_id, conf):
     reports_data_base_path = conf['reports.data.path']
     reports_data_path = reports_data_base_path + '/' + run_id
     qc_output_dir = reports_data_path + '/qc_' + run_id
-
+    tmp_extension = '_tmp'
+    
     # Check if input root bcl data exists
     if not os.path.exists(conf['bcl.data.path']):
         error("Basecalling data directory does not exists", "Basecalling data directory does not exists: " + conf['bcl.data.path'], conf)
@@ -92,30 +93,34 @@ def qc(run_id, conf):
 
     # Check if enough free space is available
     if common.df(conf['reports.data.path']) < 1 * 1024 * 1024 * 1024:
-        error("Not enough disk space to store aozan quality control for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
+        error("Not enough disk space to store aozan quality control for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id + 
               '.\nNeed more than 10 Gb on ' + conf['reports.data.path'] + '.', conf)
         return False
 
+    # Create temporary temporary directory
+    qc_output_dir = qc_output_dir + tmp_extension
+     
     # Initialize the QC object
-    qc = QC(conf, conf['tmp.path'])
+    qc = QC(conf, bcl_input_dir, fastq_input_dir, qc_output_dir, conf['tmp.path'], run_id)
 
     # Compute the report
     try:
-        report = qc.computeReport(bcl_input_dir, fastq_input_dir, qc_output_dir, run_id)
+        report = qc.computeReport()
     except AozanException, exp:
         error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
         return False
-    except Throwable, exp:
-        error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + exp.getMessage() + '\n' 
+    except Throwable, exp:  
+        error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + str(exp.getMessage()) + '\n' 
               + StringUtils.join(exp.getStackTrace(), '\n\t'), conf)
         return False
 
-    # Write qc data
-    if conf['qc.report.save.raw.data'].lower().strip() == 'true':
+    # Remove qc data if not demand
+    if conf['qc.report.save.raw.data'].lower().strip() == 'false':
         try:
-            qc.writeRawData(report, qc_output_dir + '/data-' + run_id + '.txt')
+            os.remove(qc_output_dir + '/data-' + run_id + '.txt')
+            # qc.writeRawData(report, qc_output_dir + '/data-' + run_id + '.txt')
         except AozanException, exp:
-            error("error while computing qc raw data for run " + run_id + ".", exp.getMessage(), conf)
+            error("error while removing qc raw data for run " + run_id + ".", exp.getMessage(), conf)
             return False
 
     # Write the XML report
@@ -126,7 +131,7 @@ def qc(run_id, conf):
             error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
             return False
         except Throwable, exp:
-            error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + exp.getMessage() + '\n' 
+            error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + str(exp.getMessage()) + '\n' 
                   + StringUtils.join(exp.getStackTrace(), '\n\t'), conf)
             return False
 
@@ -141,14 +146,17 @@ def qc(run_id, conf):
         error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
         return False
     except Throwable, exp:
-        error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + exp.getMessage() + '\n' 
+        error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + str(exp.getMessage()) + '\n' 
               + StringUtils.join(exp.getStackTrace(), '\n\t'), conf)
         return False
+
+    # Remove tmp extension of temporary qc directory
+    os.rename(qc_output_dir, qc_output_dir[:len(tmp_extension)])
 
     # Archive the reports
     cmd = 'cd ' + reports_data_path + '  && ' + \
        'tar cjf qc_' + run_id + '.tar.bz2 qc_' + run_id
-    common.log("DEBUG", "exec: " + cmd, conf)
+    common.log("WARNING", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while saving the qc archive file for " + run_id, 'Error while saving the  qc archive file.\nCommand line:\n' + cmd, conf)
         return False
@@ -163,7 +171,7 @@ def qc(run_id, conf):
 
     # The output directory must be read only
     cmd = 'chmod -R ugo-w ' + qc_output_dir
-    common.log("DEBUG", "exec: " + cmd, conf)
+    common.log("WARNING", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while setting read only the output qc directory for run " + run_id, 'Error while setting read only the output qc directory.\nCommand line:\n' + cmd, conf)
         return False
@@ -176,8 +184,8 @@ def qc(run_id, conf):
     df = df_in_bytes / (1024 * 1024 * 1024)
     du = du_in_bytes / (1024 * 1024)
 
-    common.log("DEBUG", "QC step: output disk free after qc: " + str(df_in_bytes), conf)
-    common.log("DEBUG", "QC step: space used by qc: " + str(du_in_bytes), conf)
+    common.log("WARNING", "QC step: output disk free after qc: " + str(df_in_bytes), conf)
+    common.log("WARNING", "QC step: space used by qc: " + str(du_in_bytes), conf)
 
     duration = time.time() - start_time
 

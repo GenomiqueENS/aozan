@@ -9,11 +9,14 @@ Created on 25 oct. 2011
 import smtplib, os.path, time
 from java.io import File
 from java.lang import Runtime
+from java.util.logging import Logger
+from java.util.logging import Level
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.audio import MIMEAudio
 from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
+from fr.ens.transcriptome.aozan import Globals
 import mimetypes
 from email import encoders
 
@@ -204,7 +207,7 @@ def error(short_message, message, last_error_file_path, conf):
 
     new_error = short_message + message
     new_error.replace('\n', ' ')
-    log('CRITICAL', new_error, conf)
+    log('SEVERE', new_error, conf)
 
     if os.path.exists(last_error_file_path):
         f = open(last_error_file_path, 'r')
@@ -230,17 +233,8 @@ def log(level, message, conf):
         conf: configuration dictionary
     """
 
-    msg = time_to_human_readable(time.time()) + '\t' + level + '\t' + message
-
-    print(msg)
-
-    try:
-        f = open(conf['aozan.var.path'] + '/aozan.log', 'a')
-        f.write(msg + '\n')
-        f.close()
-    except:
-        pass
-
+    logger = Logger.getLogger(Globals.APP_NAME)
+    logger.log(Level.parse(level), message)
 
 
 def duration_to_human_readable(time):
@@ -301,7 +295,7 @@ def add_run_id_to_processed_run_ids(run_id, done_file_path, conf):
         conf: configuration dictionary
     """
 
-    log('DEBUG', 'Add ' + run_id + ' to ' + os.path.basename(done_file_path), conf)
+    log('WARNING', 'Add ' + run_id + ' to ' + os.path.basename(done_file_path), conf)
 
     f = open(done_file_path, 'a')
 

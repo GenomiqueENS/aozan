@@ -24,6 +24,8 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -77,13 +79,15 @@ public class PFClustersPercentLaneTest extends AbstractLaneTest {
   //
 
   @Override
-  public void configure(final Map<String, String> properties)
+  public List<AozanTest> configure(final Map<String, String> properties)
       throws AozanException {
 
     if (properties == null)
       throw new NullPointerException("The properties object is null");
 
     this.interval.configureDoubleInterval(properties);
+
+    return Collections.singletonList((AozanTest) this);
   }
 
   //

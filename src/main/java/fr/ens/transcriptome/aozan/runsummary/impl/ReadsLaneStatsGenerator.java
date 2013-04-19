@@ -29,9 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.runsummary.ReadsStats;
@@ -39,24 +36,13 @@ import fr.ens.transcriptome.eoulsan.EoulsanException;
 import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
 import fr.ens.transcriptome.eoulsan.Globals;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
-import fr.ens.transcriptome.eoulsan.bio.FastqFormat;
-import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
 import fr.ens.transcriptome.eoulsan.bio.ReadSequence;
-import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.KeepOneMatchReadAlignmentsFilter;
-import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.MultiReadAlignmentsFilter;
-import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.ReadAlignmentsFilter;
-import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.ReadAlignmentsFilterBuffer;
-import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.RemoveUnmappedReadAlignmentsFilter;
 import fr.ens.transcriptome.eoulsan.bio.io.FastqReader;
 import fr.ens.transcriptome.eoulsan.bio.io.FastqWriter;
 import fr.ens.transcriptome.eoulsan.bio.readsfilters.IlluminaFilterFlagReadFilter;
 import fr.ens.transcriptome.eoulsan.bio.readsfilters.ReadFilter;
-import fr.ens.transcriptome.eoulsan.bio.readsmappers.BowtieReadsMapper;
-import fr.ens.transcriptome.eoulsan.data.DataFile;
 import fr.ens.transcriptome.eoulsan.illumina.CasavaDesign;
 import fr.ens.transcriptome.eoulsan.illumina.CasavaSample;
-import fr.ens.transcriptome.eoulsan.steps.generators.GenomeMapperIndexer;
-import fr.ens.transcriptome.eoulsan.util.FakeReporter;
 import fr.ens.transcriptome.eoulsan.util.StatUtils;
 
 public final class ReadsLaneStatsGenerator {
@@ -77,8 +63,6 @@ public final class ReadsLaneStatsGenerator {
       "All indexes");;
   private final ReadsStatsImpl unknownIndexStats =
       new ReadsStatsImpl("Unknown");
-
-  private boolean doMapping = false;
 
   public ReadsStats getTotalStats() {
     return totalStats;
@@ -140,12 +124,6 @@ public final class ReadsLaneStatsGenerator {
       result.total = resultCount[0];
       result.passingFilters = resultCount[1];
       result.q30 = resultCount[2];
-
-      if (this.doMapping) {
-        result.mapped =
-            mapFilteredFastq(fastqTmp, samples.get(i).getSampleRef());
-        result.mappedData = true;
-      }
 
       this.allIndexedStats.add(result);
 
@@ -244,93 +222,6 @@ public final class ReadsLaneStatsGenerator {
     writer.close();
 
     return new int[] {reads, accepted, q30};
-  }
-
-  /**
-   * Map the filtered reads.
-   * @param fastqFile file with the fastq to map
-   * @param genomeName Name of the genome to map
-   * @return the number of alignment that pass the filter
-   * @throws IOException if an error occurs while mapping
-   * @throws BadBioEntryException if an
-   */
-  private int mapFilteredFastq(File fastqFile, String genomeName)
-      throws IOException, BadBioEntryException {
-
-    final File tmpDir = EoulsanRuntime.getRuntime().getTempDirectory();
-
-    final BowtieReadsMapper bowtie = new BowtieReadsMapper();
-    bowtie.setTempDirectory(tmpDir);
-    bowtie.setThreadsNumber(Runtime.getRuntime().availableProcessors());
-
-    final File archiveFile = new File(genomeName + ".zip");
-    final File archiveDir = new File(genomeName);
-
-    if (!archiveDir.exists()) {
-
-      // Get the genome file
-      final DataFile genomeFile = new DataFile("genome:/" + genomeName);
-      LOGGER.info("Genome file:" + genomeFile);
-
-      // new File("/home/jourdren/tmp/run_summary/genome/"
-      // + genomeName.toLowerCase().trim() + ".fasta");
-
-      // Create genome description
-      final GenomeDescription desc =
-          GenomeDescription.createGenomeDescFromFasta(genomeFile.open(),
-              genomeName + ".fasta");
-
-      GenomeMapperIndexer indexer = new GenomeMapperIndexer(bowtie);
-      indexer.createIndex(genomeFile, desc, new DataFile(archiveFile));
-      // bowtie.makeArchiveIndex(genomeFile, archiveFile);
-    }
-
-    // Init mapper
-    bowtie.init(false, FastqFormat.FASTQ_SANGER, new FakeReporter(),
-        "fakeCounterGroup");
-
-    // Map the reads
-    bowtie.map(fastqFile, archiveFile, archiveDir);
-
-    // Parse the result SAM file
-    return parseSamFile(bowtie.getSAMFile(new GenomeDescription()));
-  }
-
-  /**
-   * Parse SAM file
-   * @param samFile input SAM file to parse
-   * @return the number of alignment that pass the filter
-   */
-  private int parseSamFile(final File samFile) {
-
-    final SAMFileReader inputSam = new SAMFileReader(samFile);
-
-    final List<ReadAlignmentsFilter> listFilters = Lists.newArrayList();
-    listFilters.add(new RemoveUnmappedReadAlignmentsFilter());
-    listFilters.add(new KeepOneMatchReadAlignmentsFilter());
-
-    final ReadAlignmentsFilter filter =
-        new MultiReadAlignmentsFilter(listFilters);
-    final ReadAlignmentsFilterBuffer buffer =
-        new ReadAlignmentsFilterBuffer(filter, true);
-
-    int count = 0;
-
-    for (final SAMRecord samRecord : inputSam) {
-
-      final boolean result = buffer.addAlignment(samRecord);
-      if (result)
-        count += buffer.getFilteredAlignments().size();
-
-    }
-    count += buffer.getFilteredAlignments().size();
-
-    inputSam.close();
-
-    if (!samFile.delete())
-      LOGGER.warning("Unable to remove temporary file: " + samFile);
-
-    return count;
   }
 
   public String toHeaderString(final int maxSamples) {

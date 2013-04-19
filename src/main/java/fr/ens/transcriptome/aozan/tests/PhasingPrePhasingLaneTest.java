@@ -24,6 +24,7 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -97,7 +98,7 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
   //
 
   @Override
-  public void configure(final Map<String, String> properties)
+  public List<AozanTest> configure(final Map<String, String> properties)
       throws AozanException {
 
     if (properties == null)
@@ -111,6 +112,8 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
       if ("prephasing.interval".equals(e.getKey().trim().toLowerCase()))
         this.prephasingInterval = new DoubleInterval(e.getValue());
     }
+
+    return Collections.singletonList((AozanTest) this);
 
   }
 

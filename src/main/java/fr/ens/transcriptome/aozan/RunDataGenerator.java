@@ -25,12 +25,14 @@
 package fr.ens.transcriptome.aozan;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Logger;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.collectors.Collector;
@@ -41,20 +43,11 @@ import fr.ens.transcriptome.aozan.collectors.Collector;
  */
 public class RunDataGenerator {
 
-  /** RTA output directory property key. */
-  public static final String RTA_OUTPUT_DIR = "rta.output.dir";
+  /** Logger */
+  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
-  /** Casava design path property key. */
-  public static final String CASAVA_DESIGN_PATH = "casava.design.path";
-
-  /** Casava output directory property key. */
-  public static final String CASAVA_OUTPUT_DIR = "casava.output.dir";
-
-  /** QC output directory property key. */
-  public static final String QC_OUTPUT_DIR = "qc.output.dir";
-
-  /** Temporary directory property key. */
-  public static final String TMP_DIR = "tmp.dir";
+  /** Timer **/
+  private Stopwatch timer = new Stopwatch();
 
   /** Collect done property key. */
   private static final String COLLECT_DONE = "collect.done";
@@ -62,68 +55,11 @@ public class RunDataGenerator {
   private final List<Collector> collectors = Lists.newArrayList();
   private final Properties properties = new Properties();
 
-  //
-  // Setters
-  //
-
   /**
-   * Set the RTA output directory.
-   * @param RTAOutputDir the RTA output directory
+   * Set global configuration for collectors and tests.
+   * @param conf global configuration object
    */
-  public void setRTAOutputDir(final File RTAOutputDir) {
-
-    checkNotNull(RTAOutputDir, "RTA output directory is null");
-
-    properties.setProperty(RTA_OUTPUT_DIR, RTAOutputDir.getAbsolutePath());
-  }
-
-  /**
-   * Set the Casava design file path.
-   * @param casavaDesignFile the Casava design path
-   */
-  public void setCasavaDesignFile(final File casavaDesignFile) {
-
-    checkNotNull(casavaDesignFile, "Casava design file is null");
-    properties.setProperty(CASAVA_DESIGN_PATH,
-        casavaDesignFile.getAbsolutePath());
-  }
-
-  /**
-   * Set the Casava output directory.
-   * @param casavaOutputDir the Casava output directory
-   */
-  public void setCasavaOutputDir(final File casavaOutputDir) {
-
-    checkNotNull(casavaOutputDir, "Casava output directory is null");
-    properties
-        .setProperty(CASAVA_OUTPUT_DIR, casavaOutputDir.getAbsolutePath());
-  }
-
-  /**
-   * Set the QC output directory.
-   * @param QCOutputDir the QC output directory
-   */
-  public void setQCOutputDir(final File QCOutputDir) {
-
-    checkNotNull(QCOutputDir, "QC output directory is null");
-    properties.setProperty(QC_OUTPUT_DIR, QCOutputDir.getAbsolutePath());
-  }
-
-  /**
-   * Set the temporary directory.
-   * @param tmpDir the temporary output directory
-   */
-  public void setTemporaryDir(final File tmpDir) {
-
-    checkNotNull(tmpDir, "Temporary directory is null");
-    properties.setProperty(TMP_DIR, tmpDir.getAbsolutePath());
-  }
-
-  /**
-   * Set additional configuration for collectors and tests.
-   * @param conf additional configuration object
-   */
-  public void setAdditionnalConf(final Map<String, String> conf) {
+  public void setGlobalConf(final Map<String, String> conf) {
 
     if (conf == null)
       return;
@@ -148,30 +84,52 @@ public class RunDataGenerator {
     if (this.properties.containsKey(COLLECT_DONE))
       throw new AozanException("Collect has been already done.");
 
-    if (!this.properties.containsKey(RTA_OUTPUT_DIR))
+    if (!this.properties.containsKey(QC.RTA_OUTPUT_DIR))
       throw new AozanException("RTA output directory is not set.");
 
-    if (!this.properties.containsKey(CASAVA_DESIGN_PATH))
+    if (!this.properties.containsKey(QC.CASAVA_DESIGN_PATH))
       throw new AozanException("Casava design file path is not set.");
 
-    if (!this.properties.containsKey(CASAVA_OUTPUT_DIR))
+    if (!this.properties.containsKey(QC.CASAVA_OUTPUT_DIR))
       throw new AozanException("Casava output directory is not set.");
 
-    if (!this.properties.containsKey(QC_OUTPUT_DIR))
+    if (!this.properties.containsKey(QC.QC_OUTPUT_DIR))
       throw new AozanException("QC output directory is not set.");
 
-    if (!this.properties.containsKey(TMP_DIR))
+    if (!this.properties.containsKey(QC.TMP_DIR))
       throw new AozanException("Temporary directory is not set.");
+
+    // Initialize timer for each collector
+    long during = 0L;
+
+    timer.start();
+    LOGGER.fine("Step collector start");
 
     // For all collectors
     for (final Collector collector : this.collectors) {
+
+      timer.reset();
+      timer.start();
+      LOGGER.fine(collector.getName().toUpperCase() + " start");
 
       // Configure
       collector.configure(new Properties(this.properties));
 
       // And collect data
       collector.collect(data);
+
+      during += timer.elapsedMillis();
+      LOGGER.fine(collector.getName().toUpperCase()
+          + " end in " + toTimeHumanReadable(timer.elapsedMillis()));
+
     }
+
+    for (final Collector collector : this.collectors) {
+      collector.clear();
+    }
+
+    LOGGER.fine("Step collector end in " + toTimeHumanReadable(during));
+    timer.stop();
 
     this.properties.setProperty(COLLECT_DONE, "true");
 

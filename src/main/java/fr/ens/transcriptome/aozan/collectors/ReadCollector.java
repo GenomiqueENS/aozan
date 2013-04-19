@@ -45,8 +45,8 @@ import org.xml.sax.SAXException;
 import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.RunDataGenerator;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**
@@ -79,8 +79,7 @@ public class ReadCollector implements Collector {
     if (properties == null)
       return;
 
-    this.RTAOutputDirPath =
-        properties.getProperty(RunDataGenerator.RTA_OUTPUT_DIR);
+    this.RTAOutputDirPath = properties.getProperty(QC.RTA_OUTPUT_DIR);
   }
 
   @Override
@@ -257,4 +256,8 @@ public class ReadCollector implements Collector {
     return sb.toString();
   }
 
+  @Override
+  public void clear() {
+    return;
+  }
 }
