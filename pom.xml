@@ -20,6 +20,87 @@
         <url>http://transcriptome.ens.fr/sgdb</url>
   </organization>
 
+
+  <developers>
+		<developer>
+			<id>jourdren</id>
+			<name>Laurent Jourdren</name>
+			<email>aozan 0 biologie ens fr</email>
+			<url />
+			<organization>
+				École normale supérieure, IBENS, Genomic Paris Centre
+			</organization>
+			<organizationUrl>
+				http://transcriptome.ens.fr/sgdb/
+			</organizationUrl>
+			<roles>
+				<role>Lead Developer</role>
+			</roles>
+			<timezone>1</timezone>
+			<properties />
+		</developer>
+		<developer>
+			<id>perrin</id>
+			<name>Sandrine Perin</name>
+			<email>aozan 0 biologie ens fr</email>
+			<url />
+			<organization>
+				École normale supérieure, IBENS, Genomic Paris Centre
+			</organization>
+			<organizationUrl>
+				http://transcriptome.ens.fr/sgdb/
+			</organizationUrl>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>1</timezone>
+			<properties />
+		</developer>
+		<developer>
+			<id>lecrom</id>
+			<name>Stéphane Le Crom</name>
+			<email>aozan 0 biologie ens fr</email>
+			<url />
+			<organization>
+				École normale supérieure, IBENS, Genomic Paris Centre
+			</organization>
+			<organizationUrl>
+				http://transcriptome.ens.fr/sgdb/
+			</organizationUrl>
+			<roles>
+				<role>Project manager and documentation review</role>
+			</roles>
+			<timezone>1</timezone>
+			<properties />
+		</developer>
+	</developers>
+
+	<contributors>
+	</contributors>
+
+	<licenses>
+		<license>
+			<name>GNU General Public License v3.0</name>
+			<url>http://www.gnu.org/licenses/gpl-3.0-standalone.html</url>
+			<distribution>repo</distribution>
+			<comments />
+		</license>
+		<license>
+			<name>CeCILL-C Licence française de logiciel libre</name>
+			<url>http://www.cecill.info/licences/Licence_CeCILL_V2-en.html</url>
+			<distribution>repo</distribution>
+			<comments />
+		</license>
+	</licenses>
+
+	<mailingLists>
+		<mailingList>
+			<name>aozan-group</name>
+			<subscribe>http://groups.google.com/group/aozan/subscribe</subscribe>
+			<!--unsubscribe>http://groups.google.com/group/aozan/unsubscribe</unsubscribe-->
+			<archive>http://groups.google.com/group/aozan</archive>
+		</mailingList>
+	</mailingLists>
   <dependencies>
     <!-- Warning Jython must be the first dependency -->
     <dependency>
@@ -192,7 +273,7 @@
                     <include name="checkstyle-license.txt"/>
                     <include name="COMPILING.txt"/>
                     <include name="INSTALL.txt"/>
-                    <include name="LICENSE-LGPL.txt"/>
+                    <include name="LICENSE-GPL.txt"/>
                     <include name="LICENSE-CeCILL-C.txt"/>
                   </fileset>
                 </copy>
