@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+/*
+ *                  Aozan development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU General Public License version 3 or later 
+ * and CeCILL. This should be distributed with the code. If you 
+ * do not have a copy, see:
+ *
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+ *
+ * Copyright for this code is held jointly by the Genomic platform
+ * of the Institut de Biologie de l'École Normale Supérieure and
+ * the individual authors. These should be listed in @author doc
+ * comments.
+ *
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page at:
+ *
+ *      http://www.transcriptome.ens.fr/aozan
+ *
+ */
+ -->
+<document>
+
+	<properties>
+		<title>Research contamination</title>
+		<author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
+	</properties>
+
+
+
+	<body>
+
+		<section name="Research contamination step">
+			<p>This step research contamination in samples fastq files. To do this Aozan uses the principles from 
+			<a href="http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/">FastqScreen</a>. 
+			FastQ Screen allows you to screen a library of sequences in FastQ format against a set of sequence databases. </p>
+			
+			<p>The code has been rewriting in Aozan and additionnal values have been created. A step is added for screen reads 
+			on the genome of the sample if the casava design file contains this data.</p>
+
+			<h4>Configuration parameters</h4>
+
+			<p>
+				The next table contains the parameters of this step. For more
+				details on mapping,
+				<a href="http://transcriptome.ens.fr/eoulsan/datarepositories.html">you can see this page.</a>
+			</p>
+
+			<table>
+				<p>General configuration for research contamination</p>
+				<tr>
+					<th>Aozan property</th>
+					<th>Type</th>
+					<th>description</th>
+				</tr>
+				<tr>
+					<td>qc.conf.genome.alias.path</td>
+					<td>string</td>
+					<td>Path to the file which make the corresponding between genome
+						name in casava design file and the genome name reference used for
+						identified index of bowtie mapper.
+					</td>
+				</tr>
+
+				<tr>
+					<td>qc.conf.settings.genomes.desc.path</td>
+					<td>string</td>
+					<td>Path to the genomes descriptions repository. The genome
+						description file contains some basic informations
+						about the genome
+						like the chromosome length. The repository allow to
+						avoid useless
+						genome sequence parsing
+						once it has been already parsed in a
+						previous run.
+					</td>
+				</tr>
+
+				<tr>
+					<td>qc.conf.settings.genomes</td>
+					<td>string</td>
+					<td>Path to the genomes repository.</td>
+				</tr>
+
+				<tr>
+					<td>qc.conf.settings.mappers.indexes.path</td>
+					<td>string</td>
+					<td>Path to the genomes indexes repository.</td>
+				</tr>
+
+				<tr>
+					<td>qc.conf.fastqscreen.genomes</td>
+					<td>string</td>
+					<td>List of reference genomes used per default for fastqscreen
+						(e.g. phix, adapters)</td>
+				</tr>
+
+			</table>
+
+			<p>Configuration tests</p>
+
+			<p>If none tests is at 'True', Fastq Screen will not been launched.
+			</p>
+
+			<table>
+				<tr>
+					<th>Aozan property</th>
+					<th>Type</th>
+					<th>Default value</th>
+					<th>description</th>
+				</tr>
+				<tr>
+					<td>qc.test.hitnolibraries.enable</td>
+					<td>boolean</td>
+					<td>False</td>
+					<td>Enable mapped except genome sample test</td>
+				</tr>
+				<tr>
+					<td>qc.test.hitnolibraries.interval</td>
+					<td>double interval</td>
+					<td>[0, 0.1]</td>
+					<td>Interval of valid values</td>
+				</tr>
+				<tr>
+					<td>qc.test.fsqmapped.enable</td>
+					<td>boolean</td>
+					<td>False</td>
+					<td>Enable mapped test for each reference genome test</td>
+				</tr>
+				<tr>
+					<td>qc.test.fsqmapped.interval</td>
+					<td>double interval</td>
+					<td>[0, 0.1]</td>
+					<td>Interval of valid values</td>
+				</tr>
+
+				<tr>
+					<td>qc.test.linkreport.enable</td>
+					<td>boolean</td>
+					<td>False</td>
+					<td>Enable created a column with link to report fastqscreen file.</td>
+				</tr>
+			</table>
+
+		</section>
+
+	</body>
+
+</document>
