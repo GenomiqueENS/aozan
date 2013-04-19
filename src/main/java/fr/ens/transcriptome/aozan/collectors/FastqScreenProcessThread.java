@@ -120,7 +120,6 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     File read2 = null;
     // mode paired
     if (this.paired) {
-      System.out.println("load r2 " + fastqSampleR2.getKeyFastqSample());
       read2 = new File(fastqStorage.getTemporaryFile(fastqSampleR2));
 
       if (read2 == null || !read2.exists())

@@ -26,7 +26,6 @@ package fr.ens.transcriptome.aozan.io;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -116,7 +115,7 @@ public class FastqSample {
    * sample
    * @throws AozanException
    */
-  public CompressionType setCompressionExtension() { // throws AozanException {
+  public CompressionType setCompressionExtension() {
 
     if (StringUtils.extension(fastqFiles.get(0).getName()).equals("fastq"))
       return CompressionType.NONE;

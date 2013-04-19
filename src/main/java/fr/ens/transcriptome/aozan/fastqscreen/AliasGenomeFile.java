@@ -157,7 +157,6 @@ public class AliasGenomeFile {
         fw.close();
       }
     } catch (IOException io) {
-      System.out.println(io.getMessage());
     }
   }
 

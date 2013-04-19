@@ -328,9 +328,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     if (readsmapped > readsprocessed)
       return null;
 
-    System.out.println("Result of mappings : nb read mapped "
-        + readsmapped + " / nb read " + readsprocessed);
-
     LOGGER.fine("FASTQSCREEN : result of mappings : nb read mapped "
         + readsmapped + " / nb read " + readsprocessed);
 
