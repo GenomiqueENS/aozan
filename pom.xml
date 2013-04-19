@@ -8,7 +8,9 @@
   <packaging>jar</packaging>
 
   <name>Aozan</name>
-  <url>http://maven.apache.org</url>
+  <description>An automated post sequencing data processing pipeline</description>
+  <url>http://transcriptome.ens.fr/aozan</url>
+  <inceptionYear>2011</inceptionYear>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
