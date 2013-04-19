@@ -44,7 +44,8 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
 
 /**
  * The private class define a class for a thread that execute fastqScreen for a
- * sample. It receive results in rundata and create a report file. 
+ * sample. It receive results in rundata and create a report file.
+ * @since 0.11
  * @author Sandrine Perrin
  */
 class FastqScreenProcessThread extends AbstractFastqProcessThread {
@@ -67,20 +68,21 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     // Timer
     final Stopwatch timer = new Stopwatch().start();
 
-    LOGGER.fine("FASTQSCREEN : start for " + fastqSample.getKeyFastqSample());
+    LOGGER.fine("FASTQSCREEN : start for "
+        + this.fastqSample.getKeyFastqSample());
 
     try {
       processResults();
-      success = true;
+      this.success = true;
     } catch (AozanException e) {
-      exception = e;
+      this.exception = e;
     } finally {
 
       timer.stop();
 
       LOGGER.fine("FASTQSCREEN : end for "
-          + fastqSample.getKeyFastqSample() + " in mode "
-          + (paired ? "paired" : "single") + " on genome(s) " + genomes
+          + this.fastqSample.getKeyFastqSample() + " in mode "
+          + (paired ? "paired" : "single") + " on genome(s) " + this.genomes
           + " in " + toTimeHumanReadable(timer.elapsedMillis()));
 
     }
@@ -90,36 +92,25 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   @Override
   protected void createReportFile() throws AozanException, IOException {
 
-    // TODO to remove after test
-    System.out.println(resultsFastqscreen.statisticalTableToString());
+    String headerReport =
+        "FastqScreen : for Projet "
+            + fastqSample.getProjectName() + "\nresult for sample : "
+            + fastqSample.getSampleName();
 
     File fastqScreenFile =
-        new File(reportDir.getAbsolutePath()
-            + "/" + fastqSample.getKeyFastqSample() + "-fastqscreen.txt");
+        new File(this.reportDir.getAbsolutePath()
+            + "/" + this.fastqSample.getKeyFastqSample() + "-fastqscreen.txt");
 
-    try {
-      BufferedWriter br = Files.newWriter(fastqScreenFile, Charsets.UTF_8);
-      br.append(resultsFastqscreen.statisticalTableToString());
-      br.close();
+    BufferedWriter br = Files.newWriter(fastqScreenFile, Charsets.UTF_8);
+    br.append(this.resultsFastqscreen.statisticalTableToString(headerReport));
+    br.close();
 
-    } catch (IOException io) {
-
-      if (fastqScreenFile.exists())
-        fastqScreenFile.delete();
-
-    }
     LOGGER.fine("FASTQSCREEN : for "
-        + fastqSample.getKeyFastqSample() + " report fastqscreen");
+        + this.fastqSample.getKeyFastqSample() + " report fastqscreen");
   }
 
   @Override
   protected void processResults() throws AozanException {
-
-    // TODO to remove after test
-    System.out.println("lane current "
-        + fastqSample.getLane() + "\tsample current "
-        + fastqSample.getSampleName() + "\tproject name "
-        + fastqSample.getProjectName());
 
     File read1 = new File(fastqStorage.getTemporaryFile(fastqSample));
 
@@ -128,8 +119,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     File read2 = null;
     // mode paired
-    if (paired) {
-
+    if (this.paired) {
       read2 = new File(fastqStorage.getTemporaryFile(fastqSampleR2));
 
       if (read2 == null || !read2.exists())
@@ -138,7 +128,8 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     // Add read2 in command line
     resultsFastqscreen =
-        fastqscreen.execute(read1, read2, fastqSample, genomes, genomeSample);
+        fastqscreen.execute(read1, read2, fastqSample, genomes, genomeSample,
+            paired);
 
     if (resultsFastqscreen == null)
       throw new AozanException("Fastqscreen return no result for sample "

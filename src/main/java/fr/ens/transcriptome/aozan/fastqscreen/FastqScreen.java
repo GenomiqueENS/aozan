@@ -44,6 +44,7 @@ import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 
 /**
  * This class execute fastqscreen pair-end mode or single-end
+ * @since 0.11
  * @author Sandrine Perrin
  */
 public class FastqScreen {
@@ -76,9 +77,10 @@ public class FastqScreen {
    */
   public FastqScreenResult execute(final File fastqRead,
       final FastqSample fastqSample, final List<String> genomes,
-      final String genomeSample) throws AozanException {
+      final String genomeSample, final boolean paired) throws AozanException {
 
-    return this.execute(fastqRead, null, fastqSample, genomes, genomeSample);
+    return this.execute(fastqRead, null, fastqSample, genomes, genomeSample,
+        paired);
 
   }
 
@@ -91,8 +93,8 @@ public class FastqScreen {
    */
   public FastqScreenResult execute(final File fastqRead1,
       final File fastqRead2, final FastqSample fastqSample,
-      final List<String> genomes, final String genomeSample)
-      throws AozanException {
+      final List<String> genomes, final String genomeSample,
+      final boolean paired) throws AozanException {
 
     // Timer
     final Stopwatch timer = new Stopwatch().start();
@@ -103,10 +105,11 @@ public class FastqScreen {
     try {
 
       if (fastqRead2 == null)
-        pmr.doMap(fastqRead1, genomes, genomeSample, tmpDir, confThreads);
+        pmr.doMap(fastqRead1, genomes, genomeSample, tmpDir, confThreads,
+            paired);
       else
         pmr.doMap(fastqRead1, fastqRead2, genomes, genomeSample, tmpDir,
-            confThreads);
+            confThreads, paired);
 
       LOGGER.fine("FASTQSCREEN : step map for "
           + fastqSample.getKeyFastqSample() + " in mode "

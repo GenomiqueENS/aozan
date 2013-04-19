@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- /* * Aozan development code * * This code may be freely distributed 
+	and modified under the * terms of the GNU General Public License version 
+	3 or later * and CeCILL. This should be distributed with the code. If you 
+	* do not have a copy, see: * * http://www.gnu.org/licenses/gpl-3.0-standalone.html 
+	* http://www.cecill.info/licences/Licence_CeCILL_V2-en.html * * Copyright 
+	for this code is held jointly by the Genomic platform * of the Institut de 
+	Biologie de l'École Normale Supérieure and * the individual authors. These 
+	should be listed in @author doc * comments. * * For more information on the 
+	Aozan project and its aims, * or to join the Aozan Google group, visit the 
+	home page at: * * http://www.transcriptome.ens.fr/aozan * */ -->
+<document>
+
+	<properties>
+		<title>Synchronization</title>
+		<author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
+	</properties>
+
+
+
+	<body>
+
+<section name="Synchronization step">
+
+    <p>This step copy output run files from the HiSeq computer to another place (usually a safe storage). 
+    CIF files can be excluded from the copy.</p>
+     
+       <h4>Configuration parameters</h4>
+	 
+	 <p>The next table contains the parameters of this step.</p>
+	 
+     <table>
+	   <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+	   <tr><td>sync.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
+	   <tr><td>sync.space.factor</td><td>double</td><td>0.2</td><td>Factor to use to get the estimation of space needed 
+	     in bcl directory for the run from the space used in hiSeq directory by the run</td></tr>
+	   <tr><td>rsync.exclude.cif</td><td>boolean</td><td>True</td><td>Do not copy CIF files</td></tr>
+     </table>
+     
+   </section>   
+   
+	</body>
+
+</document>

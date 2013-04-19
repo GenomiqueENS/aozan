@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -49,6 +50,7 @@ import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignCSVReader;
  * between the genome sample and the reference genome used with bowtie, if it
  * exists. The class retrieve the percent of reads mapped on each reference
  * genomes.
+ * @since 0.11
  * @author Sandrine Perrin
  */
 public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
@@ -60,8 +62,8 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   private String genomeReference;
 
   @Override
-  public String[] getCollectorsNamesRequiered() {
-    return new String[] {FastqScreenCollector.COLLECTOR_NAME};
+  public List<String> getCollectorsNamesRequiered() {
+    return ImmutableList.of(FastqScreenCollector.COLLECTOR_NAME);
   }
 
   @Override
@@ -72,6 +74,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
         + sampleName + "." + genomeReference + ".mapped.percent";
   }
 
+  @Override
   public Class<?> getValueType() {
     return Double.class;
   }
@@ -195,8 +198,11 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     }
 
     // Retrieve all genome sample included in casava design file
-    for (CasavaSample casavaSample : casavaDesign)
-      genomesFromCasavaDesign.add(casavaSample.getSampleRef());
+    for (CasavaSample casavaSample : casavaDesign) {
+      String genomeSample =
+          casavaSample.getSampleRef().replaceAll("\"", "").trim().toLowerCase();
+      genomesFromCasavaDesign.add(genomeSample);
+    }
 
     // Retrieve list of corresponding reference genome from casava design file
     return AliasGenomeFile.getInstance().convertListToGenomeReferenceName(

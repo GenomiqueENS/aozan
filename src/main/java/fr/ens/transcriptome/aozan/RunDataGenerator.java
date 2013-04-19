@@ -1,24 +1,23 @@
 /*
- *                  Eoulsan development code
+ *                  Aozan development code
  *
  * This code may be freely distributed and modified under the
- * terms of the GNU Lesser General Public License version 2.1 or
- * later and CeCILL-C. This should be distributed with the code.
- * If you do not have a copy, see:
+ * terms of the GNU General Public License version 3 or later 
+ * and CeCILL. This should be distributed with the code. If you 
+ * do not have a copy, see:
  *
- *      http://www.gnu.org/licenses/lgpl-2.1.txt
- *      http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.txt
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
  *
  * Copyright for this code is held jointly by the Genomic platform
  * of the Institut de Biologie de l'École Normale Supérieure and
  * the individual authors. These should be listed in @author doc
  * comments.
  *
- * For more information on the Eoulsan project and its aims,
- * or to join the Eoulsan Google group, visit the home page
- * at:
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page at:
  *
- *      http://www.transcriptome.ens.fr/eoulsan
+ *      http://www.transcriptome.ens.fr/aozan
  *
  */
 
@@ -96,9 +95,6 @@ public class RunDataGenerator {
     if (!this.properties.containsKey(QC.TMP_DIR))
       throw new AozanException("Temporary directory is not set.");
 
-    // Initialize timer for each collector
-    long during = 0L;
-
     // Timer
     final Stopwatch timerGlobal = new Stopwatch().start();
 
@@ -116,17 +112,17 @@ public class RunDataGenerator {
       // And collect data
       collector.collect(data);
 
-      during += timerGlobal.elapsedMillis();
       LOGGER.fine(collector.getName().toUpperCase()
           + " end in " + toTimeHumanReadable(timerCollector.elapsedMillis()));
 
     }
 
-    for (final Collector collector : this.collectors) {
-      collector.clear();
-    }
+    // for (final Collector collector : this.collectors) {
+    // collector.clear();
+    // }
 
-    LOGGER.fine("Step collector end in " + toTimeHumanReadable(during));
+    LOGGER.fine("Step collector end in "
+        + toTimeHumanReadable(timerGlobal.elapsedMillis()));
     timerGlobal.stop();
 
     this.properties.setProperty(COLLECT_DONE, "true");

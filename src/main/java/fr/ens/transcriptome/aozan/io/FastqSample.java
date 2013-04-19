@@ -37,6 +37,7 @@ import fr.ens.transcriptome.eoulsan.util.StringUtils;
 /**
  * The class correspond of one entity to treat by AbstractFastqCollector, so a
  * sample per lane and in mode-paired one FastSample for each read (R1 and R2).
+ * @since 0.11
  * @author Sandrine Perrin
  */
 public class FastqSample {
@@ -44,10 +45,7 @@ public class FastqSample {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
-  // TODO to remove, value for test
-  public static final String VALUE = ".fq";
-
-  // public static final String VALUE = ".fastq";
+  public static final String VALUE = ".fastq";
 
   private final int read;
   private final int lane;
@@ -117,7 +115,7 @@ public class FastqSample {
    * sample
    * @throws AozanException
    */
-  public CompressionType setCompressionExtension() { // throws AozanException {
+  public CompressionType setCompressionExtension() {
 
     if (StringUtils.extension(fastqFiles.get(0).getName()).equals("fastq"))
       return CompressionType.NONE;
@@ -305,24 +303,12 @@ public class FastqSample {
 
     this.runFastqPath = casavaOutputPath;
 
-    // if (sampleName.equals("2012_0197"))
-    this.fastqFiles = createListFastqFiles(read);
-    // else
-    // this.fastqFiles = Collections.emptyList();
+    this.fastqFiles = createListFastqFiles(this.read);
 
-    // TODO to remove after test
-    if (fastqFiles.size() == 0) {
-      this.keyFastqSample = "";
-      this.nameTemporaryFastqFiles = null;
-      this.compressionType = CompressionType.NONE;
+    this.compressionType = setCompressionExtension();
+    this.keyFastqSample = createKeyFastqSample();
 
-    } else {
-
-      this.compressionType = setCompressionExtension();
-      this.keyFastqSample = createKeyFastqSample();
-      this.nameTemporaryFastqFiles = createNameTemporaryFastqFile();
-
-    }
+    this.nameTemporaryFastqFiles = createNameTemporaryFastqFile();
 
     long uncompressSizeFiles =
         this.getUncompressedSize() / (1024 * 1024 * 1024);

@@ -38,6 +38,7 @@ import fr.ens.transcriptome.aozan.Globals;
 /**
  * This class manages the files uncompressed fastq to create temporary files and
  * object sequenceFile for FastqC.
+ * @since 0.11
  * @author Sandrine Perrin
  */
 public final class FastqStorage {

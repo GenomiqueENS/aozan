@@ -25,11 +25,11 @@ package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
@@ -42,6 +42,7 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
  * the properties defined in the configuration file Aozan, which define the list
  * of references genomes. Each sample are mapped on list of references genomes
  * and the genome of sample if it is available for Aozan.
+ * @since 0.11
  * @author Sandrine Perrin
  */
 public class FastqScreenCollector extends AbstractFastqCollector {
@@ -64,14 +65,13 @@ public class FastqScreenCollector extends AbstractFastqCollector {
    * @return list of names collector
    */
   @Override
-  public String[] getCollectorsNamesRequiered() {
+  public List<String> getCollectorsNamesRequiered() {
 
-    List<String> result =
-        Lists.newArrayList(super.getCollectorsNamesRequiered());
+    List<String> result = super.getCollectorsNamesRequiered();
     result.add(FastQCCollector.COLLECTOR_NAME);
     result.add(UncompressFastqCollector.COLLECTOR_NAME);
 
-    return result.toArray(new String[] {});
+    return Collections.unmodifiableList(result);
 
   }
 
@@ -102,11 +102,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
     if (fastqSample.getFastqFiles() == null
         || fastqSample.getFastqFiles().isEmpty()) {
-      return null;
-
-      // TODO fix after test : throw an AozanException
-      // throw new AozanException("No fastq files defined for fastqSample "
-      //    + fastqSample.getKeyFastqSample());
+      throw new AozanException("No fastq files defined for fastqSample "
+          + fastqSample.getKeyFastqSample());
     }
 
     // Create the thread object only if the fastq sample correspond to a R1

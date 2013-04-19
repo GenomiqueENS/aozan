@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
 /*
- *                  Eoulsan development code
+ *                  Aozan development code
  *
  * This code may be freely distributed and modified under the
- * terms of the GNU Lesser General Public License version 2.1 or
- * later and CeCILL-C. This should be distributed with the code.
- * If you do not have a copy, see:
+ * terms of the GNU General Public License version 3 or later 
+ * and CeCILL. This should be distributed with the code. If you 
+ * do not have a copy, see:
  *
- *      http://www.gnu.org/licenses/lgpl-2.1.txt
- *      http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.txt
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
  *
  * Copyright for this code is held jointly by the Genomic platform
  * of the Institut de Biologie de l'École Normale Supérieure and
  * the individual authors. These should be listed in @author doc
  * comments.
  *
- * For more information on the Eoulsan project and its aims,
- * or to join the Eoulsan Google group, visit the home page
- * at:
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page at:
  *
- *      http://www.transcriptome.ens.fr/eoulsan
+ *      http://www.transcriptome.ens.fr/aozan
  *
  */
 -->
@@ -73,11 +72,11 @@
 	  </tr>
 	  <tr>
             <td>Memory</td>
-            <td>By default 2048 MiB are allocated to the JVM for running Eoulsan.
+            <td>By default 2048 MiB are allocated to the JVM for running Aozan.
             You can edit this value in the <code>aozan.sh</code> file with the 
             <b>-Xmx</b> option of the JVM. However Aozan use external tools 
-            like Casava or Bowtie that also need memory, 8 GiB seem to be
-            a good amount of memory to run Eoulsan.</td>
+            like Casava/bcl2fastq or Bowtie that also need memory, 8 GiB seem to be
+            a good amount of memory to run Aozan.</td>
           </tr>
 	  <tr>
             <td>Processor architecture</td>
@@ -96,8 +95,8 @@
             Hadoop 0.20.x/1.0.x is required (later versions has not been yet tested).</td>
           </tr-->
 	  <tr>
-            <td>Casvava</td>
-            <td>1.8.2 or above.</td>
+            <td>Casava</td>
+            <td>1.8.2 or above.<br/>or use bcl2fastq 1.8.3</td>
           </tr>
 	  <tr>
             <td>rsync</td>

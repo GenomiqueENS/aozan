@@ -23,21 +23,26 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.List;
+
+import com.google.common.collect.ImmutableList;
+
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
 
 /**
- * The class add in the qc report html one result from fastqScreen for each
+ * The class adds in the qc report html one result from fastqScreen for each
  * sample. It print the percent of reads which mapped on at least one genomes
  * except the genome sample.
+ * @since 0.11
  * @author Sandrine Perrin
  */
 public class HitNoLibrariesFastqScreenSampleTest extends
     AbstractSimpleSampleTest {
 
   @Override
-  public String[] getCollectorsNamesRequiered() {
-    return new String[] {FastqScreenCollector.COLLECTOR_NAME};
+  public List<String> getCollectorsNamesRequiered() {
+    return ImmutableList.of(FastqScreenCollector.COLLECTOR_NAME);
   }
 
   @Override
@@ -58,6 +63,7 @@ public class HitNoLibrariesFastqScreenSampleTest extends
     return Double.class;
   }
 
+  @SuppressWarnings("unused")
   protected Number transformValue(final Number value, final RunData data,
       final int read, final boolean indexedRead, final int lane) {
 

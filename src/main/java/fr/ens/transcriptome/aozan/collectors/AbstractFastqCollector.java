@@ -50,6 +50,7 @@ import fr.ens.transcriptome.aozan.io.FastqStorage;
 /**
  * The abstract class define commons methods for the Collectors which treats
  * fastq files.
+ * @since 0.11
  * @author Sandrine Perrin
  */
 abstract public class AbstractFastqCollector implements Collector {
@@ -59,15 +60,16 @@ abstract public class AbstractFastqCollector implements Collector {
 
   public static final String KEY_READ_COUNT = "run.info.read.count";
   public static final String KEY_READ_X_INDEXED = "run.info.read";
+  protected static boolean paired = false;
 
   protected FastqStorage fastqStorage;
   protected String casavaOutputPath;
   protected String qcReportOutputPath;
   protected String tmpPath;
-  protected boolean paired = false;
 
-  // Set sample to treat
-  protected Set<FastqSample> fastqSamples = new LinkedHashSet<FastqSample>();
+  // Set samples to treat
+  protected static Set<FastqSample> fastqSamples =
+      new LinkedHashSet<FastqSample>();
 
   // mode threaded
   private static final int CHECKING_DELAY_MS = 5000;
@@ -104,12 +106,12 @@ abstract public class AbstractFastqCollector implements Collector {
 
   /**
    * Get the name of the collectors required to run this collector.
-   * @return an array of String with the name of the required collectors
+   * @return a list of String with the name of the required collectors
    */
   @Override
-  public String[] getCollectorsNamesRequiered() {
-    return new String[] {RunInfoCollector.COLLECTOR_NAME,
-        DesignCollector.COLLECTOR_NAME};
+  public List<String> getCollectorsNamesRequiered() {
+    return Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME,
+        DesignCollector.COLLECTOR_NAME);
   }
 
   /**
@@ -144,15 +146,13 @@ abstract public class AbstractFastqCollector implements Collector {
    */
   @Override
   public void collect(RunData data) throws AozanException {
-    // TODO to remove
-    // data = FastqScreenDemo.getRunData();
 
     controlPreCollect(data, this.qcReportOutputPath);
 
     RunData resultPart = null;
     if (this.getThreadsNumber() > 1) {
 
-      for (FastqSample fs : this.fastqSamples) {
+      for (FastqSample fs : fastqSamples) {
         if (fs.getFastqFiles() != null && !fs.getFastqFiles().isEmpty()) {
 
           resultPart = loadResultPart(fs);
@@ -183,10 +183,6 @@ abstract public class AbstractFastqCollector implements Collector {
         }
       }
 
-      // TODO : remove after test
-      System.out.println(this.getName().toUpperCase()
-          + " : multithread " + this.futureThreads.size());
-
       if (this.futureThreads.size() > 0) {
 
         // Wait for threads
@@ -200,7 +196,7 @@ abstract public class AbstractFastqCollector implements Collector {
     } else {
 
       // Code without starting threads :
-      for (FastqSample fs : this.fastqSamples) {
+      for (FastqSample fs : fastqSamples) {
         // TODO to remove after text
         if (fs.getFastqFiles() != null && !fs.getFastqFiles().isEmpty()) {
 
@@ -247,7 +243,7 @@ abstract public class AbstractFastqCollector implements Collector {
   private void controlPreCollect(final RunData data,
       final String qcReportOutputPath) throws AozanException {
 
-    if (!this.fastqSamples.isEmpty())
+    if (!fastqSamples.isEmpty())
       return;
 
     LOGGER.fine("Collector fastq : step preparation");
@@ -293,7 +289,8 @@ abstract public class AbstractFastqCollector implements Collector {
     final int readCount = data.getInt(KEY_READ_COUNT);
     final boolean lastReadIndexed =
         data.getBoolean(KEY_READ_X_INDEXED + readCount + ".indexed");
-    this.paired = readCount > 1 && !lastReadIndexed;
+
+    paired = readCount > 1 && !lastReadIndexed;
 
     for (int read = 1; read <= readCount; read++) {
 
@@ -330,11 +327,16 @@ abstract public class AbstractFastqCollector implements Collector {
           FastqSample fastqSample =
               new FastqSample(this.casavaOutputPath, read, lane, sampleName,
                   projectName, index);
-          this.fastqSamples.add(fastqSample);
+          fastqSamples.add(fastqSample);
 
-          this.uncompressedSizeFiles += fastqSample.getUncompressedSize();
+          // Check temporary fastq files exists
+          if (!(new File(tmpPath
+              + "/" + fastqSample.getNameTemporaryFastqFiles()).exists())) {
+            this.uncompressedSizeFiles += fastqSample.getUncompressedSize();
 
+          }
         } // sample
+
       }// lane
     }// read
 
@@ -371,6 +373,8 @@ abstract public class AbstractFastqCollector implements Collector {
           + this.getName().toUpperCase()
           + " : Error during reading data file for the sample "
           + fastqSample.getKeyFastqSample());
+
+      return null;
     }
     return data;
   }
@@ -483,7 +487,7 @@ abstract public class AbstractFastqCollector implements Collector {
     this.fastqStorage.clear();
 
     // Delete all data files fastqSample per fastqSample
-    for (FastqSample fs : this.fastqSamples) {
+    for (FastqSample fs : fastqSamples) {
 
       if (!fs.getFastqFiles().isEmpty()) {
         File projectDir =

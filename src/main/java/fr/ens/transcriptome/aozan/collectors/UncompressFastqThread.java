@@ -44,6 +44,7 @@ import fr.ens.transcriptome.eoulsan.util.FileUtils;
 /**
  * This private class create a thread for each array of file to uncompress and
  * compile in temporary file.
+ * @since 0.11
  * @author Sandrine Perrin
  */
 class UncompressFastqThread extends AbstractFastqProcessThread {
@@ -115,8 +116,9 @@ class UncompressFastqThread extends AbstractFastqProcessThread {
     File tmpFastqFile =
         new File(fastqStorage.getTemporaryFile(fastqSample) + ".tmp");
 
-    if (!tmpFastqFile.exists()) {
+    if (!new File(fastqStorage.getTemporaryFile(fastqSample)).exists()) {
       // Uncompresses and compiles files of array in new temporary files
+
       try {
 
         OutputStream out = new FileOutputStream(tmpFastqFile);

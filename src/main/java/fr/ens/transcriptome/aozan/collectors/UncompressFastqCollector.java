@@ -24,10 +24,9 @@
 package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-
-import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
@@ -36,6 +35,7 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
 /**
  * The class realize the creating of array of compressed fastq files in a
  * temporary files, in multitasking mode.
+ * @since 0.11
  * @author Sandrine Perrin
  */
 public class UncompressFastqCollector extends AbstractFastqCollector {
@@ -58,13 +58,12 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
    * @return list of names collector
    */
   @Override
-  public String[] getCollectorsNamesRequiered() {
+  public List<String> getCollectorsNamesRequiered() {
 
-    List<String> result =
-        Lists.newArrayList(super.getCollectorsNamesRequiered());
+    List<String> result = super.getCollectorsNamesRequiered();
     result.add(FastQCCollector.COLLECTOR_NAME);
 
-    return result.toArray(new String[] {});
+    return Collections.unmodifiableList(result);
 
   }
 
