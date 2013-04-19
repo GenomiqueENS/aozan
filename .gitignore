@@ -1,0 +1,9 @@
+/target/
+/.classpath
+/.settings/
+/.classpath
+/build.num
+/.gitignore
+/bin/
+/.project
+/.pydevproject
