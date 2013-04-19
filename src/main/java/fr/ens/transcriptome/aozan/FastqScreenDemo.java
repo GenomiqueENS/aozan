@@ -49,12 +49,12 @@ import fr.ens.transcriptome.aozan.collectors.FastQCCollector;
 import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
 import fr.ens.transcriptome.aozan.collectors.UncompressFastqCollector;
 import fr.ens.transcriptome.aozan.io.FastqSample;
-import fr.ens.transcriptome.aozan.io.FastqStorage;
 
 public class FastqScreenDemo {
 
   /** Logger */
-  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+  private static final Logger LOGGER = Logger
+      .getLogger(fr.ens.transcriptome.aozan.Globals.APP_NAME);
 
   /** Timer */
   private static Stopwatch timer = new Stopwatch();
@@ -108,7 +108,7 @@ public class FastqScreenDemo {
       Main.initLogger(TMP_DIR + "/" + runId + "_aozan_test.log");
       LOGGER.setLevel(Level.ALL);
 
-      System.out.println("Create report qc");
+      System.out.println("Create report qc for run " + runId + "  "+ FastqSample.VALUE);
       // reportQC();
       reportQC2();
 

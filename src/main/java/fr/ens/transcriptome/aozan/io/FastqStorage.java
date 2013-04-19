@@ -50,12 +50,20 @@ public final class FastqStorage {
   public static final String KEY_READ_COUNT = "run.info.read.count";
   public static final String KEY_READ_X_INDEXED = "run.info.read";
 
-  private static String tmpPath;
+  private String tmpPath;
 
+  /**
+   * Return a sequenceFile for all fastq files present to treat in the sample.
+   * If the temporary file doesn't existed, it is created.
+   * @param fastqSample sample to treat
+   * @return SequenceFile an structure which allow to browse a fastq file
+   *         sequence per sequence
+   * @throws AozanException if an error occurs during writing file
+   */
   public SequenceFile getSequenceFile(final FastqSample fastqSample)
       throws AozanException {
 
-    final File[] fastq = (File[]) fastqSample.getFastqFiles().toArray();
+    final File[] fastq = fastqSample.getFastqFiles().toArray(new File[0]);
     final SequenceFile seqFile;
 
     try {
@@ -65,8 +73,8 @@ public final class FastqStorage {
 
       } else {
         // Create temporary fastq file
-        final File f = new File(getTemporaryFile(fastqSample) + ".tmp");
-        seqFile = new SequenceFileAozan(fastq, f, fastqSample);
+        final File tmpFile = new File(getTemporaryFile(fastqSample) + ".tmp");
+        seqFile = new AozanSequenceFile(fastq, tmpFile, fastqSample);
 
       }
 
@@ -116,32 +124,6 @@ public final class FastqStorage {
   }
 
   /**
-   * Remove specific temporary file
-   * @param file to remove
-   */
-  public void removeTemporaryFastq(final File file) {
-
-    if (file.exists()) {
-
-      if (!file.delete())
-        LOGGER.warning("Can't delete temporary fastq file: "
-            + file.getAbsolutePath());
-    }
-  }
-
-  /**
-   * Remove specific of pair of temporaries files
-   * @param file1
-   * @param file2
-   */
-  public void removeTemporaryFastq(final File file1, final File file2) {
-    removeTemporaryFastq(file1);
-
-    if (file2 != null)
-      removeTemporaryFastq(file2);
-  }
-
-  /**
    * Delete all temporaries files
    * @throws IOException
    */
@@ -182,13 +164,11 @@ public final class FastqStorage {
 
   /**
    * Define the path used for FastqStorage.
-   * @param casavaOutput path of the directory contains fastq file
-   * @param tmp path of the tmp directory
+   * @param path of the temporary directory
    */
   public void setTmpDir(final String tmp) {
-    if (singleton != null) {
-      tmpPath = tmp;
-    }
+
+    tmpPath = tmp;
   }
 
   //
@@ -207,6 +187,10 @@ public final class FastqStorage {
     return singleton;
   }
 
+  /**
+   * Get absolute path of the temporary directory
+   * @return path of the temporary directory
+   */
   public String getTmpDir() {
     return tmpPath;
   }

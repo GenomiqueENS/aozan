@@ -45,9 +45,9 @@ public class FastqSample {
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
   // TODO to remove, value for test
-  private static final String VALUE = ".fq";
+  public static final String VALUE = ".fq";
 
-  // private static final String VALUE = ".fastq";
+  // public static final String VALUE = ".fastq";
 
   private final int read;
   private final int lane;
@@ -97,17 +97,16 @@ public class FastqSample {
     switch (compressionType) {
 
     case GZIP:
-      return 7.;
+      return 7.0;
 
     case BZIP2:
-      return 5.;
+      return 5.0;
 
     case NONE:
-      return 1.;
+      return 1.0;
 
-      // TODO to define return value
     default:
-      return 1.;
+      return 1.0;
 
     }
 
@@ -127,9 +126,6 @@ public class FastqSample {
         CompressionType.getCompressionTypeByFilename(fastqFiles.get(0)
             .getName());
 
-    // if (compressionType.equals(CompressionType.NONE))
-    // throw new AozanException("Compression extension unknown.");
-
     return zType;
   }
 
@@ -148,6 +144,7 @@ public class FastqSample {
    * @return true if it must uncompress fastq files else false.
    */
   public boolean isUncompressedNeeded() {
+
     return !compressionType.equals(CompressionType.NONE);
   }
 
@@ -169,18 +166,18 @@ public class FastqSample {
   }
 
   /**
-   * Set the directory to the file
-   * @return
+   * Set the directory to the fastq files for this fastqSample
+   * @return directory of fastq files for a fastqSample
    */
-  public File casavaOutputDir() {
+  private File casavaOutputDir() {
 
     return new File(this.runFastqPath
         + "/Project_" + projectName + "/Sample_" + sampleName);
   }
 
   /**
-   * Set the prefix of the file of read1
-   * @return
+   * Set the prefix of the fastq file of read1 for this fastqSample
+   * @return prefix fastq files for this fastqSample
    */
   private String prefixFileName(int read) {
     return String.format("%s_%s_L%03d_R%d_", sampleName, "".equals(index)
@@ -327,10 +324,12 @@ public class FastqSample {
 
     }
 
+    long uncompressSizeFiles =
+        this.getUncompressedSize() / (1024 * 1024 * 1024);
+
     LOGGER.fine("Add a sample "
         + this.getKeyFastqSample() + " " + this.getFastqFiles().size()
         + " file(s), type compression " + this.compressionType
-        + " (size estimated "
-        + Globals.FORMATTER_MILLIER.format(this.getUncompressedSize()) + ")");
+        + " (size estimated " + uncompressSizeFiles + " Go)");
   }
 }

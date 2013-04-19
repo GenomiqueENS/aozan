@@ -95,8 +95,7 @@ public class FastQCCollector extends AbstractFastqCollector {
   //
 
   @Override
-  // TODO REVIEW: Why is this method is there and not in its super class ?
-  public int getThreadsNumber() {
+  protected int getThreadsNumber() {
     return numberThreads;
   }
 

@@ -42,9 +42,19 @@ abstract class AbstractFastqProcessThread implements Runnable {
 
   protected AozanException exception;
   protected boolean success;
+  protected boolean dataSave;
 
+  /**
+   * Create a report file for the sample treated.
+   * @throws AozanException
+   * @throws IOException
+   */
   abstract protected void createReportFile() throws AozanException, IOException;
 
+  /**
+   * Execute the treatment on a sample and supplying the rundata.
+   * @throws AozanException
+   */
   abstract protected void processResults() throws AozanException;
 
   /**
@@ -75,6 +85,27 @@ abstract class AbstractFastqProcessThread implements Runnable {
     return this.success;
   }
 
+  /**
+   * Test if the data file is saving
+   * @return true if the data file is saving else false
+   */
+  public boolean isDataSave() {
+
+    return this.dataSave;
+  }
+
+  /**
+   * Set the data file is saving
+   */
+  public void setDataSave() {
+
+    this.dataSave = true;
+  }
+
+  /**
+   * Return the fastqSample which represent a sample to treat
+   * @return fastqSample, object which represent a sample to treat
+   */
   public FastqSample getFastqSample() {
     return this.fastqSample;
   }
@@ -85,14 +116,19 @@ abstract class AbstractFastqProcessThread implements Runnable {
 
   /**
    * Public constructor.
-   * @param fastqSample
+   * @param fastqSample, object which represent a sample to treat
    * @throws AozanException if the fastqSample return none fastq file.
    */
   public AbstractFastqProcessThread(final FastqSample fastqSample)
       throws AozanException {
 
+    // Check if fastqSample is null
+    if (fastqSample == null)
+      throw new AozanException("No fastqSample defined");
+
     this.fastqSample = fastqSample;
 
+    // Check if fastq files exists for this fastqSample
     if (this.fastqSample.getFastqFiles() == null
         || this.fastqSample.getFastqFiles().isEmpty())
       throw new AozanException("No fastq file defined");

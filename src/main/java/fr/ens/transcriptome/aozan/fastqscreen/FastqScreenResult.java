@@ -23,15 +23,10 @@
 
 package fr.ens.transcriptome.aozan.fastqscreen;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
 
 /**
@@ -39,9 +34,6 @@ import fr.ens.transcriptome.aozan.RunData;
  * @author Sandrine Perrin
  */
 public class FastqScreenResult {
-
-  /** Logger */
-  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
   // Legend for global value in fastqscreen
   private static final String PERCENT_MAPPED_NONE_GENOME =
@@ -56,7 +48,8 @@ public class FastqScreenResult {
           + "\t %Multiple_hits_one_library \t %One_hit_multiple_libraries \t "
           + "%Multiple_hits_multiple_libraries";
 
-  private Map<String, DataPerGenome> resultsPerGenome;
+  private Map<String, DataPerGenome> resultsPerGenome =
+      new HashMap<String, DataPerGenome>();
   private double percentUnmappedNoneGenome = 0.0;
   private double percentMappedAtLeastOneGenome = 0.0;
   private double percentMappedExceptGenomeSample = 0.0;
@@ -86,31 +79,6 @@ public class FastqScreenResult {
         + "\n");
 
     return s.toString();
-  }
-
-  /**
-   * Save result from fastqscreen in file.
-   * @param dirPath directory who save file of result from fastqscreen
-   */
-  public void createFileResultFastqScreen_OLD(final String pathDir) {
-
-    String result = pathDir + "/fastqscreen.txt";
-    try {
-      FileWriter fr = new FileWriter(result);
-      BufferedWriter br = new BufferedWriter(fr);
-
-      br.append(statisticalTableToString());
-
-      br.close();
-      fr.close();
-    } catch (IOException io) {
-      io.printStackTrace();
-    }
-
-    System.out.println("Save result fastqscreen in file : " + result);
-
-    LOGGER.fine("Save result fastqscreen in file : " + result);
-
   }
 
   /**
@@ -154,6 +122,7 @@ public class FastqScreenResult {
 
     double percentMappedOnlyOnGenomeSample = 0.0;
 
+    // Convert value in percentage for all results of each genome
     for (Map.Entry<String, DataPerGenome> e : this.resultsPerGenome.entrySet()) {
       e.getValue().countPercentValue(readsprocessed);
 
@@ -161,6 +130,7 @@ public class FastqScreenResult {
           e.getValue().getPercentMappedOnlyOnGenomeSample();
     }
 
+    // Convert value in percentage for the global values
     this.percentUnmappedNoneGenome =
         ((double) (readsprocessed - readsMapped)) / readsprocessed;
     this.percentMappedAtLeastOneGenome = 1.0 - this.percentUnmappedNoneGenome;
@@ -172,7 +142,7 @@ public class FastqScreenResult {
   }
 
   /**
-   * Update rundata with result from fastqscreen
+   * Update rundata with results from fastqscreen
    * @param data rundata
    * @param prefix name of sample
    * @throws AozanException if no value.
@@ -181,40 +151,28 @@ public class FastqScreenResult {
 
     if (this.resultsPerGenome.isEmpty())
       throw new AozanException(
-          "During fastqScreen execusion : no genome receive");
+          "During fastqScreen execution : no genome receive");
 
     if (!countPercentOk)
       throw new AozanException(
-          "During fastqScreen execusion : no value ​for each genome");
+          "During fastqScreen execution : no value ​for genome");
 
     RunData data = new RunData();
 
+    // Add in data all results for each genome
     for (Map.Entry<String, DataPerGenome> e : this.resultsPerGenome.entrySet()) {
       e.getValue().updateRundata(data, prefix);
     }
 
-    // print last line of report FastqScreen
+    // Add global values of FastqScreen report
     data.put(prefix + "." + PERCENT_MAPPED_NONE_GENOME,
         this.percentUnmappedNoneGenome);
     data.put(prefix + "." + PERCENT_MAPPED_AT_LEAST_ONE_GENOME,
         this.percentMappedAtLeastOneGenome);
-
-    //
     data.put(prefix + "." + PERCENT_MAPPED_EXCEPT_GENOME_SAMPLE,
         this.percentMappedExceptGenomeSample);
 
     return data;
-  }
-
-  //
-  // CONSTRUCTOR
-  //
-
-  /**
-   * Public constructor of FastqScreenResult
-   */
-  public FastqScreenResult() {
-    this.resultsPerGenome = new HashMap<String, DataPerGenome>();
   }
 
   //
@@ -225,12 +183,12 @@ public class FastqScreenResult {
    * This internal class saves values of fastqscreen from one reference genome.
    * @author Sandrine Perrin
    */
-  public static class DataPerGenome {
+  private static class DataPerGenome {
 
     private String genome;
     private boolean isGenomeSample;
 
-    // specific legend : represent key in rundata
+    // Specific legend : represent key in rundata
     private String unMappedLegend = "unmapped";
     private String oneHitOneLibraryLegend = "one.hit.one.library";
     private String multipleHitsOneLibraryLegend = "multiple.hits.one.library";
@@ -252,7 +210,7 @@ public class FastqScreenResult {
     private int multipleHitsMultipleLibrariesCount = 0;
 
     /**
-     * Count for each read number of hit per reference genome
+     * Count for each read number of hit per reference genome.
      * @param oneHit true if read mapped one time on genome else false
      * @param oneGenome true if read mapped on several genome else false
      */
@@ -311,7 +269,7 @@ public class FastqScreenResult {
     }
 
     /**
-     * Rounding a double
+     * Rounding in double.
      * @param n double
      * @return double value rounded
      */
@@ -359,9 +317,7 @@ public class FastqScreenResult {
             oneHitOneLibraryPercent + multipleHitsOneLibraryPercent;
 
         return readsMappedOnlyOnGenomeSample;
-
       }
-
       return 0.0;
     }
 

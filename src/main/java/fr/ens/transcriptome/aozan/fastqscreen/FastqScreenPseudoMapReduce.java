@@ -30,7 +30,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -43,7 +42,6 @@ import fr.ens.transcriptome.eoulsan.Settings;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.eoulsan.bio.FastqFormat;
 import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
-import fr.ens.transcriptome.eoulsan.bio.readsmappers.AbstractBowtieReadsMapper;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.BowtieReadsMapper;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.SequenceReadsMapper;
 import fr.ens.transcriptome.eoulsan.data.DataFile;
@@ -63,14 +61,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
-  /** Timer */
-  private final Stopwatch timer = new Stopwatch();
-
   protected static final String COUNTER_GROUP = "reads_mapping";
   private final Reporter reporter;
-
-  private static final String KEY_NUMBER_THREAD = "qc.conf.fastqc.threads";
-  private static final String KEY_TMP_DIR = "tmp.dir";
 
   private int mapperThreads = Runtime.getRuntime().availableProcessors();
   private final SequenceReadsMapper bowtie;
@@ -94,10 +86,11 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @throws BadBioEntryException if an error occurs while creating index genome
    */
   public void doMap(File fastqRead, List<String> listGenomes,
-      final String genomeSample, Properties properties) throws AozanException,
-      BadBioEntryException {
+      final String genomeSample, String tmpDir, int numberThreads)
+      throws AozanException, BadBioEntryException {
 
-    this.doMap(fastqRead, null, listGenomes, genomeSample, properties);
+    this.doMap(fastqRead, null, listGenomes, genomeSample, tmpDir,
+        numberThreads);
   }
 
   /**
@@ -112,25 +105,20 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @throws BadBioEntryException if an error occurs while creating index genome
    */
   public void doMap(File fastqRead1, File fastqRead2, List<String> listGenomes,
-      final String genomeSample, Properties properties) throws AozanException,
-      BadBioEntryException {
+      final String genomeSample, String tmpDir, int numberThreads)
+      throws AozanException, BadBioEntryException {
 
-    if (properties.containsKey(KEY_TMP_DIR)) {
-      try {
-        int confThreads =
-            Integer.parseInt(properties.getProperty(KEY_NUMBER_THREAD));
-        if (confThreads > 0)
-          this.mapperThreads = confThreads;
-      } catch (Exception e) {
-      }
-    }
+    // Timer : for step mapping on genome
+    final Stopwatch timer = new Stopwatch().start();
 
-    final String tmpDir = properties.getProperty(KEY_TMP_DIR);
     final boolean pairend = fastqRead2 == null ? false : true;
 
     // change mapper arguments
     final String newArgumentsMapper =
         " -l 20 -k 2 --chunkmbs 512" + (pairend ? " --maxins 1000" : "");
+
+    if (numberThreads > 0)
+      mapperThreads = numberThreads;
 
     for (String genome : listGenomes) {
 
@@ -139,10 +127,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
         // get index Genome reference exists
         File archiveIndexFile = createIndex(bowtie, genomeFile, tmpDir);
-
-        // Count time for step mapping on genome
-        timer.reset();
-        timer.start();
 
         FastsqScreenSAMParser parser =
             new FastsqScreenSAMParser(this.getMapOutputTempFile(), genome,
@@ -172,10 +156,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
           bowtie.map(fastqRead1, fastqRead2, parser);
         }
 
-        LOGGER.fine("FASTQSCREEN : for "
-            + genome + " command lane bowtie "
-            + ((AbstractBowtieReadsMapper) bowtie).getCmdLane());
-
         parser.closeMapOutputFile();
 
         this.readsprocessed = parser.getReadsprocessed();
@@ -203,8 +183,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       final DataFile genomeDataFile, final String tmpDir)
       throws BadBioEntryException, IOException {
 
-    timer.reset();
-    timer.start();
+    // Timer :
+    final Stopwatch timer = new Stopwatch().start();
 
     final DataFile result =
         new DataFile(tmpDir
@@ -219,6 +199,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     LOGGER.fine("FASTQSCREEN : create/Retrieve index for "
         + genomeDataFile.getName() + " in "
         + toTimeHumanReadable(timer.elapsedMillis()));
+
+    timer.stop();
 
     return result.toFile();
   }
@@ -252,7 +234,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     return desc;
   }
 
-  @Override
   /**
    * Mapper Receive value in SAM format, only the read mapped are added in
    * output with reference genome
@@ -261,6 +242,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @param reporter reporter
    * @throws IOException if an error occurs while executing the mapper
    */
+  @Override
   public void map(final String value, final List<String> output,
       final Reporter reporter) throws IOException {
 

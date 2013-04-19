@@ -46,9 +46,6 @@ public class RunDataGenerator {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
-  /** Timer **/
-  private Stopwatch timer = new Stopwatch();
-
   /** Collect done property key. */
   private static final String COLLECT_DONE = "collect.done";
 
@@ -102,14 +99,15 @@ public class RunDataGenerator {
     // Initialize timer for each collector
     long during = 0L;
 
-    timer.start();
+    // Timer
+    final Stopwatch timerGlobal = new Stopwatch().start();
+
     LOGGER.fine("Step collector start");
 
     // For all collectors
     for (final Collector collector : this.collectors) {
 
-      timer.reset();
-      timer.start();
+      Stopwatch timerCollector = new Stopwatch().start();
       LOGGER.fine(collector.getName().toUpperCase() + " start");
 
       // Configure
@@ -118,9 +116,9 @@ public class RunDataGenerator {
       // And collect data
       collector.collect(data);
 
-      during += timer.elapsedMillis();
+      during += timerGlobal.elapsedMillis();
       LOGGER.fine(collector.getName().toUpperCase()
-          + " end in " + toTimeHumanReadable(timer.elapsedMillis()));
+          + " end in " + toTimeHumanReadable(timerCollector.elapsedMillis()));
 
     }
 
@@ -129,7 +127,7 @@ public class RunDataGenerator {
     }
 
     LOGGER.fine("Step collector end in " + toTimeHumanReadable(during));
-    timer.stop();
+    timerGlobal.stop();
 
     this.properties.setProperty(COLLECT_DONE, "true");
 

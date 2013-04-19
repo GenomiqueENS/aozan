@@ -39,8 +39,13 @@ import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFormatException;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
 
-public class SequenceFileAozan implements SequenceFile {
+/**
+ * The class allow to browse a fastq file sequence per sequence and writing them
+ * in a new file.
+ * @author Sandrine Perrin
+ */
 
+public class AozanSequenceFile implements SequenceFile {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
@@ -52,6 +57,13 @@ public class SequenceFileAozan implements SequenceFile {
   private final FastqSample fastqSample;
   private final FileWriter fw;
 
+  /**
+   * Go to the next sequence of fastq file and write this sequence in temporary
+   * file.
+   * @return Sequence the next sequence from a fastq file or null at the end
+   * @throws SequenceFormatException it occurs if the format of sequence is
+   *           different of fastq format .
+   */
   @Override
   public Sequence next() throws SequenceFormatException {
 
@@ -76,26 +88,20 @@ public class SequenceFileAozan implements SequenceFile {
         this.fw.close();
 
         long sizeFile = tmpFile.length();
+        sizeFile /= (1024 * 1024 * 1024);
 
         // Rename file for remove '.tmp' final
         tmpFile.renameTo(new File(FastqStorage.getInstance().getTemporaryFile(
             fastqSample)));
 
-        synchronized (this) {
-          LOGGER.fine("FASTQC : uncompress for "
-              + fastqSample.getKeyFastqSample()
-              + " "
-              + +fastqSample.getFastqFiles().size()
-              + " fastq file(s), type compression "
-              + fastqSample.getCompressionType()
-              + " in "
-              + toTimeHumanReadable(timer.elapsedMillis())
-              + "(tmp fastq file size "
-              + Globals.FORMATTER_MILLIER.format(sizeFile)
-              + " / estimated size "
-              + Globals.FORMATTER_MILLIER.format(fastqSample
-                  .getUncompressedSize()) + ")");
-        }
+        LOGGER.fine("FASTQC : uncompress for "
+            + fastqSample.getKeyFastqSample() + " "
+            + +fastqSample.getFastqFiles().size()
+            + " fastq file(s), type compression "
+            + fastqSample.getCompressionType() + " in "
+            + toTimeHumanReadable(timer.elapsedMillis())
+            + "(tmp fastq file size " + sizeFile + "Go / estimated size "
+            + fastqSample.getUncompressedSize() + ")");
         timer.stop();
 
       }
@@ -136,11 +142,8 @@ public class SequenceFileAozan implements SequenceFile {
   // Constructor
   //
 
-  public SequenceFileAozan(final File[] files, final File tmpFile,
+  public AozanSequenceFile(final File[] files, final File tmpFile,
       final FastqSample fastqSample) throws AozanException {
-
-    // Init timer
-    this.timer = new Stopwatch().start();
 
     this.tmpFile = tmpFile;
     this.fastqSample = fastqSample;
@@ -148,6 +151,9 @@ public class SequenceFileAozan implements SequenceFile {
     try {
       this.fw = new FileWriter(this.tmpFile);
       this.seqFile = SequenceFactory.getSequenceFile(files);
+
+      // Init timer
+      this.timer = new Stopwatch().start();
 
     } catch (SequenceFormatException e) {
       throw new AozanException(e.getMessage());

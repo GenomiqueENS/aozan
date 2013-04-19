@@ -25,7 +25,6 @@ package fr.ens.transcriptome.aozan.fastqscreen;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,7 +33,9 @@ import java.util.List;
 import net.sf.samtools.SAMParser;
 import net.sf.samtools.SAMRecord;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 
 import fr.ens.transcriptome.eoulsan.bio.SAMParserLine;
 import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.MultiReadAlignmentsFilter;
@@ -65,7 +66,6 @@ public class FastsqScreenSAMParser implements SAMParserLine {
   private int readsprocessed = 0;
   private int readsmapped = 0;
 
-  @Override
   /**
    * Call for each line of SAM file. Method create a new file, it contains a
    * line for each read mapped with her name and mapping data : first character
@@ -74,6 +74,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
    * @param SAMline parse SAM line
    * @throws IOException
    */
+  @Override
   public void parseLine(final String SAMline) throws IOException {
 
     if (SAMline == null || SAMline.length() == 0)
@@ -141,16 +142,14 @@ public class FastsqScreenSAMParser implements SAMParserLine {
    * @throws IOException
    */
   public void parserLine(final File SAMFile) throws IOException {
-    FileReader fr = new FileReader(SAMFile);
-    BufferedReader br = new BufferedReader(fr);
+
+    BufferedReader br = Files.newReader(SAMFile, Charsets.ISO_8859_1);
     String line;
 
     while ((line = br.readLine()) != null) {
       parseLine(line);
     }
-
     br.close();
-    fr.close();
   }
 
   public File getSAMOutputFile() {
@@ -196,7 +195,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
   }
 
   //
-  // GETTER
+  // Getters
   //
 
   public int getReadsprocessed() {
@@ -209,7 +208,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
   }
 
   //
-  // CONSTRUCTOR
+  // Constructor
   //
 
   /**
@@ -233,7 +232,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
     this.listFilters.add(new RemoveUnmappedReadAlignmentsFilter());
 
     this.filter = new MultiReadAlignmentsFilter(listFilters);
-    this.buffer = new ReadAlignmentsFilterBuffer(filter); // , true);
+    this.buffer = new ReadAlignmentsFilterBuffer(filter);
 
     this.genomeDescriptionList = new ArrayList<String>();
 

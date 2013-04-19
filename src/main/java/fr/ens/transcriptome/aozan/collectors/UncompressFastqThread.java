@@ -42,11 +42,11 @@ import fr.ens.transcriptome.eoulsan.io.CompressionType;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
 /**
- * This internal class create a thread for each array of file to uncompress and
+ * This private class create a thread for each array of file to uncompress and
  * compile in temporary file.
  * @author Sandrine Perrin
  */
-public class UncompressFastqThread extends AbstractFastqProcessThread {
+class UncompressFastqThread extends AbstractFastqProcessThread {
 
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
@@ -88,21 +88,17 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
 
     } finally {
 
-      synchronized (this) {
-        LOGGER.fine("UNCOMPRESS fastq : for "
-            + fastqSample.getKeyFastqSample()
-            + " "
-            + fastqSample.getFastqFiles().size()
-            + " fastq file(s) in type compression "
-            + fastqSample.getCompressionType()
-            + " in "
-            + toTimeHumanReadable(timer.elapsedMillis())
-            + " : temporary fastq file size "
-            + Globals.FORMATTER_MILLIER.format(sizeFile)
-            + " (size estimated "
-            + Globals.FORMATTER_MILLIER.format(fastqSample
-                .getUncompressedSize()) + ")");
-      }
+      long uncompressSizeFile =
+          fastqSample.getUncompressedSize() / (1024 * 1024 * 1024);
+
+      LOGGER.fine("UNCOMPRESS fastq : for "
+          + fastqSample.getKeyFastqSample() + " "
+          + fastqSample.getFastqFiles().size()
+          + " fastq file(s) in type compression "
+          + fastqSample.getCompressionType() + " in "
+          + toTimeHumanReadable(timer.elapsedMillis())
+          + " : temporary fastq file size " + sizeFile + " Go (size estimated "
+          + uncompressSizeFile + " Go)");
       timer.stop();
     }
 
@@ -148,6 +144,7 @@ public class UncompressFastqThread extends AbstractFastqProcessThread {
     }
 
     sizeFile = tmpFastqFile.length();
+    sizeFile = sizeFile / (1024 * 1024 * 1024);
 
     // Rename file for remove '.tmp' final
     tmpFastqFile.renameTo(new File(fastqStorage.getTemporaryFile(fastqSample)));

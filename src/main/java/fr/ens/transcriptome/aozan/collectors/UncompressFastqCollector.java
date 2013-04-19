@@ -44,11 +44,11 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
 
   private int numberThreads = Runtime.getRuntime().availableProcessors();
 
-  @Override
   /**
    * Get collector name
-   * @return name 
+   * @return name
    */
+  @Override
   public String getName() {
     return COLLECTOR_NAME;
   }
@@ -69,7 +69,7 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
   }
 
   @Override
-  public void configure(Properties properties) {
+  public void configure(final Properties properties) {
     super.configure(properties);
 
     // Set the number of threads
@@ -107,17 +107,17 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     return new UncompressFastqThread(fastqSample);
   }
 
-  @Override
   /**
    * No data file to save in UncompressCollector
    */
+  @Override
   protected void saveResultPart(final FastqSample fastqSample,
       final RunData data) {
     return;
   }
 
   @Override
-  public int getThreadsNumber() {
+  protected int getThreadsNumber() {
     return numberThreads;
   }
 

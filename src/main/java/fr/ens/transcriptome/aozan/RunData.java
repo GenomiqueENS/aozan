@@ -249,26 +249,24 @@ public class RunData {
   /**
    * Create the data file
    * @param filePath path destination
-   * @return true if creating file is success, other false
    * @throws AozanException if an error occurs while writing the data file
    */
-  public boolean createRunDataFile(final String fileName) throws IOException {
-    return createRunDataFile(new File(fileName));
+  public void createRunDataFile(final String fileName) throws IOException {
+    createRunDataFile(new File(fileName));
   }
 
   /**
    * Create the data file
    * @param filePath file destination
-   * @return true if creating file is success, other false
    * @throws AozanException if an error occurs while writing the data file
    */
-  public boolean createRunDataFile(final File fileName) throws IOException {
+  public void createRunDataFile(final File fileName) throws IOException {
 
     if (fileName == null)
-      return false;
+      throw new NullPointerException();
 
     if (fileName.isDirectory())
-      return false;
+      throw new IOException();
 
     BufferedWriter bw;
 
@@ -276,7 +274,6 @@ public class RunData {
     bw.write(this.toString());
     bw.close();
 
-    return true;
   }
 
   /**
@@ -284,7 +281,7 @@ public class RunData {
    * @param file file source
    * @throws IOException if an error occurs while reading the data file
    */
-  public void addDataFileInRundata(String fileName) throws IOException {
+  public void addDataFileInRundata(final String fileName) throws IOException {
     addDataFileInRundata(new File(fileName));
   }
 
@@ -293,7 +290,7 @@ public class RunData {
    * @param file file source
    * @throws IOException if an error occurs while reading the data file
    */
-  public void addDataFileInRundata(File file) throws IOException {
+  public void addDataFileInRundata(final File file) throws IOException {
 
     if (file == null)
       throw new NullPointerException("The file parameter is null");
@@ -340,7 +337,7 @@ public class RunData {
    * @param file file to read
    * @throws IOException if an error occurs while reading the data file
    */
-  public RunData(File file) throws IOException {
+  public RunData(final File file) throws IOException {
 
     if (file == null)
       throw new NullPointerException("The file parameter is null");
