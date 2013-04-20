@@ -1,7 +1,7 @@
 Building Aozan from source
 ---------------------------
 
-  Teolenn requires to be built from source. Maven is project management from
+  Aozan requires to be built from source. Maven is project management from
 the Apache Software Foundation.
 
   You can download it at the following URL:
@@ -19,6 +19,6 @@ the Apache Software Foundation.
   To run Aozan you only need to unpack one of the Aozan binary archives and
 see the instruction in the running section of the INSTALL file.
 
-  You can download the latest version of doelan on our website :
+  You can download the latest version of Aozan on our website :
 
     http://transcriptome.ens.fr/aozan

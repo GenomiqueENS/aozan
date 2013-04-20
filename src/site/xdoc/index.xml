@@ -35,7 +35,7 @@
 		
 
 	<body>
-	        <link rel="alternate" type="application/rss+xml" title="Eoulsan updates" href="aozan.rss" />
+	        <link rel="alternate" type="application/rss+xml" title="Aozan updates" href="aozan.rss" />
 
 		<section name="Welcome to Aozan">
 
@@ -50,7 +50,7 @@
 				<p style="font-size: smaller">
 					<img valign="top"
 						src="http://maven.apache.org/images/folder-open.gif" border="0"
-						alt="" title="Download Eoulsan" />
+						alt="" title="Download Aozan" />
 					<a href="aozan-@@@VERSION@@@.tar.gz">Download</a>
 					Aozan Application
 					<br />
