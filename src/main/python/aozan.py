@@ -251,9 +251,8 @@ def aozan_main(conf_file_path):
 
 # Launch Aozan main
 if __name__ == "__main__":
-    
     if len(sys.argv) < 1:
-        print "No configuration file define in command line.\nSyntax: aozan.py conf_file"
+        print "No configuration file set in command line.\nSyntax: aozan.py conf_file"
         sys.exit(1)
     else:
         aozan_main(sys.argv[0])

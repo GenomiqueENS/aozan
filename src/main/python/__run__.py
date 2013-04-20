@@ -8,7 +8,7 @@ import sys
 import aozan
 
 if len(sys.argv) < 2:
-    print "No configuration file define in command line.\nSyntax: aozan.sh conf_file"
+    print "No configuration file set in command line.\nSyntax: aozan.sh conf_file"
     sys.exit(1)
 else:
     aozan.aozan_main(sys.argv[1])
