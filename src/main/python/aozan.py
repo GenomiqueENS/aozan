@@ -13,7 +13,7 @@ from java.util import Locale
 import first_base_report
 from java.util import LinkedHashMap
 from fr.ens.transcriptome.aozan import Globals
-from fr.ens.transcriptome.aozan import Main
+from fr.ens.transcriptome.aozan import Common
 
 
 def create_lock_file(lock_file_path):
@@ -207,7 +207,7 @@ def aozan_main(conf_file_path):
         sys.exit(0)
 
     # Init logger
-    Main.initLogger(conf['aozan.var.path'] + '/aozan.log')
+    Common.initLogger(conf['aozan.var.path'] + '/aozan.log')
 
     # Check critical free space available
     hiseq_run.send_mail_if_critical_free_space_available(conf)

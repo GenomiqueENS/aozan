@@ -29,10 +29,10 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 /**
- * This the main class of Aozan.
+ * This class contains common methods like logger initialization.
  * @author Laurent Jourdren
  */
-public class Main {
+public class Common {
 
   /**
    * Initialize the logger for the application.
