@@ -194,6 +194,14 @@
         <directory>src/test/java/files</directory>
       </testResource>
     </testResources>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>2.0-beta-7</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -411,6 +419,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
+        <version>2.0-beta-7</version>
         <configuration>
           <outputEncoding>utf-8</outputEncoding>
         </configuration>
@@ -418,6 +427,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>changes-maven-plugin</artifactId>
+        <version>2.0-beta-1</version>
         <reportSets>
           <reportSet>
             <reports>
