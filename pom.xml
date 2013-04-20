@@ -91,6 +91,29 @@
     </mailingList>
   </mailingLists>
 
+  <scm>
+    <connection>scm:git:https://code.google.com/p/aozan/</connection>
+    <developerConnection>scm:git:https://code.google.com/p/aozan/</developerConnection>
+    <url>http://code.google.com/p/aozan/source/browse</url>
+  </scm>
+
+  <issueManagement>
+    <system>code.google.com</system>
+    <url>http://code.google.com/p/aozan/issues</url>
+  </issueManagement>
+
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>ens</id>
+      <name>ENS repository</name>
+      <!--url>https://maven-repository.dev.java.net/nonav/repository</url-->
+      <url>http://transcriptome.ens.fr/maven2</url>
+    </repository>
+  </repositories>
+
   <dependencies>
     <!-- Warning: Jython version must be set in the properties -->
     <dependency>
@@ -148,18 +171,6 @@
       <scope>compile</scope>
     </dependency>
   </dependencies>
-  
-  <repositories>
-    <repository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>ens</id>
-      <name>ENS repository</name>
-      <!--url>https://maven-repository.dev.java.net/nonav/repository</url-->
-      <url>http://transcriptome.ens.fr/maven2</url>
-    </repository>
-  </repositories>
 
   <build>
     <directory>target</directory>
