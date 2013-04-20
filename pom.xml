@@ -232,9 +232,26 @@
                   <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss z" />
                 </tstamp>
 
+<!-- execute git describe -->
+                <exec executable="git" failifexecutionfails="false" outputproperty="build.commit">
+                  <arg value="describe"/>
+                  <arg value="--all"/>
+                  <arg value="--long"/>
+                </exec>
+
+                <condition property="build.commit" value="">
+                  <not>
+                    <isset property="build.commit"/>
+                  </not>
+                </condition>
+
+                <exec executable="hostname" outputproperty="build.host"/>
+
                 <manifest file="${basedir}/target/generated-resources/MANIFEST.MF">
                   <attribute name="Built-By" value="${user.name}"/>
                   <attribute name="Built-Date" value="${TODAY}"/>  
+                  <attribute name="Built-Commit" value="${build.commit}" />
+                  <attribute name="Built-Host" value="${build.host}" /> 
 
                   <attribute name="Specification-Title" value="${pom.name}"/>   
                   <attribute name="Specification-Version" value="${pom.version}"/>   
@@ -245,7 +262,6 @@
                   <attribute name="Implementation-Vendor" value="${project.organization.name}"/>
 
                 </manifest>
-                <copy file="${basedir}/target/generated-resources/MANIFEST.MF" tofile="${basedir}/target/classes/manifest.txt"/>
               </tasks>
             </configuration>
             <goals>
@@ -392,6 +408,16 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries/>
+            <manifestFile>${basedir}/target/generated-resources/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
