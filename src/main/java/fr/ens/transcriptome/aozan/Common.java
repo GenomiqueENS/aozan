@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 /**
  * This class contains common methods like logger initialization.
+ * @since 1.0
  * @author Laurent Jourdren
  */
 public class Common {

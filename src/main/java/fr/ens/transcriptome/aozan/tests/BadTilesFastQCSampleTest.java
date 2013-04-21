@@ -33,6 +33,7 @@ import fr.ens.transcriptome.aozan.fastqc.BadTiles;
 /**
  * This class define a sample test for FastQC sequence length distribution
  * module.
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class BadTilesFastQCSampleTest extends AbstractFastQCSampleTest {

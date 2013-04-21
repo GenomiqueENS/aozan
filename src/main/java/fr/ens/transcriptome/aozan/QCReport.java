@@ -55,7 +55,7 @@ import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**
  * This class generate the QC Report.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class QCReport {

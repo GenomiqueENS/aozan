@@ -29,6 +29,7 @@ import fr.ens.transcriptome.aozan.AozanException;
 
 /**
  * This class define a score interval.
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class ScoreInterval {

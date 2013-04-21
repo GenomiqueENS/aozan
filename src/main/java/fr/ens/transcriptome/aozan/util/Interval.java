@@ -25,7 +25,7 @@ package fr.ens.transcriptome.aozan.util;
 
 /**
  * This interface define an interval.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public interface Interval {

@@ -42,7 +42,7 @@ import fr.ens.transcriptome.eoulsan.illumina.RunInfo;
 
 /**
  * This collector collect data from the RunInfo.xml file.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class RunInfoCollector implements Collector {

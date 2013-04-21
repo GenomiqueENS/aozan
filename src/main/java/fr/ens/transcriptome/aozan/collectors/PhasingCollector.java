@@ -49,7 +49,7 @@ import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**
  * This class define a collector for phasing/prephasing statistics data.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class PhasingCollector implements Collector {

@@ -30,7 +30,7 @@ import fr.ens.transcriptome.aozan.AozanException;
 
 /**
  * This interface define an Aozan QC test.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public interface AozanTest {

@@ -36,7 +36,7 @@ import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
 /**
  * This class a test on passing filter cluster in a lane.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class PFClustersPercentLaneTest extends AbstractLaneTest {

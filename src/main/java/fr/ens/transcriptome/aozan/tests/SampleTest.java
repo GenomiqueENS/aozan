@@ -27,7 +27,7 @@ import fr.ens.transcriptome.aozan.RunData;
 
 /**
  * This interface define sample test.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public interface SampleTest extends AozanTest {

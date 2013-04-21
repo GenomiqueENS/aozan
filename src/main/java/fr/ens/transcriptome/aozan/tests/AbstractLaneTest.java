@@ -25,7 +25,7 @@ package fr.ens.transcriptome.aozan.tests;
 
 /**
  * This class define a abstract Lane test.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public abstract class AbstractLaneTest implements LaneTest {

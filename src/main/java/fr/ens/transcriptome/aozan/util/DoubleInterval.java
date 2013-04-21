@@ -29,7 +29,7 @@ import fr.ens.transcriptome.aozan.AozanException;
 
 /**
  * This class define a double interval
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class DoubleInterval implements Interval {

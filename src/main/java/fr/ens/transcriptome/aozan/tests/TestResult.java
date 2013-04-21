@@ -25,7 +25,7 @@ package fr.ens.transcriptome.aozan.tests;
 
 /**
  * This class define a test result.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class TestResult {

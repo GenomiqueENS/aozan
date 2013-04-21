@@ -32,7 +32,7 @@ import fr.ens.transcriptome.aozan.collectors.FastQCCollector;
 
 /**
  * This class define an abstract FastQC test.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {

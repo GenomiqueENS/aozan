@@ -39,6 +39,7 @@ import fr.ens.transcriptome.eoulsan.util.Version;
 
 /**
  * This class contains Globals constants.
+ * @since 0.6
  * @author Laurent Jourdren
  */
 public class Globals {

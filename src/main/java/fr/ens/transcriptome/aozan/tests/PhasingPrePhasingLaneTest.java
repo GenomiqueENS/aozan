@@ -39,7 +39,7 @@ import fr.ens.transcriptome.aozan.util.Interval;
 
 /**
  * This class define a lane test on phasing / prephasing.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
