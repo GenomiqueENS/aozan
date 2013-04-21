@@ -45,7 +45,7 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
 /**
  * The private class define a class for a thread that execute fastqScreen for a
  * sample. It receive results in rundata and create a report file.
- * @since 0.11
+ * @since 1.0
  * @author Sandrine Perrin
  */
 class FastqScreenProcessThread extends AbstractFastqProcessThread {

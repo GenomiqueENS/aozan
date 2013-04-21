@@ -46,7 +46,7 @@ import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.RemoveUnmappedReadAlig
 /**
  * This class ensures alignment fastqScreen treating the output format BAM of
  * mapper.
- * @since 0.11
+ * @since 1.0
  * @author Sandrine Perrin
  */
 public class FastsqScreenSAMParser implements SAMParserLine {

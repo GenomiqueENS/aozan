@@ -42,7 +42,7 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
  * the properties defined in the configuration file Aozan, which define the list
  * of references genomes. Each sample are mapped on list of references genomes
  * and the genome of sample if it is available for Aozan.
- * @since 0.11
+ * @since 1.0
  * @author Sandrine Perrin
  */
 public class FastqScreenCollector extends AbstractFastqCollector {

@@ -31,7 +31,7 @@ import fr.ens.transcriptome.aozan.RunData;
 
 /**
  * This class manages results from fastqscreen.
- * @since 0.11
+ * @since 1.0
  * @author Sandrine Perrin
  */
 public class FastqScreenResult {

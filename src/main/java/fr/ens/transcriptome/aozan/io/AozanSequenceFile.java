@@ -42,7 +42,7 @@ import fr.ens.transcriptome.aozan.Globals;
 /**
  * The class allow to browse a fastq file sequence per sequence and writing them
  * in a new file.
- * @since 0.11
+ * @since 1.0
  * @author Sandrine Perrin
  */
 public class AozanSequenceFile implements SequenceFile {
