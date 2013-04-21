@@ -27,6 +27,10 @@ import java.util.Map;
 
 import fr.ens.transcriptome.aozan.AozanException;
 
+/**
+ * This class define a score interval.
+ * @author Laurent Jourdren
+ */
 public class ScoreInterval {
 
   private final Interval[] intervals = new Interval[9];

@@ -27,6 +27,11 @@ import com.google.common.base.Objects;
 
 import fr.ens.transcriptome.aozan.AozanException;
 
+/**
+ * This class define a long interval
+ * @since 1.0
+ * @author Laurent Jourdren
+ */
 public class LongInterval implements Interval {
 
   private final long min;

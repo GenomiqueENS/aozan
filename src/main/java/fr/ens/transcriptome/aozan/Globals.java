@@ -37,6 +37,10 @@ import java.util.logging.LogRecord;
 
 import fr.ens.transcriptome.eoulsan.util.Version;
 
+/**
+ * This class contains Globals constants.
+ * @author Laurent Jourdren
+ */
 public class Globals {
 
   private static Attributes manifestAttributes;
