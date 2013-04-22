@@ -1,5 +1,5 @@
-INSTALLING Eoulsan
------------------
+INSTALLING Aozan
+----------------
 
   To install Aozan, see the documentation on our website :
 

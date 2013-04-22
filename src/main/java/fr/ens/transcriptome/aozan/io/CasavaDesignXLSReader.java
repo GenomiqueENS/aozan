@@ -45,6 +45,7 @@ import fr.ens.transcriptome.eoulsan.util.Utils;
 
 /**
  * This class reads a Casava design file in xls format.
+ * @since 0.1
  * @author Laurent Jourdren
  */
 public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {

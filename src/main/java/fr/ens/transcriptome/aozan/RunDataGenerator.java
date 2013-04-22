@@ -38,6 +38,7 @@ import fr.ens.transcriptome.aozan.collectors.Collector;
 
 /**
  * This Class collect Data.
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class RunDataGenerator {

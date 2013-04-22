@@ -123,9 +123,9 @@
  </ul>
  
  <p>On ubuntu, you can install requirements (except CASAVA) with the following command:</p>
- <pre>
+<source>
 $ sudo apt-get install openjdk-6-jre-headless rsync
- </pre>
+</source>
  
  <a name="casava"/>
  <subsection name="Installing CASAVA">
@@ -154,7 +154,7 @@ $ VERSION=1.8.2 &amp;&amp; \
 
 # Remove CASAVA examples (not mandatory, save lot of space on the system)
 $ sudo rm -rf /usr/local/casava-$VERSION/share/CASAVA-$VERSION/examples 
- </source>
+</source>
    
  </subsection>
  
@@ -196,7 +196,7 @@ $ make install
 
 # Launch installation
 $ tar -cvjf /usr/local/bcl2fastq-1.8.3.tar.bz2 bcl2fastq-1.8.3/
- </source>
+</source>
    
  </subsection>
  
@@ -218,9 +218,9 @@ COMPRESSIONSUFFIX:=.gz
 
  <p>The installation of Aozan is very easy, you just had to uncompress the archive:</p>
 
-<pre>
+<source>
 $ tar xzf aozan-@@@VERSION@@@.tar.gz
-</pre>
+</source>
 
  <p>Aozan is written in Python and Java. It use the Java implementation of Python (Jython) that 
  is bundled in Aozan.</p>
@@ -239,9 +239,9 @@ $ tar xzf aozan-@@@VERSION@@@.tar.gz
 
  <p>In this case, we can launch Aozan with the following command:</p>
 
-<pre>
+<source>
 $ /usr/local/aozan/aozan.sh /etc/aozan.conf
-</pre>
+</source>
 
   </subsection>
 
@@ -251,7 +251,7 @@ $ /usr/local/aozan/aozan.sh /etc/aozan.conf
  <p>In the following lines, we configure our system to launch Aozan every hour using a script in
    <tt>/etc/cron.daily</tt> (on a Debian/Ubuntu GNU/Linux distribution).</p>
 
- <pre>
+ <source>
 #!/bin/bash
 
 # User to use to launch Aozan
@@ -264,14 +264,14 @@ AOZAN_DIR=/usr/local/aozan
 AOZAN_CONF=/etc/aozan.conf
 
 su $AOZAN_USER -c "$AOZAN_DIR/aozan.sh $AOZAN_CONF"
-</pre>
+</source>
 
 
  <p>Then we set the permission on the aozan cron script:</p>
 
-<pre>
+<source>
 $ sudo chmod 755 /etc/cron/daily/aozan &amp;&amp; sudo chmod root:root /etc/cron/daily/aozan
-</pre>
+</source>
 
   </subsection>
 </section>
@@ -298,27 +298,27 @@ $ sudo chmod 755 /etc/cron/daily/aozan &amp;&amp; sudo chmod root:root /etc/cron
 
  <ul>
    <li>First install the tools for mounting Windows shares (CIFS):</li>
-   <pre>
+<source>
 $ sudo apt-get install cifs-utils smbclient
-</pre>
+</source>
 
  <li>Then, test if you can connect to the share:</li>
- <pre>
+<source>
 $ smbclient -U sbsuser 'smb://hiseq01.example.com/F$'
-</pre>
+</source>
 
  <li>And now you can add the following lines in /etc/fstab:</li>
- <pre>
+<source>
 //hiseq01.example.com/F$   /mnt/hiseq01_f    cifs    username=sbsuser,password=hiseqpassword       0       0
 //hiseq01.example.com/G$   /mnt/hiseq01_g    cifs    username=sbsuser,password=hiseqpassword       0       0
-</pre>
+</source>
 
  <li>Now create the mount points and process to mounting of the shares:</li>
-<pre>
+<source>
 $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
    sudo mount /mnt/hiseq01_f &amp;&amp; \
    sudo mount /mnt/hiseq01_g
-</pre>
+</source>
 
  <li>You can also use autofs to mount the share. TODO</li>
  </ul>

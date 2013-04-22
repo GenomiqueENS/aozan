@@ -36,7 +36,7 @@ import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
 /**
  * This class define a sample percent in lane test.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class PercentInLaneSampleTest extends AbstractSampleTest {

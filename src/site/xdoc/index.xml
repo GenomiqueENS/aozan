@@ -35,7 +35,7 @@
 		
 
 	<body>
-	        <link rel="alternate" type="application/rss+xml" title="Eoulsan updates" href="aozan.rss" />
+	        <link rel="alternate" type="application/rss+xml" title="Aozan updates" href="aozan.rss" />
 
 		<section name="Welcome to Aozan">
 
@@ -50,7 +50,7 @@
 				<p style="font-size: smaller">
 					<img valign="top"
 						src="http://maven.apache.org/images/folder-open.gif" border="0"
-						alt="" title="Download Eoulsan" />
+						alt="" title="Download Aozan" />
 					<a href="aozan-@@@VERSION@@@.tar.gz">Download</a>
 					Aozan Application
 					<br />
@@ -98,11 +98,9 @@
 
 		<section name="Funding">
 
-		<p>This work was supported by the Infrastructures en Biologie Santé et Agronomie (IBiSA), France Génomique and Amazon Web Services research grant.</p>
-		<a href="http://www.ibisa.net/"><img src="images/logo_ibisa-40.gif"/></a>&#160;&#160;
-		<a href="https://www.france-genomique.org/spip/"><img src="images/logo_"/></a>&#160;&#160;
-		<a href="http://aws.amazon.com/"><img src="images/logo_aws-40.gif"/></a>
-		
+		<p>This work was supported by the Infrastructures en Biologie Santé et Agronomie (IBiSA) and France Génomique.</p>
+		<a href="http://www.ibisa.net/"><img src="images/logo_ibisa-40pxh.png"/></a>&#160;&#160;
+		<a href="https://www.france-genomique.org/"><img src="images/logo_francegenomique-40pxh.png"/></a>&#160;&#160;
 		</section>
 		
 	

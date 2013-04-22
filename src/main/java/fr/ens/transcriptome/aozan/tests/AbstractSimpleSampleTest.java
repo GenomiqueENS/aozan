@@ -31,6 +31,11 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
+/**
+ * This class define a simple sample test.
+ * @since 0.8
+ * @author Laurent Jourdren
+ */
 public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
 
   private ScoreInterval interval = new ScoreInterval();

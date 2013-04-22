@@ -31,6 +31,7 @@ import fr.ens.transcriptome.aozan.AozanException;
 
 /**
  * This class define a sample test for FastQC duplication level module.
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class DuplicationLevelFastQCSampleTest extends AbstractFastQCSampleTest {

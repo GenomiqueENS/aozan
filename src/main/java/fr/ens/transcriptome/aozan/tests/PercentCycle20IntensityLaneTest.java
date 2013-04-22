@@ -32,7 +32,7 @@ import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 
 /**
  * This class define a test on percent of intensity at cycle 20.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class PercentCycle20IntensityLaneTest extends AbstractSimpleLaneTest {

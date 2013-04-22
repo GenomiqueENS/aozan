@@ -31,7 +31,7 @@ import fr.ens.transcriptome.aozan.RunData;
 
 /**
  * This interface define a Collector.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public interface Collector {

@@ -36,7 +36,7 @@ import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
 /**
  * This class define a lane test on cluster density.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class ClusterDensityLaneTest extends AbstractLaneTest {

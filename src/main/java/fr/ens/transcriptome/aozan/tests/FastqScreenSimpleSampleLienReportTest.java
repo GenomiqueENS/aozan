@@ -36,7 +36,7 @@ import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
 /**
  * The class adds in the qc report html a link to the report fastqScreen for
  * each sample.
- * @since 0.11
+ * @since 1.0
  * @author Sandrine Perrin
  */
 public class FastqScreenSimpleSampleLienReportTest extends AbstractSampleTest {

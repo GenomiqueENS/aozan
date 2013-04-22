@@ -31,7 +31,7 @@ import fr.ens.transcriptome.aozan.collectors.FlowcellDemuxSummaryCollector;
 
 /**
  * This class define a passing filter clusters count test for samples.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class PFClustersSampleTest extends AbstractSimpleSampleTest {

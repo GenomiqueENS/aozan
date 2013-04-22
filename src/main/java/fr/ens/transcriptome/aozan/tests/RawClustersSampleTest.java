@@ -31,7 +31,7 @@ import fr.ens.transcriptome.aozan.collectors.FlowcellDemuxSummaryCollector;
 
 /**
  * This class define a raw clusters count test for samples.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class RawClustersSampleTest extends AbstractSimpleSampleTest {

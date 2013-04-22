@@ -52,7 +52,7 @@ import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**
  * This class define a collector for demux statistics data.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class FlowcellDemuxSummaryCollector implements Collector {

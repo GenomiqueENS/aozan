@@ -62,7 +62,7 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
 /**
  * This private class define a class for a thread that read fastq file for
  * FastQC modules.
- * @since 0.11
+ * @since 1.0
  * @author Laurent Jourdren
  */
 class FastQCProcessThread extends AbstractFastqProcessThread {

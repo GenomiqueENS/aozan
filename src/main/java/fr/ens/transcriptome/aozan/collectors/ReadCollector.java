@@ -52,7 +52,7 @@ import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**
  * This class define a Collector for read?.xml files.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class ReadCollector implements Collector {

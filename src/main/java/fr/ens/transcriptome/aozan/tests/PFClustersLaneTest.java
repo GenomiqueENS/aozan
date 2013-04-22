@@ -32,7 +32,7 @@ import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 
 /**
  * This class define a Passing Filter cluster lane test.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class PFClustersLaneTest extends AbstractSimpleLaneTest {

@@ -1,138 +1,134 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <document>
-	<properties>
-		<title>Change log</title>
-		<author email="jourdren@biologie.ens.fr">
-			Laurent Jourdren
-		</author>
-	</properties>
-	<body>
+  <properties>
+    <title>Change log</title>
+    <author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
+  </properties>
+  <body>
 
-		<release version="0.1" description="" date="2011-12-08">
-			<action dev="jourdren" type="update">
-		                Initial version.
-			</action>
-		</release>
+    <release version="0.1" description="Aozan version 0.1" date="2011-12-08">
+      <action dev="jourdren" type="update">
+      Initial version.
+      </action>
+    </release>
 		
-		<release version="0.2" description="" date="2011-12-09">
-            <action dev="jourdren" type="add">
-                        While a run is running on HiSeq, send the first base report when available.
-            </action>
-        </release>
+    <release version="0.2" description="Aozan version 0.2" date="2011-12-09">
+      <action dev="jourdren" type="add">
+      While a run is running on HiSeq, send the first base report when available.
+      </action>
+    </release>
         
-        <release version="0.3" description="" date="2011-12-09">
-            <action dev="jourdren" type="add">
+    <release version="0.3" description="Aozan version 0.3" date="2011-12-09">
+      <action dev="jourdren" type="add">
                         Add a hiseq.deny file that contains all the run ids to not process.
-            </action>
-            <action dev="jourdren" type="fix">
+      </action>
+      <action dev="jourdren" type="fix">
                         Now save a file with the pid of aozan. Now send a mail with the lock error only when the lock pid no more exists.
-            </action>
-                        <action dev="jourdren" type="fix">
+      </action>
+      <action dev="jourdren" type="fix">
                         Remove temporary files (design, hiseq_log_ directory).
-            </action>
-            </action>
-                        <action dev="jourdren" type="fix">
+      </action>
+      <action dev="jourdren" type="fix">
                         Fix issue when zip design files.
-            </action>
-        </release>
+      </action>
+    </release>
 
-        <release version="0.4" description="" date="2011-12-09">
-            <action dev="jourdren" type="fix">
+    <release version="0.4" description="Aozan version 0.4" date="2011-12-09">
+      <action dev="jourdren" type="fix">
                         Fix issue with pid checking of already running aozan process.
-            </action>
-        </release>
+      </action>
+    </release>
         
-        <release version="0.5" description="" date="2011-12-12">
-            <action dev="jourdren" type="add">
+    <release version="0.5" description="Aozan version 0.5" date="2011-12-12">
+      <action dev="jourdren" type="add">
                         Aozan has now a log file name aozan.log.
-            </action>
-            <action dev="jourdren" type="add">
+      </action>
+      <action dev="jourdren" type="add">
                         Trace exception in log file.
-            </action>
-            <action dev="jourdren" type="fix">
+      </action>
+      <action dev="jourdren" type="fix">
                         Issue with pid of currently running instance of Aozan.
-            </action>
-            <action dev="jourdren" type="fix">
+      </action>
+      <action dev="jourdren" type="fix">
                         Now get the good Basecall_Stats_FLOWCELLID path even for RTA 1.10.36.
-            </action>
-            <action dev="jourdren" type="add">
+      </action>
+      <action dev="jourdren" type="add">
                         Now show in log the new disk usage and disk free at the end of sync step and demux step.
-            </action>
-            <action dev="jourdren" type="fix">
+      </action>
+      <action dev="jourdren" type="fix">
                         Demux space estimation.
-            </action>
-        </release> 
+      </action>
+    </release> 
 		
 		
-		 <release version="0.6" description="" date="2011-12-16">
-            <action dev="jourdren" type="fix">
+    <release version="0.6" description="Aozan version 0.6" date="2011-12-16">
+      <action dev="jourdren" type="fix">
                         Fix mail message when a run is discovered.
-            </action>
-            <action dev="jourdren" type="update">
+      </action>
+      <action dev="jourdren" type="update">
                         Don't show Aozan welcome message when there is nothing to do.
-            </action>
-            <action dev="jourdren" type="fix">
+      </action>
+      <action dev="jourdren" type="fix">
                         Change Eoulsan version dependency. Prevent errors with Casava design CSV file with comma in cell value.
-            </action>
-
-        </release>
+      </action>
+    </release>
         
-        <release version="0.7" description="" date="2012-02-24">
-            <action dev="jourdren" type="fix">
+    <release version="0.7" description="Aozan version 0.7" date="2012-02-24">
+      <action dev="jourdren" type="fix">
                         Fix typo in mail message when the end of run is discovered.
-            </action>
-            <action dev="jourdren" type="update">
+      </action>
+      <action dev="jourdren" type="update">
                         Now use Eoulsan 1.2-SNAPSHOT as dependency. New Casava design check:  1) Allow the use of a sample in several lanes.
 2) new error if a sample is used by more than one project. 3) new warning if a sample exists in more than one lane. 4) new warning with the list of line where is a sample (if the number
 of lanes >1). 5) new errors if a sample is defined several time by with not the same sequence index.
-            </action>
-            <action dev="jourdren" type="update">
+      </action>
+      <action dev="jourdren" type="update">
                         In demux step, add Casava design warnings to log and to the success mail send to users.
-            </action>
-            <action dev="jourdren" type="update">
+      </action>
+      <action dev="jourdren" type="update">
                         The default number of threads is now the number of available processors/cores.
-            </action>
-        </release>
+      </action>
+    </release>
         
-        <release version="0.8" description="" date="2012-05-16">
-            <action dev="jourdren" type="add">
+    <release version="0.8" description="Aozan version 0.8" date="2012-05-16">
+      <action dev="jourdren" type="add">
                 Add support for Casava 1.8.2.
-            </action>
-            <action dev="jourdren" type="add">
+      </action>
+      <action dev="jourdren" type="add">
                 Add Quality control report step.
-            </action>
-        </release>
+      </action>
+    </release>
         
-        <release version="0.9" description="" date="2012-06-20">
-            <action dev="jourdren" type="update">
+    <release version="0.9" description="Aozan version 0.9" date="2012-06-20">
+      <action dev="jourdren" type="update">
                 When an exception is thrown, send a mail with the exception message and traceback.
-            </action>
-            <action dev="jourdren" type="fix">
+      </action>
+      <action dev="jourdren" type="fix">
                 When checking critical space available on HiSeq computer at every Aozan startup do not send a message if the HiSeq data path is not reachable.
-            </action>
-            <action dev="jourdren" type="fix">
+      </action>
+      <action dev="jourdren" type="fix">
                 In Casava design checking now only allow strings using ascii charset.
-            </action>
-			<action dev="jourdren" type="fix">
+      </action>
+      <action dev="jourdren" type="fix">
                 Aozan qc test do not fail if data to test does not exist.
-            </action>
-            <action dev="jourdren" type="fix">
+      </action>
+      <action dev="jourdren" type="fix">
                 FastQC don't throw exception if no read read.
-            </action>
-            <action dev="jourdren" type="update">
+      </action>
+      <action dev="jourdren" type="update">
                 No write the qc raw data before the xml qc report.
-            </action>
-            <action dev="jourdren" type="update">
+      </action>
+      <action dev="jourdren" type="update">
                 If an unexcepted exception is thrown in qc step, now send a mail.
-            </action>
-        </release>
+      </action>
+    </release>
         
-        <release version="0.10" description="" date="2012-10-08">
-            <action dev="jourdren" type="add">
+    <release version="0.10" description="Aozan version 0.10" date="2012-10-08">
+      <action dev="jourdren" type="add">
                 Jython is now bundled in Aozan.
-            </action>
-        </release>
+      </action>
+    </release>
 		
-	</body>
+  </body>
 </document>

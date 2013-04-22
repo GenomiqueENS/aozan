@@ -32,7 +32,7 @@ import fr.ens.transcriptome.aozan.io.FastqStorage;
 
 /**
  * The abstract class define a thread, it calls by AbtractFastqCollector.
- * @since 0.11
+ * @since 1.0
  * @author Laurent Jourdren
  * @author Sandrine Perrin
  */

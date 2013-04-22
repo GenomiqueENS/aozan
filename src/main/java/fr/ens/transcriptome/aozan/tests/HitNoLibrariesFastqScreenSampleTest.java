@@ -34,7 +34,7 @@ import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
  * The class adds in the qc report html one result from fastqScreen for each
  * sample. It print the percent of reads which mapped on at least one genomes
  * except the genome sample.
- * @since 0.11
+ * @since 1.0
  * @author Sandrine Perrin
  */
 public class HitNoLibrariesFastqScreenSampleTest extends

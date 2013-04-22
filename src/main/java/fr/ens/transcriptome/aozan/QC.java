@@ -47,6 +47,11 @@ import fr.ens.transcriptome.aozan.tests.AozanTestRegistry;
 import fr.ens.transcriptome.aozan.tests.LaneTest;
 import fr.ens.transcriptome.aozan.tests.SampleTest;
 
+/**
+ * This class is the main QC class.
+ * @since 0.8
+ * @author Laurent Jourdren
+ */
 public class QC {
 
   /** Logger */

@@ -32,6 +32,7 @@ import fr.ens.transcriptome.aozan.AozanException;
 
 /**
  * This class define a sample test for FastQC kmer content module.
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class KmerContentFastQCSampleTest extends AbstractFastQCSampleTest {

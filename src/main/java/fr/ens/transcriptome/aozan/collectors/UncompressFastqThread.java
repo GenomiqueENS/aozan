@@ -44,7 +44,7 @@ import fr.ens.transcriptome.eoulsan.util.FileUtils;
 /**
  * This private class create a thread for each array of file to uncompress and
  * compile in temporary file.
- * @since 0.11
+ * @since 1.0
  * @author Sandrine Perrin
  */
 class UncompressFastqThread extends AbstractFastqProcessThread {

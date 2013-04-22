@@ -52,6 +52,7 @@ import fr.ens.transcriptome.eoulsan.bio.IlluminaReadId;
 /**
  * This class define a QCModule for FastQC that list the bad tiles in a fastq
  * file.
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class BadTiles implements QCModule {

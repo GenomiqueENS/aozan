@@ -41,7 +41,7 @@ import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignCSVReader;
 
 /**
  * This class define a Casava design Collector
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class DesignCollector implements Collector {

@@ -37,7 +37,7 @@ import fr.ens.transcriptome.eoulsan.util.StringUtils;
 /**
  * The class correspond of one entity to treat by AbstractFastqCollector, so a
  * sample per lane and in mode-paired one FastSample for each read (R1 and R2).
- * @since 0.11
+ * @since 1.0
  * @author Sandrine Perrin
  */
 public class FastqSample {

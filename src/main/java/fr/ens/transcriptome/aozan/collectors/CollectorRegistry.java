@@ -33,7 +33,7 @@ import fr.ens.transcriptome.aozan.AozanRuntimeException;
 
 /**
  * This class define a registry for Collectors.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class CollectorRegistry {

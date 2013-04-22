@@ -39,7 +39,7 @@ import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
 /**
  * This class define a lane test on PhiX percent aligned.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  */
 public class PercentAlignLaneTest extends AbstractLaneTest {

@@ -25,7 +25,7 @@ package fr.ens.transcriptome.aozan;
 
 /**
  * A nestable Aozan exception. This class came from from Biojava code.
- * @since 1.0
+ * @since 0.8
  * @author Laurent Jourdren
  * @author Matthew Pocock
  */

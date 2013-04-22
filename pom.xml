@@ -15,111 +15,125 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <didyouknow>Did you know that aozan is the breton word for prepare?</didyouknow>
+    <jython.version>2.5.3</jython.version>
   </properties>
   
   <organization>
-        <name>École normale supérieure genomic platform</name>
-        <url>http://transcriptome.ens.fr/sgdb</url>
+    <name>École normale supérieure genomic platform</name>
+    <url>http://transcriptome.ens.fr/sgdb</url>
   </organization>
 
-
   <developers>
-		<developer>
-			<id>jourdren</id>
-			<name>Laurent Jourdren</name>
-			<email>aozan 0 biologie ens fr</email>
-			<url />
-			<organization>
-				École normale supérieure, IBENS, Genomic Paris Centre
-			</organization>
-			<organizationUrl>
-				http://transcriptome.ens.fr/sgdb/
-			</organizationUrl>
-			<roles>
-				<role>Lead Developer</role>
-			</roles>
-			<timezone>1</timezone>
-			<properties />
-		</developer>
-		<developer>
-			<id>perrin</id>
-			<name>Sandrine Perin</name>
-			<email>aozan 0 biologie ens fr</email>
-			<url />
-			<organization>
-				École normale supérieure, IBENS, Genomic Paris Centre
-			</organization>
-			<organizationUrl>
-				http://transcriptome.ens.fr/sgdb/
-			</organizationUrl>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<timezone>1</timezone>
-			<properties />
-		</developer>
-		<developer>
-			<id>lecrom</id>
-			<name>Stéphane Le Crom</name>
-			<email>aozan 0 biologie ens fr</email>
-			<url />
-			<organization>
-				École normale supérieure, IBENS, Genomic Paris Centre
-			</organization>
-			<organizationUrl>
-				http://transcriptome.ens.fr/sgdb/
-			</organizationUrl>
-			<roles>
-				<role>Project manager and documentation review</role>
-			</roles>
-			<timezone>1</timezone>
-			<properties />
-		</developer>
-	</developers>
+    <developer>
+      <id>jourdren</id>
+      <name>Laurent Jourdren</name>
+      <email>aozan 0 biologie ens fr</email>
+      <url />
+      <organization>École normale supérieure, IBENS, Genomic Paris Centre</organization>
+      <organizationUrl>http://transcriptome.ens.fr/sgdb/</organizationUrl>
+      <roles>
+        <role>Lead Developer</role>
+      </roles>
+      <timezone>1</timezone>
+      <properties />
+    </developer>
+    <developer>
+      <id>perrin</id>
+      <name>Sandrine Perin</name>
+      <email>aozan 0 biologie ens fr</email>
+      <url />
+      <organization>École normale supérieure, IBENS, Genomic Paris Centre</organization>
+      <organizationUrl>http://transcriptome.ens.fr/sgdb/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>1</timezone>
+      <properties />
+    </developer>
+    <developer>
+      <id>lecrom</id>
+      <name>Stéphane Le Crom</name>
+      <email>aozan 0 biologie ens fr</email>
+      <url />
+      <organization>École normale supérieure, IBENS, Genomic Paris Centre</organization>
+      <organizationUrl>http://transcriptome.ens.fr/sgdb/</organizationUrl>
+      <roles>
+        <role>Project manager and documentation review</role>
+      </roles>
+      <timezone>1</timezone>
+      <properties />
+    </developer>
+  </developers>
 
-	<contributors>
-	</contributors>
+  <contributors/>
 
-	<licenses>
-		<license>
-			<name>GNU General Public License v3.0</name>
-			<url>http://www.gnu.org/licenses/gpl-3.0-standalone.html</url>
-			<distribution>repo</distribution>
-			<comments />
-		</license>
-		<license>
-			<name>CeCILL Licence française de logiciel libre</name>
-			<url>http://www.cecill.info/licences/Licence_CeCILL_V2-en.html</url>
-			<distribution>repo</distribution>
-			<comments />
-		</license>
-	</licenses>
+  <licenses>
+    <license>
+      <name>GNU General Public License v3.0</name>
+      <url>http://www.gnu.org/licenses/gpl-3.0-standalone.html</url>
+      <distribution>repo</distribution>
+      <comments />
+    </license>
+    <license>
+      <name>CeCILL-C Licence française de logiciel libre</name>
+      <url>http://www.cecill.info/licences/Licence_CeCILL_V2-en.html</url>
+      <distribution>repo</distribution>
+      <comments />
+    </license>
+  </licenses>
 
-	<mailingLists>
-		<mailingList>
-			<name>aozan-group</name>
-			<subscribe>http://groups.google.com/group/aozan/subscribe</subscribe>
-			<!--unsubscribe>http://groups.google.com/group/aozan/unsubscribe</unsubscribe-->
-			<archive>http://groups.google.com/group/aozan</archive>
-		</mailingList>
-	</mailingLists>
+  <mailingLists>
+    <mailingList>
+      <name>aozan-group</name>
+      <subscribe>http://groups.google.com/group/aozan/subscribe</subscribe>
+      <!--unsubscribe>http://groups.google.com/group/aozan/unsubscribe</unsubscribe-->
+      <archive>http://groups.google.com/group/aozan</archive>
+    </mailingList>
+  </mailingLists>
+
+  <scm>
+    <connection>scm:git:https://code.google.com/p/aozan/</connection>
+    <developerConnection>scm:git:https://code.google.com/p/aozan/</developerConnection>
+    <url>http://code.google.com/p/aozan/source/browse</url>
+  </scm>
+
+  <issueManagement>
+    <system>code.google.com</system>
+    <url>http://code.google.com/p/aozan/issues</url>
+  </issueManagement>
+
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>ens</id>
+      <name>ENS repository</name>
+      <!--url>https://maven-repository.dev.java.net/nonav/repository</url-->
+      <url>http://transcriptome.ens.fr/maven2</url>
+    </repository>
+  </repositories>
+
+
   <dependencies>
-    <!-- Warning Jython must be the first dependency -->
+    <!-- Warning: Jython version must be set in the properties -->
     <dependency>
       <groupId>org.python</groupId>
       <artifactId>jython-standalone</artifactId>
-      <version>2.5.3</version>
-      <scope>compile</scope>
+      <version>${jython.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>fr.ens.transcriptome</groupId>
       <artifactId>eoulsan</artifactId>
       <version>1.3-SNAPSHOT</version>
+      <scope>compile</scope>
     </dependency> 
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi</artifactId>
       <version>3.7</version>
+      <scope>compile</scope>
     </dependency> 
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -146,30 +160,18 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-		<groupId>org.apache.commons</groupId>
-		<artifactId>commons-compress</artifactId>
-		<version>1.4.1</version>
-		<scope>compile</scope>
-	</dependency>
-	<dependency>
-		<groupId>net.sourceforge.picard</groupId>
-		<artifactId>sam</artifactId>
-		<version>1.76</version>
-		<scope>compile</scope>
-	</dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+      <version>1.4.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.picard</groupId>
+      <artifactId>sam</artifactId>
+      <version>1.76</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
-  
-  <repositories>
-    <repository>
-       <snapshots>
-          <enabled>true</enabled>
-       </snapshots>
-          <id>ens</id>
-          <name>ENS repository</name>
-          <!--url>https://maven-repository.dev.java.net/nonav/repository</url-->
-          <url>http://transcriptome.ens.fr/maven2</url>
-    </repository>
-  </repositories>
 
   <build>
     <directory>target</directory>
@@ -193,6 +195,14 @@
         <directory>src/test/java/files</directory>
       </testResource>
     </testResources>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>2.0-beta-7</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -212,38 +222,53 @@
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
-            <execution>
-                        <id>generate-ressources</id>
-                            <phase>generate-resources</phase>
-                            <configuration>
-                                    <tasks>
-                                <mkdir dir="${basedir}/target/generated-resources"/>
-                                <buildnumber file="${basedir}/build.num"/>
-                                <tstamp>
-                                    <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss z" />
-                                </tstamp>
+          <execution>
+            <id>generate-ressources</id>
+            <phase>generate-resources</phase>
+            <configuration>
+              <tasks>
+                <mkdir dir="${basedir}/target/generated-resources"/>
+                <buildnumber file="${basedir}/build.num"/>
+                <tstamp>
+                  <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss z" />
+                </tstamp>
 
-                                <manifest file="${basedir}/target/generated-resources/MANIFEST.MF">
-                                    <attribute name="Built-By" value="${user.name}"/>
-                                    <attribute name="Built-Date" value="${TODAY}"/>  
+<!-- execute git describe -->
+                <exec executable="git" failifexecutionfails="false" outputproperty="build.commit">
+                  <arg value="describe"/>
+                  <arg value="--all"/>
+                  <arg value="--long"/>
+                </exec>
 
-                                    <attribute name="Specification-Title" value="${pom.name}"/>   
-                                    <attribute name="Specification-Version" value="${pom.version}"/>   
-                                    <attribute name="Specification-Vendor" value="${project.organization.name}"/>
+                <condition property="build.commit" value="">
+                  <not>
+                    <isset property="build.commit"/>
+                  </not>
+                </condition>
 
-                                    <attribute name="Implementation-Title" value="${pom.name}"/>   
-                                    <attribute name="Implementation-Version" value="build${build.number}"/>   
-                                    <attribute name="Implementation-Vendor" value="${project.organization.name}"/>
+                <exec executable="hostname" outputproperty="build.host"/>
 
-                                    <!--attribute name="Main-Class" value="fr.ens.transcriptome.eoulsan.Main"/-->
-                                </manifest>
-                                <copy file="${basedir}/target/generated-resources/MANIFEST.MF" tofile="${basedir}/target/classes/manifest.txt"/>
-                                    </tasks>
-                            </configuration>
-                            <goals>
-                                    <goal>run</goal>
-                            </goals>
-                        </execution>
+                <manifest file="${basedir}/target/generated-resources/MANIFEST.MF">
+                  <attribute name="Built-By" value="${user.name}"/>
+                  <attribute name="Built-Date" value="${TODAY}"/>  
+                  <attribute name="Built-Commit" value="${build.commit}" />
+                  <attribute name="Built-Host" value="${build.host}" /> 
+
+                  <attribute name="Specification-Title" value="${pom.name}"/>   
+                  <attribute name="Specification-Version" value="${pom.version}"/>   
+                  <attribute name="Specification-Vendor" value="${project.organization.name}"/>
+
+                  <attribute name="Implementation-Title" value="${pom.name}"/>   
+                  <attribute name="Implementation-Version" value="build${build.number}"/>   
+                  <attribute name="Implementation-Vendor" value="${project.organization.name}"/>
+
+                </manifest>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
           <execution>
             <id>create-dist</id>
             <phase>package</phase>
@@ -256,12 +281,12 @@
 
                 <copy file="${basedir}/src/main/bin/${pom.artifactId}.sh" todir="${basedir}/target/dist/" />
                 <chmod file="${basedir}/target/dist/${pom.artifactId}.sh" perm="ugo+rx" />
-          
+
                 <copy file="${basedir}/target/${pom.artifactId}-${pom.version}.jar" todir="${basedir}/target/dist/lib" />
                 <move file="${basedir}/target/dist/" tofile="${basedir}/target/dist/${pom.artifactId}-${pom.version}"/>
 
-		<jar jarfile="${basedir}/target/dist/${artifactId}-${version}/lib/jython-standalone-2.5.3.jar" update="true">
-                      <fileset dir="${basedir}/src/main/python" includes="*" />
+                <jar jarfile="${basedir}/target/dist/${artifactId}-${version}/lib/jython-standalone-${jython.version}.jar" update="true">
+                  <fileset dir="${basedir}/src/main/python" includes="*" />
                 </jar>
 
                 <!-- Package source distribution -->
@@ -280,7 +305,6 @@
                   </fileset>
                 </copy>
                 <move file="${basedir}/target/dist-src/" tofile="${basedir}/target/dist-src/${pom.artifactId}-${pom.version}"/>
-    
               </tasks>
             </configuration>
             <goals>
@@ -339,7 +363,62 @@
               <goal>run</goal>
             </goals>
           </execution>
+          <execution>
+            <id>replace-variables-site</id>
+            <phase>site</phase>
+            <configuration>
+              <tasks>
+                <replace encoding="iso-8859-1" dir="${basedir}/target/site" value="${pom.url}">
+                  <include name="**/*.jnlp"/>
+                  <include name="**/*.html"/>
+                  <include name="**/*.rss"/>
+                  <replacetoken>@@@WEBSITE@@@</replacetoken>
+                </replace>
+                <replace encoding="iso-8859-1" dir="${basedir}/target/site" value="${pom.version}">
+                  <include name="**/*.jnlp"/>
+                  <include name="**/*.html"/>
+                  <include name="**/*.rss"/>
+                  <replacetoken>@@@VERSION@@@</replacetoken>
+                </replace>
+                <replace encoding="iso-8859-1" dir="${basedir}/target/site" value="${pom.name}">
+                  <include name="**/*.jnlp"/>
+                  <include name="**/*.html"/>
+                  <include name="**/*.rss"/>
+                  <replacetoken>@@@APPNAME@@@</replacetoken>
+                </replace>
+                <replace encoding="iso-8859-1" dir="${basedir}/target/site" value="${artifactId}">
+                  <include name="**/*.jnlp"/>
+                  <include name="**/*.html"/>
+                  <include name="**/*.rss"/>
+                  <replacetoken>@@@APPNAMEMIN@@@</replacetoken>
+                </replace>
+
+                <tstamp>
+                  <format property="TODAY_UK" pattern="EEE, dd MMM yyyy HH:mm:ss z" locale="en,UK"/>
+                </tstamp>
+                <replace encoding="iso-8859-1" dir="${basedir}/target/site" value="${TODAY_UK}">
+                  <include name="**/*.jnlp"/>
+                  <include name="**/*.html"/>
+                  <include name="**/*.rss"/>
+                  <replacetoken>@@@DATE@@@</replacetoken>
+                </replace>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries/>
+            <manifestFile>${basedir}/target/generated-resources/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -360,5 +439,32 @@
       </plugin>
     </plugins>
   </build>
+
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>2.0-beta-7</version>
+        <configuration>
+          <templateFile>${basedir}/src/site/site.vm</templateFile>
+          <outputEncoding>utf-8</outputEncoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>changes-maven-plugin</artifactId>
+        <version>2.0-beta-1</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>changes-report</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
 
 </project>
