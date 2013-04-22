@@ -40,7 +40,7 @@
           <p>To compile Aozan, the default memory allocated by Maven is not enough. Your must set the environment variable <b>MAVEN_OPTS</b> to do this. To change this variable using bash use the built-in command <b>export</b> (512MiB or 1GiB is a good amount of memory of Maven):</p>
           <source>$ export MAVEN_OPTS=-Xmx1024m</source>	  
           <p><b>Update:</b> It seems that with last version of Maven the default memory size allocated is enough to build Aozan.</p>
-          <p>Aozan need <a href="http://jython.org/">Jython</a> to compile. You need to install it and set the <code>JYTHON_HOME</code> with the path to jython before building Aozan. Aozan was developed with Jython 2.5.x, later version of Jython may also works.</p>
+          <p>Aozan need <a href="http://jython.org/">Jython</a> to compile. You need to install it. Aozan was developed with Jython 2.5.x, later version of Jython may also works.</p>
  
 	  <p>First set your current directory to the base directory of <b>Aozan</b>.</p>
 	  
