@@ -73,7 +73,7 @@
 
 
 			<p>Aozan has been developped in order to automatically handle data transfert, demultiplexing conversion, quality control
-			and research contamination once a HiSeq run has been finished. Through our computer infrastructure and the creation 
+			and the contamination detection once a HiSeq run has been finished. Through our computer infrastructure and the creation 
 			of a run design, we are able to get at the end of each run a whole data quality reporting in order to evaluate each
 			sequencing parameter. Aozan is involved in the primary data analysis and produce compressed fastq files from 
 			an HiSeq sequencer output</p>

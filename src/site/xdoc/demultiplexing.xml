@@ -34,13 +34,14 @@
 
 	 <section name="Demultiplexing step">
      
-     <p>This step allow to launch demultiplexing using CASVASA. Aozan can use samplesheet in XLS format or generated
+     <p>This step allow to launch demultiplexing using CASAVA. Aozan can use samplesheet in XLS format or generated
      by an external tool in addition of samplesheet in CSV format. Using samplesheet in XLS format allow
      to use alias for adapters sequences indexes.</p>
 
-	 Alongside Aozan, we provide a standalone CASAVA design validator available on our website that allows you to check 
+	 <p>Alongside Aozan, we provide a standalone CASAVA design validator available on our website that allows you to check 
 	 your run design and generate a valid CSV design file.
-	 The tool is avaible <a href="http://www.transcriptome.ens.fr/designvalidator/">here.</a>
+	 The tool is available <a href="http://www.transcriptome.ens.fr/designvalidator/">here.</a>
+	 </p>
 	 
 	  
       <h4>Configuration parameters</h4>
@@ -68,6 +69,10 @@
 	     <tr><td>casava.with.failed.reads</td><td>boolean</td><td>True</td><td>Add reads that not pass Illumina filter in fastq files</td></tr>   
 	   </table>
      
+        <p>An example of email sent to the end of demultiplexing step.</p>
+       <div align="center">
+       		<table><tr><th><img src="images/mail_demultiplexing.png" alt="" border="1"></img></th></tr></table>
+       	</div>
    </section>
 	</body>
 

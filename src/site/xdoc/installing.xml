@@ -50,11 +50,12 @@
         <li>Aozan is ready to run.</li>
 
 			<ul>
-				<il>Manually : 
+				<il><p>Manually :</p> 
 <source>$ cd aozan-@@@VERSION@@@
 $ ./aozan.sh /etc/aozan.conf</source>
 				</il>
-				<il><a href="quickstart.xml#aozan_cron_job">As cron job</a></il>
+				<il><p>As cron job : <a href="quickstart.html#aozan_cron_job">details are here.</a></p>
+				</il>
 			</ul>
 
       </ul>

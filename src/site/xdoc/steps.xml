@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+/*
+ *                  Aozan development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU General Public License version 3 or later 
+ * and CeCILL. This should be distributed with the code. If you 
+ * do not have a copy, see:
+ *
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+ *
+ * Copyright for this code is held jointly by the Genomic platform
+ * of the Institut de Biologie de l'École Normale Supérieure and
+ * the individual authors. These should be listed in @author doc
+ * comments.
+ *
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page at:
+ *
+ *      http://www.transcriptome.ens.fr/aozan
+ *
+ */
+-->
+<document>
+
+	<properties>
+		<title>Steps</title>
+		<author email="jourdren@biologie.ens.fr">
+			Laurent Jourdren
+		</author>
+		
+	</properties>
+		
+
+	<body>
+		<p>Aozan works in 6 steps :
+		
+		<ul>
+			<il><p><a href="first-base-report.html">Send first base report</a>
+			 : send an email with the first base report, if a new run is currently running.</p>
+			 </il>
+			
+			<il><p><a href="end-run-discovering.html">End of run detection</a></p>
+				<ul><il><p>Checks <i>&quot;Basecalling_Netcopy_complete.txt&quot;</i> file creation in the run directory </p></il>
+				<il><p>Can handle multiple HiSeq sequencer outputs</p></il></ul>
+			</il>
+			
+			<il><p><a href="synchronization.html">NAS and mid-term storage synchronization</a></p>
+				<ul><il><p>Uses rsync</p></il>
+				<il><p>Does not copy CIF files (optional)</p></il></ul>
+			</il>
+			
+			<il><p><a href="demultiplexing.html">Demultiplexing</a></p>
+				<ul><il><p>Demultiplexing is performed by CASAVA</p></il>
+				<il><p>Parallel computation is done with &quot;make -j&quot;</p></il>
+				<il><p>CASAVA or bcl2fastq has been modified to provide bzip2 compression functionality (optional)</p></il>
+				<il><p>Creates one fastq file by sample</p></il>
+				<il><p>Uses alias for samples indexes (optional)</p></il></ul>
+			</il>
+			
+			<il><p><a href="quality-control.html">Quality control and validation</a></p>
+				<ul><il><p>Launch <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC</a> on each sample (using parallel computation)</p></il>
+				<il><p>Creates a report file including the thresholds fixed for quality controls</p></il></ul>
+			</il>
+			
+			<il><p><a href="contamination.html">Contamination detection (optional)</a></p>
+			 	<ul><il><p>Uses the principles from 
+				<a href="http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/">FastQ Screen.</a></p></il>
+				<il><p>Maps reads on a list of reference genomes for assessing sample contamination and on the genome of the sample.</p></il>
+			 	<il><p>Creates a report file with values for each genome</p></il></ul>
+			</il>
+		</ul>
+		</p>
+		
+		<p>Aozan sends emails <b>at each step</b> of the pre-analysis workflow and 
+		a <b>QC report</b> at the end of the quality control step.</p>
+	</body>
+	
+</document>

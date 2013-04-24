@@ -26,33 +26,42 @@
 <document>
 
 	<properties>
-		<title>Research contamination</title>
-		<author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
+		<title>Contamination detection</title>
+		<author email="sperrin@biologie.ens.fr">Sandrine Perrin</author>
 	</properties>
 
 
 
 	<body>
 
-		<section name="Research contamination step">
-			<p>This step research contamination in samples fastq files. To do this Aozan uses the principles from 
-			<a href="http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/">FastqScreen</a>. 
-			FastQ Screen allows you to screen a library of sequences in FastQ format against a set of sequence databases. </p>
+		<section name="Contamination detection step">
+			<p>This step assesses the sample contamination from the fastq files. To do Aozan uses the principles from 
+			<a href="http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/">FastQ Screen</a>. 
+			FastQ Screen allows to screen a library of sequences in Fastq format against a set of sequence databases. </p>
 			
-			<p>The code has been rewriting in Aozan and additionnal values have been created. A step is added for screen reads 
-			on the genome of the sample if the casava design file contains this data.</p>
-
-			<h4>Configuration parameters</h4>
-
-			<p>
-				The next table contains the parameters of this step. For more
-				details on mapping,
-				<a href="http://transcriptome.ens.fr/eoulsan/datarepositories.html">you can see this page.</a>
+			<p>The code has been rewriting in Aozan and additional values have been creating.
+			There we use <a href="http://bowtie-bio.sourceforge.net/manual.shtml">bowtie</a> to align reads 
+			to reference genomes or contaminant databases like adapter sequences, PhiX and ribosomes databases.
+			Moreover it aligns on the genome of the sample based on the data in the casava design file.
 			</p>
 
-			<table>
-				<p>General configuration for research contamination</p>
-				<tr>
+			<p>All the reads are aligned, currently. The runtime is very long, even with the multithreading option of bowtie. 
+			The list of reference genomes is reduit to the essential.
+			For reduce the runtime, if necessary, all fastq files are uncrompressed in multithreading mode. 
+			After, the align on reference genomes is launched. At the end, all temporary fastq files are removed. 
+			This solution requires to have a lot of free space in temporary directory defined. 
+			Aozan estimates the needed space and sends an warning email if it is not enough.
+			</p>
+			
+			<h4>Configuration parameters</h4>
+
+			<h5>General configuration for launch the mapper.</h5>
+			<p>Aozan uses the development in other framework from the platform, 
+			<a href="http://transcriptome.ens.fr/eoulsan">Eoulsan,</a>for management alignment automatic. 
+			<a href="http://transcriptome.ens.fr/eoulsan/datarepositories.html">More details in this page.</a>
+			</p>
+			
+			<table><tr>
 					<th>Aozan property</th>
 					<th>Type</th>
 					<th>description</th>
@@ -62,7 +71,7 @@
 					<td>string</td>
 					<td>Path to the file which make the corresponding between genome
 						name in casava design file and the genome name reference used for
-						identified index of bowtie mapper.
+						identified index of bowtie. If a genome's name doesn't exist in the alias file, it's added at the end. 
 					</td>
 				</tr>
 
@@ -101,9 +110,9 @@
 
 			</table>
 
-			<p>Configuration tests</p>
+			<H5>Configuration tests</H5>
 
-			<p>If none tests is at 'True', Fastq Screen will not been launched.
+			<p>If none tests is at 'True', fastqscreen will not been launched.
 			</p>
 
 			<table>
@@ -117,7 +126,7 @@
 					<td>qc.test.hitnolibraries.enable</td>
 					<td>boolean</td>
 					<td>False</td>
-					<td>Enable mapped except genome sample test</td>
+					<td>Enable percent of reads mapped except genome sample test</td>
 				</tr>
 				<tr>
 					<td>qc.test.hitnolibraries.interval</td>
@@ -129,23 +138,35 @@
 					<td>qc.test.fsqmapped.enable</td>
 					<td>boolean</td>
 					<td>False</td>
-					<td>Enable mapped test for each reference genome test</td>
+					<td>Enable percent of reads mapped on each reference genome test</td>
 				</tr>
 				<tr>
 					<td>qc.test.fsqmapped.interval</td>
 					<td>double interval</td>
 					<td>[0, 0.1]</td>
-					<td>Interval of valid values</td>
+					<td>Interval of valid values. If the genome is this of sample, the interval is reverse (ex: [0.9, 1])</td>
 				</tr>
 
 				<tr>
 					<td>qc.test.linkreport.enable</td>
 					<td>boolean</td>
 					<td>False</td>
-					<td>Enable created a column with link to report fastqscreen file.</td>
+					<td>Enable a column with link to report fastqscreen file, save in quality control directory.</td>
 				</tr>
 			</table>
 
+		<p>An example of a report fastqscreen with four reference genomes and the genome sample (hg19) :
+		<div align="center">
+			<table><tr><th><img src="images/report_fastqscreen.png" alt="" border="1"></img></th></tr></table>
+		</div>
+		</p>
+		
+		<p>An example of a report of quality control with major values of fastqscreen. 
+		<div align="center">
+			<table><tr><th><img src="images/tab_fastqscreen.png" alt="" border="1"></img></th></tr></table>
+		
+		</div>
+		</p>
 		</section>
 
 	</body>

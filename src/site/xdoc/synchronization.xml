@@ -37,6 +37,12 @@
 	   <tr><td>rsync.exclude.cif</td><td>boolean</td><td>True</td><td>Do not copy CIF files</td></tr>
      </table>
      
+     <p></p>
+     <p>An example of email sent at the end of synchronization step.</p>
+       <div align="center">
+       		<table><tr><th><img src="images/mail_synchro.png" alt="" border="1"></img></th></tr></table>
+       </div>
+       
    </section>   
    
 	</body>
