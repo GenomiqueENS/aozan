@@ -118,9 +118,9 @@ public class RunDataGenerator {
 
     }
 
-    // for (final Collector collector : this.collectors) {
-    // collector.clear();
-    // }
+    for (final Collector collector : this.collectors) {
+      collector.clear();
+    }
 
     LOGGER.fine("Step collector end in "
         + toTimeHumanReadable(timerGlobal.elapsedMillis()));
