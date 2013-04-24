@@ -408,6 +408,34 @@
               <goal>run</goal>
             </goals>
           </execution>
+          <execution>
+            <id>integrate-archives-site</id>
+			<phase>install</phase>
+	        <configuration>
+	          <tasks unless="distrib.package.compression.skip">
+
+	            <!-- skip this task with command: mvn -Ddistrib.package.skip=true -->
+
+	            <mkdir dir="${basedir}/target/site" />
+
+	            <copy file="${basedir}/target/${artifactId}-${pom.version}.tar.gz"
+	               todir="${basedir}/target/site"/>
+	            <copy file="${basedir}/target/${artifactId}-src-${pom.version}.tar.gz"
+	               todir="${basedir}/target/site"/>
+	            <copy file="${basedir}/target/${artifactId}-${pom.version}.tar.bz2"
+	               todir="${basedir}/target/site"/>
+	            <copy file="${basedir}/target/${artifactId}-src-${pom.version}.tar.bz2"
+	               todir="${basedir}/target/site"/>
+	            <copy file="${basedir}/target/${artifactId}-${pom.version}.zip"
+	               todir="${basedir}/target/site"/>
+	            <copy file="${basedir}/target/${artifactId}-src-${pom.version}.zip"
+	               todir="${basedir}/target/site"/>
+	          </tasks>
+	        </configuration>
+	        <goals>
+	          <goal>run</goal>
+	        </goals>
+	      </execution>          
         </executions>
       </plugin>
       <plugin>
