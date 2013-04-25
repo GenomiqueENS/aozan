@@ -35,7 +35,7 @@
 		
 
 	<body>
-	        <link rel="alternate" type="application/rss+xml" title="Eoulsan updates" href="aozan.rss" />
+	        <link rel="alternate" type="application/rss+xml" title="Aozan updates" href="aozan.rss" />
 
 		<section name="Quickstart Guide">
 			<ul>
@@ -117,7 +117,7 @@
  <p>To run Aozan, you need to install the following software:</p>
  <ul>
    <li>Java 6 or above (tested with Oracle JRE and OpenJDK)</li>
-   <li>Casava 1.8.2 or above, or bcl2fastq 1.8.3</li>
+   <li>CASAVA/bcl2fastq 1.8.2 or above</li>
    <li>rsync 3.0.x or later</li>
  </ul>
  
@@ -127,10 +127,11 @@ $ sudo apt-get install openjdk-6-jre-headless rsync
 </source>
  
  <a name="casava"/>
- <subsection name="Installing CASAVA">
+ <subsection name="Installing CASAVA/bcl2fastq">
 
- <p>CASAVA can be downloaded on the Illumina website 
- <a href="http://support.illumina.com/sequencing/sequencing_software/casava/downloads.ilmn">here</a>.</p>
+ <p>CASAVA or bcl2fastq can be downloaded on the Illumina website 
+ <a href="http://support.illumina.com/sequencing/sequencing_software/casava/downloads.ilmn">here for CASAVA</a> and 
+<a href="http://support.illumina.com/downloads/bcl2fastq_conversion_software_183.ilmn">here for bcl2fast</a>.</p>
 
  <p>Next, we download and install CASAVA 1.8.2 with the following lines:</p>
  
@@ -173,8 +174,8 @@ COMPRESSIONSUFFIX:=.gz
  <a href="http://support.illumina.com/downloads/bcl2fastq_conversion_software_183.ilmn">here</a>.</p>
 
  <p>Next, we download and install bcl2fastq 1.8.3 with the following lines. The install on ubuntu has failed. 
-   So we had to recompile bcl2fastq in static mode on Centos 5.9, before make final installing.
- <a href="http://centos.mirror.fr.planethoster.net/5/isos/x86_64/"> (download image iso here)</a></p>
+   So we had to recompile bcl2fastq in static mode on Centos 5.9, before make final installing. You can download
+ <a href="http://centos.mirror.fr.planethoster.net/5/isos/x86_64/">Centos 5.9 image iso here</a>.</p>
  
  <source>
 # Download bcl2fastq 1.8.3
@@ -233,7 +234,7 @@ $ tar xzf aozan-@@@VERSION@@@.tar.gz
      <tt>/etc/aozan.conf</tt>.
     Note that it is better to configure your aozan.conf file before running Aozan.</p>
     <p>The configuration file is a text file, the parameters correspond at key-value pairs. 
-    See the pages for steps for more details.</p>
+    See the <a href="steps.html">pages for steps</a> for more details.</p>
 
  <subsection name="Launching Aozan manually">
 
@@ -280,8 +281,12 @@ $ sudo chmod 755 /etc/cron/daily/aozan &amp;&amp; sudo chmod root:root /etc/cron
  <section name="Accessing HiSeq Data">
 
  <p>Aozan can handle several HiSeq instruments. For each instruments you must allow Aozan computer 
- to access to HiSeq output directories. On HiSeq 2000, 2 hard drives are dedicated to each flow cell slot. 
+ to access to HiSeq output directories. On HiSeq 2000/2500, 2 hard drives are dedicated to each flow cell slot. 
    So you must sharing each hard drive with Aozan computer.</p>
+
+ <p>You can also choose to force HiSeq to directly write its data on a network storage like a NAS. In this
+    case you must mount this network storage (using preferably an Unix network file system like NFS) on
+    computer where Aozan is installed.</p>
 
  <subsection name="Enable sharing on HiSeq computer">
    
@@ -336,7 +341,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
    <tr><th>Aozan property</th><th>Sample value</th><th>description</th></tr>
    <tr><td>aozan.var.path (*)</td><td>/var/lib/aozan</td><td>Aozan internal data directory. It contains 
      log files and history of processed runs.</td></tr>
-   <tr><td>hiseq.data.path</td><td>/mnt/hiseq1,/mnt/hiseq2</td><td>Hiseq output directories. 
+   <tr><td>hiseq.data.path</td><td>/mnt/hiseq01_f,/mnt/hiseq01_g</td><td>Hiseq output directories. 
      Multplie values are allowed if there is several HiSeq or 2 output directories for each flow cell of 
      an HiSeq 2000.</td></tr>
    <tr><td>bcl.data.path</td><td>/mnt/storage/bcl</td><td>Hiseq output data after synchronization. Usualy cif files
@@ -344,15 +349,15 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
    <tr><td>fastq.data.path</td><td>/mnt/storage/fastq</td><td>Directory for the output of 
      demultiplexing with CASAVA or bcl2fastq.</td></tr>
    <tr><td>reports.data.path</td><td>/mnt/storage/reports</td><td>Directory for the qc report.</td></tr>
-   <tr><td>casava.designs.path</td><td>/mnt/storage/casava_designs</td><td>Directory with CASAVA design (design_$runId.xls)
+   <tr><td>casava.designs.path</td><td>/mnt/storage/casava_designs</td><td>Directory with CASAVA samplesheets (with files 
+like <tt>design_INSTRUMENT-SN_RUN-NUMBER$runId.xls</tt> where INSTRUMENT-SN is the instrument serial number and RUN-NUMBER 
+is the run number, e.g. <tt>design_SNL125_0067.xls</tt>)
      for demultiplexing. If a custom script is used to generate CSV design files, this directory will no be used.</td></tr>
    <tr><td>tmp.path</td><td>/tmp</td><td>Temporary directory.</td></tr> 
  </table>
 
-	<p>(*) In the directory specified in field aozan.var.path, you must create the following files. 
-	Aozan allows to process several runs at the same time. At the end of a step, it adds the run id in the file. 
-	The file corresponding on the next step allow to listing the runs to treated.
-	The update is automatic :
+	<p>(*) The directory specified in field aozan.var.path contains the following files. 
+	Aozan allows to process several runs at the same time. At the end of a step, it adds the run id of that run that has been processed in the step log file. 
 		<ul>
 			<il><p><b>first_base_report.done</b> : list of the run ids treated for the first base report step ;</p></il>
 			<il><p><b>hiseq.done</b> : list of the run ids treated for the end run discovering step;</p></il>
@@ -414,7 +419,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
  <section name="Steps">
  
  	<p>The quality control and the contamination detection steps are the longest, they can last several days. 
-   If Aozan is stopped before the end, it is possible to relaunch him. Points restore allow get back at the last sample treated. 
+   If Aozan is stopped before the end, it is possible to relaunch him. Restore points allow get back at the last sample treated. 
    The intermediary data are saved in the quality control directory in files with the extension &quot;.data&quot;.
    </p>
    

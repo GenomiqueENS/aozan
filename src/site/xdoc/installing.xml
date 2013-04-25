@@ -48,17 +48,13 @@
 		<source>$ tar xzf aozan-@@@VERSION@@@.tar.gz</source>
 
         <li>Aozan is ready to run.</li>
-
-			<ul>
-				<il><p>Manually :</p></il> 
+      
+        <li>You can now launch Aozan manually:</li> 
 <source>$ cd aozan-@@@VERSION@@@
 $ ./aozan.sh /etc/aozan.conf</source>
 				
-				<il><p>As cron job : <a href="quickstart.html#aozan_cron_job">details are here.</a></p>
-				</il>
-			</ul>
-
-      </ul>
+        <li><p>Or as cron job, see <a href="quickstart.html#aozan_cron_job">details here.</a></p></li>
+	</ul>
 
 		<!-- 
       	<p>If you want to run Aozan on a local Hadoop cluster, see the <a href="hadoopmode.html">Hadoop configuration page</a> for more informations about Hadoop installation and configuration.</p>

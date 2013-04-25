@@ -57,11 +57,13 @@
 			<item name="Downloading" href="/download.html" />
 			<item name="Installing" href="/installing.html" />
 			<item name="Release Notes" href="/changes-report.html" />
+			<item name="Samplesheet validator" href="http://www.transcriptome.ens.fr/designvalidator" />
 		</menu>
 
 		<menu name="Documentation">
 
 			<item name="Quickstart Guide" href="/quickstart.html"/>
+			<item name="Configuration example" href="/aozan-example.conf"/>
 			
 			<item name="Built-in steps" href="/steps.html" collapse="true">
 				<item name="First base report" href="/first-base-report.html"/>
@@ -78,10 +80,10 @@
 
 		<menu name="Development">
 		    <item name="How to contribute" href="/contribute.html"/>
-		    <!-- item name="Writing a Step plugin" href="/writingstepplugin.html" /-->
+  		    <!-- item name="Writing a Step plugin" href="/writingstepplugin.html" /-->
 			<item name="Downloading sources" href="/download-src.html" />
 			<item name="Compiling" href="/compiling.html"/>
-			<item name="Developer Wiki" href="http://code.google.com/p/aozan/wiki/MainPage" />
+			<!-- item name="Developer Wiki" href="http://code.google.com/p/aozan/wiki/MainPage" /-->
             <item name="Aozan on Google code" href="http://code.google.com/p/aozan" />
 		</menu>
 
