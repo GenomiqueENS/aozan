@@ -37,8 +37,8 @@
 	<section name="Quality control step">
      
      <p>This step allow to perform some quality controls on the output of the runs. To do this Aozan use Illumina reports and 
-     <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC</a>. Aozan contains an additional FastQC 
-     step named "<b>Bad tiles</b>" that search tiles with BMS issues with Illumina flowcell v3.</p>  
+     <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/" target="_blank">FastQC version 0.10.0</a>. Aozan contains an additional FastQC 
+     step named "<b>Bad tiles</b>" that search tiles with BMS (&quot;Bottom Middle Swath&quot;) issues with Illumina flowcell v3.</p>  
 
      <h4>Configuration parameters</h4>
      
@@ -55,7 +55,7 @@
      
      <p>An example of all data built for one run in quality control step.</p>
        <div align="center">
-       		<table><tr><th><img src="images/qc_one_run.png" alt="" border="1"></img></th></tr></table>
+       		<table><tr><th align="center"><img src="images/qc_one_run.png" alt="" border="1"></img></th></tr></table>
        </div>
      
      <p>In addition to this parameters, user can add tests to perform in this steps. The order of the parameters in the Aozan configuration
@@ -96,7 +96,7 @@
        
        <p>An example of table built with lanes quality tests.</p>
        <div align="center">
-       		<table><tr><td><img src="images/qc_lane_test.png" alt="" border="1"></img></td></tr></table>
+       		<table><tr><th align="center"><img src="images/qc_lane_test.png" alt="" border="1"></img></th></tr></table>
        </div>
        
        <h5>Sample quality tests</h5>
@@ -130,7 +130,7 @@
     
     <p>An example of table built with sample quality tests</p>
     <div align="center">
-    	<table><tr><th><img src="images/qc_sample_test.png" alt="" border="1"></img></th></tr></table>
+    	<table><tr><th align="center"><img src="images/qc_sample_test.png" alt="" border="1"></img></th></tr></table>
     </div>
     
     

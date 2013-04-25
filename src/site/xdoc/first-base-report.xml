@@ -50,7 +50,7 @@
      	<p></p>
      	<p>An example of email sent for the first base report step.</p>
        <div align="center">
-         <table><tr><th><img src="images/mail_firstbasereport.png" alt="" border="1"></img></th></tr></table>
+         <table><tr><th align="center"><img src="images/mail_firstbasereport.png" alt="" border="1"></img></th></tr></table>
        </div>
        
    		</section>

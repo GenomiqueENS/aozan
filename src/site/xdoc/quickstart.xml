@@ -77,7 +77,7 @@
 		<a name="introduction"/>
 		<section name="Introduction">
 
-		  <p>Aozan is tool that automatically handle Illumina HiSeq generated data from the end of sequencing to the 
+		  <p>Aozan is a tool that automatically handle Illumina HiSeq generated data from the end of sequencing to the 
 		  demultiplexing and quality control. The great strength  of Aozan is to not require user to process data. 
 		  </p>
 		  <p>Each step of the post-sequencing data processing is quite easy to done. However 
@@ -232,6 +232,8 @@ $ tar xzf aozan-@@@VERSION@@@.tar.gz
    In the following examples, Aozan is installed in <tt>/usr/local/aozan</tt> and the configuration file is 
      <tt>/etc/aozan.conf</tt>.
     Note that it is better to configure your aozan.conf file before running Aozan.</p>
+    <p>The configuration file is a text file, the parameters correspond at key-value pairs. 
+    See the pages for steps for more details.</p>
 
  <subsection name="Launching Aozan manually">
 
@@ -328,6 +330,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
 
  <p>To work, Aozan need the following directories. The path of this directories must be set in the Aozan
  configuration file.</p>
+ <p>An example of aozan configuration file is <a href="./aozan-example.conf" target="_blank">here.</a></p>
  
  <table>
    <tr><th>Aozan property</th><th>Sample value</th><th>description</th></tr>
@@ -346,7 +349,10 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
    <tr><td>tmp.path</td><td>/tmp</td><td>Temporary directory.</td></tr> 
  </table>
 
-	<p>(*) In the directory specified in field aozan.var.path, you must create the following files. The update is automatic :
+	<p>(*) In the directory specified in field aozan.var.path, you must create the following files. 
+	Aozan allows to process several runs at the same time. At the end of a step, it adds the run id in the file. 
+	The file corresponding on the next step allow to listing the runs to treated.
+	The update is automatic :
 		<ul>
 			<il><p><b>first_base_report.done</b> : list of the run ids treated for the first base report step ;</p></il>
 			<il><p><b>hiseq.done</b> : list of the run ids treated for the end run discovering step;</p></il>
@@ -364,6 +370,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
 
  <p>This section describe the Aozan global configuration settings. For the steps settings, 
  	see in the <a href="steps.html">steps documentation.</a></p>
+ <p>An example of aozan configuration file is <a href="./aozan-example.conf" target="_blank">here.</a></p>
  
    <subsection name="General configuration">
 
@@ -377,8 +384,8 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
 	     describe a run. (deprecated)</td></tr>
 	   <tr><td>reports.url</td><td>string</td><td>Not set</td><td>Run reports URL</td></tr>
 	   <tr><td>hiseq.critical.min.space</td><td>integer</td><td>1099511627776</td><td>Threshold before sending 
-	     a email at each Aozan start if not enough space is available on HiSeq output disk</td></tr>
-	   <!-- tr>hiseq.critical.min.space<td></td><td>integer</td><td>3298534883328</td><td>Not used</td></tr-->
+	     a email at each Aozan start if not enough space is available on HiSeq output disk, the value corresponds 1 Tb in bytes.</td></tr>
+	   
 	 </table>
    
    </subsection>
@@ -422,7 +429,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
    
    <p>An example of email sent to the end of Aozan with the quality control summary as attachment.</p>
    <div align="center">
-   		<table><tr><th><img src="images/mail_end_qc.png" alt="" border="1"></img></th></tr></table>
+   		<table><tr><th align="center"><img src="images/mail_end_qc.png" alt="" border="1"></img></th></tr></table>
    </div>
    
  </section>

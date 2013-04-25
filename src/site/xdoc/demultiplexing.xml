@@ -36,11 +36,12 @@
      
      <p>This step allow to launch demultiplexing using CASAVA. Aozan can use samplesheet in XLS format or generated
      by an external tool in addition of samplesheet in CSV format. Using samplesheet in XLS format allow
-     to use alias for adapters sequences indexes.</p>
+     to use alias for adapters sequences indexes.
+     <br/><a href="./design_SNL110_template.xls" target="_blank">See an example of casava design file.</a></p>
 
 	 <p>Alongside Aozan, we provide a standalone CASAVA design validator available on our website that allows you to check 
 	 your run design and generate a valid CSV design file.
-	 The tool is available <a href="http://www.transcriptome.ens.fr/designvalidator/">here.</a>
+	 The tool is available <a href="http://www.transcriptome.ens.fr/designvalidator/" target="_blank">here.</a>
 	 </p>
 	 
 	  
@@ -54,7 +55,7 @@
 	     <tr><td>demux.space.factor</td><td>double</td><td>0.7</td><td>Factor to use to get the estimation of space needed 
 	     in fastq directory for the run from the space used in bcl directory by the run</td></tr>
 	     <tr><td>index.sequences</td><td>string</td><td>Not set</td><td>Path to a file that contains alias 
-	     for adapters sequences indexes</td></tr>
+	     for adapters sequences indexes. <a href="./indexes-sequences.txt" target="_blank">See an example.</a></td></tr>
 	     <tr><td>casava.adapter.fasta.file.path</td><td>string</td><td>Not set</td><td>Adapter sequence file to use when launch CASAVA</td></tr>
 	     <tr><td>casava.compression</td><td>string</td><td>bzip2</td><td>Compression to use (gzip or bzip2)</td></tr>
 	     <tr><td>casava.compression.level</td><td>integer</td><td>9</td><td>Compression level</td></tr>
@@ -71,9 +72,8 @@
      
         <p>An example of email sent to the end of demultiplexing step.</p>
        <div align="center">
-       		<table><tr><th><img src="images/mail_demultiplexing.png" alt="" border="1"></img></th></tr></table>
+       		<table><tr><th align="center"><img src="images/mail_demultiplexing.png" alt="" border="1"></img></th></tr></table>
        	</div>
    </section>
 	</body>
-
 </document>
