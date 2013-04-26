@@ -79,8 +79,8 @@
 			
 			<li><p><a href="quality-control.html">Quality control and validation</a></p>
 				<ul>
-					<li><a href="qc_lanes_tests.html">Lanes quality tests</a> on demultiplexing steps data</li>
-					<li><a href="qc_samples_tests.html">Samples quality tests</a> on demultiplexing steps data,
+					<li><a href="qc-lanes-tests.html">Lanes quality tests</a> on demultiplexing steps data</li>
+					<li><a href="qc-samples-tests.html">Samples quality tests</a> on demultiplexing steps data,
 					<a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC</a> results, and contamination detection results 
                                         (a reimplementation of <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/">FastQ Screen</a>)</li>
 					<li>Creates a QC report file with thresholds for acceptable values</li>
