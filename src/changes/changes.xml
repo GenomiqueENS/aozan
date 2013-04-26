@@ -130,7 +130,7 @@
       </action>
     </release>
 		
-    <release version="1.0" description="Aozan version 1.0" date="TBD">
+    <release version="1.0" description="Aozan version 1.0" date="2013-04-26">
       <action dev="perrin" type="add">
                 Quality control contains a optional module for assessing sample contamination, 
                 based on FastQ Screen model.
