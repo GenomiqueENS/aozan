@@ -70,8 +70,12 @@
 				<item name="End run discovering" href="/end-run-discovering.html"/>
 				<item name="Synchronization" href="/synchronization.html"/>
 				<item name="Demultiplexing" href="/demultiplexing.html"/>
-				<item name="Quality Control" href="/quality-control.html"/>
-				<item name="Contamination detection" href="/contamination.html"/>
+				
+				<item name="Quality Control" href="/quality-control.html">
+					<item name="Lanes tests" href="/qc_lanes_tests.html"/>
+					<item name="Samples tests" href="/qc_samples_tests.html"/>
+				</item>
+				
 			</item>
 			
 			<item name="Known bugs" href="/bugs.html" />

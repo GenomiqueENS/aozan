@@ -94,19 +94,18 @@
  <section name="Principles">
    
    <p>Aozan is not an interactive tool, it communicate with users through emails. It is launched regulary (usually every hour) 
-   through a cron job. There are 6 steps in Aozan, once the end of a run has been discovered, synchronization, 
+   through a cron job. There are 5 steps in Aozan, once the end of a run has been discovered, synchronization, 
    demultiplexing and quality control will be automatically executed. However if the end of another run is 
    discovered at the end of this last 3 steps, the synchronization of the new run will be launched before resuming
    the end of the analysis of the previous run.</p>
    
-   <p>The 6 steps of Aozan are:</p>
+   <p>The 5 steps of Aozan are:</p>
    <ul>
      <li><a href="first-base-report.html">First base report end step</a></li>
      <li><a href="end-run-discovering.html">End run discovering step</a></li>
      <li><a href="synchronization.html">Synchronization step</a></li>
      <li><a href="demultiplexing.html">Demultiplexing step</a></li>
      <li><a href="quality-control.html">Quality control step</a></li>
-     <li><a href="contamination.html">Contamination detection step</a></li>
    </ul>
  </section>
 
@@ -328,7 +327,10 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
  <p>You can also use autofs to mount the share.</p>
 
   </subsection>
-</section>
+
+ </section>
+
+
 
 <a name="directoryAozan"/>
  <section name="Directories requiered by Aozan">
@@ -411,7 +413,13 @@ is the run number, e.g. <tt>design_SNL125_0067.xls</tt>)
 
    </subsection>
    
-
+    <subsection name="Illumina configuration">
+   	<p>With the new version of RTA (RTA-1.17), the directories Status_Files/ and reports/ in Basecalls/Data don't create per default. 
+   	 	You should edit the C:\Illumina\RTA\Configs\HiSeq.Configuration.xml file to add the following line :
+		&lt;SaveHtmReportFiles&gt;true&lt;/SaveHtmReportFiles&gt;. This can be added at the first level, within the &lt;RTAConfiguration&gt; tags.
+	</p>
+	<p>Soon, they will not be generated at all. In a next version of Aozan, the binaries files in InterOp will used instead of them.</p>
+	</subsection>
    
  </section>
    
@@ -429,12 +437,11 @@ is the run number, e.g. <tt>design_SNL125_0067.xls</tt>)
      <li><a href="synchronization.html">Synchronization step</a></li>
      <li><a href="demultiplexing.html">Demultiplexing step</a></li>
      <li><a href="quality-control.html">Quality control step</a></li>
-     <li><a href="contamination.html">Contamination detection step</a></li>
    </ul>
    
    <p>An example of email sent to the end of Aozan with the quality control summary as attachment.</p>
    <div align="center">
-   		<table><tr><th align="center"><img src="images/mail_end_qc.png" alt="" border="1"></img></th></tr></table>
+   	 <table><tr><th align="center"><img src="images/mail_end_qc.png" alt="" border="1"></img></th></tr></table>
    </div>
    
  </section>

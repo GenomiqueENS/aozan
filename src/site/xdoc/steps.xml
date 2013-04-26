@@ -35,8 +35,14 @@
 		
 
 	<body>
-		<p>Aozan works in 6 steps :
-		
+	
+		<p>Aozan works in 5 steps. It sends emails <b>at each step</b> of the pre-analysis workflow and 
+		a <b>QC report</b> at the end of the quality control step.
+		The parameters for each step should be writing in Aozan configuration file, 
+		an example is <a href="./aozan-example.conf">here.</a>
+  
+		</p>
+		<p>
 		<ul>
 			<il><p><a href="first-base-report.html">Send first base report</a>
 			 : send an email with the first base report, if a new run is currently running.</p>
@@ -61,25 +67,18 @@
 			</il>
 			
 			<il><p><a href="quality-control.html">Quality control and validation</a></p>
-				<ul><il><p>Launch <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/" target="_blank">FastQC</a> on each sample (using parallel computation)</p></il>
-				<il><p>Creates a report file including the thresholds fixed for quality controls</p></il></ul>
+				<ul>
+					<il><p><a href="qc_lanes_tests.html">Lanes quality tests</a> obtained by demultiplexing steps</p></il>
+					<il><p><a href="qc_samples_tests.html">Samples quality tests</a> obtained by demultiplexing steps and by use 
+					<a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC, </a>a quality control tool for high throughput sequence data. 
+					and a optional module for a contamination detection.</p></il>
+					<il><p>Creates a report file including the thresholds fixed for quality controls.</p></il>
+				</ul>
 			</il>
 			
-			<il><p><a href="contamination.html">Contamination detection (optional)</a></p>
-			 	<ul><il><p>Uses the principles from 
-				<a href="http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/" target="_blank">FastQ Screen.</a></p></il>
-				<il><p>Maps reads on a list of reference genomes for assessing sample contamination and on the genome of the sample.</p></il>
-			 	<il><p>Creates a report file with values for each genome</p></il></ul>
-			</il>
 		</ul>
 		</p>
 		
-		<p>Aozan sends emails <b>at each step</b> of the pre-analysis workflow and 
-		a <b>QC report</b> at the end of the quality control step.
-		The parameters for each step should be writing in Aozan configuration file, 
-		an example is <a href="./aozan-example.conf">here.</a>
-  
-		</p>
 	</body>
 	
 </document>
