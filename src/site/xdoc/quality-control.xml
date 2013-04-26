@@ -37,15 +37,15 @@
 	<section name="Quality control step">
      
      <p>This step allow to perform some quality controls on the output of the runs. To do this Aozan use Illumina reports, 
-     <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/" target="_blank">FastQC version 0.10.0</a> 
-     and a module for the contamination detection (with <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/">FastQ Screen</a> tool). </p>  
+     <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/" target="_blank">FastQC</a> results 
+     and contamination detection results (using <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/">FastQ Screen</a>). </p>  
 
      <p>This step creates a report file including the thresholds fixed for quality controls with : </p>
 	 <ul>
-	   <il><p><a href="./qc_lanes_tests.html">Lanes quality tests</a> with Illumina reports</p></il>
-	   <il><p><a href="./qc_samples_tests.html">Samples quality tests</a> with Illumina reports, 
+	   <li><a href="./qc_lanes_tests.html">Lanes quality tests</a> with Illumina reports</li>
+	   <li><a href="./qc_samples_tests.html">Samples quality tests</a> with Illumina reports, 
 		 <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC, </a>a quality control tool for high throughput sequence data. 
-				and a optional module for the contamination detection.</p></il>
+				and a optional module for the contamination detection.</li>
 	  </ul>
     
      <h4>Configuration parameters</h4>

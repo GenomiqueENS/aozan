@@ -43,9 +43,9 @@
        
        <p>For the quality control sample test, the report brings together three source of data :</p>
        <ul>
-       		<il><p><a href="#data_illumina">Data supplied by the demultiplexing step ;</a></p></il>
-       		<il><p><a href="#fastqc">FastQC</a>;</p></il>
-       		<il><p><a href="#contamination">Contamination detection ;</a></p></il>
+       		<li><p><a href="#data_illumina">Data supplied by the demultiplexing step</a></p></li>
+       		<li><p><a href="#fastqc">FastQC</a></p></li>
+       		<li><p><a href="#contamination">Contamination detection</a></p></li>
        </ul>
        
        <a name="data_illumina"/>
@@ -88,7 +88,8 @@
          <tr><td>qc.test.kmercontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC kmercontent test</td></tr>
          <tr><td>qc.test.badtiles.enable</td><td>boolean</td><td>False</td><td>Enable FastQC badtiles test</td></tr>
     	</table>
-    <p>The explanation to construct intervals is <a href="#syntax_interval">here.</a></p>
+
+    <p>If no FastQC test property is set, FastQC will not be launch on FastQ data.</p>
        
     <p>An example of table built with sample quality tests</p>
     <div align="center">
@@ -111,7 +112,7 @@
 			Moreover it aligns on the genome of the sample based on the data in the casava design file.
 			</p>
 
-			<p>All the reads are aligned, currently. The runtime is very long, even with the multithreading option of bowtie. 
+			<p>Currently all the reads are aligned. The runtime is very long, even with the multithreading option of bowtie. 
 			The list of reference genomes is limited to the essential.
 			For reduce the runtime, if necessary, all fastq files are uncompressed in multithreading mode. 
 			After, the align on reference genomes is launched. At the end, all temporary fastq files are removed. 
@@ -119,9 +120,6 @@
 			Aozan estimates the needed space and sends an warning email if it is not enough.
 			</p>
 			
-			<p>For launch the contamination detection, it need that the key-value pair &quot;qc.step=True&quot; and at least 
-			one test has been &quot;True&quot; in Aozan configuration file.</p>
-
 			<h5>General configuration for launch the mapper.</h5>
 			<p>Aozan uses the development in other framework from the platform, 
 			<a href="http://transcriptome.ens.fr/eoulsan"  target="_blank">Eoulsan,</a>for management alignment automatic. 
@@ -187,6 +185,7 @@
 				</tr>
 			</table>	
 		<p>The explanation to construct intervals is <a href="#syntax_interval">here.</a></p>
+                <p>If no FastQ Screen test property is set, FastQ Screen will not be launch on FastQ data.</p>
        
        <p>An example of a report of quality control with major values of fastqscreen : 
 		<div align="center">

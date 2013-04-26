@@ -361,12 +361,12 @@ is the run number, e.g. <tt>design_SNL125_0067.xls</tt>)
 	<p>(*) The directory specified in field aozan.var.path contains the following files. 
 	Aozan allows to process several runs at the same time. At the end of a step, it adds the run id of that run that has been processed in the step log file. 
 		<ul>
-			<il><p><b>first_base_report.done</b> : list of the run ids treated for the first base report step ;</p></il>
-			<il><p><b>hiseq.done</b> : list of the run ids treated for the end run discovering step;</p></il>
-			<il><p><b>hiseq.deny</b> : list of the run ids not to treat (in this file, manual entry) ;</p></il>
-			<il><p><b>sync.done</b> : list of the run ids treated for the synchronization step ; </p></il>
-			<il><p><b>demux.done</b> : list of the run ids treated for the demuliplexing step ; </p></il>
-			<il><p><b>qc.done</b> : list of the run ids treated for the quality control step ; </p></il>
+			<li><b>first_base_report.done</b> : list of the run ids treated for the first base report step</li>
+			<li><b>hiseq.done</b> : list of the run ids treated for the end run discovering step;</li>
+			<li><b>hiseq.deny</b> : list of the run ids not to treat (in this file, manual entry)</li>
+			<li><b>sync.done</b> : list of the run ids treated for the synchronization step</li>
+			<li><b>demux.done</b> : list of the run ids treated for the demuliplexing step</li>
+			<li><b>qc.done</b> : list of the run ids treated for the quality control step</li>
 		</ul>
 	</p>
 	
@@ -414,9 +414,9 @@ is the run number, e.g. <tt>design_SNL125_0067.xls</tt>)
    </subsection>
    
     <subsection name="Illumina configuration">
-   	<p>With the new version of RTA (RTA-1.17), the directories Status_Files/ and reports/ in Basecalls/Data don't create per default. 
-   	 	You should edit the C:\Illumina\RTA\Configs\HiSeq.Configuration.xml file to add the following line :
-		&lt;SaveHtmReportFiles&gt;true&lt;/SaveHtmReportFiles&gt;. This can be added at the first level, within the &lt;RTAConfiguration&gt; tags.
+   	<p>With the new version of HSC (HSC-2.x.x), the directories <tt>Status_Files/</tt> and <tt>reports/</tt> in Basecalls/Data don't create per default. 
+   	 	You should edit the <tt>C:\Illumina\RTA\Configs\HiSeq.Configuration.xml</tt> file to add the following line :
+		<tt>&lt;SaveHtmReportFiles&gt;true&lt;/SaveHtmReportFiles&gt;</tt>. This can be added at the first level, within the <tt>&lt;RTAConfiguration&gt;</tt> tags.
 	</p>
 	<p>Soon, they will not be generated at all. In a next version of Aozan, the binaries files in InterOp will used instead of them.</p>
 	</subsection>
@@ -426,9 +426,9 @@ is the run number, e.g. <tt>design_SNL125_0067.xls</tt>)
    <a name="steps"/>
  <section name="Steps">
  
- 	<p>The quality control and the contamination detection steps are the longest, they can last several days. 
+   <p>The quality control step is the longest step, it can last several days. 
    If Aozan is stopped before the end, it is possible to relaunch him. Restore points allow get back at the last sample treated. 
-   The intermediary data are saved in the quality control directory in files with the extension &quot;.data&quot;.
+   The intermediary data are saved in the quality control directory in files with the extension <tt>&quot;.data&quot;</tt>.
    </p>
    
    <ul>

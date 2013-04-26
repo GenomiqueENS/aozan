@@ -39,46 +39,55 @@
 		<p>Aozan works in 5 steps. It sends emails <b>at each step</b> of the pre-analysis workflow and 
 		a <b>QC report</b> at the end of the quality control step.
 		The parameters for each step should be writing in Aozan configuration file, 
-		an example is <a href="./aozan-example.conf">here.</a>
-  
-		</p>
-		<p>
+		an example is <a href="./aozan-example.conf">here.</a>. The available steps are:</p>
+		<p/>
 		<ul>
-			<il><p><a href="first-base-report.html">Send first base report</a>
-			 : send an email with the first base report, if a new run is currently running.</p>
-			 </il>
+			<li><a href="first-base-report.html">Send first base report</a>
+                              <ul>
+			        <li>send an email with the first base report, if a new run is currently running</li>
+                              </ul>
+                         </li>
+			<p/>
 			
-			<il><p><a href="end-run-discovering.html">End of run detection</a></p>
-				<ul><il><p>Checks <i>&quot;Basecalling_Netcopy_complete.txt&quot;</i> file creation in the run directory </p></il>
-				<il><p>Can handle multiple HiSeq sequencer outputs</p></il></ul>
-			</il>
-			
-			<il><p><a href="synchronization.html">NAS and mid-term storage synchronization</a></p>
-				<ul><il><p>Uses rsync</p></il>
-				<il><p>Does not copy CIF files (optional)</p></il></ul>
-			</il>
-			
-			<il><p><a href="demultiplexing.html">Demultiplexing</a></p>
-				<ul><il><p>Demultiplexing is performed by CASAVA</p></il>
-				<il><p>Parallel computation is done with &quot;make -j&quot;</p></il>
-				<il><p>CASAVA or bcl2fastq has been modified to provide bzip2 compression functionality (optional)</p></il>
-				<il><p>Creates one fastq file by sample</p></il>
-				<il><p>Uses alias for samples indexes (optional)</p></il></ul>
-			</il>
-			
-			<il><p><a href="quality-control.html">Quality control and validation</a></p>
+			<li><a href="end-run-discovering.html">End of run detection</a>
 				<ul>
-					<il><p><a href="qc_lanes_tests.html">Lanes quality tests</a> obtained by demultiplexing steps</p></il>
-					<il><p><a href="qc_samples_tests.html">Samples quality tests</a> obtained by demultiplexing steps and by use 
-					<a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC, </a>a quality control tool for high throughput sequence data. 
-					and a optional module for a contamination detection.</p></il>
-					<il><p>Creates a report file including the thresholds fixed for quality controls.</p></il>
+                                  <li>Checks &quot;<tt>Basecalling_Netcopy_complete.txt</tt>&quot; file creation in the run directory</li>
+				  <li>Can handle multiple HiSeq sequencer outputs</li>
+                                </ul>
+			</li>
+			<p/>
+			
+	
+			<li><a href="synchronization.html">NAS and mid-term storage synchronization</a>
+				<ul>
+                                  <li>Uses rsync</li>
+				  <li>Does not copy CIF files (optional)</li>
+                                </ul>
+			</li>
+			<p/>
+			
+			<li><a href="demultiplexing.html">Demultiplexing</a>
+				<ul>
+                                  <li>Demultiplexing is performed by CASAVA</li>
+				  <li>Parallel computation is done with &quot;<tt>make -j</tt>&quot;</li>
+				  <li>CASAVA or bcl2fastq has been modified to provide bzip2 compression functionality (optional)</li>
+				  <li>Creates one fastq file by sample</li>
+				  <li>Uses alias for samples indexes (optional)</li>
+                                </ul>
+			</li>
+			<p/>
+			
+			<li><p><a href="quality-control.html">Quality control and validation</a></p>
+				<ul>
+					<li><a href="qc_lanes_tests.html">Lanes quality tests</a> on demultiplexing steps data</li>
+					<li><a href="qc_samples_tests.html">Samples quality tests</a> on demultiplexing steps data,
+					<a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC</a> results, and contamination detection results 
+                                        (a reimplementation of <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/">FastQ Screen</a>)</li>
+					<li>Creates a QC report file with thresholds for acceptable values</li>
 				</ul>
-			</il>
+			</li>
 			
 		</ul>
-		</p>
-		
 	</body>
 	
 </document>

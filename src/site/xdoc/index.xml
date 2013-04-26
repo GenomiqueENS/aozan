@@ -73,17 +73,21 @@
 
 
 			<p>Aozan has been developped in order to automatically handle data transfert, demultiplexing conversion, quality control
-			and the contamination detection once a HiSeq run has been finished. Through our computer infrastructure and the creation 
-			of a run design, we are able to get at the end of each run a whole data quality reporting in order to evaluate each
-			sequencing parameter. Aozan is involved in the primary data analysis and produce compressed fastq files from 
-			an HiSeq sequencer output</p>
+			and the contamination detection once a HiSeq run has been finished. Through most computer infrastructures and the creation 
+			of a run samplesheet, Aozan is able to get at the end of each run a whole data quality reporting in order to evaluate each
+			sequencing parameter. This software is involved in the primary data analysis and produce compressed fastq files from 
+			an HiSeq sequencer output.</p>
 			
-			<p>Aozan helps us to greatly improve our efficiency with run data management and to keep tracks of run statistics
+			<p>Aozan helps to greatly improve efficiency with run data management and to keep tracks of run statistics
 			with several automatic mail information and HTML web pages.				
 			</p>
 			
+		</section>
 
+		<section name="Samplesheet validator">
 
+			<p>We provide also a <a href="">CASAVA/bcl2fastq samplesheet validator</a> to help users to check their run design. This tool
+                        use only html and javascript. When you use this tool, no data is sent to our servers.</p>
 
 		</section>
 

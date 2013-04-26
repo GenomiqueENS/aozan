@@ -71,7 +71,7 @@
 				<item name="Synchronization" href="/synchronization.html"/>
 				<item name="Demultiplexing" href="/demultiplexing.html"/>
 				
-				<item name="Quality Control" href="/quality-control.html">
+				<item name="Quality Control" href="/quality-control.html" collapse="true">
 					<item name="Lanes tests" href="/qc_lanes_tests.html"/>
 					<item name="Samples tests" href="/qc_samples_tests.html"/>
 				</item>

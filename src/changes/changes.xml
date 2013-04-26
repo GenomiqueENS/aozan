@@ -79,14 +79,9 @@
                         Fix typo in mail message when the end of run is discovered.
       </action>
       <action dev="jourdren" type="update">
-      		Now use <a href="http://transcriptome.ens.fr/eoulsan/index.html">Eoulsan</a> 1.2-SNAPSHOT as dependency. New Casava design check:  
-            <ul>
-            	<il>1) Allow the use of a sample in several lanes.</il>
-				<il>2) new error if a sample is used by more than one project. </il>
-				<il>3) new warning if a sample exists in more than one lane. </il>
-				<il>4) new warning with the list of line where is a sample (if the number of lanes >1). </il>
-				<il>5) new errors if a sample is defined several time by with not the same sequence index.</il>
-			</ul>
+      		Now use <a href="http://transcriptome.ens.fr/eoulsan/index.html">Eoulsan</a> 1.2-SNAPSHOT as dependency. New Casava samplesheet check:  
+1) Allow the use of a sample in several lanes; 2) new error if a sample is used by more than one project; 3) new warning if a sample exists in more than one lane;
+4) new warning with the list of line where is a sample (if the number of lanes >1); 5) new errors if a sample is defined several time by with not the same sequence index.
       </action>
       <action dev="jourdren" type="update">
                         In demux step, add Casava design warnings to log and to the success mail send to users.
@@ -135,7 +130,7 @@
       </action>
     </release>
 		
-	<release version="1.0" description="Aozan version 1.0" date="2013-XXX">
+    <release version="1.0" description="Aozan version 1.0" date="TBD">
       <action dev="perrin" type="add">
                 Quality control contains a optional module for assessing sample contamination, 
                 based on FastQ Screen model.
