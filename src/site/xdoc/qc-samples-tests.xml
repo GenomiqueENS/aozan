@@ -129,7 +129,7 @@
 			<table>
 			  <tr><th>Aozan property</th><th>Type</th><th>description</th></tr>
 			  <tr><td>qc.conf.genome.alias.path</td><td>string</td>
-				  <td>Path to the file which make the correspondance between genome name in casava design file and the genome name reference used for
+				  <td>Path to the file which make the correspondence between genome name in casava design file and the genome name reference used for
 						identified index of bowtie. If a genome's name doesn't exist in the alias file, it's added at the end. </td></tr>
 			  <tr><td>qc.conf.settings.genomes.desc.path</td><td>string</td>
 				  <td>Path to the genomes descriptions repository. The genome description file contains some basic informations about the genome
