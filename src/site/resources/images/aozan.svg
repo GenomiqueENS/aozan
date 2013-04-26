@@ -9,8 +9,8 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="210mm"
-   height="297mm"
+   width="269.3671"
+   height="70"
    id="svg2"
    version="1.1"
    inkscape:version="0.48.3.1 r9886"
@@ -32,17 +32,21 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2"
-     inkscape:cx="372.14286"
-     inkscape:cy="760"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="94.31758"
+     inkscape:cy="6.4253835"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1024"
-     inkscape:window-height="580"
-     inkscape:window-x="-2"
-     inkscape:window-y="-3"
-     inkscape:window-maximized="1" />
+     inkscape:window-width="1110"
+     inkscape:window-height="639"
+     inkscape:window-x="343"
+     inkscape:window-y="221"
+     inkscape:window-maximized="0"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -51,27 +55,32 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <g
      inkscape:label="Calque 1"
      inkscape:groupmode="layer"
-     id="layer1">
+     id="layer1"
+     transform="translate(-206.15603,-257.15689)">
     <text
        xml:space="preserve"
-       style="font-size:64px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Impact;-inkscape-font-specification:Impact Condensed"
-       x="205.71429"
-       y="326.64789"
+       style="font-size:110.75949097px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Ubuntu Mono;-inkscape-font-specification:Ubuntu Mono Bold"
+       x="205.15919"
+       y="325.71701"
        id="text2816"
        sodipodi:linespacing="100%"
        inkscape:export-xdpi="122.70238"
        inkscape:export-ydpi="122.70238"
-       inkscape:export-filename="/home/jourdren/workspace/aozan/src/site/resources/images/aozan.png"><tspan
+       inkscape:export-filename="/home/jourdren/workspace/eoulsan/src/site/resources/images/eoulsan.png"><tspan
          sodipodi:role="line"
          id="tspan2820"
-         x="205.71429"
-         y="326.64789">Aozan</tspan></text>
+         x="205.15919"
+         y="325.71701"><tspan
+           id="tspan3757"
+           style="font-size:110.75949097px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;font-family:Ubuntu Mono;-inkscape-font-specification:Ubuntu Mono Bold">A</tspan><tspan
+           style="font-size:110.75949097000000165px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#9b1319;fill-opacity:1;font-family:Ubuntu Mono;-inkscape-font-specification:Ubuntu Mono Bold"
+           id="tspan2824">ozan</tspan></tspan></text>
   </g>
 </svg>
