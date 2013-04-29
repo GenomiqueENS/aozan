@@ -39,6 +39,8 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
+import com.google.common.math.DoubleMath;
+
 import fr.ens.transcriptome.eoulsan.illumina.CasavaDesign;
 import fr.ens.transcriptome.eoulsan.illumina.io.AbstractCasavaDesignTextReader;
 import fr.ens.transcriptome.eoulsan.util.Utils;
@@ -77,7 +79,8 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
         while (fields.size() != cell.getColumnIndex())
           fields.add("");
 
-        fields.add(cell.toString());
+        // Convert cell value to String
+        fields.add(parseCell(cell));
       }
 
       // Parse the fields
@@ -90,6 +93,23 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
     this.is.close();
 
     return getDesign();
+  }
+
+  /**
+   * Parse the content of a cell.
+   * @param cell cell to parse
+   * @return a String with the cell content
+   */
+  private static final String parseCell(final HSSFCell cell) {
+
+    if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+      final double doubleValue = cell.getNumericCellValue();
+
+      if (DoubleMath.isMathematicalInteger(doubleValue))
+        return Long.toString((long) doubleValue);
+    }
+
+    return cell.toString();
   }
 
   /**
@@ -110,7 +130,7 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
   }
 
   //
-  // Contructors
+  // Constructors
   //
 
   /**
