@@ -477,7 +477,7 @@
         <version>2.0-beta-7</version>
         <configuration>
           <templateFile>${basedir}/src/site/site.vm</templateFile>
-          <outputEncoding>utf-8</outputEncoding>
+          <outputEncoding>iso-8859-1</outputEncoding>
         </configuration>
       </plugin>
       <plugin>
