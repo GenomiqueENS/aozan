@@ -48,6 +48,10 @@ import com.google.common.collect.Maps;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.collectors.interopfile.AbstractBinaryIteratorReader;
+import fr.ens.transcriptome.aozan.collectors.interopfile.ErrorMetricsOutReader;
+import fr.ens.transcriptome.aozan.collectors.interopfile.ExtractionMetricsOutReader;
+import fr.ens.transcriptome.aozan.collectors.interopfile.TileMetricsOutReader;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**
@@ -88,13 +92,33 @@ public class ReadCollector implements Collector {
 
     // Collect read info
     final int readCount = data.getInt("run.info.read.count");
-    for (int i = 1; i <= readCount; i++) {
-      File readInfoFile =
-          new File(this.RTAOutputDirPath + "/Data/reports/Summary", "read"
-              + i + ".xml");
-      collectRead(data, readInfoFile);
+
+    if (new File(this.RTAOutputDirPath + "/Data/reports/Summary", "read10.xml")
+        .exists()) {
+
+      for (int i = 1; i <= readCount; i++) {
+        File readInfoFile =
+            new File(this.RTAOutputDirPath + "/Data/reports/Summary", "read"
+                + i + ".xml");
+        collectRead(data, readInfoFile);
+      }
+    } else {
+
+      // File read1.xml doesn't exist, reading binary files in InterOp directory
+      collectRead(data);
     }
 
+  }
+
+  private void collectRead(final RunData data) throws AozanException {
+    // Collect
+    System.out.println("read interop file");
+
+    AbstractBinaryIteratorReader.setDirectory(this.RTAOutputDirPath
+        + "/InterOp/");
+    new TileMetricsOutReader().collect(data);
+    new ErrorMetricsOutReader().collect(data);
+    new ExtractionMetricsOutReader().collect(data);
   }
 
   /**
