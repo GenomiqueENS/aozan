@@ -27,38 +27,71 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Logger;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
+import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.interopfile.AbstractBinaryIteratorReader.IlluminaMetrics;
 import fr.ens.transcriptome.aozan.collectors.interopfile.ExtractionMetricsOutIterator.IlluminaIntensitiesMetrics;
 
 /**
+ * This class collects run data by reading the ExtractionMetricsOut.bin in
+ * InterOp directory.
  * @author Sandrine Perrin
  * @since 1.1
  */
 public class ExtractionMetricsOutReader extends AbstractBinaryInterOpReader {
+  /** Logger */
+  // private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
-  private Collection<IlluminaMetrics> collection = null;
-  private Map<LaneRead, ExtractionMetricsPerLane> intensity =
+  private String dirInterOpPath ;
+  private Map<LaneRead, ExtractionMetricsPerLane> intensityPerLaneRead =
       new TreeMap<LaneRead, ExtractionMetricsPerLane>();
 
+  // private int cycleNumberBeginRead1 = -1;
+  // private int cycleNumberBeginRead2 = -1;
+  // private int cycleNumberBeginRead3 = -1;
+
+  /**
+   * Collect data.
+   * @param data result data object
+   */
   @Override
-  public void collect(final RunData data) {
+  public void collect(final RunData data) throws AozanException {
+
     super.collect(data);
     String key = "";
-    parseCollection();
 
-    System.out.println("TILE size internal map " + intensity.size());
+    // this.cycleNumberBeginRead1 = 1;
+    //
+    // if (reads > 1)
+    // this.cycleNumberBeginRead2 =
+    // data.getInt("run.info.read1.cycles") + this.cycleNumberBeginRead1;
+    // if (reads > 2)
+    // this.cycleNumberBeginRead3 =
+    // data.getInt("run.info.read2.cycles") + this.cycleNumberBeginRead2;
+
+    // System.out.println("INTEN value seuil reads "
+    // + cycleNumberBeginRead1 + " -- " + cycleNumberBeginRead2 + " -- "
+    // + cycleNumberBeginRead3);
+
+    parseCollection(getCyclesStartRead(data));
+
+    // System.out
+    // .println("INTEN size internal map " + intensityPerLaneRead.size());
 
     for (int read = 1; read <= reads; read++) {
       // TODO to define
       data.put("read" + read + ".density.ratio", "0.3472222");
     }
 
-    // Parse map intensity defined for each pair : lane-read for update run data
-    for (Map.Entry<LaneRead, ExtractionMetricsPerLane> e : intensity.entrySet()) {
+    // Parse map defined for each pair : lane-read
+    for (Map.Entry<LaneRead, ExtractionMetricsPerLane> e : intensityPerLaneRead
+        .entrySet()) {
       key = "read" + e.getKey().getRead() + ".lane" + e.getKey().getLane();
 
       data.put(key + ".first.cycle.int.pf", e.getValue().getIntensityCycle1());
@@ -70,97 +103,135 @@ public class ExtractionMetricsOutReader extends AbstractBinaryInterOpReader {
           .getRatioIntensityCycle20SD());
 
       // TODO to remove after test
-      // System.out.println(e.getValue());
+      if (TestCollectorReadBinary.PRINT_DETAIL)
+        System.out.println(e.getKey() + "  " + e.getValue());
+      // LOGGER.info(e.getKey() + "  " + e.getValue());
     }
 
   }
 
   /**
-   * 
+   * Compute values needed.
+   * @param cyclesStartRead list number reads with the number cycle
+   *          corresponding to the first of a read
    */
-  private void parseCollection() {
+  private void parseCollection(Map<Integer, List<Integer>> cyclesStartRead)
+      throws AozanException {
 
     // Set an iterator on extractionMetric binary file
     ExtractionMetricsOutIterator binIterator =
         new ExtractionMetricsOutIterator();
 
     // Reading the binary file and set a collection of records
-    collection = makeCollection(binIterator);
+    Collection<IlluminaMetrics> collection = makeCollection(binIterator);
 
-    // Set the intensity value used for each lane and each read
+    // System.out.println("INTENS cycles min "
+    // + IlluminaIntensitiesMetrics.minCycle + " max "
+    // + IlluminaIntensitiesMetrics.maxCycle);
+
+    // Set the intensityPerLaneRead value used for each lane and each read
     for (int lane = 1; lane <= lanes; lane++) {
 
-      // For read1
-      countIntensityRead(lane, 1);
-      // For read2
-      countIntensityRead(lane, read1CyclesCumul + 1);
-      // For read3, if it exists
-      countIntensityRead(lane, read2CyclesCumul + 1);
+      for (Map.Entry<Integer, List<Integer>> e : cyclesStartRead.entrySet()) {
+        int firstCycle = e.getValue().get(0);
+        int lastCycle = e.getValue().get(1);
+        collectIntensityPerLaneRead(lane, firstCycle, lastCycle, collection,
+            e.getKey());
+      }
     }
-
   }
 
   /**
-   * For a lane,
-   * @param lane the number of lane to treat
-   * @param start the number of the first cycle of a read
+   * Compute intensity values needed for a pair lane-read
+   * @param lane number lane
+   * @param startCycle number cycle corresponding to start of a read
+   * @param collection all record from binary file
+   * @param read number read
    */
-  private void countIntensityRead(int lane, int start) {
-    if (start <= 0)
-      return;
+  private void collectIntensityPerLaneRead(final int lane,
+      final int startCycle, final int lastCycle,
+      final Collection<IlluminaMetrics> collection, final int read) {
 
-    // Set the number of read
-    int read =
-        (start == 1) ? 1 : (start == read1CyclesCumul + 1
-            ? 2 : (start == read2CyclesCumul + 1 ? 3 : -1));
-
-    if (read == -1) {
-      System.out.println("Error in compt intensity for lane " + lane);
-      return;
-    }
-
-    if (read > reads)
-      return;
-
-    int sum = 0;
-    int sum2 = 0;
-    int c20 = 0;
-    int n = 0;
-    int nn = 0;
     List<Number> intensityCycle1 = Lists.newArrayList();
     List<Number> intensityCycle20 = Lists.newArrayList();
+    int numberCycleTwentieth = startCycle + 19;
+    // Parse number tile
+    for (Integer tile : IlluminaIntensitiesMetrics.getTilesNumberList()) {
 
-    for (int tile = IlluminaIntensitiesMetrics.minTile; tile <= IlluminaIntensitiesMetrics.maxTile; tile++) {
       for (IlluminaMetrics im : collection) {
         IlluminaIntensitiesMetrics iem = (IlluminaIntensitiesMetrics) im;
 
         if (iem.getLaneNumber() == lane && iem.getTileNumber() == tile) {
 
           // cycle 1
-          if (iem.getCycleNumber() == start) {
+          if (iem.getCycleNumber() == startCycle) {
             // intensityCycle1.add(iem.getSumIntensitiesByChannel());
             intensityCycle1.add(iem.getIntensities()[iem.BASE_A]);
-            sum += iem.getSumIntensitiesByChannel();
-            sum2 += iem.getIntensities()[iem.BASE_A];
-            n++;
           }
           // cycle 20th of the current read
-          if (iem.getCycleNumber() == start + 19) {
+          if (numberCycleTwentieth <= lastCycle
+              && iem.getCycleNumber() == numberCycleTwentieth) {
             // intensityCycle20.add(iem.getSumIntensitiesByChannel());
             intensityCycle20.add(iem.getIntensities()[iem.BASE_A]);
-            c20 += iem.getIntensities()[iem.BASE_A];
-            nn++;
           }
         }
       }
     }
+    // System.out.println("lane "
+    // + lane + " read " + read + " size cycle 1 " + intensityCycle1.size()
+    // + " cycle 20 " + intensityCycle20.size());
+    // System.out.println(lane
+    // + " " + read + " start " + startCycle + " size c1 "
+    // + intensityCycle1.size() + " size c20 " + intensityCycle20.size());
 
-    // System.out.println("start "
-    // + start + " lane " + lane + " sum intensity C1 " + sum + " average "
-    // + (sum / n) + "\t sum intensity C1 " + sum2 + " average2 " + (sum2 / n)
-    // + (nn > 0 ? "\tc20 " + c20 + " ave " + (c20 / nn) : ""));
+    intensityPerLaneRead.put(new LaneRead(lane, read),
+        new ExtractionMetricsPerLane(intensityCycle1, intensityCycle20, lane,
+            read));
 
-    intensity.put(new LaneRead(lane, read), new ExtractionMetricsPerLane(tiles,
-        intensityCycle1, intensityCycle20));
+    // String s = new LaneRead(lane, read).toString();
+    // if (s.equals("6-2"))
+    // System.out.println(s
+    // + " \n\t c1 " + intensityCycle1 + " \n\t c20 " + intensityCycle20);
+  }
+
+  /**
+   * Build a map : number read with number cycle corresponding to end of read
+   * @param data on run
+   * @return map
+   */
+  private final Map<Integer, List<Integer>> getCyclesStartRead(
+      final RunData data) {
+
+    // key : number read, value(pair:first number cycle, last number cycle) :
+    // number cycle corresponding to the start of a read
+    final Map<Integer, List<Integer>> result = Maps.newLinkedHashMap();
+
+    final int readCount = data.getInt("run.info.read.count");
+
+    int firstNumberCycle = 0;
+    int lastNumberCycle = 0;
+    for (int read = 1; read <= readCount; read++) {
+      firstNumberCycle = lastNumberCycle + 1;
+      lastNumberCycle += data.getInt("run.info.read" + read + ".cycles");
+
+      List<Integer> l = Lists.newLinkedList();
+      l.add(firstNumberCycle);
+      l.add(lastNumberCycle);
+      result.put(read, l);
+    }
+    System.out.println("read/last cycles " + result);
+    return result;
+  }
+  
+  //
+  // Constructor
+  //
+  
+  public ExtractionMetricsOutReader() {
+    // TODO Auto-generated constructor stub
+  }
+  
+  ExtractionMetricsOutReader(final String dirInterOpPath){
+    this.dirInterOpPath = dirInterOpPath;
   }
 }
