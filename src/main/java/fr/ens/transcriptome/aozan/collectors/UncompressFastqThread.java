@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import com.google.common.base.Stopwatch;
@@ -95,9 +96,9 @@ class UncompressFastqThread extends AbstractFastqProcessThread {
       LOGGER.fine("UNCOMPRESS fastq : for "
           + fastqSample.getKeyFastqSample() + " "
           + fastqSample.getFastqFiles().size()
-          + " fastq file(s) in type compression "
+          + " fastq file(s) in value compression "
           + fastqSample.getCompressionType() + " in "
-          + toTimeHumanReadable(timer.elapsedMillis())
+          + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS))
           + " : temporary fastq file size " + sizeFile + " Go (size estimated "
           + uncompressSizeFile + " Go)");
       timer.stop();
@@ -130,7 +131,7 @@ class UncompressFastqThread extends AbstractFastqProcessThread {
                 + fastqFile.getName() + " doesn't exist");
           }
 
-          // Get compression type
+          // Get compression value
           CompressionType zType = fastqSample.getCompressionType();
 
           // Append compressed fastq file to uncompressed file

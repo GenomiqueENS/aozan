@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -166,7 +167,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
         LOGGER.fine("FASTQSCREEN : mapping on genome "
             + genome + " in mode " + (paired ? "paired" : "single") + ", in "
-            + toTimeHumanReadable(timer.elapsedMillis()));
+            + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
         timer.stop();
       } catch (IOException e) {
@@ -206,7 +207,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     LOGGER.fine("FASTQSCREEN : create/Retrieve index for "
         + genomeDataFile.getName() + " in "
-        + toTimeHumanReadable(timer.elapsedMillis()));
+        + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
     timer.stop();
 

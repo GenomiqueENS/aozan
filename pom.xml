@@ -160,16 +160,22 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-compress</artifactId>
-      <version>1.4.1</version>
-      <scope>compile</scope>
+       <groupId>org.apache.commons</groupId>
+       <artifactId>commons-compress</artifactId>
+       <version>1.4.1</version>
+       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>net.sourceforge.picard</groupId>
-      <artifactId>sam</artifactId>
-      <version>1.76</version>
-      <scope>compile</scope>
+       <groupId>org.apache.commons</groupId>
+       <artifactId>commons-math3</artifactId>
+       <version>3.2</version>
+       <scope>compile</scope>
+    </dependency>
+    <dependency>
+       <groupId>net.sourceforge.picard</groupId>
+       <artifactId>sam</artifactId>
+       <version>1.92</version>
+       <scope>compile</scope>
     </dependency>
   </dependencies>
 
@@ -459,7 +465,7 @@
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>jython-standalone,eoulsan,poi,guava,fastqc,jbzip2,commons-compress,sam</includeArtifactIds>
+              <includeArtifactIds>jython-standalone,eoulsan,poi,guava,fastqc,jbzip2,commons-compress,sam,commons-math3</includeArtifactIds>
               <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
             </configuration>
           </execution>

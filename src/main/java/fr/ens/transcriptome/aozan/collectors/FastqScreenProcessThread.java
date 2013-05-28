@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import com.google.common.base.Charsets;
@@ -83,7 +84,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
       LOGGER.fine("FASTQSCREEN : end for "
           + this.fastqSample.getKeyFastqSample() + " in mode "
           + (paired ? "paired" : "single") + " on genome(s) " + this.genomes
-          + " in " + toTimeHumanReadable(timer.elapsedMillis()));
+          + " in " + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
     }
 
@@ -96,6 +97,10 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
         "FastqScreen : for Projet "
             + fastqSample.getProjectName() + "\nresult for sample : "
             + fastqSample.getSampleName();
+
+    // TODO to remove after test
+    System.out.println("\n"
+        + this.resultsFastqscreen.statisticalTableToString(headerReport));
 
     File fastqScreenFile =
         new File(this.reportDir.getAbsolutePath()
@@ -111,6 +116,12 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
   @Override
   protected void processResults() throws AozanException {
+
+    // TODO to remove after test
+    System.out.println("lane current "
+        + this.fastqSample.getLane() + "\tsample current "
+        + this.fastqSample.getSampleName() + "\tproject name "
+        + this.fastqSample.getProjectName());
 
     File read1 = new File(fastqStorage.getTemporaryFile(fastqSample));
 

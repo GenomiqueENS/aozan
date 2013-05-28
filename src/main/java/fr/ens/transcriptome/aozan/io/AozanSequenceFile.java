@@ -28,6 +28,7 @@ import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import com.google.common.base.Stopwatch;
@@ -99,7 +100,7 @@ public class AozanSequenceFile implements SequenceFile {
             + +fastqSample.getFastqFiles().size()
             + " fastq file(s), type compression "
             + fastqSample.getCompressionType() + " in "
-            + toTimeHumanReadable(timer.elapsedMillis())
+            + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS))
             + "(tmp fastq file size " + sizeFile + "Go / estimated size "
             + fastqSample.getUncompressedSize() + ")");
         timer.stop();

@@ -28,6 +28,7 @@ import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import javax.swing.JScrollPane;
@@ -94,7 +95,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
       LOGGER.fine("FASTQC : end for "
           + fastqSample.getKeyFastqSample() + " in "
-          + toTimeHumanReadable(timer.elapsedMillis()));
+          + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
     }
 

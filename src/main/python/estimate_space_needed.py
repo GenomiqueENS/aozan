@@ -8,7 +8,7 @@ Created on 15 avril 2012
 import common
 from java.io import File
 from fr.ens.transcriptome.eoulsan.illumina import RunInfo
-
+from xml.dom.minidom import parse
 
 def estimate(run_id, conf):
     """Estimate space needed in directories : hiseq, bcl and fastq
@@ -36,7 +36,7 @@ def estimate(run_id, conf):
         cycle_count = cycle_count + read.getNumberCycles()
     
     # retrieve data from runParameters.xml 
-    run_info_path = hiseq_run_path + "/runParameters.xml"
+    run_param_path = hiseq_run_path + "/runParameters.xml"
     
     #
     # Estimate space needed +10%
@@ -62,28 +62,18 @@ def estimate(run_id, conf):
     
     # for bcl files    
     # bcl file : compressed or not, info in runParameters.xml
-    compressed_bcl_file = False
-
-    if compressed_bcl_file:
-        ratio_bcl_file_compressed = 5.0  # TO DEFINE RATIO
-    else:
-        ratio_bcl_file_compressed = 1.0
+    ratio_bcl = ratio_bcl_compressed(run_param_path)
     
     # quality data for Q30 : compressed or not
-    compressed_quality_data = False
+    ratio_quality = compressed_quality_data(run_param_path)
     
-    if compressed_quality_data:
-        ratio_quality_compressed = 5.0  # TO DEFINE RATIO
-    else:
-        ratio_quality_compressed = 1.0
-    
-    bcl_space_needed = int(conf['bcl.space.factor']) * run_factor * ratio_bcl_file_compressed * ratio_quality_compressed
+    bcl_space_needed = int(conf['bcl.space.factor']) * run_factor * ratio_bcl * ratio_quality
     bcl_space_free = common.df(conf['bcl.data.path'])
     
     # check if the remaining space on the directory is inferior at 5 percent 
     bcl_space_remaining_not_enough = (bcl_space_free - bcl_space_needed) < (long(File(conf['bcl.data.path']).getTotalSpace()) * 0.05)
     
-    print 'bcl tot '+ str(long(File(conf['bcl.data.path']).getTotalSpace()))+ 'bcl_space_remaining_not_enough ' + str(bcl_space_remaining_not_enough)
+    print 'bcl tot ' + str(long(File(conf['bcl.data.path']).getTotalSpace())) + 'bcl_space_remaining_not_enough ' + str(bcl_space_remaining_not_enough)
     
     # check if free space is available
     if (bcl_space_needed > bcl_space_free) or (bcl_space_remaining_not_enough):
@@ -98,7 +88,7 @@ def estimate(run_id, conf):
     # check if the remaining space on the directory is inferior at 5 percent 
     fastq_space_remaining_not_enough = (fastq_space_free - fastq_space_needed) < (long(File(conf['fastq.data.path']).getTotalSpace()) * 0.05)
     
-    print 'fastq tot '+str(long(File(conf['fastq.data.path']).getTotalSpace())) + 'fastq_space_remaining_not_enough ' + str(fastq_space_remaining_not_enough)
+    print 'fastq tot ' + str(long(File(conf['fastq.data.path']).getTotalSpace())) + 'fastq_space_remaining_not_enough ' + str(fastq_space_remaining_not_enough)
     
     # check if free space is available
     if (fastq_space_needed > fastq_space_free) or (fastq_space_remaining_not_enough):
@@ -107,7 +97,7 @@ def estimate(run_id, conf):
         log_message(run_id, 'fastq files', fastq_space_needed, fastq_space_free, conf) 
 
 
-
+  
 def error(run_id, type_file, space_needed, space_free, space_remaining_not_enough, conf):
     """Error handling.
 
@@ -147,3 +137,43 @@ def log_message(run_id, type_file, space_needed, space_free, conf):
     message = message + ' is needed, it is free space %.2f Gb ' % (space_free / 1024 / 1024 / 1024)
     common.log('INFO', message, conf)
     
+    
+def ratio_bcl_compressed(run_param_path):
+    """
+    Arguments:
+        run_param_path : path to runParameters.xml
+    """
+    
+    # for bcl files    
+    # bcl file : compressed or not, info in runParameters.xml
+    compressed_bcl_file = False
+    balise = "CompressBcls";
+ 
+    doc = parse(run_param_path)
+
+    if doc.documentElement.getElementsByTagName(balise).__len__() > 0:
+        el = doc.documentElement.getElementsByTagName(balise)[0]
+        if el.nodeType == el.ELEMENT_NODE:
+            txt = el.childNodes[0].nodeValue
+            if txt == 'true':
+                compressed_bcl_file = True
+      
+    if compressed_bcl_file:
+        ratio_bcl_file_compressed = 5.0  # TO DEFINE RATIO
+    else:
+        ratio_bcl_file_compressed = 1.0
+        
+    return ratio_bcl_file_compressed
+
+def compressed_quality_data(run_param_path):
+    """
+    Arguments:
+        run_param_path : path to runParameters.xml
+    """
+        
+    if compressed_quality_data:
+        ratio_quality_compressed = 5.0  # TO DEFINE RATIO
+    else:
+        ratio_quality_compressed = 1.0
+        
+    return ratio_quality_compressed
