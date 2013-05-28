@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import com.google.common.base.Stopwatch;
@@ -114,7 +115,7 @@ public class FastqScreen {
       LOGGER.fine("FASTQSCREEN : step map for "
           + fastqSample.getKeyFastqSample() + " in mode "
           + (fastqRead2 == null ? "single" : "paired") + " on genome(s) "
-          + genomes + " in " + toTimeHumanReadable(timer.elapsedMillis()));
+          + genomes + " in " + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
       timer.reset();
       timer.start();
@@ -124,7 +125,7 @@ public class FastqScreen {
       LOGGER.fine("FASTQSCREEN : step reduce for "
           + fastqSample.getKeyFastqSample() + " in mode "
           + (fastqRead2 == null ? "single" : "paired") + " in "
-          + toTimeHumanReadable(timer.elapsedMillis()));
+          + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
       // Remove temporary output file use in map-reduce step
       new File(tmpDir + "/outputDoReduce.txt").delete();

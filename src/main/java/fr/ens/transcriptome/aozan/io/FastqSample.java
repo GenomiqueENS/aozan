@@ -307,11 +307,11 @@ public class FastqSample {
 
     this.runFastqPath = casavaOutputPath;
 
-    // if (sampleName.equals("2012_0197"))
-    // if (sampleName.equals("Okaz-M3"))
-    this.fastqFiles = createListFastqFiles(this.read);
-    // else
-    // this.fastqFiles = Collections.emptyList();
+    // if (projectName.equals("plasticit_abdomen_B2012"))
+    if (sampleName.equals("2012_0197"))
+      this.fastqFiles = createListFastqFiles(this.read);
+    else
+      this.fastqFiles = Collections.emptyList();
 
     // TODO to remove after test
     if (fastqFiles.size() == 0) {

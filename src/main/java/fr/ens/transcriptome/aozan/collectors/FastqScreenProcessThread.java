@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import com.google.common.base.Charsets;
@@ -83,7 +84,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
       LOGGER.fine("FASTQSCREEN : end for "
           + this.fastqSample.getKeyFastqSample() + " in mode "
           + (paired ? "paired" : "single") + " on genome(s) " + this.genomes
-          + " in " + toTimeHumanReadable(timer.elapsedMillis()));
+          + " in " + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
     }
 

@@ -29,6 +29,7 @@ import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import com.google.common.base.Stopwatch;
@@ -113,7 +114,8 @@ public class RunDataGenerator {
       collector.collect(data);
 
       LOGGER.fine(collector.getName().toUpperCase()
-          + " end in " + toTimeHumanReadable(timerCollector.elapsedMillis()));
+          + " end in "
+          + toTimeHumanReadable(timerCollector.elapsed(TimeUnit.MILLISECONDS)));
 
     }
 
@@ -122,7 +124,7 @@ public class RunDataGenerator {
     // }
 
     LOGGER.fine("Step collector end in "
-        + toTimeHumanReadable(timerGlobal.elapsedMillis()));
+        + toTimeHumanReadable(timerGlobal.elapsed(TimeUnit.MILLISECONDS)));
     timerGlobal.stop();
 
     this.properties.setProperty(COLLECT_DONE, "true");
