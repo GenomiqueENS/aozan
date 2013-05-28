@@ -67,7 +67,7 @@ public class FastqScreenSimpleSampleLienReportTest extends AbstractSampleTest {
             "".equals(index) ? "NoIndex" : index, lane, readSample);
     final String url = "Project_" + projectName + "/" + filename;
 
-    return new TestResult(0, url, "url");
+    return new TestResult(9, url, "url");
   }
 
   @Override
