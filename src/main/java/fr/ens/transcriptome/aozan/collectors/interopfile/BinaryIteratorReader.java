@@ -28,8 +28,8 @@ import java.util.Iterator;
 import fr.ens.transcriptome.aozan.collectors.interopfile.AbstractBinaryIteratorReader.IlluminaMetrics;
 
 /**
- * This interface define an iterator on Illumina Metrics for reading binary files
- * from the InterOp directory. It allow to parse all records.
+ * This interface define an iterator on Illumina Metrics for reading binary
+ * files from the InterOp directory. It allow to parse all records.
  * @author Sandrine Perrin
  * @since 1.1
  */

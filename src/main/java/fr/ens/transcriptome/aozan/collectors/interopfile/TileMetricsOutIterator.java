@@ -39,10 +39,7 @@ import net.sf.picard.util.UnsignedTypeUtil;
  */
 public class TileMetricsOutIterator extends AbstractBinaryIteratorReader {
 
-  public final String NAME = "TileMetricsOut.bin";
-
-  // public static final String tileMetricsOutFile = dirInterOp
-  // + "TileMetricsOut.bin";
+  public final String NAME = "TileMetricsOut";
 
   public static final String tileMetricsOutFile = "TileMetricsOut.bin";
 
@@ -75,11 +72,6 @@ public class TileMetricsOutIterator extends AbstractBinaryIteratorReader {
    * @throws AozanException it occurs if size record or version aren't the same
    *           that expected.
    */
-  public TileMetricsOutIterator(final String dirInterOpPath)
-      throws AozanException {
-    super(new File(dirInterOpPath + tileMetricsOutFile), EXPECTED_RECORD_SIZE,
-        EXPECTED_VERSION);
-  }
 
   public TileMetricsOutIterator() throws AozanException {
     super(new File(dirInterOp + tileMetricsOutFile), EXPECTED_RECORD_SIZE,

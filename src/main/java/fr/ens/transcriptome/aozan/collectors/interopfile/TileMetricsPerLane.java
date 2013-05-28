@@ -38,7 +38,7 @@ import com.google.common.collect.Lists;
  * @author Sandrine Perrin
  * @since 1.1
  */
-class TileMetricsPerLane extends ValuesPerLane {
+class TileMetricsPerLane {
 
   private double clusterDensity = 0.0; // code in binary file 100
   private double clusterDensityPF = 0.0; // code in binary file 101
@@ -47,8 +47,6 @@ class TileMetricsPerLane extends ValuesPerLane {
   private double prcPFClusters = 0.0;
   private List<Number> numberClusterValues = Lists.newArrayList();
   private List<Number> numberClusterPFValues = Lists.newArrayList();
-  // private List<Number> clusterDensityValues = Lists.newArrayList();
-  // private List<Number> clusterDensityPFValues = Lists.newArrayList();
 
   // Standard deviation
   private double clusterDensitySD = 0.0;
@@ -58,61 +56,61 @@ class TileMetricsPerLane extends ValuesPerLane {
   private double prcPFClustersSD = 0.0;
 
   private Double controlLane = 0.0; // code in binary file 400
-  private int tileCount = 1;
   private boolean prcClusterCompute = false;
 
-  // All tile metrics per read
+  // All metrics per read
   private List<ReadMetrics> list = new LinkedList<ReadMetrics>();
 
-  public void addMetrics(final int code, final List<Number> sum) {
+  /**
+   * Compute mean and standard deviation to code metric.
+   * @param code metrics
+   * @param list values for all tile
+   */
+  public void addMetrics(final int code, final List<Number> list) {
 
     Number value = null;
     Number sd = null;
-    // if (code >= 200 && code <= 299) {
-    // double d = 0.0;
-    // for (Number n : sum) {
-    // d += n.doubleValue();
-    // }
-    // value = d;
-    // } else {
-    value = average(sum);
-    sd = standardDeviation(sum, value);
-    // }
+
+    StatisticsUtils stat = new StatisticsUtils(list);
+    value = stat.getMean();
+    sd = stat.getStandardDeviation();
 
     switch (code) {
     case 100:
       this.clusterDensity = value.doubleValue();
       this.clusterDensitySD = sd.doubleValue();
-      // this.clusterDensityValues = sum;
       break;
+
     case 101:
       this.clusterDensityPF = value.doubleValue();
       this.clusterDensityPFSD = sd.doubleValue();
-      // this.clusterDensityPFValues = sum;
       break;
+
     case 102:
       this.numberCluster = value.longValue();
       this.numberClusterSD = sd.doubleValue();
-      this.numberClusterValues = sum;
-      // System.out.println("nb_clusters " + Joiner.on(" ").join(sum));
+      this.numberClusterValues = list;
       break;
+
     case 103:
       this.numberClusterPF = value.longValue();
       this.numberClusterPFSD = sd.doubleValue();
-      this.numberClusterPFValues = sum;
-      // System.out.println("nb_clusters_PF " + Joiner.on(" ").join(sum));
+      this.numberClusterPFValues = list;
       break;
+
     case 400:
       // value unique to a run, read first value in list
-      this.controlLane = sum.get(0).doubleValue();
+      this.controlLane = list.get(0).doubleValue();
       break;
     default: // code 20X and 30X
       addReadMetrics(code, value, sd);
     }
-
     computePercentClusterPF();
   }
 
+  /**
+   * Compute mean and standard deviation for percent cluster PF.
+   */
   private void computePercentClusterPF() {
 
     if (numberClusterPFValues.size() == 0 || numberClusterValues.size() == 0)
@@ -121,27 +119,29 @@ class TileMetricsPerLane extends ValuesPerLane {
     if (prcClusterCompute)
       return;
 
-    List<Number> prcPFClustersDetail =
-        Lists.newArrayListWithCapacity(numberClusterValues.size());
+    StatisticsUtils stat = new StatisticsUtils();
 
+    // Set the percent cluster PF for each tile
     for (int i = 0; i < numberClusterValues.size(); i++) {
 
-      // if (numberClusterPFValues.get(i).intValue() > 0) {
       double prc =
           new Double(numberClusterPFValues.get(i).intValue())
               / new Double(numberClusterValues.get(i).intValue());
-
-      prcPFClustersDetail.add(prc);
-      // }
+      stat.addValues(prc);
     }
 
-    this.prcPFClusters = (average(prcPFClustersDetail)).doubleValue();
-    this.prcPFClustersSD =
-        standardDeviation(prcPFClustersDetail, this.prcPFClusters);
+    this.prcPFClusters = stat.getMean();
+    this.prcPFClustersSD = stat.getStandardDeviation();
 
     prcClusterCompute = true;
   }
 
+  /**
+   * Add a metric (mean and standard deviation) to a read from the code metric.
+   * @param code metric
+   * @param average mean for the code metric
+   * @param sd standard deviation for the code metric
+   */
   private void addReadMetrics(final int code, final Number average,
       final Number sd) {
 
@@ -159,6 +159,7 @@ class TileMetricsPerLane extends ValuesPerLane {
     }
 
     boolean find = false;
+    // update ReadMetrics for the number read if it exists
     for (ReadMetrics read : list) {
       if (read.getNumberRead() == numeroRead) {
         read.addValue(code, average, sd);
@@ -167,57 +168,69 @@ class TileMetricsPerLane extends ValuesPerLane {
     }
 
     if (!find) {
-      // add new ReadMetrics
+      // create new ReadMetrics
       ReadMetrics readMetrics = new ReadMetrics(numeroRead);
       readMetrics.addValue(code, average, sd);
       list.add(readMetrics);
     }
   }
 
+  /** Get the mean of percent cluster PF */
   public double getPrcPFClusters() {
     return prcPFClusters * 100;
   }
 
+  /** Get the standard deviation of percent cluster PF */
   public double getPrcPFClustersSD() {
     return prcPFClustersSD * 100;
   }
 
+  /** Get the mean of cluster density */
   public double getClusterDensity() {
     return clusterDensity;
   }
 
-  public double getClusterDensityPF() {
-    return clusterDensityPF;
-  }
-
-  public long getNumberCluster() {
-    return numberCluster;
-  }
-
-  public long getNumberClusterPF() {
-    return numberClusterPF;
-  }
-
+  /** Get the standard deviation of cluster density */
   public double getClusterDensitySD() {
     return clusterDensitySD;
   }
 
+  /** Get the mean of cluster density PF */
+  public double getClusterDensityPF() {
+    return clusterDensityPF;
+  }
+
+  /** Get the standard deviation of cluster density PF */
   public double getClusterDensityPFSD() {
     return clusterDensityPFSD;
   }
 
+  /** Get the mean of number cluster */
+  public long getNumberCluster() {
+    return numberCluster;
+  }
+
+  /** Get the mean of number cluster PF */
+  public long getNumberClusterPF() {
+    return numberClusterPF;
+  }
+
+  /** Get the standard deviation of number cluster */
   public double getNumberClusterSD() {
     return numberClusterSD;
   }
 
+  /** Get the standard deviation of number cluster PF */
   public double getNumberClusterPFSD() {
     return numberClusterPFSD;
   }
 
+  /** Get the number lane from control */
   public int getControlLane() {
     return controlLane.intValue();
   }
 
+  /** Get the set of read metrics */
   public List<ReadMetrics> getList() {
     return list;
   }

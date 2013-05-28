@@ -42,10 +42,8 @@ import fr.ens.transcriptome.aozan.AozanException;
  */
 public class ErrorMetricsOutIterator extends AbstractBinaryIteratorReader {
 
-  public final String NAME = "ErrorMetricsOut.bin";
+  public final String NAME = "ErrorMetricsOut";
 
-  // public static String errorMetricsOutFile = dirInterOp +
-  // "ErrorMetricsOut.bin";
   public static String errorMetricsOutFile = "ErrorMetricsOut.bin";
   private static final int EXPECTED_RECORD_SIZE = 30;
   private static final int EXPECTED_VERSION = 3;
@@ -90,12 +88,6 @@ public class ErrorMetricsOutIterator extends AbstractBinaryIteratorReader {
    * @throws AozanException it occurs if size record or version aren't the same
    *           that expected.
    */
-  public ErrorMetricsOutIterator(final String dirInterOpPath)
-      throws AozanException {
-
-    super(new File(dirInterOpPath + errorMetricsOutFile), EXPECTED_RECORD_SIZE,
-        EXPECTED_VERSION);
-  }
 
   public ErrorMetricsOutIterator() throws AozanException {
 
@@ -131,9 +123,6 @@ public class ErrorMetricsOutIterator extends AbstractBinaryIteratorReader {
    */
   public static class IlluminaErrorMetrics extends IlluminaMetrics {
 
-    static int maxTile = 0;
-    static int minTile = Integer.MAX_VALUE;
-
     static int maxCycle = 0;
     static int minCycle = Integer.MAX_VALUE;
 
@@ -164,9 +153,6 @@ public class ErrorMetricsOutIterator extends AbstractBinaryIteratorReader {
       this.numberReadsTwoErrors = bb.getInt();
       this.numberReadsThreeErrors = bb.getInt();
       this.numberReadsFourErrors = bb.getInt();
-
-      maxTile = (tileNumber > maxTile) ? tileNumber : maxTile;
-      minTile = (tileNumber < minTile) ? tileNumber : minTile;
 
       maxCycle = (cycleNumber > maxCycle) ? cycleNumber : maxCycle;
       minCycle = (cycleNumber < minCycle) ? cycleNumber : minCycle;

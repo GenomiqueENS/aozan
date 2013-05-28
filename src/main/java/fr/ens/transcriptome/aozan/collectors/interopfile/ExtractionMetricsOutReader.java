@@ -27,13 +27,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.interopfile.AbstractBinaryIteratorReader.IlluminaMetrics;
 import fr.ens.transcriptome.aozan.collectors.interopfile.ExtractionMetricsOutIterator.IlluminaIntensitiesMetrics;
@@ -45,16 +43,9 @@ import fr.ens.transcriptome.aozan.collectors.interopfile.ExtractionMetricsOutIte
  * @since 1.1
  */
 public class ExtractionMetricsOutReader extends AbstractBinaryInterOpReader {
-  /** Logger */
-  // private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
-  private String dirInterOpPath ;
   private Map<LaneRead, ExtractionMetricsPerLane> intensityPerLaneRead =
       new TreeMap<LaneRead, ExtractionMetricsPerLane>();
-
-  // private int cycleNumberBeginRead1 = -1;
-  // private int cycleNumberBeginRead2 = -1;
-  // private int cycleNumberBeginRead3 = -1;
 
   /**
    * Collect data.
@@ -66,28 +57,12 @@ public class ExtractionMetricsOutReader extends AbstractBinaryInterOpReader {
     super.collect(data);
     String key = "";
 
-    // this.cycleNumberBeginRead1 = 1;
-    //
-    // if (reads > 1)
-    // this.cycleNumberBeginRead2 =
-    // data.getInt("run.info.read1.cycles") + this.cycleNumberBeginRead1;
-    // if (reads > 2)
-    // this.cycleNumberBeginRead3 =
-    // data.getInt("run.info.read2.cycles") + this.cycleNumberBeginRead2;
-
-    // System.out.println("INTEN value seuil reads "
-    // + cycleNumberBeginRead1 + " -- " + cycleNumberBeginRead2 + " -- "
-    // + cycleNumberBeginRead3);
-
     parseCollection(getCyclesStartRead(data));
 
-    // System.out
-    // .println("INTEN size internal map " + intensityPerLaneRead.size());
-
-    for (int read = 1; read <= reads; read++) {
-      // TODO to define
-      data.put("read" + read + ".density.ratio", "0.3472222");
-    }
+    // for (int read = 1; read <= reads; read++) {
+    // // TODO to define
+    // data.put("read" + read + ".density.ratio", "0.3472222");
+    // }
 
     // Parse map defined for each pair : lane-read
     for (Map.Entry<LaneRead, ExtractionMetricsPerLane> e : intensityPerLaneRead
@@ -105,7 +80,6 @@ public class ExtractionMetricsOutReader extends AbstractBinaryInterOpReader {
       // TODO to remove after test
       if (TestCollectorReadBinary.PRINT_DETAIL)
         System.out.println(e.getKey() + "  " + e.getValue());
-      // LOGGER.info(e.getKey() + "  " + e.getValue());
     }
 
   }
@@ -124,10 +98,6 @@ public class ExtractionMetricsOutReader extends AbstractBinaryInterOpReader {
 
     // Reading the binary file and set a collection of records
     Collection<IlluminaMetrics> collection = makeCollection(binIterator);
-
-    // System.out.println("INTENS cycles min "
-    // + IlluminaIntensitiesMetrics.minCycle + " max "
-    // + IlluminaIntensitiesMetrics.maxCycle);
 
     // Set the intensityPerLaneRead value used for each lane and each read
     for (int lane = 1; lane <= lanes; lane++) {
@@ -177,21 +147,9 @@ public class ExtractionMetricsOutReader extends AbstractBinaryInterOpReader {
         }
       }
     }
-    // System.out.println("lane "
-    // + lane + " read " + read + " size cycle 1 " + intensityCycle1.size()
-    // + " cycle 20 " + intensityCycle20.size());
-    // System.out.println(lane
-    // + " " + read + " start " + startCycle + " size c1 "
-    // + intensityCycle1.size() + " size c20 " + intensityCycle20.size());
 
     intensityPerLaneRead.put(new LaneRead(lane, read),
-        new ExtractionMetricsPerLane(intensityCycle1, intensityCycle20, lane,
-            read));
-
-    // String s = new LaneRead(lane, read).toString();
-    // if (s.equals("6-2"))
-    // System.out.println(s
-    // + " \n\t c1 " + intensityCycle1 + " \n\t c20 " + intensityCycle20);
+        new ExtractionMetricsPerLane(intensityCycle1, intensityCycle20));
   }
 
   /**
@@ -219,19 +177,8 @@ public class ExtractionMetricsOutReader extends AbstractBinaryInterOpReader {
       l.add(lastNumberCycle);
       result.put(read, l);
     }
-    System.out.println("read/last cycles " + result);
+
     return result;
   }
-  
-  //
-  // Constructor
-  //
-  
-  public ExtractionMetricsOutReader() {
-    // TODO Auto-generated constructor stub
-  }
-  
-  ExtractionMetricsOutReader(final String dirInterOpPath){
-    this.dirInterOpPath = dirInterOpPath;
-  }
+
 }

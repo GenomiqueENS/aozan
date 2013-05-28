@@ -42,10 +42,8 @@ import fr.ens.transcriptome.aozan.AozanException;
  */
 public class ExtractionMetricsOutIterator extends AbstractBinaryIteratorReader {
 
-  public final String NAME = "ExtractionMetricsOut.bin";
+  public final String NAME = "ExtractionMetricsOut";
 
-  // public static final String extractMetricsOutFile = dirInterOp
-  // + "ExtractionMetricsOut.bin";
   public static final String extractMetricsOutFile = "ExtractionMetricsOut.bin";
 
   private static final int EXPECTED_RECORD_SIZE = 38;
@@ -113,9 +111,6 @@ public class ExtractionMetricsOutIterator extends AbstractBinaryIteratorReader {
    */
   public static class IlluminaIntensitiesMetrics extends IlluminaMetrics {
 
-    // static int maxTile = 0;
-    // static int minTile = Integer.MAX_VALUE;
-    //
     static int maxCycle = 0;
     static int minCycle = Integer.MAX_VALUE;
 
@@ -152,9 +147,6 @@ public class ExtractionMetricsOutIterator extends AbstractBinaryIteratorReader {
       // Read date/time for CIF creation, not used
       ByteBuffer dateCif = bb.get(new byte[8]);
 
-      // maxTile = (tileNumber > maxTile) ? tileNumber : maxTile;
-      // minTile = (tileNumber < minTile) ? tileNumber : minTile;
-      //
       maxCycle = (cycleNumber > maxCycle) ? cycleNumber : maxCycle;
       minCycle = (cycleNumber < minCycle) ? cycleNumber : minCycle;
 
@@ -202,9 +194,7 @@ public class ExtractionMetricsOutIterator extends AbstractBinaryIteratorReader {
       int sum = 0;
       for (int n = 0; n < intensities.length; n++) {
         sum += intensities[n];
-        // System.out.print(n + " - " + intensities[n]);
       }
-      // System.out.println();
       return sum / intensities.length;
     }
   }

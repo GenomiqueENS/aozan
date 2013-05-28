@@ -26,14 +26,12 @@ package fr.ens.transcriptome.aozan.collectors.interopfile;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.interopfile.AbstractBinaryIteratorReader.IlluminaMetrics;
 import fr.ens.transcriptome.aozan.collectors.interopfile.ErrorMetricsOutIterator.IlluminaErrorMetrics;
@@ -46,10 +44,7 @@ import fr.ens.transcriptome.aozan.collectors.interopfile.ErrorMetricsOutIterator
  * @since 1.1
  */
 public class ErrorMetricsOutReader extends AbstractBinaryInterOpReader {
-  /** Logger */
-  // private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
-  private String dirInterOpPath;
   static int seuil35ForRead = 35;
   static int seuil75ForRead = 75; // optional
   static int seuil100ForRead = 100; // optional
@@ -57,8 +52,6 @@ public class ErrorMetricsOutReader extends AbstractBinaryInterOpReader {
       new TreeMap<LaneRead, ErrorRatesPerLane>();
 
   private Map<Integer, Integer> readLastCycle;
-
-  // private int numberCycleForRead1;
 
   /**
    * Collect data.
@@ -69,18 +62,12 @@ public class ErrorMetricsOutReader extends AbstractBinaryInterOpReader {
     // parse map, each entry is added in data
     super.collect(data);
 
-    // this.numberCycleForRead1 = data.getInt("run.info.read1.cycles") - 1;
     this.readLastCycle = getCyclesEndRead(data);
-    // System.out.println("ERROR value seuil reads " + numberCycleForRead1);
 
     parseCollection(data);
 
-    // System.out.println("ERROR size internal map "
-    // + errorMetricsPerLaneRead.size());
-
     for (Map.Entry<LaneRead, ErrorRatesPerLane> e : errorMetricsPerLaneRead
         .entrySet()) {
-      // System.out.println(e.getKey() + " \t" + e.getValue());
       String key =
           "read" + e.getKey().getRead() + ".lane" + e.getKey().getLane();
       data.put(key + ".err.rate.100", e.getValue().getErrorRateCycle100());
@@ -95,10 +82,10 @@ public class ErrorMetricsOutReader extends AbstractBinaryInterOpReader {
       data.put(key + ".called.cycles.max", 0);
       data.put(key + ".called.cycles.min", 0);
 
+      // TODO to remove after test
       if (TestCollectorReadBinary.PRINT_DETAIL)
         if (e.getKey().getRead() != 2)
           System.out.println(e.getKey() + " " + e.getValue());
-      // LOGGER.info(e.getKey() + "  " + e.getValue());
     }
 
   }
@@ -112,19 +99,12 @@ public class ErrorMetricsOutReader extends AbstractBinaryInterOpReader {
    */
   private void parseCollection(RunData data) throws AozanException {
 
-
     if (!ErrorMetricsOutIterator.errorMetricsOutFileExists())
       collectionEmpty(1, lanes);
 
     else {
-      ErrorMetricsOutIterator binIterator =
-          new ErrorMetricsOutIterator();
+      ErrorMetricsOutIterator binIterator = new ErrorMetricsOutIterator();
       Collection<IlluminaMetrics> collection = makeCollection(binIterator);
-      // Map<Integer, Integer> cyclesStartRead = getCyclesEndRead(data);
-
-      // System.out.println("ERROR cycles min "
-      // + IlluminaErrorMetrics.minCycle + " max "
-      // + IlluminaErrorMetrics.maxCycle);
 
       for (int lane = 1; lane <= lanes; lane++) {
 
@@ -226,30 +206,6 @@ public class ErrorMetricsOutReader extends AbstractBinaryInterOpReader {
 
     }
 
-    // // In SR count cycle = 50
-    // // Check if cycle is the last for read 1
-    // if (cycle == numberCycleForRead1) {
-    //
-    // errorMetricsPerLaneRead.put(new LaneRead(lane, 1),
-    // new ErrorRatesPerLane(sumErrorRate, error35, error75, error100));
-    //
-    // // Check if cycle is the last for read3
-    // } else if (cycle == IlluminaErrorMetrics.maxCycle) {
-    //
-    // // TODO test with paired, if record for read2 are set in file.
-    // errorMetricsPerLaneRead.put(new LaneRead(lane, 3),
-    // new ErrorRatesPerLane(sumErrorRate, error35, error75, error100));
-    // }
-    // } // for cycle
-    //
-    // // TODO to check with a PE run
-    // // None cycle corresponding for read2 (index)
-    // if (reads >= 2) {
-    // // Put read2 for index, values null
-    // errorMetricsPerLaneRead.put(new LaneRead(lane, 2),
-    // new ErrorRatesPerLane());
-    // }
-
   }
 
   /**
@@ -276,13 +232,8 @@ public class ErrorMetricsOutReader extends AbstractBinaryInterOpReader {
    */
   private static final Map<Integer, Integer> getCyclesEndRead(final RunData data) {
 
-    // run.info.read.count=2
-    // run.info.read1.cycles=51
-
     final Map<Integer, Integer> result = Maps.newLinkedHashMap();
-
     final int readCount = data.getInt("run.info.read.count");
-
     int cyclesCount = 0;
 
     for (int read = 1; read <= readCount; read++) {
@@ -294,21 +245,9 @@ public class ErrorMetricsOutReader extends AbstractBinaryInterOpReader {
         cyclesCount += data.getInt("run.info.read" + read + ".cycles");
         result.put(read, cyclesCount - 1);
       }
-
     }
-    System.out.println("read/last cycles " + result);
+
     return result;
   }
 
-  //
-  // Constructor
-  //
-
-  public ErrorMetricsOutReader() {
-    // TODO Auto-generated constructor stub
-  }
-
-  public ErrorMetricsOutReader(final String dirInterOpPath) {
-    this.dirInterOpPath = dirInterOpPath;
-  }
 }

@@ -27,13 +27,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.interopfile.AbstractBinaryIteratorReader.IlluminaMetrics;
 import fr.ens.transcriptome.aozan.collectors.interopfile.TileMetricsOutIterator.IlluminaTileMetrics;
@@ -48,7 +46,7 @@ import fr.ens.transcriptome.aozan.collectors.interopfile.TileMetricsPerLane.Read
 public class TileMetricsOutReader extends AbstractBinaryInterOpReader {
 
   private Collection<IlluminaMetrics> collection;
-  // private String dirInterOpPath;
+
   private Map<Integer, TileMetricsPerLane> tileMetricsPerLane =
       new TreeMap<Integer, TileMetricsPerLane>();
 
@@ -62,9 +60,6 @@ public class TileMetricsOutReader extends AbstractBinaryInterOpReader {
 
     // Parse map, each entry is added in run data
     parseCollection();
-
-    // System.out.println("TILE size internal map " +
-    // tileMetricsPerLane.size());
 
     // Parse tiles metrics for each lanes
     for (Map.Entry<Integer, TileMetricsPerLane> e : tileMetricsPerLane
@@ -95,9 +90,8 @@ public class TileMetricsOutReader extends AbstractBinaryInterOpReader {
         data.put(key + ".phasing", rm.getPhasing());
         data.put(key + ".prephasing", rm.getPrephasing());
 
+        // TODO to remove after test
         if (TestCollectorReadBinary.PRINT_DETAIL)
-          // if (rm.getNumberRead() == 1)
-
           System.out.println(e.getKey()
               + (e.getKey() == e.getValue().getControlLane() ? "(C)" : "   ")
               + e.getValue()
@@ -107,9 +101,7 @@ public class TileMetricsOutReader extends AbstractBinaryInterOpReader {
                       .getPrcPFClustersSD(), rm.getPhasing(), rm
                       .getPrephasing()));
       }
-
     }
-    // System.out.println("collect tile metrics \n" + data);
   }
 
   /**
@@ -150,16 +142,5 @@ public class TileMetricsOutReader extends AbstractBinaryInterOpReader {
     }
     // Set a object Tile Metrics for a lane and reads
     tileMetricsPerLane.put(lane, new TileMetricsPerLane(metrics));
-  }
-
-  //
-  // Constructor
-  //
-
-  // public TileMetricsOutReader(final String dirInterOpPath) {
-  // this.dirInterOpPath = dirInterOpPath;
-  // }
-
-  public TileMetricsOutReader() {
   }
 }

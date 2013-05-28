@@ -37,7 +37,7 @@ import com.google.common.collect.Lists;
  * @author Sandrine Perrin
  * @since 1.1
  */
-class ErrorRatesPerLane extends ValuesPerLane {
+class ErrorRatesPerLane {
 
   private double errorRate = 0.0; // average errorRate
   private double errorRateCycle35 = 0.0;
@@ -71,8 +71,8 @@ class ErrorRatesPerLane extends ValuesPerLane {
       List<Number> list =
           Arrays.asList(entry.getValue().toArray(new Number[] {}));
 
-      // Average rate error for one tile
-      errorRatePerTile.add(average(list));
+      StatisticsUtils stat = new StatisticsUtils(list);
+      errorRatePerTile.add(stat.getMean());
 
     }
     return errorRatePerTile;
@@ -177,38 +177,50 @@ class ErrorRatesPerLane extends ValuesPerLane {
       final int read) {
 
     // Need rate error per tile before compute rate error for a lane
-    List<Number> errorRatePerTile = computeErrorRatePerTile(sumErrorRate);
+    List<Number> errorRatePerTile;
 
     if (sumErrorRate.size() > 0) {
-      this.errorRate = (average(errorRatePerTile)).doubleValue();
-      this.errorRateSD = standardDeviation(errorRatePerTile, this.errorRate);
+      errorRatePerTile = computeErrorRatePerTile(sumErrorRate);
+      StatisticsUtils stat = new StatisticsUtils(errorRatePerTile);
+
+      this.errorRate = stat.getMean();
+      this.errorRateSD = stat.getStandardDeviation();
+
     } else {
       System.out.println("ERROR error ----> "
           + lane + "-" + read + " list sum rate error empty");
     }
+
     // Check if number cycle > 35, else values are 0.0
     if (error35.size() > 0) {
       errorRatePerTile = computeErrorRatePerTile(error35);
-      this.errorRateCycle35 = (average(errorRatePerTile)).doubleValue();
-      this.errorRateCycle35SD =
-          standardDeviation(errorRatePerTile, this.errorRateCycle35);
+      StatisticsUtils stat = new StatisticsUtils(errorRatePerTile);
+
+      this.errorRateCycle35 = stat.getMean();
+      this.errorRateCycle35SD = stat.getStandardDeviation();
+
     }
 
     // Check if number cycle > 75, else values are 0.0
     if (error75.size() > 0) {
       errorRatePerTile = computeErrorRatePerTile(error75);
-      this.errorRateCycle75 = (average(errorRatePerTile)).doubleValue();
-      this.errorRateCycle75SD =
-          standardDeviation(errorRatePerTile, this.errorRateCycle75);
+      StatisticsUtils stat = new StatisticsUtils(errorRatePerTile);
+
+      this.errorRateCycle75 = stat.getMean();
+      this.errorRateCycle75SD = stat.getStandardDeviation();
+
     }
 
     // Check if number cycle > 100, else values are 0.0
     if (error100.size() > 0) {
       errorRatePerTile = computeErrorRatePerTile(error100);
-      this.errorRateCycle100 = (average(errorRatePerTile)).doubleValue();
-      this.errorRateCycle100SD =
-          standardDeviation(errorRatePerTile, this.errorRateCycle100);
+      StatisticsUtils stat = new StatisticsUtils(errorRatePerTile);
+
+      this.errorRateCycle100 = stat.getMean();
+      this.errorRateCycle100SD = stat.getStandardDeviation();
+
     }
+
   }
 
   /**

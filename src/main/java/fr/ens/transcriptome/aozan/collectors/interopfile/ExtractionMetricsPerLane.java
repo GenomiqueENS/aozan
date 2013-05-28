@@ -24,11 +24,6 @@
 package fr.ens.transcriptome.aozan.collectors.interopfile;
 
 import java.util.List;
-import java.util.logging.Logger;
-
-import com.google.common.collect.Lists;
-
-import fr.ens.transcriptome.aozan.Globals;
 
 /**
  * This class contains all intensity values for a lane extracted from binary
@@ -36,7 +31,7 @@ import fr.ens.transcriptome.aozan.Globals;
  * @author Sandrine Perrin
  * @since 1.1
  */
-class ExtractionMetricsPerLane extends ValuesPerLane {
+class ExtractionMetricsPerLane {
 
   private int intensityCycle1 = 0;
   private double intensityCycle1SD = 0.0;
@@ -54,7 +49,7 @@ class ExtractionMetricsPerLane extends ValuesPerLane {
       List<Number> intensityCycle20Values) {
     double result = 0.0;
 
-    List<Number> ratioIntensity = Lists.newArrayList();
+    StatisticsUtils stat = new StatisticsUtils();
 
     for (int i = 0; i < intensityCycle1Values.size(); i++) {
       double intensityC1 = new Double(intensityCycle1Values.get(i).intValue());
@@ -62,12 +57,12 @@ class ExtractionMetricsPerLane extends ValuesPerLane {
           new Double(intensityCycle20Values.get(i).intValue());
 
       if (intensityC1 > 0 && intensityC20 > 0) {
-        ratioIntensity.add(intensityC20 / intensityC1);
+        stat.addValues(intensityC20 / intensityC1);
       }
     }
 
-    this.ratioIntensityCycle20 = (average(ratioIntensity)).doubleValue();
-    result = standardDeviation(ratioIntensity, this.ratioIntensityCycle20);
+    this.ratioIntensityCycle20 = stat.getMean();
+    result = stat.getStandardDeviation();
 
     this.ratioIntensityCycle20SD = result * 100;
   }
@@ -139,35 +134,27 @@ class ExtractionMetricsPerLane extends ValuesPerLane {
    * @param intensityCycle20Values all intensities values for the cycle 20
    */
   ExtractionMetricsPerLane(final List<Number> intensityCycle1Values,
-      final List<Number> intensityCycle20Values, final int lane, final int read) {
+      final List<Number> intensityCycle20Values) {
 
-    if (intensityCycle1Values.size() <= 0) {
-      System.out.println("ERROR intensity ----> "
-          + lane + "-" + read + " list sum rate error empty");
-    } else {
-      // TODO to check, used only intensity for the base A
-      Number intensityC1_AllBases = average(intensityCycle1Values);
+    StatisticsUtils statCycle1 = new StatisticsUtils(intensityCycle1Values);
+    StatisticsUtils statCycle20 = new StatisticsUtils(intensityCycle20Values);
 
-      this.intensityCycle1 = intensityC1_AllBases.intValue();
+    // TODO to check, used only intensity for the base A
+    this.intensityCycle1 = new Double(statCycle1.getMean()).intValue();
 
-      // intensityCycle1 somme intensity / compt(tile) / 4
-      this.intensityCycle1SD =
-          standardDeviation(intensityCycle1Values, intensityC1_AllBases);
+    // intensityCycle1 somme intensity / compt(tile) / 4
+    this.intensityCycle1SD = statCycle1.getStandardDeviation();
 
-      // Check if count cycle > 20
-      if (intensityCycle20Values.size() > 0) {
-        Number intensityC20_AllBases = average(intensityCycle20Values);
-        this.intensityCycle20 = intensityC20_AllBases.intValue(); // / 4;
+    // Check if count cycle > 20
+    if (intensityCycle20Values.size() > 0) {
+      this.intensityCycle20 = new Double(statCycle20.getMean()).intValue();
 
-        this.intensityCycle20SD =
-            standardDeviation(intensityCycle20Values, this.intensityCycle20);
+      this.intensityCycle20SD = statCycle20.getStandardDeviation();
 
-        // Compute intensity statistic at cycle 20 as a percentage of that at
-        // the
-        // first cycle.
-        computeRatioIntensityCycle20(intensityCycle1Values,
-            intensityCycle20Values);
-      }
+      // Compute intensity statistic at cycle 20 as a percentage of that at
+      // the first cycle.
+      computeRatioIntensityCycle20(intensityCycle1Values,
+          intensityCycle20Values);
     }
   }
 }
