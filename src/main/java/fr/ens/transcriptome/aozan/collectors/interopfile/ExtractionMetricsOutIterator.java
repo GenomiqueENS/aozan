@@ -28,8 +28,6 @@ import java.nio.ByteBuffer;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import net.sf.picard.util.UnsignedTypeUtil;
-
 import com.google.common.collect.Sets;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -134,14 +132,14 @@ public class ExtractionMetricsOutIterator extends AbstractBinaryIteratorReader {
 
       tilesNumberList.add(tileNumber);
 
-      this.cycleNumber = UnsignedTypeUtil.uShortToInt(bb.getShort());
+      this.cycleNumber = uShortToInt(bb.getShort());
 
       for (int i = 0; i < 4; i++) {
         this.fwhm[i] = bb.getFloat();
       }
 
       for (int i = 0; i < 4; i++) {
-        this.intensities[i] = UnsignedTypeUtil.uShortToInt(bb.getShort());
+        this.intensities[i] = uShortToInt(bb.getShort());
       }
 
       // Read date/time for CIF creation, not used

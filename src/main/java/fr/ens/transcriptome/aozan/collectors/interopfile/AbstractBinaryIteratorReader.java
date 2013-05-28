@@ -141,7 +141,7 @@ public abstract class AbstractBinaryIteratorReader implements
     final ByteBuffer header = bbIterator.getHeaderBytes();
 
     // Get the version, should be EXPECTED_VERSION
-    final int actualVersion = UnsignedTypeUtil.uByteToInt(header.get());
+    final int actualVersion = IlluminaMetrics.uByteToInt(header.get());
     if (actualVersion != expectedVersion) {
       throw new AozanException(getName()
           + " expects the version number to be " + expectedVersion
@@ -149,7 +149,7 @@ public abstract class AbstractBinaryIteratorReader implements
     }
 
     // Check the size record needed
-    final int actualRecordSize = UnsignedTypeUtil.uByteToInt(header.get());
+    final int actualRecordSize = IlluminaMetrics.uByteToInt(header.get());
     if (expectedRecordSize != actualRecordSize) {
       throw new AozanException(getName()
           + " expects the record size to be " + expectedRecordSize
@@ -267,8 +267,8 @@ public abstract class AbstractBinaryIteratorReader implements
     protected final int tileNumber; // uint16
 
     IlluminaMetrics(final ByteBuffer bb) {
-      laneNumber = UnsignedTypeUtil.uShortToInt(bb.getShort());
-      tileNumber = UnsignedTypeUtil.uShortToInt(bb.getShort());
+      laneNumber = uShortToInt(bb.getShort());
+      tileNumber = uShortToInt(bb.getShort());
     }
 
     /** Get the number lane */
@@ -279,6 +279,26 @@ public abstract class AbstractBinaryIteratorReader implements
     /** Get the number tile */
     public int getTileNumber() {
       return tileNumber;
+    }
+
+    /** Convert an unsigned byte to a signed int */
+    public static int uByteToInt(final byte unsignedByte) {
+      return unsignedByte & 0xFF;
+    }
+
+    /** Convert an unsigned byte to a signed short */
+    public static int uByteToShort(final byte unsignedByte) {
+      return (short) unsignedByte & 0xFF;
+    }
+
+    /** Convert an unsigned short to an Int */
+    public static int uShortToInt(final short unsignedShort) {
+      return unsignedShort & 0xFFFF;
+    }
+
+    /** Convert an unsigned int to a long */
+    public static long uIntToLong(final int unsignedInt) {
+      return unsignedInt & 0xFFFFFFFFL;
     }
   }
 }

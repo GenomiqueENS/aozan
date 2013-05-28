@@ -29,8 +29,6 @@ import java.util.NoSuchElementException;
 
 import fr.ens.transcriptome.aozan.AozanException;
 
-import net.sf.picard.util.UnsignedTypeUtil;
-
 /**
  * This class define a specified iterator for reading the binary file :
  * TileMetricsOut.bin.
@@ -117,7 +115,7 @@ public class TileMetricsOutIterator extends AbstractBinaryIteratorReader {
      */
     public IlluminaTileMetrics(final ByteBuffer bb) {
       super(bb);
-      metricCode = UnsignedTypeUtil.uShortToInt(bb.getShort());
+      metricCode = IlluminaMetrics.uShortToInt(bb.getShort());
       metricValue = bb.getFloat();
 
     }

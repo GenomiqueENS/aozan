@@ -28,8 +28,6 @@ import java.nio.ByteBuffer;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import net.sf.picard.util.UnsignedTypeUtil;
-
 import com.google.common.collect.Sets;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -145,7 +143,7 @@ public class ErrorMetricsOutIterator extends AbstractBinaryIteratorReader {
 
       tilesNumberList.add(tileNumber);
 
-      this.cycleNumber = UnsignedTypeUtil.uShortToInt(bb.getShort());
+      this.cycleNumber = uShortToInt(bb.getShort());
 
       this.errorRate = bb.getFloat();
       this.numberPerfectReads = bb.getInt();
