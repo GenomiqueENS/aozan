@@ -53,6 +53,9 @@ import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignCSVReader;
  * @since 1.0
  * @author Sandrine Perrin
  */
+/**
+ * @author sperrin
+ */
 public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
   private static final String KEY_GENOMES = "qc.conf.fastqscreen.genomes";
@@ -60,6 +63,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   private final String KEY_ALIAS_GENOME_PATH = "qc.conf.genome.alias.path";
 
   private String genomeReference;
+  private boolean isGenomeContamination;
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -69,9 +73,13 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   @Override
   public String getKey(int read, int readSample, int lane, String sampleName) {
 
+    String value =
+        isGenomeContamination
+            ? ".mapped.percent" : ".one.hit.one.library.percent";
+
     return "fastqscreen.lane"
         + lane + ".sample." + sampleName + ".read" + readSample + "."
-        + sampleName + "." + genomeReference + ".mapped.percent";
+        + sampleName + "." + genomeReference + value;
   }
 
   @Override
@@ -144,7 +152,8 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
       // Create an new AozanTest for each reference genome
       final FastqScreenSimpleSampleTest testGenome =
-          new FastqScreenSimpleSampleTest(genome);
+          new FastqScreenSimpleSampleTest(genome,
+              genomesPerDefault.contains(genome));
 
       testGenome.internalConfigure(properties);
 
@@ -217,16 +226,19 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
    * Public constructor
    */
   public FastqScreenSimpleSampleTest() {
-    this(null);
+    this(null, false);
   }
 
   /**
    * Public constructor, specific for a reference genome
    * @param genome name of reference genome
    */
-  public FastqScreenSimpleSampleTest(String genome) {
-    super("fsqmapped", "", "fastqscreen mapped on " + genome, "%");
+  public FastqScreenSimpleSampleTest(String genome,
+      boolean isGenomeContamination) {
+    super("fsqmapped", "", "fastqscreen "
+        + (isGenomeContamination ? "" : "uniq ") + "mapped on " + genome, "%");
     this.genomeReference = genome;
+    this.isGenomeContamination = isGenomeContamination;
   }
 
 }
