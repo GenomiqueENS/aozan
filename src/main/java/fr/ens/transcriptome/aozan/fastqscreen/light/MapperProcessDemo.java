@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,8 +42,8 @@ public class TestMapperProcess {
   public static final void main(String[] args) throws IOException,
       InterruptedException {
 
-    new TestMapperProcess().testMapperProcessStdinStdout();
-    Thread.sleep(1000);
+    // new TestMapperProcess().testMapperProcessStdinStdout();
+    // Thread.sleep(1000);
     new TestMapperProcess().testMapperProcessStdinStdoutPartial();
   }
 
@@ -93,8 +94,6 @@ public class TestMapperProcess {
     try {
       BufferedInputStream bis =
           new BufferedInputStream(new FileInputStream(fastq));
-      // while (-1 != (n = input.read(buffer))) {
-      // output.write(buffer, 0, n);
 
       while ((n = bis.read(buffer)) != -1) {
         os.write(buffer, 0, n);
@@ -102,6 +101,7 @@ public class TestMapperProcess {
       }
 
       bis.close();
+      os.close();
     } catch (Exception e) {
     }
     // }
@@ -289,6 +289,23 @@ public class TestMapperProcess {
 
     System.out.println("bytes size fastq "
         + n + "  sam size " + samFile.length());
+  }
+
+  public void parseStdinStream2(final OutputStream os) throws IOException {
+    BufferedInputStream bis =
+        new BufferedInputStream(new FileInputStream(fastq));
+    byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+    long count = 0;
+    int n = 0;
+    while (-1 != (n = bis.read(buffer))) {
+      os.write(buffer, 0, n);
+      count += n;
+    }
+
+    bis.close();
+    os.close();
+
+    System.out.println("nb lines in fastq " + count);
   }
 
   static {
