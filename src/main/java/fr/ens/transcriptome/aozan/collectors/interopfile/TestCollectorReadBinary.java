@@ -25,16 +25,16 @@ public class TestCollectorReadBinary {
   private static final String DIR_TMP =
       "/home/sperrin/Documents/FastqScreenTest/tmp/interOp";
 
-  public static final boolean PRINT_DETAIL = true;
+  public static final boolean PRINT_DETAIL = false;
   static File file = null;
   static BufferedWriter bw = null;
 
   public static void main(String[] argv) {
-    file = new File(DIR_TMP, "comparaison_V3.data");
+    file = new File(DIR_TMP, "comparaison_all_run_20130704.data");
 
     try {
       System.setOut(new PrintStream(new FileOutputStream(new File(DIR_TMP,
-          "redir_consoleoutput.data"))));
+          "redir_consoleoutput_all_run_20130704.data"))));
 
     } catch (FileNotFoundException e1) {
       e1.printStackTrace();
@@ -67,7 +67,8 @@ public class TestCollectorReadBinary {
 
     // collectRun(new File(DIR_TMP +
     // "/hiseq_log_130326_SNL110_0066_AD1GG4ACXX/"));
-
+    // collectRun(new File(DIR_TMP +
+    // "/hiseq_log_130621_SNL110_0073_AD1Y8WACXX/"));
     // collectRun(new File(DIR_TMP +
     // "/hiseq_log_120830_SNL110_0055_AD16D9ACXX/"));
   }
@@ -216,10 +217,10 @@ public class TestCollectorReadBinary {
         + read + ".lane" + lane + ".prc.intensity.after.20.cycles.pf.sd",
         Double.class, Epsilon.DOUBLE_2));
     keys.add(new Critere("read" + read + ".lane" + lane + ".prc.pf.clusters",
-        Double.class, Epsilon.UNITE));
+        Double.class, Epsilon.DOUBLE_1));
     keys.add(new Critere(
         "read" + read + ".lane" + lane + ".prc.pf.clusters.sd", Double.class,
-        Epsilon.DOUBLE_2));
+        Epsilon.DOUBLE_1));
     keys.add(new Critere("read" + read + ".lane" + lane + ".prephasing",
         Double.class, Epsilon.DOUBLE_3));
     keys.add(new Critere("read" + read + ".lane" + lane + ".tile.count",

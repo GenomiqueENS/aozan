@@ -28,8 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
@@ -126,21 +125,37 @@ public class TileMetricsOutReader extends AbstractBinaryInterOpReader {
    * @param lane number lane
    */
   private void collectPerLane(final int lane) {
-    ListMultimap<Integer, Number> metrics = ArrayListMultimap.create();
-
+    // Map<metricCode, Map<numberTile, metricValue>>
+    Map<Integer, Map<Integer, Double>> metrics = Maps.newHashMap();
     for (IlluminaMetrics im : collection) {
 
       if (im.getLaneNumber() == lane) {
 
         IlluminaTileMetrics itm = (IlluminaTileMetrics) im;
-        int code = itm.getMetricCode();
-        double val = itm.getMetricValue();
 
-        metrics.put(code, val);
+        addEntryInMultiMap(metrics, itm.getMetricCode(), im.getTileNumber(),
+            itm.getMetricValue());
 
       }
     }
     // Set a object Tile Metrics for a lane and reads
-    tileMetricsPerLane.put(lane, new TileMetricsPerLane(metrics));
+    tileMetricsPerLane.put(lane, new TileMetricsPerLane(metrics, lane));
+  }
+
+  private static void addEntryInMultiMap(
+      final Map<Integer, Map<Integer, Double>> map, final int code,
+      final int tile, final double value) {
+
+    if (map.containsKey(code)) {
+
+      if (!map.get(code).containsKey(tile)) {
+        map.get(code).put(tile, value);
+      }
+
+    } else {
+      Map<Integer, Double> m = new TreeMap<Integer, Double>();
+      m.put(tile, value);
+      map.put(code, m);
+    }
   }
 }

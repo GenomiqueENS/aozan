@@ -52,6 +52,7 @@ import fr.ens.transcriptome.aozan.collectors.interopfile.AbstractBinaryIteratorR
 import fr.ens.transcriptome.aozan.collectors.interopfile.ErrorMetricsOutReader;
 import fr.ens.transcriptome.aozan.collectors.interopfile.ExtractionMetricsOutReader;
 import fr.ens.transcriptome.aozan.collectors.interopfile.TileMetricsOutReader;
+import fr.ens.transcriptome.eoulsan.util.FileUtils;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**
@@ -314,9 +315,20 @@ public class ReadCollector implements Collector {
      * @param data
      */
     ReadCollectorBinaryFile(final RunData data) throws AozanException {
-      System.out.println("rta " + RTAOutputDirPath);
+      System.out.println("interOp " + RTAOutputDirPath + "/InterOp/");
 
-      collectRead(data, RTAOutputDirPath + "/InterOp/");
+      String readInfoFilePath = RTAOutputDirPath + "/InterOp/";
+      try {
+
+        FileUtils.checkExistingDirectoryFile(new File(readInfoFilePath),
+            "Directory interOp not find here !" + readInfoFilePath);
+        collectRead(data, readInfoFilePath);
+
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+
     }
   }
 }

@@ -94,7 +94,8 @@ public abstract class AbstractBinaryIteratorReader implements
     final byte[] header = new byte[HEADER_SIZE];
 
     try {
-      FileUtils.checkExistingFile(metricsOutFile, "");
+      FileUtils.checkExistingFile(metricsOutFile, "Error binary file "
+          + metricsOutFile.getAbsolutePath() + " doesn't exist !");
 
       final FileInputStream is = new FileInputStream(metricsOutFile);
       final FileChannel channel = is.getChannel();
@@ -230,11 +231,11 @@ public abstract class AbstractBinaryIteratorReader implements
     }
 
     //
-    // Constuctor
+    // Constructor
     //
 
     /**
-     * Public contructor.
+     * Public constructor.
      * @param header byte array for header
      * @param file binary file
      * @param elementSize size of element to read

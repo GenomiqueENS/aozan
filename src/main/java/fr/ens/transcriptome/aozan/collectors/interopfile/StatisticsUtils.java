@@ -110,7 +110,7 @@ public class StatisticsUtils {
    * Public constructor, build a list of values used for compute statistics.
    * @param list values
    */
-  public StatisticsUtils(final List<Number> list) {
+  public StatisticsUtils(final List<? extends Number> list) {
 
     this.ds = new DescriptiveStatistics();
 

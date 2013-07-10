@@ -23,14 +23,12 @@
 
 package fr.ens.transcriptome.aozan.collectors.interopfile;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * This class contains all tile metrics for a lane extracted from binary file
@@ -40,13 +38,14 @@ import com.google.common.collect.Lists;
  */
 class TileMetricsPerLane {
 
+  private int lane;
   private double clusterDensity = 0.0; // code in binary file 100
   private double clusterDensityPF = 0.0; // code in binary file 101
   private long numberCluster = 0L; // code in binary file 102
   private long numberClusterPF = 0L; // code in binary file 103
   private double prcPFClusters = 0.0;
-  private List<Number> numberClusterValues = Lists.newArrayList();
-  private List<Number> numberClusterPFValues = Lists.newArrayList();
+  private Map<Integer, Double> numberClusterValues = Maps.newHashMap();
+  private Map<Integer, Double> numberClusterPFValues = Maps.newHashMap();
 
   // Standard deviation
   private double clusterDensitySD = 0.0;
@@ -64,14 +63,19 @@ class TileMetricsPerLane {
   /**
    * Compute mean and standard deviation to code metric.
    * @param code metrics
-   * @param list values for all tile
+   * @param list values for all tiles
    */
-  public void addMetrics(final int code, final List<Number> list) {
+  public void addMetrics(final int code,
+      final Map<Integer, Double> valuesPerTile) {
 
     Number value = null;
     Number sd = null;
 
-    StatisticsUtils stat = new StatisticsUtils(list);
+    // if (code == 200 || code == 201)
+    // System.out.println(list);
+
+    StatisticsUtils stat =
+        new StatisticsUtils(new ArrayList<Double>(valuesPerTile.values()));
     value = stat.getMean();
     sd = stat.getStandardDeviation();
 
@@ -89,18 +93,19 @@ class TileMetricsPerLane {
     case 102:
       this.numberCluster = value.longValue();
       this.numberClusterSD = sd.doubleValue();
-      this.numberClusterValues = list;
+      this.numberClusterValues = valuesPerTile;
       break;
 
     case 103:
       this.numberClusterPF = value.longValue();
       this.numberClusterPFSD = sd.doubleValue();
-      this.numberClusterPFValues = list;
+      this.numberClusterPFValues = valuesPerTile;
       break;
 
     case 400:
       // value unique to a run, read first value in list
-      this.controlLane = list.get(0).doubleValue();
+      int key = valuesPerTile.keySet().iterator().next();
+      this.controlLane = valuesPerTile.get(key).doubleValue();
       break;
     default: // code 20X and 30X
       addReadMetrics(code, value, sd);
@@ -122,12 +127,20 @@ class TileMetricsPerLane {
     StatisticsUtils stat = new StatisticsUtils();
 
     // Set the percent cluster PF for each tile
-    for (int i = 0; i < numberClusterValues.size(); i++) {
+    for (Map.Entry<Integer, Double> clusters : numberClusterValues.entrySet()) {
 
-      double prc =
-          new Double(numberClusterPFValues.get(i).intValue())
-              / new Double(numberClusterValues.get(i).intValue());
-      stat.addValues(prc);
+      for (Map.Entry<Integer, Double> clustersPF : numberClusterPFValues
+          .entrySet()) {
+        if (clusters.getKey().equals(clustersPF.getKey())) {
+
+          double prc =
+              new Double(clustersPF.getValue())
+                  / new Double(clusters.getValue());
+
+          stat.addValues(prc);
+        }
+      }
+
     }
 
     this.prcPFClusters = stat.getMean();
@@ -253,16 +266,20 @@ class TileMetricsPerLane {
    * Constructor
    * @param metrics set of tile metrics (code and value) for a lane
    */
-  TileMetricsPerLane(final ListMultimap<Integer, Number> metrics) {
+  TileMetricsPerLane(final Map<Integer, Map<Integer, Double>> metrics, int lane) {
 
     // Map key is code metric, values are values per tile
-    Map<Integer, Collection<Number>> map = metrics.asMap();
+    // Map<Integer, Collection<Number>> map = metrics.asMap();
+    //
+    // for (Map.Entry<Integer, Collection<Number>> entry : map.entrySet()) {
+    // List<Number> list =
+    // Arrays.asList(entry.getValue().toArray(new Number[] {}));
+    // addMetrics(entry.getKey(), list);
+    // }
+    this.lane = lane;
 
-    for (Map.Entry<Integer, Collection<Number>> entry : map.entrySet()) {
-      List<Number> list =
-          Arrays.asList(entry.getValue().toArray(new Number[] {}));
-      addMetrics(entry.getKey(), list);
-    }
+    for (Map.Entry<Integer, Map<Integer, Double>> entry : metrics.entrySet())
+      addMetrics(entry.getKey(), entry.getValue());
   }
 
   //
@@ -277,9 +294,9 @@ class TileMetricsPerLane {
   class ReadMetrics {
 
     private int numberRead; // N
-    private double phasing = 0.0; // code in binary file 20N
-    private double prephasing = 0.0; // code in binary file 20(N+1)
-    private double percentAlignedPhix = 0.0; // code in binary file 30N
+    private double phasing = 0.0; // code in binary file 200+(N-1)*2
+    private double prephasing = 0.0; // code in binary file 201+(N-1)*2
+    private double percentAlignedPhix = 0.0; // code in binary file 300+N-1
     private double percentAlignedPhixSD = 0.0;
 
     /**

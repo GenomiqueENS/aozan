@@ -138,8 +138,11 @@ public class TileMetricsOutIterator extends AbstractBinaryIteratorReader {
 
     @Override
     public String toString() {
-      return String.format("lane %s tile %s code %s value %.04f", laneNumber,
-          tileNumber, metricCode, metricValue);
+      // return String.format("lane %s tile %s code %s value %.04f", laneNumber,
+      // tileNumber, metricCode, metricValue);
+
+      return laneNumber
+          + "\t" + tileNumber + "\t" + metricCode + "\t" + metricValue + "\n";
     }
   }
 }
