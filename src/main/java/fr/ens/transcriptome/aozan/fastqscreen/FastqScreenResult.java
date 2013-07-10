@@ -56,6 +56,9 @@ public class FastqScreenResult {
   private double percentMappedExceptGenomeSample = 0.0;
   private boolean countPercentOk = false;
 
+  private int readsMapped;
+  private int readsprocessed;
+
   /**
    * Print table percent in format use by fastqscreen program with rounding
    * value
@@ -124,7 +127,9 @@ public class FastqScreenResult {
     if (this.resultsPerGenome.isEmpty())
       throw new AozanException(
           "During fastqScreen execusion : no genome receive");
-
+    this.readsMapped = readsMapped;
+    this.readsprocessed = readsprocessed;
+    
     double percentMappedOnlyOnGenomeSample = 0.0;
 
     // Convert value in percentage for all results of each genome
@@ -178,6 +183,14 @@ public class FastqScreenResult {
         this.percentMappedExceptGenomeSample);
 
     return data;
+  }
+
+  public int getCountReadsMapped() {
+    return this.readsMapped;
+  }
+
+  public int getCountReadsProcessed() {
+    return this.readsprocessed;
   }
 
   //

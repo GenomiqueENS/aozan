@@ -115,7 +115,8 @@ public class FastqScreen {
       LOGGER.fine("FASTQSCREEN : step map for "
           + fastqSample.getKeyFastqSample() + " in mode "
           + (fastqRead2 == null ? "single" : "paired") + " on genome(s) "
-          + genomes + " in " + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
+          + genomes + " in "
+          + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
       timer.reset();
       timer.start();
