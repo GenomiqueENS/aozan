@@ -213,7 +213,8 @@ public class Globals {
 
     readManifest();
 
-    return manifestAttributes.getValue(propertyKey);
+    return manifestAttributes != null ? manifestAttributes
+        .getValue(propertyKey) : null;
   }
 
   private static synchronized void readManifest() {

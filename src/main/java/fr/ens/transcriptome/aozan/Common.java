@@ -24,9 +24,12 @@
 package fr.ens.transcriptome.aozan;
 
 import java.io.IOException;
+import static fr.ens.transcriptome.eoulsan.LocalEoulsanRuntime.initEoulsanRuntimeForExternalApp;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
+
+import fr.ens.transcriptome.eoulsan.EoulsanException;
 
 /**
  * This class contains common methods like logger initialization.
@@ -35,14 +38,24 @@ import java.util.logging.Logger;
  */
 public class Common {
 
+  // TODO to fix
+  public static void initLogger(final String logPath) throws AozanException,
+      IOException {
+    try {
+      initEoulsanRuntimeForExternalApp();
+    } catch (EoulsanException ee) {
+      throw new AozanException(ee.getMessage());
+    }
+  }
+
   /**
    * Initialize the logger for the application.
    * @param logPath path of the log file
    * @throws SecurityException if an error occurs while initializing the logger
    * @throws IOException if cannot open/create the log file
    */
-  public static void initLogger(final String logPath) throws SecurityException,
-      IOException {
+  public static void initLogger_OLD(final String logPath)
+      throws SecurityException, IOException {
 
     final Logger aozanLogger =
         Logger.getLogger(fr.ens.transcriptome.aozan.Globals.APP_NAME);

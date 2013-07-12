@@ -21,11 +21,15 @@
  *
  */
 
-package fr.ens.transcriptome.aozan.collectors.interopfile;
+package fr.ens.transcriptome.aozan.util;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.stat.descriptive.rank.Median;
+
+import com.google.common.collect.Lists;
 
 /**
  * @author Sandrine Perrin
@@ -35,6 +39,8 @@ public class StatisticsUtils {
 
   private DescriptiveStatistics ds;
   private double mean = 0.0;
+
+  private DescriptiveStatistics dsWithZero = null;
 
   /**
    * Compute the mean for values
@@ -48,8 +54,60 @@ public class StatisticsUtils {
     return ds.getMean();
   }
 
+  // value 0.0 not remove
+  public double getMeanWithoutZero() {
+
+    if (dsWithZero == null) {
+
+      dsWithZero = new DescriptiveStatistics();
+
+      for (Double d : ds.getValues()) {
+        if (d != 0.0)
+          dsWithZero.addValue(d);
+      }
+    }
+    return dsWithZero.getMean();
+  }
+
+  public double getMedianWithoutZero() {
+
+    if (dsWithZero == null) {
+      dsWithZero = new DescriptiveStatistics();
+
+      for (Double d : ds.getValues()) {
+        if (d != 0.0)
+          dsWithZero.addValue(d);
+      }
+    }
+    return new Median().evaluate(dsWithZero.getValues());
+
+  }
+
   public double getStandardDeviation() {
     return getStandardDeviation(false);
+  }
+
+  public double getMediane() {
+    return new Median().evaluate(ds.getValues());
+  }
+
+  public DescriptiveStatistics getDescriptiveStatistics() {
+    return this.ds;
+  }
+
+  public DescriptiveStatistics getDSWithZero() {
+    return this.dsWithZero;
+  }
+
+  public String printValues() {
+    StringBuilder s = new StringBuilder();
+
+    for (double d : ds.getValues()) {
+      s.append(d);
+      s.append("\n");
+    }
+
+    return s.toString();
   }
 
   /**
@@ -110,7 +168,7 @@ public class StatisticsUtils {
    * Public constructor, build a list of values used for compute statistics.
    * @param list values
    */
-  public StatisticsUtils(final List<Number> list) {
+  public StatisticsUtils(final List<? extends Number> list) {
 
     this.ds = new DescriptiveStatistics();
 
@@ -120,7 +178,13 @@ public class StatisticsUtils {
       if (val != null)
         if (!val.isInfinite())
           this.ds.addValue(val);
+
     }
+  }
+
+  public StatisticsUtils(final Collection<? extends Number> list) {
+    this(Lists.newArrayList(list));
+
   }
 
   public StatisticsUtils() {
