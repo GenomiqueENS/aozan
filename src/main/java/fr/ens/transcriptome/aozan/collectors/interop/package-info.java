@@ -21,28 +21,8 @@
  *
  */
 
-package fr.ens.transcriptome.aozan.collectors.interopfile;
-
-import java.util.Iterator;
-
-import fr.ens.transcriptome.aozan.collectors.interopfile.AbstractBinaryIteratorReader.IlluminaMetrics;
-
 /**
- * This interface define an iterator on Illumina Metrics for reading binary
- * files from the InterOp directory. It allow to parse all records.
- * @author Sandrine Perrin
+ * This package defines the collectors which collects data from InterOp binary files for a run.
  * @since 1.1
  */
-
-interface BinaryIteratorReader extends Iterator<IlluminaMetrics> {
-
-  @Override
-  public boolean hasNext();
-
-  @Override
-  public IlluminaMetrics next();
-
-  @Override
-  public void remove();
-
-}
+package fr.ens.transcriptome.aozan.collectors.interop;
