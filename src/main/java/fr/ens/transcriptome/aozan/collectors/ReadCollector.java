@@ -43,16 +43,15 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.collectors.interopfile.AbstractBinaryIteratorReader;
-import fr.ens.transcriptome.aozan.collectors.interopfile.ErrorMetricsOutReader;
-import fr.ens.transcriptome.aozan.collectors.interopfile.ExtractionMetricsOutReader;
-import fr.ens.transcriptome.aozan.collectors.interopfile.TileMetricsOutReader;
-import fr.ens.transcriptome.eoulsan.util.FileUtils;
+import fr.ens.transcriptome.aozan.collectors.interop.ErrorMetricsCollector;
+import fr.ens.transcriptome.aozan.collectors.interop.ExtractionMetricsCollector;
+import fr.ens.transcriptome.aozan.collectors.interop.TileMetricsCollector;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**
@@ -65,7 +64,10 @@ public class ReadCollector implements Collector {
   /** The collector name. */
   public static final String COLLECTOR_NAME = "read";
 
-  protected static String RTAOutputDirPath;
+  protected String RTAOutputDirPath;
+  protected Properties properties;
+
+  private final List<Collector> subCollectionList = Lists.newArrayList();
 
   @Override
   public String getName() {
@@ -85,24 +87,41 @@ public class ReadCollector implements Collector {
     if (properties == null)
       return;
 
+    this.properties = properties;
     RTAOutputDirPath = properties.getProperty(QC.RTA_OUTPUT_DIR);
+
+    // Build the list of subcollector
+    if (new File(RTAOutputDirPath + "/Data/reports/Summary", "read1.xml")
+        .exists()) {
+      // file read.xml exists
+      subCollectionList.add(new ReadXMLCollector());
+
+    } else {
+      // Reading interOpFile
+      subCollectionList.add(new TileMetricsCollector());
+      subCollectionList.add(new ExtractionMetricsCollector());
+      subCollectionList.add(new ErrorMetricsCollector());
+    }
+
+    // Configure sub-collector
+    for (Collector collector : subCollectionList)
+      collector.configure(properties);
   }
 
   @Override
   public void collect(final RunData data) throws AozanException {
 
-    if (new File(RTAOutputDirPath + "/Data/reports/Summary", "read1.xml")
-        .exists()) {
-      new ReadCollectorXML(data);
-    } else {
+    // Collect sub-collector
+    for (Collector collector : subCollectionList)
+      collector.collect(data);
 
-      // File read1.xml doesn't exist, reading binary files in InterOp directory
-      new ReadCollectorBinaryFile(data);
-    }
   }
 
   @Override
   public void clear() {
+
+    for (Collector collector : subCollectionList)
+      collector.clear();
   }
 
   //
@@ -110,20 +129,38 @@ public class ReadCollector implements Collector {
   //
 
   /**
-   * This class define a Collector for read?.xml files.
-   * @since 1.0
-   * @author Laurent Jourdren
+   * This internal class define a Collector for read?.xml files.
    */
-  class ReadCollectorXML extends ReadCollector {
+  private final class ReadXMLCollector implements Collector {
+
+    /** Sub-collector for readCollector */
+    private static final String NAME_COLLECTOR = "ReadXMLCollector";
+
+    /**
+     * Collect data for each read?.xml file.
+     * @param data RunData object
+     * @throws AozanException if an error occurs while collecting data
+     */
+    @Override
+    public void collect(final RunData data) throws AozanException {
+
+      // Collect read info
+      final int readCount = data.getInt("run.info.read.count");
+
+      for (int i = 1; i <= readCount; i++) {
+        String readInfoFilePath =
+            RTAOutputDirPath + "/Data/reports/Summary/read" + i + ".xml";
+        collectXMLFile(data, readInfoFilePath);
+      }
+    }
 
     /**
      * Collect data for a read?.xml file
      * @param data RunData object
      * @param readInfoFilePath the read?.xml file path
-     * @throws AozanException if an error occurs while collecting data
      */
-    private void collectRead(final RunData data, final String readInfoFilePath)
-        throws AozanException {
+    private void collectXMLFile(final RunData data,
+        final String readInfoFilePath) throws AozanException {
 
       if (data == null)
         return;
@@ -276,59 +313,24 @@ public class ReadCollector implements Collector {
       return sb.toString();
     }
 
-    ReadCollectorXML(final RunData data) throws AozanException {
-      // Collect read info
-      final int readCount = data.getInt("run.info.read.count");
+    @Override
+    public String getName() {
+      return NAME_COLLECTOR;
+    }
 
-      for (int i = 1; i <= readCount; i++) {
-        String readInfoFile =
-            RTAOutputDirPath + "/Data/reports/Summary/read" + i + ".xml";
+    @Override
+    public List<String> getCollectorsNamesRequiered() {
+      return ReadCollector.this.getCollectorsNamesRequiered();
+    }
 
-        collectRead(data, readInfoFile);
-      }
+    @Override
+    public void configure(Properties properties) {
+    }
+
+    @Override
+    public void clear() {
+
     }
   }
 
-  /**
-   * This class define a Collector for several binary files from InterOp
-   * directory.
-   * @since 1.1
-   * @author Sandrine Perrin
-   */
-  class ReadCollectorBinaryFile extends ReadCollector {
-
-    private void collectRead(final RunData data, final String readInfoFilePath)
-        throws AozanException {
-
-      AbstractBinaryIteratorReader.setDirectory(readInfoFilePath);
-
-      // Collect metrics on number cluster
-      new TileMetricsOutReader().collect(data);
-      // Collect metrics on error rate
-      new ErrorMetricsOutReader().collect(data);
-      // Collect metrics on intensity rate
-      new ExtractionMetricsOutReader().collect(data);
-    }
-
-    /**
-     * Public constructor
-     * @param data
-     */
-    ReadCollectorBinaryFile(final RunData data) throws AozanException {
-      System.out.println("interOp " + RTAOutputDirPath + "/InterOp/");
-
-      String readInfoFilePath = RTAOutputDirPath + "/InterOp/";
-      try {
-
-        FileUtils.checkExistingDirectoryFile(new File(readInfoFilePath),
-            "Directory interOp not find here !" + readInfoFilePath);
-        collectRead(data, readInfoFilePath);
-
-      } catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-
-    }
-  }
 }
