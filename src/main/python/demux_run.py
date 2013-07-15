@@ -302,7 +302,7 @@ def demux(run_id, conf):
     cpu_count = Runtime.getRuntime().availableProcessors()
 
     # Launch casava
-    cmd = "cd " + fastq_output_dir + " && make -j " + str(cpu_count)
+    cmd = 'cd ' + fastq_output_dir + ' && make -j ' + str(cpu_count) + ' > ' + fastq_output_dir + '/make.out' + ' 2> ' + fastq_output_dir + '/make.err'
     common.log("SEVERE", "exec: " + cmd, conf)
     exit_code = os.system(cmd)
     if exit_code != 0:
