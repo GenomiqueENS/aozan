@@ -426,6 +426,7 @@ def set_default_conf(conf):
     conf['casava.threads'] = str(Runtime.getRuntime().availableProcessors())
     conf['casava.adapter.fasta.file.path'] = ''
     conf['casava.with.failed.reads'] = 'True'
+    conf['casava.additionnal.arguments'] = ''
 
     # Data path
     conf['tmp.path'] = '/tmp'
