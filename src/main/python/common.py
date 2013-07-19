@@ -452,4 +452,6 @@ def set_default_conf(conf):
     conf['mail.header'] = 'THIS IS AN AUTOMATED MESSAGE.\\n\\n'
     conf['mail.footer'] = '\\n\\nThe Aozan team.\\n'
 
-
+    # Collector configuration
+    conf['readXMLCollector.used'] = 'false'
+    conf['cluster.density.ratio'] = '0.3472222'
