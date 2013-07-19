@@ -23,9 +23,12 @@
 
 package fr.ens.transcriptome.aozan.collectors.interop;
 
-import java.nio.ByteBuffer;
+import static fr.ens.transcriptome.aozan.collectors.interop.AbstractBinaryFileReader.uShortToInt;
+import static fr.ens.transcriptome.aozan.collectors.interop.AbstractBinaryFileReader.uIntToLong;
+import static fr.ens.transcriptome.aozan.collectors.interop.AbstractBinaryFileReader.uByteToInt;
 
-import fr.ens.transcriptome.aozan.collectors.interop.AbstractBinaryFileReader.IlluminaMetrics;
+import java.nio.ByteBuffer;
+import java.util.Date;
 
 /**
  * This internal class save a record from ExtractionMetricsOut.bin file,
@@ -115,21 +118,35 @@ public class IlluminaIntensityMetrics {
    */
   IlluminaIntensityMetrics(final ByteBuffer bb) {
 
-    this.laneNumber = IlluminaMetrics.uShortToInt(bb.getShort());
-    this.tileNumber = IlluminaMetrics.uShortToInt(bb.getShort());
-    this.cycleNumber = IlluminaMetrics.uShortToInt(bb.getShort());
+    this.laneNumber = uShortToInt(bb.getShort());
+    this.tileNumber = uShortToInt(bb.getShort());
+    this.cycleNumber = uShortToInt(bb.getShort());
 
     for (int i = 0; i < 4; i++) {
       this.fwhm[i] = bb.getFloat();
     }
 
     for (int i = 0; i < 4; i++) {
-      this.intensities[i] = IlluminaMetrics.uShortToInt(bb.getShort());
+      this.intensities[i] = uShortToInt(bb.getShort());
     }
 
     // Read date/time for CIF creation, not used
-    ByteBuffer dateCif = bb.get(new byte[8]);
+    // TODO get date create cif file to finalize
+    ByteBuffer buf = bb.get(new byte[8]);
+    buf.put(0, new Byte("0"));
+    buf.put(1, new Byte("0"));
+    buf.position(0);
+
+    if (compt++ < 1) {
+      System.out.println("long " + buf.getLong());
+
+      Date dateCif = new Date(buf.getLong());
+
+      System.out.println(laneNumber
+          + "_" + tileNumber + "_" + cycleNumber + " date cif " + dateCif);
+    }
 
   }
 
+  static int compt = 0;
 }

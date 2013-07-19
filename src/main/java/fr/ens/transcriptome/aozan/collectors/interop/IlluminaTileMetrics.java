@@ -23,9 +23,9 @@
 
 package fr.ens.transcriptome.aozan.collectors.interop;
 
-import java.nio.ByteBuffer;
+import static fr.ens.transcriptome.aozan.collectors.interop.AbstractBinaryFileReader.uShortToInt;
 
-import fr.ens.transcriptome.aozan.collectors.interop.AbstractBinaryFileReader.IlluminaMetrics;
+import java.nio.ByteBuffer;
 
 /**
  * This class save a record from TileMetricsOut.bin file, corresponding of the
@@ -101,9 +101,9 @@ public class IlluminaTileMetrics {
    * @param bb ByteBuffer who read one record
    */
   IlluminaTileMetrics(final ByteBuffer bb) {
-    laneNumber = IlluminaMetrics.uShortToInt(bb.getShort());
-    tileNumber = IlluminaMetrics.uShortToInt(bb.getShort());
-    metricCode = IlluminaMetrics.uShortToInt(bb.getShort());
+    laneNumber = uShortToInt(bb.getShort());
+    tileNumber = uShortToInt(bb.getShort());
+    metricCode = uShortToInt(bb.getShort());
     metricValue = bb.getFloat();
 
   }

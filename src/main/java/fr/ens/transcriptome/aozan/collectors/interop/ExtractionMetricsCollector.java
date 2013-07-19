@@ -23,14 +23,19 @@
 
 package fr.ens.transcriptome.aozan.collectors.interop;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.collectors.Collector;
+import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.util.StatisticsUtils;
 
 /**
@@ -39,12 +44,13 @@ import fr.ens.transcriptome.aozan.util.StatisticsUtils;
  * @author Sandrine Perrin
  * @since 1.1
  */
-public class ExtractionMetricsCollector extends AbstractBinaryFileCollector {
+public class ExtractionMetricsCollector implements Collector {
 
   /** The sub-collector name from ReadCollector. */
   public static final String NAME_COLLECTOR = "ExtractionMetricsCollector";
 
-  final Map<Integer, ExtractionMetricsPerLane> intensityMetrics = Maps
+  private String dirInterOpPath;
+  private final Map<Integer, ExtractionMetricsPerLane> intensityMetrics = Maps
       .newHashMap();
 
   // number cycle corresponding to the start of a read
@@ -56,22 +62,38 @@ public class ExtractionMetricsCollector extends AbstractBinaryFileCollector {
 
   private int read3FirstCycleNumber;
 
-  @Override
   public String getName() {
     return NAME_COLLECTOR;
+  }
+
+  /**
+   * Get the name of the collectors required to run this collector.
+   * @return a list of String with the name of the required collectors
+   */
+  public List<String> getCollectorsNamesRequiered() {
+    return Collections.unmodifiableList(Lists
+        .newArrayList(RunInfoCollector.COLLECTOR_NAME));
+  }
+
+  /**
+   * Configure the collector with the path of the run data
+   * @param properties object with the collector configuration
+   */
+  public void configure(Properties properties) {
+    String RTAOutputDirPath = properties.getProperty(QC.RTA_OUTPUT_DIR);
+    this.dirInterOpPath = RTAOutputDirPath + "/InterOp/";
   }
 
   /**
    * Collect data from TileMetric interOpFile.
    * @param data result data object
    */
-  @Override
   public void collect(final RunData data) throws AozanException {
-    super.collect(data);
 
     int keyMap;
 
-    ExtractionMetricsReader reader = new ExtractionMetricsReader(dirInterOpPath);
+    ExtractionMetricsReader reader =
+        new ExtractionMetricsReader(dirInterOpPath);
     initMetricsMap(data);
 
     // Distribution of metrics between lane and code
@@ -99,13 +121,17 @@ public class ExtractionMetricsCollector extends AbstractBinaryFileCollector {
    */
   private void initMetricsMap(final RunData data) {
 
+    final int lanesCount = data.getInt("run.info.flow.cell.lane.count");
+    final int readsCount = data.getInt("run.info.read.count");
+
     defineReadsStartEndCycleNumber(data);
 
     for (int lane = 1; lane <= lanesCount; lane++)
       for (int read = 1; read <= readsCount; read++) {
 
         intensityMetrics.put(getKeyMap(lane, read),
-            new ExtractionMetricsPerLane(lane, read));
+            new ExtractionMetricsPerLane(lane, read, read1FirstCycleNumber,
+            read2FirstCycleNumber, read3FirstCycleNumber));
       }
 
   }
@@ -125,6 +151,16 @@ public class ExtractionMetricsCollector extends AbstractBinaryFileCollector {
 
     return 3;
 
+  }
+
+  /**
+   * Set unique id for each pair lane-read in a run
+   * @param lane lane number
+   * @param read read number
+   * @return integer identifier unique
+   */
+  private int getKeyMap(final int lane, final int read) {
+    return lane * 100 + read;
   }
 
   /**
@@ -149,8 +185,14 @@ public class ExtractionMetricsCollector extends AbstractBinaryFileCollector {
 
   }
 
+  /**
+   * Remove temporary files
+   */
+  public void clear() {
+  }
+
   //
-  // Internal Class
+  // Inner Class
   //
 
   /**
@@ -159,7 +201,7 @@ public class ExtractionMetricsCollector extends AbstractBinaryFileCollector {
    * @author Sandrine Perrin
    * @since 1.1
    */
-  public class ExtractionMetricsPerLane {
+  private static final class ExtractionMetricsPerLane {
 
     private int laneNumber;
     private int readNumber;
@@ -169,9 +211,6 @@ public class ExtractionMetricsCollector extends AbstractBinaryFileCollector {
 
     private int intensityCycle1 = 0;
     private double intensityCycle1SD = 0.0;
-
-    private int intensityCycle20 = 0;
-    private double intensityCycle20SD = 0.0;
 
     private double ratioIntensityCycle20 = 0.0;
     private double ratioIntensityCycle20SD = 0.0;
@@ -189,9 +228,8 @@ public class ExtractionMetricsCollector extends AbstractBinaryFileCollector {
     public void addMetric(final IlluminaIntensityMetrics iim) {
       int cycle = iim.getCycleNumber();
 
-      // TODO Good compute : iim.getAverageIntensities();
       // here use only the value for base A, like in the Illumina files.
-
+      // TODO Good compute : iim.getAverageIntensities();
       if (cycle == firstCycleNumber) {
         intensityCycle1ValuesPerTile.put(iim.getTileNumber(),
             iim.getIntensities()[0]);
@@ -212,9 +250,6 @@ public class ExtractionMetricsCollector extends AbstractBinaryFileCollector {
       StatisticsUtils statCycle1 =
           new StatisticsUtils(intensityCycle1ValuesPerTile.values());
 
-      StatisticsUtils statCycle20 =
-          new StatisticsUtils(intensityCycle20ValuesPerTile.values());
-
       // TODO to check, used only intensity for the base A
       this.intensityCycle1 = new Double(statCycle1.getMean()).intValue();
 
@@ -223,9 +258,6 @@ public class ExtractionMetricsCollector extends AbstractBinaryFileCollector {
 
       // Check if count cycle > 20
       if (intensityCycle20ValuesPerTile.size() > 0) {
-        this.intensityCycle20 = new Double(statCycle20.getMean()).intValue();
-
-        this.intensityCycle20SD = statCycle20.getStandardDeviation();
 
         // Compute intensity statistic at cycle 20 as a percentage of that at
         // the first cycle.
@@ -280,64 +312,13 @@ public class ExtractionMetricsCollector extends AbstractBinaryFileCollector {
         double intensityC20 =
             new Double(intensityCycle20Values.get(i).intValue());
 
-        if (intensityC1 > 0 && intensityC20 > 0) {
+        if (intensityC1 > 0) {
           stat.addValues(intensityC20 / intensityC1 * 100);
         }
       }
 
       this.ratioIntensityCycle20 = stat.getMean();
       this.ratioIntensityCycle20SD = stat.getStandardDeviation();
-    }
-
-    /**
-     * Get the average intensity for cycle 1.
-     * @return average intensity for cycle 1
-     */
-    public int getIntensityCycle1() {
-      return intensityCycle1;
-    }
-
-    /**
-     * Get the standard deviation intensity for cycle 1.
-     * @return standard deviation intensity for cycle 1
-     */
-    public double getIntensityCycle1SD() {
-      return intensityCycle1SD;
-    }
-
-    /**
-     * Get the average intensity for cycle 20.
-     * @return average intensity for cycle 20
-     */
-    public double getIntensityCycle20() {
-      return intensityCycle20;
-    }
-
-    /**
-     * Get the standard deviation intensity for cycle 20.
-     * @return standard deviation intensity for cycle 1
-     */
-    public double getIntensityCycle20SD() {
-      return intensityCycle20SD;
-    }
-
-    /**
-     * Get the average for intensity statistic at cycle 20 as a percentage of
-     * that at the first cycle.
-     * @return average ratio intensity for cycle 20 compare to cycle 1
-     */
-    public double getRatioIntensityCycle20() {
-      return ratioIntensityCycle20 * 100;
-    }
-
-    /**
-     * Get the standard deviation for intensity statistic at cycle 20 as a
-     * percentage of that at the first cycle.
-     * @return standard deviation ratio intensity for cycle 20 compare to cycle
-     *         1
-     */
-    public double getRatioIntensityCycle20SD() {
-      return ratioIntensityCycle20SD;
     }
 
     @Override
@@ -356,7 +337,10 @@ public class ExtractionMetricsCollector extends AbstractBinaryFileCollector {
      * @param lane lane number
      * @param read read number
      */
-    ExtractionMetricsPerLane(final int lane, final int read) {
+    ExtractionMetricsPerLane(final int lane, final int read,
+        final int read1FirstCycleNumber, final int read2FirstCycleNumber,
+        final int read3FirstCycleNumber) {
+
       this.laneNumber = lane;
       this.readNumber = read;
 

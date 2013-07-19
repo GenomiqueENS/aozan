@@ -23,9 +23,10 @@
 
 package fr.ens.transcriptome.aozan.collectors.interop;
 
+import static fr.ens.transcriptome.aozan.collectors.interop.AbstractBinaryFileReader.uShortToInt;
+
 import java.nio.ByteBuffer;
 
-import fr.ens.transcriptome.aozan.collectors.interop.AbstractBinaryFileReader.IlluminaMetrics;
 
 /**
  * This internal class save a record from ErrorMetricsOut.bin file,
@@ -61,8 +62,6 @@ public class IlluminaErrorMetrics {
   private final int numberReadsTwoErrors; // uint32
   private final int numberReadsThreeErrors; // uint32
   private final int numberReadsFourErrors; // uint32
-
-  
 
   /** Get the number lane */
   public int getLaneNumber() {
@@ -121,20 +120,20 @@ public class IlluminaErrorMetrics {
         numberReadsOneError, numberReadsTwoErrors, numberReadsThreeErrors,
         numberReadsFourErrors);
   }
-  
+
   //
   // Constructor
   //
-  
+
   /**
    * Constructor. One record countReads on the ByteBuffer.
    * @param bb ByteBuffer who read one record
    */
   IlluminaErrorMetrics(final ByteBuffer bb) {
 
-    this.laneNumber = IlluminaMetrics.uShortToInt(bb.getShort());
-    this.tileNumber = IlluminaMetrics.uShortToInt(bb.getShort());
-    this.cycleNumber = IlluminaMetrics.uShortToInt(bb.getShort());
+    this.laneNumber = uShortToInt(bb.getShort());
+    this.tileNumber = uShortToInt(bb.getShort());
+    this.cycleNumber = uShortToInt(bb.getShort());
 
     this.errorRate = bb.getFloat();
     this.numberPerfectReads = bb.getInt();
