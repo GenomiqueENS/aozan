@@ -27,6 +27,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,7 +75,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
    * represent the number of hits for a read : 1 or 2 (for several hits) and the
    * end represent the name of reference genome
    * @param SAMline parse SAM line
-   * @throws IOException
+   * @throws IOException if an error occurs while writing in mapOutputFile
    */
   @Override
   public void parseLine(final String SAMline) throws IOException {
@@ -132,6 +134,26 @@ public class FastsqScreenSAMParser implements SAMParserLine {
       records.clear();
     }
 
+  }
+
+  /**
+   * Parse a SAM file and create a new file, it contains a line for each read
+   * mapped with her name and mapping data : first character represent the
+   * number of hits for a read : 1 or 2 (for several hits) and the end represent
+   * the name of reference genome
+   * @param is inputStream to parse
+   * @throws IOException
+   */
+  public void parseLine(final InputStream is) throws IOException {
+
+    BufferedReader br =
+        new BufferedReader(new InputStreamReader(is, Charsets.ISO_8859_1));
+    String line = null;
+
+    while ((line = br.readLine()) != null) {
+      parseLine(line);
+
+    }
   }
 
   /**
