@@ -60,7 +60,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
   private final List<String> genomeDescriptionList;
   private final SAMParser parser;
   private boolean headerParsed = false;
-  private boolean paired = false;
+  private boolean pairedMode = false;
 
   private final List<ReadAlignmentsFilter> listFilters;
   private final ReadAlignmentsFilter filter;
@@ -118,7 +118,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
         int nbHits;
 
         // define number of hits 1 or 2 (over one)
-        if (paired)
+        if (pairedMode)
           // mode paired : records contains an event number of reads
           nbHits = records.size() == 2 ? 1 : 2;
         else
@@ -146,14 +146,10 @@ public class FastsqScreenSAMParser implements SAMParserLine {
    */
   public void parseLine(final InputStream is) throws IOException {
 
-    BufferedReader br =
-        new BufferedReader(new InputStreamReader(is, Charsets.ISO_8859_1));
-    String line = null;
+    ThreadLocal local = new ThreadLocal(is);
+    local.start();
+    local.throwException();
 
-    while ((line = br.readLine()) != null) {
-      parseLine(line);
-
-    }
   }
 
   /**
@@ -164,7 +160,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
    * @param SAMFile parse SAM file create by bowtie
    * @throws IOException
    */
-  public void parserLine(final File SAMFile) throws IOException {
+  public void parseLine(final File SAMFile) throws IOException {
 
     BufferedReader br = Files.newReader(SAMFile, Charsets.ISO_8859_1);
     String line;
@@ -192,7 +188,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
 
         int nbHits;
         // mode paired : records contains an event number of reads
-        if (paired)
+        if (pairedMode)
           nbHits = records.size() == 2 ? 1 : 2;
         else
           nbHits = records.size() == 1 ? 1 : 2;
@@ -239,13 +235,15 @@ public class FastsqScreenSAMParser implements SAMParserLine {
    * filters used for parsing SAM file
    * @param mapOutputFile file result from mapping
    * @param genome name genome
+   * @param paired true if a pair-end run and option paired mode equals true
+   *          else false
    * @throws IOException if an error occurs while initializing mapOutputFile
    */
   public FastsqScreenSAMParser(final File mapOutputFile, final String genome,
-      final boolean paired) throws IOException {
+      final boolean pairedMode) throws IOException {
 
     this.genome = genome;
-    this.paired = paired;
+    this.pairedMode = pairedMode;
 
     // Create parser object
     this.parser = new SAMParser();
@@ -261,6 +259,53 @@ public class FastsqScreenSAMParser implements SAMParserLine {
 
     this.mapOutputFile = mapOutputFile;
     this.fw = new FileWriter(this.mapOutputFile);
+
+  }
+
+  //
+  // Inner Class
+  //
+
+  private class ThreadLocal extends Thread {
+
+    private IOException exception = null;
+    private InputStream is;
+
+    public void throwException() throws IOException {
+      if (exception != null)
+        throw new IOException(exception);
+    }
+
+    public void run() {
+      try {
+        BufferedReader br =
+            new BufferedReader(new InputStreamReader(this.is,
+                Charsets.ISO_8859_1));
+        String line = null;
+
+        while ((line = br.readLine()) != null) {
+          parseLine(line);
+        }
+
+        br.close();
+
+      } catch (IOException io) {
+        exception = io;
+      } finally {
+        try {
+          is.close();
+        } catch (IOException e) {
+        }
+      }
+
+    }
+
+    //
+    // Constructor
+    //
+    ThreadLocal(final InputStream is) {
+      this.is = is;
+    }
 
   }
 }

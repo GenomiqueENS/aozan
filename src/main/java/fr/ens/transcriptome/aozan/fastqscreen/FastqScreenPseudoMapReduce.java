@@ -89,7 +89,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @param listGenomes list of reference genome
    * @param genomeSample genome reference corresponding to sample
    * @param properties properties for mapping
-   * @param paired true if a pair-end run else false
+   * @param paired true if a pair-end run and option paired mode equals true
+   *          else false
    * @throws AozanException if an error occurs while mapping
    * @throws BadBioEntryException if an error occurs while creating index genome
    */
@@ -109,19 +110,20 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @param listGenomes list of genome reference
    * @param genomeSample genome reference corresponding to sample
    * @param properties properties for mapping
-   * @param paired true if a pair-end run else false
+   * @param paired true if a pair-end run and option paired mode equals true
+   *          else false
    * @throws AozanException if an error occurs while mapping
    * @throws BadBioEntryException if an error occurs while creating index genome
    * @throws InterruptedException if an error occurs during mapper process
    */
   public void doMap(final File fastqRead1, final File fastqRead2,
       final List<String> listGenomes, final String genomeSample,
-      final String tmpDir, final int numberThreads, final boolean paired)
+      final String tmpDir, final int numberThreads, final boolean pairedMode)
       throws AozanException, BadBioEntryException {
 
     // change mapper arguments
     final String newArgumentsMapper =
-        " -l 20 -k 2 --chunkmbs 512" + (paired ? " --maxins 1000" : "");
+        " -l 20 -k 2 --chunkmbs 512" + (pairedMode ? " --maxins 1000" : "");
 
     if (numberThreads > 0)
       mapperThreads = numberThreads;
@@ -143,7 +145,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
         FastsqScreenSAMParser parser =
             new FastsqScreenSAMParser(this.getMapOutputTempFile(), genome,
-                paired);
+                pairedMode);
 
         this.setGenomeReference(genome, genomeSample);
 
@@ -166,13 +168,15 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
           // mode single-end
           // bowtie.map(fastqRead1, parser);
           if (desc == null)
-            throw new AozanException("Bowtie description null");
+            throw new AozanException(
+                "Fastqscreen : genome description is null for bowtie");
           mapperProcess = bowtie.mapSE(desc);
+
+          parser.parseLine(mapperProcess.getStout());
 
           FileUtils.copy(new FileInputStream(fastqRead1),
               mapperProcess.getStdin());
 
-          parser.parseLine(mapperProcess.getStout());
           try {
             mapperProcess.waitFor();
 
@@ -183,6 +187,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         } else {
           // mode pair-end
           // bowtie.map(fastqRead1, fastqRead2, parser);
+          throw new UnsupportedOperationException("Fastqscreen : mapping in PE impossible.");
+          
         }
 
         parser.closeMapOutputFile();
@@ -190,7 +196,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         this.readsprocessed = parser.getReadsprocessed();
 
         LOGGER.fine("FASTQSCREEN : mapping on genome "
-            + genome + " in mode " + (paired ? "paired" : "single") + ", in "
+            + genome + " in mode " + (pairedMode ? "paired" : "single")
+            + ", in "
             + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
         timer.stop();
@@ -218,7 +225,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     final DataFile result =
         new DataFile(tmpDir
-            + "/aozan-bowtie-index-" + genomeDataFile.getName() + ".zip");
+            + "/aozan-" + bowtie.getMapperName().toLowerCase() + "-index-"
+            + genomeDataFile.getName() + ".zip");
 
     // Create genome description
     this.desc = createGenomeDescription(genomeDataFile);
@@ -229,7 +237,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     GenomeMapperIndexer indexer = new GenomeMapperIndexer(bowtie);
     indexer.createIndex(genomeDataFile, desc, result);
 
-    LOGGER.fine("FASTQSCREEN : create/Retrieve index for "
+    LOGGER.fine("FASTQSCREEN : create/retrieve index for "
         + genomeDataFile.getName() + " in "
         + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
@@ -370,7 +378,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    */
   public FastqScreenPseudoMapReduce() {
 
-    //TODO to remove 
+    // TODO to remove
     this.bowtie = new BowtieReadsMapper() {
 
       protected MapperProcess internalMapSE(final File archiveIndexDir,
@@ -399,7 +407,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
             // Input from stdin
             cmd.add("-");
 
-            //TODO to remove 
+            // TODO to remove
             System.out.println("cmd " + cmd.toString().replace(',', ' '));
             return Collections.singletonList(cmd);
           }
