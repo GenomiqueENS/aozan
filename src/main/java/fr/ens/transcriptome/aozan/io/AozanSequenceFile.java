@@ -46,6 +46,8 @@ import fr.ens.transcriptome.aozan.Globals;
  * @since 1.0
  * @author Sandrine Perrin
  */
+
+// TODO to remove this class, not used in aozan 1.1
 public class AozanSequenceFile implements SequenceFile {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);

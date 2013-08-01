@@ -315,7 +315,6 @@ public class ReadCollector implements Collector {
      * @param data
      */
     ReadCollectorBinaryFile(final RunData data) throws AozanException {
-      System.out.println("interOp " + RTAOutputDirPath + "/InterOp/");
 
       String readInfoFilePath = RTAOutputDirPath + "/InterOp/";
       try {
