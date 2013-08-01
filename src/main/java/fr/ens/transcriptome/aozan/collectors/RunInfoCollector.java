@@ -112,6 +112,13 @@ public class RunInfoCollector implements Collector {
       for (int i = 1; i <= runInfo.getFlowCellLaneCount(); i++)
         data.put(prefix + ".align.to.phix.lane" + i, lanesToAlign.contains(i));
 
+      // TODO add new entry in data : run mode
+      boolean runPE =
+          runInfo.getReads().size() > 1
+              && !data.getBoolean("run.info.read"
+                  + runInfo.getReads().size() + ".indexed");
+      data.put(prefix + ".run.mode", runPE ? "PE" : "SR");
+
     } catch (IOException e) {
       throw new AozanException(e);
     } catch (ParserConfigurationException e) {
