@@ -78,14 +78,21 @@ public class FastqScreenResult {
     }
 
     // add last lines for percentage of reads
-    s.append("\n% reads_unmapped_none_genome : "
-        + DataPerGenome.roundDouble(this.percentUnmappedNoneGenome) + "\n");
+    s.append("\n");
+    s.append("% reads_unmapped_none_genome : "
+        + DataPerGenome.roundDouble(this.percentUnmappedNoneGenome));
+    s.append("\n");
     s.append("% reads_mapped_at_least_one_genome : "
-        + DataPerGenome.roundDouble(this.percentMappedAtLeastOneGenome) + "\n");
+        + DataPerGenome.roundDouble(this.percentMappedAtLeastOneGenome));
+    s.append("\n");
     s.append("% reads_mapped_except_genome_sample : "
-        + DataPerGenome.roundDouble(this.percentMappedExceptGenomeSample)
-        + "\n");
-
+        + DataPerGenome.roundDouble(this.percentMappedExceptGenomeSample));
+    s.append("\n");
+    s.append("% reads_mapped_except_genome_sample : "
+        + DataPerGenome.roundDouble(this.percentMappedExceptGenomeSample));
+    s.append("\n");
+    s.append("read mapped "
+        + this.readsMapped + " / nb read " + this.readsprocessed);
     return s.toString();
   }
 
@@ -129,7 +136,7 @@ public class FastqScreenResult {
           "During fastqScreen execusion : no genome receive");
     this.readsMapped = readsMapped;
     this.readsprocessed = readsprocessed;
-    
+
     double percentMappedOnlyOnGenomeSample = 0.0;
 
     // Convert value in percentage for all results of each genome
@@ -181,6 +188,9 @@ public class FastqScreenResult {
         this.percentMappedAtLeastOneGenome);
     data.put(prefix + "." + PERCENT_MAPPED_EXCEPT_GENOME_SAMPLE,
         this.percentMappedExceptGenomeSample);
+
+    data.put(prefix + ".read.mapped.count", this.readsMapped);
+    data.put(prefix + ".read.processed.count", this.readsprocessed);
 
     return data;
   }
