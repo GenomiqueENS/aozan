@@ -27,8 +27,10 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
@@ -40,7 +42,11 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
  */
 public class UncompressFastqCollector extends AbstractFastqCollector {
 
+  /** Logger */
+  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+
   public static final String COLLECTOR_NAME = "uncompressfastq";
+  private long uncompressedSizeFiles = 0l;
 
   private int numberThreads = Runtime.getRuntime().availableProcessors();
 
@@ -88,8 +94,15 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
   }
 
   @Override
+  public void collect(final RunData data) throws AozanException {
+    super.collect(data);
+    controlPreCollect(data, this.qcReportOutputPath);
+
+  }
+
+  @Override
   public AbstractFastqProcessThread collectSample(final RunData data,
-      final FastqSample fastqSample, final File reportDir)
+      final FastqSample fastqSample, final File reportDir, final boolean runPE)
       throws AozanException {
 
     if (fastqSample == null
@@ -120,4 +133,52 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     return numberThreads;
   }
 
+  /**
+   * Realize all preliminary control before execute AbstractFastqCollector, it
+   * check if the free space in tmp directory is enough for save all
+   * uncompressed fastq files.
+   * @param data data used
+   * @param qcReportOutputPath path to save qc report
+   * @throws AozanException
+   */
+  private void controlPreCollect(final RunData data,
+      final String qcReportOutputPath) throws AozanException {
+
+    LOGGER.fine("Collector uncompressed fastq files : step preparation");
+
+    // Count size from all fastq files used
+    long freeSpace = new File(this.tmpPath).getFreeSpace();
+    freeSpace = freeSpace / (1024 * 1024 * 1024);
+
+    for (FastqSample fastqSample : fastqSamples) {
+      // Check temporary fastq files exists
+      if (!(new File(tmpPath + "/" + fastqSample.getNameTemporaryFastqFiles())
+          .exists())) {
+        this.uncompressedSizeFiles += fastqSample.getUncompressedSize();
+      }
+
+    }
+
+    // Estimate used space : needed space + 5%
+    long uncompressedSizeNeeded = (long) (this.uncompressedSizeFiles * 1.05);
+    uncompressedSizeNeeded = uncompressedSizeNeeded / (1024 * 1024 * 1024);
+
+    if (uncompressedSizeNeeded > freeSpace)
+      throw new AozanException(
+          "Not enough disk space to store uncompressed fastq files for step fastqScreen. We are "
+              + freeSpace
+              + " Go in directory "
+              + new File(this.tmpPath).getAbsolutePath()
+              + ", and we need "
+              + uncompressedSizeNeeded + " Go. Echec Aozan");
+
+    LOGGER
+        .fine("Enough disk space to store uncompressed fastq files for step fastqScreen. We are "
+            + freeSpace
+            + " Go in directory "
+            + new File(this.tmpPath).getAbsolutePath()
+            + ", and we need "
+            + uncompressedSizeNeeded + " Go.");
+
+  }
 }

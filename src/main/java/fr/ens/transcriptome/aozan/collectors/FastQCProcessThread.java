@@ -49,6 +49,7 @@ import uk.ac.bbsrc.babraham.FastQC.Modules.QCModule;
 import uk.ac.bbsrc.babraham.FastQC.Modules.SequenceLengthDistribution;
 import uk.ac.bbsrc.babraham.FastQC.Report.HTMLReportArchive;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.Sequence;
+import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFactory;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFile;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFormatException;
 
@@ -267,7 +268,19 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
     this.ignoreFilteredSequences = ignoreFilteredSequences;
     this.reportDir = reportDir;
 
-    this.seqFile = this.fastqStorage.getSequenceFile(this.fastqSample);
+    try {
+      // this.seqFile = this.fastqStorage.getSequenceFile(this.fastqSample);
+
+      this.seqFile =
+          SequenceFactory.getSequenceFile(fastqSample.getFastqFiles().toArray(
+              new File[0]));
+
+    } catch (IOException io) {
+      throw new AozanException(io.getMessage());
+
+    } catch (SequenceFormatException e) {
+      throw new AozanException(e.getMessage());
+    }
 
     // Define modules list
     final OverRepresentedSeqs os = new OverRepresentedSeqs();

@@ -333,4 +333,48 @@ public class ReadCollector implements Collector {
     }
   }
 
+  // <<<<<<< HEAD
+  // =======
+  // /**
+  // * This class define a Collector for several binary files from InterOp
+  // * directory.
+  // * @since 1.1
+  // * @author Sandrine Perrin
+  // */
+  // class ReadCollectorBinaryFile extends ReadCollector {
+  //
+  // private void collectRead(final RunData data, final String readInfoFilePath)
+  // throws AozanException {
+  //
+  // AbstractBinaryIteratorReader.setDirectory(readInfoFilePath);
+  //
+  // // Collect metrics on number cluster
+  // new TileMetricsOutReader().collect(data);
+  // // Collect metrics on error rate
+  // new ErrorMetricsOutReader().collect(data);
+  // // Collect metrics on intensity rate
+  // new ExtractionMetricsOutReader().collect(data);
+  // }
+  //
+  // /**
+  // * Public constructor
+  // * @param data
+  // */
+  // ReadCollectorBinaryFile(final RunData data) throws AozanException {
+  //
+  // String readInfoFilePath = RTAOutputDirPath + "/InterOp/";
+  // try {
+  //
+  // FileUtils.checkExistingDirectoryFile(new File(readInfoFilePath),
+  // "Directory interOp not find here !" + readInfoFilePath);
+  // collectRead(data, readInfoFilePath);
+  //
+  // } catch (IOException e) {
+  // // TODO Auto-generated catch block
+  // e.printStackTrace();
+  // }
+  //
+  // }
+  // }
+  // >>>>>>> refs/heads/fastqscreen_light
 }

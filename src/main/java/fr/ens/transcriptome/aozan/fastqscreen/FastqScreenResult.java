@@ -25,6 +25,7 @@ package fr.ens.transcriptome.aozan.fastqscreen;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
@@ -73,19 +74,27 @@ public class FastqScreenResult {
 
     s.append("\n" + HEADER_COLUMNS_TEXT + "\n");
 
+    // length max genome
+    int nameLength = lengthMaxGenomeName(this.resultsPerGenome.keySet());
+
     for (Map.Entry<String, DataPerGenome> e : this.resultsPerGenome.entrySet()) {
-      s.append(e.getValue().getAllPercentValues() + "\n");
+      s.append(e.getValue().getAllPercentValues(nameLength) + "\n");
     }
 
     // add last lines for percentage of reads
-    s.append("\n% reads_unmapped_none_genome : "
-        + DataPerGenome.roundDouble(this.percentUnmappedNoneGenome) + "\n");
+    s.append("\n");
+    s.append("% reads_unmapped_none_genome : "
+        + DataPerGenome.roundDouble(this.percentUnmappedNoneGenome));
+    s.append("\n");
     s.append("% reads_mapped_at_least_one_genome : "
-        + DataPerGenome.roundDouble(this.percentMappedAtLeastOneGenome) + "\n");
+        + DataPerGenome.roundDouble(this.percentMappedAtLeastOneGenome));
+    s.append("\n");
     s.append("% reads_mapped_except_genome_sample : "
-        + DataPerGenome.roundDouble(this.percentMappedExceptGenomeSample)
-        + "\n");
+        + DataPerGenome.roundDouble(this.percentMappedExceptGenomeSample));
+    s.append("\n");
 
+    s.append("read mapped "
+        + this.readsMapped + " / readsProcessed " + this.readsprocessed);
     return s.toString();
   }
 
@@ -129,7 +138,7 @@ public class FastqScreenResult {
           "During fastqScreen execusion : no genome receive");
     this.readsMapped = readsMapped;
     this.readsprocessed = readsprocessed;
-    
+
     double percentMappedOnlyOnGenomeSample = 0.0;
 
     // Convert value in percentage for all results of each genome
@@ -182,6 +191,9 @@ public class FastqScreenResult {
     data.put(prefix + "." + PERCENT_MAPPED_EXCEPT_GENOME_SAMPLE,
         this.percentMappedExceptGenomeSample);
 
+    data.put(prefix + ".read.mapped.count", this.readsMapped);
+    data.put(prefix + ".read.processed.count", this.readsprocessed);
+
     return data;
   }
 
@@ -191,6 +203,15 @@ public class FastqScreenResult {
 
   public int getCountReadsProcessed() {
     return this.readsprocessed;
+  }
+
+  private int lengthMaxGenomeName(final Set<String> genomesName) {
+    int length = 0;
+    for (String s : genomesName)
+      length = s.length() > length ? s.length() : length;
+
+    return length;
+
   }
 
   //
@@ -276,8 +297,8 @@ public class FastqScreenResult {
      * Get string with all values rounded.
      * @return string
      */
-    String getAllPercentValues() {
-      return genome
+    String getAllPercentValues(final int lengthName) {
+      return writeGenomeName(genome, lengthName)
           + "\t" + roundDouble(this.mappedPercent) + "\t"
           + roundDouble(this.unMappedPercent) + "\t"
           + roundDouble(this.oneHitOneLibraryPercent) + "\t"
@@ -337,6 +358,25 @@ public class FastqScreenResult {
         return readsMappedOnlyOnGenomeSample;
       }
       return 0.0;
+    }
+
+    /**
+     * Extends the genome name with "_" to the length max for writing in report.
+     * @param genomeName name of genome
+     * @param lengthFinal final length expected
+     * @return string of length equal to lengthFinal
+     */
+    private String writeGenomeName(final String genomeName,
+        final int lengthFinal) {
+      StringBuilder s = new StringBuilder();
+      s.append(genomeName);
+      int length = genomeName.length();
+      while (length < lengthFinal) {
+        s.append("_");
+        length++;
+      }
+
+      return s.toString();
     }
 
     //

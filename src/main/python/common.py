@@ -331,6 +331,16 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
         sections: The list of section to write
     """
 
+    """ Since version RTA after 1.17, Illumina stop the generation of the Status and reports files"""
+    text_runInfo = ''
+    
+    path_report = conf['reports.data.path'] + '/' + run_id
+    """ Check dir report exists """
+    
+    if os.path.exists(path_report + '/report_' + run_id):
+        text_runInfo = """<li><a href="report_###RUN_ID###/Status.htm">Run info</a></li>
+               <li><a href="report_###RUN_ID###.tar.bz2">All reports(compressed archive)</a></li>"""
+
     text = """<html>
         <head>
                 <title>Run ###RUN_ID###</title>
@@ -343,8 +353,7 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
 
                 <ul>
                         <li><a href="report_###RUN_ID###/First_Base_Report.htm">First base report</a></li>
-                        <li><a href="report_###RUN_ID###/Status.htm">Run info</a></li>
-                        <li><a href="report_###RUN_ID###.tar.bz2">All reports(compressed archive)</a></li>
+                        %s
                         <li><a href="hiseq_log_###RUN_ID###.tar.bz2">HiSeq log (compressed archive)</a></li>
                 </ul>
 ###END_SECTION
@@ -369,7 +378,7 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
 ###END_SECTION
 
         </body>
-</html>"""
+</html>""" % (text_runInfo)
 
     template_path = conf['index.html.template']
     if template_path != None and template_path != '' and os.path.exists(template_path):

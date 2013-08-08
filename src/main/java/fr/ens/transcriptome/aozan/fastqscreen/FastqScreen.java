@@ -55,14 +55,16 @@ public class FastqScreen {
 
   protected static final String COUNTER_GROUP = "fastqscreen";
 
-  private static final String KEY_NUMBER_THREAD = "qc.conf.fastqc.threads";
-  private static final String KEY_TMP_DIR = "tmp.dir";
+  public/* private */static final String KEY_NUMBER_THREAD =
+      "qc.conf.fastqc.threads";
+  public/* private */static final String KEY_TMP_DIR = "tmp.dir";
 
-  private static final String KEY_GENOMES_DESC_PATH =
+  public/* private */static final String KEY_GENOMES_DESC_PATH =
       "qc.conf.settings.genomes.desc.path";
-  private static final String KEY_MAPPERS_INDEXES_PATH =
+  public/* private */static final String KEY_MAPPERS_INDEXES_PATH =
       "qc.conf.settings.mappers.indexes.path";
-  private static final String KEY_GENOMES_PATH = "qc.conf.settings.genomes";
+  public/* private */static final String KEY_GENOMES_PATH =
+      "qc.conf.settings.genomes";
 
   private String tmpDir;
   private int confThreads;
@@ -90,12 +92,14 @@ public class FastqScreen {
    * @param fastqFile fastq file input for mapper
    * @param listGenomes list or reference genome, used by mapper
    * @param genomeSample genome reference corresponding to sample
+   * @param paired true if a pair-end run and option paired mode equals true
+   *          else false
    * @throws AozanException
    */
   public FastqScreenResult execute(final File fastqRead1,
       final File fastqRead2, final FastqSample fastqSample,
       final List<String> genomes, final String genomeSample,
-      final boolean paired) throws AozanException {
+      final boolean pairedMode) throws AozanException {
 
     // Timer
     final Stopwatch timer = new Stopwatch().start();
@@ -105,18 +109,17 @@ public class FastqScreen {
 
     try {
 
-      if (fastqRead2 == null)
-        pmr.doMap(fastqRead1, genomes, genomeSample, tmpDir, confThreads,
-            paired);
-      else
+      if (pairedMode)
         pmr.doMap(fastqRead1, fastqRead2, genomes, genomeSample, tmpDir,
-            confThreads, paired);
+            confThreads, pairedMode);
+      else
+        pmr.doMap(fastqRead1, genomes, genomeSample, tmpDir, confThreads,
+            pairedMode);
 
       LOGGER.fine("FASTQSCREEN : step map for "
           + fastqSample.getKeyFastqSample() + " in mode "
-          + (fastqRead2 == null ? "single" : "paired") + " on genome(s) "
-          + genomes + " in "
-          + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
+          + (pairedMode ? "paired" : "single") + " on genome(s) " + genomes
+          + " in " + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
       timer.reset();
       timer.start();
@@ -125,7 +128,7 @@ public class FastqScreen {
 
       LOGGER.fine("FASTQSCREEN : step reduce for "
           + fastqSample.getKeyFastqSample() + " in mode "
-          + (fastqRead2 == null ? "single" : "paired") + " in "
+          + (pairedMode ? "paired" : "single") + " in "
           + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
       // Remove temporary output file use in map-reduce step
@@ -164,24 +167,14 @@ public class FastqScreen {
       } catch (Exception e) {
       }
     }
-    try {
-      // init EoulsanRuntime, it is necessary to use the implementation of
-      // bowtie in Eoulsan
-      LocalEoulsanRuntime.initEoulsanRuntimeForExternalApp();
-      Settings settings = EoulsanRuntime.getSettings();
 
-      settings.setGenomeDescStoragePath(properties
-          .getProperty(KEY_GENOMES_DESC_PATH));
-      settings.setGenomeMapperIndexStoragePath(properties
-          .getProperty(KEY_MAPPERS_INDEXES_PATH));
-      settings.setGenomeStoragePath(properties.getProperty(KEY_GENOMES_PATH));
+    Settings settings = EoulsanRuntime.getSettings();
 
-    } catch (IOException e) {
-      e.printStackTrace();
-
-    } catch (EoulsanException ee) {
-      ee.printStackTrace();
-    }
+    settings.setGenomeDescStoragePath(properties
+        .getProperty(KEY_GENOMES_DESC_PATH));
+    settings.setGenomeMapperIndexStoragePath(properties
+        .getProperty(KEY_MAPPERS_INDEXES_PATH));
+    settings.setGenomeStoragePath(properties.getProperty(KEY_GENOMES_PATH));
 
   }
 }

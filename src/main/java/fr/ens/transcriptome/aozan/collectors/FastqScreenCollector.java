@@ -49,8 +49,15 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
   public static final String COLLECTOR_NAME = "fastqscreen";
   private static final String KEY_GENOMES = "qc.conf.fastqscreen.genomes";
+  public static final String KEY_SKIP_CONTROL_LANE =
+      "qc.conf.skip.control.lane";
+  public static final String KEY_IGNORE_PAIRED_MODE =
+      "qc.conf.ignore.paired.mode";
 
   private FastqScreen fastqscreen;
+
+  private boolean skipControlLane;
+  private boolean ignorePairedMode;
 
   // List of genome for fastqscreen specific of a sample
   private List<String> genomesConfiguration = new ArrayList<String>();
@@ -68,8 +75,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
   public List<String> getCollectorsNamesRequiered() {
 
     List<String> result = super.getCollectorsNamesRequiered();
-    result.add(FastQCCollector.COLLECTOR_NAME);
-    result.add(UncompressFastqCollector.COLLECTOR_NAME);
+    result.add(TemporaryPartialFastqCollector.COLLECTOR_NAME);
 
     return Collections.unmodifiableList(result);
 
@@ -93,11 +99,27 @@ public class FastqScreenCollector extends AbstractFastqCollector {
       genomesConfiguration.add(g);
     }
 
+    try {
+      this.ignorePairedMode =
+          Boolean.parseBoolean(properties.getProperty(KEY_IGNORE_PAIRED_MODE));
+
+    } catch (Exception e) {
+      // Default value
+      this.ignorePairedMode = false;
+    }
+
+    try {
+      this.skipControlLane =
+          Boolean.parseBoolean(properties.getProperty(KEY_SKIP_CONTROL_LANE));
+    } catch (Exception e) {
+      // Default value
+      this.skipControlLane = true;
+    }
   }
 
   @Override
   public AbstractFastqProcessThread collectSample(RunData data,
-      final FastqSample fastqSample, final File reportDir)
+      final FastqSample fastqSample, final File reportDir, final boolean runPE)
       throws AozanException {
 
     if (fastqSample.getFastqFiles() == null
@@ -109,21 +131,33 @@ public class FastqScreenCollector extends AbstractFastqCollector {
       // + fastqSample.getKeyFastqSample());
     }
 
+    // TODO to remove : use configuration aozan for mode PE
     // Create the thread object only if the fastq sample correspond to a R1
-    if (fastqSample.getRead() == 2)
-      return null;
+    // if (fastqSample.getRead() == 2)
+    // return null;
 
     // Retrieve genome sample
-    String genomeSample =
+    final String genomeSample =
         data.get("design.lane"
             + fastqSample.getLane() + "." + fastqSample.getSampleName()
             + ".sample.ref");
 
-    String genomeReferenceSample =
+    final String genomeReferenceSample =
         AliasGenomeFile.getInstance().getGenomeReferenceCorresponding(
             genomeSample);
 
-    if (paired) {
+    final boolean controlLane =
+        data.getBoolean("design.lane"
+            + fastqSample.getLane() + "." + fastqSample.getSampleName()
+            + ".control");
+
+    // Skip the control lane
+    if (skipControlLane && controlLane)
+      return null;
+
+    final boolean pairedMode = runPE && !ignorePairedMode;
+
+    if (pairedMode) {
       // in mode paired FastqScreen should be launched with R1 and R2 together.
       // Search fasqtSample which correspond to fastqSample R1
       String prefixRead2 = fastqSample.getPrefixRead2();
@@ -133,14 +167,14 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
           return new FastqScreenProcessThread(fastqSample, fastqSampleR2,
               fastqscreen, genomesConfiguration, genomeReferenceSample,
-              reportDir, paired);
+              reportDir, pairedMode);
         }
       }
     }
 
     // Call in mode single-end
     return new FastqScreenProcessThread(fastqSample, fastqscreen,
-        genomesConfiguration, genomeReferenceSample, reportDir, paired);
+        genomesConfiguration, genomeReferenceSample, reportDir, pairedMode);
   }
 
   //

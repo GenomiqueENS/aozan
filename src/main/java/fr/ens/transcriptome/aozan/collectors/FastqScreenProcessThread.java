@@ -58,7 +58,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   private final FastqScreen fastqscreen;
   private final List<String> genomes;
   private final String genomeSample;
-  private final boolean paired;
+  private final boolean pairedMode;
   private FastqSample fastqSampleR2;
 
   private FastqScreenResult resultsFastqscreen = null;
@@ -82,9 +82,14 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
       timer.stop();
 
       LOGGER.fine("FASTQSCREEN : end for "
-          + this.fastqSample.getKeyFastqSample() + " in mode "
-          + (paired ? "paired" : "single") + " on genome(s) " + this.genomes
-          + " in " + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
+          + this.fastqSample.getKeyFastqSample()
+          + " in mode "
+          + (pairedMode ? "paired" : "single")
+          + (this.success
+              ? " on genome(s) "
+                  + this.genomes + " in "
+                  + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS))
+              : " with fail."));
 
     }
 
@@ -95,8 +100,10 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     String headerReport =
         "FastqScreen : for Projet "
-            + fastqSample.getProjectName() + "\nresult for sample : "
-            + fastqSample.getSampleName();
+            + fastqSample.getProjectName()
+            + (this.genomeSample == null
+                ? "" : " (genome reference for sample " + this.genomeSample)
+            + ").\nresult for sample : " + fastqSample.getSampleName();
 
     // TODO to remove after test
     System.out.println("\n"
@@ -130,7 +137,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     File read2 = null;
     // mode paired
-    if (this.paired) {
+    if (this.pairedMode) {
       read2 = new File(fastqStorage.getTemporaryFile(fastqSampleR2));
 
       if (read2 == null || !read2.exists())
@@ -140,7 +147,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     // Add read2 in command line
     resultsFastqscreen =
         fastqscreen.execute(read1, read2, fastqSample, genomes, genomeSample,
-            paired);
+            pairedMode);
 
     if (resultsFastqscreen == null)
       throw new AozanException("Fastqscreen return no result for sample "
@@ -172,7 +179,8 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @param listGenomes list of references genomes for FastqScreen
    * @param genomeSample genome reference corresponding to sample
    * @param reportDir path for the directory who save the FastqScreen report
-   * @param paired true if a pair-end run else false
+   * @param paired true if a pair-end run and option paired mode equals true
+   *          else false
    * @throws AozanException if an error occurs during create thread, if no fastq
    *           file was found
    */
@@ -180,9 +188,10 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   public FastqScreenProcessThread(final FastqSample fastqSampleR1,
       final FastqSample fastqSampleR2, final FastqScreen fastqscreen,
       final List<String> genomes, final String genomeSample,
-      final File reportDir, final boolean paired) throws AozanException {
+      final File reportDir, final boolean pairedMode) throws AozanException {
 
-    this(fastqSampleR1, fastqscreen, genomes, genomeSample, reportDir, paired);
+    this(fastqSampleR1, fastqscreen, genomes, genomeSample, reportDir,
+        pairedMode);
     this.fastqSampleR2 = fastqSampleR2;
   }
 
@@ -194,13 +203,14 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @param listGenomes list of references genomes for FastqScreen
    * @param genomeSample genome reference corresponding to sample
    * @param reportDir path for the directory who save the FastqScreen report
-   * @param paired true if a pair-end run else false
+   * @param paired true if a pair-end run and option paired mode equals true
+   *          else false
    * @throws AozanException if an error occurs during create thread, if no fastq
    *           file was found
    */
   public FastqScreenProcessThread(final FastqSample fastqSample,
       final FastqScreen fastqscreen, final List<String> genomes,
-      final String genomeSample, final File reportDir, final boolean paired)
+      final String genomeSample, final File reportDir, final boolean pairedMode)
       throws AozanException {
 
     super(fastqSample);
@@ -209,7 +219,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     this.fastqscreen = fastqscreen;
     this.genomeSample = genomeSample;
     this.reportDir = reportDir;
-    this.paired = paired;
+    this.pairedMode = pairedMode;
 
     // Copy list genome for fastqscreen
     this.genomes = new ArrayList<String>();

@@ -8,16 +8,13 @@ import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -38,12 +35,10 @@ import fr.ens.transcriptome.eoulsan.EoulsanException;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.eoulsan.bio.IlluminaReadId;
 import fr.ens.transcriptome.eoulsan.bio.ReadSequence;
-import fr.ens.transcriptome.eoulsan.bio.Sequence;
 import fr.ens.transcriptome.eoulsan.bio.io.FastqReader;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
-import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
-public class TestPartialFastq {
+public class EssaiPartialFastq {
 
   static final String dir =
       "/home/sperrin/Documents/FastqScreenTest/fqs_light/sources/";
@@ -72,25 +67,37 @@ public class TestPartialFastq {
   static int fastqSize; // nb reads
   static String genomeSample;
 
-  final static FastqScreen fastqscreen;
+  static FastqScreen fastqscreen = null;
 
   public static void main(String[] argv) {
 
     /** Parameters fastq file */
     /** TEST : ribosomal contamination */
-//    runId = "130326_SNL110_0066_AD1GG4ACXX";
-//    sample = "2013_0019";
-//    projet = "yakafocon3_A2012";
-//    fileSrc = "";
-//    lane = 1;
-//    read = 1;
-//    index = "CGATGT";
-//    fastqSize = 45298094; // nb reads
-//    genomeSample = "C_albicans";
-//
-//    launch_test();
+    // runId = "130326_SNL110_0066_AD1GG4ACXX";
+    // sample = "2013_0019";
+    // projet = "yakafocon3_A2012";
+    // fileSrc = "";
+    // lane = 1;
+    // read = 1;
+    // index = "CGATGT";
+    // fastqSize = 45298094; // nb reads
+    // genomeSample = "C_albicans";
+    //
+    // launch_test();
 
     /** TEST : fastq classique run 58 */
+    runId = "121116_SNL110_0058_AC11HRACXX";
+    sample = "2012_0200";
+    projet = "microbrain_A2012";
+    fileSrc = "";
+    lane = 5;
+    read = 1;
+    index = "CGATGT";
+    fastqSize = 36039833; // nb reads
+    genomeSample = "mm10";
+
+    launch_test();
+
     // runId = "121116_SNL110_0058_AC11HRACXX";
     // sample = "2012_0200";
     // projet = "microbrain_A2012";
@@ -104,41 +111,42 @@ public class TestPartialFastq {
     // launch_test();
 
     /** TEST : bad tiles and enormous fastq file */
-    runId = "130604_SNL110_0070_AD26NTACXX";
-    sample = "ssDNA";
-    projet = "imagifngs_D2013";
-    fileSrc = "";
-    lane = 8;
-    read = 1;
-    index = "NoIndex";
-    fastqSize = 131791620; // nb reads
-    genomeSample = "";
-
-    launch_test();
+    // runId = "130604_SNL110_0070_AD26NTACXX";
+    // sample = "ssDNA";
+    // projet = "imagifngs_D2013";
+    // fileSrc = "";
+    // lane = 8;
+    // read = 1;
+    // index = "NoIndex";
+    // fastqSize = 131791620; // nb reads
+    // genomeSample = "";
+    //
+    // launch_test();
   }
 
   public static void launch_test() {
+    // File fastq =
+    // new File(dirRun
+    // + "/qc_"
+    // + runId
+    // + "/"
+    // + runId
+    // + String.format(
+    // "/Project_%s/Sample_%s/%s_%s_L%03d_R%d_001.fastq.bz2", projet,
+    // sample, sample, index, lane, read));
+
     File fastq =
-        new File(dirRun
-            + "/qc_"
-            + runId
-            + "/"
-            + runId
-            + String.format(
-                "/Project_%s/Sample_%s/%s_%s_L%03d_R%d_001.fastq.bz2", projet,
-                sample, sample, index, lane, read));
+        new File(
+            "/home/sperrin/Documents/FastqScreenTest/fqs_light/sources/Project_microbrain_A2012/"
+                + String.format("%s_%s_L%03d_R%d_001.fastq.bz2", sample, index,
+                    lane, read));
 
     Stopwatch timer = new Stopwatch().start();
     // Build tmp partial fastq files to execute fastqscreen
 
-    double part = 0.02;
-    double part_pas = 0.02;
-    double part_end = 0.1;
-    double partToRead = 0.0;
-
-    int nbReadsToCopy = 20000;
+    int nbReadsToCopy = 200000;
     int count_pas = 20000;
-    int count_end = 300000;
+    int count_end = nbReadsToCopy;
     boolean random = true;
 
     File dataFile =
@@ -189,7 +197,6 @@ public class TestPartialFastq {
 
       System.out.println("\ttimer_fqs "
           + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
-
       String result =
           "TEST\t"
               + projet + "\t" + sample + "\t" + timerCreateFile + "\t"
@@ -270,7 +277,8 @@ public class TestPartialFastq {
       final int step = (int) (1 / part);
 
       System.out.println("part "
-          + part + " nb read to copy " + nbReadsToCopy + " pas " + step);
+          + part + " nb read to copy " + String.format("%,d", nbReadsToCopy)
+          + " pas " + step);
 
       IlluminaReadId ill = null;
 
@@ -289,8 +297,10 @@ public class TestPartialFastq {
 
             // System.out.println(nbReadToCopy + " -- " + seq.toFastQ());
 
-            if (--nbReadsToCopy <= 0)
+            if (--nbReadsToCopy <= 0) {
+              System.out.println("get out loop readSeq");
               break;
+            }
           }
 
           comptReadsPF++;
@@ -495,8 +505,8 @@ public class TestPartialFastq {
       final boolean random) {
 
     List<String> genomes =
-        Lists.newArrayList("phix", "adapters", "lsuref_dna", "ssuref",
-            genomeSample);
+        Lists.newArrayList("phix", "adapters", "lsuref_106", "ssuref_106",
+            "lsuref_111", "ssuref_111", genomeSample);
 
     FastqSample fastqSample = new FastqSample(dir, 1, 1, sample, projet, index);
 
@@ -516,7 +526,7 @@ public class TestPartialFastq {
       RunData data = result.createRundata("TEST");
       File dataFile =
           new File(dir + "/Project_" + projet, "data_"
-              + index + "_bz" + "_" + random + ".data");
+              + index + "_mp" + ".data");
       data.createRunDataFile(dataFile);
 
       for (String g : genomes) {
@@ -537,7 +547,7 @@ public class TestPartialFastq {
     try {
       BufferedWriter bw =
           new BufferedWriter(new FileWriter(new File(
-              dir + "/Project_" + projet, "result_pf.csv"), true));
+              dir + "/Project_" + projet, "result_pf_mp.csv"), true));
 
       bw.write(result);
       bw.write("\n");

@@ -76,7 +76,7 @@ public class FastQCCollector extends AbstractFastqCollector {
 
   @Override
   public AbstractFastqProcessThread collectSample(final RunData data,
-      final FastqSample fastqSample, final File reportDir)
+      final FastqSample fastqSample, final File reportDir, final boolean runPE)
       throws AozanException {
 
     final List<File> fastqFiles = fastqSample.getFastqFiles();

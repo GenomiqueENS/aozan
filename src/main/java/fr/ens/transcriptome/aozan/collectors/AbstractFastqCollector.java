@@ -58,9 +58,9 @@ abstract public class AbstractFastqCollector implements Collector {
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
 
+  public static final String KEY_RUN_MODE = "run.info.run.mode";
   public static final String KEY_READ_COUNT = "run.info.read.count";
-  public static final String KEY_READ_X_INDEXED = "run.info.read";
-  protected static boolean paired = false;
+  public static final String KEY_LANE_COUNT = "run.info.flow.cell.lane.count";
 
   protected FastqStorage fastqStorage;
   protected String casavaOutputPath;
@@ -75,8 +75,6 @@ abstract public class AbstractFastqCollector implements Collector {
   private static final int CHECKING_DELAY_MS = 5000;
   private static final int WAIT_SHUTDOWN_MINUTES = 60;
 
-  private long uncompressedSizeFiles = 0l;
-
   protected List<AbstractFastqProcessThread> threads;
   protected List<Future<? extends AbstractFastqProcessThread>> futureThreads;
   protected ExecutorService executor;
@@ -85,11 +83,12 @@ abstract public class AbstractFastqCollector implements Collector {
    * Collect data for a fastqSample
    * @param data
    * @param fastqSample
+   * @param runPE true if it is a run PE else false
    * @throws AozanException if an error occurs while execution
    */
   abstract protected AbstractFastqProcessThread collectSample(
-      final RunData data, final FastqSample fastqSample, final File reportDir)
-      throws AozanException;
+      final RunData data, final FastqSample fastqSample, final File reportDir,
+      final boolean runPE) throws AozanException;
 
   /**
    * Return the number of thread that the collector can be used for execution.
@@ -147,7 +146,9 @@ abstract public class AbstractFastqCollector implements Collector {
   @Override
   public void collect(RunData data) throws AozanException {
 
-    controlPreCollect(data, this.qcReportOutputPath);
+    createListFastqSamples(data);
+
+    final boolean runPE = data.get(KEY_RUN_MODE).equals("PE") ? true : false;
 
     RunData resultPart = null;
     if (this.getThreadsNumber() > 1) {
@@ -172,7 +173,7 @@ abstract public class AbstractFastqCollector implements Collector {
                     + reportDir.getAbsolutePath());
 
             AbstractFastqProcessThread thread =
-                collectSample(data, fs, reportDir);
+                collectSample(data, fs, reportDir, runPE);
 
             if (thread != null) {
               // Add thread to executor or futureThreads, I don't know
@@ -213,67 +214,28 @@ abstract public class AbstractFastqCollector implements Collector {
                 throw new AozanException("Cannot create report directory: "
                     + reportDir.getAbsolutePath());
 
-            // This not really a thread as it will be never started
             AbstractFastqProcessThread pseudoThread =
-                collectSample(data, fs, reportDir);
+                collectSample(data, fs, reportDir, runPE);
 
             if (pseudoThread == null)
               continue;
 
+            // This not really a thread as it will be never started
             pseudoThread.run();
 
-            resultPart = pseudoThread.getResults();
-            saveResultPart(fs, resultPart);
+            // Throw exception from fastqscreen collector thread if not success
+            if (!pseudoThread.success)
+              throw new AozanException(pseudoThread.getException());
+            else {
+              // Save result
+              resultPart = pseudoThread.getResults();
+              saveResultPart(fs, resultPart);
+            }
           }
           data.put(resultPart);
         }
       }
     }
-
-  }
-
-  /**
-   * Realize all preliminary control before execute AbstractFastqCollector, it
-   * check if the free space in tmp directory is enough for save all
-   * uncompressed fastq files.
-   * @param data data used
-   * @param qcReportOutputPath path to save qc report
-   * @throws AozanException
-   */
-  private void controlPreCollect(final RunData data,
-      final String qcReportOutputPath) throws AozanException {
-
-    if (!fastqSamples.isEmpty())
-      return;
-
-    LOGGER.fine("Collector fastq : step preparation");
-
-    // Count size from all fastq files used
-    long freeSpace = new File(this.tmpPath).getFreeSpace();
-    freeSpace = freeSpace / (1024 * 1024 * 1024);
-
-    createListFastqSamples(data);
-
-    // Estimate used space : needed space + 5%
-    long uncompressedSizeNeeded = (long) (this.uncompressedSizeFiles * 1.05);
-    uncompressedSizeNeeded = uncompressedSizeNeeded / (1024 * 1024 * 1024);
-
-    if (uncompressedSizeNeeded > freeSpace)
-      throw new AozanException(
-          "Not enough disk space to store uncompressed fastq files for step fastqScreen. We are "
-              + freeSpace
-              + " Go in directory "
-              + new File(this.tmpPath).getAbsolutePath()
-              + ", and we need "
-              + uncompressedSizeNeeded + " Go. Echec Aozan");
-
-    LOGGER
-        .fine("Enough disk space to store uncompressed fastq files for step fastqScreen. We are "
-            + freeSpace
-            + " Go in directory "
-            + new File(this.tmpPath).getAbsolutePath()
-            + ", and we need "
-            + uncompressedSizeNeeded + " Go.");
 
   }
 
@@ -284,13 +246,11 @@ abstract public class AbstractFastqCollector implements Collector {
    */
   private void createListFastqSamples(final RunData data) {
 
-    final int laneCount = data.getInt("run.info.flow.cell.lane.count");
-    // mode paired or single-end present in Rundata
-    final int readCount = data.getInt(KEY_READ_COUNT);
-    final boolean lastReadIndexed =
-        data.getBoolean(KEY_READ_X_INDEXED + readCount + ".indexed");
+    if (!fastqSamples.isEmpty())
+      return;
 
-    paired = readCount > 1 && !lastReadIndexed;
+    final int laneCount = data.getInt(KEY_LANE_COUNT);
+    final int readCount = data.getInt(KEY_READ_COUNT);
 
     for (int read = 1; read <= readCount; read++) {
 
@@ -314,32 +274,25 @@ abstract public class AbstractFastqCollector implements Collector {
               data.get("design.lane"
                   + lane + "." + sampleName + ".sample.project");
 
+          // TODO check possible to remove
           // update list of genomes samples
           // receive genome name for sample
-          String genomeSample =
-              data.get("design.lane" + lane + "." + sampleName + ".sample.ref");
-
-          // if genomeSample is present in mapAliasGenome, it add in list of
+          // String genomeSample =
+          // data.get("design.lane" + lane + "." + sampleName + ".sample.ref");
+          // if genomeSample is present in mapAliasGenome, add in list of
           // genomes reference for the mapping
-          genomeSample = genomeSample.trim().toLowerCase();
-          genomeSample = genomeSample.replace('"', '\0');
+          // genomeSample = genomeSample.trim().toLowerCase();
+          // genomeSample = genomeSample.replace('"', '\0');
 
           FastqSample fastqSample =
               new FastqSample(this.casavaOutputPath, read, lane, sampleName,
                   projectName, index);
           fastqSamples.add(fastqSample);
 
-          // Check temporary fastq files exists
-          if (!(new File(tmpPath
-              + "/" + fastqSample.getNameTemporaryFastqFiles()).exists())) {
-            this.uncompressedSizeFiles += fastqSample.getUncompressedSize();
-
-          }
         } // sample
 
       }// lane
     }// read
-
   }
 
   /**

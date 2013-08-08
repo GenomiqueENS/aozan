@@ -55,7 +55,13 @@ public class Common {
    * @throws IOException if cannot open/create the log file
    */
   public static void initLogger_OLD(final String logPath)
-      throws SecurityException, IOException {
+      throws SecurityException, IOException, AozanException {
+
+    try {
+      initEoulsanRuntimeForExternalApp();
+    } catch (EoulsanException ee) {
+      throw new AozanException(ee.getMessage());
+    }
 
     final Logger aozanLogger =
         Logger.getLogger(fr.ens.transcriptome.aozan.Globals.APP_NAME);

@@ -172,6 +172,12 @@
        <scope>compile</scope>
     </dependency>
     <dependency>
+		<groupId>commons-cli</groupId>
+		<artifactId>commons-cli</artifactId>
+		<version>1.2</version>
+		<scope>compile</scope>
+	</dependency>
+    <dependency>
        <groupId>net.sourceforge.picard</groupId>
        <artifactId>sam</artifactId>
        <version>1.92</version>
@@ -465,7 +471,7 @@
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>jython-standalone,eoulsan,poi,guava,fastqc,jbzip2,commons-compress,sam,commons-math3</includeArtifactIds>
+              <includeArtifactIds>jython-standalone,eoulsan,poi,guava,fastqc,jbzip2,commons-compress,sam,commons-math3,commons-cli</includeArtifactIds>
               <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
             </configuration>
           </execution>

@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +25,7 @@ import fr.ens.transcriptome.eoulsan.bio.readsmappers.BowtieReadsMapper;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.MapperProcess;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
-public class TestMapperProcess {
+public class MapperProcessDemo {
   private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
   private static final String EXEC = "/tmp/eoulsan/UNKNOWN_VERSION/bowtie";
@@ -37,14 +36,14 @@ public class TestMapperProcess {
       "/home/sperrin/Documents/FastqScreenTest/tmp";
   private static final File fastq =
       new File(
-          "/home/sperrin/Documents/FastqScreenTest/runtest/qc_121116_SNL110_0058_AC11HRACXX/121116_SNL110_0058_AC11HRACXX/Project_microbrain_A2012/Sample_2012_0200/2012_0200_CGATGT_L005_R1_001.millefq");
+          "/home/sperrin/Documents/FastqScreenTest/tmp/aozan_fastq_2013_0143_AGTTCC_L008_R1_001.fastq");
+
+  // "/home/sperrin/Documents/FastqScreenTest/runtest/qc_121116_SNL110_0058_AC11HRACXX/121116_SNL110_0058_AC11HRACXX/Project_microbrain_A2012/Sample_2012_0200/2012_0200_CGATGT_L005_R1_001.millefq");
 
   public static final void main(String[] args) throws IOException,
       InterruptedException {
 
-    // new TestMapperProcess().testMapperProcessStdinStdout();
-    // Thread.sleep(1000);
-    new TestMapperProcess().testMapperProcessStdinStdoutPartial();
+    new MapperProcessDemo().testMapperProcessStdinStdoutPartial();
   }
 
   public void testMapperProcessStdinStdoutPartial() throws IOException,
@@ -94,7 +93,8 @@ public class TestMapperProcess {
     try {
       BufferedInputStream bis =
           new BufferedInputStream(new FileInputStream(fastq));
-
+      System.out.println("read fastq " + fastq.getAbsolutePath());
+      
       while ((n = bis.read(buffer)) != -1) {
         os.write(buffer, 0, n);
         compt += n;
@@ -110,7 +110,7 @@ public class TestMapperProcess {
     //
     // local.start();
 
-    System.out.println("nb lines in fastq " + compt);
+    System.out.println("nb bytes in fastq " + compt);
   }
 
   public void parseStdoutStream(final InputStream is, final File samFile)
