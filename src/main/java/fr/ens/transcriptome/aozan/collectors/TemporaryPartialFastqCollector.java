@@ -33,6 +33,12 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
+/**
+ * This class manages the creation of temporary partial fastq file for
+ * contamination research.
+ * @since 1.1
+ * @author Sandrine Perrin
+ */
 public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
 
   public static final String COLLECTOR_NAME = "tmppartialfastq";

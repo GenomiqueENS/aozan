@@ -49,11 +49,21 @@ import fr.ens.transcriptome.eoulsan.bio.io.FastqReader;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
+/**
+ * The class define a class for a thread that create a temporary partial fastq
+ * file, with fixed reads (200 000) to use for contamination research. Only the
+ * reads pf are used. They are selected among the first 30 millions reads pf.
+ * @since 1.1
+ * @author Sandrine Perrin
+ */
 public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
 
   /** Logger */
   private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
   private static final int COUNT_READS_TO_COPY = 200000;
+
+  // Use only the first 30 000 000 reads pf in fastq file
+  private static final int MAX_READS_PF_PARSING = 30000000;
 
   /** Timer **/
   private Stopwatch timer = new Stopwatch();
@@ -154,14 +164,6 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
 
     final int step =
         (int) (1 / ((double) COUNT_READS_TO_COPY / pfClusterCount));
-
-    // TODO to remove
-    System.out.println(tmpFastqFile.getName()
-        + " nb PF reads to copy "
-        + String.format("%,d", COUNT_READS_TO_COPY
-            / this.fastqSample.getFastqFiles().size()) + " pas " + step
-        + " from " + fastqSample.getFastqFiles().size() + " fastq files\t"
-        + pfClusterCount);
 
     for (File fastqFile : this.fastqSample.getFastqFiles()) {
       int comptReadsPF = 1;
@@ -266,12 +268,6 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
     int count_reads_to_copy_by_fastq =
         COUNT_READS_TO_COPY / this.fastqSample.getFastqFiles().size();
 
-    // TODO to remove
-    System.out.println(tmpFastqFile.getName()
-        + " nb read to copy " + String.format("%,d", COUNT_READS_TO_COPY)
-        + " pas " + step + " from " + fastqSample.getFastqFiles().size()
-        + " fastq files");
-
     for (File fastqFile : fastqSample.getFastqFiles()) {
       int comptReadsPF = 1;
 
@@ -350,9 +346,6 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
 
       OutputStream out = new FileOutputStream(this.tmpFastqFile);
 
-      // TODO to remove
-      System.out.println(tmpFastqFile.getName()+ " uncompress file ");
-
       for (File fastqFile : this.fastqSample.getFastqFiles()) {
 
         if (!fastqFile.exists()) {
@@ -396,7 +389,9 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
     super(fastqSample);
 
     this.rawClusterCount = rawClusterCount;
-    this.pfClusterCount = pfClusterCount;
+    this.pfClusterCount =
+        MAX_READS_PF_PARSING < pfClusterCount
+            ? pfClusterCount : MAX_READS_PF_PARSING;
 
     this.tmpFastqFile =
         new File(fastqStorage.getTemporaryFile(fastqSample) + ".tmp");
