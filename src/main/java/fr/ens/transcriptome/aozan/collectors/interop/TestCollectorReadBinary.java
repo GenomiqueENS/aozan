@@ -31,7 +31,7 @@ public class TestCollectorReadBinary {
   static BufferedWriter bw = null;
 
   public static void main(String[] argv) {
-    String v = "remove";
+    String v = "78";
     file = new File(DIR_RESULT, "comparaison_all_run_" + v + ".data");
 
     // Copy console output in a file
@@ -64,13 +64,14 @@ public class TestCollectorReadBinary {
           }
         }));
 
-//    for (File f : runs) {
-//      collectRun(f);
-//    }
+    for (File f : runs) {
+      collectRun(f);
+    }
 
     // collectRun(new File(DIR_TMP +
     // "/hiseq_log_120830_SNL110_0055_AD16D9ACXX/"));
-    collectRun(new File(DIR_TMP + "/hiseq_log_130621_SNL110_0073_AD1Y8WACXX/"));
+    // collectRun(new File(DIR_TMP +
+    // "/hiseq_log_130621_SNL110_0073_AD1Y8WACXX/"));
     // collectRun(new File(DIR_TMP +
     // "/hiseq_log_130507_SNL110_0068_AD20WUACXX/"));
   }
