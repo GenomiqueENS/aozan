@@ -117,9 +117,9 @@ public class FastqScreen {
             pairedMode);
 
       LOGGER.fine("FASTQSCREEN : step map for "
-          + fastqSample.getKeyFastqSample() + " in mode " + pairedMode
-          + " on genome(s) " + genomes + " in "
-          + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
+          + fastqSample.getKeyFastqSample() + " in mode "
+          + (pairedMode ? "paired" : "single") + " on genome(s) " + genomes
+          + " in " + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
       timer.reset();
       timer.start();
@@ -127,7 +127,8 @@ public class FastqScreen {
       pmr.doReduce(new File(tmpDir + "/outputDoReduce.txt"));
 
       LOGGER.fine("FASTQSCREEN : step reduce for "
-          + fastqSample.getKeyFastqSample() + " in mode " + pairedMode + " in "
+          + fastqSample.getKeyFastqSample() + " in mode "
+          + (pairedMode ? "paired" : "single") + " in "
           + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
       // Remove temporary output file use in map-reduce step
@@ -167,24 +168,13 @@ public class FastqScreen {
       }
     }
 
-    try {
-      // init EoulsanRuntime, it is necessary to use the implementation of
-      // bowtie in Eoulsan
-      LocalEoulsanRuntime.initEoulsanRuntimeForExternalApp();
-      Settings settings = EoulsanRuntime.getSettings();
+    Settings settings = EoulsanRuntime.getSettings();
 
-      settings.setGenomeDescStoragePath(properties
-          .getProperty(KEY_GENOMES_DESC_PATH));
-      settings.setGenomeMapperIndexStoragePath(properties
-          .getProperty(KEY_MAPPERS_INDEXES_PATH));
-      settings.setGenomeStoragePath(properties.getProperty(KEY_GENOMES_PATH));
-
-    } catch (IOException e) {
-      e.printStackTrace();
-
-    } catch (EoulsanException ee) {
-      ee.printStackTrace();
-    }
+    settings.setGenomeDescStoragePath(properties
+        .getProperty(KEY_GENOMES_DESC_PATH));
+    settings.setGenomeMapperIndexStoragePath(properties
+        .getProperty(KEY_MAPPERS_INDEXES_PATH));
+    settings.setGenomeStoragePath(properties.getProperty(KEY_GENOMES_PATH));
 
   }
 }
