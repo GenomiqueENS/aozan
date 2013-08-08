@@ -51,7 +51,7 @@ import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.RemoveUnmappedReadAlig
  * @since 1.0
  * @author Sandrine Perrin
  */
-public class FastsqScreenSAMParser implements SAMParserLine {
+public class FastqScreenSAMParser implements SAMParserLine {
 
   private File mapOutputFile = null;
   private String genome;
@@ -67,7 +67,6 @@ public class FastsqScreenSAMParser implements SAMParserLine {
   private final ReadAlignmentsFilterBuffer buffer;
 
   private int readsprocessed = 0;
-  private int readsmapped = 0;
 
   /**
    * Call for each line of SAM file. Method create a new file, it contains a
@@ -109,9 +108,13 @@ public class FastsqScreenSAMParser implements SAMParserLine {
     if (!result) {
       readsprocessed++;
 
+      // // TODO to remove
+      // System.out.print(readsprocessed
+      // + (readsprocessed % 100 == 0 ? "\n" : " "));
+
       List<SAMRecord> records = buffer.getFilteredAlignments();
 
-      if (records.size() > 0) {
+      if (records != null && records.size() > 0) {
 
         String nameRead = records.get(0).getReadName();
 
@@ -137,18 +140,26 @@ public class FastsqScreenSAMParser implements SAMParserLine {
   }
 
   /**
-   * Parse a SAM file and create a new file, it contains a line for each read
-   * mapped with her name and mapping data : first character represent the
-   * number of hits for a read : 1 or 2 (for several hits) and the end represent
-   * the name of reference genome
+   * Parse a SAM file and create a new file mapoutsamfile, it contains a line
+   * for each read mapped with her name and mapping data : first character
+   * represent the number of hits for a read : 1 or 2 (for several hits) and the
+   * end represent the name of reference genome
    * @param is inputStream to parse
    * @throws IOException
    */
   public void parseLine(final InputStream is) throws IOException {
 
-    ThreadLocal local = new ThreadLocal(is);
-    local.start();
-    local.throwException();
+    BufferedReader br =
+        new BufferedReader(new InputStreamReader(is, Charsets.ISO_8859_1));
+    String line = null;
+    int compt = 0;
+    while ((line = br.readLine()) != null) {
+      parseLine(line);
+      compt++;
+    }
+
+    br.close();
+    is.close();
 
   }
 
@@ -178,31 +189,29 @@ public class FastsqScreenSAMParser implements SAMParserLine {
   /**
    * Write last record and close file mapOutputFile
    */
-  public void closeMapOutputFile() {
+  public void closeMapOutputFile() throws IOException {
     // processing read buffer - end of input stream bowtie execution
-    try {
-      readsprocessed++;
-      List<SAMRecord> records = buffer.getFilteredAlignments();
-      if (records.size() != 0) {
-        String nameRead = records.get(0).getReadName();
+    readsprocessed++;
+    List<SAMRecord> records = buffer.getFilteredAlignments();
 
-        int nbHits;
-        // mode paired : records contains an event number of reads
-        if (pairedMode)
-          nbHits = records.size() == 2 ? 1 : 2;
-        else
-          nbHits = records.size() == 1 ? 1 : 2;
+    if (records != null && records.size() > 0) {
+      String nameRead = records.get(0).getReadName();
 
-        // write in SAMmapOutputFile
-        if (nameRead != null) {
-          fw.write(nameRead + "\t" + nbHits + genome);
-          fw.write("\n");
-        }
+      int nbHits;
+      // mode paired : records contains an event number of reads
+      if (pairedMode)
+        nbHits = records.size() == 2 ? 1 : 2;
+      else
+        nbHits = records.size() == 1 ? 1 : 2;
+
+      // write in SAMmapOutputFile
+      if (nameRead != null) {
+        fw.write(nameRead + "\t" + nbHits + genome);
+        fw.write("\n");
       }
-      fw.close();
-
-    } catch (IOException io) {
     }
+    fw.close();
+
   }
 
   @Override
@@ -222,10 +231,6 @@ public class FastsqScreenSAMParser implements SAMParserLine {
     return this.readsprocessed;
   }
 
-  public int getReadsMapped() {
-    return this.readsmapped;
-  }
-
   //
   // Constructor
   //
@@ -239,7 +244,7 @@ public class FastsqScreenSAMParser implements SAMParserLine {
    *          else false
    * @throws IOException if an error occurs while initializing mapOutputFile
    */
-  public FastsqScreenSAMParser(final File mapOutputFile, final String genome,
+  public FastqScreenSAMParser(final File mapOutputFile, final String genome,
       final boolean pairedMode) throws IOException {
 
     this.genome = genome;
@@ -262,50 +267,4 @@ public class FastsqScreenSAMParser implements SAMParserLine {
 
   }
 
-  //
-  // Inner Class
-  //
-
-  private class ThreadLocal extends Thread {
-
-    private IOException exception = null;
-    private InputStream is;
-
-    public void throwException() throws IOException {
-      if (exception != null)
-        throw new IOException(exception);
-    }
-
-    public void run() {
-      try {
-        BufferedReader br =
-            new BufferedReader(new InputStreamReader(this.is,
-                Charsets.ISO_8859_1));
-        String line = null;
-
-        while ((line = br.readLine()) != null) {
-          parseLine(line);
-        }
-
-        br.close();
-
-      } catch (IOException io) {
-        exception = io;
-      } finally {
-        try {
-          is.close();
-        } catch (IOException e) {
-        }
-      }
-
-    }
-
-    //
-    // Constructor
-    //
-    ThreadLocal(final InputStream is) {
-      this.is = is;
-    }
-
-  }
 }
