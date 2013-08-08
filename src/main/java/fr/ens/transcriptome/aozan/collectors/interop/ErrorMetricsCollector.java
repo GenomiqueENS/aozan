@@ -26,8 +26,10 @@ package fr.ens.transcriptome.aozan.collectors.interop;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
@@ -35,7 +37,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
+import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.util.StatisticsUtils;
 
 /**
@@ -45,42 +50,71 @@ import fr.ens.transcriptome.aozan.util.StatisticsUtils;
  * @author Sandrine Perrin
  * @since 1.1
  */
-public class ErrorMetricsCollector extends AbstractBinaryFileCollector {
+public class ErrorMetricsCollector implements Collector {
 
   /** The sub-collector name from ReadCollector. */
   public static final String NAME_COLLECTOR = "ErrorMetricsCollector";
 
+  private String dirInterOpPath;
+
+  private int lanesCount;
+  private int readsCount;
+
+  private int read1CycleCount;
   private int read1LastCycleNumber = -1;
+
   private int read2LastCycleNumber = -1;
 
-  private Map<Integer, ErrorRatesPerLane> errorRatesMetrics = Maps.newHashMap();
+  private int read3CycleCount;
 
-  @Override
+  private final Map<Integer, ErrorRatesPerLane> errorRatesMetrics = Maps
+      .newHashMap();
+
   public String getName() {
     return NAME_COLLECTOR;
+  }
+
+  /**
+   * Get the name of the collectors required to run this collector.
+   * @return a list of String with the name of the required collectors
+   */
+  public List<String> getCollectorsNamesRequiered() {
+    return Collections.unmodifiableList(Lists
+        .newArrayList(RunInfoCollector.COLLECTOR_NAME));
+  }
+
+  /**
+   * Configure the collector with the path of the run data
+   * @param properties object with the collector configuration
+   */
+  public void configure(Properties properties) {
+    String RTAOutputDirPath = properties.getProperty(QC.RTA_OUTPUT_DIR);
+    this.dirInterOpPath = RTAOutputDirPath + "/InterOp/";
   }
 
   /**
    * Collect data.
    * @param data result data object
    */
-  @Override
   public void collect(final RunData data) throws AozanException {
-    super.collect(data);
+
+    lanesCount = data.getInt("run.info.flow.cell.lane.count");
+    readsCount = data.getInt("run.info.read.count");
+    read1CycleCount = data.getInt("run.info.read1.cycles");
+
+    if (readsCount == 3)
+      read3CycleCount = data.getInt("run.info.read3.cycles");
 
     try {
       ErrorMetricsReader reader = new ErrorMetricsReader(dirInterOpPath);
       initMetricsMap(data);
 
-      int lane;
-      int read;
+      int keyMap;
 
       // Distribution of metrics between lane and code
       for (IlluminaErrorMetrics iem : reader.getSetIlluminaMetrics()) {
-        lane = iem.getLaneNumber();
-        read = getReadNumber(iem.getCycleNumber());
-
-        int keyMap = lane * 100 + read;
+        keyMap =
+            getKeyMap(iem.getLaneNumber(), getReadNumber(iem.getCycleNumber()));
         errorRatesMetrics.get(keyMap).addMetric(iem);
       }
 
@@ -92,12 +126,23 @@ public class ErrorMetricsCollector extends AbstractBinaryFileCollector {
     }
 
     // Build runData
-    for (Map.Entry<Integer, ErrorRatesPerLane> entry : errorRatesMetrics.entrySet()) {
+    for (Map.Entry<Integer, ErrorRatesPerLane> entry : errorRatesMetrics
+        .entrySet()) {
 
       entry.getValue().computeData();
       data.put(entry.getValue().getRunData());
     }
 
+  }
+
+  /**
+   * Set unique id for each pair lane-read in a run
+   * @param lane lane number
+   * @param read read number
+   * @return integer identifier unique
+   */
+  protected int getKeyMap(final int lane, final int read) {
+    return lane * 100 + read;
   }
 
   /**
@@ -113,11 +158,12 @@ public class ErrorMetricsCollector extends AbstractBinaryFileCollector {
 
         // lane skiping with phix
         if (data.getBoolean("run.info.align.to.phix.lane" + lane)) {
-          errorRatesMetrics.put(getKeyMap(lane, read), new ErrorRatesPerLane(lane,
-              read, readsCount));
+          errorRatesMetrics.put(getKeyMap(lane, read), new ErrorRatesPerLane(
+              lane, read, readsCount, read1CycleCount, read2LastCycleNumber,
+              read3CycleCount));
 
         } else {
-          // None phix in this lane, all value error are 0
+          // None phix in this lane, all values error are 0
           collectionEmpty(lane, lane);
         }
       }
@@ -152,7 +198,9 @@ public class ErrorMetricsCollector extends AbstractBinaryFileCollector {
       for (int read = 1; read <= readsCount; read++) {
 
         int keyMap = lane * 100 + read;
-        errorRatesMetrics.put(keyMap, new ErrorRatesPerLane(lane, read, readsCount));
+        errorRatesMetrics.put(keyMap, new ErrorRatesPerLane(lane, read,
+            readsCount, true, read1CycleCount, read2LastCycleNumber,
+            read3CycleCount));
       }
     }
 
@@ -185,8 +233,14 @@ public class ErrorMetricsCollector extends AbstractBinaryFileCollector {
 
   }
 
+  /**
+   * Remove temporary files
+   */
+  public void clear() {
+  }
+
   //
-  // Internal class
+  // Inner class
   //
 
   /**
@@ -195,14 +249,14 @@ public class ErrorMetricsCollector extends AbstractBinaryFileCollector {
    * @author Sandrine Perrin
    * @since 1.1
    */
-  class ErrorRatesPerLane {
-
-    private int seuil_35_cycle;
-    private int seuil_75_cycle;
-    private int seuil_100_cycle;
+  private static final class ErrorRatesPerLane {
 
     private int laneNumber;
     private int readNumber;
+
+    private int threshold_35_cycle = -1;
+    private int threshold_75_cycle = -1;
+    private int threshold_100_cycle = -1;
 
     // average errorRate
     private double errorRate = 0.0;
@@ -243,17 +297,17 @@ public class ErrorMetricsCollector extends AbstractBinaryFileCollector {
       allErrorRates.put(iem.getTileNumber(), iem.getErrorRate());
       int cycle = iem.getCycleNumber();
 
-      if (cycle <= seuil_35_cycle) {
+      if (cycle <= threshold_35_cycle) {
         error35.put(iem.getTileNumber(), iem.getErrorRate());
       }
 
       // seuil = 0 in run SR
-      if (cycle <= seuil_75_cycle) {
+      if (cycle <= threshold_75_cycle) {
         error75.put(iem.getTileNumber(), iem.getErrorRate());
       }
 
       // seuil = 0 in run SR
-      if (cycle <= seuil_100_cycle) {
+      if (cycle <= threshold_100_cycle) {
         error100.put(iem.getTileNumber(), iem.getErrorRate());
       }
     }
@@ -359,78 +413,10 @@ public class ErrorMetricsCollector extends AbstractBinaryFileCollector {
       data.put(key + ".err.rate.phix.sd", errorRateSD);
 
       // TODO to define
-      data.put(key + ".called.cycles.max", 0);
-      data.put(key + ".called.cycles.min", 0);
+      data.put(key + ".called.cycles.max", calledCyclesMax);
+      data.put(key + ".called.cycles.min", calledCyclesMin);
 
       return data;
-    }
-
-    /**
-     * Get the rate error for a lane, all cycles used.
-     * @return rate error for a lane.
-     */
-    public double getErrorRate() {
-      return this.errorRate;
-    }
-
-    /**
-     * Get the rate error for a lane, cycles used from 1 to 35.
-     * @return rate error for a lane.
-     */
-    public double getErrorRateCycle35() {
-      return this.errorRateCycle35;
-    }
-
-    /**
-     * Get the rate error for a lane, cycles used from 1 to 75.
-     * @return rate error for a lane.
-     */
-    public double getErrorRateCycle75() {
-      return this.errorRateCycle75;
-    }
-
-    /**
-     * Get the rate error for a lane, cycles used from 1 to 100.
-     * @return rate error for a lane.
-     */
-    public double getErrorRateCycle100() {
-      return this.errorRateCycle100;
-    }
-
-    /**
-     * Get the standard deviation for the rate error for a lane, all cycles
-     * used.
-     * @return rate error for a lane.
-     */
-    public double getErrorRateSD() {
-      return errorRateSD;
-    }
-
-    /**
-     * Get the standard deviation for the rate error for a lane, cycles used
-     * from 1 to 35.
-     * @return rate error for a lane.
-     */
-    public double getErrorRateCycle35SD() {
-      return errorRateCycle35SD;
-    }
-
-    /**
-     * Get the standard deviation for the rate error for a lane, cycles used
-     * from 1 to 75.
-     * @return rate error for a lane.
-     */
-    public double getErrorRateCycle75SD() {
-      return errorRateCycle75SD;
-    }
-
-    /**
-     * Get the standard deviation for the rate error for a lane, cycles used
-     * from 1 to 100.
-     * @return rate error for a lane.
-     */
-    public double getErrorRateCycle100SD() {
-      return errorRateCycle100SD;
     }
 
     @Override
@@ -454,34 +440,57 @@ public class ErrorMetricsCollector extends AbstractBinaryFileCollector {
      * @param lane lane number
      * @param read read number
      * @param readsCount number read for the run
+     * @param asEmpty if true, all values are default values (0.0),
+     *          corresponding to a control lane or without skipping Phix
      */
-    ErrorRatesPerLane(final int lane, final int read, final int readsCount) {
+    ErrorRatesPerLane(final int lane, final int read, final int readsCount,
+        final boolean asEmpty, final int read1CycleCount,
+        final int read2LastCycleNumber, final int read3CycleCount) {
       this.laneNumber = lane;
       this.readNumber = read;
 
-      if (readsCount == 3) {
-        // Case PE
-        if (read == 3) {
-          // case PE - read2
-          // Set first cycle for read 3
-          int startCycleNumberR3 = read2LastCycleNumber + 1;
+      if (!asEmpty) {
+        int firstCycleNumber = -1;
+        int readCycleCount = -1;
 
-          seuil_35_cycle = startCycleNumberR3 + 35;
-          seuil_75_cycle = startCycleNumberR3 + 75;
-          seuil_100_cycle = startCycleNumberR3 + 100;
+        switch (readNumber) {
+        case 1:
+          firstCycleNumber = 0;
+          readCycleCount = read1CycleCount;
+          calledCyclesMin = firstCycleNumber + readCycleCount - 1;
+          calledCyclesMax = firstCycleNumber + readCycleCount - 1;
+          break;
 
-        } else {
-          // Case SR and PE - read1
-          seuil_35_cycle = 35;
-          seuil_75_cycle = 75;
-          seuil_100_cycle = 100;
+        case 3:
+          firstCycleNumber = read2LastCycleNumber + 1;
+          readCycleCount = read3CycleCount;
+          calledCyclesMin = firstCycleNumber + readCycleCount - 1;
+          calledCyclesMax = firstCycleNumber + readCycleCount - 1;
+          break;
         }
-      } else {
-        // case SR - 50
-        seuil_35_cycle = 35;
-        seuil_75_cycle = -1;
-        seuil_100_cycle = -1;
+
+        // check threshold computed > at the cycle count
+        // no error rate for read2 (index), cycle absent from
+        // ErrorMetricsOut.bin
+        if (35 <= readCycleCount && readNumber != 2)
+          threshold_35_cycle = firstCycleNumber + 35;
+
+        if (75 <= readCycleCount && readNumber != 2)
+          threshold_75_cycle = firstCycleNumber + 75;
+
+        if (100 <= readCycleCount && readNumber != 2)
+          threshold_100_cycle = firstCycleNumber + 100;
+
       }
+
+    }
+
+    ErrorRatesPerLane(final int lane, final int read, final int readsCount,
+        final int read1CycleCount, final int read2LastCycleNumber,
+        final int read3CycleCount) {
+      this(lane, read, readsCount, false, read1CycleCount,
+          read2LastCycleNumber, read3CycleCount);
     }
   }
+
 }

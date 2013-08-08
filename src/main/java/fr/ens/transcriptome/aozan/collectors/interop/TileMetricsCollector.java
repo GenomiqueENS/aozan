@@ -23,16 +23,21 @@
 
 package fr.ens.transcriptome.aozan.collectors.interop;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
+import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.util.StatisticsUtils;
 
 /**
@@ -41,41 +46,62 @@ import fr.ens.transcriptome.aozan.util.StatisticsUtils;
  * @author Sandrine Perrin
  * @since 1.1
  */
-public class TileMetricsCollector extends AbstractBinaryFileCollector {
+public class TileMetricsCollector implements Collector {
 
   /** The sub-collector name from ReadCollector. */
   public static final String NAME_COLLECTOR = "TileMetricsCollector";
-  private Map<Integer, TileMetricsPerLane> tileMetrics = Maps.newHashMap();
 
-  @Override
+  private static double densityRatio = 0.0;
+
+  private final Map<Integer, TileMetricsPerLane> tileMetrics = Maps
+      .newHashMap();
+  private String dirInterOpPath;
+
   public String getName() {
     return NAME_COLLECTOR;
+  }
+
+  /**
+   * Get the name of the collectors required to run this collector.
+   * @return a list of String with the name of the required collectors
+   */
+  public List<String> getCollectorsNamesRequiered() {
+    return Collections.unmodifiableList(Lists
+        .newArrayList(RunInfoCollector.COLLECTOR_NAME));
+  }
+
+  /**
+   * Configure the collector with the path of the run data
+   * @param properties object with the collector configuration
+   */
+  public void configure(Properties properties) {
+    String RTAOutputDirPath = properties.getProperty(QC.RTA_OUTPUT_DIR);
+    this.dirInterOpPath = RTAOutputDirPath + "/InterOp/";
+
+    densityRatio =
+        Double.parseDouble(properties.getProperty("cluster.density.ratio"));
   }
 
   /**
    * Collect data from TileMetric interOpFile.
    * @param data result data object
    */
-  @Override
   public void collect(final RunData data) throws AozanException {
-    super.collect(data);
-
-    int lane;
 
     TileMetricsReader reader = new TileMetricsReader(dirInterOpPath);
-    initMetricsMap();
+    initMetricsMap(data);
 
     // Distribution of metrics between lane and code
     for (IlluminaTileMetrics itm : reader.getSetIlluminaMetrics()) {
-      lane = itm.getLaneNumber();
-      tileMetrics.get(lane).addMetric(itm);
+
+      tileMetrics.get(itm.getLaneNumber()).addMetric(itm);
     }
 
     // Build runData
-    for (Map.Entry<Integer, TileMetricsPerLane> entry : tileMetrics.entrySet()) {
+    for (TileMetricsPerLane value : tileMetrics.values()) {
 
-      entry.getValue().computeData();
-      data.put(entry.getValue().getRunData());
+      value.computeData();
+      data.put(value.getRunData());
     }
   }
 
@@ -83,7 +109,15 @@ public class TileMetricsCollector extends AbstractBinaryFileCollector {
    * Initialize TileMetrics map.
    * @return map
    */
-  private void initMetricsMap() {
+  private void initMetricsMap(final RunData data) {
+
+    int tilesCount =
+        data.getInt("run.info.flow.cell.tile.count")
+            * data.getInt("run.info.flow.cell.surface.count")
+            * data.getInt("run.info.flow.cell.swath.count");
+
+    int lanesCount = data.getInt("run.info.flow.cell.lane.count");
+    int readsCount = data.getInt("run.info.read.count");
 
     for (int lane = 1; lane <= lanesCount; lane++)
       tileMetrics.put(lane,
@@ -91,8 +125,14 @@ public class TileMetricsCollector extends AbstractBinaryFileCollector {
 
   }
 
+  /**
+   * Remove temporary files
+   */
+  public void clear() {
+  }
+
   //
-  // Internal class
+  // Inner class
   //
 
   /**
@@ -101,7 +141,19 @@ public class TileMetricsCollector extends AbstractBinaryFileCollector {
    * @author Sandrine Perrin
    * @since 1.1
    */
-  final class TileMetricsPerLane {
+  private static final class TileMetricsPerLane {
+
+    /** Set code used for TileMetrics */
+    private static final int CLUSTER_DENSITY_CODE = 100;
+    private static final int CLUSTER_DENSITY_PF_CODE = 101;
+    private static final int NUMBER_CLUSTER_CODE = 102;
+    private static final int NUMBER_CLUSTER_PF_CODE = 103;
+    private static final int CONTROL_LANE = 400;
+
+    // code set for read1 and used to compute code for other reads
+    private static final int PHASING_CODE = 200;
+    private static final int PREPHASING_CODE = 201;
+    private static final int PCR_ALIGNED_PHIX_CODE = 300;
 
     private int laneNumber;
     private int countTiles;
@@ -173,27 +225,27 @@ public class TileMetricsCollector extends AbstractBinaryFileCollector {
         sd = stat.getStandardDeviation();
 
         switch (entry.getKey()) {
-        case 100:
+        case CLUSTER_DENSITY_CODE:
           this.clusterDensity = mean.doubleValue();
           this.clusterDensitySD = sd.doubleValue();
           break;
 
-        case 101:
+        case CLUSTER_DENSITY_PF_CODE:
           this.clusterDensityPF = mean.doubleValue();
           this.clusterDensityPFSD = sd.doubleValue();
           break;
 
-        case 102:
+        case NUMBER_CLUSTER_CODE:
           this.numberCluster = mean.longValue();
           this.numberClusterSD = sd.doubleValue();
           break;
 
-        case 103:
+        case NUMBER_CLUSTER_PF_CODE:
           this.numberClusterPF = mean.longValue();
           this.numberClusterPFSD = sd.doubleValue();
           break;
 
-        case 400:
+        case CONTROL_LANE:
           // value unique to a run, read first value in list
           this.controlLane = mean.doubleValue();
           break;
@@ -242,8 +294,8 @@ public class TileMetricsCollector extends AbstractBinaryFileCollector {
         }
       }
 
-      this.prcPFClusters = stat.getMean();
-      this.prcPFClustersSD = stat.getStandardDeviation();
+      this.prcPFClusters = stat.getMean() * 100;
+      this.prcPFClustersSD = stat.getStandardDeviation() * 100;
 
     }
 
@@ -258,15 +310,15 @@ public class TileMetricsCollector extends AbstractBinaryFileCollector {
       int numeroRead = -1;
 
       // code >= 300
-      if (code >= 300)
-        numeroRead = code - 300 + 1;
+      if (code >= PCR_ALIGNED_PHIX_CODE)
+        numeroRead = code - PCR_ALIGNED_PHIX_CODE + 1;
       else {
         // code pair and < 300
         if (code % 2 == 0)
-          numeroRead = (code - 200) / 2 + 1;
+          numeroRead = (code - PHASING_CODE) / 2 + 1;
         else
           // code impair and < 300
-          numeroRead = (code - 201) / 2 + 1;
+          numeroRead = (code - PREPHASING_CODE) / 2 + 1;
       }
 
       // update ReadMetrics for the read number if it exists
@@ -293,14 +345,14 @@ public class TileMetricsCollector extends AbstractBinaryFileCollector {
         String key = "read" + rm.getNumberRead() + ".lane" + laneNumber;
 
         // Same values for all read in a lane, values for one tile
-        data.put(key + ".clusters.pf", getNumberClusterPF());
-        data.put(key + ".clusters.pf.sd", getNumberClusterPFSD());
+        data.put(key + ".clusters.pf", numberClusterPF);
+        data.put(key + ".clusters.pf.sd", numberClusterPFSD);
 
-        data.put(key + ".clusters.raw", getNumberCluster());
-        data.put(key + ".clusters.raw.sd", getNumberClusterSD());
+        data.put(key + ".clusters.raw", numberCluster);
+        data.put(key + ".clusters.raw.sd", numberClusterSD);
 
-        data.put(key + ".prc.pf.clusters", getPrcPFClusters());
-        data.put(key + ".prc.pf.clusters.sd", getPrcPFClustersSD());
+        data.put(key + ".prc.pf.clusters", prcPFClusters);
+        data.put(key + ".prc.pf.clusters.sd", prcPFClustersSD);
 
         data.put(key + ".tile.count", countTiles);
 
@@ -311,69 +363,15 @@ public class TileMetricsCollector extends AbstractBinaryFileCollector {
         data.put(key + ".phasing", rm.getPhasing());
         data.put(key + ".prephasing", rm.getPrephasing());
 
+        data.put("read" + rm.getNumberRead() + ".density.ratio", densityRatio);
+        String s =
+            data.getBoolean("run.info.read" + rm.getNumberRead() + ".indexed")
+                ? "(Index)" : "";
+        data.put("read" + rm.getNumberRead() + ".type", s);
+
       }
 
       return data;
-    }
-
-    /** Get the mean of percent cluster PF */
-    public double getPrcPFClusters() {
-      return prcPFClusters * 100;
-    }
-
-    /** Get the standard deviation of percent cluster PF */
-    public double getPrcPFClustersSD() {
-      return prcPFClustersSD * 100;
-    }
-
-    /** Get the mean of cluster density */
-    public double getClusterDensity() {
-      return clusterDensity;
-    }
-
-    /** Get the standard deviation of cluster density */
-    public double getClusterDensitySD() {
-      return clusterDensitySD;
-    }
-
-    /** Get the mean of cluster density PF */
-    public double getClusterDensityPF() {
-      return clusterDensityPF;
-    }
-
-    /** Get the standard deviation of cluster density PF */
-    public double getClusterDensityPFSD() {
-      return clusterDensityPFSD;
-    }
-
-    /** Get the mean of number cluster */
-    public long getNumberCluster() {
-      return numberCluster;
-    }
-
-    /** Get the mean of number cluster PF */
-    public long getNumberClusterPF() {
-      return numberClusterPF;
-    }
-
-    /** Get the standard deviation of number cluster */
-    public double getNumberClusterSD() {
-      return numberClusterSD;
-    }
-
-    /** Get the standard deviation of number cluster PF */
-    public double getNumberClusterPFSD() {
-      return numberClusterPFSD;
-    }
-
-    /** Get the number lane from control */
-    public int getControlLane() {
-      return controlLane.intValue();
-    }
-
-    /** Get the set of read metrics */
-    public List<ReadTileMetrics> getListReads() {
-      return listReads;
     }
 
     @Override
@@ -405,7 +403,7 @@ public class TileMetricsCollector extends AbstractBinaryFileCollector {
     }
 
     //
-    // Internal class
+    // Inner class
     //
 
     /**
@@ -413,7 +411,7 @@ public class TileMetricsCollector extends AbstractBinaryFileCollector {
      * @author Sandrine Perrin
      * @since 1.1
      */
-    class ReadTileMetrics {
+    private static final class ReadTileMetrics {
 
       private int readNumber; // N
       private double phasing = 0.0; // code in binary file 200+(N-1)*2
@@ -436,13 +434,14 @@ public class TileMetricsCollector extends AbstractBinaryFileCollector {
        */
       public void addValue(final int code, final StatisticsUtils stat) {
 
-        if (code >= 300) {
+        if (code >= PCR_ALIGNED_PHIX_CODE && code < 400) {
           this.percentAlignedPhix = new Double(stat.getMean()).doubleValue();
           this.percentAlignedPhixSD =
               new Double(stat.getStandardDeviation()).doubleValue();
 
         } else if (code % 2 == 0) {
           // Compute the mediane with using value = 0.0
+
           this.phasing =
               new Double(stat.getMedianWithoutZero()).doubleValue() * 100;
 

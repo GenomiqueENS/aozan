@@ -32,14 +32,19 @@ import org.apache.commons.math3.stat.descriptive.rank.Median;
 import com.google.common.collect.Lists;
 
 /**
+ * This class contains statistics methods, using the class DescriptiveStatistics
+ * from commons.apache.math
  * @author Sandrine Perrin
  * @since 1.1
  */
+/**
+ * @author sperrin
+ */
 public class StatisticsUtils {
 
+  /** object maintains a dataset of values of a single variable */
   private DescriptiveStatistics ds;
-  private double mean = 0.0;
-
+  /** copy dataset without values == 0 */
   private DescriptiveStatistics dsWithZero = null;
 
   /**
@@ -48,61 +53,105 @@ public class StatisticsUtils {
    *         set.
    */
   public double getMean() {
-    if (this.mean > 0.0)
-      return this.mean;
 
     return ds.getMean();
   }
 
-  // value 0.0 not remove
+  /**
+   * Compute the mean for values which are different of 0
+   * @return mean or NaN if no values have been added, or 0.0 for a single value
+   *         set.
+   */
   public double getMeanWithoutZero() {
 
-    if (dsWithZero == null) {
+    buildDescriptiveStatisticsWithZero();
 
-      dsWithZero = new DescriptiveStatistics();
-
-      for (Double d : ds.getValues()) {
-        if (d != 0.0)
-          dsWithZero.addValue(d);
-      }
+    // Build dataset of values from dataset initial
+    for (Double d : ds.getValues()) {
+      if (d != 0.0)
+        dsWithZero.addValue(d);
     }
+
     return dsWithZero.getMean();
   }
 
+  /**
+   * Compute the median for values which are different of 0
+   * @return median or NaN if no values have been added, or 0.0 for a single
+   *         value set.
+   */
   public double getMedianWithoutZero() {
 
-    if (dsWithZero == null) {
-      dsWithZero = new DescriptiveStatistics();
+    buildDescriptiveStatisticsWithZero();
 
-      for (Double d : ds.getValues()) {
-        if (d != 0.0)
-          dsWithZero.addValue(d);
-      }
-    }
-    return new Median().evaluate(dsWithZero.getValues());
+    return (dsWithZero.getN() == 0 ? 0.0 : new Median().evaluate(dsWithZero
+        .getValues()));
 
   }
 
-  public double getStandardDeviation() {
-    return getStandardDeviation(false);
-  }
-
+  /**
+   * Compute the median for values
+   * @return median or NaN if no values have been added, or 0.0 for a single
+   *         value set.
+   */
   public double getMediane() {
     return new Median().evaluate(ds.getValues());
   }
 
+  /**
+   * Compute the standard deviation for values
+   * @return standard deviation or NaN if no values have been added, or 0.0 for
+   *         a single value set.
+   */
+  public double getStandardDeviation() {
+    return getStandardDeviation(false);
+  }
+
+  /**
+   * Returns the instance of DescriptiveStatistics
+   * @return instance of DescriptiveStatistics
+   */
   public DescriptiveStatistics getDescriptiveStatistics() {
     return this.ds;
   }
 
-  public DescriptiveStatistics getDSWithZero() {
+  /**
+   * Returns the instance of DescriptiveStatistics which doesn't contain the
+   * value zero
+   * @return instance of DescriptiveStatistics
+   */
+  public DescriptiveStatistics getDescriptiveStatisticsWithZero() {
+    buildDescriptiveStatisticsWithZero();
+
     return this.dsWithZero;
   }
 
+  /**
+   * Print dataset
+   * @return string of dataset
+   */
+  public String printValuesWithZero() {
+    buildDescriptiveStatisticsWithZero();
+
+    return printValues(dsWithZero);
+  }
+
+  /**
+   * Print dataset
+   * @return string of dataset
+   */
   public String printValues() {
+    return printValues(ds);
+  }
+
+  /**
+   * Print dataset
+   * @return string of dataset
+   */
+  private String printValues(final DescriptiveStatistics stat) {
     StringBuilder s = new StringBuilder();
 
-    for (double d : ds.getValues()) {
+    for (double d : stat.getValues()) {
       s.append(d);
       s.append("\n");
     }
@@ -149,7 +198,7 @@ public class StatisticsUtils {
   }
 
   /**
-   * Add values
+   * Add values in dataset
    * @param number
    */
   public void addValues(Number number) {
@@ -160,12 +209,27 @@ public class StatisticsUtils {
         this.ds.addValue(val);
   }
 
+  /**
+   * Builds dataset without value zero of each call, if the dataset source has
+   * been modified
+   */
+  private void buildDescriptiveStatisticsWithZero() {
+
+    this.dsWithZero = new DescriptiveStatistics();
+
+    for (Double d : ds.getValues()) {
+      if (d != 0.0)
+        dsWithZero.addValue(d);
+    }
+  }
+
   //
   // Constructor
   //
 
   /**
    * Public constructor, build a list of values used for compute statistics.
+   * Infinity values are ignored.
    * @param list values
    */
   public StatisticsUtils(final List<? extends Number> list) {
@@ -182,11 +246,20 @@ public class StatisticsUtils {
     }
   }
 
+  /**
+   * Public constructor, build a list of values used for compute statistics.
+   * Infinity values are ignored.
+   * @param list values
+   */
   public StatisticsUtils(final Collection<? extends Number> list) {
     this(Lists.newArrayList(list));
 
   }
 
+  /**
+   * Public constructor with a empty dataset.
+   * @param list values
+   */
   public StatisticsUtils() {
     this.ds = new DescriptiveStatistics();
   }

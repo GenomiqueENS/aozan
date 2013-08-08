@@ -31,7 +31,7 @@ public class TestCollectorReadBinary {
   static BufferedWriter bw = null;
 
   public static void main(String[] argv) {
-    String v = "remove";
+    String v = "78";
     file = new File(DIR_RESULT, "comparaison_all_run_" + v + ".data");
 
     // Copy console output in a file
@@ -157,6 +157,10 @@ public class TestCollectorReadBinary {
     props.put(QC.CASAVA_OUTPUT_DIR,
         "/home/sperrin/shares-net/sequencages/fastq/" + runId);
 
+    // Collector configuration
+    props.put("readXMLCollector.used", "false");
+    props.put("cluster.density.ratio", "0.3472222");
+
     runInfoColl.configure(props);
     phasingColl.configure(props);
 
@@ -219,8 +223,6 @@ public class TestCollectorReadBinary {
     keys.add(new Critere("read"
         + read + ".lane" + lane + ".first.cycle.int.pf.sd", Double.class,
         Epsilon.UNITE, "int"));
-    keys.add(new Critere("read" + read + ".lane" + lane + ".phasing",
-        Double.class, Epsilon.DOUBLE_3, "tile"));
     keys.add(new Critere("read" + read + ".lane" + lane + ".prc.align",
         Double.class, Epsilon.DOUBLE_2, "tile"));
     keys.add(new Critere("read" + read + ".lane" + lane + ".prc.align.sd",
@@ -236,10 +238,13 @@ public class TestCollectorReadBinary {
     keys.add(new Critere(
         "read" + read + ".lane" + lane + ".prc.pf.clusters.sd", Double.class,
         Epsilon.DOUBLE_1, "tile"));
-    keys.add(new Critere("read" + read + ".lane" + lane + ".prephasing",
-        Double.class, Epsilon.DOUBLE_3, "tile"));
     keys.add(new Critere("read" + read + ".lane" + lane + ".tile.count",
         Integer.class, Epsilon.CENTAINE, "tile"));
+
+    // keys.add(new Critere("read" + read + ".lane" + lane + ".phasing",
+    // Double.class, Epsilon.DOUBLE_3, "tile"));
+    // keys.add(new Critere("read" + read + ".lane" + lane + ".prephasing",
+    // Double.class, Epsilon.DOUBLE_3, "tile"));
 
     // use Phasing Collector
     keys.add(new Critere("phasing.read" + read + ".lane" + lane + ".phasing",
@@ -303,7 +308,8 @@ public class TestCollectorReadBinary {
         boolean res = diff <= eps.getValue();
         s =
             String.format("%s \t %.4f \t %.2f \t %.4f \t %.4f", res, diff,
-                ((diff / val_ori) * 100), val_ori, val_test);
+                (val_ori == 0.0 ? 0.0 : ((diff / val_ori) * 100)), val_ori,
+                val_test);
 
       } else if (this.clazz == String.class) {
 
@@ -323,8 +329,10 @@ public class TestCollectorReadBinary {
       // } catch (NullPointerException e) {
       // System.out.println(runId + "\tkey pbl " + key);
       // }
+
       return s
-          + "\t " + runId + "\t" + key + "\t" + fileInterOpSource.toUpperCase();
+          + "\t " + runId + "\t" + keySource + "\t"
+          + fileInterOpSource.toUpperCase();
     }
   }
 

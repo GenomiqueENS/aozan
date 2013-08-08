@@ -145,7 +145,7 @@ public abstract class AbstractBinaryFileReader<M> {
   private void checkVersionFile(final ByteBuffer header) throws AozanException {
 
     // Get the version, should be EXPECTED_VERSION
-    final int actualVersion = IlluminaMetrics.uByteToInt(header.get());
+    final int actualVersion = uByteToInt(header.get());
     if (actualVersion != getExpectedVersion()) {
       throw new AozanException(getName()
           + " expects the version number to be " + getExpectedVersion()
@@ -153,7 +153,7 @@ public abstract class AbstractBinaryFileReader<M> {
     }
 
     // Check the size record needed
-    final int actualRecordSize = IlluminaMetrics.uByteToInt(header.get());
+    final int actualRecordSize = uByteToInt(header.get());
     if (getExpectedRecordSize() != actualRecordSize) {
       throw new AozanException(getName()
           + " expects the record size to be " + getExpectedRecordSize()
@@ -182,37 +182,24 @@ public abstract class AbstractBinaryFileReader<M> {
           + dirInterOpPath);
   }
 
-  //
-  // Internal class
-  //
+  /** Convert an unsigned byte to a signed int */
+  public static final int uByteToInt(final byte unsignedByte) {
+    return unsignedByte & 0xFF;
+  }
 
-  /**
-   * This internal class define an object of illumina metrics with data always
-   * present in records from binary file in InterOp directory.
-   * @author Sandrine Perrin
-   * @since 1.1
-   */
-  static class IlluminaMetrics {
+  /** Convert an unsigned byte to a signed short */
+  public static final int uByteToShort(final byte unsignedByte) {
+    return (short) unsignedByte & 0xFF;
+  }
 
-    /** Convert an unsigned byte to a signed int */
-    public static int uByteToInt(final byte unsignedByte) {
-      return unsignedByte & 0xFF;
-    }
+  /** Convert an unsigned short to an int */
+  public static final int uShortToInt(final short unsignedShort) {
+    return unsignedShort & 0xFFFF;
+  }
 
-    /** Convert an unsigned byte to a signed short */
-    public static int uByteToShort(final byte unsignedByte) {
-      return (short) unsignedByte & 0xFF;
-    }
-
-    /** Convert an unsigned short to an int */
-    public static int uShortToInt(final short unsignedShort) {
-      return unsignedShort & 0xFFFF;
-    }
-
-    /** Convert an unsigned int to a long */
-    public static long uIntToLong(final int unsignedInt) {
-      return unsignedInt & 0xFFFFFFFFL;
-    }
+  /** Convert an unsigned int to a long */
+  public static final long uIntToLong(final int unsignedInt) {
+    return unsignedInt & 0xFFFFFFFFL;
   }
 
 }
