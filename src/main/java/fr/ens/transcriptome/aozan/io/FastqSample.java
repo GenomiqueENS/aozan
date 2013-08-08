@@ -327,12 +327,8 @@ public class FastqSample {
 
     this.nameTemporaryFastqFiles = createNameTemporaryFastqFile();
 
-    long uncompressSizeFiles =
-        this.getUncompressedSize() / (1024 * 1024 * 1024);
-
     LOGGER.fine("Add a sample "
         + this.getKeyFastqSample() + " " + this.getFastqFiles().size()
-        + " file(s), type compression " + this.compressionType
-        + " (size estimated " + uncompressSizeFiles + " Go)");
+        + " fastq file(s), type compression " + this.compressionType);
   }
 }
