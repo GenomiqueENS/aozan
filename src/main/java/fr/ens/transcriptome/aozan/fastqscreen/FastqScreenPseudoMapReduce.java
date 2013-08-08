@@ -27,10 +27,8 @@ package fr.ens.transcriptome.aozan.fastqscreen;
 import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -46,13 +44,11 @@ import fr.ens.transcriptome.eoulsan.Settings;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.BowtieReadsMapper;
-import fr.ens.transcriptome.eoulsan.bio.readsmappers.MapperProcess;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.SequenceReadsMapper;
 import fr.ens.transcriptome.eoulsan.data.DataFile;
 import fr.ens.transcriptome.eoulsan.data.storages.GenomeDescStorage;
 import fr.ens.transcriptome.eoulsan.data.storages.SimpleGenomeDescStorage;
 import fr.ens.transcriptome.eoulsan.steps.generators.GenomeMapperIndexer;
-import fr.ens.transcriptome.eoulsan.util.FileUtils;
 import fr.ens.transcriptome.eoulsan.util.PseudoMapReduce;
 import fr.ens.transcriptome.eoulsan.util.Reporter;
 import fr.ens.transcriptome.eoulsan.util.StringUtils;
@@ -128,8 +124,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     if (numberThreads > 0)
       mapperThreads = numberThreads;
 
-    MapperProcess mapperProcess = null;
-
     for (String genome : listGenomes) {
       // Timer : for step mapping on genome
       final Stopwatch timer = new Stopwatch().start();
@@ -140,11 +134,14 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         // get index Genome reference exists
         File archiveIndexFile = createIndex(bowtie, genomeFile, tmpDir);
 
-        if (archiveIndexFile == null)
+        if (archiveIndexFile == null) {
+          LOGGER.warning("FASTQSCREEN : archive index file not found for "
+              + genome);
           continue;
+        }
 
-        FastsqScreenSAMParser parser =
-            new FastsqScreenSAMParser(this.getMapOutputTempFile(), genome,
+        FastqScreenSAMParser parser =
+            new FastqScreenSAMParser(this.getMapOutputTempFile(), genome,
                 pairedMode);
 
         this.setGenomeReference(genome, genomeSample);
@@ -164,36 +161,26 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         bowtie.setMapperArguments(newArgumentsMapper);
         bowtie.setThreadsNumber(mapperThreads);
 
-        if (fastqRead2 == null) {
+        if (pairedMode) {
+          // mode pair-end
+          // bowtie.map(fastqRead1, fastqRead2, parser);
+          throw new UnsupportedOperationException(
+              "Fastqscreen : mapping in PE impossible.");
+
+        } else {
           // mode single-end
           // bowtie.map(fastqRead1, parser);
+
           if (desc == null)
             throw new AozanException(
                 "Fastqscreen : genome description is null for bowtie");
-          mapperProcess = bowtie.mapSE(desc);
 
-          parser.parseLine(mapperProcess.getStout());
+          InputStream outputSAM = bowtie.mapSE(fastqRead1, desc);
+          parser.parseLine(outputSAM);
 
-          FileUtils.copy(new FileInputStream(fastqRead1),
-              mapperProcess.getStdin());
-
-          try {
-            mapperProcess.waitFor();
-
-          } catch (InterruptedException e) {
-            throw new AozanException(e.getMessage());
-          }
-
-        } else {
-          // mode pair-end
-          // bowtie.map(fastqRead1, fastqRead2, parser);
-          throw new UnsupportedOperationException("Fastqscreen : mapping in PE impossible.");
-          
+          parser.closeMapOutputFile();
+          this.readsprocessed = parser.getReadsprocessed();
         }
-
-        parser.closeMapOutputFile();
-
-        this.readsprocessed = parser.getReadsprocessed();
 
         LOGGER.fine("FASTQSCREEN : mapping on genome "
             + genome + " in mode " + (pairedMode ? "paired" : "single")
@@ -201,6 +188,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
             + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
         timer.stop();
+
       } catch (IOException e) {
         throw new AozanException(e.getMessage());
       }
@@ -256,14 +244,15 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   private GenomeDescription createGenomeDescription(final DataFile genomeFile)
       throws BadBioEntryException, IOException {
 
+    if (!genomeFile.exists())
+      LOGGER.warning("Fastqscreen "
+          + genomeFile.getBasename()
+          + " not exists, Index mapper can't be created.");
     GenomeDescription desc = null;
 
     if (storage != null) {
       desc = storage.get(genomeFile);
     }
-
-    if (!genomeFile.exists())
-      return null;
 
     if (desc == null) {
       // Compute the genome description
@@ -358,9 +347,12 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    */
   public FastqScreenResult getFastqScreenResult() throws AozanException {
 
-    if (readsmapped > readsprocessed)
+    if (readsmapped > readsprocessed) {
+      LOGGER.warning("FASTQSCREEN : nb read mapped "
+          + readsmapped + " must been superior to nb read processed "
+          + readsprocessed);
       return null;
-
+    }
     LOGGER.fine("FASTQSCREEN : result of mappings : nb read mapped "
         + readsmapped + " / nb read " + readsprocessed);
 
@@ -378,50 +370,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    */
   public FastqScreenPseudoMapReduce() {
 
-    // TODO to remove
-    this.bowtie = new BowtieReadsMapper() {
-
-      protected MapperProcess internalMapSE(final File archiveIndexDir,
-          final GenomeDescription genomeDescription) throws IOException {
-
-        final String bowtiePath;
-
-        synchronized (SYNC) {
-          bowtiePath = install(getMapperExecutables());
-        }
-
-        // Get index argument
-        final String index = getIndexArgument(archiveIndexDir);
-
-        return new MapperProcess(this, false, true, false) {
-
-          @Override
-          protected List<List<String>> createCommandLines() {
-
-            // Build the command line
-            final List<String> cmd = new ArrayList<String>();
-
-            // Add common arguments
-            cmd.addAll(createCommonArgs(bowtiePath, index, false, false));
-
-            // Input from stdin
-            cmd.add("-");
-
-            // TODO to remove
-            System.out.println("cmd " + cmd.toString().replace(',', ' '));
-            return Collections.singletonList(cmd);
-          }
-
-          @Override
-          protected File executionDirectory() {
-
-            return archiveIndexDir;
-          }
-
-        };
-
-      }
-    };
+    this.bowtie = new BowtieReadsMapper();
 
     this.reporter = new Reporter();
 
