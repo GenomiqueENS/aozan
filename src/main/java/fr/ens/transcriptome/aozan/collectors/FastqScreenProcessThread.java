@@ -100,8 +100,10 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     String headerReport =
         "FastqScreen : for Projet "
-            + fastqSample.getProjectName() + "\nresult for sample : "
-            + fastqSample.getSampleName();
+            + fastqSample.getProjectName()
+            + (this.genomeSample == null
+                ? "" : " (genome reference for sample " + this.genomeSample)
+            + ").\nresult for sample : " + fastqSample.getSampleName();
 
     // TODO to remove after test
     System.out.println("\n"

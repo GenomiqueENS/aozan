@@ -214,17 +214,23 @@ abstract public class AbstractFastqCollector implements Collector {
                 throw new AozanException("Cannot create report directory: "
                     + reportDir.getAbsolutePath());
 
-            // This not really a thread as it will be never started
             AbstractFastqProcessThread pseudoThread =
                 collectSample(data, fs, reportDir, runPE);
 
             if (pseudoThread == null)
               continue;
 
+            // This not really a thread as it will be never started
             pseudoThread.run();
 
-            resultPart = pseudoThread.getResults();
-            saveResultPart(fs, resultPart);
+            // Throw exception from fastqscreen collector thread if not success
+            if (!pseudoThread.success)
+              throw new AozanException(pseudoThread.getException());
+            else {
+              // Save result
+              resultPart = pseudoThread.getResults();
+              saveResultPart(fs, resultPart);
+            }
           }
           data.put(resultPart);
         }

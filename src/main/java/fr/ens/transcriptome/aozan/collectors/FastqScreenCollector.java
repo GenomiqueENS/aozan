@@ -75,7 +75,6 @@ public class FastqScreenCollector extends AbstractFastqCollector {
   public List<String> getCollectorsNamesRequiered() {
 
     List<String> result = super.getCollectorsNamesRequiered();
-    result.add(FastQCCollector.COLLECTOR_NAME);
     result.add(TemporaryPartialFastqCollector.COLLECTOR_NAME);
 
     return Collections.unmodifiableList(result);
@@ -156,7 +155,6 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     if (skipControlLane && controlLane)
       return null;
 
-    System.out.println("FASTQSCREEN COLLECTOR paired mode " + ignorePairedMode);
     final boolean pairedMode = runPE && !ignorePairedMode;
 
     if (pairedMode) {
@@ -176,8 +174,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
     // Call in mode single-end
     return new FastqScreenProcessThread(fastqSample, fastqscreen,
-        genomesConfiguration, genomeReferenceSample, reportDir,
-        pairedMode);
+        genomesConfiguration, genomeReferenceSample, reportDir, pairedMode);
   }
 
   //
