@@ -467,6 +467,9 @@ public class ErrorMetricsCollector implements Collector {
           calledCyclesMin = firstCycleNumber + readCycleCount - 1;
           calledCyclesMax = firstCycleNumber + readCycleCount - 1;
           break;
+        default:
+          calledCyclesMax = 0;
+          calledCyclesMin = 0;
         }
 
         // check threshold computed > at the cycle count

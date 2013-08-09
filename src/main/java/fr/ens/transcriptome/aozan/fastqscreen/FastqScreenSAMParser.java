@@ -145,14 +145,15 @@ public class FastqScreenSAMParser implements SAMParserLine {
    * represent the number of hits for a read : 1 or 2 (for several hits) and the
    * end represent the name of reference genome
    * @param is inputStream to parse
+   * @return number lines read
    * @throws IOException
    */
-  public void parseLine(final InputStream is) throws IOException {
+  public long parseLine(final InputStream is) throws IOException {
 
     BufferedReader br =
         new BufferedReader(new InputStreamReader(is, Charsets.ISO_8859_1));
     String line = null;
-    int compt = 0;
+    long compt = 0;
     while ((line = br.readLine()) != null) {
       parseLine(line);
       compt++;
@@ -161,6 +162,7 @@ public class FastqScreenSAMParser implements SAMParserLine {
     br.close();
     is.close();
 
+    return compt;
   }
 
   /**

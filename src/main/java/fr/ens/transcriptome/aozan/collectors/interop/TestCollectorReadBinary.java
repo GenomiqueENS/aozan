@@ -257,7 +257,7 @@ public class TestCollectorReadBinary {
     return keys;
   }
 
-  private class Critere {
+  private static class Critere {
 
     String keySource = null;
     String key;
@@ -323,7 +323,7 @@ public class TestCollectorReadBinary {
         else
           res = val_ori.equals(val_test);
 
-        s = String.format("%s \t     \t %.3f \t %.3f", res, val_ori, val_test);
+        s = String.format("%s \t     \t %sf \t %sf", res, val_ori, val_test);
       }
 
       // } catch (NullPointerException e) {

@@ -60,7 +60,8 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
   private static final String KEY_GENOMES = "qc.conf.fastqscreen.genomes";
   // Key for retrieve the path of alias file
-  private final String KEY_ALIAS_GENOME_PATH = "qc.conf.genome.alias.path";
+  private static final String KEY_ALIAS_GENOME_PATH =
+      "qc.conf.genome.alias.path";
 
   private String genomeReference;
   private boolean isGenomeContamination;

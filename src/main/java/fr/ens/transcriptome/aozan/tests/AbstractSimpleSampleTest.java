@@ -151,7 +151,7 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
           transformValue(value, data, read, readSample, lane, sampleName);
 
       // Do the test ?
-      if (interval == null || sampleName == null)
+      if (interval == null)
         return new TestResult(transformedValue, isValuePercent());
 
       int score =

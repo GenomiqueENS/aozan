@@ -69,7 +69,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
   private Stopwatch timer = new Stopwatch();
 
   private final int rawClusterCount;
-  private final int pfClusterCount;
+  private final int pfClusterCountParsed;
 
   private final File tmpFastqFile;
 
@@ -111,8 +111,8 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
 
       LOGGER.fine("Temporary Partial fastq created in "
           + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)) + " for "
-          + fastqSample.getKeyFastqSample() + "\t pf reads count "
-          + this.pfClusterCount);
+          + fastqSample.getKeyFastqSample() + "\t pf reads count parsed "
+          + this.pfClusterCountParsed);
       timer.stop();
     }
 
@@ -125,15 +125,12 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
   @Override
   protected void processResults() throws AozanException {
 
-    File tmpFastqFile =
-        new File(fastqStorage.getTemporaryFile(fastqSample) + ".tmp");
-
     if (!new File(fastqStorage.getTemporaryFile(fastqSample)).exists()) {
 
       if (COUNT_READS_TO_COPY > this.rawClusterCount) {
         uncompressedFastqFile();
 
-      } else if (COUNT_READS_TO_COPY > this.pfClusterCount) {
+      } else if (COUNT_READS_TO_COPY > this.pfClusterCountParsed) {
         // Use all reads
         partialFastqFile();
       } else {
@@ -141,9 +138,9 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
         filteredFastqFile();
       }
 
-      // Rename file: removing '.tmp' final
-      tmpFastqFile
-          .renameTo(new File(fastqStorage.getTemporaryFile(fastqSample)));
+      // Rename file: remove '.tmp' final
+      this.tmpFastqFile.renameTo(new File(fastqStorage
+          .getTemporaryFile(fastqSample)));
     }
   }
 
@@ -154,47 +151,139 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
    */
   private void filteredFastqFile() throws AozanException {
 
-    final FileWriter fwTmpFastq;
+    FileWriter fwTmpFastq = null;
     try {
       fwTmpFastq = new FileWriter(this.tmpFastqFile);
+
+      final int step =
+          (int) (1 / ((double) COUNT_READS_TO_COPY / pfClusterCountParsed));
+
+      for (File fastqFile : this.fastqSample.getFastqFiles()) {
+        int comptReadsPF = 1;
+        int count_reads_to_copy_by_fastq =
+            COUNT_READS_TO_COPY / this.fastqSample.getFastqFiles().size();
+
+        if (!fastqFile.exists()) {
+          throw new AozanException("Fastq file "
+              + fastqFile.getName() + " doesn't exist");
+        }
+
+        FastqReader fastqReader = null;
+        try {
+          // Get compression value
+          CompressionType zType = this.fastqSample.getCompressionType();
+
+          // Append compressed fastq file to uncompressed file
+          final InputStream is =
+              zType.createInputStream(new FileInputStream(fastqFile));
+
+          fastqReader = new FastqReader(is);
+          IlluminaReadId ill = null;
+
+          for (final ReadSequence seq : fastqReader) {
+
+            if (ill == null)
+              ill = new IlluminaReadId(seq);
+            else
+              ill.parse(seq);
+
+            if (!ill.isFiltered()) {
+              if (comptReadsPF % step == 0) {
+                // Write in tmp fastq file
+                fwTmpFastq.write(seq.toFastQ());
+                fwTmpFastq.flush();
+
+                if (--count_reads_to_copy_by_fastq <= 0)
+                  break;
+
+              }
+              comptReadsPF++;
+            }
+          }
+
+          // Throw an exception if an error has occurred while reading data
+          fastqReader.throwException();
+
+        } catch (IOException e) {
+          throw new AozanException(e.getMessage());
+        } catch (EoulsanException ee) {
+          throw new AozanException(ee.getMessage());
+        } catch (BadBioEntryException bbe) {
+          throw new AozanException(bbe.getMessage());
+
+        } finally {
+
+          if (fastqReader != null)
+            try {
+              // Close fastqReader and inputStream on fastq file
+              fastqReader.close();
+            } catch (IOException io) {
+              LOGGER
+                  .warning("Exception occuring during the closing of FastqReader. Step collector "
+                      + TemporaryPartialFastqCollector.COLLECTOR_NAME
+                      + " for the sample " + fastqSample.getKeyFastqSample());
+            }
+        }
+      }
+
+      if (fwTmpFastq != null)
+        fwTmpFastq.close();
+
     } catch (IOException io) {
-      throw new AozanException(
-          "An exception occured during creating à writer file on temporary fastq file");
+      LOGGER.warning("Exception occuring during creating tmp file : "
+          + tmpFastqFile.getAbsolutePath() + ". Step collector "
+          + TemporaryPartialFastqCollector.COLLECTOR_NAME + " for the sample "
+          + fastqSample.getKeyFastqSample());
+
+    } finally {
+      if (fwTmpFastq != null)
+        try {
+          fwTmpFastq.close();
+        } catch (IOException e) {
+        }
+
     }
+  }
 
-    final int step =
-        (int) (1 / ((double) COUNT_READS_TO_COPY / pfClusterCount));
+  /**
+   * Write the temporary partial file from a array of fastq files, writing reads
+   * randomly in files.
+   * @throws AozanException if an error occurs while creating file
+   */
+  private void partialFastqFile() throws AozanException {
 
-    for (File fastqFile : this.fastqSample.getFastqFiles()) {
-      int comptReadsPF = 1;
+    FileWriter fwTmpFastq = null;
+
+    try {
+      fwTmpFastq = new FileWriter(this.tmpFastqFile);
+
+      final int step =
+          (int) (1 / ((double) COUNT_READS_TO_COPY / this.rawClusterCount));
+
       int count_reads_to_copy_by_fastq =
           COUNT_READS_TO_COPY / this.fastqSample.getFastqFiles().size();
 
-      if (!fastqFile.exists()) {
-        throw new AozanException("Fastq file "
-            + fastqFile.getName() + " doesn't exist");
-      }
+      for (File fastqFile : fastqSample.getFastqFiles()) {
+        int comptReadsPF = 1;
 
-      FastqReader fastqReader = null;
-      try {
-        // Get compression value
-        CompressionType zType = this.fastqSample.getCompressionType();
+        if (!fastqFile.exists()) {
+          throw new AozanException("Fastq file "
+              + fastqFile.getName() + " doesn't exist");
+        }
 
-        // Append compressed fastq file to uncompressed file
-        final InputStream is =
-            zType.createInputStream(new FileInputStream(fastqFile));
+        FastqReader fastqReader = null;
+        try {
+          // Get compression value
+          CompressionType zType = fastqSample.getCompressionType();
 
-        fastqReader = new FastqReader(is);
-        IlluminaReadId ill = null;
+          // Append compressed fastq file to uncompressed file
+          final InputStream is =
+              zType.createInputStream(new FileInputStream(fastqFile));
 
-        for (final ReadSequence seq : fastqReader) {
+          fastqReader = new FastqReader(is);
 
-          if (ill == null)
-            ill = new IlluminaReadId(seq);
-          else
-            ill.parse(seq);
+          for (final ReadSequence seq : fastqReader) {
 
-          if (!ill.isFiltered()) {
             if (comptReadsPF % step == 0) {
               // Write in tmp fastq file
               fwTmpFastq.write(seq.toFastQ());
@@ -206,132 +295,40 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
             }
             comptReadsPF++;
           }
+
+          // Throw an exception if an error has occurred while reading data
+          fastqReader.throwException();
+
+        } catch (IOException e) {
+          throw new AozanException(e.getMessage());
+        } catch (BadBioEntryException bbe) {
+          throw new AozanException(bbe.getMessage());
+
+        } finally {
+
+          if (fastqReader != null)
+            try {
+              fastqReader.close();
+            } catch (IOException io) {
+              LOGGER
+                  .warning("Exception occurred during the closing of FastqReader. Step collector "
+                      + TemporaryPartialFastqCollector.COLLECTOR_NAME
+                      + " for the sample " + fastqSample.getKeyFastqSample());
+            }
         }
-
-        // Throw an exception if an error has occurred while reading data
-        fastqReader.throwException();
-
-      } catch (IOException e) {
-        throw new AozanException(e.getMessage());
-      } catch (EoulsanException ee) {
-        throw new AozanException(ee.getMessage());
-      } catch (BadBioEntryException bbe) {
-        throw new AozanException(bbe.getMessage());
-
-      } finally {
-
-        if (fastqReader != null)
-          try {
-            fastqReader.close();
-          } catch (IOException io) {
-            LOGGER
-                .warning("Exception occuring during the closing of FastqReader. Step collector "
-                    + TemporaryPartialFastqCollector.COLLECTOR_NAME
-                    + " for the sample " + fastqSample.getKeyFastqSample());
-          }
-
-        if (fwTmpFastq != null)
-          try {
-            fwTmpFastq.close();
-          } catch (IOException io) {
-            LOGGER
-                .warning("Exception occuring during the closing of tmp file : "
-                    + tmpFastqFile.getAbsolutePath() + ". Step collector "
-                    + TemporaryPartialFastqCollector.COLLECTOR_NAME
-                    + " for the sample " + fastqSample.getKeyFastqSample());
-
-          }
       }
-    }
 
-  }
-
-  /**
-   * Write the temporary partial file from a array of fastq files, writing reads
-   * randomly in files.
-   * @throws AozanException if an error occurs while creating file
-   */
-  private void partialFastqFile() throws AozanException {
-
-    final FileWriter fwTmpFastq;
-
-    try {
-      fwTmpFastq = new FileWriter(this.tmpFastqFile);
     } catch (IOException io) {
-      throw new AozanException(
-          "An exception occured during creating à writer file on temporary fastq file");
-    }
+      LOGGER.warning("Exception occurred during creating tmp file : "
+          + tmpFastqFile.getAbsolutePath() + ". Step collector "
+          + TemporaryPartialFastqCollector.COLLECTOR_NAME + " for the sample "
+          + fastqSample.getKeyFastqSample());
 
-    final int step =
-        (int) (1 / ((double) COUNT_READS_TO_COPY / this.rawClusterCount));
-
-    int count_reads_to_copy_by_fastq =
-        COUNT_READS_TO_COPY / this.fastqSample.getFastqFiles().size();
-
-    for (File fastqFile : fastqSample.getFastqFiles()) {
-      int comptReadsPF = 1;
-
-      if (!fastqFile.exists()) {
-        throw new AozanException("Fastq file "
-            + fastqFile.getName() + " doesn't exist");
-      }
-
-      FastqReader fastqReader = null;
+    } finally {
       try {
-        // Get compression value
-        CompressionType zType = fastqSample.getCompressionType();
-
-        // Append compressed fastq file to uncompressed file
-        final InputStream is =
-            zType.createInputStream(new FileInputStream(fastqFile));
-
-        fastqReader = new FastqReader(is);
-
-        for (final ReadSequence seq : fastqReader) {
-
-          if (comptReadsPF % step == 0) {
-            // Write in tmp fastq file
-            fwTmpFastq.write(seq.toFastQ());
-            fwTmpFastq.flush();
-
-            if (--count_reads_to_copy_by_fastq <= 0)
-              break;
-
-          }
-          comptReadsPF++;
-        }
-
-        // Throw an exception if an error has occurred while reading data
-        fastqReader.throwException();
-
-      } catch (IOException e) {
-        throw new AozanException(e.getMessage());
-      } catch (BadBioEntryException bbe) {
-        throw new AozanException(bbe.getMessage());
-
-      } finally {
-
-        if (fastqReader != null)
-          try {
-            fastqReader.close();
-          } catch (IOException io) {
-            LOGGER
-                .warning("Exception occurred during the closing of FastqReader. Step collector "
-                    + TemporaryPartialFastqCollector.COLLECTOR_NAME
-                    + " for the sample " + fastqSample.getKeyFastqSample());
-          }
-
         if (fwTmpFastq != null)
-          try {
-            fwTmpFastq.close();
-          } catch (IOException io) {
-            LOGGER
-                .warning("Exception occurred during the closing of tmp file : "
-                    + tmpFastqFile.getAbsolutePath() + ". Step collector "
-                    + TemporaryPartialFastqCollector.COLLECTOR_NAME
-                    + " for the sample " + fastqSample.getKeyFastqSample());
-
-          }
+          fwTmpFastq.close();
+      } catch (IOException e) {
       }
     }
   }
@@ -389,8 +386,8 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
     super(fastqSample);
 
     this.rawClusterCount = rawClusterCount;
-    this.pfClusterCount =
-        MAX_READS_PF_PARSING < pfClusterCount
+    this.pfClusterCountParsed =
+        MAX_READS_PF_PARSING > pfClusterCount
             ? pfClusterCount : MAX_READS_PF_PARSING;
 
     this.tmpFastqFile =

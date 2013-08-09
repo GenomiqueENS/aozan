@@ -51,7 +51,7 @@ public class TileMetricsCollector implements Collector {
   /** The sub-collector name from ReadCollector. */
   public static final String NAME_COLLECTOR = "TileMetricsCollector";
 
-  private static double densityRatio = 0.0;
+  private double densityRatio = 0.0;
 
   private final Map<Integer, TileMetricsPerLane> tileMetrics = Maps
       .newHashMap();
@@ -79,7 +79,8 @@ public class TileMetricsCollector implements Collector {
     this.dirInterOpPath = RTAOutputDirPath + "/InterOp/";
 
     densityRatio =
-        Double.parseDouble(properties.getProperty("cluster.density.ratio"));
+        Double.parseDouble(properties
+            .getProperty("qc.conf.cluster.density.ratio"));
   }
 
   /**
@@ -120,8 +121,8 @@ public class TileMetricsCollector implements Collector {
     int readsCount = data.getInt("run.info.read.count");
 
     for (int lane = 1; lane <= lanesCount; lane++)
-      tileMetrics.put(lane,
-          new TileMetricsPerLane(lane, readsCount, tilesCount));
+      tileMetrics.put(lane, new TileMetricsPerLane(lane, readsCount,
+          tilesCount, this.densityRatio));
 
   }
 
@@ -157,6 +158,7 @@ public class TileMetricsCollector implements Collector {
 
     private int laneNumber;
     private int countTiles;
+    private double densityRatio;
 
     private double clusterDensity = 0.0; // code in binary file 100
     private double clusterDensityPF = 0.0; // code in binary file 101
@@ -283,7 +285,7 @@ public class TileMetricsCollector implements Collector {
           // For each tile
           if (clusters.getKey().equals(clustersPF.getKey())) {
 
-            double prc =
+            Double prc =
                 new Double(clustersPF.getValue())
                     / new Double(clusters.getValue());
 
@@ -389,10 +391,11 @@ public class TileMetricsCollector implements Collector {
     //
 
     TileMetricsPerLane(final int laneNumber, final int countReads,
-        final int countTiles) {
+        final int countTiles, final double densityRatio) {
 
       this.laneNumber = laneNumber;
       this.countTiles = countTiles;
+      this.densityRatio = densityRatio;
 
       this.metricsPerTilePerCode = Maps.newHashMap();
       this.listReads = new LinkedList<ReadTileMetrics>();
@@ -414,10 +417,10 @@ public class TileMetricsCollector implements Collector {
     private static final class ReadTileMetrics {
 
       private int readNumber; // N
-      private double phasing = 0.0; // code in binary file 200+(N-1)*2
-      private double prephasing = 0.0; // code in binary file 201+(N-1)*2
-      private double percentAlignedPhix = 0.0; // code in binary file 300+N-1
-      private double percentAlignedPhixSD = 0.0;
+      private Double phasing = 0.0; // code in binary file 200+(N-1)*2
+      private Double prephasing = 0.0; // code in binary file 201+(N-1)*2
+      private Double percentAlignedPhix = 0.0; // code in binary file 300+N-1
+      private Double percentAlignedPhixSD = 0.0;
 
       /**
        * Constructor

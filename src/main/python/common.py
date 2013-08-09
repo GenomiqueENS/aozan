@@ -462,5 +462,5 @@ def set_default_conf(conf):
     conf['mail.footer'] = '\\n\\nThe Aozan team.\\n'
 
     # Collector configuration
-    conf['readXMLCollector.used'] = 'false'
-    conf['cluster.density.ratio'] = '0.3472222'
+    conf['qc.conf.read.xml.collector.used'] = 'false'
+    conf['qc.conf.cluster.density.ratio'] = '0.3472222'

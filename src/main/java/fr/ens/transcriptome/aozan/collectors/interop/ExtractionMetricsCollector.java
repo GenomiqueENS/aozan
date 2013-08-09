@@ -119,7 +119,7 @@ public class ExtractionMetricsCollector implements Collector {
    * Initialize TileMetrics map.
    * @return map
    */
-  private void initMetricsMap(final RunData data) {
+  private void initMetricsMap(final RunData data) throws AozanException {
 
     final int lanesCount = data.getInt("run.info.flow.cell.lane.count");
     final int readsCount = data.getInt("run.info.read.count");
@@ -131,7 +131,7 @@ public class ExtractionMetricsCollector implements Collector {
 
         intensityMetrics.put(getKeyMap(lane, read),
             new ExtractionMetricsPerLane(lane, read, read1FirstCycleNumber,
-            read2FirstCycleNumber, read3FirstCycleNumber));
+                read2FirstCycleNumber, read3FirstCycleNumber));
       }
 
   }
@@ -307,9 +307,9 @@ public class ExtractionMetricsCollector implements Collector {
       // Compute % intensity C20 / intensity C1 for each tile
       for (int i = 0; i < intensityCycle1Values.size(); i++) {
 
-        double intensityC1 =
+        Double intensityC1 =
             new Double(intensityCycle1Values.get(i).intValue());
-        double intensityC20 =
+        Double intensityC20 =
             new Double(intensityCycle20Values.get(i).intValue());
 
         if (intensityC1 > 0) {
@@ -339,7 +339,7 @@ public class ExtractionMetricsCollector implements Collector {
      */
     ExtractionMetricsPerLane(final int lane, final int read,
         final int read1FirstCycleNumber, final int read2FirstCycleNumber,
-        final int read3FirstCycleNumber) {
+        final int read3FirstCycleNumber) throws AozanException {
 
       this.laneNumber = lane;
       this.readNumber = read;
@@ -360,12 +360,14 @@ public class ExtractionMetricsCollector implements Collector {
         this.twentiethCycleNumber = read3FirstCycleNumber + 19;
         break;
 
+      default:
+        throw new AozanException(
+            "In ExtractionMetricsCollector can't define the number of first and twentieth cycle for the reads of the run");
       }
 
       this.intensityCycle1ValuesPerTile = Maps.newTreeMap();
       this.intensityCycle20ValuesPerTile = Maps.newTreeMap();
     }
-
   }
 
 }

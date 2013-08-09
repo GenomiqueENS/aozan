@@ -26,7 +26,6 @@ package fr.ens.transcriptome.aozan.io;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -308,11 +307,7 @@ public class FastqSample {
 
     this.runFastqPath = casavaOutputPath;
 
-    // if (projectName.equals("plasticit_abdomen_B2012"))
-    // if (sampleName.equals("2012_0200"))
     this.fastqFiles = createListFastqFiles(this.read);
-    // else
-    // this.fastqFiles = Collections.emptyList();
 
     // TODO to remove after test
     if (fastqFiles.size() == 0) {

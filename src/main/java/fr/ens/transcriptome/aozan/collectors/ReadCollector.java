@@ -23,7 +23,6 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
-import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
@@ -31,7 +30,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.interop.ErrorMetricsCollector;
 import fr.ens.transcriptome.aozan.collectors.interop.ExtractionMetricsCollector;
@@ -46,7 +44,8 @@ public class ReadCollector implements Collector {
 
   /** The collector name. */
   public static final String COLLECTOR_NAME = "read";
-  private static final String READ_XML_COLLECTOR_SPECIFIED = "";
+  public static final String READ_XML_COLLECTOR_SPECIFIED =
+      "qc.conf.read.xml.collector.used";
 
   private String RTAOutputDirPath;
   private Properties properties;
@@ -72,9 +71,11 @@ public class ReadCollector implements Collector {
       return;
 
     this.properties = properties;
-    RTAOutputDirPath = properties.getProperty(QC.RTA_OUTPUT_DIR);
+
+    // Use ReadXMLCollector, if specified in aozan.conf
     String readXMLCollectorUsed =
-        properties.getProperty("readXMLCollector.used").trim().toLowerCase();
+        properties.getProperty(READ_XML_COLLECTOR_SPECIFIED).trim()
+            .toLowerCase();
 
     // Build the list of subcollector
     if (readXMLCollectorUsed.equals("true")) {
@@ -110,48 +111,4 @@ public class ReadCollector implements Collector {
       collector.clear();
   }
 
-  // <<<<<<< HEAD
-  // =======
-  // /**
-  // * This class define a Collector for several binary files from InterOp
-  // * directory.
-  // * @since 1.1
-  // * @author Sandrine Perrin
-  // */
-  // class ReadCollectorBinaryFile extends ReadCollector {
-  //
-  // private void collectRead(final RunData data, final String readInfoFilePath)
-  // throws AozanException {
-  //
-  // AbstractBinaryIteratorReader.setDirectory(readInfoFilePath);
-  //
-  // // Collect metrics on number cluster
-  // new TileMetricsOutReader().collect(data);
-  // // Collect metrics on error rate
-  // new ErrorMetricsOutReader().collect(data);
-  // // Collect metrics on intensity rate
-  // new ExtractionMetricsOutReader().collect(data);
-  // }
-  //
-  // /**
-  // * Public constructor
-  // * @param data
-  // */
-  // ReadCollectorBinaryFile(final RunData data) throws AozanException {
-  //
-  // String readInfoFilePath = RTAOutputDirPath + "/InterOp/";
-  // try {
-  //
-  // FileUtils.checkExistingDirectoryFile(new File(readInfoFilePath),
-  // "Directory interOp not find here !" + readInfoFilePath);
-  // collectRead(data, readInfoFilePath);
-  //
-  // } catch (IOException e) {
-  // // TODO Auto-generated catch block
-  // e.printStackTrace();
-  // }
-  //
-  // }
-  // }
-  // >>>>>>> refs/heads/fastqscreen_light
 }
