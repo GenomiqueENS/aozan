@@ -170,9 +170,11 @@ def compressed_quality_data(run_param_path):
     Arguments:
         run_param_path : path to runParameters.xml
     """
-        
+    
+    compressed_quality_data = False
+    
     if compressed_quality_data:
-        ratio_quality_compressed = 5.0  # TO DEFINE RATIO
+        ratio_quality_compressed = 1.0  # TO DEFINE RATIO
     else:
         ratio_quality_compressed = 1.0
         
