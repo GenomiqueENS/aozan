@@ -51,7 +51,7 @@ public class FastqScreenSimpleSampleLienReportTest extends AbstractSampleTest {
     // Check fastqscreen launch for sample
     String key =
         "fastqscreen.lane"
-            + lane + ".sample." + sampleName + ".read" + read + "."
+            + lane + ".sample." + sampleName + ".read" + readSample + "."
             + sampleName + ".mappedexceptgenomesample";
 
     if (data.get(key) == null)

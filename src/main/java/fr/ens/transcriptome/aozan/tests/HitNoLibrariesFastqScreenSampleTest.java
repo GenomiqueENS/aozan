@@ -49,8 +49,8 @@ public class HitNoLibrariesFastqScreenSampleTest extends
   protected String getKey(int read, int readSample, int lane, String sampleName) {
 
     return "fastqscreen.lane"
-        + lane + ".sample." + sampleName + ".read" + read + "." + sampleName
-        + ".mappedexceptgenomesample";
+        + lane + ".sample." + sampleName + ".read" + readSample + "."
+        + sampleName + ".mappedexceptgenomesample";
   }
 
   @Override
