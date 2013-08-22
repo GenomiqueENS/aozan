@@ -46,6 +46,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
@@ -250,6 +251,10 @@ public class ReadXMLCollector implements Collector {
 
   @Override
   public void configure(Properties properties) {
+    if (properties == null)
+      return;
+
+    this.RTAOutputDirPath = properties.getProperty(QC.RTA_OUTPUT_DIR);
   }
 
   @Override

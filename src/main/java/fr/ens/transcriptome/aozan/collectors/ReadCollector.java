@@ -47,9 +47,6 @@ public class ReadCollector implements Collector {
   public static final String READ_XML_COLLECTOR_SPECIFIED =
       "qc.conf.read.xml.collector.used";
 
-  private String RTAOutputDirPath;
-  private Properties properties;
-
   private final List<Collector> subCollectionList = Lists.newArrayList();
 
   @Override
@@ -69,8 +66,6 @@ public class ReadCollector implements Collector {
 
     if (properties == null)
       return;
-
-    this.properties = properties;
 
     // Use ReadXMLCollector, if specified in aozan.conf
     String readXMLCollectorUsed =
