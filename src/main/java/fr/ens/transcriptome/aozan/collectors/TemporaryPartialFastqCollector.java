@@ -42,10 +42,22 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
 public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
 
   public static final String COLLECTOR_NAME = "tmppartialfastq";
-  public static final String KEY_IGNORE_PAIRED_MODE =
-      "qc.conf.ignore.paired.mode";
+  public static final String KEY_SKIP_CONTROL_LANE =
+      "qc.conf.skip.control.lane";
 
-  private boolean ignorePairedMode;
+  public static final String KEY_READS_PF_USED = "qc.conf.reads.pf.used";
+  public static final String KEY_MAX_READS_PF_PARSING =
+      "qc.conf.max.reads.parsed";
+
+  /** Parameters configuration */
+  private boolean skipControlLane;
+
+  // count reads pf necessary for create a temporary partial fastq
+  private int countReadsPFtoCopy;
+  // Limit parsing of the initial fastq file
+  // if it is -1 parse integral fastq file
+  private int maxReadsPFtoParse;
+
   private int numberThreads = Runtime.getRuntime().availableProcessors();
 
   /**
@@ -90,14 +102,31 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
     }
 
     try {
-      this.ignorePairedMode =
-          Boolean.parseBoolean(properties.getProperty(KEY_IGNORE_PAIRED_MODE));
-
+      this.skipControlLane =
+          Boolean.parseBoolean(properties.getProperty(KEY_SKIP_CONTROL_LANE));
     } catch (Exception e) {
       // Default value
-      this.ignorePairedMode = true;
+      this.skipControlLane = true;
     }
 
+    int readsToCopy =
+        Integer.parseInt(properties.getProperty(KEY_READS_PF_USED));
+    if (readsToCopy == -1) {
+      // Use a fully fastq file, force uncompress fastq file independently
+      // number reads
+      this.countReadsPFtoCopy = Integer.MAX_VALUE;
+    } else {
+      this.countReadsPFtoCopy = readsToCopy;
+    }
+
+    final int countReads =
+        Integer.parseInt(properties.getProperty(KEY_MAX_READS_PF_PARSING));
+    if (countReads == -1) {
+      // Parsing fully fastq file
+      this.maxReadsPFtoParse = Integer.MAX_VALUE;
+    } else {
+      this.maxReadsPFtoParse = countReads;
+    }
   }
 
   @Override
@@ -111,11 +140,13 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
       return null;
     }
 
-    // Check mode defined
-    final boolean singleMode = !runPE || ignorePairedMode;
+    final boolean controlLane =
+        data.getBoolean("design.lane"
+            + fastqSample.getLane() + "." + fastqSample.getSampleName()
+            + ".control");
 
-    // Ignore R2 fastq files
-    if (singleMode && fastqSample.getRead() == 2) {
+    // Skip control lane
+    if (controlLane && skipControlLane) {
       return null;
     }
 
@@ -135,7 +166,7 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
 
     // Create the thread object
     return new TemporaryPartialFastqThread(fastqSample, rawClusterCount,
-        pfClusterCount);
+        pfClusterCount, this.countReadsPFtoCopy, this.maxReadsPFtoParse);
   }
 
   /**

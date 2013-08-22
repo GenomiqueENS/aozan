@@ -152,23 +152,27 @@ public class FastqScreenCollector extends AbstractFastqCollector {
             + ".control");
 
     // Skip the control lane
-    if (skipControlLane && controlLane)
+    if (controlLane && skipControlLane)
       return null;
 
     final boolean pairedMode = runPE && !ignorePairedMode;
 
-    if (pairedMode) {
-      // in mode paired FastqScreen should be launched with R1 and R2 together.
-      // Search fasqtSample which correspond to fastqSample R1
-      String prefixRead2 = fastqSample.getPrefixRead2();
+    if (pairedMode)
 
-      for (FastqSample fastqSampleR2 : fastqSamples) {
-        if (fastqSampleR2.getKeyFastqSample().equals(prefixRead2)) {
+      if (fastqSample.getRead() != 1)
+        return null;
 
-          return new FastqScreenProcessThread(fastqSample, fastqSampleR2,
-              fastqscreen, genomesConfiguration, genomeReferenceSample,
-              reportDir, pairedMode);
-        }
+    // in mode paired FastqScreen should be launched with R1 and R2
+    // together.
+    // Search fasqtSample which corresponding to fastqSample R1
+    String prefixRead2 = fastqSample.getPrefixRead2();
+
+    for (FastqSample fastqSampleR2 : fastqSamples) {
+      if (fastqSampleR2.getKeyFastqSample().equals(prefixRead2)) {
+
+        return new FastqScreenProcessThread(fastqSample, fastqSampleR2,
+            fastqscreen, genomesConfiguration, genomeReferenceSample,
+            reportDir, pairedMode);
       }
     }
 

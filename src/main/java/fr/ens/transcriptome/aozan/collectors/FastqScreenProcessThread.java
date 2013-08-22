@@ -42,6 +42,7 @@ import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreen;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreenResult;
 import fr.ens.transcriptome.aozan.io.FastqSample;
+import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
 /**
  * The private class define a class for a thread that execute fastqScreen for a
@@ -99,11 +100,12 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   protected void createReportFile() throws AozanException, IOException {
 
     String headerReport =
-        "FastqScreen : for Projet "
+        "FastqScreen for Projet "
             + fastqSample.getProjectName()
             + (this.genomeSample == null
-                ? "" : " (genome reference for sample " + this.genomeSample)
-            + ").\nresult for sample : " + fastqSample.getSampleName();
+                ? " (no genome reference" : " (genome reference for sample "
+                    + this.genomeSample) + ").\nresult for sample : "
+            + fastqSample.getSampleName();
 
     // TODO to remove after test
     System.out.println("\n"
@@ -117,8 +119,21 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     br.append(this.resultsFastqscreen.statisticalTableToString(headerReport));
     br.close();
 
-    LOGGER.fine("FASTQSCREEN : for "
+    LOGGER.fine("FASTQSCREEN : save "
         + this.fastqSample.getKeyFastqSample() + " report fastqscreen");
+
+    // mode paired : copy same report for fastqSample R2
+    if (this.pairedMode) {
+
+      File reportR2 =
+          new File(this.reportDir.getAbsolutePath()
+              + "/" + this.fastqSample.getPrefixRead2() + "-fastqscreen.txt");
+      FileUtils.copyFile(fastqScreenFile, reportR2);
+
+      LOGGER.fine("FASTQSCREEN : save "
+          + this.fastqSample.getPrefixRead2() + " report fastqscreen");
+    }
+
   }
 
   @Override
@@ -157,6 +172,15 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     // Create rundata for the sample
     this.results.put(resultsFastqscreen.createRundata("fastqscreen"
         + fastqSample.getPrefixRundata()));
+
+    // mode paired : same values for fastqSample R2
+    if (this.pairedMode && fastqSample.getRead() == 1) {
+      String prefixR2 =
+          fastqSample.getPrefixRundata().replace(".read1.", ".read2.");
+      
+      this.results.put(resultsFastqscreen.createRundata("fastqscreen"
+          + prefixR2));
+    }
 
     try {
       createReportFile();
@@ -226,8 +250,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     this.genomes.addAll(genomes);
 
     // Add genomeSample in list of genome to fastqscreen
-    if (this.genomeSample.length() > 0
-        && !this.genomes.contains(this.genomeSample))
+    if (this.genomeSample != null && !this.genomes.contains(this.genomeSample))
       this.genomes.add(this.genomeSample);
 
   }
