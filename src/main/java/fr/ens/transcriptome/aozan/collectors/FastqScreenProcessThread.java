@@ -98,27 +98,58 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   @Override
   protected void createReportFile() throws AozanException, IOException {
 
-    String headerReport =
-        "FastqScreen : for Projet "
-            + fastqSample.getProjectName()
-            + (this.genomeSample == null
-                ? "" : " (genome reference for sample " + this.genomeSample)
-            + ").\nresult for sample : " + fastqSample.getSampleName();
-
     // TODO to remove after test
     System.out.println("\n"
-        + this.resultsFastqscreen.statisticalTableToString(headerReport));
+        + this.resultsFastqscreen.reportToCSV(this.fastqSample,
+            this.genomeSample));
 
-    File fastqScreenFile =
-        new File(this.reportDir.getAbsolutePath()
-            + "/" + this.fastqSample.getKeyFastqSample() + "-fastqscreen.txt");
+    String fileName =
+        this.reportDir.getAbsolutePath()
+            + "/" + this.fastqSample.getKeyFastqSample() + "-fastqscreen";
 
-    BufferedWriter br = Files.newWriter(fastqScreenFile, Charsets.UTF_8);
-    br.append(this.resultsFastqscreen.statisticalTableToString(headerReport));
-    br.close();
+    writeCSV(fileName);
+
+    // Report with a link in qc html page
+    writeHtml(fileName);
 
     LOGGER.fine("FASTQSCREEN : for "
         + this.fastqSample.getKeyFastqSample() + " report fastqscreen");
+  }
+
+  /**
+   * Create a report fastqScreen for a sample in csv format.
+   * @param fileName name of the report file in csv format
+   * @throws IOException if an error occurs during writing file
+   */
+  private void writeCSV(final String fileName) throws AozanException,
+      IOException {
+
+    File file = new File(fileName + ".csv");
+
+    BufferedWriter br = Files.newWriter(file, Charsets.UTF_8);
+    br.append(this.resultsFastqscreen.reportToCSV(this.fastqSample,
+        this.genomeSample));
+
+    br.close();
+
+  }
+
+  /**
+   * Create a report fastqScreen for a sample in html format.
+   * @param fileName name of the report file in html format
+   * @throws IOException if an error occurs during writing file
+   */
+  private void writeHtml(final String fileName) throws AozanException,
+      IOException {
+
+    File file = new File(fileName + ".html");
+
+    BufferedWriter br = Files.newWriter(file, Charsets.UTF_8);
+    br.append(this.resultsFastqscreen.reportToHtml(this.fastqSample,
+        this.genomeSample));
+
+    br.close();
+
   }
 
   @Override
