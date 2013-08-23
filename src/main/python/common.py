@@ -335,7 +335,7 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
     text_runInfo = ''
     
     path_report = conf['reports.data.path'] + '/' + run_id
-    """ Check dir report exists """
+    # Check directory report exists
     
     if os.path.exists(path_report + '/report_' + run_id):
         text_runInfo = """<li><a href="report_###RUN_ID###/Status.htm">Run info</a></li>
@@ -461,6 +461,17 @@ def set_default_conf(conf):
     conf['mail.header'] = 'THIS IS AN AUTOMATED MESSAGE.\\n\\n'
     conf['mail.footer'] = '\\n\\nThe Aozan team.\\n'
 
-    # Collector configuration
+    # Collectors configuration
+    # ReadCollector
     conf['qc.conf.read.xml.collector.used'] = 'false'
-    conf['qc.conf.cluster.density.ratio'] = '0.3472222'
+    # TileMetricsCollector
+    conf['qc.conf.cluster.density.ratio'] = str(0.3472222)
+    # TemporaryPartialFastqCollector
+    conf['qc.conf.reads.pf.used'] = str(200000)
+    # Use only the first X reads pf in fastq file
+    conf['qc.conf.max.reads.parsed'] = str(30000000)
+    # Configuration FastqscreenCollector, parameters for mapping
+    # no detection contamination for control lane
+    conf['qc.conf.skip.control.lane'] = 'true'
+    # run paired : no paired mapping
+    conf['qc.conf.ignore.paired.mode'] = 'true'

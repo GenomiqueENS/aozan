@@ -93,8 +93,8 @@ public class FastqScreenResult {
         + DataPerGenome.roundDouble(this.percentMappedExceptGenomeSample));
     s.append("\n");
 
-    s.append("read mapped "
-        + this.readsMapped + " / readsProcessed " + this.readsprocessed);
+    s.append("reads mapped "
+        + this.readsMapped + " / reads processed " + this.readsprocessed);
     return s.toString();
   }
 

@@ -31,7 +31,7 @@ public class TestCollectorReadBinary {
   static BufferedWriter bw = null;
 
   public static void main(String[] argv) {
-    String v = "78";
+    String v = "79";
     file = new File(DIR_RESULT, "comparaison_all_run_" + v + ".data");
 
     // Copy console output in a file
@@ -158,8 +158,8 @@ public class TestCollectorReadBinary {
         "/home/sperrin/shares-net/sequencages/fastq/" + runId);
 
     // Collector configuration
-    props.put("readXMLCollector.used", "false");
-    props.put("cluster.density.ratio", "0.3472222");
+    props.put("qc.conf.readXMLCollector.used", "false");
+    props.put("qc.conf.cluster.density.ratio", "0.3472222");
 
     runInfoColl.configure(props);
     phasingColl.configure(props);

@@ -31,14 +31,15 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import com.google.common.base.Stopwatch;
-
 import uk.ac.bbsrc.babraham.FastQC.Sequence.Sequence;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFactory;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFile;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFormatException;
+
+import com.google.common.base.Stopwatch;
+
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.Globals;
+import fr.ens.transcriptome.aozan.Common;
 
 /**
  * The class allow to browse a fastq file sequence per sequence and writing them
@@ -50,7 +51,7 @@ import fr.ens.transcriptome.aozan.Globals;
 // TODO to remove this class, not used in aozan 1.1
 public class AozanSequenceFile implements SequenceFile {
   /** Logger */
-  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+  private static final Logger LOGGER = Common.getLogger();
 
   /** Timer **/
   private Stopwatch timer;

@@ -38,14 +38,8 @@ import fr.ens.transcriptome.eoulsan.EoulsanException;
  */
 public class Common {
 
-  // TODO to fix
-  public static void initLogger(final String logPath) throws AozanException,
-      IOException {
-    try {
-      initEoulsanRuntimeForExternalApp();
-    } catch (EoulsanException ee) {
-      throw new AozanException(ee.getMessage());
-    }
+  public static final Logger getLogger() {
+    return Logger.getLogger(fr.ens.transcriptome.eoulsan.Globals.APP_NAME);
   }
 
   /**
@@ -54,8 +48,8 @@ public class Common {
    * @throws SecurityException if an error occurs while initializing the logger
    * @throws IOException if cannot open/create the log file
    */
-  public static void initLogger_OLD(final String logPath)
-      throws SecurityException, IOException, AozanException {
+  public static void initLogger(final String logPath) throws SecurityException,
+      IOException, AozanException {
 
     try {
       initEoulsanRuntimeForExternalApp();
@@ -63,27 +57,20 @@ public class Common {
       throw new AozanException(ee.getMessage());
     }
 
-    final Logger aozanLogger =
-        Logger.getLogger(fr.ens.transcriptome.aozan.Globals.APP_NAME);
-    final Logger eoulsanLogger =
-        Logger.getLogger(fr.ens.transcriptome.eoulsan.Globals.APP_NAME);
+    final Logger eoulsanLogger = getLogger();
 
     // Set default log level
-    aozanLogger.setLevel(Globals.LOG_LEVEL);
-    eoulsanLogger.setLevel(Globals.LOG_LEVEL);
+    eoulsanLogger.setLevel(fr.ens.transcriptome.eoulsan.Globals.LOG_LEVEL);
 
     final Handler fh = new FileHandler(logPath, true);
-    fh.setFormatter(Globals.LOG_FORMATTER);
+    fh.setFormatter(fr.ens.transcriptome.eoulsan.Globals.LOG_FORMATTER);
 
-    aozanLogger.setUseParentHandlers(false);
     eoulsanLogger.setUseParentHandlers(false);
 
     // Remove default Handler
-    aozanLogger.removeHandler(aozanLogger.getParent().getHandlers()[0]);
     eoulsanLogger.removeHandler(eoulsanLogger.getParent().getHandlers()[0]);
 
-    aozanLogger.addHandler(fh);
-    // eoulsanLogger.addHandler(fh);
+    eoulsanLogger.addHandler(fh);
   }
 
 }

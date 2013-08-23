@@ -33,7 +33,7 @@ import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFactory;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFile;
 import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFormatException;
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.Globals;
+import fr.ens.transcriptome.aozan.Common;
 
 /**
  * This class manages the files uncompressed fastq to create temporary files and
@@ -44,7 +44,7 @@ import fr.ens.transcriptome.aozan.Globals;
 public final class FastqStorage {
 
   /** Logger */
-  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+  private static final Logger LOGGER = Common.getLogger();
 
   private static FastqStorage singleton;
 

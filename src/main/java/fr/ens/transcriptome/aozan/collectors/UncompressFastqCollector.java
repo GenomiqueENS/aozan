@@ -30,7 +30,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.Globals;
+import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
@@ -43,7 +43,7 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
 public class UncompressFastqCollector extends AbstractFastqCollector {
 
   /** Logger */
-  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+  private static final Logger LOGGER = Common.getLogger();
 
   public static final String COLLECTOR_NAME = "uncompressfastq";
   private long uncompressedSizeFiles = 0l;

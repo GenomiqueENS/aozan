@@ -174,7 +174,7 @@ public class AliasGenomeFile {
     if (aliasGenomesForRun.containsKey(genome))
       return aliasGenomesForRun.get(genome);
 
-    return "";
+    return null;
   }
 
   /**

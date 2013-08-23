@@ -41,7 +41,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.Globals;
+import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.io.FastqSample;
@@ -56,7 +56,7 @@ import fr.ens.transcriptome.aozan.io.FastqStorage;
 abstract public class AbstractFastqCollector implements Collector {
 
   /** Logger */
-  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+  private static final Logger LOGGER = Common.getLogger();
 
   public static final String KEY_RUN_MODE = "run.info.run.mode";
   public static final String KEY_READ_COUNT = "run.info.read.count";

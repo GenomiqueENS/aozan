@@ -45,7 +45,7 @@ import fr.ens.transcriptome.aozan.collectors.Collector;
 public class RunDataGenerator {
 
   /** Logger */
-  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+  private static final Logger LOGGER = Common.getLogger();
 
   /** Collect done property key. */
   private static final String COLLECT_DONE = "collect.done";
@@ -120,9 +120,9 @@ public class RunDataGenerator {
 
     }
 
-    for (final Collector collector : this.collectors) {
-      collector.clear();
-    }
+    // for (final Collector collector : this.collectors) {
+    // collector.clear();
+    // }
 
     LOGGER.fine("Step collector end in "
         + toTimeHumanReadable(timerGlobal.elapsed(TimeUnit.MILLISECONDS)));

@@ -57,7 +57,7 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.Globals;
+import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.fastqc.BadTiles;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
@@ -70,7 +70,7 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
 class FastQCProcessThread extends AbstractFastqProcessThread {
 
   /** Logger */
-  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+  private static final Logger LOGGER = Common.getLogger();
 
   private final SequenceFile seqFile;
   private final boolean ignoreFilteredSequences;

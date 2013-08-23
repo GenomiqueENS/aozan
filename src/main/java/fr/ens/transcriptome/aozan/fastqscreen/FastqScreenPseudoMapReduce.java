@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
 import com.google.common.base.Stopwatch;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.Globals;
+import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
 import fr.ens.transcriptome.eoulsan.Settings;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
@@ -61,7 +61,7 @@ import fr.ens.transcriptome.eoulsan.util.StringUtils;
 public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
   /** Logger */
-  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+  private static final Logger LOGGER = Common.getLogger();
 
   protected static final String COUNTER_GROUP = "reads_mapping";
   private final Reporter reporter;
@@ -163,9 +163,13 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
         if (pairedMode) {
           // mode pair-end
-          // bowtie.map(fastqRead1, fastqRead2, parser);
-          throw new UnsupportedOperationException(
-              "Fastqscreen : mapping in PE impossible.");
+          InputStream outputSAM = bowtie.mapPE(fastqRead1, fastqRead2, desc);
+          parser.parseLine(outputSAM);
+
+          parser.closeMapOutputFile();
+          this.readsprocessed = parser.getReadsprocessed();
+          // throw new UnsupportedOperationException(
+          // "Fastqscreen : mapping in PE impossible.");
 
         } else {
           // mode single-end

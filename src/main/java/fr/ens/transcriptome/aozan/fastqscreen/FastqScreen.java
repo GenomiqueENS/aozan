@@ -35,7 +35,7 @@ import java.util.logging.Logger;
 import com.google.common.base.Stopwatch;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.Globals;
+import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
 import fr.ens.transcriptome.eoulsan.Settings;
@@ -49,7 +49,7 @@ import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 public class FastqScreen {
 
   /** Logger */
-  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+  private static final Logger LOGGER = Common.getLogger();
 
   protected static final String COUNTER_GROUP = "fastqscreen";
 

@@ -55,7 +55,7 @@ import fr.ens.transcriptome.aozan.tests.SampleTest;
 public class QC {
 
   /** Logger */
-  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
+  private static final Logger LOGGER = Common.getLogger();
 
   /** RTA output directory property key. */
   public static final String RTA_OUTPUT_DIR = "rta.output.dir";

@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.Globals;
+import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
 import fr.ens.transcriptome.eoulsan.util.StringUtils;
 
@@ -43,10 +43,7 @@ import fr.ens.transcriptome.eoulsan.util.StringUtils;
 public class FastqSample {
 
   /** Logger */
-  private static final Logger LOGGER = Logger.getLogger(Globals.APP_NAME);
-
-  // TODO to remove, value for test
-  // public static final String VALUE = ".fq";
+  private static final Logger LOGGER = Common.getLogger();
 
   public static final String VALUE = ".fastq";
 

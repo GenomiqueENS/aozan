@@ -289,6 +289,10 @@ def demux(run_id, conf):
         cmd = cmd + ' --with-failed-reads'
     if conf['casava.adapter.fasta.file.path']!='':
         cmd = cmd + ' --adapter-sequence ' + conf['casava.adapter.fasta.file.path']
+    
+    if conf['casava.additionnal.arguments']!='':
+        cmd = cmd + ' ' + conf['casava.additionnal.arguments']
+    
           
     common.log("SEVERE", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
