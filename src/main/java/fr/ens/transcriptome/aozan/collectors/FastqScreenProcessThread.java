@@ -60,6 +60,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   private final String genomeSample;
   private final boolean pairedMode;
   private FastqSample fastqSampleR2;
+  private final String runId;
 
   private FastqScreenResult resultsFastqscreen = null;
 
@@ -146,7 +147,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     BufferedWriter br = Files.newWriter(file, Charsets.UTF_8);
     br.append(this.resultsFastqscreen.reportToHtml(this.fastqSample,
-        this.genomeSample));
+        this.genomeSample, this.runId));
 
     br.close();
 
@@ -181,7 +182,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
             pairedMode);
 
     if (resultsFastqscreen == null)
-      throw new AozanException("Fastqscreen return no result for sample "
+      throw new AozanException("Fastqscreen returns no result for sample "
           + String.format("/Project_%s/Sample_%s",
               fastqSample.getProjectName(), fastqSample.getSampleName()));
 
@@ -219,10 +220,11 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   public FastqScreenProcessThread(final FastqSample fastqSampleR1,
       final FastqSample fastqSampleR2, final FastqScreen fastqscreen,
       final List<String> genomes, final String genomeSample,
-      final File reportDir, final boolean pairedMode) throws AozanException {
+      final File reportDir, final boolean pairedMode, final String runId)
+      throws AozanException {
 
     this(fastqSampleR1, fastqscreen, genomes, genomeSample, reportDir,
-        pairedMode);
+        pairedMode, runId);
     this.fastqSampleR2 = fastqSampleR2;
   }
 
@@ -241,8 +243,8 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    */
   public FastqScreenProcessThread(final FastqSample fastqSample,
       final FastqScreen fastqscreen, final List<String> genomes,
-      final String genomeSample, final File reportDir, final boolean pairedMode)
-      throws AozanException {
+      final String genomeSample, final File reportDir,
+      final boolean pairedMode, final String runId) throws AozanException {
 
     super(fastqSample);
 
@@ -251,6 +253,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     this.genomeSample = genomeSample;
     this.reportDir = reportDir;
     this.pairedMode = pairedMode;
+    this.runId = runId;
 
     // Copy list genome for fastqscreen
     this.genomes = new ArrayList<String>();

@@ -20,10 +20,13 @@ version="1.0">
 <body>
 
   <h3>Detection contamination report</h3>
-  <h5>Project : <xsl:value-of select="/ReportFastqScreen/projectName"/></h5>
-  <h5>Sample : <xsl:value-of select="/ReportFastqScreen/sampleName"/></h5>
-  <h5>Genome sample : <xsl:value-of select="/ReportFastqScreen/genomeSample"/></h5>
-  <h5>Creation date : <xsl:value-of select="/ReportFastqScreen/dateReport"/></h5>
+  <ul>
+    <li><b>Run Id : </b> <xsl:value-of select="/ReportFastqScreen/RunId"/></li>
+    <li><b>Project : </b> <xsl:value-of select="/ReportFastqScreen/projectName"/></li>
+    <li><b>Sample : </b> <xsl:value-of select="/ReportFastqScreen/sampleName"/></li>
+    <li><b>Genome sample : </b> <xsl:value-of select="/ReportFastqScreen/genomeSample"/></li>
+    <li><b>Creation date : </b> <xsl:value-of select="/ReportFastqScreen/dateReport"/></li>
+  </ul>
 
   <table border="1">
     <tr>
@@ -42,16 +45,18 @@ version="1.0">
    </xsl:for-each>
    </table>
    
-   <p><xsl:value-of select="/ReportFastqScreen/Report/ReadsUnmapped/@name"/> : <xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsUnmapped,'#0.00','aozan')"/> %</p>
-   <p><xsl:value-of select="/ReportFastqScreen/Report/ReadsMappedOneGenome/@name"/> : <xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsMappedOneGenome,'#0.00','aozan')"/> %</p>
-   <p><xsl:value-of select="/ReportFastqScreen/Report/ReadsMappedExceptGenomeSample/@name"/> : <xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsMappedExceptGenomeSample,'#0.00','aozan')"/> %</p>
-   
    <p>
-    <xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsMapped,'# ##0','thousand')"/>  
-    <xsl:value-of select="/ReportFastqScreen/Report/ReadsMapped/@name"/>  
-     / 
-    <xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsProcessed,'# ##0','thousand')"/>  
-    <xsl:value-of select="/ReportFastqScreen/Report/ReadsProcessed/@name"/>  </p>
+   <ul>
+     <li><xsl:value-of select="/ReportFastqScreen/Report/ReadsUnmapped/@name"/> : <xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsUnmapped,'#0.00','aozan')"/> %</li>
+     <li><xsl:value-of select="/ReportFastqScreen/Report/ReadsMappedOneGenome/@name"/> : <xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsMappedOneGenome,'#0.00','aozan')"/> %</li>
+     <li><xsl:value-of select="/ReportFastqScreen/Report/ReadsMappedExceptGenomeSample/@name"/> : <xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsMappedExceptGenomeSample,'#0.00','aozan')"/> %</li>
+   
+     <li><xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsMapped,'# ##0','thousand')"/>&#160;  
+       <xsl:value-of select="/ReportFastqScreen/Report/ReadsMapped/@name"/>  / 
+       <xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsProcessed,'# ##0','thousand')"/>&#160;
+       <xsl:value-of select="/ReportFastqScreen/Report/ReadsProcessed/@name"/>  </li>
+   </ul>
+   </p>
 </body>
 </html>
 </xsl:template>

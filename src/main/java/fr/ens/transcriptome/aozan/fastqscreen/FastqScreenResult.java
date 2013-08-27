@@ -133,19 +133,19 @@ public class FastqScreenResult {
   }
 
   public String reportToHtml(final FastqSample fastqSample,
-      final String genomeSample) throws AozanException {
+      final String genomeSample, final String runId) throws AozanException {
 
     if (!isComputedPercent)
       throw new AozanException(
           "Error writing a html report fastqScreen : no values available.");
 
-    final String xml = toXML(fastqSample, genomeSample);
+    final String xml = toXML(fastqSample, genomeSample, runId);
 
     return xml;
   }
 
-  private String toXML(final FastqSample fastqSample, final String genomeSample)
-      throws AozanException {
+  private String toXML(final FastqSample fastqSample,
+      final String genomeSample, final String runId) throws AozanException {
 
     if (!isComputedPercent)
       return null;
@@ -162,7 +162,7 @@ public class FastqScreenResult {
       StringWriter sw = new StringWriter();
       StreamResult result = new StreamResult(sw);
 
-      Document doc = createDocumentXML(fastqSample, genomeSample);
+      Document doc = createDocumentXML(fastqSample, genomeSample, runId);
       DOMSource source = new DOMSource(doc);
       trans.transform(source, result);
 
@@ -199,7 +199,7 @@ public class FastqScreenResult {
   }
 
   private Document createDocumentXML(final FastqSample fastqSample,
-      final String genomeSample) {
+      final String genomeSample, final String runId) {
     DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 
     DocumentBuilder docBuilder = null;
@@ -223,12 +223,13 @@ public class FastqScreenResult {
     System.out.println("genome in xml " + genomeSample);
     // Header
     XMLUtils.addTagValue(doc, root, "AozanStep", "Detection contamination");
+    XMLUtils.addTagValue(doc, root, "RunId", runId);
     XMLUtils
         .addTagValue(doc, root, "projectName", fastqSample.getProjectName());
     XMLUtils.addTagValue(doc, root, "genomeSample", (genomeSample == null
         ? "no genome" : genomeSample));
     XMLUtils.addTagValue(doc, root, "sampleName", fastqSample.getSampleName());
-    XMLUtils.addTagValue(doc, root, "dateReport", df.format(new Date()));
+    XMLUtils.addTagValue(doc, root, "dateReport", new Date().toString());
 
     final Element report = doc.createElement("Report");
     root.appendChild(report);
