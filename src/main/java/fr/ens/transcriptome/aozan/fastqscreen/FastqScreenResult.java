@@ -23,12 +23,37 @@
 
 package fr.ens.transcriptome.aozan.fastqscreen;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import com.google.common.base.Splitter;
+
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.io.FastqSample;
+import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**
  * This class manages results from fastqscreen.
@@ -55,7 +80,7 @@ public class FastqScreenResult {
   private double percentUnmappedNoneGenome = 0.0;
   private double percentMappedAtLeastOneGenome = 0.0;
   private double percentMappedExceptGenomeSample = 0.0;
-  private boolean countPercentOk = false;
+  private boolean isComputedPercent = false;
 
   private int readsMapped;
   private int readsprocessed;
@@ -65,13 +90,22 @@ public class FastqScreenResult {
    * value
    * @return string with results from fastqscreen
    */
-  public String statisticalTableToString(final String header) {
+  public String reportToCSV(final FastqSample fastqSample,
+      final String genomeSample) throws AozanException {
+
+    if (!isComputedPercent)
+      throw new AozanException(
+          "Error writing a csv report fastqScreen : no values available.");
 
     StringBuilder s = new StringBuilder();
 
-    if (header != null)
-      s.append(header + "\n");
+    s.append("FastqScreen : for Projet "
+        + fastqSample.getProjectName()
+        + (genomeSample == null ? "" : " (genome reference for sample "
+            + genomeSample) + ").\nresult for sample : "
+        + fastqSample.getSampleName());
 
+    s.append("\n");
     s.append("\n" + HEADER_COLUMNS_TEXT + "\n");
 
     // length max genome
@@ -96,6 +130,181 @@ public class FastqScreenResult {
     s.append("reads mapped "
         + this.readsMapped + " / reads processed " + this.readsprocessed);
     return s.toString();
+  }
+
+  public String reportToHtml(final FastqSample fastqSample,
+      final String genomeSample, final String runId) throws AozanException {
+
+    if (!isComputedPercent)
+      throw new AozanException(
+          "Error writing a html report fastqScreen : no values available.");
+
+    final String xml = toXML(fastqSample, genomeSample, runId);
+
+    return xml;
+  }
+
+  private String toXML(final FastqSample fastqSample,
+      final String genomeSample, final String runId) throws AozanException {
+
+    if (!isComputedPercent)
+      return null;
+
+    try {
+      // set up a transformer
+      TransformerFactory transfac = TransformerFactory.newInstance();
+      Transformer trans = transfac.newTransformer();
+      // trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+      trans.setOutputProperty(OutputKeys.INDENT, "yes");
+      trans.setOutputProperty(OutputKeys.METHOD, "xml");
+
+      // create string from xml tree
+      StringWriter sw = new StringWriter();
+      StreamResult result = new StreamResult(sw);
+
+      Document doc = createDocumentXML(fastqSample, genomeSample, runId);
+      DOMSource source = new DOMSource(doc);
+      trans.transform(source, result);
+
+      InputStream is =
+          this.getClass().getResourceAsStream(Globals.EMBEDDED_FASTQSCREEN_XSL);
+
+      if (is == null)
+        return null;
+
+      // Create the transformer
+      final Transformer transformer =
+          TransformerFactory.newInstance().newTransformer(
+              new javax.xml.transform.stream.StreamSource(is));
+
+      // Create the String writer
+      final StringWriter writer = new StringWriter();
+
+      // Transform the document
+      transformer.transform(new DOMSource(doc), new StreamResult(writer));
+
+      // Close input stream
+      is.close();
+
+      // Return the result of the transformation
+      // System.out.println(sw.toString());
+      return writer.toString();
+
+    } catch (TransformerException e) {
+      throw new AozanException(e);
+    } catch (IOException e) {
+      throw new AozanException(e);
+    }
+
+  }
+
+  private Document createDocumentXML(final FastqSample fastqSample,
+      final String genomeSample, final String runId) {
+    DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+
+    DocumentBuilder docBuilder = null;
+    Document doc = null;
+
+    try {
+      docBuilder = dbfac.newDocumentBuilder();
+      doc = docBuilder.newDocument();
+
+    } catch (ParserConfigurationException e) {
+      e.printStackTrace();
+    }
+
+    // Create the root element and add it to the document
+    Element root = doc.createElement("ReportFastqScreen");
+    root.setAttribute("formatversion", "1.0");
+    doc.appendChild(root);
+
+    final DateFormat df = new SimpleDateFormat("yyyy.MM.dd", Locale.US);
+
+    System.out.println("genome in xml " + genomeSample);
+    // Header
+    XMLUtils.addTagValue(doc, root, "AozanStep", "Detection contamination");
+    XMLUtils.addTagValue(doc, root, "RunId", runId);
+    XMLUtils
+        .addTagValue(doc, root, "projectName", fastqSample.getProjectName());
+    XMLUtils.addTagValue(doc, root, "genomeSample", (genomeSample == null
+        ? "no genome" : genomeSample));
+    XMLUtils.addTagValue(doc, root, "sampleName", fastqSample.getSampleName());
+    XMLUtils.addTagValue(doc, root, "dateReport", new Date().toString());
+
+    final Element report = doc.createElement("Report");
+    root.appendChild(report);
+
+    // Table - column
+    final Element columns = doc.createElement("Columns");
+    report.appendChild(columns);
+
+    for (String header : Splitter.on('\t').split(HEADER_COLUMNS_TEXT)) {
+
+      final Element columnElement = doc.createElement("Column");
+      columnElement.setAttribute("name", header.trim());
+      columnElement.setTextContent(header.trim());
+      columns.appendChild(columnElement);
+
+    }
+
+    // Values per genome
+    final Element genomes = doc.createElement("Genomes");
+    report.appendChild(genomes);
+
+    for (Map.Entry<String, DataPerGenome> e : this.resultsPerGenome.entrySet()) {
+      String data = e.getValue().getAllPercentValues();
+
+      final Element genome = doc.createElement("Genome");
+      genomes.appendChild(genome);
+
+      boolean first = true;
+
+      for (String value : Splitter.on('\t').split(data)) {
+        if (first) {
+          // Genome name (first column)
+          genome.setAttribute("name", value.trim());
+          first = false;
+        } else {
+          final Element columnElement = doc.createElement("Value");
+          columnElement.setAttribute("name", value.trim());
+          columnElement.setTextContent(value.trim());
+          genome.appendChild(columnElement);
+        }
+      }
+    }
+
+    // Bilan report fastqscreen
+    final Element unmappedElement = doc.createElement("ReadsUnmapped");
+    unmappedElement.setAttribute("name", "reads_unmapped_none_genome");
+    unmappedElement.setTextContent(Double.toString(DataPerGenome
+        .roundDouble(this.percentUnmappedNoneGenome)));
+    report.appendChild(unmappedElement);
+
+    final Element mappedElement = doc.createElement("ReadsMappedOneGenome");
+    mappedElement.setAttribute("name", "reads_mapped_at_least_one_genome");
+    mappedElement.setTextContent(Double.toString(DataPerGenome
+        .roundDouble(this.percentMappedAtLeastOneGenome)));
+    report.appendChild(mappedElement);
+
+    final Element mappedExceptGenomeElement =
+        doc.createElement("ReadsMappedExceptGenomeSample");
+    mappedExceptGenomeElement.setAttribute("name",
+        "reads_mapped_at_except_genome_sample");
+    mappedExceptGenomeElement.setTextContent(Double.toString(DataPerGenome
+        .roundDouble(this.percentMappedExceptGenomeSample)));
+    report.appendChild(mappedExceptGenomeElement);
+
+    final Element readsMappedElement = doc.createElement("ReadsMapped");
+    readsMappedElement.setAttribute("name", "reads_mapped");
+    readsMappedElement.setTextContent(Integer.toString(this.readsMapped));
+    report.appendChild(readsMappedElement);
+
+    final Element readsProcessedElement = doc.createElement("ReadsProcessed");
+    readsProcessedElement.setAttribute("name", "reads_processed");
+    readsProcessedElement.setTextContent(Integer.toString(this.readsprocessed));
+    report.appendChild(readsProcessedElement);
+
+    return doc;
   }
 
   /**
@@ -157,7 +366,7 @@ public class FastqScreenResult {
     this.percentMappedExceptGenomeSample =
         percentMappedAtLeastOneGenome - percentMappedOnlyOnGenomeSample;
 
-    countPercentOk = true;
+    isComputedPercent = true;
   }
 
   /**
@@ -172,7 +381,7 @@ public class FastqScreenResult {
       throw new AozanException(
           "During fastqScreen execution : no genome receive");
 
-    if (!countPercentOk)
+    if (!isComputedPercent)
       throw new AozanException(
           "During fastqScreen execution : no value ​for genome");
 
@@ -307,6 +516,10 @@ public class FastqScreenResult {
           + roundDouble(this.multipleHitsMultipleLibrariesPercent);
     }
 
+    String getAllPercentValues() {
+      return getAllPercentValues(-1);
+    }
+
     /**
      * Rounding in double.
      * @param n double
@@ -368,6 +581,10 @@ public class FastqScreenResult {
      */
     private String writeGenomeName(final String genomeName,
         final int lengthFinal) {
+
+      if (lengthFinal == -1)
+        return genomeName;
+
       StringBuilder s = new StringBuilder();
       s.append(genomeName);
       int length = genomeName.length();

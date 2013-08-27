@@ -60,7 +60,9 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   private final List<String> genomes;
   private final String genomeSample;
   private final boolean pairedMode;
+  private final boolean runPE;
   private FastqSample fastqSampleR2;
+  private final String runId;
 
   private FastqScreenResult resultsFastqscreen = null;
 
@@ -99,40 +101,68 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   @Override
   protected void createReportFile() throws AozanException, IOException {
 
-    String headerReport =
-        "FastqScreen for Projet "
-            + fastqSample.getProjectName()
-            + (this.genomeSample == null
-                ? " (no genome reference" : " (genome reference for sample "
-                    + this.genomeSample) + ").\nresult for sample : "
-            + fastqSample.getSampleName();
-
     // TODO to remove after test
     System.out.println("\n"
-        + this.resultsFastqscreen.statisticalTableToString(headerReport));
+        + this.resultsFastqscreen.reportToCSV(this.fastqSample,
+            this.genomeSample));
 
-    File fastqScreenFile =
-        new File(this.reportDir.getAbsolutePath()
-            + "/" + this.fastqSample.getKeyFastqSample() + "-fastqscreen.txt");
+    String report =
+        this.reportDir.getAbsolutePath()
+            + "/" + this.fastqSample.getKeyFastqSample() + "-fastqscreen";
 
-    BufferedWriter br = Files.newWriter(fastqScreenFile, Charsets.UTF_8);
-    br.append(this.resultsFastqscreen.statisticalTableToString(headerReport));
-    br.close();
+    writeCSV(report);
+
+    // Report with a link in qc html page
+    writeHtml(report);
 
     LOGGER.fine("FASTQSCREEN : save "
         + this.fastqSample.getKeyFastqSample() + " report fastqscreen");
 
-    // mode paired : copy same report for fastqSample R2
-    if (this.pairedMode) {
+//    if (runPE) {
+//      // copy same report for fastqSample R2
+//      String reportR2 =
+//          this.reportDir.getAbsolutePath()
+//              + "/" + this.fastqSample.getPrefixRead2() + "-fastqscreen";
+//      FileUtils
+//          .copyFile(new File(report + ".csv"), new File(reportR2 + ".csv"));
+//      FileUtils
+//          .copyFile(new File(report + ".csv"), new File(reportR2 + ".csv"));
+//    }
+  }
 
-      File reportR2 =
-          new File(this.reportDir.getAbsolutePath()
-              + "/" + this.fastqSample.getPrefixRead2() + "-fastqscreen.txt");
-      FileUtils.copyFile(fastqScreenFile, reportR2);
+  /**
+   * Create a report fastqScreen for a sample in csv format.
+   * @param fileName name of the report file in csv format
+   * @throws IOException if an error occurs during writing file
+   */
+  private void writeCSV(final String fileName) throws AozanException,
+      IOException {
 
-      LOGGER.fine("FASTQSCREEN : save "
-          + this.fastqSample.getPrefixRead2() + " report fastqscreen");
-    }
+    File file = new File(fileName + ".csv");
+
+    BufferedWriter br = Files.newWriter(file, Charsets.UTF_8);
+    br.append(this.resultsFastqscreen.reportToCSV(this.fastqSample,
+        this.genomeSample));
+
+    br.close();
+
+  }
+
+  /**
+   * Create a report fastqScreen for a sample in html format.
+   * @param fileName name of the report file in html format
+   * @throws IOException if an error occurs during writing file
+   */
+  private void writeHtml(final String fileName) throws AozanException,
+      IOException {
+
+    File file = new File(fileName + ".html");
+
+    BufferedWriter br = Files.newWriter(file, Charsets.UTF_8);
+    br.append(this.resultsFastqscreen.reportToHtml(this.fastqSample,
+        this.genomeSample, this.runId));
+
+    br.close();
 
   }
 
@@ -165,7 +195,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
             pairedMode);
 
     if (resultsFastqscreen == null)
-      throw new AozanException("Fastqscreen return no result for sample "
+      throw new AozanException("Fastqscreen returns no result for sample "
           + String.format("/Project_%s/Sample_%s",
               fastqSample.getProjectName(), fastqSample.getSampleName()));
 
@@ -173,14 +203,14 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     this.results.put(resultsFastqscreen.createRundata("fastqscreen"
         + fastqSample.getPrefixRundata()));
 
-    // mode paired : same values for fastqSample R2
-    if (this.pairedMode && fastqSample.getRead() == 1) {
-      String prefixR2 =
-          fastqSample.getPrefixRundata().replace(".read1.", ".read2.");
-      
-      this.results.put(resultsFastqscreen.createRundata("fastqscreen"
-          + prefixR2));
-    }
+    // // mode paired : same values for fastqSample R2
+    // if (this.pairedMode && fastqSample.getRead() == 1) {
+    // String prefixR2 =
+    // fastqSample.getPrefixRundata().replace(".read1.", ".read2.");
+    //
+    // this.results.put(resultsFastqscreen.createRundata("fastqscreen"
+    // + prefixR2));
+    // }
 
     try {
       createReportFile();
@@ -205,6 +235,8 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @param reportDir path for the directory who save the FastqScreen report
    * @param paired true if a pair-end run and option paired mode equals true
    *          else false
+   * @param runPE true if the run is PE else false
+   * @param runId id of the run
    * @throws AozanException if an error occurs during create thread, if no fastq
    *           file was found
    */
@@ -212,10 +244,11 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   public FastqScreenProcessThread(final FastqSample fastqSampleR1,
       final FastqSample fastqSampleR2, final FastqScreen fastqscreen,
       final List<String> genomes, final String genomeSample,
-      final File reportDir, final boolean pairedMode) throws AozanException {
+      final File reportDir, final boolean pairedMode, final boolean runPE,
+      final String runId) throws AozanException {
 
     this(fastqSampleR1, fastqscreen, genomes, genomeSample, reportDir,
-        pairedMode);
+        pairedMode, runPE, runId);
     this.fastqSampleR2 = fastqSampleR2;
   }
 
@@ -229,12 +262,15 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @param reportDir path for the directory who save the FastqScreen report
    * @param paired true if a pair-end run and option paired mode equals true
    *          else false
+   * @param runPE true if the run is PE else false
+   * @param runId id of the run
    * @throws AozanException if an error occurs during create thread, if no fastq
    *           file was found
    */
   public FastqScreenProcessThread(final FastqSample fastqSample,
       final FastqScreen fastqscreen, final List<String> genomes,
-      final String genomeSample, final File reportDir, final boolean pairedMode)
+      final String genomeSample, final File reportDir,
+      final boolean pairedMode, final boolean runPE, final String runId)
       throws AozanException {
 
     super(fastqSample);
@@ -244,6 +280,8 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     this.genomeSample = genomeSample;
     this.reportDir = reportDir;
     this.pairedMode = pairedMode;
+    this.runPE = runPE;
+    this.runId = runId;
 
     // Copy list genome for fastqscreen
     this.genomes = new ArrayList<String>();

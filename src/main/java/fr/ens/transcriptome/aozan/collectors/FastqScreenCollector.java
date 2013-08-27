@@ -156,6 +156,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
       return null;
 
     final boolean pairedMode = runPE && !ignorePairedMode;
+    final String runId = data.get("run.info.run.id");
 
     if (pairedMode)
 
@@ -172,13 +173,14 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
         return new FastqScreenProcessThread(fastqSample, fastqSampleR2,
             fastqscreen, genomesConfiguration, genomeReferenceSample,
-            reportDir, pairedMode);
+            reportDir, pairedMode, runPE, runId);
       }
     }
 
     // Call in mode single-end
     return new FastqScreenProcessThread(fastqSample, fastqscreen,
-        genomesConfiguration, genomeReferenceSample, reportDir, pairedMode);
+        genomesConfiguration, genomeReferenceSample, reportDir, pairedMode,
+        runPE, runId);
   }
 
   //
