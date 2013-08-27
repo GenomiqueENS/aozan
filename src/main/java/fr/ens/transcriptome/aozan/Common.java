@@ -60,7 +60,7 @@ public class Common {
     final Logger eoulsanLogger = getLogger();
 
     // Set default log level
-    eoulsanLogger.setLevel(fr.ens.transcriptome.eoulsan.Globals.LOG_LEVEL);
+    eoulsanLogger.setLevel(fr.ens.transcriptome.aozan.Globals.LOG_LEVEL);
 
     final Handler fh = new FileHandler(logPath, true);
     fh.setFormatter(fr.ens.transcriptome.eoulsan.Globals.LOG_FORMATTER);
