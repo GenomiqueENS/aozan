@@ -24,7 +24,7 @@ def create_lock_file(lock_file_path):
     """
 
     f = open(lock_file_path, 'w')
-    f.write(str(os.getpid()))
+    f.write(str(Common.getCurrentPid()))
     f.close()
 
 
