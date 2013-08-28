@@ -107,9 +107,9 @@
 			FastQ Screen allows to screen a library of sequences in Fastq format against a set of sequence databases. </p>
 			
 			<p>The code has been rewriting in Aozan and additional values have been creating.
-			There we use <a href="http://bowtie-bio.sourceforge.net/manual.shtml"  target="_blank">bowtie</a> to align reads 
-			to reference genomes or contaminant databases like adapter sequences, PhiX and ribosomes databases.
-			Moreover it aligns on the genome of the sample based on the data in the casava design file.
+			Here we use <a href="http://bowtie-bio.sourceforge.net/manual.shtml"  target="_blank">bowtie</a> to align reads 
+			to reference genomes or contaminant databases like adapter sequences, PhiX and <a href="http://www.arb-silva.de/no_cache/download/archive/release_111/Exports">ribosomes databases</a>.
+			Moreover it aligns on the genome of the sample based on the data in the casava sample-sheet file.
 			</p>
 
 			<p>Currently all the reads are aligned. The runtime is very long, even with the multithreading option of bowtie. 
@@ -127,17 +127,45 @@
 			</p>
 			
 			<table>
-			  <tr><th>Aozan property</th><th>Type</th><th>description</th></tr>
+			  <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
 			  <tr><td>qc.conf.genome.alias.path</td><td>string</td>
+				  <td></td>
 				  <td>Path to the file which make the correspondence between genome name in casava design file and the genome name reference used for
 						identified index of bowtie. If a genome's name doesn't exist in the alias file, it's added at the end. </td></tr>
 			  <tr><td>qc.conf.settings.genomes.desc.path</td><td>string</td>
+				  <td></td>
 				  <td>Path to the genomes descriptions repository. The genome description file contains some basic informations about the genome
 						like the chromosome length. The repository allow to avoid useless genome sequence parsing once it has been already parsed in a
 						previous run. </td></tr>
-			  <tr><td>qc.conf.settings.genomes</td><td>string</td><td>Path to the genomes repository.</td></tr>
- 			  <tr><td>qc.conf.settings.mappers.indexes.path</td><td>string</td><td>Path to the genomes indexes repository.</td></tr>
-			  <tr><td>qc.conf.fastqscreen.genomes</td><td>string</td><td>List of reference genomes used per default for fastqscreen (e.g. phix, adapters)</td></tr>
+			  <tr><td>qc.conf.settings.genomes</td><td>string</td><td></td><td>Path to the genomes repository.</td></tr>
+ 			  <tr><td>qc.conf.settings.mappers.indexes.path</td><td>string</td><td></td><td>Path to the genomes indexes repository.</td></tr>
+			  <tr><td>qc.conf.fastqscreen.genomes</td><td>string</td><td>phix, adapters</td><td>List of reference genomes used per default for fastqscreen.</td></tr>
+			  <tr>
+				<td>qc.conf.skip.control.lane</td>
+				<td>boolean</td>
+				<td>True</td>
+				<td>For the contamination detection in control lane : if it's true none, false : ok</td>
+			  </tr>
+			  <tr>
+				<td>qc.conf.ignore.paired.mode</td>
+				<td>boolean</td>
+				<td>True</td>
+				<td>For a run paired-end, the detection contamination concerns only reads R1, same value assigned for reads R2 
+					else it's False the mapping is paired mode with reads R1 and reads R2.</td>
+			  </tr>
+			  <tr>
+				<td>qc.conf.max.reads.parsed</td>
+				<td>integer</td>
+				<td>200000</td>
+				<td>Number of reads in fastq used for the step, selected only the reads with passing filtered illumina. If it's equals to -1, all reads in fastq files used.</td>
+			  </tr>
+			  <tr>
+				<td>qc.conf.reads.pf.used</td>
+				<td>integer</td>
+				<td>30000000</td>
+				<td>Number of reads who are selected reads passing filtered for create fastq partial for the step. If it's equals to -1, parsing files fully.</td>
+			  </tr>
+			  
 			</table>
 
 			<H5>Configuration tests</H5>
@@ -147,13 +175,13 @@
 					<th>Aozan property</th>
 					<th>Type</th>
 					<th>Default value</th>
-					<th>description</th>
+					<th>Description</th>
 				</tr>
 				<tr>
 					<td>qc.test.hitnolibraries.enable</td>
 					<td>boolean</td>
 					<td>False</td>
-					<td>A report of quality control contains a column with the percent 
+					<td>The report of quality control contains a column with the percent 
 					of reads mapped at least one reference genomes, except on genome sample test</td>
 				</tr>
 				<tr>
@@ -166,7 +194,7 @@
 					<td>qc.test.fsqmapped.enable</td>
 					<td>boolean</td>
 					<td>False</td>
-					<td>A report of quality control contains a column with the percent
+					<td>The report of quality control contains a column with the percent
 					 of reads mapped for each reference genome test.</td>
 				</tr>
 				<tr>
@@ -180,24 +208,45 @@
 					<td>qc.test.linkreport.enable</td>
 					<td>boolean</td>
 					<td>False</td>
-					<td>A report of quality control contains a column with link to report fastqscreen file, 
+					<td>The report of quality control contains a column with link to report fastqscreen file, 
 					save in quality control directory.</td>
 				</tr>
 			</table>	
 		<p>The explanation to construct intervals is <a href="#syntax_interval">here.</a></p>
                 <p>If no FastQ Screen test property is set, FastQ Screen will not be launch on FastQ data.</p>
        
-       <p>An example of a report of quality control with major values of fastqscreen : 
+        <p>The last column contains a link to the report html fastqscreen. An example of a report html of quality control with major values of fastqscreen : 
 		<div align="center">
 			<table><tr><th align="center"><img src="images/tab_fastqscreen.png" alt="" border="1"></img></th></tr></table>
+		</div>
+		</p>
 		
-		</div>
-		</p>
-		<p>An example of a report fastqscreen with four reference genomes and the genome sample (hg19) :
+		<p>An example of a report html fastqscreen with four reference genomes and the genome sample (hg19) :
 		<div align="center">
-			<table><tr><th align="center"><img src="images/report_fastqscreen.png" alt="" border="1"></img></th></tr></table>
+			<table><tr><th align="center"><img src="images/report_html_fastqscreen.png" alt="" border="1"></img></th></tr></table>
 		</div>
-		</p>
+		<p>The report exists in csv format.</p>
+		
+		<p>List of values for each genome :
+		<ul>
+			<li><b>%Mapped</b> : percent of reads which mapped on this genome. It must be low for the genome reference of contamination and big for the genome of the sample).</li>
+			<li><b>%Unmapped</b> : percent of reads which not mapped on this genome.</li>
+			<li><b>%One_hit_one_library</b> : percent of reads which mapped uniq on this genome.</li>
+			<li><b>%Multiple_hits_one_library</b> : percent of reads which multi-mapped on this genome.</li>
+			<li><b>%One_hit_multiple_libraries</b> : percent of reads which mapped once on all genomes.</li>
+			<li><b>%Multiple_hits_multiple_libraries</b> : percent of reads which multi-mapped on all genomes.</li>
+		</ul>
+	The genome of the sample serves the positif temoin.
+	</p>
+
+	<p>List of values for all genomes :
+	<ul>
+		<li><b>% reads_unmapped_none_genome</b> : percent of reads which not mapped on none genomes tested. It must be big if the genome of the sample isn't used and low if it is used).</li> 
+		<li><b>% reads_mapped_at_least_one_genome</b> : percent of reads which mapped at least on one genome.</li>
+		<li><b>% reads_mapped_except_genome_sample</b> : percent of reads which mapped within the genome reference of contamination, the genome of the sample is excluded.</li>
+		<li> 'x' reads mapped / 200 000 reads processed </li>
+	</ul>
+	</p>
     </subsection>
     
     <a name="syntax_interval"/>

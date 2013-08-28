@@ -41,9 +41,27 @@
      for each test, however if this property is not set, the value will be computed but not checked if it is the correct interval.
      You will find below all the parameters for all the available tests in Aozan:</p>
      
+     <h4>Parameters for collect data to lanes quality tests</h4>
+       <table>
+       		<tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
+       		<tr>
+       			<td>qc.conf.read.xml.collector.used</td>
+       			<td>boolean</td>
+       			<td>False</td>
+       			<td>Per default, reading interOp binary files for collect data on lane quality tests, 
+       				if it is possible to use files read1.xml available with version 1.17.20 RTA and previous.</td>
+       		</tr>
+       		<tr>
+       			<td>qc.conf.cluster.density.ratio</td>
+       			<td>integer</td>
+       			<td>0.3472222</td>
+       			<td>Value necessary for compute the cluster density in the lane quality tests.</td>
+       		</tr>
+       </table>
+     
        <h4>Configuration lanes quality tests</h4>
        <table>
-         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
          <tr><td>qc.test.rawclusters.enable</td><td>boolean</td><td>False</td><td>Enable rawcluster test</td></tr>
          <tr><td>qc.test.rawclusters.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of rawcluster</td></tr>
          <tr><td>qc.test.pfclusters.enable</td><td>boolean</td><td>False</td><td>Enable pfcluster test</td></tr>

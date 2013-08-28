@@ -129,7 +129,7 @@ public class FastqscreenDemo {
       date = new SimpleDateFormat("yyMMdd").format(new Date());
 
       Common.initLogger(TMP_DIR + "/" + runId + "_aozan_test.log");
-      LOGGER.setLevel(Level.ALL);
+      LOGGER.setLevel(Level.CONFIG);
 
       System.out.println("Create report qc for run "
           + runId + "  " + FastqSample.VALUE);
