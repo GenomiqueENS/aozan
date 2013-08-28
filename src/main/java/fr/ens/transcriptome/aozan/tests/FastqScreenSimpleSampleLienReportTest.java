@@ -63,8 +63,8 @@ public class FastqScreenSimpleSampleLienReportTest extends AbstractSampleTest {
     final String index =
         data.get("design.lane" + lane + "." + sampleName + ".index");
     final String filename =
-        String.format("%s_%s_L%03d_R%d_001-fastqscreen.html", sampleName,
-            "".equals(index) ? "NoIndex" : index, lane, readSample);
+        String.format("%s_%s_L%03d_R1_001-fastqscreen.html", sampleName,
+            "".equals(index) ? "NoIndex" : index, lane);
 
     final String url = "Project_" + projectName + "/" + filename;
 

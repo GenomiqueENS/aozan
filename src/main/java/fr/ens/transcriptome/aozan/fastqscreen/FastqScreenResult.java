@@ -132,20 +132,20 @@ public class FastqScreenResult {
     return s.toString();
   }
 
-  public String reportToHtml(final FastqSample fastqSample,
-      final String genomeSample, final String runId) throws AozanException {
+  public String reportToHtml(final FastqSample fastqSample, final RunData data,
+      final String genomeSample) throws AozanException {
 
     if (!isComputedPercent)
       throw new AozanException(
           "Error writing a html report fastqScreen : no values available.");
 
-    final String xml = toXML(fastqSample, genomeSample, runId);
+    final String xml = toXML(fastqSample, data, genomeSample);
 
     return xml;
   }
 
-  private String toXML(final FastqSample fastqSample,
-      final String genomeSample, final String runId) throws AozanException {
+  private String toXML(final FastqSample fastqSample, final RunData data,
+      final String genomeSample) throws AozanException {
 
     if (!isComputedPercent)
       return null;
@@ -162,7 +162,7 @@ public class FastqScreenResult {
       StringWriter sw = new StringWriter();
       StreamResult result = new StreamResult(sw);
 
-      Document doc = createDocumentXML(fastqSample, genomeSample, runId);
+      Document doc = createDocumentXML(fastqSample, data, genomeSample);
       DOMSource source = new DOMSource(doc);
       trans.transform(source, result);
 
@@ -187,7 +187,6 @@ public class FastqScreenResult {
       is.close();
 
       // Return the result of the transformation
-      // System.out.println(sw.toString());
       return writer.toString();
 
     } catch (TransformerException e) {
@@ -199,7 +198,7 @@ public class FastqScreenResult {
   }
 
   private Document createDocumentXML(final FastqSample fastqSample,
-      final String genomeSample, final String runId) {
+      final RunData data, final String genomeSample) {
     DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 
     DocumentBuilder docBuilder = null;
@@ -220,16 +219,27 @@ public class FastqScreenResult {
 
     final DateFormat df = new SimpleDateFormat("yyyy.MM.dd", Locale.US);
 
-    System.out.println("genome in xml " + genomeSample);
     // Header
     XMLUtils.addTagValue(doc, root, "AozanStep", "Detection contamination");
-    XMLUtils.addTagValue(doc, root, "RunId", runId);
+    XMLUtils.addTagValue(doc, root, "GeneratorName",
+        Globals.APP_NAME_LOWER_CASE);
+    XMLUtils.addTagValue(doc, root, "GeneratorVersion",
+        Globals.APP_VERSION_STRING);
+    XMLUtils.addTagValue(doc, root, "RunId", data.get("run.info.run.id"));
+    XMLUtils.addTagValue(doc, root, "RunDate", data.get("run.info.date"));
+    XMLUtils.addTagValue(doc, root, "FlowcellId",
+        data.get("run.info.flow.cell.id"));
+    XMLUtils.addTagValue(doc, root, "InstrumentSN",
+        data.get("run.info.instrument"));
+    XMLUtils.addTagValue(doc, root, "InstrumentRunNumber",
+        data.get("run.info.run.number"));
+    XMLUtils.addTagValue(doc, root, "ReportDate", new Date().toString());
+
     XMLUtils
         .addTagValue(doc, root, "projectName", fastqSample.getProjectName());
     XMLUtils.addTagValue(doc, root, "genomeSample", (genomeSample == null
         ? "no genome" : genomeSample));
     XMLUtils.addTagValue(doc, root, "sampleName", fastqSample.getSampleName());
-    XMLUtils.addTagValue(doc, root, "dateReport", new Date().toString());
 
     final Element report = doc.createElement("Report");
     root.appendChild(report);
@@ -252,14 +262,14 @@ public class FastqScreenResult {
     report.appendChild(genomes);
 
     for (Map.Entry<String, DataPerGenome> e : this.resultsPerGenome.entrySet()) {
-      String data = e.getValue().getAllPercentValues();
+      String val = e.getValue().getAllPercentValues();
 
       final Element genome = doc.createElement("Genome");
       genomes.appendChild(genome);
 
       boolean first = true;
 
-      for (String value : Splitter.on('\t').split(data)) {
+      for (String value : Splitter.on('\t').split(val)) {
         if (first) {
           // Genome name (first column)
           genome.setAttribute("name", value.trim());
