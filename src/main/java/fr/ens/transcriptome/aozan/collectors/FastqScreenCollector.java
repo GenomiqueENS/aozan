@@ -119,22 +119,19 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
   @Override
   public AbstractFastqProcessThread collectSample(RunData data,
-      final FastqSample fastqSample, final File reportDir, final boolean runPE)
+      final FastqSample fastqSample, final File reportDir, final boolean isRunPE)
       throws AozanException {
 
     if (fastqSample.getFastqFiles() == null
         || fastqSample.getFastqFiles().isEmpty()) {
-      return null;
 
-      // TODO fix after test : throw an AozanException
-      // throw new AozanException("No fastq files defined for fastqSample "
-      // + fastqSample.getKeyFastqSample());
+      throw new AozanException("No fastq files defined for fastqSample "
+          + fastqSample.getKeyFastqSample());
     }
 
-    // TODO to remove : use configuration aozan for mode PE
     // Create the thread object only if the fastq sample correspond to a R1
-    // if (fastqSample.getRead() == 2)
-    // return null;
+    if (fastqSample.getRead() == 2)
+      return null;
 
     // Retrieve genome sample
     final String genomeSample =
@@ -155,32 +152,29 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     if (controlLane && skipControlLane)
       return null;
 
-    final boolean pairedMode = runPE && !ignorePairedMode;
-    final String runId = data.get("run.info.run.id");
+    final boolean isPairedMode = isRunPE && !ignorePairedMode;
 
-    if (pairedMode)
+    if (isRunPE && isPairedMode) {
 
-      if (fastqSample.getRead() != 1)
-        return null;
+      // in mode paired FastqScreen should be launched with R1 and R2
+      // together.
+      // Search fasqtSample which corresponding to fastqSample R1
+      String prefixRead2 = fastqSample.getPrefixRead2();
 
-    // in mode paired FastqScreen should be launched with R1 and R2
-    // together.
-    // Search fasqtSample which corresponding to fastqSample R1
-    String prefixRead2 = fastqSample.getPrefixRead2();
+      for (FastqSample fastqSampleR2 : fastqSamples) {
+        if (fastqSampleR2.getKeyFastqSample().equals(prefixRead2)) {
 
-    for (FastqSample fastqSampleR2 : fastqSamples) {
-      if (fastqSampleR2.getKeyFastqSample().equals(prefixRead2)) {
-
-        return new FastqScreenProcessThread(fastqSample, fastqSampleR2,
-            fastqscreen, genomesConfiguration, genomeReferenceSample,
-            reportDir, pairedMode, runPE, runId);
+          return new FastqScreenProcessThread(fastqSample, fastqSampleR2,
+              fastqscreen, data, genomesConfiguration, genomeReferenceSample,
+              reportDir, isPairedMode, isRunPE);
+        }
       }
     }
 
-    // Call in mode single-end
-    return new FastqScreenProcessThread(fastqSample, fastqscreen,
-        genomesConfiguration, genomeReferenceSample, reportDir, pairedMode,
-        runPE, runId);
+    // Call with a mode single-end for mapping
+    return new FastqScreenProcessThread(fastqSample, fastqscreen, data,
+        genomesConfiguration, genomeReferenceSample, reportDir, isPairedMode,
+        isRunPE);
   }
 
   //
