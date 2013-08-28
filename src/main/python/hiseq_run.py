@@ -44,6 +44,11 @@ def get_reads_number(run_id, conf):
 
 	hiseq_data_path = find_hiseq_run_path(run_id, conf)
 
+	run_parameters_path = hiseq_data_path + '/' + run_id + "/runParameters.xml"
+
+	if not os.path.exists(run_parameters_path):
+		return -1
+
 	tree = ElementTree()
 	tree.parse(hiseq_data_path + '/' + run_id + "/runParameters.xml")
 
@@ -65,6 +70,10 @@ def check_end_run(run_id, conf):
 		return False
 
 	reads_number = get_reads_number(run_id, conf)
+
+	# if reads_number equals -1, runParameters.xml is missing
+	if reads_number == -1
+		return False
 
 	for i in range(reads_number):
 		if not os.path.exists(hiseq_data_path + '/' + run_id + '/Basecalling_Netcopy_complete_Read' + str(i + 1) + '.txt'):

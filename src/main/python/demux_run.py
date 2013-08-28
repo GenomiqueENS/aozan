@@ -161,7 +161,7 @@ def demux(run_id, conf):
               'The fastq output directory already exists for run ' + run_id + ': ' + fastq_output_dir, conf)
         return False
 
-    # Compute disk usage and disk free to check if enough disk space is available 
+    # Compute disk usage and disk free to check if enough disk space is available
     input_path_du = common.du(conf['bcl.data.path'] + '/' + run_id)
     output_df = common.df(conf['fastq.data.path'])
     du_factor = float(conf['demux.space.factor'])
@@ -171,7 +171,7 @@ def demux(run_id, conf):
     common.log("SEVERE", "Demux step: output disk free: " + str(output_df), conf)
     common.log("SEVERE", "Demux step: space needed: " + str(space_needed), conf)
 
-    # Check if free space is available 
+    # Check if free space is available
     if output_df < space_needed:
         error("Not enough disk space to perform demultiplexing for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id +
               '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + fastq_output_dir + '.', conf)
@@ -222,20 +222,20 @@ def demux(run_id, conf):
             error("error while copying Casava CSV design file to temporary directory for run " + run_id,
                   'Error while copying Casava CSV design file to temporary directory.\nCommand line:\n' + cmd, conf)
             return False
-        
+
     elif conf['casava.design.format'].strip().lower() == 'command':
-        
+
         if conf['casava.design.generator.command'] == None or conf['casava.design.generator.command'].strip() == '':
             error("error while creating Casava CSV design file for run " + run_id,
                   'Error while creating Casava CSV design file, the command is empty.', conf)
             return False
-        
+
         cmd = conf['casava.design.generator.command'] + ' ' + run_id + ' ' + design_csv_path
         common.log("SEVERE", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
             error("error while creating Casava CSV design file for run " + run_id,
                   'Error while creating Casava CSV design file.\nCommand line:\n' + cmd, conf)
-            
+
         if not os.path.exists(design_csv_path):
             error("error while creating Casava CSV design file for run " + run_id,
                   'Error while creating Casava CSV design file, the external command did not create Casava CSV file:\n' + cmd, conf)
@@ -247,7 +247,7 @@ def demux(run_id, conf):
     # Check if Casava CSV design file has been created
     if not os.path.exists(design_csv_path):
             error("error while reading Casava CSV design file for run " + run_id,
-                  'Error while reading Casava CSV design file, the file file does not exist: \n' + design_csv_path, conf)            
+                  'Error while reading Casava CSV design file, the file file does not exist: \n' + design_csv_path, conf)
 
     # Check Casava CSV design file
     try:
@@ -285,28 +285,29 @@ def demux(run_id, conf):
           '--input-dir ' + conf['bcl.data.path'] + '/' + run_id + '/Data/Intensities/BaseCalls ' + \
           '--sample-sheet ' + design_csv_path + ' ' + \
           '--output-dir ' + fastq_output_dir
-    if conf['casava.with.failed.reads']=='True':
+    if conf['casava.with.failed.reads'] == 'True':
         cmd = cmd + ' --with-failed-reads'
-    if conf['casava.adapter.fasta.file.path']!='':
+    if conf['casava.adapter.fasta.file.path'] != '':
         cmd = cmd + ' --adapter-sequence ' + conf['casava.adapter.fasta.file.path']
     
-    if conf['casava.additionnal.arguments']!='':
+    if conf['casava.additionnal.arguments'] != '':
         cmd = cmd + ' ' + conf['casava.additionnal.arguments']
-    
-          
+
     common.log("SEVERE", "exec: " + cmd, conf)
-    if os.system(cmd) != 0:
-        error("error while creating Casava makefile for run " + run_id, 'Error while creating Casava makefile.\nCommand line:\n' + cmd, conf)
+    exit_code = os.system(cmd)
+    if exit_code != 0:
+        error("error while creating Casava makefile for run " + run_id, 'Error while creating Casava makefile (exit code: ' + exit_code + ').\nCommand line:\n' + cmd, conf)
         return False
 
     # Get the number of cpu
     cpu_count = Runtime.getRuntime().availableProcessors()
 
     # Launch casava
-    cmd = "cd " + fastq_output_dir + " && make -j " + str(cpu_count)
+    cmd = 'cd ' + fastq_output_dir + ' && make -j ' + str(cpu_count) + ' > ' + fastq_output_dir + '/make.out' + ' 2> ' + fastq_output_dir + '/make.err'
     common.log("SEVERE", "exec: " + cmd, conf)
-    if os.system(cmd) != 0:
-        error("error while running Casava for run " + run_id, 'Error while creating Casava makefile.\nCommand line:\n' + cmd, conf)
+    exit_code = os.system(cmd)
+    if exit_code != 0:
+        error("error while running Casava for run " + run_id, 'Error while running Casava (exit code: ' + exit_code + ').\nCommand line:\n' + cmd, conf)
         return False
 
     # Copy design to output directory
@@ -349,7 +350,7 @@ def demux(run_id, conf):
         cmd = 'cd ' + conf['tmp.path'] + \
         ' && zip ' + conf['casava.designs.path'] + '/designs.zip ' + \
         os.path.basename(design_csv_path)
-        
+
     common.log("SEVERE", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while archiving the design file for " + run_id, 'Error while archiving the design file for.\nCommand line:\n' + cmd, conf)
