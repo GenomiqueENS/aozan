@@ -89,7 +89,7 @@ public class Globals {
       + "-" + APP_VERSION_STRING + "-" + APP_BUILD_NUMBER + "-";
 
   /** The log level of the application. */
-  public static final Level LOG_LEVEL = Level.INFO; // Level.OFF;
+  public static final Level LOG_LEVEL = Level.CONFIG; // Level.FINEST;
 
   /** Set the debug mode. */
   public static final boolean DEBUG = APP_VERSION_STRING.endsWith("-SNAPSHOT")
@@ -125,7 +125,7 @@ public class Globals {
   /** Embedded XSL QC stylesheet. */
   public static final String EMBEDDED_QC_XSL = "/aozan.xsl";
   public static final String EMBEDDED_FASTQSCREEN_XSL = "/fastqscreen.xsl";
-  
+
   /** Default locale of the application. */
   public static final Locale DEFAULT_LOCALE = Locale.US;
 

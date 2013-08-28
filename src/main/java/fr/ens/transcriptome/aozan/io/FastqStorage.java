@@ -129,7 +129,7 @@ public final class FastqStorage {
    * @throws IOException
    */
   public void clear() {
-    LOGGER.info("Delete temporaries fastq files");
+    LOGGER.warning("Delete temporaries fastq files");
 
     File[] files = new File(tmpPath).listFiles(new FileFilter() {
 

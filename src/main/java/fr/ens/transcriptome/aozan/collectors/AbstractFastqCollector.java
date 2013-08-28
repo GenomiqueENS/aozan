@@ -148,7 +148,8 @@ abstract public class AbstractFastqCollector implements Collector {
 
     createListFastqSamples(data);
 
-    final boolean runPE = data.get(KEY_RUN_MODE).equals("PE") ? true : false;
+    final boolean isRunPE =
+        data.get(KEY_RUN_MODE).toUpperCase().equals("PE") ? true : false;
 
     RunData resultPart = null;
     if (this.getThreadsNumber() > 1) {
@@ -173,7 +174,7 @@ abstract public class AbstractFastqCollector implements Collector {
                     + reportDir.getAbsolutePath());
 
             AbstractFastqProcessThread thread =
-                collectSample(data, fs, reportDir, runPE);
+                collectSample(data, fs, reportDir, isRunPE);
 
             if (thread != null) {
               // Add thread to executor or futureThreads, I don't know
@@ -215,7 +216,7 @@ abstract public class AbstractFastqCollector implements Collector {
                     + reportDir.getAbsolutePath());
 
             AbstractFastqProcessThread pseudoThread =
-                collectSample(data, fs, reportDir, runPE);
+                collectSample(data, fs, reportDir, isRunPE);
 
             if (pseudoThread == null)
               continue;
@@ -273,16 +274,6 @@ abstract public class AbstractFastqCollector implements Collector {
           String projectName =
               data.get("design.lane"
                   + lane + "." + sampleName + ".sample.project");
-
-          // TODO check possible to remove
-          // update list of genomes samples
-          // receive genome name for sample
-          // String genomeSample =
-          // data.get("design.lane" + lane + "." + sampleName + ".sample.ref");
-          // if genomeSample is present in mapAliasGenome, add in list of
-          // genomes reference for the mapping
-          // genomeSample = genomeSample.trim().toLowerCase();
-          // genomeSample = genomeSample.replace('"', '\0');
 
           FastqSample fastqSample =
               new FastqSample(this.casavaOutputPath, read, lane, sampleName,

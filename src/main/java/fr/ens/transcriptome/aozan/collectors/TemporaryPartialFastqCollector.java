@@ -44,13 +44,15 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
   public static final String COLLECTOR_NAME = "tmppartialfastq";
   public static final String KEY_SKIP_CONTROL_LANE =
       "qc.conf.skip.control.lane";
-
+  public static final String KEY_IGNORE_PAIRED_MODE =
+      "qc.conf.ignore.paired.mode";
   public static final String KEY_READS_PF_USED = "qc.conf.reads.pf.used";
   public static final String KEY_MAX_READS_PF_PARSING =
       "qc.conf.max.reads.parsed";
 
   /** Parameters configuration */
   private boolean skipControlLane;
+  private boolean ignorePairedMode;
 
   // count reads pf necessary for create a temporary partial fastq
   private int countReadsPFtoCopy;
@@ -109,6 +111,15 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
       this.skipControlLane = true;
     }
 
+    try {
+      this.ignorePairedMode =
+          Boolean.parseBoolean(properties.getProperty(KEY_IGNORE_PAIRED_MODE));
+
+    } catch (Exception e) {
+      // Default value
+      this.ignorePairedMode = false;
+    }
+
     int readsToCopy =
         Integer.parseInt(properties.getProperty(KEY_READS_PF_USED));
     if (readsToCopy == -1) {
@@ -149,6 +160,11 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
     if (controlLane && skipControlLane) {
       return null;
     }
+
+    // Ignore fastq from reads R2 in run PE if the mapping mode is not paired
+    final boolean isPairedMode = runPE && !ignorePairedMode;
+    if (!isPairedMode && fastqSample.getRead() == 2)
+      return null;
 
     // Check if the temporary partial fastq file exists
     if (fastqStorage.tmpFileExists(fastqSample))
