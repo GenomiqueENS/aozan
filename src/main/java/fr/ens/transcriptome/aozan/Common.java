@@ -24,7 +24,10 @@
 package fr.ens.transcriptome.aozan;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+
 import static fr.ens.transcriptome.eoulsan.LocalEoulsanRuntime.initEoulsanRuntimeForExternalApp;
+
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
@@ -40,6 +43,18 @@ public class Common {
 
   public static final Logger getLogger() {
     return Logger.getLogger(fr.ens.transcriptome.eoulsan.Globals.APP_NAME);
+  }
+
+  /**
+   * Return the pid of the instance of jvm
+   * @return pid of the instance of jvm, or null
+   */
+  public static final int getCurrentPid() {
+
+    final String beanName = ManagementFactory.getRuntimeMXBean().getName();
+    final int index = beanName.indexOf('@');
+
+    return Integer.parseInt(beanName.substring(0, index));
   }
 
   /**
