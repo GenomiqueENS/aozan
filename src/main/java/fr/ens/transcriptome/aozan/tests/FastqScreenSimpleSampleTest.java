@@ -53,9 +53,6 @@ import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignCSVReader;
  * @since 1.0
  * @author Sandrine Perrin
  */
-/**
- * @author sperrin
- */
 public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
   private static final String KEY_GENOMES = "qc.conf.fastqscreen.genomes";

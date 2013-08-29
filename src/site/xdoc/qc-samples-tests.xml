@@ -114,56 +114,59 @@
 
 			<p>Currently all the reads are aligned. The runtime is very long, even with the multithreading option of bowtie. 
 			The list of reference genomes is limited to the essential.
-			For reduce the runtime, if necessary, all fastq files are uncompressed in multithreading mode. 
-			After, the align on reference genomes is launched. At the end, all temporary fastq files are removed. 
-			This solution requires to have a lot of free space in temporary directory used. 
-			Aozan estimates the needed space and sends an warning email if it is not enough.
-			</p>
+			<!-- For reduce the runtime, if necessary, the fastq files are prepared in multithreading mode. -->
+			For reduce the runtime, several choices have been made :</p>
+				<p><ul><li>create a partial fastq file for each sample for this step : 200 000 reads pf (passing illumina filters), selected at regular interval.
+							It's enough for estimate the contamination in a sample.</li>
+					<li>browse the beginning of initial file for create partial fastq file, the duration of creation fastq file is not too extended without lost information.</li></ul></p>
+			 
+			<p>After, the align on reference genomes is launched. At the end, all temporary fastq files are removed.</p>
 			
 			<h5>General configuration for launch the mapper.</h5>
 			<p>Aozan uses the development in other framework from the platform, 
-			<a href="http://transcriptome.ens.fr/eoulsan"  target="_blank">Eoulsan,</a>for management alignment automatic. 
+			<a href="http://transcriptome.ens.fr/eoulsan"  target="_blank">Eoulsan, </a>for handle automatically the alignment. 
 			<a href="http://transcriptome.ens.fr/eoulsan/datarepositories.html" target="_blank">More details in this page.</a>
 			</p>
 			
 			<table>
 			  <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
 			  <tr><td>qc.conf.genome.alias.path</td><td>string</td>
-				  <td></td>
+				  <td>NA</td>
 				  <td>Path to the file which make the correspondence between genome name in casava design file and the genome name reference used for
 						identified index of bowtie. If a genome's name doesn't exist in the alias file, it's added at the end. </td></tr>
 			  <tr><td>qc.conf.settings.genomes.desc.path</td><td>string</td>
-				  <td></td>
+				  <td>NA</td>
 				  <td>Path to the genomes descriptions repository. The genome description file contains some basic informations about the genome
 						like the chromosome length. The repository allow to avoid useless genome sequence parsing once it has been already parsed in a
 						previous run. </td></tr>
-			  <tr><td>qc.conf.settings.genomes</td><td>string</td><td></td><td>Path to the genomes repository.</td></tr>
- 			  <tr><td>qc.conf.settings.mappers.indexes.path</td><td>string</td><td></td><td>Path to the genomes indexes repository.</td></tr>
+			  <tr><td>qc.conf.settings.genomes</td><td>string</td><td>NA</td><td>Path to the genomes repository.</td></tr>
+ 			  <tr><td>qc.conf.settings.mappers.indexes.path</td><td>string</td><td>NA</td><td>Path to the genomes indexes repository.</td></tr>
 			  <tr><td>qc.conf.fastqscreen.genomes</td><td>string</td><td>phix, adapters</td><td>List of reference genomes used per default for fastqscreen.</td></tr>
 			  <tr>
 				<td>qc.conf.skip.control.lane</td>
 				<td>boolean</td>
 				<td>True</td>
-				<td>For the contamination detection in control lane : if it's true none, false : ok</td>
+				<td>No of contamination detection on control lane.</td>
 			  </tr>
 			  <tr>
 				<td>qc.conf.ignore.paired.mode</td>
 				<td>boolean</td>
 				<td>True</td>
-				<td>For a run paired-end, the detection contamination concerns only reads R1, same value assigned for reads R2 
-					else it's False the mapping is paired mode with reads R1 and reads R2.</td>
+				<td>For a run paired-end, the detection contamination concerns only the reads R1, same value are assigned for reads R2 
+					It's 'False' the mapping is paired mode with reads R1 and  R2.</td>
 			  </tr>
 			  <tr>
 				<td>qc.conf.max.reads.parsed</td>
 				<td>integer</td>
 				<td>200000</td>
-				<td>Number of reads in fastq used for the step, selected only the reads with passing filtered illumina. If it's equals to -1, all reads in fastq files used.</td>
+				<td>Number of reads included in temporary fastq files create for this step. 
+					Only the reads with passing filtered illumina are selected. It's equal to -1, all reads in fastq files used.</td>
 			  </tr>
 			  <tr>
 				<td>qc.conf.reads.pf.used</td>
 				<td>integer</td>
 				<td>30000000</td>
-				<td>Number of reads who are selected reads passing filtered for create fastq partial for the step. If it's equals to -1, parsing files fully.</td>
+				<td>Part of fastq files in number of reads used for create the fastq files. It's equal to -1, it browses fastq files fully.</td>
 			  </tr>
 			  
 			</table>
@@ -209,7 +212,7 @@
 					<td>boolean</td>
 					<td>False</td>
 					<td>The report of quality control contains a column with link to report fastqscreen file, 
-					save in quality control directory.</td>
+						save in quality control directory.</td>
 				</tr>
 			</table>	
 		<p>The explanation to construct intervals is <a href="#syntax_interval">here.</a></p>
@@ -224,27 +227,27 @@
 		<p>An example of a report html fastqscreen with four reference genomes and the genome sample (hg19) :
 		<div align="center">
 			<table><tr><th align="center"><img src="images/report_html_fastqscreen.png" alt="" border="1"></img></th></tr></table>
-		</div>
+		</div></p>
 		<p>The report exists in csv format.</p>
 		
 		<p>List of values for each genome :
 		<ul>
-			<li><b>%Mapped</b> : percent of reads which mapped on this genome. It must be low for the genome reference of contamination and big for the genome of the sample).</li>
-			<li><b>%Unmapped</b> : percent of reads which not mapped on this genome.</li>
-			<li><b>%One_hit_one_library</b> : percent of reads which mapped uniq on this genome.</li>
-			<li><b>%Multiple_hits_one_library</b> : percent of reads which multi-mapped on this genome.</li>
-			<li><b>%One_hit_multiple_libraries</b> : percent of reads which mapped once on all genomes.</li>
-			<li><b>%Multiple_hits_multiple_libraries</b> : percent of reads which multi-mapped on all genomes.</li>
-		</ul>
-	The genome of the sample serves the positif temoin.
+			<li><b>%Mapped</b> : percent of reads which are mapped on this genome. It must be low for the genome reference of contamination and big for the genome of the sample).</li>
+			<li><b>%Unmapped</b> : percent of reads which are not mapped on this genome.</li>
+			<li><b>%One_hit_one_library</b> : percent of reads which are mapped with one hit on one genome.</li>
+			<li><b>%Multiple_hits_one_library</b> : percent of reads which are multi-mapped on this genome.</li>
+			<li><b>%One_hit_multiple_libraries</b> : percent of reads which are mapped with one hit on several genomes.</li>
+			<li><b>%Multiple_hits_multiple_libraries</b> : percent of reads which are multi-mapped on several genomes.</li>
+		</ul></p>
+	<p>NB : The genome of the sample serves the positif temoin.
 	</p>
 
 	<p>List of values for all genomes :
 	<ul>
-		<li><b>% reads_unmapped_none_genome</b> : percent of reads which not mapped on none genomes tested. It must be big if the genome of the sample isn't used and low if it is used).</li> 
-		<li><b>% reads_mapped_at_least_one_genome</b> : percent of reads which mapped at least on one genome.</li>
-		<li><b>% reads_mapped_except_genome_sample</b> : percent of reads which mapped within the genome reference of contamination, the genome of the sample is excluded.</li>
-		<li> 'x' reads mapped / 200 000 reads processed </li>
+		<li><b>% reads_unmapped_none_genome</b> : percent of reads which are not mapped on none genomes tested. It must be big if the genome of the sample isn't used and low if it is used).</li> 
+		<li><b>% reads_mapped_at_least_one_genome</b> : percent of reads which are mapped on at least one genome.</li>
+		<li><b>% reads_mapped_except_genome_sample</b> : percent of reads which are mapped on the genomes references of contamination, the genome of the sample is excluded.</li>
+		<li> X reads mapped / 200 000 reads processed </li>
 	</ul>
 	</p>
     </subsection>

@@ -72,7 +72,7 @@ def check_end_run(run_id, conf):
 	reads_number = get_reads_number(run_id, conf)
 
 	# if reads_number equals -1, runParameters.xml is missing
-	if reads_number == -1
+	if reads_number == -1:
 		return False
 
 	for i in range(reads_number):
