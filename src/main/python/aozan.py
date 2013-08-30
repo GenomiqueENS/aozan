@@ -207,7 +207,7 @@ def aozan_main(conf_file_path):
         sys.exit(0)
 
     # Init logger
-    Common.initLogger(conf['aozan.var.path'] + '/aozan.log')
+    Common.initLogger(conf['aozan.log.path'])
 
     # Check critical free space available
     hiseq_run.send_mail_if_critical_free_space_available(conf)
