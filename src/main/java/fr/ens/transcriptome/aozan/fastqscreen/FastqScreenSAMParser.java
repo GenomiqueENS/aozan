@@ -108,10 +108,6 @@ public class FastqScreenSAMParser implements SAMParserLine {
     if (!result) {
       readsprocessed++;
 
-      // // TODO to remove
-      // System.out.print(readsprocessed
-      // + (readsprocessed % 100 == 0 ? "\n" : " "));
-
       List<SAMRecord> records = buffer.getFilteredAlignments();
 
       if (records != null && records.size() > 0) {

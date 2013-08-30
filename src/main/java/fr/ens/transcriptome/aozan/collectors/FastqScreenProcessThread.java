@@ -102,11 +102,6 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   @Override
   protected void createReportFile() throws AozanException, IOException {
 
-    // TODO to remove after test
-    System.out.println("\n"
-        + this.resultsFastqscreen.reportToCSV(this.fastqSample,
-            this.genomeSample));
-
     final String report =
         this.reportDir.getAbsolutePath()
             + "/" + this.fastqSample.getKeyFastqSample() + "-fastqscreen";
@@ -182,12 +177,6 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
   @Override
   protected void processResults() throws AozanException {
-
-    // TODO to remove after test
-    System.out.println("lane current "
-        + this.fastqSample.getLane() + "\tsample current "
-        + this.fastqSample.getSampleName() + "\tproject name "
-        + this.fastqSample.getProjectName());
 
     File read1 = new File(fastqStorage.getTemporaryFile(fastqSample));
 

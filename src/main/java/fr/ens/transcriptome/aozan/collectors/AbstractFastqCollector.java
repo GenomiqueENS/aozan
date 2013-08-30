@@ -199,7 +199,7 @@ abstract public class AbstractFastqCollector implements Collector {
 
       // Code without starting threads :
       for (FastqSample fs : fastqSamples) {
-        // TODO to remove after text
+
         if (fs.getFastqFiles() != null && !fs.getFastqFiles().isEmpty()) {
 
           resultPart = loadResultPart(fs);

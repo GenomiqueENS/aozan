@@ -153,8 +153,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         // remove default argument
         bowtie.setMapperArguments("");
 
-        // bowtie.init(paired, FastqFormat.FASTQ_SANGER, archiveIndexFile,
-        // indexDir, reporter, COUNTER_GROUP);
         bowtie.init(archiveIndexFile, indexDir, reporter, COUNTER_GROUP);
 
         // define new argument
@@ -168,12 +166,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
           parser.closeMapOutputFile();
           this.readsprocessed = parser.getReadsprocessed();
-          // throw new UnsupportedOperationException(
-          // "Fastqscreen : mapping in PE impossible.");
 
         } else {
-          // mode single-end
-          // bowtie.map(fastqRead1, parser);
 
           if (desc == null)
             throw new AozanException(

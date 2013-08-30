@@ -48,7 +48,7 @@ import fr.ens.transcriptome.aozan.Common;
  * @author Sandrine Perrin
  */
 
-// TODO to remove this class, not used in aozan 1.1
+// this class is used with UncompressFastqCollector not used in aozan 1.1
 public class AozanSequenceFile implements SequenceFile {
   /** Logger */
   private static final Logger LOGGER = Common.getLogger();

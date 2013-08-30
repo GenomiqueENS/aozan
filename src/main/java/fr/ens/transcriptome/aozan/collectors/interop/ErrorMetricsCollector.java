@@ -411,8 +411,6 @@ public class ErrorMetricsCollector implements Collector {
       data.put(key + ".err.rate.75.sd", errorRateCycle75SD);
       data.put(key + ".err.rate.phix", errorRate);
       data.put(key + ".err.rate.phix.sd", errorRateSD);
-
-      // TODO to define
       data.put(key + ".called.cycles.max", calledCyclesMax);
       data.put(key + ".called.cycles.min", calledCyclesMin);
 

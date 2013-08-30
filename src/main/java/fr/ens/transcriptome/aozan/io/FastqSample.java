@@ -306,16 +306,8 @@ public class FastqSample {
 
     this.fastqFiles = createListFastqFiles(this.read);
 
-    // TODO to remove after test
-    if (fastqFiles.size() == 0) {
-      this.compressionType = CompressionType.NONE;
-      this.keyFastqSample = "";
-
-    } else {
-
-      this.compressionType = setCompressionExtension();
-      this.keyFastqSample = createKeyFastqSample();
-    }
+    this.compressionType = setCompressionExtension();
+    this.keyFastqSample = createKeyFastqSample();
 
     this.nameTemporaryFastqFiles = createNameTemporaryFastqFile();
 

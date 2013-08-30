@@ -248,7 +248,9 @@ public class FastqScreenResult {
     final Element columns = doc.createElement("Columns");
     report.appendChild(columns);
 
-    for (String header : Splitter.on('\t').split(HEADER_COLUMNS_TEXT)) {
+    final String headerColumns = HEADER_COLUMNS_TEXT.replace('_', ' ');
+
+    for (String header : Splitter.on('\t').split(headerColumns)) {
 
       final Element columnElement = doc.createElement("Column");
       columnElement.setAttribute("name", header.trim());

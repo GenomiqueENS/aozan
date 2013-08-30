@@ -12,7 +12,28 @@ version="1.0">
   <style TYPE="text/css">
     td {
       text-align: center;
-      width: 30px;
+      width: 100px;
+    }
+    th {
+        background-color:#457DBB;
+        border: thin solid #6495ed;
+        width: 35px;
+    }
+    table {
+        border: medium solid #000000;
+    }
+    body{
+    	font-family : "Times New Roman", Times, serif ;
+    }
+    h1{
+    	color:#234CA5;
+        font-style : italic;
+        font-size : 30px;
+    }
+    h2{}
+    h3{
+    	color:#B9121B;
+        font-style : italic;
     }
   </style>
 </head>

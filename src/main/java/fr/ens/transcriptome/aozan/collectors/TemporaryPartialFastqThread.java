@@ -99,10 +99,6 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
   public void run() {
     timer.start();
 
-    // TODO to remove
-    LOGGER.fine("Temporary Partial fastq start for "
-        + fastqSample.getKeyFastqSample());
-
     try {
       processResults();
       this.success = true;

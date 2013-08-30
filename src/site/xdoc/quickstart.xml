@@ -343,6 +343,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
    <tr><th>Aozan property</th><th>Sample value</th><th>description</th></tr>
    <tr><td>aozan.var.path (*)</td><td>/var/lib/aozan</td><td>Aozan internal data directory. It contains 
      log files and history of processed runs.</td></tr>
+   <tr><td>aozan.log.path</td><td>/var/log/aozan</td><td>Path to the Aozan log files.</td></tr>
    <tr><td>hiseq.data.path</td><td>/mnt/hiseq01_f,/mnt/hiseq01_g</td><td>Hiseq output directories. 
      Multplie values are allowed if there is several HiSeq or 2 output directories for each flow cell of 
      an HiSeq 2000.</td></tr>
