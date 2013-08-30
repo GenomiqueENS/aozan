@@ -173,7 +173,7 @@ def demux(run_id, conf):
 
     # Check if free space is available
     if output_df < space_needed:
-        error("Not enough disk space to perform demultiplexing for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id +
+        error("Not enough disk space to perform demultiplexing for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id + 
               '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + fastq_output_dir + '.', conf)
         return False
 
@@ -296,7 +296,7 @@ def demux(run_id, conf):
     common.log("SEVERE", "exec: " + cmd, conf)
     exit_code = os.system(cmd)
     if exit_code != 0:
-        error("error while creating Casava makefile for run " + run_id, 'Error while creating Casava makefile (exit code: ' + exit_code + ').\nCommand line:\n' + cmd, conf)
+        error("error while creating Casava makefile for run " + run_id, 'Error while creating Casava makefile (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
         return False
 
     # Get the number of cpu
@@ -307,7 +307,7 @@ def demux(run_id, conf):
     common.log("SEVERE", "exec: " + cmd, conf)
     exit_code = os.system(cmd)
     if exit_code != 0:
-        error("error while running Casava for run " + run_id, 'Error while running Casava (exit code: ' + exit_code + ').\nCommand line:\n' + cmd, conf)
+        error("error while running Casava for run " + run_id, 'Error while running Casava (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
         return False
 
     # Copy design to output directory
