@@ -27,6 +27,22 @@ def create_lock_file(lock_file_path):
     f.write(str(Common.getCurrentPid()))
     f.close()
 
+def lock_file_exists(lock_file_path):
+    """Check if the lock file exists for the execute pid
+
+    Arguments:
+        lock_file_path path of the lock file
+    """
+        
+    if not os.path.exists(lock_file_path):
+        return False
+    
+    if os.path.exists('/proc/%d' % (load_pid_in_lock_file(lock_file_path))):
+        return True
+    
+    # PID from a dead processus, lock to delete
+    delete_lock_file(lock_file_path)
+    return False
 
 def delete_lock_file(lock_file_path):
     """Create the lock file.
@@ -215,8 +231,8 @@ def aozan_main(conf_file_path):
     lock_file_path = conf['lock.file']
 
     # Run only if there is no lock
-    if not os.path.exists(lock_file_path):
-
+    # if not os.path.exists(lock_file_path):
+    if not lock_file_exists(lock_file_path):
         try:
             # Create lock file
             create_lock_file(lock_file_path)
