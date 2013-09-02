@@ -139,7 +139,7 @@
       			Quality control contains points of restoration if a hardware problem occurs before the end. 
       </action>
     </release>
-    <release version="1.1" description="Aozan version 1.1" date="2013-09-01">
+    <release version="1.1" description="Aozan version 1.1" date="2013-09-02">
       <action dev="perrin" type="add">
       			Module of contamination detection uses partial fastq files for decrease the runtime without lost of information.
       </action>
