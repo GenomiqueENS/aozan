@@ -142,7 +142,7 @@ class UncompressFastqThread extends AbstractFastqProcessThread {
         out.close();
 
       } catch (IOException io) {
-        throw new AozanException(io.getMessage());
+        throw new AozanException(io);
       }
     }
 

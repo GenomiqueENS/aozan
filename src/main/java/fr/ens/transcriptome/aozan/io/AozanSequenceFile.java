@@ -160,10 +160,10 @@ public class AozanSequenceFile implements SequenceFile {
       this.timer = new Stopwatch().start();
 
     } catch (SequenceFormatException e) {
-      throw new AozanException(e.getMessage());
+      throw new AozanException(e);
 
     } catch (IOException io) {
-      throw new AozanException(io.getMessage());
+      throw new AozanException(io);
     }
   }
 

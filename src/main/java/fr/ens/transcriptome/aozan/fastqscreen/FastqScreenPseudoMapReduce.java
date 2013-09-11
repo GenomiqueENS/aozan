@@ -188,7 +188,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         timer.stop();
 
       } catch (IOException e) {
-        throw new AozanException(e.getMessage());
+        throw new AozanException(e);
       }
     }
   }

@@ -80,10 +80,10 @@ public final class FastqStorage {
       }
 
     } catch (IOException io) {
-      throw new AozanException(io.getMessage());
+      throw new AozanException(io);
 
     } catch (SequenceFormatException e) {
-      throw new AozanException(e.getMessage());
+      throw new AozanException(e);
     }
 
     return seqFile;

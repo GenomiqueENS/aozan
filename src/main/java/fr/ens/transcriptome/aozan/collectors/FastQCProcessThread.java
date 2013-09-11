@@ -168,8 +168,6 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
     } catch (ClassCastException e) {
 
-      e.printStackTrace();
-
       throw new AozanException(
           "The results panel of Basic Stats FastQC module has changed."
               + " Update Aozan code to handle this.");
@@ -276,10 +274,10 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
               new File[0]));
 
     } catch (IOException io) {
-      throw new AozanException(io.getMessage());
+      throw new AozanException(io);
 
     } catch (SequenceFormatException e) {
-      throw new AozanException(e.getMessage());
+      throw new AozanException(e);
     }
 
     // Define modules list
