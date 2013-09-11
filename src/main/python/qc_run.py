@@ -41,6 +41,19 @@ def error(short_message, message, conf):
 
     common.error('[Aozan] qc: ' + short_message, message, conf['aozan.var.path'] + '/qc.lasterr', conf)
 
+def exception_msg(exp, conf):
+    """Create error message when an AozanException is thrown.
+    
+    Arguments:
+        exp: exception
+        conf: configuration dictionary
+    """
+    
+    if conf['aozan.debug'] == 'true':
+        return exp.getClass().getName() + ": " + exp.getMessage() + '\n' + StringUtils.join(exp.getStackTrace(), '\n\t')
+    else:
+        return exp.getMessage()
+   
 
 def qc(run_id, conf):
     """Proceed to quality control of a run.
@@ -107,11 +120,10 @@ def qc(run_id, conf):
     try:
         report = qc.computeReport()
     except AozanException, exp:
-        error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
+        error("error while computing qc report for run " + run_id + ".", exception_msg(exp, conf), conf)
         return False
     except Throwable, exp:  
-        error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + str(exp.getMessage()) + '\n' 
-              + StringUtils.join(exp.getStackTrace(), '\n\t'), conf)
+        error("error while computing qc report for run " + run_id + ".", exception_msg(exp, conf), conf)
         return False
 
     # Remove qc data if not demand
@@ -128,11 +140,10 @@ def qc(run_id, conf):
         try:
             qc.writeXMLReport(report, qc_output_dir + '/' + run_id + '.xml')
         except AozanException, exp:
-            error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
+            error("error while computing qc report for run " + run_id + ".", exception_msg(exp, conf), conf)
             return False
         except Throwable, exp:
-            error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + str(exp.getMessage()) + '\n' 
-                  + StringUtils.join(exp.getStackTrace(), '\n\t'), conf)
+            error("error while computing qc report for run " + run_id + ".", exception_msg(exp, conf), conf)
             return False
 
     # Remove tmp extension of temporary qc directory
@@ -147,11 +158,10 @@ def qc(run_id, conf):
         else:
             qc.writeReport(report, conf['qc.report.stylesheet'], html_report_file)
     except AozanException, exp:
-        error("error while computing qc report for run " + run_id + ".", exp.getMessage(), conf)
+        error("error while computing qc report for run " + run_id + ".", exception_msg(exp, conf), conf)
         return False
     except Throwable, exp:
-        error("error while computing qc report for run " + run_id + ".", exp.getClass().getName() + ": " + str(exp.getMessage()) + '\n' 
-              + StringUtils.join(exp.getStackTrace(), '\n\t'), conf)
+        error("error while computing qc report for run " + run_id + ".", exception_msg(exp, conf), conf)
         return False
 
     # Check if the report has been generated
