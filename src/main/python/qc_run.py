@@ -50,6 +50,10 @@ def exception_msg(exp, conf):
     """
     
     if conf['aozan.debug'] == 'true':
+        
+        if isinstance(exp, AozanException) and exp.getWrappedException() != None:
+            exp = exp.getWrappedException()
+        
         return exp.getClass().getName() + ": " + exp.getMessage() + '\n' + StringUtils.join(exp.getStackTrace(), '\n\t')
     else:
         return exp.getMessage()
