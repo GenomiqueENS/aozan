@@ -113,7 +113,8 @@ public class FastqscreenDemo {
         // runId = "130726_SNL110_0078_AC2AJTACXX";
         // runId = "130709_SNL110_0075_AD2C79ACXX";
         // runId = "130715_SNL110_0076_AD2C4UACXX";
-        runId = "130722_SNL110_0077_AH0NT2ADXX";
+        // runId = "130722_SNL110_0077_AH0NT2ADXX";
+        runId = "130904_SNL110_0082_AC2BR0ACXX";
       }
 
       date = new SimpleDateFormat("yyMMdd").format(new Date());
@@ -197,8 +198,8 @@ public class FastqscreenDemo {
 
     conf.put("qc.conf.read.xml.collector.used", "false");
     conf.put("qc.conf.cluster.density.ratio", "0.3472222");
-    conf.put("qc.conf.fastqscreen.genomes", "ssuref, mm10");
-
+    conf.put("qc.conf.read.xml.collector.used", "true");
+    
     // conf.put("qc.conf.ignore.paired.mode", "False");
     // parse fully fastq file
     // conf.put("qc.conf.max.reads.parsed", "-1");
@@ -208,9 +209,6 @@ public class FastqscreenDemo {
     System.out.println("genomes : "
         + conf.get("qc.conf.fastqscreen.genomes") + " mapping mode "
         + conf.get("qc.conf.ignore.paired.mode"));
-    
-    System.out.println(conf.get("qc.conf.genome.alias.path")
-        + " \t " + conf.get("qc.conf.settings.genomes"));
 
     return conf;
   }
