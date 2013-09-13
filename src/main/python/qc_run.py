@@ -74,7 +74,7 @@ def qc(run_id, conf):
     reports_data_base_path = conf['reports.data.path']
     reports_data_path = reports_data_base_path + '/' + run_id
     qc_output_dir = reports_data_path + '/qc_' + run_id
-    tmp_extension = '_tmp'
+    tmp_extension = '.tmp'
     
     # Check if input root bcl data exists
     if not os.path.exists(conf['bcl.data.path']):
