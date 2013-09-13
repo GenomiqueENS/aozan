@@ -173,7 +173,7 @@ def demux(run_id, conf):
 
     # Check if free space is available
     if output_df < space_needed:
-        error("Not enough disk space to perform demultiplexing for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id + 
+        error("Not enough disk space to perform demultiplexing for run " + run_id, "Not enough disk space to perform demultiplexing for run " + run_id + 
               '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + fastq_output_dir + '.', conf)
         return False
 
