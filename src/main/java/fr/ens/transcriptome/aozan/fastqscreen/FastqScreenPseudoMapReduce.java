@@ -172,9 +172,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
           if (desc == null)
             throw new AozanException(
                 "Fastqscreen : genome description is null for bowtie");
-          LOGGER.info("fastqRead1: " + fastqRead1);
-          LOGGER.info("archiveIndexFile: " + archiveIndexFile);
-          LOGGER.info("indexDir: " + indexDir);
+
           InputStream outputSAM = bowtie.mapSE(fastqRead1, desc);
           parser.parseLine(outputSAM);
 
@@ -190,16 +188,10 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         timer.stop();
 
       } catch (IOException e) {
-        
-        StringBuilder sb = new StringBuilder();
-        sb.append(e.getClass().getName()+'\n');
-        sb.append(e.getMessage()+'\n');
-        for (StackTraceElement ste : e.getStackTrace())
-          sb.append('\t' + ste.toString() + '\n');
-        
-        throw new AozanException(sb.toString());
-      } catch (BadBioEntryException e) {
         throw new AozanException(e);
+
+      } catch (BadBioEntryException bee) {
+        throw new AozanException(bee);
       }
     }
   }
