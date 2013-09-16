@@ -37,14 +37,45 @@ version="1.0">
       background: green;
     }
     .score7 {
-      background: green;
+      background: #09943E;
     }
     .score8 {
-      background: green;
+      background: #09943E;
     }
     .score9 {
-      background: green;
+      background: #389B5E;
     }
+        td {
+      text-align: center;
+      width: 100px;
+    }
+    th {
+        background-color: #174574;
+        color:WhiteSmoke;
+        font-style : bold;
+        border: thin solid #6495ed;
+        width: 50px;
+        font-size: 100%;
+    }
+    table {
+        border: medium solid #000000;
+        font-size: 95%;
+    }
+    body{
+        font-family : "Arial", Times, serif ;
+        font-size: 90%;
+    }
+    h1{
+        color:#234CA5;
+        font-style : italic;
+        font-size : 30px;
+    }
+    h2{}
+    h3{
+        color:#B9121B;
+        font-style : italic;
+    }
+    
   </style>
 </head>
 <body>
