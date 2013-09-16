@@ -34,13 +34,13 @@ version="1.0">
       background: yellow;
     }
     .score6 {
-      background: green;
+      background: #389B5E;
     }
     .score7 {
-      background: #09943E;
+      background: #389B5E;
     }
     .score8 {
-      background: #09943E;
+      background: #389B5E;
     }
     .score9 {
       background: #389B5E;
