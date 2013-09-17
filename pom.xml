@@ -291,6 +291,10 @@
 
                 <mkdir dir="${basedir}/target/dist/lib"/>
 
+				<copy file="${basedir}/INSTALL.txt" todir="${basedir}/target/dist/" />
+				<copy file="${basedir}/LICENSE-GPL.txt" todir="${basedir}/target/dist/" />
+				<copy file="${basedir}/LICENSE-CeCILL.txt" todir="${basedir}/target/dist/" />
+
                 <copy file="${basedir}/src/main/bin/${pom.artifactId}.sh" todir="${basedir}/target/dist/" />
                 <chmod file="${basedir}/target/dist/${pom.artifactId}.sh" perm="ugo+rx" />
 

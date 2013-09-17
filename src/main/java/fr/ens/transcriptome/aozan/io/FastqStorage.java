@@ -80,10 +80,10 @@ public final class FastqStorage {
       }
 
     } catch (IOException io) {
-      throw new AozanException(io.getMessage());
+      throw new AozanException(io);
 
     } catch (SequenceFormatException e) {
-      throw new AozanException(e.getMessage());
+      throw new AozanException(e);
     }
 
     return seqFile;
@@ -125,18 +125,20 @@ public final class FastqStorage {
   }
 
   /**
-   * Delete all temporaries files
+   * Delete all temporaries files (fastq tmp files and map files)
    * @throws IOException
    */
   public void clear() {
-    LOGGER.warning("Delete temporaries fastq files");
+    LOGGER.info("Delete temporaries fastq and map files");
 
     File[] files = new File(tmpPath).listFiles(new FileFilter() {
 
       public boolean accept(final File pathname) {
-        return pathname.getName().startsWith("aozan_fastq_")
-            && (pathname.getName().endsWith(".fastq") || pathname.getName()
-                .endsWith(".fastq.tmp"));
+        return (pathname.getName().startsWith("aozan_fastq_") && (pathname
+            .getName().endsWith(".fastq") || pathname.getName().endsWith(
+            ".fastq.tmp")))
+            || (pathname.getName().startsWith("map-") && (pathname.getName()
+                .endsWith(".txt")));
       }
     });
 

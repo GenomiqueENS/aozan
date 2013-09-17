@@ -108,10 +108,8 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
     if (key == null)
       return null;
 
-    // case line undetermined
-    if (sampleName == null)
-      return new TestResult("NA");
-
+    // Key not present in data, case with fastqscreen, a genome specific from a
+    // project
     if (data.get(key) == null)
       return new TestResult("NA");
 
@@ -151,7 +149,7 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
           transformValue(value, data, read, readSample, lane, sampleName);
 
       // Do the test ?
-      if (interval == null)
+      if (interval == null || sampleName == null)
         return new TestResult(transformedValue, isValuePercent());
 
       int score =

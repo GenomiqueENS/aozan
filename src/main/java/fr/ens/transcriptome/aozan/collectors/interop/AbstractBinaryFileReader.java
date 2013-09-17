@@ -103,7 +103,7 @@ public abstract class AbstractBinaryFileReader<M> {
       is.close();
 
     } catch (IOException e) {
-      throw new AozanException(e.getMessage());
+      throw new AozanException(e);
     }
 
     // check version file

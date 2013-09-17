@@ -69,7 +69,7 @@ public class Common {
     try {
       initEoulsanRuntimeForExternalApp();
     } catch (EoulsanException ee) {
-      throw new AozanException(ee.getMessage());
+      throw new AozanException(ee);
     }
 
     final Logger eoulsanLogger = getLogger();

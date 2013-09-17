@@ -209,11 +209,11 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
           fastqReader.throwException();
 
         } catch (IOException e) {
-          throw new AozanException(e.getMessage());
+          throw new AozanException(e);
         } catch (EoulsanException ee) {
-          throw new AozanException(ee.getMessage());
+          throw new AozanException(ee);
         } catch (BadBioEntryException bbe) {
-          throw new AozanException(bbe.getMessage());
+          throw new AozanException(bbe);
 
         } finally {
 
@@ -304,9 +304,9 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
           fastqReader.throwException();
 
         } catch (IOException e) {
-          throw new AozanException(e.getMessage());
+          throw new AozanException(e);
         } catch (BadBioEntryException bbe) {
-          throw new AozanException(bbe.getMessage());
+          throw new AozanException(bbe);
 
         } finally {
 
@@ -365,7 +365,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
       out.close();
 
     } catch (IOException io) {
-      throw new AozanException(io.getMessage());
+      throw new AozanException(io);
     }
   }
 

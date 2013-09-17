@@ -74,7 +74,7 @@ public class FastqscreenDemo {
   public static final String SRC_RUN =
       "/home/sperrin/Documents/FastqScreenTest/runtest";
   public static final String TMP_DIR =
-      "/home/sperrin/Documents/FastqScreenTest/tmp";
+      "/home/sperrin/Documents/FastqScreenTest/tmp_bis";
   public static final String ALIAS_GENOME_PATH =
       "/home/sperrin/Documents/FastqScreenTest/resources/alias_name_genome_fastqscreen.txt";
 
@@ -108,12 +108,13 @@ public class FastqscreenDemo {
         // runId = "120830_SNL110_0055_AD16D9ACXX";
         runId = "130801_SNL110_0079_AD2CR3ACXX";
       } else {
-        
+
         // ESSAI fastqscreen partial fastq
         // runId = "130726_SNL110_0078_AC2AJTACXX";
         // runId = "130709_SNL110_0075_AD2C79ACXX";
         // runId = "130715_SNL110_0076_AD2C4UACXX";
-        runId = "130722_SNL110_0077_AH0NT2ADXX";
+        // runId = "130722_SNL110_0077_AH0NT2ADXX";
+        runId = "130904_SNL110_0082_AC2BR0ACXX";
       }
 
       date = new SimpleDateFormat("yyMMdd").format(new Date());
@@ -197,8 +198,8 @@ public class FastqscreenDemo {
 
     conf.put("qc.conf.read.xml.collector.used", "false");
     conf.put("qc.conf.cluster.density.ratio", "0.3472222");
-    // conf.put("qc.conf.fastqscreen.genomes", "phix");
-
+    conf.put("qc.conf.read.xml.collector.used", "true");
+    
     // conf.put("qc.conf.ignore.paired.mode", "False");
     // parse fully fastq file
     // conf.put("qc.conf.max.reads.parsed", "-1");
@@ -211,5 +212,4 @@ public class FastqscreenDemo {
 
     return conf;
   }
-
 }

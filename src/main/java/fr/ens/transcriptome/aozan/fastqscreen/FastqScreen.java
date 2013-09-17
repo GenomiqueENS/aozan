@@ -133,10 +133,10 @@ public class FastqScreen {
       new File(tmpDir + "/outputDoReduce.txt").delete();
 
     } catch (IOException e) {
-      throw new AozanException(e.getMessage());
+      throw new AozanException(e);
 
     } catch (BadBioEntryException bad) {
-      throw new AozanException(bad.getMessage());
+      throw new AozanException(bad);
 
     } finally {
       timer.stop();

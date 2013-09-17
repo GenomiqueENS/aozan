@@ -86,7 +86,7 @@
 
 		<section name="Samplesheet validator">
 
-			<p>We provide also a <a href="">CASAVA/bcl2fastq samplesheet validator</a> to help users to check their run design. This tool
+			<p>We provide also a <a href="http://www.transcriptome.ens.fr/designvalidator/">CASAVA/bcl2fastq samplesheet validator</a> to help users to check their run design. This tool
                         use only html and javascript. When you use this tool, no data is sent to our servers.</p>
 
 		</section>

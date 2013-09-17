@@ -31,6 +31,23 @@ package fr.ens.transcriptome.aozan;
  */
 public class AozanException extends Exception {
 
+  private static final long serialVersionUID = -749903788412172296L;
+  
+  private Exception exception;
+
+  /**
+   * Get the wrapped exception.
+   * @return the wrapped exception
+   */
+  public Exception getWrappedException() {
+
+    return exception;
+  }
+
+  //
+  // Constructors
+  //
+
   /**
    * Create a new AozanException from the message of another exception.
    * @param exception exception with the message to use
@@ -38,6 +55,7 @@ public class AozanException extends Exception {
   public AozanException(final Exception e) {
 
     this(e.getMessage());
+    this.exception = e;
   }
 
   /**
@@ -53,6 +71,7 @@ public class AozanException extends Exception {
    * Create a new AozanException.
    */
   public AozanException() {
+
     super();
   }
 

@@ -100,13 +100,13 @@ public class RunDataGenerator {
     // Timer
     final Stopwatch timerGlobal = new Stopwatch().start();
 
-    LOGGER.warning("Step collector start");
+    LOGGER.info("Step collector start");
 
     // For all collectors
     for (final Collector collector : this.collectors) {
 
       Stopwatch timerCollector = new Stopwatch().start();
-      LOGGER.warning(collector.getName().toUpperCase() + " start");
+      LOGGER.info(collector.getName().toUpperCase() + " start");
 
       // Configure
       collector.configure(new Properties(this.properties));
@@ -114,7 +114,7 @@ public class RunDataGenerator {
       // And collect data
       collector.collect(data);
 
-      LOGGER.warning(collector.getName().toUpperCase()
+      LOGGER.info(collector.getName().toUpperCase()
           + " end in "
           + toTimeHumanReadable(timerCollector.elapsed(TimeUnit.MILLISECONDS)));
 
@@ -124,7 +124,7 @@ public class RunDataGenerator {
       collector.clear();
     }
 
-    LOGGER.warning("Step collector end in "
+    LOGGER.info("Step collector end in "
         + toTimeHumanReadable(timerGlobal.elapsed(TimeUnit.MILLISECONDS)));
     timerGlobal.stop();
 

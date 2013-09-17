@@ -115,7 +115,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   public void doMap(final File fastqRead1, final File fastqRead2,
       final List<String> listGenomes, final String genomeSample,
       final String tmpDir, final int numberThreads, final boolean pairedMode)
-      throws AozanException, BadBioEntryException {
+      throws AozanException {
 
     // change mapper arguments
     final String newArgumentsMapper =
@@ -188,7 +188,10 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         timer.stop();
 
       } catch (IOException e) {
-        throw new AozanException(e.getMessage());
+        throw new AozanException(e);
+
+      } catch (BadBioEntryException bee) {
+        throw new AozanException(bee);
       }
     }
   }
