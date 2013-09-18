@@ -27,8 +27,11 @@ import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
+import javassist.CannotCompileException;
+import javassist.NotFoundException;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.fastqc.ContaminantFinder;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
 /**
@@ -71,6 +74,20 @@ public class FastQCCollector extends AbstractFastqCollector {
 
       } catch (NumberFormatException e) {
       }
+    }
+
+    // Rewriting code of the method ContaminantFinder for read the contaminant
+    // list in fastqc-1.10.1 jar
+    try {
+      ContaminantFinder.doMagic();
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    } catch (CannotCompileException e) {
+      e.printStackTrace();
+    } catch (InstantiationException e) {
+      e.printStackTrace();
+    } catch (IllegalAccessException e) {
+      e.printStackTrace();
     }
   }
 

@@ -42,10 +42,10 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
-import uk.ac.bbsrc.babraham.FastQC.Modules.QCModule;
-import uk.ac.bbsrc.babraham.FastQC.Report.HTMLReportArchive;
-import uk.ac.bbsrc.babraham.FastQC.Sequence.Sequence;
-import uk.ac.bbsrc.babraham.FastQC.Sequence.QualityEncoding.PhredEncoding;
+import uk.ac.babraham.FastQC.Modules.QCModule;
+import uk.ac.babraham.FastQC.Report.HTMLReportArchive;
+import uk.ac.babraham.FastQC.Sequence.Sequence;
+import uk.ac.babraham.FastQC.Sequence.QualityEncoding.PhredEncoding;
 import fr.ens.transcriptome.eoulsan.EoulsanException;
 import fr.ens.transcriptome.eoulsan.bio.IlluminaReadId;
 

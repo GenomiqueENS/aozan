@@ -31,10 +31,10 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import uk.ac.bbsrc.babraham.FastQC.Sequence.Sequence;
-import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFactory;
-import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFile;
-import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFormatException;
+import uk.ac.babraham.FastQC.Sequence.Sequence;
+import uk.ac.babraham.FastQC.Sequence.SequenceFactory;
+import uk.ac.babraham.FastQC.Sequence.SequenceFile;
+import uk.ac.babraham.FastQC.Sequence.SequenceFormatException;
 
 import com.google.common.base.Stopwatch;
 

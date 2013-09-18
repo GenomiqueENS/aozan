@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import uk.ac.bbsrc.babraham.FastQC.Modules.NContent;
+import uk.ac.babraham.FastQC.Modules.NContent;
 import fr.ens.transcriptome.aozan.AozanException;
 
 /**

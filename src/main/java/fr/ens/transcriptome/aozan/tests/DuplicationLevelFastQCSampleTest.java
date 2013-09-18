@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import uk.ac.bbsrc.babraham.FastQC.Modules.OverRepresentedSeqs;
+import uk.ac.babraham.FastQC.Modules.OverRepresentedSeqs;
 import fr.ens.transcriptome.aozan.AozanException;
 
 /**

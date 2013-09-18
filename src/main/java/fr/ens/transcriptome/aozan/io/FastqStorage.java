@@ -29,9 +29,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
-import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFactory;
-import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFile;
-import uk.ac.bbsrc.babraham.FastQC.Sequence.SequenceFormatException;
+import uk.ac.babraham.FastQC.Sequence.SequenceFactory;
+import uk.ac.babraham.FastQC.Sequence.SequenceFile;
+import uk.ac.babraham.FastQC.Sequence.SequenceFormatException;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 
