@@ -15,7 +15,7 @@ version="1.0">
       width: 100px;
     }
     th {
-        background-color: #174574;
+        background-color: #234CA5;
         color:WhiteSmoke;
         font-style : bold;
         border: thin solid #6495ed;
