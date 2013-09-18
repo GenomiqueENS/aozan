@@ -59,6 +59,7 @@ import com.google.common.collect.Lists;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.fastqc.BadTiles;
+import fr.ens.transcriptome.aozan.fastqc.HTMLReportArchiveAozan;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
 /**
@@ -235,8 +236,8 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
     // Force unzip of the report
     System.setProperty("fastqc.unzip", "true");
 
-    new HTMLReportArchive(seqFile, this.moduleList.toArray(new QCModule[] {}),
-        reportFile);
+    new HTMLReportArchiveAozan(seqFile,
+        this.moduleList.toArray(new QCModule[] {}), reportFile);
 
     LOGGER.fine("FASTQC : "
         + fastqSample.getKeyFastqSample() + " creation qc report html");
