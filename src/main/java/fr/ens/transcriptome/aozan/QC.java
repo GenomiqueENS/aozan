@@ -61,7 +61,7 @@ public class QC {
   public static final String RTA_OUTPUT_DIR = "rta.output.dir";
 
   /** Casava design path property key. */
-  public static final String CASAVA_DESIGN_PATH = "casava.design.path";
+  public static final String CASAVA_DESIGN_PATH = "casava.samplesheet.path";
 
   /** Casava output directory property key. */
   public static final String CASAVA_OUTPUT_DIR = "casava.output.dir";
