@@ -57,7 +57,7 @@
 			<item name="Downloading" href="/download.html" />
 			<item name="Installing" href="/installing.html" />
 			<item name="Release Notes" href="/changes-report.html" />
-			<item name="Samplesheet validator" href="http://www.transcriptome.ens.fr/designvalidator" />
+			<item name="Samplesheet validator" href="http://www.transcriptome.ens.fr/designvalidator" target="_blank"/>
 		</menu>
 
 		<menu name="Documentation">

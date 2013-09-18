@@ -70,7 +70,7 @@
        
        <a name="fastqc"/>
        <subsection name="Sample quality tests from FastQC">
-       <p> Aozan launch FastQC on each sample (using parallel computation) and creates a report file including the thresholds fixed for quality controls.
+       <p> Aozan launch <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/" target="_blank">FastQC</a> on each sample (using parallel computation) and creates a report file including the thresholds fixed for quality controls.
     	It contains an additional FastQC step named "<b>Bad tiles</b>" that search tiles with BMS (&quot;Bottom Middle Swath&quot;) issues with Illumina flowcell v3.</p>
      
        <table>
