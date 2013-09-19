@@ -108,7 +108,11 @@ version="1.0">
    
    <p><a href="http://www.transcriptome.ens.fr/aozan/qc-samples-tests.html#contamination" target="_blank">Contamination detection detail report</a></p>
 <div class="footer">
-	Produced by <a href="<xsl:value-of select="/QCReport/GeneratorWebsite"/>">Aozan</a> (version <xsl:value-of select="/QCReport/GeneratorRevision"/>)
+	Source 
+	<xsl:element name="a">
+		<xsl:attribute name="href"><xsl:value-of select="/QCReport/GeneratorWebsite"/></xsl:attribute>Aozan : <xsl:value-of select="/QCReport/GeneratorWebsite"/>
+	</xsl:element>
+	(version <xsl:value-of select="/QCReport/GeneratorRevision"/>)
 	
 </div>
 </body>
