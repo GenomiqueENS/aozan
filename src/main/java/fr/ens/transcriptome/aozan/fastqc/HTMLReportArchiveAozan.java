@@ -209,7 +209,8 @@ public class HTMLReportArchiveAozan extends HTMLReportArchive {
 
   }
 
-  private List<String> listResourceDirectory(final String resourceDirectory) {
+  private static List<String> listResourceDirectory(
+      final String resourceDirectory) {
 
     if (resourceDirectory == null) {
       return null;
@@ -219,9 +220,10 @@ public class HTMLReportArchiveAozan extends HTMLReportArchive {
 
     try {
 
+      // Modification with 0.10.0 : call a class present in file jar
       final File dirOrJar =
-          new File(this.getClass().getProtectionDomain().getCodeSource()
-              .getLocation().toURI());
+          new File(uk.ac.babraham.FastQC.FastQCApplication.class
+              .getProtectionDomain().getCodeSource().getLocation().toURI());
 
       if (dirOrJar.isFile()) {
 
@@ -273,13 +275,13 @@ public class HTMLReportArchiveAozan extends HTMLReportArchive {
 
   private void addTemplate(String filename, String date) throws IOException {
 
-    // Version FastQC 0.10.1
+    // VERSION FastQC 0.10.1
     // BufferedReader br =
     // new BufferedReader(new FileReader(new File(URLDecoder.decode(
     // ClassLoader.getSystemResource("Templates/header_template.html")
     // .getFile(), "UTF-8"))));
 
-    // Version FastQC 0.10.0
+    // VERSION FastQC 0.10.0
     BufferedReader br =
         new BufferedReader(new InputStreamReader(
             ClassLoader
