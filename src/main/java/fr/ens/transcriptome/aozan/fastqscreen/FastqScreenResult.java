@@ -222,9 +222,14 @@ public class FastqScreenResult {
     // Header
     XMLUtils.addTagValue(doc, root, "AozanStep", "Detection contamination");
     XMLUtils.addTagValue(doc, root, "GeneratorName",
-        Globals.APP_NAME_LOWER_CASE);
+        Globals.APP_NAME);
     XMLUtils.addTagValue(doc, root, "GeneratorVersion",
         Globals.APP_VERSION_STRING);
+    XMLUtils.addTagValue(doc, root, "GeneratorWebsite",
+        Globals.WEBSITE_URL);
+    XMLUtils.addTagValue(doc, root, "GeneratorRevision",
+        Globals.APP_BUILD_COMMIT);
+    
     XMLUtils.addTagValue(doc, root, "RunId", data.get("run.info.run.id"));
     XMLUtils.addTagValue(doc, root, "RunDate", data.get("run.info.date"));
     XMLUtils.addTagValue(doc, root, "FlowcellId",

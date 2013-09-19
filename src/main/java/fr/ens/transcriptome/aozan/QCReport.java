@@ -265,9 +265,14 @@ public class QCReport {
       doc.appendChild(root);
 
       XMLUtils.addTagValue(doc, root, "GeneratorName",
-          Globals.APP_NAME_LOWER_CASE);
+          Globals.APP_NAME);
       XMLUtils.addTagValue(doc, root, "GeneratorVersion",
           Globals.APP_VERSION_STRING);
+      XMLUtils.addTagValue(doc, root, "GeneratorWebsite",
+          Globals.WEBSITE_URL);
+      XMLUtils.addTagValue(doc, root, "GeneratorRevision",
+          Globals.APP_BUILD_COMMIT);
+     
       XMLUtils
           .addTagValue(doc, root, "RunId", this.data.get("run.info.run.id"));
       XMLUtils

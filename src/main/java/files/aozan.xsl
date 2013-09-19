@@ -9,6 +9,12 @@ version="1.0">
 <head>
   <title><xsl:value-of select="/QCReport/RunId"/> run quality report</title>
   <style TYPE="text/css">
+  	
+  	/*
+  	color alternating rows
+  	tr:nth-child(even) {background: #CCC}
+	tr:nth-child(odd) {background: #FFF}
+	*/
     td {
       text-align: center;
     }
@@ -62,7 +68,7 @@ version="1.0">
         font-size: 95%;
     }
     body{
-        font-family : "Arial", Times, serif ;
+        font-family: sans-serif;   
         font-size: 90%;
     }
     h1{
@@ -75,7 +81,20 @@ version="1.0">
         color:#B9121B;
         font-style : italic;
     }
-    
+    div.footer {
+    background-color: #EEE;
+    border:0;
+    margin:0;
+	padding:0.5em;
+    height: 1.3em;
+	overflow:hidden;
+    font-size: 100%;
+    font-weight: bold;
+    position:fixed;
+    bottom:0;
+    width:100%;
+    z-index:2;
+  }
   </style>
 </head>
 <body>
@@ -157,7 +176,14 @@ version="1.0">
 
    </table>
   </xsl:for-each>
-
+<div class="footer">
+	Source 
+	<xsl:element name="a">
+		<xsl:attribute name="href"><xsl:value-of select="/QCReport/GeneratorWebsite"/></xsl:attribute>Aozan : <xsl:value-of select="/QCReport/GeneratorWebsite"/>
+	</xsl:element>
+	(version <xsl:value-of select="/QCReport/GeneratorRevision"/>)
+	
+</div>
 </body></html>
 </xsl:template>
 </xsl:stylesheet>
