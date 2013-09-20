@@ -138,13 +138,39 @@
       <action dev="perrin" type="add">
       			Quality control contains points of restoration if a hardware problem occurs before the end. 
       </action>
+      <action dev="perrin" type="add">
+      			Estimate the space needed for the current run and check free space in directory for next step. If not send a warning mail.  
+      </action>
+      <action dev="perrin" type="add">
+      			A logger commun for java and python code. 
+      </action>
     </release>
     <release version="1.1" description="Aozan version 1.1" date="2013-09-02">
       <action dev="perrin" type="add">
       			Module of contamination detection uses partial fastq files for decrease the runtime without lost of information.
       </action>
       <action dev="perrin" type="add">
-      			Reading InterOp binary files for collect data on the run. 
+      			Collector for reading TileOutMetrics.bin InterOp binary files for collect data on the run. 
+      </action>
+      <action dev="perrin" type="add">
+      			Collector for reading ErrorOutMetrics.bin InterOp binary files for collect data on the run. 
+      </action>
+      <action dev="perrin" type="add">
+      			Collector for reading ExtractionOutMetrics.bin InterOp binary files for collect data on the run. 
+      </action>
+      <action dev="perrin" type="update">
+      			Report of detection contamination : available in two formats in html and csv. 
+      </action>
+      <action dev="perrin" type="fix">
+      			Contamination detection for pair-end run. Two modes : single (mapping used R1 fastq) or paired (mapping used two fastq R1 & R2). 
+      </action>
+      <action dev="perrin" type="add">
+      			Mode debug, in configuration Aozan file. 
+      </action>
+    </release>
+    <release version="1.1.1" description="Aozan version 1.1.1" date="2013-09-20">
+      <action dev="perrin" type="update">      			
+				Use FastQC version 0.10.1.
       </action>
     </release>
   </body>
