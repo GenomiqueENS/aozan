@@ -172,6 +172,9 @@
       <action dev="perrin" type="update">      			
 				Use FastQC version 0.10.1.
       </action>
+      <action dev="perrin" type="fix">      			
+                       Replace NA in qc report in Undetermined line by value.
+      </action>
     </release>
   </body>
 </document>
