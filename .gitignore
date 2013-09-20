@@ -10,3 +10,4 @@
 /.externalToolBuilders/
 /maven-eclipse.xml
 
+/install.sh
