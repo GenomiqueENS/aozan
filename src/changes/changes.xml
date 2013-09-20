@@ -162,7 +162,7 @@
       			Report of detection contamination : available in two formats in html and csv. 
       </action>
       <action dev="perrin" type="fix">
-      			Contamination detection for pair-end run. Two modes : single (mapping used R1 fastq) or paired (mapping used two fastq R1 & R2). 
+      			Contamination detection for pair-end run. Two modes : single (mapping used R1 fastq) or paired (mapping used two fastq R1 and R2). 
       </action>
       <action dev="perrin" type="add">
       			Mode debug, in configuration Aozan file. 
