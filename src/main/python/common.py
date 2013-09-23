@@ -306,6 +306,13 @@ def add_run_id_to_processed_run_ids(run_id, done_file_path, conf):
 def load_conf(conf, conf_file_path):
     """Load configuration file"""
 
+    # in version Aozan 1.1.1 change key in configuration to replace design by samplesheet
+    # converting table between old and new key
+    converting_table_key = {}
+    converting_table_key['casava.design.format'] = 'casava.samplesheet.format'
+    converting_table_key['casava.design.prefix.filename'] = 'casava.samplesheet.prefix.filename'
+    converting_table_key['casava.designs.path'] = 'casava.samplesheets.path'
+    
     f = open(conf_file_path, 'r')
 
     for l in f:
@@ -315,7 +322,10 @@ def load_conf(conf, conf_file_path):
         fields = s.split('=')
         if len(fields) == 2:
             conf[fields[0].strip()] = fields[1].strip()
-
+            
+            # Check if needed to converting key for design fields
+            if fields[0].strip() in converting_table_key:
+                conf[converting_table_key[fields[0].strip()]] = fields[1].strip()
     f.close()
     return conf
 
