@@ -49,13 +49,29 @@ def du(path):
     return long(lines[0].split('\t')[0])
 
 
-def send_msg(subject, message, conf):
-    """Send a message to the user about the data extraction."""
+def send_msg(subject, message, is_error, conf):
+    """Send a message to the user about the data extraction.
+    
+    Arguments:
+        subject: subject of message
+        message: text mail
+        is_error: true if it is a error message
+        conf: configuration object
+    """
 
 
     send_mail = conf['send.mail'].lower() == 'true'
     smtp_server = conf['smtp.server']
-    mail_to = conf['mail.to']
+    
+    # Specific receiver for error message
+    if is_error:
+        mail_to = conf['mail.error.to']
+        
+        if mail_to == None:
+            mail_to = conf['mail.to']
+    else:
+        mail_to = conf['mail.to']
+        
     mail_from = conf['mail.from']
     mail_cc = None
     mail_bcc = None
@@ -214,9 +230,9 @@ def error(short_message, message, last_error_file_path, conf):
         f.close()
 
         if not new_error == last_error:
-            send_msg(short_message, message, conf)
+            send_msg(short_message, message, True, conf)
     else:
-        send_msg(short_message, message, conf)
+        send_msg(short_message, message, True, conf)
 
     f = open(last_error_file_path, 'w')
     f.write(new_error)

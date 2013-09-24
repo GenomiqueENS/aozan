@@ -204,7 +204,7 @@ def send_mail_if_critical_free_space_available(conf):
 			if df < free_space_threshold:
 				common.send_msg('[Aozan] Critical: Not enough disk space on Hiseq storage for current run',
 							'There is only %.2f' % (df / (1024 * 1024 * 1024)) + ' Gb left for Hiseq run storage in ' + path + '. '
-							' The current warning threshold is set to %.2f' % (free_space_threshold / (1024 * 1024 * 1024)) + ' Gb.', conf)
+							' The current warning threshold is set to %.2f' % (free_space_threshold / (1024 * 1024 * 1024)) + ' Gb.', False, conf)
 
 def send_mail_if_recent_run(run_id, secs, conf):
 
@@ -220,7 +220,7 @@ def send_mail_if_recent_run(run_id, secs, conf):
 		common.send_msg('[Aozan] End of the HiSeq run ' + run_id, 'A new run (' + run_id + ') has been terminated at ' +
 					common.time_to_human_readable(last) + '.\n' +
 					'Data for this run can be found at: ' + run_path +
-					'\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df), conf)
+					'\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df), False, conf)
 
 
 def get_hiseq_data_paths(conf):

@@ -110,12 +110,12 @@ def sync(run_id, conf):
 
     # Check if free space is available on 
     if output_df < space_needed:
-        error("Not enough disk space to perform synchronization for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id +
+        error("Not enough disk space to perform synchronization for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id + 
               '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + bcl_data_path + '.', conf)
         return False
 
     if common.df(reports_data_base_path) < 10 * 1024 * 1024 * 1024:
-        error("Not enough disk space to store aozan reports for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
+        error("Not enough disk space to store aozan reports for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id + 
               '.\nNeed more than 10 Gb on ' + reports_data_base_path + '.', conf)
         return False
 
@@ -170,8 +170,8 @@ def sync(run_id, conf):
         'mv ' + run_id + ' ' + report_prefix + run_id + ' && ' + \
         'tar cjf ' + reports_data_path + '/' + report_archive_file + ' ' + report_prefix + run_id + ' && ' + \
         'mv ' + report_prefix + run_id + ' ' + reports_data_path
-        #'cd ' + base_dir_path + ' && ' + \
-        #'cp -p ../First_Base_Report.htm ' + reports_data_path + '/' + run_id + '/ && ' + \
+        # 'cd ' + base_dir_path + ' && ' + \
+        # 'cp -p ../First_Base_Report.htm ' + reports_data_path + '/' + run_id + '/ && ' + \
     common.log("WARNING", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while saving Illumina html reports for run " + run_id, 'Error saving Illumina html reports.\nCommand line:\n' + cmd, conf)
@@ -206,6 +206,6 @@ def sync(run_id, conf):
 
     msg += '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df)
 
-    common.send_msg('[Aozan] End of synchronization for run ' + run_id, msg, conf)
+    common.send_msg('[Aozan] End of synchronization for run ' + run_id, msg, False, conf)
     common.log('INFO', 'sync step: success in ' + common.duration_to_human_readable(duration), conf)
     return True

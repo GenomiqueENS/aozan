@@ -79,6 +79,8 @@ def welcome(conf):
         something_to_do = True
 
 something_to_do = False
+is_error_message = True
+is_not_error_message = False
 
 def discover_new_run(conf):
     """Discover new runs.
@@ -257,12 +259,12 @@ def aozan_main(conf_file_path):
                 common.log('WARNING', traceback_msg, conf)
                 
                 # Send a mail with the exception
-                common.send_msg("[Aozan] Exception: " + exception_msg, traceback_msg, conf)
+                common.send_msg("[Aozan] Exception: " + exception_msg, traceback_msg, is_not_error_message, conf)
     else:
         print "A lock file exists."
         if not os.path.exists('/proc/%d' % (load_pid_in_lock_file(lock_file_path))):
             common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf['lock.file'] + 
-                         ". Please investigate last error and then remove the lock file.", conf['aozan.var.path'] + '/aozan.lasterr', conf)
+                         ". Please investigate last error and then remove the lock file.", is_error_message, conf['aozan.var.path'] + '/aozan.lasterr', conf)
 
 
 # Launch Aozan main
