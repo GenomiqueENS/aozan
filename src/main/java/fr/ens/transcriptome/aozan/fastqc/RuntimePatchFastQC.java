@@ -66,7 +66,11 @@ public class RuntimePatchFastQC {
 
     // Add code at the beginnning of the method
     String codeToAdd =
-        "if (contaminants == null) {\n contaminants = fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.makeContaminantList();\n}";
+        "if (contaminants == null) {"
+            + "\n contaminants = fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.makeContaminantList();\n"
+            + "System.out.println(\"contaminant list \"+System.getProperty(\"fastqc.contaminant_file\"));\n"
+            + "}";
+
     cb.insertBefore(codeToAdd);
 
     // Load the class by the ClassLoader
@@ -107,7 +111,8 @@ public class RuntimePatchFastQC {
 
   /**
    * Execute method who patch code from FastQC before call in Aozan
-   * @throws AozanException throw an error occurs during modification bytecode fastqc
+   * @throws AozanException throw an error occurs during modification bytecode
+   *           fastqc
    */
   public static void runPatchFastQC() throws AozanException {
 

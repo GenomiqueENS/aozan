@@ -31,6 +31,7 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.fastqc.RuntimePatchFastQC;
 import fr.ens.transcriptome.aozan.io.FastqSample;
+import fr.ens.transcriptome.eoulsan.util.StringUtils;
 
 /**
  * This class define a FastQC Collector
@@ -41,6 +42,12 @@ public class FastQCCollector extends AbstractFastqCollector {
 
   /** The collector name. */
   public static final String COLLECTOR_NAME = "fastqc";
+
+  /** Retrieve parameters of FastQC qc.conf.+ key_fastqc */
+  public static final String KEY_FASTQC_CONTAMINANT_FILE =
+      "qc.conf.fastqc.contaminant.file";
+  public static final String KEY_FASTQC_KMER_SIZE = "qc.conf.fastqc.kmer.size";
+  public static final String KEY_FASTQC_NOGROUP = "qc.conf.fastqc.nogroup";
 
   private int numberThreads = Runtime.getRuntime().availableProcessors();
 
@@ -56,9 +63,34 @@ public class FastQCCollector extends AbstractFastqCollector {
   public void configure(final Properties properties) {
 
     super.configure(properties);
+    System.out.println("PROP\n" + properties.toString().replace(',', '\n'));
 
+    // Define parameters of FastQC
     System.setProperty("java.awt.headless", "true");
     System.setProperty("fastqc.unzip", "true");
+
+    // Check contaminant file specify in configuration Aozan for module
+    // OverRepresented
+    System.out.println("def contaminant file "
+        + properties.contains(KEY_FASTQC_CONTAMINANT_FILE));
+
+    if (properties.contains(KEY_FASTQC_CONTAMINANT_FILE)
+        && properties.getProperty(KEY_FASTQC_CONTAMINANT_FILE).length() > 0)
+
+      System.setProperty("fastqc.contaminant_file",
+          properties.getProperty(KEY_FASTQC_CONTAMINANT_FILE));
+
+    if (properties.contains(KEY_FASTQC_KMER_SIZE)
+        && properties.getProperty(KEY_FASTQC_KMER_SIZE).length() > 0)
+
+      System.setProperty("fastqc.kmer_size",
+          properties.getProperty(KEY_FASTQC_KMER_SIZE));
+
+    if (properties.contains(KEY_FASTQC_NOGROUP)
+        && properties.getProperty(KEY_FASTQC_NOGROUP).length() > 0)
+
+      System.setProperty("fastqc.nogroup",
+          properties.getProperty(KEY_FASTQC_NOGROUP));
 
     // Set the number of threads
     if (properties.containsKey("qc.conf.fastqc.threads")) {
@@ -73,6 +105,10 @@ public class FastQCCollector extends AbstractFastqCollector {
       } catch (NumberFormatException e) {
       }
     }
+
+    // TODO
+    System.out.println("contaminant list "
+        + System.getProperty("fastqc.contaminant_file"));
   }
 
   @Override
