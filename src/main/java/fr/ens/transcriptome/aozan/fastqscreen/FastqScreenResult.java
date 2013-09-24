@@ -23,6 +23,9 @@
 
 package fr.ens.transcriptome.aozan.fastqscreen;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -133,19 +136,37 @@ public class FastqScreenResult {
   }
 
   public String reportToHtml(final FastqSample fastqSample, final RunData data,
-      final String genomeSample) throws AozanException {
+      final String genomeSample, final File fastqscreenXSLFile)
+      throws AozanException {
 
     if (!isComputedPercent)
       throw new AozanException(
           "Error writing a html report fastqScreen : no values available.");
 
-    final String xml = toXML(fastqSample, data, genomeSample);
+    // Call stylesheet file for report
+    InputStream is;
+    // System.out.println("xsl " + fastqscreenXSLFile.getAbsolutePath());
+    try {
+      if (fastqscreenXSLFile == null)
+        is =
+            this.getClass().getResourceAsStream(
+                Globals.EMBEDDED_FASTQSCREEN_XSL);
+      else
+        is = new FileInputStream(fastqscreenXSLFile);
 
-    return xml;
+    } catch (FileNotFoundException e) {
+      throw new AozanException(e);
+    }
+
+    if (is == null)
+      return null;
+
+    return toXML(fastqSample, data, genomeSample, is);
   }
 
   private String toXML(final FastqSample fastqSample, final RunData data,
-      final String genomeSample) throws AozanException {
+      final String genomeSample, final InputStream isXSLFile)
+      throws AozanException {
 
     if (!isComputedPercent)
       return null;
@@ -166,16 +187,10 @@ public class FastqScreenResult {
       DOMSource source = new DOMSource(doc);
       trans.transform(source, result);
 
-      InputStream is =
-          this.getClass().getResourceAsStream(Globals.EMBEDDED_FASTQSCREEN_XSL);
-
-      if (is == null)
-        return null;
-
       // Create the transformer
       final Transformer transformer =
           TransformerFactory.newInstance().newTransformer(
-              new javax.xml.transform.stream.StreamSource(is));
+              new javax.xml.transform.stream.StreamSource(isXSLFile));
 
       // Create the String writer
       final StringWriter writer = new StringWriter();
@@ -184,7 +199,7 @@ public class FastqScreenResult {
       transformer.transform(new DOMSource(doc), new StreamResult(writer));
 
       // Close input stream
-      is.close();
+      isXSLFile.close();
 
       // Return the result of the transformation
       return writer.toString();
@@ -221,15 +236,13 @@ public class FastqScreenResult {
 
     // Header
     XMLUtils.addTagValue(doc, root, "AozanStep", "Detection contamination");
-    XMLUtils.addTagValue(doc, root, "GeneratorName",
-        Globals.APP_NAME);
+    XMLUtils.addTagValue(doc, root, "GeneratorName", Globals.APP_NAME);
     XMLUtils.addTagValue(doc, root, "GeneratorVersion",
         Globals.APP_VERSION_STRING);
-    XMLUtils.addTagValue(doc, root, "GeneratorWebsite",
-        Globals.WEBSITE_URL);
+    XMLUtils.addTagValue(doc, root, "GeneratorWebsite", Globals.WEBSITE_URL);
     XMLUtils.addTagValue(doc, root, "GeneratorRevision",
         Globals.APP_BUILD_COMMIT);
-    
+
     XMLUtils.addTagValue(doc, root, "RunId", data.get("run.info.run.id"));
     XMLUtils.addTagValue(doc, root, "RunDate", data.get("run.info.date"));
     XMLUtils.addTagValue(doc, root, "FlowcellId",

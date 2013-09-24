@@ -214,6 +214,12 @@
 					<td>The report of quality control contains a column with link to report fastqscreen file, 
 						save in quality control directory.</td>
 				</tr>
+				<tr>
+					<td>qc.conf.fastqscreen.xsl.file</td>
+					<td>string</td>
+					<td>null</td>
+					<td>Path to a specific stylesheet file to edit the fastqscreen report html, instead of the file per default.</td>
+				</tr>
 			</table>	
 		<p>The explanation to construct intervals is <a href="#syntax_interval">here.</a></p>
                 <p>If no FastQ Screen test property is set, FastQ Screen will not be launch on FastQ data.</p>

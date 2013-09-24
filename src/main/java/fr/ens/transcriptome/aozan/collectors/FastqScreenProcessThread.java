@@ -66,6 +66,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   private final RunData data;
 
   private FastqScreenResult resultsFastqscreen = null;
+  private File fastqscreenXSLFile = null;
 
   @Override
   public void run() {
@@ -157,7 +158,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     BufferedWriter br = Files.newWriter(file, Charsets.UTF_8);
     br.append(this.resultsFastqscreen.reportToHtml(this.fastqSample, this.data,
-        this.genomeSample));
+        this.genomeSample, this.fastqscreenXSLFile));
 
     br.close();
 
@@ -249,10 +250,11 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
       final FastqSample fastqSampleR2, final FastqScreen fastqscreen,
       final RunData data, final List<String> genomes,
       final String genomeSample, final File reportDir,
-      final boolean isPairedMode, final boolean isRunPE) throws AozanException {
+      final boolean isPairedMode, final boolean isRunPE,
+      final File fastqscreenXSLFile) throws AozanException {
 
     this(fastqSampleR1, fastqscreen, data, genomes, genomeSample, reportDir,
-        isPairedMode, isRunPE);
+        isPairedMode, isRunPE, fastqscreenXSLFile);
     this.fastqSampleR2 = fastqSampleR2;
   }
 
@@ -274,8 +276,8 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   public FastqScreenProcessThread(final FastqSample fastqSample,
       final FastqScreen fastqscreen, final RunData data,
       final List<String> genomes, final String genomeSample,
-      final File reportDir, final boolean isPairedMode, final boolean isRunPE)
-      throws AozanException {
+      final File reportDir, final boolean isPairedMode, final boolean isRunPE,
+      final File fastqscreenXSLFile) throws AozanException {
 
     super(fastqSample);
 
@@ -286,6 +288,12 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     this.isPairedMode = isPairedMode;
     this.isRunPE = isRunPE;
     this.data = data;
+
+    if (fastqscreenXSLFile == null || !fastqscreenXSLFile.exists()) {
+      this.fastqscreenXSLFile = null;
+    } else {
+      this.fastqscreenXSLFile = fastqscreenXSLFile;
+    }
 
     // Copy list genome for fastqscreen
     this.genomes = new ArrayList<String>();

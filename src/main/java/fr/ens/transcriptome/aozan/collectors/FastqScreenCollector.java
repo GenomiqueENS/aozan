@@ -54,10 +54,15 @@ public class FastqScreenCollector extends AbstractFastqCollector {
   public static final String KEY_IGNORE_PAIRED_MODE =
       "qc.conf.ignore.paired.mode";
 
+  // Optional in configuration Aozan, not call default xsl file.
+  public static final String KEY_FASTQSCREEN_XSL_FILE =
+      "qc.conf.fastqscreen.xsl.file";
+
   private FastqScreen fastqscreen;
 
   private boolean skipControlLane;
   private boolean ignorePairedMode;
+  private File fastqscreenXSLFile = null;
 
   // List of genome for fastqscreen specific of a sample
   private List<String> genomesConfiguration = new ArrayList<String>();
@@ -115,6 +120,15 @@ public class FastqScreenCollector extends AbstractFastqCollector {
       // Default value
       this.skipControlLane = true;
     }
+
+    try {
+      String filename = properties.getProperty(KEY_FASTQSCREEN_XSL_FILE);
+      if (new File(filename).exists())
+        this.fastqscreenXSLFile = new File(filename);
+    } catch (Exception e) {
+      // Call default xsl file
+      this.fastqscreenXSLFile = null;
+    }
   }
 
   @Override
@@ -166,7 +180,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
           return new FastqScreenProcessThread(fastqSample, fastqSampleR2,
               fastqscreen, data, genomesConfiguration, genomeReferenceSample,
-              reportDir, isPairedMode, isRunPE);
+              reportDir, isPairedMode, isRunPE, this.fastqscreenXSLFile);
         }
       }
     }
@@ -174,7 +188,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     // Call with a mode single-end for mapping
     return new FastqScreenProcessThread(fastqSample, fastqscreen, data,
         genomesConfiguration, genomeReferenceSample, reportDir, isPairedMode,
-        isRunPE);
+        isRunPE, this.fastqscreenXSLFile);
   }
 
   //

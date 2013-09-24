@@ -176,5 +176,10 @@
                        Replace NA in qc report in Undetermined line by value.
       </action>
     </release>
+    <release version="1.1.2" description="Aozan version 1.1.2" date="2013-09-24">
+      <action dev="perrin" type="fix">      			
+      		Fix bugs : files xsl (missing closing tags).
+	</action>
+   </release>
   </body>
 </document>
