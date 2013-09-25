@@ -186,7 +186,6 @@ public class FastqScreenResult {
       Document doc = createDocumentXML(fastqSample, data, genomeSample);
       DOMSource source = new DOMSource(doc);
       trans.transform(source, result);
-
       // Create the transformer
       final Transformer transformer =
           TransformerFactory.newInstance().newTransformer(
@@ -200,6 +199,13 @@ public class FastqScreenResult {
 
       // Close input stream
       isXSLFile.close();
+
+      // Print document XML
+      // StringWriter swxml = new StringWriter();
+      // StreamResult resultxml = new StreamResult(swxml);
+      // DOMSource sourcexml = new DOMSource(doc);
+      // trans.transform(sourcexml, resultxml);
+      // System.out.println(swxml.toString());
 
       // Return the result of the transformation
       return writer.toString();
