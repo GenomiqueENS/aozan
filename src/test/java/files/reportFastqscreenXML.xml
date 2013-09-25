@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ReportFastqScreen formatversion="1.0">
+<AozanStep>Detection contamination</AozanStep>
+<GeneratorName>Aozan</GeneratorName>
+<GeneratorVersion>UNKNOWN_VERSION</GeneratorVersion>
+<GeneratorWebsite>http://transcriptome.ens.fr/aozan</GeneratorWebsite>
+<GeneratorRevision>UNKNOWN_COMMIT</GeneratorRevision>
+<RunId>run_id</RunId>
+<RunDate>130722</RunDate>
+<FlowcellId>H0NT2ADXX</FlowcellId>
+<InstrumentSN>SNL110</InstrumentSN>
+<InstrumentRunNumber>77</InstrumentRunNumber>
+<ReportDate>Wed Sep 25 14:23:32 CEST 2013</ReportDate>
+<projectName>project name</projectName>
+<genomeSample>genome name</genomeSample>
+<sampleName>2013_124</sampleName>
+<Report>
+<Columns>
+<Column name="Library">Library</Column>
+<Column name="%Mapped">%Mapped</Column>
+<Column name="%Unmapped">%Unmapped</Column>
+<Column name="%One hit one library">%One hit one library</Column>
+<Column name="%Multiple hits one library">%Multiple hits one library</Column>
+<Column name="%One hit multiple libraries">%One hit multiple libraries</Column>
+<Column name="%Multiple hits multiple libraries">%Multiple hits multiple libraries</Column>
+</Columns>
+<Genomes>
+<Genome name="hg19">
+<Value name="85.78">85.78</Value>
+<Value name="14.22">14.22</Value>
+<Value name="59.03">59.03</Value>
+<Value name="26.75">26.75</Value>
+<Value name="0.0">0.0</Value>
+<Value name="0.0">0.0</Value>
+</Genome>
+<Genome name="phix">
+<Value name="2.31">2.31</Value>
+<Value name="97.69">97.69</Value>
+<Value name="2.31">2.31</Value>
+<Value name="0.0">0.0</Value>
+<Value name="0.0">0.0</Value>
+<Value name="0.0">0.0</Value>
+</Genome>
+</Genomes>
+<ReadsUnmapped name="reads_unmapped_none_genome">11.91</ReadsUnmapped>
+<ReadsMappedOneGenome name="reads_mapped_at_least_one_genome">88.09</ReadsMappedOneGenome>
+<ReadsMappedExceptGenomeSample name="reads_mapped_at_except_genome_sample">2.31</ReadsMappedExceptGenomeSample>
+<ReadsMapped name="reads_mapped">176187</ReadsMapped>
+<ReadsProcessed name="reads_processed">200000</ReadsProcessed>
+</Report>
+</ReportFastqScreen>

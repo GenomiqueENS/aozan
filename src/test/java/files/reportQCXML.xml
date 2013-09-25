@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<QCReport formatversion="1.0">
+<GeneratorName>Aozan</GeneratorName>
+<GeneratorVersion>UNKNOWN_VERSION</GeneratorVersion>
+<GeneratorWebsite>http://transcriptome.ens.fr/aozan</GeneratorWebsite>
+<GeneratorRevision>UNKNOWN_COMMIT</GeneratorRevision>
+<RunId>run_id</RunId>
+<RunDate>130722</RunDate>
+<FlowcellId>H0NT2ADXX</FlowcellId>
+<InstrumentSN>SNL110</InstrumentSN>
+<InstrumentRunNumber>77</InstrumentRunNumber>
+<ReportDate>date generation report</ReportDate>
+<ReadsReport>
+<Columns>
+<Column description="" testname="rawclusters" unit="">Raw Clusters Est.</Column>
+<Column description="" testname="pfclusters" unit="">PF Clusters Est.</Column>
+<Column description="" testname="pfclusterspercent" unit="%">PF Clusters</Column>
+<Column description="" testname="clusterdensity" unit="k/mm2">Cluster Density</Column>
+<Column description="" testname="percentalign" unit="%">PhiX Align</Column>
+<Column description="" testname="errorrate" unit="%">Error Rate</Column>
+<Column description="" testname="errorrate35cycle" unit="%">Error Rate 35 cycles</Column>
+<Column description="" testname="errorrate75cycle" unit="%">Error Rate 75 cycles</Column>
+<Column description="" testname="errorrate100cycle" unit="%">Error Rate 100 cycles</Column>
+<Column description="" testname="firstcycleintensity" unit="">First cyle intensity</Column>
+<Column description="" testname="percentintensitycycle20" unit="%">Intensity cycle 20</Column>
+<Column description="" testname="phasingprephasing" unit="">Phasing / Prephasing</Column>
+</Columns>
+<Reads>
+<Read cycles="51" indexed="false" number="1">
+<Lane number="1">
+<Test name="rawclusters" score="-1" type="int">219703808</Test>
+<Test name="pfclusters" score="-1" type="int">190532032</Test>
+<Test name="pfclusterspercent" score="9" type="percent">0.8672222558837032</Test>
+<Test name="clusterdensity" score="-1" type="float">1191.9693681584</Test>
+<Test name="percentalign" score="-1" type="percent">0.22766974806785584</Test>
+<Test name="errorrate" score="-1" type="percent">0.0011923907383228653</Test>
+<Test name="errorrate35cycle" score="9" type="percent">9.683257835817391E-4</Test>
+<Test name="errorrate75cycle" score="9" type="percent">0.0</Test>
+<Test name="errorrate100cycle" score="9" type="percent">0.0</Test>
+<Test name="firstcycleintensity" score="-1" type="int">6094</Test>
+<Test name="percentintensitycycle20" score="9" type="percent">0.8524727627451365</Test>
+<Test name="phasingprephasing" score="9" type="string">0.089% / 0.139%</Test>
+</Lane>
+<Lane number="2">
+<Test name="rawclusters" score="-1" type="int">222435712</Test>
+<Test name="pfclusters" score="-1" type="int">191641664</Test>
+<Test name="pfclusterspercent" score="9" type="percent">0.8615597840692055</Test>
+<Test name="clusterdensity" score="-1" type="float">1206.7908949875998</Test>
+<Test name="percentalign" score="-1" type="percent">0.23132145404815674</Test>
+<Test name="errorrate" score="-1" type="percent">0.0011584653289755807</Test>
+<Test name="errorrate35cycle" score="9" type="percent">9.945358029300614E-4</Test>
+<Test name="errorrate75cycle" score="9" type="percent">0.0</Test>
+<Test name="errorrate100cycle" score="9" type="percent">0.0</Test>
+<Test name="firstcycleintensity" score="-1" type="int">5929</Test>
+<Test name="percentintensitycycle20" score="9" type="percent">0.8620884207069283</Test>
+<Test name="phasingprephasing" score="9" type="string">0.091% / 0.133%</Test>
+</Lane>
+</Read>
+<Read cycles="7" indexed="true" number="2">
+<Lane number="1">
+<Test name="rawclusters" score="-1" type="int">219703808</Test>
+<Test name="pfclusters" score="-1" type="int">190532032</Test>
+<Test name="pfclusterspercent" score="-1" type="percent">0.8672222558837032</Test>
+<Test name="clusterdensity" score="-1" type="float">1191.9693681584</Test>
+<Test name="percentalign" score="-1" type="percent">0.0</Test>
+<Test name="errorrate" score="-1" type="percent">0.0</Test>
+<Test name="errorrate35cycle" score="-1" type="percent">0.0</Test>
+<Test name="errorrate75cycle" score="-1" type="percent">0.0</Test>
+<Test name="errorrate100cycle" score="-1" type="percent">0.0</Test>
+<Test name="firstcycleintensity" score="-1" type="int">6746</Test>
+<Test name="percentintensitycycle20" score="-1" type="percent">0.0</Test>
+<Test name="phasingprephasing" score="-1" type="string">0.000% / 0.000%</Test>
+</Lane>
+<Lane number="2">
+<Test name="rawclusters" score="-1" type="int">222435712</Test>
+<Test name="pfclusters" score="-1" type="int">191641664</Test>
+<Test name="pfclusterspercent" score="-1" type="percent">0.8615597840692055</Test>
+<Test name="clusterdensity" score="-1" type="float">1206.7908949875998</Test>
+<Test name="percentalign" score="-1" type="percent">0.0</Test>
+<Test name="errorrate" score="-1" type="percent">0.0</Test>
+<Test name="errorrate35cycle" score="-1" type="percent">0.0</Test>
+<Test name="errorrate75cycle" score="-1" type="percent">0.0</Test>
+<Test name="errorrate100cycle" score="-1" type="percent">0.0</Test>
+<Test name="firstcycleintensity" score="-1" type="int">6601</Test>
+<Test name="percentintensitycycle20" score="-1" type="percent">0.0</Test>
+<Test name="phasingprephasing" score="-1" type="string">0.000% / 0.000%</Test>
+</Lane>
+</Read>
+</Reads>
+</ReadsReport>
+<SamplesReport>
+<Columns>
+<Column description="" testname="rawclusterssamples" unit="">Raw clusters</Column>
+<Column description="" testname="pfclusterssamples" unit="">PF clusters</Column>
+<Column description="" testname="percentpfsample" unit="%">Passing filter</Column>
+<Column description="" testname="percentinlanesample" unit="%">Sample in lane</Column>
+<Column description="" testname="percentq30" unit="%">&gt;= Q30 Base PF</Column>
+<Column description="" testname="meanqualityscorepf" unit="">Mean quality score base PF</Column>
+<Column description="basic statistics" testname="basicstats" unit="">Basic Stats</Column>
+<Column description="per base quality scores" testname="perbasequalityscores" unit="">Per base quality scores</Column>
+<Column description="per sequence quality scores" testname="persequencequalityscores" unit="">Per sequence quality scores</Column>
+<Column description="per base sequence content" testname="perbasesequencecontent" unit="">Per base sequence content</Column>
+<Column description="per base GC content" testname="perbasegccontent" unit="">Per base GC content</Column>
+<Column description="per sequence GC content" testname="persequencegccontent" unit="">Per sequence GC content</Column>
+<Column description="n content" testname="ncontent" unit="">N Content</Column>
+<Column description="sequence length distribution" testname="sequencelengthdistribution" unit="">Sequence length distribution</Column>
+<Column description="duplication level" testname="duplicationlevel" unit="">Duplication level</Column>
+<Column description="over represented seqs" testname="overrepresentedseqs" unit="">Over represented seqs</Column>
+<Column description="kmer content" testname="kmercontent" unit="">kmer content</Column>
+<Column description="bad tiles" testname="badtiles" unit="">Bad tiles</Column>
+<Column description="" testname="hitnolibraries" unit="%">fastqScreen mapped except genome sample</Column>
+<Column description="" testname="fsqmapped" unit="%">fastqscreen mapped on phix</Column>
+<Column description="" testname="fsqmapped" unit="%">fastqscreen uniq mapped on hg19</Column>
+<Column description="link report fastqScreen" testname="linkreport" unit="">link report fastqScreen</Column>
+</Columns>
+<Reads>
+<Read number="1">
+<Sample desc="description_sample" index="TGACCA" lane="1" name="2013_124" project="project_name">
+<Test name="rawclusterssamples" score="-1" type="int">27832077</Test>
+<Test name="pfclusterssamples" score="0" type="int">24929217</Test>
+<Test name="percentpfsample" score="9" type="percent">0.8957009209194126</Test>
+<Test name="percentinlanesample" score="-1" type="percent">0.126679972305446</Test>
+<Test name="percentq30" score="9" type="percent">0.9500518070824286</Test>
+<Test name="meanqualityscorepf" score="-1" type="float">37.31965424024349</Test>
+<Test name="basicstats" score="9" type="url">Project_project_name/2013_124_TGACCA_L001_R1_001-fastqc/fastqc_report.html#M0</Test>
+<Test name="perbasequalityscores" score="9" type="url">Project_project_name/2013_124_TGACCA_L001_R1_001-fastqc/fastqc_report.html#M1</Test>
+<Test name="persequencequalityscores" score="9" type="url">Project_project_name/2013_124_TGACCA_L001_R1_001-fastqc/fastqc_report.html#M2</Test>
+<Test name="perbasesequencecontent" score="0" type="url">Project_project_name/2013_124_TGACCA_L001_R1_001-fastqc/fastqc_report.html#M3</Test>
+<Test name="perbasegccontent" score="0" type="url">Project_project_name/2013_124_TGACCA_L001_R1_001-fastqc/fastqc_report.html#M4</Test>
+<Test name="persequencegccontent" score="9" type="url">Project_project_name/2013_124_TGACCA_L001_R1_001-fastqc/fastqc_report.html#M5</Test>
+<Test name="ncontent" score="9" type="url">Project_project_name/2013_124_TGACCA_L001_R1_001-fastqc/fastqc_report.html#M6</Test>
+<Test name="sequencelengthdistribution" score="9" type="url">Project_project_name/2013_124_TGACCA_L001_R1_001-fastqc/fastqc_report.html#M7</Test>
+<Test name="duplicationlevel" score="0" type="url">Project_project_name/2013_124_TGACCA_L001_R1_001-fastqc/fastqc_report.html#M8</Test>
+<Test name="overrepresentedseqs" score="9" type="url">Project_project_name/2013_124_TGACCA_L001_R1_001-fastqc/fastqc_report.html#M9</Test>
+<Test name="kmercontent" score="4" type="url">Project_project_name/2013_124_TGACCA_L001_R1_001-fastqc/fastqc_report.html#M10</Test>
+<Test name="badtiles" score="9" type="url">Project_project_name/2013_124_TGACCA_L001_R1_001-fastqc/fastqc_report.html#M11</Test>
+<Test name="hitnolibraries" score="9" type="percent">0.02552500000000002</Test>
+<Test name="fsqmapped" score="9" type="percent">0.02313</Test>
+<Test name="fsqmapped" score="9" type="percent">0.5902</Test>
+<Test name="linkreport" score="9" type="url">Project_project_name/2013_124_TGACCA_L001_R1_001-fastqscreen.html</Test>
+</Sample>
+<Sample desc="description_sample" index="ACAGTG" lane="1" name="2013_125" project="project_name">
+<Test name="rawclusterssamples" score="-1" type="int">28718436</Test>
+<Test name="pfclusterssamples" score="0" type="int">25712445</Test>
+<Test name="percentpfsample" score="9" type="percent">0.8953288751518362</Test>
+<Test name="percentinlanesample" score="-1" type="percent">0.1307143077081787</Test>
+<Test name="percentq30" score="9" type="percent">0.9495660587703737</Test>
+<Test name="meanqualityscorepf" score="-1" type="float">37.30420117028933</Test>
+<Test name="basicstats" score="9" type="url">Project_project_name/2013_125_ACAGTG_L001_R1_001-fastqc/fastqc_report.html#M0</Test>
+<Test name="perbasequalityscores" score="9" type="url">Project_project_name/2013_125_ACAGTG_L001_R1_001-fastqc/fastqc_report.html#M1</Test>
+<Test name="persequencequalityscores" score="9" type="url">Project_project_name/2013_125_ACAGTG_L001_R1_001-fastqc/fastqc_report.html#M2</Test>
+<Test name="perbasesequencecontent" score="0" type="url">Project_project_name/2013_125_ACAGTG_L001_R1_001-fastqc/fastqc_report.html#M3</Test>
+<Test name="perbasegccontent" score="0" type="url">Project_project_name/2013_125_ACAGTG_L001_R1_001-fastqc/fastqc_report.html#M4</Test>
+<Test name="persequencegccontent" score="9" type="url">Project_project_name/2013_125_ACAGTG_L001_R1_001-fastqc/fastqc_report.html#M5</Test>
+<Test name="ncontent" score="9" type="url">Project_project_name/2013_125_ACAGTG_L001_R1_001-fastqc/fastqc_report.html#M6</Test>
+<Test name="sequencelengthdistribution" score="9" type="url">Project_project_name/2013_125_ACAGTG_L001_R1_001-fastqc/fastqc_report.html#M7</Test>
+<Test name="duplicationlevel" score="0" type="url">Project_project_name/2013_125_ACAGTG_L001_R1_001-fastqc/fastqc_report.html#M8</Test>
+<Test name="overrepresentedseqs" score="9" type="url">Project_project_name/2013_125_ACAGTG_L001_R1_001-fastqc/fastqc_report.html#M9</Test>
+<Test name="kmercontent" score="4" type="url">Project_project_name/2013_125_ACAGTG_L001_R1_001-fastqc/fastqc_report.html#M10</Test>
+<Test name="badtiles" score="9" type="url">Project_project_name/2013_125_ACAGTG_L001_R1_001-fastqc/fastqc_report.html#M11</Test>
+<Test name="hitnolibraries" score="9" type="percent">0.015924999999999967</Test>
+<Test name="fsqmapped" score="9" type="percent">0.014265</Test>
+<Test name="fsqmapped" score="9" type="percent">0.59472</Test>
+<Test name="linkreport" score="9" type="url">Project_project_name/2013_125_ACAGTG_L001_R1_001-fastqscreen.html</Test>
+</Sample>
+<Sample desc="description_sample" index="CAGATC" lane="1" name="2013_126" project="project_name">
+<Test name="rawclusterssamples" score="-1" type="int">34375161</Test>
+<Test name="pfclusterssamples" score="0" type="int">30821795</Test>
+<Test name="percentpfsample" score="9" type="percent">0.8966298368755277</Test>
+<Test name="percentinlanesample" score="-1" type="percent">0.15646135369183</Test>
+<Test name="percentq30" score="9" type="percent">0.9492952516230804</Test>
+<Test name="meanqualityscorepf" score="-1" type="float">37.286900171128906</Test>
+<Test name="basicstats" score="9" type="url">Project_project_name/2013_126_CAGATC_L001_R1_001-fastqc/fastqc_report.html#M0</Test>
+<Test name="perbasequalityscores" score="9" type="url">Project_project_name/2013_126_CAGATC_L001_R1_001-fastqc/fastqc_report.html#M1</Test>
+<Test name="persequencequalityscores" score="9" type="url">Project_project_name/2013_126_CAGATC_L001_R1_001-fastqc/fastqc_report.html#M2</Test>
+<Test name="perbasesequencecontent" score="0" type="url">Project_project_name/2013_126_CAGATC_L001_R1_001-fastqc/fastqc_report.html#M3</Test>
+<Test name="perbasegccontent" score="0" type="url">Project_project_name/2013_126_CAGATC_L001_R1_001-fastqc/fastqc_report.html#M4</Test>
+<Test name="persequencegccontent" score="9" type="url">Project_project_name/2013_126_CAGATC_L001_R1_001-fastqc/fastqc_report.html#M5</Test>
+<Test name="ncontent" score="9" type="url">Project_project_name/2013_126_CAGATC_L001_R1_001-fastqc/fastqc_report.html#M6</Test>
+<Test name="sequencelengthdistribution" score="9" type="url">Project_project_name/2013_126_CAGATC_L001_R1_001-fastqc/fastqc_report.html#M7</Test>
+<Test name="duplicationlevel" score="0" type="url">Project_project_name/2013_126_CAGATC_L001_R1_001-fastqc/fastqc_report.html#M8</Test>
+<Test name="overrepresentedseqs" score="9" type="url">Project_project_name/2013_126_CAGATC_L001_R1_001-fastqc/fastqc_report.html#M9</Test>
+<Test name="kmercontent" score="4" type="url">Project_project_name/2013_126_CAGATC_L001_R1_001-fastqc/fastqc_report.html#M10</Test>
+<Test name="badtiles" score="9" type="url">Project_project_name/2013_126_CAGATC_L001_R1_001-fastqc/fastqc_report.html#M11</Test>
+<Test name="hitnolibraries" score="9" type="percent">0.02265499999999998</Test>
+<Test name="fsqmapped" score="9" type="percent">0.020405</Test>
+<Test name="fsqmapped" score="9" type="percent">0.58887</Test>
+<Test name="linkreport" score="9" type="url">Project_project_name/2013_126_CAGATC_L001_R1_001-fastqscreen.html</Test>
+</Sample>
+<Sample desc="description_sample" index="CCGTCC" lane="1" name="2013_281" project="project_name">
+<Test name="rawclusterssamples" score="-1" type="int">2268900</Test>
+<Test name="pfclusterssamples" score="0" type="int">1927356</Test>
+<Test name="percentpfsample" score="9" type="percent">0.8494671426682533</Test>
+<Test name="percentinlanesample" score="-1" type="percent">0.010327083715808432</Test>
+<Test name="percentq30" score="9" type="percent">0.9273828291192702</Test>
+<Test name="meanqualityscorepf" score="-1" type="float">36.44410813570508</Test>
+<Test name="basicstats" score="9" type="url">Project_project_name/2013_281_CCGTCC_L001_R1_001-fastqc/fastqc_report.html#M0</Test>
+<Test name="perbasequalityscores" score="9" type="url">Project_project_name/2013_281_CCGTCC_L001_R1_001-fastqc/fastqc_report.html#M1</Test>
+<Test name="persequencequalityscores" score="9" type="url">Project_project_name/2013_281_CCGTCC_L001_R1_001-fastqc/fastqc_report.html#M2</Test>
+<Test name="perbasesequencecontent" score="0" type="url">Project_project_name/2013_281_CCGTCC_L001_R1_001-fastqc/fastqc_report.html#M3</Test>
+<Test name="perbasegccontent" score="0" type="url">Project_project_name/2013_281_CCGTCC_L001_R1_001-fastqc/fastqc_report.html#M4</Test>
+<Test name="persequencegccontent" score="0" type="url">Project_project_name/2013_281_CCGTCC_L001_R1_001-fastqc/fastqc_report.html#M5</Test>
+<Test name="ncontent" score="9" type="url">Project_project_name/2013_281_CCGTCC_L001_R1_001-fastqc/fastqc_report.html#M6</Test>
+<Test name="sequencelengthdistribution" score="9" type="url">Project_project_name/2013_281_CCGTCC_L001_R1_001-fastqc/fastqc_report.html#M7</Test>
+<Test name="duplicationlevel" score="4" type="url">Project_project_name/2013_281_CCGTCC_L001_R1_001-fastqc/fastqc_report.html#M8</Test>
+<Test name="overrepresentedseqs" score="0" type="url">Project_project_name/2013_281_CCGTCC_L001_R1_001-fastqc/fastqc_report.html#M9</Test>
+<Test name="kmercontent" score="0" type="url">Project_project_name/2013_281_CCGTCC_L001_R1_001-fastqc/fastqc_report.html#M10</Test>
+<Test name="badtiles" score="9" type="url">Project_project_name/2013_281_CCGTCC_L001_R1_001-fastqc/fastqc_report.html#M11</Test>
+<Test name="hitnolibraries" score="9" type="percent">0.08129499999999998</Test>
+<Test name="fsqmapped" score="9" type="percent">0.0234</Test>
+<Test name="fsqmapped" score="0" type="percent">0.00378</Test>
+<Test name="linkreport" score="9" type="url">Project_project_name/2013_281_CCGTCC_L001_R1_001-fastqscreen.html</Test>
+</Sample>
+<Sample desc="description_sample" index="ACTGAT" lane="1" name="2013_282" project="project_name">
+<Test name="rawclusterssamples" score="-1" type="int">39485668</Test>
+<Test name="pfclusterssamples" score="9" type="int">33510898</Test>
+<Test name="percentpfsample" score="9" type="percent">0.8486850975903459</Test>
+<Test name="percentinlanesample" score="-1" type="percent">0.17972224382327037</Test>
+<Test name="percentq30" score="9" type="percent">0.9313544650459681</Test>
+<Test name="meanqualityscorepf" score="-1" type="float">36.57380360502425</Test>
+<Test name="basicstats" score="9" type="url">Project_project_name/2013_282_ACTGAT_L001_R1_001-fastqc/fastqc_report.html#M0</Test>
+<Test name="perbasequalityscores" score="9" type="url">Project_project_name/2013_282_ACTGAT_L001_R1_001-fastqc/fastqc_report.html#M1</Test>
+<Test name="persequencequalityscores" score="9" type="url">Project_project_name/2013_282_ACTGAT_L001_R1_001-fastqc/fastqc_report.html#M2</Test>
+<Test name="perbasesequencecontent" score="4" type="url">Project_project_name/2013_282_ACTGAT_L001_R1_001-fastqc/fastqc_report.html#M3</Test>
+<Test name="perbasegccontent" score="0" type="url">Project_project_name/2013_282_ACTGAT_L001_R1_001-fastqc/fastqc_report.html#M4</Test>
+<Test name="persequencegccontent" score="4" type="url">Project_project_name/2013_282_ACTGAT_L001_R1_001-fastqc/fastqc_report.html#M5</Test>
+<Test name="ncontent" score="9" type="url">Project_project_name/2013_282_ACTGAT_L001_R1_001-fastqc/fastqc_report.html#M6</Test>
+<Test name="sequencelengthdistribution" score="9" type="url">Project_project_name/2013_282_ACTGAT_L001_R1_001-fastqc/fastqc_report.html#M7</Test>
+<Test name="duplicationlevel" score="0" type="url">Project_project_name/2013_282_ACTGAT_L001_R1_001-fastqc/fastqc_report.html#M8</Test>
+<Test name="overrepresentedseqs" score="0" type="url">Project_project_name/2013_282_ACTGAT_L001_R1_001-fastqc/fastqc_report.html#M9</Test>
+<Test name="kmercontent" score="0" type="url">Project_project_name/2013_282_ACTGAT_L001_R1_001-fastqc/fastqc_report.html#M10</Test>
+<Test name="badtiles" score="9" type="url">Project_project_name/2013_282_ACTGAT_L001_R1_001-fastqc/fastqc_report.html#M11</Test>
+<Test name="hitnolibraries" score="0" type="percent">0.16058999999999996</Test>
+<Test name="fsqmapped" score="9" type="percent">0.02013</Test>
+<Test name="fsqmapped" score="0" type="percent">0.00334</Test>
+<Test name="linkreport" score="9" type="url">Project_project_name/2013_282_ACTGAT_L001_R1_001-fastqscreen.html</Test>
+</Sample>
+<Sample desc="description_sample" index="ATTCCT" lane="1" name="2013_283" project="project_name">
+<Test name="rawclusterssamples" score="-1" type="int">13968868</Test>
+<Test name="pfclusterssamples" score="0" type="int">11895146</Test>
+<Test name="percentpfsample" score="9" type="percent">0.8515468826822618</Test>
+<Test name="percentinlanesample" score="-1" type="percent">0.0635804439380658</Test>
+<Test name="percentq30" score="9" type="percent">0.9346899953981229</Test>
+<Test name="meanqualityscorepf" score="-1" type="float">36.73283429896531</Test>
+<Test name="basicstats" score="9" type="url">Project_project_name/2013_283_ATTCCT_L001_R1_001-fastqc/fastqc_report.html#M0</Test>
+<Test name="perbasequalityscores" score="9" type="url">Project_project_name/2013_283_ATTCCT_L001_R1_001-fastqc/fastqc_report.html#M1</Test>
+<Test name="persequencequalityscores" score="9" type="url">Project_project_name/2013_283_ATTCCT_L001_R1_001-fastqc/fastqc_report.html#M2</Test>
+<Test name="perbasesequencecontent" score="0" type="url">Project_project_name/2013_283_ATTCCT_L001_R1_001-fastqc/fastqc_report.html#M3</Test>
+<Test name="perbasegccontent" score="0" type="url">Project_project_name/2013_283_ATTCCT_L001_R1_001-fastqc/fastqc_report.html#M4</Test>
+<Test name="persequencegccontent" score="9" type="url">Project_project_name/2013_283_ATTCCT_L001_R1_001-fastqc/fastqc_report.html#M5</Test>
+<Test name="ncontent" score="9" type="url">Project_project_name/2013_283_ATTCCT_L001_R1_001-fastqc/fastqc_report.html#M6</Test>
+<Test name="sequencelengthdistribution" score="9" type="url">Project_project_name/2013_283_ATTCCT_L001_R1_001-fastqc/fastqc_report.html#M7</Test>
+<Test name="duplicationlevel" score="4" type="url">Project_project_name/2013_283_ATTCCT_L001_R1_001-fastqc/fastqc_report.html#M8</Test>
+<Test name="overrepresentedseqs" score="4" type="url">Project_project_name/2013_283_ATTCCT_L001_R1_001-fastqc/fastqc_report.html#M9</Test>
+<Test name="kmercontent" score="0" type="url">Project_project_name/2013_283_ATTCCT_L001_R1_001-fastqc/fastqc_report.html#M10</Test>
+<Test name="badtiles" score="9" type="url">Project_project_name/2013_283_ATTCCT_L001_R1_001-fastqc/fastqc_report.html#M11</Test>
+<Test name="hitnolibraries" score="9" type="percent">0.031245000000000023</Test>
+<Test name="fsqmapped" score="9" type="percent">0.01915</Test>
+<Test name="fsqmapped" score="0" type="percent">0.078605</Test>
+<Test name="linkreport" score="9" type="url">Project_project_name/2013_283_ATTCCT_L001_R1_001-fastqscreen.html</Test>
+</Sample>
+<Sample desc="No description" index="Undetermined" lane="1" name="Undetermined" project="Undetermined">
+<Test name="rawclusterssamples" score="-1" type="int">73054735</Test>
+<Test name="pfclusterssamples" score="-1" type="int">61735236</Test>
+<Test name="percentpfsample" score="-1" type="percent">0.8450545471145711</Test>
+<Test name="percentinlanesample" score="-1" type="percent">0.33251459481740064</Test>
+<Test name="percentq30" score="-1" type="percent">0.9462930829324115</Test>
+<Test name="meanqualityscorepf" score="-1" type="float">37.18598126068555</Test>
+<Test name="basicstats" score="-1" type="string">NA</Test>
+<Test name="perbasequalityscores" score="-1" type="string">NA</Test>
+<Test name="persequencequalityscores" score="-1" type="string">NA</Test>
+<Test name="perbasesequencecontent" score="-1" type="string">NA</Test>
+<Test name="perbasegccontent" score="-1" type="string">NA</Test>
+<Test name="persequencegccontent" score="-1" type="string">NA</Test>
+<Test name="ncontent" score="-1" type="string">NA</Test>
+<Test name="sequencelengthdistribution" score="-1" type="string">NA</Test>
+<Test name="duplicationlevel" score="-1" type="string">NA</Test>
+<Test name="overrepresentedseqs" score="-1" type="string">NA</Test>
+<Test name="kmercontent" score="-1" type="string">NA</Test>
+<Test name="badtiles" score="-1" type="string">NA</Test>
+<Test name="hitnolibraries" score="-1" type="string">NA</Test>
+<Test name="fsqmapped" score="-1" type="string">NA</Test>
+<Test name="fsqmapped" score="-1" type="string">NA</Test>
+<Test name="linkreport" score="-1" type="string">NA</Test>
+</Sample>
+<Sample desc="description_sample" index="TGACCA" lane="2" name="2013_124" project="project_name">
+<Test name="rawclusterssamples" score="-1" type="int">28499300</Test>
+<Test name="pfclusterssamples" score="0" type="int">25421652</Test>
+<Test name="percentpfsample" score="9" type="percent">0.8920096984838224</Test>
+<Test name="percentinlanesample" score="-1" type="percent">0.1281237465902343</Test>
+<Test name="percentq30" score="9" type="percent">0.9483749222906521</Test>
+<Test name="meanqualityscorepf" score="-1" type="float">37.25275544484678</Test>
+<Test name="basicstats" score="9" type="url">Project_project_name/2013_124_TGACCA_L002_R1_001-fastqc/fastqc_report.html#M0</Test>
+<Test name="perbasequalityscores" score="9" type="url">Project_project_name/2013_124_TGACCA_L002_R1_001-fastqc/fastqc_report.html#M1</Test>
+<Test name="persequencequalityscores" score="9" type="url">Project_project_name/2013_124_TGACCA_L002_R1_001-fastqc/fastqc_report.html#M2</Test>
+<Test name="perbasesequencecontent" score="0" type="url">Project_project_name/2013_124_TGACCA_L002_R1_001-fastqc/fastqc_report.html#M3</Test>
+<Test name="perbasegccontent" score="0" type="url">Project_project_name/2013_124_TGACCA_L002_R1_001-fastqc/fastqc_report.html#M4</Test>
+<Test name="persequencegccontent" score="9" type="url">Project_project_name/2013_124_TGACCA_L002_R1_001-fastqc/fastqc_report.html#M5</Test>
+<Test name="ncontent" score="9" type="url">Project_project_name/2013_124_TGACCA_L002_R1_001-fastqc/fastqc_report.html#M6</Test>
+<Test name="sequencelengthdistribution" score="9" type="url">Project_project_name/2013_124_TGACCA_L002_R1_001-fastqc/fastqc_report.html#M7</Test>
+<Test name="duplicationlevel" score="0" type="url">Project_project_name/2013_124_TGACCA_L002_R1_001-fastqc/fastqc_report.html#M8</Test>
+<Test name="overrepresentedseqs" score="9" type="url">Project_project_name/2013_124_TGACCA_L002_R1_001-fastqc/fastqc_report.html#M9</Test>
+<Test name="kmercontent" score="4" type="url">Project_project_name/2013_124_TGACCA_L002_R1_001-fastqc/fastqc_report.html#M10</Test>
+<Test name="badtiles" score="9" type="url">Project_project_name/2013_124_TGACCA_L002_R1_001-fastqc/fastqc_report.html#M11</Test>
+<Test name="hitnolibraries" score="9" type="percent">0.025294999999999956</Test>
+<Test name="fsqmapped" score="9" type="percent">0.023075</Test>
+<Test name="fsqmapped" score="9" type="percent">0.587025</Test>
+<Test name="linkreport" score="9" type="url">Project_project_name/2013_124_TGACCA_L002_R1_001-fastqscreen.html</Test>
+</Sample>
+<Sample desc="description_sample" index="ACAGTG" lane="2" name="2013_125" project="project_name">
+<Test name="rawclusterssamples" score="-1" type="int">29562173</Test>
+<Test name="pfclusterssamples" score="0" type="int">26336611</Test>
+<Test name="percentpfsample" score="9" type="percent">0.8908888734261855</Test>
+<Test name="percentinlanesample" score="-1" type="percent">0.132902083984823</Test>
+<Test name="percentq30" score="9" type="percent">0.9474788149469953</Test>
+<Test name="meanqualityscorepf" score="-1" type="float">37.22379018317885</Test>
+<Test name="basicstats" score="9" type="url">Project_project_name/2013_125_ACAGTG_L002_R1_001-fastqc/fastqc_report.html#M0</Test>
+<Test name="perbasequalityscores" score="9" type="url">Project_project_name/2013_125_ACAGTG_L002_R1_001-fastqc/fastqc_report.html#M1</Test>
+<Test name="persequencequalityscores" score="9" type="url">Project_project_name/2013_125_ACAGTG_L002_R1_001-fastqc/fastqc_report.html#M2</Test>
+<Test name="perbasesequencecontent" score="0" type="url">Project_project_name/2013_125_ACAGTG_L002_R1_001-fastqc/fastqc_report.html#M3</Test>
+<Test name="perbasegccontent" score="0" type="url">Project_project_name/2013_125_ACAGTG_L002_R1_001-fastqc/fastqc_report.html#M4</Test>
+<Test name="persequencegccontent" score="9" type="url">Project_project_name/2013_125_ACAGTG_L002_R1_001-fastqc/fastqc_report.html#M5</Test>
+<Test name="ncontent" score="9" type="url">Project_project_name/2013_125_ACAGTG_L002_R1_001-fastqc/fastqc_report.html#M6</Test>
+<Test name="sequencelengthdistribution" score="9" type="url">Project_project_name/2013_125_ACAGTG_L002_R1_001-fastqc/fastqc_report.html#M7</Test>
+<Test name="duplicationlevel" score="0" type="url">Project_project_name/2013_125_ACAGTG_L002_R1_001-fastqc/fastqc_report.html#M8</Test>
+<Test name="overrepresentedseqs" score="9" type="url">Project_project_name/2013_125_ACAGTG_L002_R1_001-fastqc/fastqc_report.html#M9</Test>
+<Test name="kmercontent" score="4" type="url">Project_project_name/2013_125_ACAGTG_L002_R1_001-fastqc/fastqc_report.html#M10</Test>
+<Test name="badtiles" score="9" type="url">Project_project_name/2013_125_ACAGTG_L002_R1_001-fastqc/fastqc_report.html#M11</Test>
+<Test name="hitnolibraries" score="9" type="percent">0.015774999999999872</Test>
+<Test name="fsqmapped" score="9" type="percent">0.014165</Test>
+<Test name="fsqmapped" score="9" type="percent">0.59675</Test>
+<Test name="linkreport" score="9" type="url">Project_project_name/2013_125_ACAGTG_L002_R1_001-fastqscreen.html</Test>
+</Sample>
+<Sample desc="description_sample" index="CAGATC" lane="2" name="2013_126" project="project_name">
+<Test name="rawclusterssamples" score="-1" type="int">35201374</Test>
+<Test name="pfclusterssamples" score="0" type="int">31404954</Test>
+<Test name="percentpfsample" score="9" type="percent">0.8921513688641812</Test>
+<Test name="percentinlanesample" score="-1" type="percent">0.15825412982087497</Test>
+<Test name="percentq30" score="9" type="percent">0.9471938198030795</Test>
+<Test name="meanqualityscorepf" score="-1" type="float">37.20716611844106</Test>
+<Test name="basicstats" score="9" type="url">Project_project_name/2013_126_CAGATC_L002_R1_001-fastqc/fastqc_report.html#M0</Test>
+<Test name="perbasequalityscores" score="9" type="url">Project_project_name/2013_126_CAGATC_L002_R1_001-fastqc/fastqc_report.html#M1</Test>
+<Test name="persequencequalityscores" score="9" type="url">Project_project_name/2013_126_CAGATC_L002_R1_001-fastqc/fastqc_report.html#M2</Test>
+<Test name="perbasesequencecontent" score="0" type="url">Project_project_name/2013_126_CAGATC_L002_R1_001-fastqc/fastqc_report.html#M3</Test>
+<Test name="perbasegccontent" score="0" type="url">Project_project_name/2013_126_CAGATC_L002_R1_001-fastqc/fastqc_report.html#M4</Test>
+<Test name="persequencegccontent" score="9" type="url">Project_project_name/2013_126_CAGATC_L002_R1_001-fastqc/fastqc_report.html#M5</Test>
+<Test name="ncontent" score="9" type="url">Project_project_name/2013_126_CAGATC_L002_R1_001-fastqc/fastqc_report.html#M6</Test>
+<Test name="sequencelengthdistribution" score="9" type="url">Project_project_name/2013_126_CAGATC_L002_R1_001-fastqc/fastqc_report.html#M7</Test>
+<Test name="duplicationlevel" score="0" type="url">Project_project_name/2013_126_CAGATC_L002_R1_001-fastqc/fastqc_report.html#M8</Test>
+<Test name="overrepresentedseqs" score="9" type="url">Project_project_name/2013_126_CAGATC_L002_R1_001-fastqc/fastqc_report.html#M9</Test>
+<Test name="kmercontent" score="4" type="url">Project_project_name/2013_126_CAGATC_L002_R1_001-fastqc/fastqc_report.html#M10</Test>
+<Test name="badtiles" score="9" type="url">Project_project_name/2013_126_CAGATC_L002_R1_001-fastqc/fastqc_report.html#M11</Test>
+<Test name="hitnolibraries" score="9" type="percent">0.022849999999999926</Test>
+<Test name="fsqmapped" score="9" type="percent">0.020825</Test>
+<Test name="fsqmapped" score="9" type="percent">0.58984</Test>
+<Test name="linkreport" score="9" type="url">Project_project_name/2013_126_CAGATC_L002_R1_001-fastqscreen.html</Test>
+</Sample>
+<Sample desc="description_sample" index="CCGTCC" lane="2" name="2013_281" project="project_name">
+<Test name="rawclusterssamples" score="-1" type="int">2203052</Test>
+<Test name="pfclusterssamples" score="0" type="int">1855194</Test>
+<Test name="percentpfsample" score="9" type="percent">0.8421017751737135</Test>
+<Test name="percentinlanesample" score="-1" type="percent">0.00990421786405662</Test>
+<Test name="percentq30" score="9" type="percent">0.9241318482056324</Test>
+<Test name="meanqualityscorepf" score="-1" type="float">36.326865211940095</Test>
+<Test name="basicstats" score="9" type="url">Project_project_name/2013_281_CCGTCC_L002_R1_001-fastqc/fastqc_report.html#M0</Test>
+<Test name="perbasequalityscores" score="9" type="url">Project_project_name/2013_281_CCGTCC_L002_R1_001-fastqc/fastqc_report.html#M1</Test>
+<Test name="persequencequalityscores" score="9" type="url">Project_project_name/2013_281_CCGTCC_L002_R1_001-fastqc/fastqc_report.html#M2</Test>
+<Test name="perbasesequencecontent" score="0" type="url">Project_project_name/2013_281_CCGTCC_L002_R1_001-fastqc/fastqc_report.html#M3</Test>
+<Test name="perbasegccontent" score="0" type="url">Project_project_name/2013_281_CCGTCC_L002_R1_001-fastqc/fastqc_report.html#M4</Test>
+<Test name="persequencegccontent" score="0" type="url">Project_project_name/2013_281_CCGTCC_L002_R1_001-fastqc/fastqc_report.html#M5</Test>
+<Test name="ncontent" score="9" type="url">Project_project_name/2013_281_CCGTCC_L002_R1_001-fastqc/fastqc_report.html#M6</Test>
+<Test name="sequencelengthdistribution" score="9" type="url">Project_project_name/2013_281_CCGTCC_L002_R1_001-fastqc/fastqc_report.html#M7</Test>
+<Test name="duplicationlevel" score="4" type="url">Project_project_name/2013_281_CCGTCC_L002_R1_001-fastqc/fastqc_report.html#M8</Test>
+<Test name="overrepresentedseqs" score="0" type="url">Project_project_name/2013_281_CCGTCC_L002_R1_001-fastqc/fastqc_report.html#M9</Test>
+<Test name="kmercontent" score="0" type="url">Project_project_name/2013_281_CCGTCC_L002_R1_001-fastqc/fastqc_report.html#M10</Test>
+<Test name="badtiles" score="9" type="url">Project_project_name/2013_281_CCGTCC_L002_R1_001-fastqc/fastqc_report.html#M11</Test>
+<Test name="hitnolibraries" score="9" type="percent">0.08631999999999995</Test>
+<Test name="fsqmapped" score="9" type="percent">0.027135</Test>
+<Test name="fsqmapped" score="0" type="percent">0.00401</Test>
+<Test name="linkreport" score="9" type="url">Project_project_name/2013_281_CCGTCC_L002_R1_001-fastqscreen.html</Test>
+</Sample>
+<Sample desc="description_sample" index="ACTGAT" lane="2" name="2013_282" project="project_name">
+<Test name="rawclusterssamples" score="-1" type="int">39408910</Test>
+<Test name="pfclusterssamples" score="9" type="int">33144796</Test>
+<Test name="percentpfsample" score="9" type="percent">0.8410482807060636</Test>
+<Test name="percentinlanesample" score="-1" type="percent">0.17716986726822587</Test>
+<Test name="percentq30" score="9" type="percent">0.9283896030013279</Test>
+<Test name="meanqualityscorepf" score="-1" type="float">36.468316909840084</Test>
+<Test name="basicstats" score="9" type="url">Project_project_name/2013_282_ACTGAT_L002_R1_001-fastqc/fastqc_report.html#M0</Test>
+<Test name="perbasequalityscores" score="9" type="url">Project_project_name/2013_282_ACTGAT_L002_R1_001-fastqc/fastqc_report.html#M1</Test>
+<Test name="persequencequalityscores" score="9" type="url">Project_project_name/2013_282_ACTGAT_L002_R1_001-fastqc/fastqc_report.html#M2</Test>
+<Test name="perbasesequencecontent" score="4" type="url">Project_project_name/2013_282_ACTGAT_L002_R1_001-fastqc/fastqc_report.html#M3</Test>
+<Test name="perbasegccontent" score="0" type="url">Project_project_name/2013_282_ACTGAT_L002_R1_001-fastqc/fastqc_report.html#M4</Test>
+<Test name="persequencegccontent" score="4" type="url">Project_project_name/2013_282_ACTGAT_L002_R1_001-fastqc/fastqc_report.html#M5</Test>
+<Test name="ncontent" score="9" type="url">Project_project_name/2013_282_ACTGAT_L002_R1_001-fastqc/fastqc_report.html#M6</Test>
+<Test name="sequencelengthdistribution" score="9" type="url">Project_project_name/2013_282_ACTGAT_L002_R1_001-fastqc/fastqc_report.html#M7</Test>
+<Test name="duplicationlevel" score="0" type="url">Project_project_name/2013_282_ACTGAT_L002_R1_001-fastqc/fastqc_report.html#M8</Test>
+<Test name="overrepresentedseqs" score="0" type="url">Project_project_name/2013_282_ACTGAT_L002_R1_001-fastqc/fastqc_report.html#M9</Test>
+<Test name="kmercontent" score="0" type="url">Project_project_name/2013_282_ACTGAT_L002_R1_001-fastqc/fastqc_report.html#M10</Test>
+<Test name="badtiles" score="9" type="url">Project_project_name/2013_282_ACTGAT_L002_R1_001-fastqc/fastqc_report.html#M11</Test>
+<Test name="hitnolibraries" score="0" type="percent">0.15951499999999996</Test>
+<Test name="fsqmapped" score="9" type="percent">0.018765</Test>
+<Test name="fsqmapped" score="0" type="percent">0.00353</Test>
+<Test name="linkreport" score="9" type="url">Project_project_name/2013_282_ACTGAT_L002_R1_001-fastqscreen.html</Test>
+</Sample>
+<Sample desc="description_sample" index="ATTCCT" lane="2" name="2013_283" project="project_name">
+<Test name="rawclusterssamples" score="-1" type="int">13999236</Test>
+<Test name="pfclusterssamples" score="0" type="int">11817694</Test>
+<Test name="percentpfsample" score="9" type="percent">0.8441670674028211</Test>
+<Test name="percentinlanesample" score="-1" type="percent">0.06293609196439509</Test>
+<Test name="percentq30" score="9" type="percent">0.9317328490651391</Test>
+<Test name="meanqualityscorepf" score="-1" type="float">36.623601990371384</Test>
+<Test name="basicstats" score="9" type="url">Project_project_name/2013_283_ATTCCT_L002_R1_001-fastqc/fastqc_report.html#M0</Test>
+<Test name="perbasequalityscores" score="9" type="url">Project_project_name/2013_283_ATTCCT_L002_R1_001-fastqc/fastqc_report.html#M1</Test>
+<Test name="persequencequalityscores" score="9" type="url">Project_project_name/2013_283_ATTCCT_L002_R1_001-fastqc/fastqc_report.html#M2</Test>
+<Test name="perbasesequencecontent" score="0" type="url">Project_project_name/2013_283_ATTCCT_L002_R1_001-fastqc/fastqc_report.html#M3</Test>
+<Test name="perbasegccontent" score="0" type="url">Project_project_name/2013_283_ATTCCT_L002_R1_001-fastqc/fastqc_report.html#M4</Test>
+<Test name="persequencegccontent" score="9" type="url">Project_project_name/2013_283_ATTCCT_L002_R1_001-fastqc/fastqc_report.html#M5</Test>
+<Test name="ncontent" score="9" type="url">Project_project_name/2013_283_ATTCCT_L002_R1_001-fastqc/fastqc_report.html#M6</Test>
+<Test name="sequencelengthdistribution" score="9" type="url">Project_project_name/2013_283_ATTCCT_L002_R1_001-fastqc/fastqc_report.html#M7</Test>
+<Test name="duplicationlevel" score="4" type="url">Project_project_name/2013_283_ATTCCT_L002_R1_001-fastqc/fastqc_report.html#M8</Test>
+<Test name="overrepresentedseqs" score="4" type="url">Project_project_name/2013_283_ATTCCT_L002_R1_001-fastqc/fastqc_report.html#M9</Test>
+<Test name="kmercontent" score="0" type="url">Project_project_name/2013_283_ATTCCT_L002_R1_001-fastqc/fastqc_report.html#M10</Test>
+<Test name="badtiles" score="9" type="url">Project_project_name/2013_283_ATTCCT_L002_R1_001-fastqc/fastqc_report.html#M11</Test>
+<Test name="hitnolibraries" score="9" type="percent">0.021530000000000035</Test>
+<Test name="fsqmapped" score="9" type="percent">0.02153</Test>
+<Test name="fsqmapped" score="0" type="percent">0.079335</Test>
+<Test name="linkreport" score="9" type="url">Project_project_name/2013_283_ATTCCT_L002_R1_001-fastqscreen.html</Test>
+</Sample>
+<Sample desc="No description" index="Undetermined" lane="2" name="Undetermined" project="Undetermined">
+<Test name="rawclusterssamples" score="-1" type="int">73561692</Test>
+<Test name="pfclusterssamples" score="-1" type="int">61660817</Test>
+<Test name="percentpfsample" score="-1" type="percent">0.838219123616678</Test>
+<Test name="percentinlanesample" score="-1" type="percent">0.33070986250739015</Test>
+<Test name="percentq30" score="-1" type="percent">0.9454037600572175</Test>
+<Test name="meanqualityscorepf" score="-1" type="float">37.15343020154923</Test>
+<Test name="basicstats" score="-1" type="string">NA</Test>
+<Test name="perbasequalityscores" score="-1" type="string">NA</Test>
+<Test name="persequencequalityscores" score="-1" type="string">NA</Test>
+<Test name="perbasesequencecontent" score="-1" type="string">NA</Test>
+<Test name="perbasegccontent" score="-1" type="string">NA</Test>
+<Test name="persequencegccontent" score="-1" type="string">NA</Test>
+<Test name="ncontent" score="-1" type="string">NA</Test>
+<Test name="sequencelengthdistribution" score="-1" type="string">NA</Test>
+<Test name="duplicationlevel" score="-1" type="string">NA</Test>
+<Test name="overrepresentedseqs" score="-1" type="string">NA</Test>
+<Test name="kmercontent" score="-1" type="string">NA</Test>
+<Test name="badtiles" score="-1" type="string">NA</Test>
+<Test name="hitnolibraries" score="-1" type="string">NA</Test>
+<Test name="fsqmapped" score="-1" type="string">NA</Test>
+<Test name="fsqmapped" score="-1" type="string">NA</Test>
+<Test name="linkreport" score="-1" type="string">NA</Test>
+</Sample>
+</Read>
+</Reads>
+</SamplesReport>
+</QCReport>
