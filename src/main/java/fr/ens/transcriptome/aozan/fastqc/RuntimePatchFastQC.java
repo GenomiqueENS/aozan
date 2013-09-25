@@ -66,11 +66,7 @@ public class RuntimePatchFastQC {
 
     // Add code at the beginnning of the method
     String codeToAdd =
-        "if (contaminants == null) {"
-            + "\n contaminants = fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.makeContaminantList();\n"
-            + "System.out.println(\"contaminant list \"+System.getProperty(\"fastqc.contaminant_file\"));\n"
-            + "}";
-
+        "if (contaminants == null) {\n contaminants = fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.makeContaminantList();\n}";
     cb.insertBefore(codeToAdd);
 
     // Load the class by the ClassLoader

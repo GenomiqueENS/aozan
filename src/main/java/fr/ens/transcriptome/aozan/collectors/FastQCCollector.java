@@ -31,7 +31,6 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.fastqc.RuntimePatchFastQC;
 import fr.ens.transcriptome.aozan.io.FastqSample;
-import fr.ens.transcriptome.eoulsan.util.StringUtils;
 
 /**
  * This class define a FastQC Collector
@@ -63,7 +62,6 @@ public class FastQCCollector extends AbstractFastqCollector {
   public void configure(final Properties properties) {
 
     super.configure(properties);
-    System.out.println("PROP\n" + properties.toString().replace(',', '\n'));
 
     // Define parameters of FastQC
     System.setProperty("java.awt.headless", "true");
@@ -71,22 +69,20 @@ public class FastQCCollector extends AbstractFastqCollector {
 
     // Check contaminant file specify in configuration Aozan for module
     // OverRepresented
-    System.out.println("def contaminant file "
-        + properties.contains(KEY_FASTQC_CONTAMINANT_FILE));
-
-    if (properties.contains(KEY_FASTQC_CONTAMINANT_FILE)
-        && properties.getProperty(KEY_FASTQC_CONTAMINANT_FILE).length() > 0)
+    if (properties.getProperty(KEY_FASTQC_CONTAMINANT_FILE) != null
+        && properties.getProperty(KEY_FASTQC_CONTAMINANT_FILE).length() > 0) {
 
       System.setProperty("fastqc.contaminant_file",
           properties.getProperty(KEY_FASTQC_CONTAMINANT_FILE));
+    }
 
-    if (properties.contains(KEY_FASTQC_KMER_SIZE)
+    if (properties.getProperty(KEY_FASTQC_KMER_SIZE) != null
         && properties.getProperty(KEY_FASTQC_KMER_SIZE).length() > 0)
 
       System.setProperty("fastqc.kmer_size",
           properties.getProperty(KEY_FASTQC_KMER_SIZE));
 
-    if (properties.contains(KEY_FASTQC_NOGROUP)
+    if (properties.getProperty(KEY_FASTQC_NOGROUP) != null
         && properties.getProperty(KEY_FASTQC_NOGROUP).length() > 0)
 
       System.setProperty("fastqc.nogroup",
@@ -105,10 +101,6 @@ public class FastQCCollector extends AbstractFastqCollector {
       } catch (NumberFormatException e) {
       }
     }
-
-    // TODO
-    System.out.println("contaminant list "
-        + System.getProperty("fastqc.contaminant_file"));
   }
 
   @Override
