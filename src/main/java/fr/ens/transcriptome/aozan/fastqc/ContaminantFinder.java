@@ -31,6 +31,7 @@ import java.io.InputStreamReader;
 import java.util.Vector;
 
 import uk.ac.babraham.FastQC.Sequence.Contaminant.Contaminant;
+import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
 
 /**
  * Source FastQC version 0.10.0, not modify. The class version 0.10.1 doesn't
@@ -40,6 +41,46 @@ import uk.ac.babraham.FastQC.Sequence.Contaminant.Contaminant;
  * @since 1.1
  */
 public class ContaminantFinder {
+
+  private static Contaminant[] contaminants;
+
+  public static ContaminantHit findContaminantHit_Aozan(String sequence) {
+
+    // Modify call Aozan method
+    if (contaminants == null) {
+      contaminants = makeContaminantList();
+    }
+
+    ContaminantHit bestHit = null;
+    OverrepresentedSequencesBlast blastInstance =
+        new OverrepresentedSequencesBlast();
+
+    for (int c = 0; c < contaminants.length; c++) {
+      ContaminantHit thisHit = contaminants[c].findMatch(sequence);
+
+      // System.out.println("Best hit from "+c+" is "+thisHit);
+
+      if (thisHit == null)
+        continue; // No hit
+
+      if (bestHit == null || thisHit.length() > bestHit.length())
+        bestHit = thisHit;
+
+    }
+
+    if (bestHit == null) {
+
+      ContaminantHit contaminantBlast =
+          blastInstance.searchSequenceInBlast(sequence);
+
+      if (contaminantBlast != null)
+        bestHit = contaminantBlast;
+
+    }
+
+    return bestHit;
+
+  }
 
   public static Contaminant[] makeContaminantList() {
     Vector<Contaminant> c = new Vector<Contaminant>();
