@@ -29,6 +29,7 @@ import java.util.Properties;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.fastqc.OverrepresentedSequencesBlast;
 import fr.ens.transcriptome.aozan.fastqc.RuntimePatchFastQC;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
@@ -51,6 +52,7 @@ public class FastQCCollector extends AbstractFastqCollector {
   private int numberThreads = Runtime.getRuntime().availableProcessors();
 
   private boolean ignoreFilteredSequences = false;
+  private boolean isStepBlastEnable = false;
 
   @Override
   public String getName() {
@@ -101,6 +103,11 @@ public class FastQCCollector extends AbstractFastqCollector {
       } catch (NumberFormatException e) {
       }
     }
+
+    // Check if step blast needed and configure
+    OverrepresentedSequencesBlast.configure(properties);
+    isStepBlastEnable = OverrepresentedSequencesBlast.isStepBlastEnable();
+
   }
 
   @Override
@@ -108,7 +115,7 @@ public class FastQCCollector extends AbstractFastqCollector {
 
     // Rewriting code of the method ContaminantFinder for read the contaminant
     // list in fastqc-0.10.1 jar
-    RuntimePatchFastQC.runPatchFastQC();
+    RuntimePatchFastQC.runPatchFastQC(isStepBlastEnable);
 
     super.collect(data);
   }
