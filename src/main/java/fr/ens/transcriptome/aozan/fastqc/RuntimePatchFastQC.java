@@ -53,8 +53,9 @@ public class RuntimePatchFastQC {
    * @throws IllegalAccessException it occurs when fail to reflectively modify
    *           an instance
    */
-  public static void rewriteContaminantFinderMethod() throws NotFoundException,
-      CannotCompileException, InstantiationException, IllegalAccessException {
+  public static void rewriteContaminantFinderMethod(final boolean asBlastToUse)
+      throws NotFoundException, CannotCompileException, InstantiationException,
+      IllegalAccessException {
 
     // Get the class to modify
     CtClass cc =
@@ -65,8 +66,17 @@ public class RuntimePatchFastQC {
     CtBehavior cb = cc.getDeclaredMethod("findContaminantHit");
 
     // Add code at the beginnning of the method
-    String codeToAdd =
-        "if (contaminants == null) {\n contaminants = fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.makeContaminantList();\n}";
+    String codeToAdd = "";
+    
+    if (asBlastToUse) {
+      codeToAdd =
+          "return fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.findContaminantHit_Aozan(sequence);";
+
+    } else {
+      codeToAdd =
+          "if (contaminants == null) {\n contaminants = "
+              + "fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.makeContaminantList();\n}";
+    }
     cb.insertBefore(codeToAdd);
 
     // Load the class by the ClassLoader
@@ -110,10 +120,23 @@ public class RuntimePatchFastQC {
    * @throws AozanException throw an error occurs during modification bytecode
    *           fastqc
    */
-  public static void runPatchFastQC() throws AozanException {
+  
+  public static void runPatchFastQC()
+      throws AozanException {
+    runPatchFastQC(false);
+  }
+  
+  /**
+   * Execute method who patch code from FastQC before call in Aozan
+   * @param true if blast will be used else false 
+   * @throws AozanException throw an error occurs during modification bytecode
+   *           fastqc
+   */
+  public static void runPatchFastQC(final boolean asBlastToUse)
+      throws AozanException {
 
     try {
-      rewriteContaminantFinderMethod();
+      rewriteContaminantFinderMethod(asBlastToUse);
 
       modifyConstructorHtmlReportArchive();
 
@@ -136,7 +159,7 @@ public class RuntimePatchFastQC {
   public static void main(String[] args) throws NotFoundException,
       CannotCompileException, InstantiationException, IllegalAccessException {
 
-    rewriteContaminantFinderMethod();
+    rewriteContaminantFinderMethod(false);
     // new ContaminantFinder().findContaminantHit("COUCoU lolo !");
     uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminentFinder
         .findContaminantHit("hello");
