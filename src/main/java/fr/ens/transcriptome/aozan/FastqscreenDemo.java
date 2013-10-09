@@ -26,14 +26,9 @@ package fr.ens.transcriptome.aozan;
 import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -41,29 +36,19 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.FileHandler;
-import java.util.logging.Formatter;
-import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-
-import org.python.google.common.collect.Lists;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
-import javassist.CtConstructor;
 import javassist.NotFoundException;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Lists;
 
-import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.collectors.FastQCCollector;
-import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
-import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
-import fr.ens.transcriptome.aozan.collectors.UncompressFastqCollector;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
 public class FastqscreenDemo {
@@ -94,8 +79,9 @@ public class FastqscreenDemo {
   public static final String GENOMES_PATH = RESOURCE_ROOT + "/genomes";
 
   public static final String AOZAN_CONF =
-      "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_test.conf";
-  // "/home/sperrin/Documents/FastqScreenTest/runtst/aozan_without_fastqc.conf";
+  // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_test.conf";
+      "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_partiel_fastqc.conf";
+  // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_without_fastqc.conf";
 
   public static RunData data = null;
   public static Map<String, FastqSample> prefixList;
@@ -111,7 +97,7 @@ public class FastqscreenDemo {
 
     try {
       Locale.setDefault(Locale.US);
-      inactiveClearMethod();
+      inactiveCollectorClearMethod();
 
       if (paired) {
         // run test pair-end
@@ -123,8 +109,9 @@ public class FastqscreenDemo {
         // runId = "130726_SNL110_0078_AC2AJTACXX";
         // runId = "130709_SNL110_0075_AD2C79ACXX";
         // runId = "130715_SNL110_0076_AD2C4UACXX";
-        runId = "130722_SNL110_0077_AH0NT2ADXX";
+        // runId = "130722_SNL110_0077_AH0NT2ADXX";
         // runId = "130904_SNL110_0082_AC2BR0ACXX";
+        runId = "130926_SNL110_0085_AH0EYHADXX";
       }
 
       date = new SimpleDateFormat("yyMMdd").format(new Date());
@@ -173,7 +160,7 @@ public class FastqscreenDemo {
         + "_qc_tmp/" + runId + "_reportHtmlFile.html");
   }
 
-  public static void inactiveClearMethod() {
+  public static void inactiveCollectorClearMethod() {
 
     List<String> listClass = Lists.newArrayList();
     listClass
@@ -236,35 +223,49 @@ public class FastqscreenDemo {
     // conf.put("qc.conf.read.xml.collector.used", "false");
     conf.put("qc.conf.cluster.density.ratio", "0.3472222");
 
-    conf.put("qc.conf.fastqscreen.xsl.file",
-        "/home/sperrin/Documents/informatique/css/fastqscreen2.xsl");
+    // conf.put("qc.conf.fastqscreen.xsl.file",
+    // "/home/sperrin/Documents/informatique/css/fastqscreen2.xsl");
 
-    // // Configuration to FastQC
+    // Configuration to FastQC
     // File f = new File(TMP_DIR, "contaminants_fastqc.txt");
     // conf.put(FastQCCollector.KEY_FASTQC_CONTAMINANT_FILE,
     // f.getAbsolutePath());
 
     // System.out.println("conf "
-    // + conf.get(FastQCCollector.KEY_FASTQC_CONTAMINANT_FILE));
-    // System.out
-    // .println(" file " + f.getAbsolutePath() + " exists " + f.exists());
+    // + conf.get(FastQCCollector.KEY_FASTQC_CONTAMINANT_FILE)
+    // + " exists ? "
+    // + new File(conf.get(FastQCCollector.KEY_FASTQC_CONTAMINANT_FILE))
+    // .exists());
 
-    // // kmer between 2 and 10
-    // conf.put(FastQCCollector.KEY_FASTQC_KMER_SIZE, "4");
-    // // Boolean
-    // conf.put(FastQCCollector.KEY_FASTQC_NOGROUP, "true");
+    // kmer between 2 and 10
+    conf.put("qc.conf.fastqc.threads", "4");
+    // conf.put("qc.conf.step.blast.enable", "False");
 
-    // conf.put("qc.conf.ignore.paired.mode", "False");
-    // parse fully fastq file
+    // // parse fully fastq file
     // conf.put("qc.conf.max.reads.parsed", "-1");
-    // use fully fastq for create tmp fastq file for fastqscreen
+    // // use fully fastq for create tmp fastq file for fastqscreen
     // conf.put("qc.conf.reads.pf.used", "-1");
     conf.put("qc.conf.fastqscreen.genomes", "phix");
-    
+
     System.out.println("genomes : "
         + conf.get("qc.conf.fastqscreen.genomes") + " mapping mode "
         + conf.get("qc.conf.ignore.paired.mode"));
 
     return conf;
+  }
+
+  public static Properties getPropertiesAozanConf() {
+    Map<String, String> mapConf = getMapAozanConf();
+    Properties props = new Properties();
+
+    for (final Map.Entry<String, String> e : mapConf.entrySet()) {
+
+      if (e.getKey().startsWith("qc.conf.")) {
+        // System.out.println("props " + e.getKey() + " - " + e.getValue());
+        props.put(e.getKey(), e.getValue());
+      }
+    }
+
+    return props;
   }
 }

@@ -33,9 +33,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -81,9 +81,9 @@ public class OverrepresentedSequencesBlast {
   public static String TMP_PATH;
 
   // Save sequence and result blast for the run
-  final Map<String, BlastResultHit> sequencesAlreadyAnalysis;
+  final ConcurrentMap<String, BlastResultHit> sequencesAlreadyAnalysis;
+
   // Tag configuration general of blast
-  final String tag_queryDef = "Iteration_query-def";
   final String tag_queryLength = "Iteration_query-len";
   final String tag_blastVersion = "BlastOutput_version";
 
@@ -129,7 +129,7 @@ public class OverrepresentedSequencesBlast {
 
         } catch (AozanException e) {
           // TODO
-          e.printStackTrace();
+          // e.printStackTrace();
           stepEnable = false;
         }
 
@@ -199,27 +199,35 @@ public class OverrepresentedSequencesBlast {
       blastResult = sequencesAlreadyAnalysis.get(sequence);
 
     else {
+      // Save sequence in multithreading context
+      sequencesAlreadyAnalysis.put(sequence, null);
+
       try {
 
         resultXML = FileUtils.createTempFile("blast_", "_result.xml");
-        // resultXML = new File(TMP_PATH + "/blast_" + sequence +
-        // "_result.xml");
-        // resultXML = new File("/tmp/blast_" + sequence + "_result.xml");
 
         launchBlastSearch(createCommandLine(resultXML), sequence);
 
         if (resultXML.length() > 0)
           blastResult = parseDocument(resultXML, sequence);
 
-        // Save result
+        // Save result for sequence
         sequencesAlreadyAnalysis.put(sequence, blastResult);
 
       } catch (IOException e) {
-        e.printStackTrace();
+        // e.printStackTrace();
         aozanException = new AozanException(e);
       } catch (AozanException e) {
-        e.printStackTrace();
+        // e.printStackTrace();
         aozanException = new AozanException(e);
+
+      } finally {
+
+        // Remove XML file
+        if (resultXML.exists())
+          if (!resultXML.delete())
+            LOGGER.warning("Can not delete xml file with result from blast : "
+                + resultXML.getAbsolutePath());
       }
     }
 
@@ -241,8 +249,6 @@ public class OverrepresentedSequencesBlast {
     Process process;
     try {
 
-      // timer.start();
-
       process = builder.start();
 
       // Writing on standard input
@@ -254,16 +260,17 @@ public class OverrepresentedSequencesBlast {
       os.close();
 
       final int exitValue = process.waitFor();
-
-      System.out.println("exit " + exitValue);
-      // + " time : " + timer.elapsed(TimeUnit.MILLISECONDS));
+      if (exitValue > 0)
+        LOGGER
+            .warning("FastQC : fail of process to launch blastn with sequence "
+                + sequence + ", exist value is : " + exitValue);
 
     } catch (IOException e) {
-      e.printStackTrace();
+      // e.printStackTrace();
       throw new AozanException(e);
 
     } catch (InterruptedException e) {
-      e.printStackTrace();
+      // e.printStackTrace();
       throw new AozanException(e);
     }
 
@@ -304,7 +311,7 @@ public class OverrepresentedSequencesBlast {
       try {
         is.close();
       } catch (IOException e) {
-        e.printStackTrace();
+        // e.printStackTrace();
       }
     }
     return blastResult;
@@ -314,7 +321,6 @@ public class OverrepresentedSequencesBlast {
 
     if (firstCall) {
 
-      final String queryDef = extractFirstValueToString(doc, tag_queryDef);
       final String version = extractFirstValueToString(doc, tag_blastVersion);
 
       // Check version xml file
@@ -322,7 +328,7 @@ public class OverrepresentedSequencesBlast {
         // throw new AozanException(
         // "FastQC - step blast : version xml not expected "
         // + version + " instead of " + blastVersionExpected);
-        LOGGER.info("FastQC - step blast : version xml not expected "
+        LOGGER.warning("FastQC - step blast : version xml not expected "
             + version + " instead of " + blastVersionExpected);
 
       StringBuilder parameters = new StringBuilder();
@@ -341,9 +347,6 @@ public class OverrepresentedSequencesBlast {
           .append(extractFirstValueToString(doc, "Parameters_gap-extend"));
       parameters.append(", Parameters_filter=");
       parameters.append(extractFirstValueToString(doc, "Parameters_filter"));
-
-      System.out.println("\n----------------------\nblast version "
-          + version + "\t Query " + queryDef);
 
       LOGGER.info("Blast version " + version);
       LOGGER.info("Blast parameters " + parameters.toString());
@@ -383,12 +386,6 @@ public class OverrepresentedSequencesBlast {
   }
 
   private static boolean checkSequencesNotToIgnore(final String sequence) {
-
-    if (sequencesToIgnore.size() == 0) {
-      // TODO
-      // loadSequencesToIgnoreFile();
-      return false;
-    }
 
     for (String seq : sequencesToIgnore) {
       if (seq.equals(sequence))
@@ -447,7 +444,11 @@ public class OverrepresentedSequencesBlast {
   //
 
   public OverrepresentedSequencesBlast() {
-    sequencesAlreadyAnalysis = Maps.newHashMap();
+    sequencesAlreadyAnalysis = Maps.newConcurrentMap();
+
+    // TODO file not exists actually
+    // loadSequencesToIgnoreFile();
+
   }
 
   //

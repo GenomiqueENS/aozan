@@ -59,8 +59,6 @@ public class BlastResultHit {
   final String qSeq;
   final int prcIdentity;
   final int queryCover;
-
-  // TODO to remove sequence in parameters
   final String sequence;
 
   /**
@@ -119,7 +117,6 @@ public class BlastResultHit {
   public BlastResultHit(final Element hit, final int countHits,
       final int queryLength, final String sequence) {
 
-    // TODO to remove
     this.sequence = sequence;
 
     this.queryLength = queryLength;
@@ -135,13 +132,6 @@ public class BlastResultHit {
 
     int countGap = queryLength - hspAlignLen;
     this.queryCover = (int) ((double) (countGap / this.queryLength * 100));
-
-    // TODO
-    System.out.println(qSeq
-        + "\n" + result + " : \tscore " + hspBitScore + "\tevalue " + hspEValue
-        + "\tidentity " + hspIdentity + "(" + this.prcIdentity + "%)\tgaps "
-        + (queryLength - hspAlignLen) + "(" + this.queryCover + "%) ("
-        + (countHits > 100 ? "100+" : countHits) + ")");
 
   }
 
