@@ -32,10 +32,16 @@ import org.w3c.dom.Element;
 import uk.ac.babraham.FastQC.Sequence.Contaminant.Contaminant;
 import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
 
-public class BlastResultHit {
+/**
+ * This class define a object which handles result xml file blastn for one
+ * sequence query.
+ * @since 1.2
+ * @author Sandrine Perrin
+ */
+class BlastResultHit {
 
   static final String LINK_NCBI_BLASTN =
-      "\"http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE=Nucleotides&DATABASE=nr&QUERY=";
+      "\"http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&amp;PAGE=Nucleotides&amp;DATABASE=nr&amp;QUERY=";
 
   // Parameters for return only the best hit
   static final int MIN_IDENTITY_EXPECTED = 100;
@@ -113,6 +119,7 @@ public class BlastResultHit {
    * @param hit first hit retrieved by blast
    * @param countHits number hits retrieved by blast
    * @param queryLength number base in sequence query
+   * @param sequence query blast
    */
   public BlastResultHit(final Element hit, final int countHits,
       final int queryLength, final String sequence) {
