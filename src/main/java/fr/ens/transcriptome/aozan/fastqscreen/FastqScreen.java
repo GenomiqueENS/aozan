@@ -53,16 +53,14 @@ public class FastqScreen {
 
   protected static final String COUNTER_GROUP = "fastqscreen";
 
-  public/* private */static final String KEY_NUMBER_THREAD =
-      "qc.conf.fastqc.threads";
-  public/* private */static final String KEY_TMP_DIR = "tmp.dir";
+  public static final String KEY_NUMBER_THREAD = "qc.conf.fastqc.threads";
+  public static final String KEY_TMP_DIR = "tmp.path";
 
-  public/* private */static final String KEY_GENOMES_DESC_PATH =
+  public static final String KEY_GENOMES_DESC_PATH =
       "qc.conf.settings.genomes.desc.path";
-  public/* private */static final String KEY_MAPPERS_INDEXES_PATH =
+  public static final String KEY_MAPPERS_INDEXES_PATH =
       "qc.conf.settings.mappers.indexes.path";
-  public/* private */static final String KEY_GENOMES_PATH =
-      "qc.conf.settings.genomes";
+  public static final String KEY_GENOMES_PATH = "qc.conf.settings.genomes";
 
   private String tmpDir;
   private int confThreads;
