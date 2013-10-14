@@ -30,6 +30,7 @@ import static fr.ens.transcriptome.eoulsan.LocalEoulsanRuntime.initEoulsanRuntim
 
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import fr.ens.transcriptome.eoulsan.EoulsanException;
@@ -66,13 +67,18 @@ public class Common {
   public static void initLogger(final String logPath) throws SecurityException,
       IOException, AozanException {
 
+    final Logger eoulsanLogger = getLogger();
+
+    eoulsanLogger.setLevel(Level.OFF);
+
+    // Remove default Handler
+    eoulsanLogger.removeHandler(eoulsanLogger.getParent().getHandlers()[0]);
+
     try {
       initEoulsanRuntimeForExternalApp();
     } catch (EoulsanException ee) {
       throw new AozanException(ee);
     }
-
-    final Logger eoulsanLogger = getLogger();
 
     // Set default log level
     eoulsanLogger.setLevel(fr.ens.transcriptome.aozan.Globals.LOG_LEVEL);
