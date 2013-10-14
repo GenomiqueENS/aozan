@@ -71,6 +71,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   private GenomeDescStorage storage;
   private GenomeDescription desc = null;
   private FastqScreenResult fastqScreenResult;
+  private String tmpDir;
 
   private Pattern pattern = Pattern.compile("\t");
 
@@ -91,11 +92,11 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @throws BadBioEntryException if an error occurs while creating index genome
    */
   public void doMap(final File fastqRead, final List<String> listGenomes,
-      final String genomeSample, final String tmpDir, final int numberThreads,
-      final boolean paired) throws AozanException, BadBioEntryException {
+      final String genomeSample, final int numberThreads, final boolean paired)
+      throws AozanException, BadBioEntryException {
 
-    this.doMap(fastqRead, null, listGenomes, genomeSample, tmpDir,
-        numberThreads, paired);
+    this.doMap(fastqRead, null, listGenomes, genomeSample, numberThreads,
+        paired);
   }
 
   /**
@@ -114,8 +115,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    */
   public void doMap(final File fastqRead1, final File fastqRead2,
       final List<String> listGenomes, final String genomeSample,
-      final String tmpDir, final int numberThreads, final boolean pairedMode)
-      throws AozanException {
+      final int numberThreads, final boolean pairedMode) throws AozanException {
 
     // change mapper arguments
     final String newArgumentsMapper =
@@ -132,7 +132,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         DataFile genomeFile = new DataFile("genome://" + genome);
 
         // get index Genome reference exists
-        File archiveIndexFile = createIndex(bowtie, genomeFile, tmpDir);
+        File archiveIndexFile = createIndex(bowtie, genomeFile);
 
         if (archiveIndexFile == null) {
           LOGGER.warning("FASTQSCREEN : archive index file not found for "
@@ -206,14 +206,13 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @throws IOException if an error occurs while using file index genome
    */
   private File createIndex(final SequenceReadsMapper bowtie,
-      final DataFile genomeDataFile, final String tmpDir)
-      throws BadBioEntryException, IOException {
+      final DataFile genomeDataFile) throws BadBioEntryException, IOException {
 
     // Timer :
     final Stopwatch timer = new Stopwatch().start();
 
     final DataFile result =
-        new DataFile(tmpDir
+        new DataFile(this.tmpDir
             + "/aozan-" + bowtie.getMapperName().toLowerCase() + "-index-"
             + genomeDataFile.getName() + ".zip");
 
@@ -369,9 +368,14 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   /**
    * Public construction which declare the bowtie mapper
    */
-  public FastqScreenPseudoMapReduce() {
+  public FastqScreenPseudoMapReduce(final String tmpDir) {
 
     this.bowtie = new BowtieReadsMapper();
+    this.tmpDir = tmpDir;
+
+    // Define temporary directory
+    this.setMapReduceTemporaryDirectory(new File(this.tmpDir));
+    bowtie.setTempDirectory(new File(this.tmpDir));
 
     this.reporter = new Reporter();
 

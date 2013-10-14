@@ -181,5 +181,10 @@
       		Fix bugs : files xsl (missing closing tags).
 	</action>
    </release>
+    <release version="1.1.3" description="Aozan version 1.1.3" date="2013-10-14">
+      <action dev="perrin" type="fix">      			
+		Fix bug : change directory to save index mapper (selected by parameter tmp.path instead of /tmp).
+      </action>
+   </release>
   </body>
 </document>
