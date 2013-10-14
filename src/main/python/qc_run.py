@@ -54,9 +54,9 @@ def exception_msg(exp, conf):
         if isinstance(exp, AozanException) and exp.getWrappedException() != None:
             exp = exp.getWrappedException()
         
-        return exp.getClass().getName() + ": " + exp.getMessage() + '\n' + StringUtils.join(exp.getStackTrace(), '\n\t')
+        return str(exp.getClass().getName()) + ": " + str(exp.getMessage()) + '\n' + str(StringUtils.join(exp.getStackTrace(), '\n\t'))
     else:
-        return exp.getMessage()
+        return str(exp.getMessage())
    
 
 def qc(run_id, conf):
