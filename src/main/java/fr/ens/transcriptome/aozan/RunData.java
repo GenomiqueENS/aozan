@@ -23,6 +23,8 @@
 
 package fr.ens.transcriptome.aozan;
 
+import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingFile;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -293,6 +295,8 @@ public class RunData {
 
     if (file == null)
       throw new NullPointerException("The file parameter is null");
+
+    checkExistingFile(file, " rundata file doesn't exist");
 
     final BufferedReader br = new BufferedReader(new FileReader(file));
 
