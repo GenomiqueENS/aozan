@@ -54,7 +54,7 @@ public class FastqScreen {
   protected static final String COUNTER_GROUP = "fastqscreen";
 
   public static final String KEY_NUMBER_THREAD = "qc.conf.fastqc.threads";
-  public static final String KEY_TMP_DIR = "tmp.path";
+  public static final String KEY_TMP_DIR = "tmp.dir";
 
   public static final String KEY_GENOMES_DESC_PATH =
       "qc.conf.settings.genomes.desc.path";
@@ -100,17 +100,15 @@ public class FastqScreen {
     // Timer
     final Stopwatch timer = new Stopwatch().start();
 
-    FastqScreenPseudoMapReduce pmr = new FastqScreenPseudoMapReduce();
-    pmr.setMapReduceTemporaryDirectory(new File(tmpDir));
+    FastqScreenPseudoMapReduce pmr = new FastqScreenPseudoMapReduce(tmpDir);
 
     try {
 
       if (pairedMode)
-        pmr.doMap(fastqRead1, fastqRead2, genomes, genomeSample, tmpDir,
-            confThreads, pairedMode);
-      else
-        pmr.doMap(fastqRead1, genomes, genomeSample, tmpDir, confThreads,
+        pmr.doMap(fastqRead1, fastqRead2, genomes, genomeSample, confThreads,
             pairedMode);
+      else
+        pmr.doMap(fastqRead1, genomes, genomeSample, confThreads, pairedMode);
 
       LOGGER.fine("FASTQSCREEN : step map for "
           + fastqSample.getKeyFastqSample() + " in mode "
@@ -155,7 +153,7 @@ public class FastqScreen {
   public FastqScreen(final Properties properties) {
 
     this.tmpDir = properties.getProperty(KEY_TMP_DIR);
-
+    System.out.println("tmp dir " + tmpDir);
     if (properties.containsKey(KEY_TMP_DIR)) {
       try {
         confThreads =
