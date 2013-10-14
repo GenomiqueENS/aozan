@@ -7,6 +7,7 @@ Created on 25 oct. 2011
 '''
 
 import sys, os, traceback
+from optparse import OptionParser
 import common, hiseq_run, sync_run, demux_run, qc_run
 import estimate_space_needed
 from java.util import Locale
@@ -33,13 +34,13 @@ def lock_file_exists(lock_file_path):
     Arguments:
         lock_file_path path of the lock file
     """
-        
+
     if not os.path.exists(lock_file_path):
         return False
-    
+
     if os.path.exists('/proc/%d' % (load_pid_in_lock_file(lock_file_path))):
         return True
-    
+
     # PID from a dead processus, lock to delete
     delete_lock_file(lock_file_path)
     return False
@@ -201,12 +202,25 @@ def launch_steps(conf):
         return
 
 
-def aozan_main(conf_file_path):
+def aozan_main():
     """Aozan main method.
 
     Arguments:
         conf: configuration object  
     """
+
+    # Define command line parser
+    parser = OptionParser(usage='usage: ' + Globals.APP_NAME_LOWER_CASE + '.sh [options] conf_file')
+    parser.add_option('-q', '--quiet', action='store_true', dest='quiet',
+                default=False, help='quiet')
+
+    # Parse command line arguments
+    (options, args) = parser.parse_args()
+
+    # If no argument print usage
+    if len(args) < 1:
+        parser.print_help()
+        sys.exit(1)
 
     # Create configuration object
     conf = LinkedHashMap()
@@ -218,7 +232,7 @@ def aozan_main(conf_file_path):
     Locale.setDefault(Globals.DEFAULT_LOCALE)
 
     # Load Aozan conf file
-    common.load_conf(conf, conf_file_path)
+    common.load_conf(conf, args[0])
 
     # End of Aozan if aozan is not enable
     if conf['aozan.enable'].lower().strip() == 'false':
@@ -253,25 +267,22 @@ def aozan_main(conf_file_path):
                 # Get exception info
                 exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
                 traceback_msg = traceback.format_exc(sys.exc_info()[2]).replace('\n', ' ')
-                
+
                 # Log the exception
                 common.log('SEVERE', 'Exception: ' + exception_msg, conf)
                 common.log('WARNING', traceback_msg, conf)
-                
+
                 # Send a mail with the exception
                 common.send_msg("[Aozan] Exception: " + exception_msg, traceback_msg, is_not_error_message, conf)
     else:
-        print "A lock file exists."
+        if not options.quiet:
+            print "A lock file exists."
         if not os.path.exists('/proc/%d' % (load_pid_in_lock_file(lock_file_path))):
-            common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf['lock.file'] + 
+            common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf['lock.file'] +
                          ". Please investigate last error and then remove the lock file.", is_error_message, conf['aozan.var.path'] + '/aozan.lasterr', conf)
 
 
 # Launch Aozan main
 if __name__ == "__main__":
-    if len(sys.argv) < 1:
-        print "No configuration file set in command line.\nSyntax: aozan.py conf_file"
-        sys.exit(1)
-    else:
-        aozan_main(sys.argv[0])
+    aozan_main()
 
