@@ -144,10 +144,10 @@ def qc(run_id, conf):
         try:
             qc.writeXMLReport(report, qc_output_dir + '/' + run_id + '.xml')
         except AozanException, exp:
-            error("error while computing qc report for run " + run_id + ".", exception_msg(exp, conf), conf)
+            error("error while computing qc report XML for run " + run_id + ".", exception_msg(exp, conf), conf)
             return False
         except Throwable, exp:
-            error("error while computing qc report for run " + run_id + ".", exception_msg(exp, conf), conf)
+            error("error while computing qc report XML for run " + run_id + ".", exception_msg(exp, conf), conf)
             return False
 
     # Remove tmp extension of temporary qc directory
@@ -162,10 +162,10 @@ def qc(run_id, conf):
         else:
             qc.writeReport(report, conf['qc.report.stylesheet'], html_report_file)
     except AozanException, exp:
-        error("error while computing qc report for run " + run_id + ".", exception_msg(exp, conf), conf)
+        error("error while computing qc report HTML for run " + run_id + ".", exception_msg(exp, conf), conf)
         return False
     except Throwable, exp:
-        error("error while computing qc report for run " + run_id + ".", exception_msg(exp, conf), conf)
+        error("error while computing qc report HTML for run " + run_id + ".", exception_msg(exp, conf), conf)
         return False
 
     # Check if the report has been generated
