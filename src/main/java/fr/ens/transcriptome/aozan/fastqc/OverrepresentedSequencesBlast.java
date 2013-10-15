@@ -61,6 +61,7 @@ import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.FastqscreenDemo;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
+import fr.ens.transcriptome.eoulsan.util.StringUtils;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**
@@ -142,10 +143,12 @@ public class OverrepresentedSequencesBlast {
         } catch (IOException e) {
           // TODO
           // e.printStackTrace();
+          LOGGER.severe(StringUtils.join(e.getStackTrace(), "\n\t"));
           stepEnable = false;
         } catch (AozanException e) {
           // TODO
           // e.printStackTrace();
+          LOGGER.info(StringUtils.join(e.getStackTrace(), "\n\t"));
           stepEnable = false;
         }
 
@@ -253,9 +256,11 @@ public class OverrepresentedSequencesBlast {
       } catch (IOException e) {
         // e.printStackTrace();
         aozanException = new AozanException(e);
+        LOGGER.severe(StringUtils.join(e.getStackTrace(), "\n\t"));
       } catch (AozanException e) {
         // e.printStackTrace();
         aozanException = new AozanException(e);
+        LOGGER.severe(StringUtils.join(e.getStackTrace(), "\n\t"));
 
       } finally {
 
@@ -467,13 +472,10 @@ public class OverrepresentedSequencesBlast {
    * been modified : -d, -m, -a. The parameters are returned in a list.
    * @param argBlast parameters for blastn
    * @return parameters for blastn in a list
-   * @throws AozanException occurs if the parameters syntaxe is not conforme.
+   * @throws AozanException occurs if the parameters syntax not conforms.
    */
   public static List<String> checkArgBlast(final String argBlast)
       throws AozanException {
-
-    if (argBlast == null || argBlast.length() == 0)
-      return null;
 
     // Check coherence with default parameter defined in Aozan
     List<String> paramEvalue = Lists.newLinkedList();
@@ -571,8 +573,7 @@ public class OverrepresentedSequencesBlast {
     // }
     //
     // public static void attente() {
-    String file =
-        "tmp_bis/aozan_fastq_2013_0072_polyA_TTAGGC_L001_R1_001.fastq";
+    String file = "tmp_bis/aozan_fastq_W9prime_GAGTGG_L008_R1_001.fastq";
     // String file =
     // "runtest/qc_130904_SNL110_0082_AC2BR0ACXX/"
     // +
