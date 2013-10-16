@@ -45,6 +45,7 @@ import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.BowtieReadsMapper;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.SequenceReadsMapper;
+import fr.ens.transcriptome.eoulsan.bio.readsmappers.SequenceReadsMapperService;
 import fr.ens.transcriptome.eoulsan.data.DataFile;
 import fr.ens.transcriptome.eoulsan.data.storages.GenomeDescStorage;
 import fr.ens.transcriptome.eoulsan.data.storages.SimpleGenomeDescStorage;
@@ -67,16 +68,18 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   private final Reporter reporter;
 
   private int mapperThreads = Runtime.getRuntime().availableProcessors();
-  private final SequenceReadsMapper bowtie;
+  private final SequenceReadsMapper mapper;
   private GenomeDescStorage storage;
   private GenomeDescription desc = null;
   private FastqScreenResult fastqScreenResult;
   private String tmpDir;
 
+  private String newArgumentsMapper;
   private Pattern pattern = Pattern.compile("\t");
 
   private int readsprocessed = 0;
   private int readsmapped = 0;
+  private boolean pairedMode;
   private String genomeReference;
 
   /**
@@ -86,17 +89,14 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @param listGenomes list of reference genome
    * @param genomeSample genome reference corresponding to sample
    * @param properties properties for mapping
-   * @param paired true if a pair-end run and option paired mode equals true
-   *          else false
    * @throws AozanException if an error occurs while mapping
    * @throws BadBioEntryException if an error occurs while creating index genome
    */
   public void doMap(final File fastqRead, final List<String> listGenomes,
-      final String genomeSample, final int numberThreads, final boolean paired)
+      final String genomeSample, final int numberThreads)
       throws AozanException, BadBioEntryException {
 
-    this.doMap(fastqRead, null, listGenomes, genomeSample, numberThreads,
-        paired);
+    this.doMap(fastqRead, null, listGenomes, genomeSample, numberThreads);
   }
 
   /**
@@ -115,11 +115,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    */
   public void doMap(final File fastqRead1, final File fastqRead2,
       final List<String> listGenomes, final String genomeSample,
-      final int numberThreads, final boolean pairedMode) throws AozanException {
-
-    // change mapper arguments
-    final String newArgumentsMapper =
-        " -l 20 -k 2 --chunkmbs 512" + (pairedMode ? " --maxins 1000" : "");
+      final int numberThreads) throws AozanException {
 
     if (numberThreads > 0)
       mapperThreads = numberThreads;
@@ -132,7 +128,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         DataFile genomeFile = new DataFile("genome://" + genome);
 
         // get index Genome reference exists
-        File archiveIndexFile = createIndex(bowtie, genomeFile);
+        File archiveIndexFile = createIndex(mapper, genomeFile);
 
         if (archiveIndexFile == null) {
           LOGGER.warning("FASTQSCREEN : archive index file not found for "
@@ -142,7 +138,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
         FastqScreenSAMParser parser =
             new FastqScreenSAMParser(this.getMapOutputTempFile(), genome,
-                pairedMode);
+                this.pairedMode);
 
         this.setGenomeReference(genome, genomeSample);
 
@@ -151,17 +147,17 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
                 .getPath()));
 
         // remove default argument
-        bowtie.setMapperArguments("");
+        mapper.setMapperArguments("");
 
-        bowtie.init(archiveIndexFile, indexDir, reporter, COUNTER_GROUP);
+        mapper.init(archiveIndexFile, indexDir, reporter, COUNTER_GROUP);
 
         // define new argument
-        bowtie.setMapperArguments(newArgumentsMapper);
-        bowtie.setThreadsNumber(mapperThreads);
+        mapper.setMapperArguments(getMapperArguments());
+        mapper.setThreadsNumber(mapperThreads);
 
-        if (pairedMode) {
+        if (this.pairedMode) {
           // mode pair-end
-          InputStream outputSAM = bowtie.mapPE(fastqRead1, fastqRead2, desc);
+          InputStream outputSAM = mapper.mapPE(fastqRead1, fastqRead2, desc);
           parser.parseLine(outputSAM);
 
           parser.closeMapOutputFile();
@@ -173,16 +169,16 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
             throw new AozanException(
                 "Fastqscreen : genome description is null for bowtie");
 
-          InputStream outputSAM = bowtie.mapSE(fastqRead1, desc);
+          InputStream outputSAM = mapper.mapSE(fastqRead1, desc);
           parser.parseLine(outputSAM);
 
           parser.closeMapOutputFile();
           this.readsprocessed = parser.getReadsprocessed();
         }
 
-        LOGGER.fine("FASTQSCREEN : mapping on genome "
-            + genome + " in mode " + (pairedMode ? "paired" : "single")
-            + ", in "
+        LOGGER.fine("FASTQSCREEN : "
+            + mapper.getMapperName() + " mapping on genome " + genome
+            + " in mode " + (this.pairedMode ? "paired" : "single") + ", in "
             + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
         timer.stop();
@@ -361,21 +357,81 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     return fastqScreenResult;
   }
 
+  /**
+   * Return mapper arguments either the defaults or those specified in the
+   * configuration
+   * @return mapper arguments
+   */
+  private String getMapperArguments() {
+
+    if (this.newArgumentsMapper == null
+        || this.newArgumentsMapper.length() == 0)
+
+      return " -l 20 -k 2 --chunkmbs 512"
+          + (this.pairedMode ? " --maxins 1000" : "");
+
+    return this.newArgumentsMapper;
+
+  }
+
+  /**
+   * Instantiation the mapper used for fastqscreen, if it is not define the
+   * mapper per default is called
+   * @param mapperName mapper name
+   * @return instance of mapper
+   * @throws AozanException occurs when the instantiation of mapper fails or if
+   *           the mapper name doesn't recognize
+   */
+  private SequenceReadsMapper createInstanceMapper(final String mapperName,
+      final String mapperArguments) throws AozanException {
+
+    // Use default mapper if mapper name or arguments is null
+    if (mapperName == null
+        || mapperName.length() == 0 || mapperArguments == null
+        || mapperArguments.length() == 0) {
+
+      this.newArgumentsMapper = null;
+
+      return new BowtieReadsMapper();
+    }
+
+    // Retrieve instance of mapper or null
+    SequenceReadsMapper map =
+        SequenceReadsMapperService.getInstance().getMapper(mapperName);
+
+    if (map == null)
+      throw new AozanException("FASTQSCREEN : mapper name "
+          + mapperName + " from configuration Aozan doesn't recognized.");
+
+    this.newArgumentsMapper = mapperArguments;
+    return map;
+  }
+
   //
   // Constructor
   //
 
   /**
-   * Public construction which declare the bowtie mapper
+   * Public construction. Instantiation the mapper, the mapper name and the
+   * mapper arguments must be define together else it uses the default mapper
+   * @param tmpDir path to temporary directory
+   * @param pairedMode true if a pair-end run and option paired mode equals true
+   *          else false
+   * @param mapperName mapper name name can be null
+   * @param mapperArguments mapper arguments can be null
+   * @throws AozanException occurs when the instantiation of mapper fails
    */
-  public FastqScreenPseudoMapReduce(final String tmpDir) {
+  public FastqScreenPseudoMapReduce(final String tmpDir,
+      final boolean pairedMode, final String mapperName,
+      final String mapperArguments) throws AozanException {
 
-    this.bowtie = new BowtieReadsMapper();
+    this.pairedMode = pairedMode;
     this.tmpDir = tmpDir;
+
+    this.mapper = createInstanceMapper(mapperName, mapperArguments);
 
     // Define temporary directory
     this.setMapReduceTemporaryDirectory(new File(this.tmpDir));
-    bowtie.setTempDirectory(new File(this.tmpDir));
 
     this.reporter = new Reporter();
 
@@ -387,6 +443,9 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       this.storage = SimpleGenomeDescStorage.getInstance(genomeDescStoragePath);
 
     this.fastqScreenResult = new FastqScreenResult();
-  }
 
+    LOGGER.info("FASTQSCREEN : init  mapper "
+        + this.mapper.getMapperName() + ", arguments \"" + getMapperArguments()
+        + "\" in mode " + (pairedMode ? "paired" : "single"));
+  }
 }

@@ -62,8 +62,15 @@ public class FastqScreen {
       "qc.conf.settings.mappers.indexes.path";
   public static final String KEY_GENOMES_PATH = "qc.conf.settings.genomes";
 
+  // Configuration mapper for fastqscreen, optional
+  public static final String KEY_MAPPER_NAME = "qc.conf.fastqscreen.mapper";
+  public static final String KEY_MAPPER_ARGUMENT =
+      "qc.conf.fastqscreen.mapper.argument";
+
   private String tmpDir;
   private int confThreads;
+  private String mapperName;
+  private String mapperArgument;
 
   /**
    * Mode pair-end : execute fastqscreen
@@ -100,15 +107,16 @@ public class FastqScreen {
     // Timer
     final Stopwatch timer = new Stopwatch().start();
 
-    FastqScreenPseudoMapReduce pmr = new FastqScreenPseudoMapReduce(tmpDir);
+    FastqScreenPseudoMapReduce pmr =
+        new FastqScreenPseudoMapReduce(tmpDir, pairedMode, mapperName,
+            mapperArgument);
 
     try {
 
       if (pairedMode)
-        pmr.doMap(fastqRead1, fastqRead2, genomes, genomeSample, confThreads,
-            pairedMode);
+        pmr.doMap(fastqRead1, fastqRead2, genomes, genomeSample, confThreads);
       else
-        pmr.doMap(fastqRead1, genomes, genomeSample, confThreads, pairedMode);
+        pmr.doMap(fastqRead1, genomes, genomeSample, confThreads);
 
       LOGGER.fine("FASTQSCREEN : step map for "
           + fastqSample.getKeyFastqSample() + " in mode "
@@ -153,7 +161,7 @@ public class FastqScreen {
   public FastqScreen(final Properties properties) {
 
     this.tmpDir = properties.getProperty(KEY_TMP_DIR);
-    System.out.println("tmp dir " + tmpDir);
+    
     if (properties.containsKey(KEY_TMP_DIR)) {
       try {
         confThreads =
@@ -161,6 +169,10 @@ public class FastqScreen {
       } catch (Exception e) {
       }
     }
+
+    // Parameter mapper instead of default value
+    this.mapperName = properties.getProperty(KEY_MAPPER_NAME);
+    this.mapperArgument = properties.getProperty(KEY_MAPPER_ARGUMENT);
 
     Settings settings = EoulsanRuntime.getSettings();
 
