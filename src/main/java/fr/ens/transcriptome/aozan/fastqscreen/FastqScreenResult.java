@@ -23,17 +23,16 @@
 
 package fr.ens.transcriptome.aozan.fastqscreen;
 
+import static fr.ens.transcriptome.aozan.Globals.DATE_FORMAT;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -238,8 +237,6 @@ public class FastqScreenResult {
     root.setAttribute("formatversion", "1.0");
     doc.appendChild(root);
 
-    final DateFormat df = new SimpleDateFormat("yyyy.MM.dd", Locale.US);
-
     // Header
     XMLUtils.addTagValue(doc, root, "AozanStep", "Detection contamination");
     XMLUtils.addTagValue(doc, root, "GeneratorName", Globals.APP_NAME);
@@ -257,7 +254,8 @@ public class FastqScreenResult {
         data.get("run.info.instrument"));
     XMLUtils.addTagValue(doc, root, "InstrumentRunNumber",
         data.get("run.info.run.number"));
-    XMLUtils.addTagValue(doc, root, "ReportDate", new Date().toString());
+    XMLUtils.addTagValue(doc, root, "ReportDate",
+        DATE_FORMAT.format(new Date()));
 
     XMLUtils
         .addTagValue(doc, root, "projectName", fastqSample.getProjectName());

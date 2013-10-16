@@ -23,6 +23,8 @@
 
 package fr.ens.transcriptome.aozan;
 
+import static fr.ens.transcriptome.aozan.Globals.DATE_FORMAT;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -255,6 +257,7 @@ public class QCReport {
       return;
 
     try {
+
       DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
       DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
       final Document doc = this.doc = docBuilder.newDocument();
@@ -264,15 +267,13 @@ public class QCReport {
       root.setAttribute("formatversion", "1.0");
       doc.appendChild(root);
 
-      XMLUtils.addTagValue(doc, root, "GeneratorName",
-          Globals.APP_NAME);
+      XMLUtils.addTagValue(doc, root, "GeneratorName", Globals.APP_NAME);
       XMLUtils.addTagValue(doc, root, "GeneratorVersion",
           Globals.APP_VERSION_STRING);
-      XMLUtils.addTagValue(doc, root, "GeneratorWebsite",
-          Globals.WEBSITE_URL);
+      XMLUtils.addTagValue(doc, root, "GeneratorWebsite", Globals.WEBSITE_URL);
       XMLUtils.addTagValue(doc, root, "GeneratorRevision",
           Globals.APP_BUILD_COMMIT);
-     
+
       XMLUtils
           .addTagValue(doc, root, "RunId", this.data.get("run.info.run.id"));
       XMLUtils
@@ -283,7 +284,8 @@ public class QCReport {
           this.data.get("run.info.instrument"));
       XMLUtils.addTagValue(doc, root, "InstrumentRunNumber",
           this.data.get("run.info.run.number"));
-      XMLUtils.addTagValue(doc, root, "ReportDate", new Date().toString());
+      XMLUtils.addTagValue(doc, root, "ReportDate",
+          DATE_FORMAT.format(new Date()));
 
       doLanesTests(root);
       doSamplesTests(root);

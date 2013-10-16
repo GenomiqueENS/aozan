@@ -129,6 +129,10 @@ public class Globals {
   /** Default locale of the application. */
   public static final Locale DEFAULT_LOCALE = Locale.US;
 
+  /** Default locale date format in the application. */
+  public static final DateFormat DATE_FORMAT = new SimpleDateFormat(
+      "yyyy.MM.dd 'at' kk:mm:ss", DEFAULT_LOCALE);
+
   /** Format of the log. */
   public static final Formatter LOG_FORMATTER = new Formatter() {
 
