@@ -55,17 +55,51 @@ class BlastResultHit {
   static final String tag_hspAlignLen = "Hsp_align-len";
   static final String tag_hspQseq = "Hsp_qseq";
 
-  final int queryLength;
-  final String result;
-  final double hspBitScore;
-  final String hspEValue;
-  final int hspIdentity;
-  final int hspAlignLen;
-  final int countHits;
-  final String qSeq;
-  final int prcIdentity;
-  final int queryCover;
   final String sequence;
+
+  int queryLength;
+  String result;
+  double hspBitScore;
+  String hspEValue;
+  int hspIdentity;
+  int hspAlignLen;
+  int countHits;
+  String qSeq;
+  int prcIdentity;
+  int queryCover;
+
+  boolean isNull = true;
+
+  /**
+   * Generate hit data
+   * @param hit first hit retrieved by blast
+   * @param countHits number hits retrieved by blast
+   * @param queryLength number base in sequence query
+   */
+  public void addHitData(Element firstHit, final int countHits,
+      final int queryLength) {
+
+    // No hit found for this sequence
+    if (extractFirstValueToInt(firstHit, "Hit_num") == 0)
+      return;
+
+    this.queryLength = queryLength;
+    this.countHits = countHits;
+
+    this.result = extractFirstValueToString(firstHit, tag_hitDef);
+    this.hspBitScore = extractFirstValueToDouble(firstHit, tag_hspBitScore);
+    this.hspEValue = extractFirstValueToString(firstHit, tag_hspEValue);
+    this.hspIdentity = extractFirstValueToInt(firstHit, tag_hspIdentity);
+    this.hspAlignLen = extractFirstValueToInt(firstHit, tag_hspAlignLen);
+    this.qSeq = extractFirstValueToString(firstHit, tag_hspQseq);
+    this.prcIdentity = (int) ((double) hspIdentity / this.queryLength * 100);
+
+    int countGap = queryLength - hspAlignLen;
+    this.queryCover = (int) ((double) (countGap / this.queryLength * 100));
+
+    this.isNull = false;
+
+  }
 
   /**
    * Create an object contaminant hit.
@@ -109,9 +143,24 @@ class BlastResultHit {
     };
   }
 
+  public boolean isNull() {
+    return this.isNull;
+  }
+
   //
   // Constructor
   //
+
+  /**
+   * Public constructor. Object contains all informations for one blast response
+   * to a query.
+   * @param hit first hit retrieved by blast
+   */
+  public BlastResultHit(final String sequence) {
+
+    this.sequence = sequence;
+
+  }
 
   /**
    * Public constructor. Object contains all informations for one blast response
@@ -126,20 +175,7 @@ class BlastResultHit {
 
     this.sequence = sequence;
 
-    this.queryLength = queryLength;
-    this.countHits = countHits;
-
-    this.result = extractFirstValueToString(hit, tag_hitDef);
-    this.hspBitScore = extractFirstValueToDouble(hit, tag_hspBitScore);
-    this.hspEValue = extractFirstValueToString(hit, tag_hspEValue);
-    this.hspIdentity = extractFirstValueToInt(hit, tag_hspIdentity);
-    this.hspAlignLen = extractFirstValueToInt(hit, tag_hspAlignLen);
-    this.qSeq = extractFirstValueToString(hit, tag_hspQseq);
-    this.prcIdentity = (int) ((double) hspIdentity / this.queryLength * 100);
-
-    int countGap = queryLength - hspAlignLen;
-    this.queryCover = (int) ((double) (countGap / this.queryLength * 100));
-
+    addHitData(hit, countHits, queryLength);
   }
 
 }

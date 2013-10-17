@@ -48,7 +48,6 @@ import javassist.NotFoundException;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 
-import fr.ens.transcriptome.aozan.collectors.FastQCCollector;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
 public class FastqscreenDemo {
@@ -103,6 +102,12 @@ public class FastqscreenDemo {
         // run test pair-end
         // runId = "120830_SNL110_0055_AD16D9ACXX";
         runId = "130801_SNL110_0079_AD2CR3ACXX";
+        
+        // Mais - SR50
+        // runId = "131004_SNL110_0087_AD297LACXX";
+        
+        // Validation (mm10) - PE150
+        // runId = "131015_SNL110_0088_AH13M0ADXX";
       } else {
 
         // ESSAI fastqscreen partial fastq
@@ -127,6 +132,12 @@ public class FastqscreenDemo {
       LOGGER.info("Runtime for demo with a run "
           + runId + " "
           + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
+
+    } catch (AozanException ae) {
+      if (ae.getWrappedException() == null)
+        ae.printStackTrace();
+      else
+        ae.getWrappedException().printStackTrace();
 
     } catch (Exception e) {
       LOGGER.severe(e.getMessage());
@@ -238,14 +249,14 @@ public class FastqscreenDemo {
     // .exists());
 
     // kmer between 2 and 10
-    conf.put("qc.conf.fastqc.threads", "4");
+    // conf.put("qc.conf.fastqc.threads", "4");
     // conf.put("qc.conf.step.blast.enable", "False");
 
     // // parse fully fastq file
     // conf.put("qc.conf.max.reads.parsed", "-1");
     // // use fully fastq for create tmp fastq file for fastqscreen
     // conf.put("qc.conf.reads.pf.used", "-1");
-    conf.put("qc.conf.fastqscreen.genomes", "phix");
+    // conf.put("qc.conf.fastqscreen.genomes", "phix");
 
     System.out.println("genomes : "
         + conf.get("qc.conf.fastqscreen.genomes") + " mapping mode "

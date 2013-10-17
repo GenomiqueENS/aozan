@@ -26,12 +26,14 @@ package fr.ens.transcriptome.aozan.fastqc;
 import static fr.ens.transcriptome.aozan.util.XMLUtilsParser.extractFirstValueToInt;
 import static fr.ens.transcriptome.aozan.util.XMLUtilsParser.extractFirstValueToString;
 import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingFile;
+import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -225,6 +227,7 @@ public class OverrepresentedSequencesBlast {
    * @param sequence query blastn
    * @return a ContaminantHit for the best hit return by blastn or null
    */
+  @SuppressWarnings("static-access")
   public ContaminantHit searchSequenceInBlast(final String sequence) {
 
     if (checkSequencesNotToIgnore(sequence))
@@ -239,19 +242,37 @@ public class OverrepresentedSequencesBlast {
 
     else {
       // Save sequence in multithreading context
-      // sequencesAlreadyAnalysis.put(sequence, blastResult);
+      blastResult = new BlastResultHit(sequence);
+      sequencesAlreadyAnalysis.put(sequence, blastResult);
 
       try {
 
         resultXML = FileUtils.createTempFile("blast_", "_result.xml");
 
+        // Synchronize
+        // TODO remove after test
+        System.out.println(Thread.currentThread().getName()
+            + "\t" + toTimeHumanReadable(new Date().getTime())
+            + "\tBefore_blast\t" + resultXML.getAbsolutePath() + "\t"
+            + sequence);
+
         launchBlastSearch(createCommandLine(resultXML, sequence), sequence);
 
-        if (resultXML.length() > 0)
-          blastResult = parseDocument(resultXML, sequence);
+        // TODO remove after test
+        System.out
+            .println(Thread.currentThread().getName()
+                + "\t" + toTimeHumanReadable(new Date().getTime())
+                + "\tAfter_blast\t" + resultXML.getAbsolutePath() + "\t"
+                + sequence);
 
-        // Save result for sequence
-        sequencesAlreadyAnalysis.put(sequence, blastResult);
+        try {
+          // Wait writing xml file
+          Thread.currentThread().sleep(100);
+        } catch (InterruptedException e) {
+        }
+
+        if (resultXML.length() > 0)
+          parseDocument(blastResult, resultXML, sequence);
 
       } catch (IOException e) {
         // e.printStackTrace();
@@ -273,7 +294,7 @@ public class OverrepresentedSequencesBlast {
       }
     }
 
-    if (blastResult == null)
+    if (blastResult.isNull())
       // No hit found
       return null;
 
@@ -301,8 +322,6 @@ public class OverrepresentedSequencesBlast {
 
       // Writing on standard input
       OutputStreamWriter os = new OutputStreamWriter(process.getOutputStream());
-      os.write(">seq_automatic");
-      os.write("\n");
       os.write(sequence);
       os.flush();
       os.close();
@@ -326,15 +345,13 @@ public class OverrepresentedSequencesBlast {
 
   /**
    * Parse xml file result to identify the best hit.
+   * @param the best hit or null
    * @param resultXML result file from blastn
    * @param sequence query blastn
-   * @return the best hit or null
    * @throws AozanException occurs if the parsing fails.
    */
-  public BlastResultHit parseDocument(final File resultXML,
-      final String sequence) throws AozanException {
-
-    BlastResultHit blastResult = null;
+  public void parseDocument(final BlastResultHit blastResult,
+      final File resultXML, final String sequence) throws AozanException {
 
     InputStream is = null;
     try {
@@ -354,7 +371,7 @@ public class OverrepresentedSequencesBlast {
       parseHeaderDocument(doc);
 
       // Search the best hit
-      blastResult = parseHit(doc, sequence);
+      parseHit(blastResult, doc, sequence);
 
       is.close();
     } catch (IOException e) {
@@ -371,7 +388,6 @@ public class OverrepresentedSequencesBlast {
         // e.printStackTrace();
       }
     }
-    return blastResult;
   }
 
   /**
@@ -418,11 +434,12 @@ public class OverrepresentedSequencesBlast {
 
   /**
    * Search hit in xml result file.
+   * @param best hit contained in xml file or null
    * @param doc root of the xml file
    * @param sequence query blastn
-   * @return best hit contained in xml file or null
    */
-  private BlastResultHit parseHit(final Document doc, final String sequence) {
+  private void parseHit(final BlastResultHit blastResult, final Document doc,
+      final String sequence) {
 
     List<Element> responses = XMLUtils.getElementsByTagName(doc, "Iteration");
     Element elemIteration = responses.get(0);
@@ -430,22 +447,16 @@ public class OverrepresentedSequencesBlast {
     final int queryLength =
         extractFirstValueToInt(elemIteration, tag_queryLength);
 
-    BlastResultHit blastResult = null;
-
     List<Element> hits = XMLUtils.getElementsByTagName(elemIteration, "Hit");
     int countHits = hits.size();
 
     // No hit found
     if (countHits == 0)
-      return null;
+      return;
 
-    Element firstHit = hits.get(0);
-    if (extractFirstValueToInt(firstHit, "Hit_num") == 1)
-      // Parse the document
-      blastResult =
-          new BlastResultHit(firstHit, countHits, queryLength, sequence);
+    // Parse the document
+    blastResult.addHitData(hits.get(0), countHits, queryLength);
 
-    return blastResult;
   }
 
   /**
@@ -573,7 +584,8 @@ public class OverrepresentedSequencesBlast {
     // }
     //
     // public static void attente() {
-    String file = "tmp_bis/aozan_fastq_W9prime_GAGTGG_L008_R1_001.fastq";
+    String file =
+        "tmp_bis/aozan_fastq_2013_0069_polyA_ATCACG_L001_R1_001.fastq";
     // String file =
     // "runtest/qc_130904_SNL110_0082_AC2BR0ACXX/"
     // +
@@ -605,6 +617,12 @@ public class OverrepresentedSequencesBlast {
           "report-fastqc.zip"));
 
       // searchSequenceInBlast(seq, null);
+
+    } catch (AozanException ae) {
+      if (ae.getWrappedException() == null)
+        ae.printStackTrace();
+      else
+        ae.getWrappedException().printStackTrace();
 
     } catch (Exception e) {
       e.printStackTrace();
