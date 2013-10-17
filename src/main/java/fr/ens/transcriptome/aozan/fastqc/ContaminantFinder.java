@@ -32,6 +32,7 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.Common;
+import fr.ens.transcriptome.eoulsan.util.StringUtils;
 import uk.ac.babraham.FastQC.Sequence.Contaminant.Contaminant;
 import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
 
@@ -77,8 +78,13 @@ public class ContaminantFinder {
 
       ContaminantHit contaminantBlast =
           blastInstance.searchSequenceInBlast(sequence);
-      LOGGER.warning("Error during find contaminant with blast : "
-          + OverrepresentedSequencesBlast.throwException().getMessage());
+
+      // Catch exception
+      if (OverrepresentedSequencesBlast.throwException() != null)
+
+        LOGGER.warning("Error during find contaminant with blast : "
+            + StringUtils.join(OverrepresentedSequencesBlast.throwException()
+                .getStackTrace(), "\n\t"));
 
       if (contaminantBlast != null)
         bestHit = contaminantBlast;
