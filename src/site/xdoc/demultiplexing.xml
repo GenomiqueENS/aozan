@@ -69,7 +69,8 @@
 	     <tr><td>casava.mismatches</td><td>integer</td><td>0</td><td>Number of mismatches allowed in adapters indexes</td></tr>
 	     <tr><td>casava.path</td><td>string</td><td>/usr/local/casava</td><td>Path to CASAVA or Bcl2fastq basedir</td></tr>
 	     <tr><td>casava.with.failed.reads</td><td>boolean</td><td>True</td><td>Add reads that not pass Illumina filter in fastq files</td></tr>
-	     <tr><td>casava.additionnal.arguments</td><td>string</td><td>Not set</td><td>additional arguments for CASAVA</td></tr>   
+	     <tr><td>casava.additionnal.arguments</td><td>string</td><td>Not set</td><td>Additional arguments for CASAVA</td></tr>
+	     <tr><td>casava.threads</td><td>integer</td><td>Number of computer cores</td><td>Number of threads to use for demultiplexing </td></tr>
 	   </table>
      
         <p>An example of email sent at the end of demultiplexing step.</p>
