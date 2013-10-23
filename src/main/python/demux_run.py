@@ -300,7 +300,9 @@ def demux(run_id, conf):
         return False
 
     # Get the number of cpu
-    cpu_count = Runtime.getRuntime().availableProcessors()
+    cpu_count = int(conf['casava.threads'])
+    if cpu_count < 1:
+        cpu_count = Runtime.getRuntime().availableProcessors()
 
     # Launch casava
     cmd = 'cd ' + fastq_output_dir + ' && make -j ' + str(cpu_count) + ' > ' + fastq_output_dir + '/make.out' + ' 2> ' + fastq_output_dir + '/make.err'
