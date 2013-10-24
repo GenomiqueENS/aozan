@@ -64,7 +64,7 @@ version="1.0">
     }
     
     th {
-        background-color:#E6E6E6;
+        background-color:#E7EAF1;
         color:black;
         font-style : bold;
         border: thin solid black;
@@ -265,7 +265,7 @@ version="1.0">
        </xsl:for-each>
        
        <!-- Repeat Sample Name in last column -->
-        <td class="repeat"><xsl:value-of select="@name"/></td>
+        <td class="repeat"><xsl:value-of select="@name"/><br/><xsl:value-of select="@project"/></td>
        </tr>
      
     </xsl:for-each>
@@ -280,7 +280,7 @@ version="1.0">
       <xsl:for-each select="/QCReport/SamplesReport/Columns/Column">
         <td class="repeat"><xsl:value-of select="."/><xsl:if test="@unit!=''"> (<xsl:value-of select="@unit"/>)</xsl:if></td>
       </xsl:for-each>
-      <td class="repeat">Sample name</td>
+      <td class="repeat">Sample_Project name</td>
     </tr>
     
    </table>
