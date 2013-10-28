@@ -26,8 +26,12 @@ package fr.ens.transcriptome.aozan;
 import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -84,7 +88,7 @@ public class FastqscreenDemo {
 
   public static RunData data = null;
   public static Map<String, FastqSample> prefixList;
-  private static boolean paired = false;
+  private static boolean paired = true;
 
   static String runId;
   static String date;
@@ -101,13 +105,13 @@ public class FastqscreenDemo {
       if (paired) {
         // run test pair-end
         // runId = "120830_SNL110_0055_AD16D9ACXX";
-        runId = "130801_SNL110_0079_AD2CR3ACXX";
-        
+        // runId = "130801_SNL110_0079_AD2CR3ACXX";
+
         // Mais - SR50
         // runId = "131004_SNL110_0087_AD297LACXX";
-        
+
         // Validation (mm10) - PE150
-        // runId = "131015_SNL110_0088_AH13M0ADXX";
+        runId = "131015_SNL110_0088_AH13M0ADXX";
       } else {
 
         // ESSAI fastqscreen partial fastq
@@ -120,6 +124,15 @@ public class FastqscreenDemo {
       }
 
       date = new SimpleDateFormat("yyMMdd").format(new Date());
+
+      // Copy console output in a file
+      try {
+        System.setOut(new PrintStream(new FileOutputStream(new File(SRC_RUN
+            + "/qc_" + runId + "/console_" + date + ".txt"))));
+
+      } catch (FileNotFoundException e1) {
+        e1.printStackTrace();
+      }
 
       Common.initLogger(TMP_DIR + "/" + runId + "_aozan_test.log");
       LOGGER.setLevel(Level.CONFIG);
@@ -153,7 +166,7 @@ public class FastqscreenDemo {
 
     qcDir = SRC_RUN + "/qc_" + runId + "/" + runId;
     String bclDir = "/home/sperrin/shares-net/sequencages/bcl/" + runId;
-    String fastqDir = "/home/sperrin/shares-net/sequencages/fastq/" + runId;
+    String fastqDir = "/home/sperrin/shares-net/sequencages/fastq/" + runId+".0mismatch";
     // String bclDir, String fastqDir, String qcDir, File tmpDir
 
     QC qc =

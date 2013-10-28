@@ -28,10 +28,12 @@ import static fr.ens.transcriptome.aozan.util.XMLUtilsParser.extractFirstValueTo
 import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingFile;
 import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Date;
 import java.util.List;
@@ -77,6 +79,8 @@ public class OverrepresentedSequencesBlast {
   /** LOGGER */
   private static final Logger LOGGER = Common.getLogger();
 
+  private static final String SEQUENCES_NOT_USE_FILE =
+      "/sequences_nohit_with_blastn.txt";
   // Key for parameters in Aozan configuration
   public static final String KEY_STEP_BLAST_REQUIRED =
       "qc.conf.step.blast.enable";
@@ -103,7 +107,6 @@ public class OverrepresentedSequencesBlast {
   static boolean firstCall = true;
   static boolean stepEnable = false;
 
-  static List<String> sequencesToIgnore = Lists.newArrayList();
   final static List<String> cmd = Lists.newLinkedList();
   static String blastVersionExpected;
 
@@ -141,6 +144,10 @@ public class OverrepresentedSequencesBlast {
 
           createCommonArgs(blastPath, blastDBPath,
               checkArgBlast(blastArguments));
+
+          // Add in map all sequences to do not analysis, return a resultBlast
+          // with no hit
+          loadSequencesToIgnoreFile();
 
         } catch (IOException e) {
           // TODO
@@ -229,9 +236,6 @@ public class OverrepresentedSequencesBlast {
    */
   @SuppressWarnings("static-access")
   public ContaminantHit searchSequenceInBlast(final String sequence) {
-
-    if (checkSequencesNotToIgnore(sequence))
-      return null;
 
     BlastResultHit blastResult = null;
     File resultXML = null;
@@ -468,17 +472,6 @@ public class OverrepresentedSequencesBlast {
   }
 
   /**
-   * Check if the sequence is included in list of sequences which doesn't return
-   * a result by blastn.
-   * @param sequence query blastn
-   * @return true if blastn doesn't be launched for this sequence else false
-   */
-  private static boolean checkSequencesNotToIgnore(final String sequence) {
-
-    return sequencesToIgnore.contains(sequence);
-  }
-
-  /**
    * Check argument for blastn from configuration aozan. This parameters can't
    * been modified : -d, -m, -a. The parameters are returned in a list.
    * @param argBlast parameters for blastn
@@ -530,6 +523,43 @@ public class OverrepresentedSequencesBlast {
     return args;
   }
 
+  /**
+   * Add in hashMap all sequences identified like to fail blastn analysis for
+   * skipping them
+   */
+  private static void loadSequencesToIgnoreFile() {
+
+    BufferedReader br = null;
+    try {
+      br =
+          new BufferedReader(
+              new InputStreamReader(
+                  fr.ens.transcriptome.aozan.fastqc.OverrepresentedSequencesBlast.class
+                      .getResourceAsStream(SEQUENCES_NOT_USE_FILE)));
+      String sequence = "";
+
+      while ((sequence = br.readLine()) != null) {
+
+        if (!sequence.startsWith("#"))
+          if (sequence.trim().length() > 0)
+            sequencesAlreadyAnalysis
+                .put(sequence, new BlastResultHit(sequence));
+
+      }
+      br.close();
+
+    } catch (IOException e) {
+
+    } finally {
+      if (br != null)
+        try {
+          br.close();
+        } catch (IOException e) {
+        }
+    }
+
+  }
+
   //
   // Constructor
   //
@@ -539,58 +569,13 @@ public class OverrepresentedSequencesBlast {
    */
   public OverrepresentedSequencesBlast() {
 
-    // TODO file not exists actually
-    // loadSequencesToIgnoreFile();
-
   }
 
   /** Test method */
   public static void main(final String[] argv) {
 
-    // TODO to remove after test
-    // Properties props = FastqscreenDemo.getPropertiesAozanConf();
-    // props.put(KEY_BLAST_ARGUMENTS, "-e 10");
-    //
-    // configure(props);
-    // try {
-    // RuntimePatchFastQC.runPatchFastQC(isStepBlastEnable());
-    // } catch (AozanException e1) {
-    // e1.printStackTrace();
-    // }
-    //
-    // File[] filesXml =
-    // (new File("/home/sperrin/Documents/FastqScreenTest/tmp_bis/tmp")
-    // .listFiles(new FileFilter() {
-    //
-    // @Override
-    // public boolean accept(final File pathname) {
-    // return pathname.length() > 0
-    // && pathname.getName().endsWith(".xml");
-    // }
-    // }));
-    //
-    // OverrepresentedSequenceBlast ors = new OverrepresentedSequenceBlast();
-    // BlastResultHit hit = null;
-    // for (File f : filesXml) {
-    // System.out.println("file " + f.getName());
-    // try {
-    // hit = ors.parseDocument(f, "AAAACACTTGTGCATTCTTTG");
-    // } catch (AozanException e) {
-    // // TODO Auto-generated catch block
-    // System.out.println("file " + f.getName());
-    // e.printStackTrace();
-    // }
-    // }
-    // }
-    //
-    // public static void attente() {
     String file =
         "tmp_bis/aozan_fastq_2013_0069_polyA_ATCACG_L001_R1_001.fastq";
-    // String file =
-    // "runtest/qc_130904_SNL110_0082_AC2BR0ACXX/"
-    // +
-    // "130904_SNL110_0082_AC2BR0ACXX/Project_bulbe_D2013/Sample_2013_0209/2013_0209_GTGAAA_L008_R1_001.fastq.bz2";
-
     final File fastq =
         new File("/home/sperrin/Documents/FastqScreenTest/" + file);
 
