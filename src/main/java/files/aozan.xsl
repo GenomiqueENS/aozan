@@ -13,16 +13,16 @@ version="1.0">
     .score-1 {
     }
     .score0 {
-      background: #FA2E26;
+      background: #F34545;
     }
     .score1 {
-      background: #FA2E26;
+      background: #F34545;
     }
     .score2 {
-      background: #FA2E26;
+      background: #F34545;
     }
     .score3 {
-      background: #FA2E26;
+      background: #F34545;
     }
     .score4 {
       background: #F8F848;
@@ -31,16 +31,16 @@ version="1.0">
       background: #F8F848;
     }
     .score6 {
-      background: #35B968;
+      background: #55D486;
     }
     .score7 {
-      background: #35B968;
+      background: #55D486;
     }
     .score8 {
-      background: #35B968;
+      background: #55D486;
     }
     .score9 {
-      background: #35B968;
+      background: #55D486;
     }
     
     td {
@@ -68,6 +68,7 @@ version="1.0">
         color:black;
         font-style : bold;
         border: thin solid black;
+        border-bottom-width: 2px;
         width: 50px;
         font-size: 100%;
     }
@@ -96,10 +97,14 @@ version="1.0">
         color:black;
         font-style : italic;
     }
-    a:link {
-    	color:DarkSlateBlue;
-    	font-weight: bold;
-    }
+     a:link {
+        color:#1B65AF;
+        font-weight: bold;
+    } 
+    a:visited {
+        color:#1B65AF;
+        font-weight: bold;
+    }   
   	
   div.report {
     display:block;
@@ -118,7 +123,7 @@ version="1.0">
 	
 
   div.footer {
-    background-color: #E7EAF1;
+    background-color: #C1C4CA;
     border:0;
     margin:0;
     padding:0.5em;
@@ -132,8 +137,9 @@ version="1.0">
     z-index:2;
   }
         
+    
     div.header {
-		background-color: #E7EAF1;
+		background-color: #CAD5EB;
         border:0;
         margin:0;
         padding: 0.5em;
@@ -176,14 +182,15 @@ version="1.0">
 	<div id="header_title">
 		<!-- img src="http://www.transcriptome.ens.fr/aozan/images/aozan_qc_logo.png" alt="Aozan"/>  <xsl:value-of select="/QCReport/RunId"/> Quality report -->
 		<img src="/home/sperrin/workspace/aozan/src/site/resources/images/aozan_qc_logo.png" alt="Aozan"/> &#xA0; &#xA0; <xsl:value-of select="/QCReport/RunId"/> Quality report
+		
 	</div> 
 
 	<div id="header_filename">
 		<xsl:value-of select="/QCReport/RunId"/><br/>
-		<xsl:variable name="reportDate" select="/QCReport/ReportDate"/>
-		<xsl:value-of select="substring($reportDate, 1, 10)"/><br/>
-		<a href="#lane">Lane</a> / <a href="#sample">Sample</a>
+		<xsl:value-of select="/QCReport/ReportDate"/><br/>
+		<a href="#lane">Lanes</a> / <a href="#sample">Samples</a>
 	</div>
+	
 </div>
 
 <div class="report">

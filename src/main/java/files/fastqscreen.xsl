@@ -13,31 +13,42 @@ version="1.0">
     td {
       text-align: center;
       width: 100px;
+      border: 1px solid black;
+      
+      padding-left:3px;
+      padding-right:3px;
+      padding-top:1px;
+      padding-bottom:1px;
+      position : static;
+      background-clip: padding-box;
     }
     th {
-        background-color: #234CA5;
-        color:WhiteSmoke;
+        background-color:#E7EAF1;
+        color:black;
         font-style : bold;
-        border: thin solid #6495ed;
+        border: thin solid black;
+        border-bottom-width: 2px;
         width: 50px;
         font-size: 100%;
     }
     table {
         border: medium solid #000000;
         font-size: 95%;
+        border-collapse:collapse;
     }
-    body{
+    
+     body{
         font-family: sans-serif;   
-        font-size: 90%;
+        font-size: 80%;
     }
     h1{
-        color:#234CA5;
+        color: #234CA5;
         font-style : italic;
-        font-size : 30px;
+        font-size : 20px;
     }
     h2{}
     h3{
-        color:#B9121B;
+        color:black;
         font-style : italic;
     }
 	div.footer {
