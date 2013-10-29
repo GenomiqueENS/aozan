@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
@@ -59,6 +60,8 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   // Key for retrieve the path of alias file
   private static final String KEY_ALIAS_GENOME_PATH =
       "qc.conf.genome.alias.path";
+
+  private static final Pattern pattern = Pattern.compile(".,;:/-_'");
 
   private String genomeReference;
   private boolean isGenomeContamination;
@@ -207,8 +210,12 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     // Retrieve all genome sample included in casava design file
     for (CasavaSample casavaSample : casavaDesign) {
       String genomeSample =
-          casavaSample.getSampleRef().replaceAll("\"", "").trim().toLowerCase();
-      genomesFromCasavaDesign.add(genomeSample);
+          casavaSample.getSampleRef().replaceAll("\"", "").toLowerCase();
+
+      // Remplace all symbols not letters or numbers by space
+      pattern.matcher(genomeSample).replaceAll(" ");
+
+      genomesFromCasavaDesign.add(genomeSample.trim());
     }
 
     // Retrieve list of corresponding reference genome from casava design file
