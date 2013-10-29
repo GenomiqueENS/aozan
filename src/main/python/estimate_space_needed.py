@@ -112,16 +112,15 @@ def error(run_id, type_file, space_needed, space_free, space_remaining_not_enoug
     """
 
     short_message = "not enough disk space to store " + type_file + " for run " + run_id
-    message = type_file + " : not enough disk space to store files for run " + run_id + ' on '+ dir_path +'.\n' 
-    message = message + '%.2f GB' % (space_needed / 1024 / 1024 / 1024)+ ' is needed '
-    message = message + ' however only %.2f GB' % (space_free / 1024 / 1024 / 1024) + ' of free space is currently available on storage.'
+    message = type_file + " : not enough disk space to store files for run " + run_id + ' on ' + dir_path + '.\n' 
+    message = message + '%.2f GB' % (space_needed / 1024 / 1024 / 1024) + ' is needed by Aozan'
+    message = message + ' however only %.2f GB' % (space_free / 1024 / 1024 / 1024) + ' of free space is currently available on this storage.'
     
     if space_remaining_not_enough:
         message = message + 'Remaining space in the directory at the end is estimated inferior at 5 percent'
         
     # send warning mail
     common.error('[Aozan] Estimate space needed : ' + short_message, message, conf['aozan.var.path'] + '/space_estimated.lasterr', conf)
-    
     
     
 def log_message(run_id, type_file, space_needed, space_free, conf):
