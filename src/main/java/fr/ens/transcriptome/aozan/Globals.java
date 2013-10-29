@@ -131,7 +131,7 @@ public class Globals {
 
   /** Default locale date format in the application. */
   public static final DateFormat DATE_FORMAT = new SimpleDateFormat(
-      "yyyy.MM.dd 'at' kk:mm:ss", DEFAULT_LOCALE);
+      "EEE dd MMM yyyy", DEFAULT_LOCALE);
 
   /** Format of the log. */
   public static final Formatter LOG_FORMATTER = new Formatter() {
@@ -140,8 +140,8 @@ public class Globals {
         DEFAULT_LOCALE);
 
     public String format(final LogRecord record) {
-      return record.getLevel()
-          + "\t" + df.format(new Date(record.getMillis())) + "\t"
+      return df.format(new Date(record.getMillis())) 
+          + "\t" + record.getLevel() + "\t"
           + record.getMessage() + "\n";
     }
   };
