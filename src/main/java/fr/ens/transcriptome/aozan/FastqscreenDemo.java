@@ -49,9 +49,8 @@ import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.NotFoundException;
 
-import org.python.google.common.collect.Lists;
-
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
@@ -124,7 +123,7 @@ public class FastqscreenDemo {
         // runId = "130926_SNL110_0085_AH0EYHADXX";
       }
 
-      String date = new SimpleDateFormat("yyMMdd").format(new Date());
+      date = new SimpleDateFormat("yyMMdd").format(new Date());
 
       // Copy console output in a file
       // try {
