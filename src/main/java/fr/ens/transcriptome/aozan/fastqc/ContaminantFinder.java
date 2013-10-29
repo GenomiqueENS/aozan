@@ -29,17 +29,71 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Vector;
+import java.util.logging.Logger;
 
+import fr.ens.transcriptome.aozan.Common;
+import fr.ens.transcriptome.eoulsan.util.StringUtils;
 import uk.ac.babraham.FastQC.Sequence.Contaminant.Contaminant;
+import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
 
 /**
  * Source FastQC version 0.10.0, not modify. The class version 0.10.1 doesn't
  * provide access to files in fastqc jar. Use old version. Call the method
- * instead of the true after modification of bytecode.
- * Copyright Copyright 2010-11 Simon Andrews
+ * instead of the true after modification of bytecode. Copyright Copyright
+ * 2010-11 Simon Andrews
  * @since 1.1
  */
 public class ContaminantFinder {
+
+  /** LOGGER */
+  private static final Logger LOGGER = Common.getLogger();
+
+  private static Contaminant[] contaminants;
+
+  public static ContaminantHit findContaminantHit_Aozan(String sequence) {
+
+    // Modify call Aozan method
+    if (contaminants == null) {
+      contaminants = makeContaminantList();
+    }
+
+    ContaminantHit bestHit = null;
+    OverrepresentedSequencesBlast blastInstance =
+        new OverrepresentedSequencesBlast();
+
+    for (int c = 0; c < contaminants.length; c++) {
+      ContaminantHit thisHit = contaminants[c].findMatch(sequence);
+
+      // System.out.println("Best hit from "+c+" is "+thisHit);
+
+      if (thisHit == null)
+        continue; // No hit
+
+      if (bestHit == null || thisHit.length() > bestHit.length())
+        bestHit = thisHit;
+
+    }
+
+    if (bestHit == null) {
+
+      ContaminantHit contaminantBlast =
+          blastInstance.searchSequenceInBlast(sequence);
+
+      // Catch exception
+      if (OverrepresentedSequencesBlast.throwException() != null)
+
+        LOGGER.warning("Error during find contaminant with blast : "
+            + StringUtils.join(OverrepresentedSequencesBlast.throwException()
+                .getStackTrace(), "\n\t"));
+
+      if (contaminantBlast != null)
+        bestHit = contaminantBlast;
+
+    }
+
+    return bestHit;
+
+  }
 
   public static Contaminant[] makeContaminantList() {
     Vector<Contaminant> c = new Vector<Contaminant>();

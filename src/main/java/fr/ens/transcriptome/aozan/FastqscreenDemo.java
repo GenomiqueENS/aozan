@@ -83,12 +83,13 @@ public class FastqscreenDemo {
   public static final String GENOMES_PATH = RESOURCE_ROOT + "/genomes";
 
   public static final String AOZAN_CONF =
-      "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_test.conf";
-  // "/home/sperrin/Documents/FastqScreenTest/runtst/aozan_without_fastqc.conf";
+  // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_test.conf";
+      "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_partiel_fastqc.conf";
+  // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_without_fastqc.conf";
 
   public static RunData data = null;
   public static Map<String, FastqSample> prefixList;
-  private static boolean paired = false;
+  private static boolean paired = true;
 
   static String runId;
   static String date;
@@ -100,15 +101,18 @@ public class FastqscreenDemo {
 
     try {
       Locale.setDefault(Locale.US);
-      inactiveClearMethod();
+      inactiveCollectorClearMethod();
 
       if (paired) {
         // run test pair-end
         // runId = "120830_SNL110_0055_AD16D9ACXX";
-        runId = "130801_SNL110_0079_AD2CR3ACXX";
-        runId = "131004_SNL110_0087_AD297LACXX";
-        runId = "131015_SNL110_0088_AH13M0ADXX";
+        // runId = "130801_SNL110_0079_AD2CR3ACXX";
 
+        // Mais - SR50
+        // runId = "131004_SNL110_0087_AD297LACXX";
+
+        // Validation (mm10) - PE150
+        runId = "131015_SNL110_0088_AH13M0ADXX";
       } else {
 
         // runId = "130726_SNL110_0078_AC2AJTACXX";
@@ -120,16 +124,23 @@ public class FastqscreenDemo {
         // runId = "130926_SNL110_0085_AH0EYHADXX";
       }
 
-      date = new SimpleDateFormat("yyMMdd").format(new Date());
+      String date = new SimpleDateFormat("yyMMdd").format(new Date());
 
       // Copy console output in a file
-//      try {
-//        System.setOut(new PrintStream(new FileOutputStream(new File(SRC_RUN
-//            + "/qc_" + runId + "/console_" + date + ".txt"))));
-//
-//      } catch (FileNotFoundException e1) {
-//        e1.printStackTrace();
-//      }
+      // try {
+      // System.setOut(new PrintStream(new FileOutputStream(new File(SRC_RUN
+      // + "/qc_" + runId + "/console_" + date + ".txt"))));
+      //
+      // } catch (FileNotFoundException e1) {
+      // e1.printStackTrace();
+      // }
+      try {
+        System.setOut(new PrintStream(new FileOutputStream(new File(SRC_RUN
+            + "/qc_" + runId + "/console_" + date + ".txt"))));
+
+      } catch (FileNotFoundException e1) {
+        e1.printStackTrace();
+      }
 
       Common.initLogger(TMP_DIR + "/" + runId + "_aozan_test.log");
       LOGGER.setLevel(Level.CONFIG);
@@ -181,7 +192,7 @@ public class FastqscreenDemo {
         + "_qc_tmp/" + runId + "_reportHtmlFile.html");
   }
 
-  public static void inactiveClearMethod() {
+  public static void inactiveCollectorClearMethod() {
 
     List<String> listClass = Lists.newArrayList();
     listClass
@@ -241,10 +252,28 @@ public class FastqscreenDemo {
       e.printStackTrace();
     }
 
+    // conf.put("qc.conf.read.xml.collector.used", "false");
+    conf.put("qc.conf.cluster.density.ratio", "0.3472222");
+
     System.out.println("genomes : "
         + conf.get("qc.conf.fastqscreen.genomes") + " mapping mode "
         + conf.get("qc.conf.ignore.paired.mode"));
 
     return conf;
+  }
+
+  public static Properties getPropertiesAozanConf() {
+    Map<String, String> mapConf = getMapAozanConf();
+    Properties props = new Properties();
+
+    for (final Map.Entry<String, String> e : mapConf.entrySet()) {
+
+      if (e.getKey().startsWith("qc.conf.")) {
+        // System.out.println("props " + e.getKey() + " - " + e.getValue());
+        props.put(e.getKey(), e.getValue());
+      }
+    }
+
+    return props;
   }
 }

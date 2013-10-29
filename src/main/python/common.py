@@ -67,7 +67,8 @@ def send_msg(subject, message, is_error, conf):
     if is_error:
         mail_to = conf['mail.error.to']
         
-        if mail_to == None:
+        # Mail error not define
+        if mail_to == None or mail_to == '':
             mail_to = conf['mail.to']
     else:
         mail_to = conf['mail.to']
