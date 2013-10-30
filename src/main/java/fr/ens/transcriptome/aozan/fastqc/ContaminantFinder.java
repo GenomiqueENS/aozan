@@ -31,6 +31,7 @@ import java.io.InputStreamReader;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.eoulsan.util.StringUtils;
 import uk.ac.babraham.FastQC.Sequence.Contaminant.Contaminant;
@@ -50,7 +51,7 @@ public class ContaminantFinder {
 
   private static Contaminant[] contaminants;
 
-  public static ContaminantHit findContaminantHit_Aozan(String sequence) {
+  public static ContaminantHit findContaminantHit(String sequence) {
 
     // Modify call Aozan method
     if (contaminants == null) {
@@ -58,8 +59,6 @@ public class ContaminantFinder {
     }
 
     ContaminantHit bestHit = null;
-    OverrepresentedSequencesBlast blastInstance =
-        new OverrepresentedSequencesBlast();
 
     for (int c = 0; c < contaminants.length; c++) {
       ContaminantHit thisHit = contaminants[c].findMatch(sequence);
@@ -76,23 +75,26 @@ public class ContaminantFinder {
 
     if (bestHit == null) {
 
-      ContaminantHit contaminantBlast =
-          blastInstance.searchSequenceInBlast(sequence);
+      try {
 
-      // Catch exception
-      if (OverrepresentedSequencesBlast.throwException() != null)
+        final ContaminantHit contaminantBlast =
+            OverrepresentedSequencesBlast.getInstance().blastSequence(sequence);
+
+        if (contaminantBlast != null)
+          bestHit = contaminantBlast;
+
+      } catch (IOException e) {
 
         LOGGER.warning("Error during find contaminant with blast : "
-            + StringUtils.join(OverrepresentedSequencesBlast.throwException()
-                .getStackTrace(), "\n\t"));
+            + StringUtils.join(e.getStackTrace(), "\n\t"));
+      } catch (AozanException e) {
 
-      if (contaminantBlast != null)
-        bestHit = contaminantBlast;
-
+        LOGGER.warning("Error during find contaminant with blast : "
+            + StringUtils.join(e.getStackTrace(), "\n\t"));
+      }
     }
 
     return bestHit;
-
   }
 
   public static Contaminant[] makeContaminantList() {
