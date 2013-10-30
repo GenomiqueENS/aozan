@@ -165,6 +165,7 @@ public class TileMetricsCollector implements Collector {
     private long numberCluster = 0L; // code in binary file 102
     private long numberClusterPF = 0L; // code in binary file 103
     private double prcPFClusters = 0.0;
+    @SuppressWarnings("unused")
     private Double controlLane = 0.0; // code in binary file 400
 
     private Map<Integer, Map<Integer, Double>> metricsPerTilePerCode;

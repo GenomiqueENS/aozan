@@ -25,6 +25,7 @@ package fr.ens.transcriptome.aozan;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,6 +35,8 @@ import java.util.jar.Manifest;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+
+import com.google.common.base.Charsets;
 
 import fr.ens.transcriptome.eoulsan.util.Version;
 
@@ -129,8 +132,8 @@ public class Globals {
   /** Default locale of the application. */
   public static final Locale DEFAULT_LOCALE = Locale.US;
 
-  public static final String DEFAULT_FILE_ENCODING = "UTF-8";
-  
+  public static final Charset DEFAULT_FILE_ENCODING = Charsets.UTF_8;
+
   /** Default locale date format in the application. */
   public static final DateFormat DATE_FORMAT = new SimpleDateFormat(
       "EEE dd MMM yyyy", DEFAULT_LOCALE);
@@ -142,9 +145,8 @@ public class Globals {
         DEFAULT_LOCALE);
 
     public String format(final LogRecord record) {
-      return df.format(new Date(record.getMillis())) 
-          + "\t" + record.getLevel() + "\t"
-          + record.getMessage() + "\n";
+      return df.format(new Date(record.getMillis()))
+          + "\t" + record.getLevel() + "\t" + record.getMessage() + "\n";
     }
   };
 

@@ -37,6 +37,7 @@ import com.google.common.collect.Maps;
 
 public class QCDemo {
 
+  @SuppressWarnings("unused")
   private static List<String> getRunIds(final String fastqDir) {
 
     final File[] runIdsDir = new File(fastqDir).listFiles(new FileFilter() {

@@ -35,10 +35,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -58,6 +59,7 @@ import com.google.common.collect.Maps;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.Common;
+import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 import fr.ens.transcriptome.eoulsan.util.StringUtils;
@@ -88,24 +90,28 @@ public class OverrepresentedSequencesBlast {
   public static final String KEY_STEP_BLAST_ENABLE =
       "qc.conf.step.blast.enable";
 
-  private static OverrepresentedSequencesBlast singleton;
-
-  private boolean configured;
-  private String tmpPath;
-
-  // Save sequence and result blast for the run
-  private final ConcurrentMap<String, BlastResultHit> sequencesAlreadyAnalysis =
-      Maps.newConcurrentMap();
-
   // Tag configuration general of blast
   private static final String tag_queryLength = "Iteration_query-len";
   private static final String tag_blastVersion = "BlastOutput_version";
+
+  private static OverrepresentedSequencesBlast singleton;
+
+  // Save sequence and result blast for the run
+  private final Map<String, BlastResultHit> sequencesAlreadyAnalysis = Maps
+      .newHashMap();
+
+  private boolean configured;
+  private String tmpPath;
 
   private boolean firstCall = true;
   private boolean stepEnable = false;
 
   private List<String> blastCommonCommandLine;
   private String blastVersionExpected;
+
+  //
+  // Configuration
+  //
 
   /**
    * Configure and check that blastall can be launched
@@ -129,8 +135,8 @@ public class OverrepresentedSequencesBlast {
 
       this.tmpPath = properties.getProperty(QC.TMP_DIR);
 
-      String blastPath = properties.getProperty(KEY_BLAST_PATH);
-      String blastDBPath = properties.getProperty(KEY_BLAST_PATH_DB);
+      String blastPath = properties.getProperty(KEY_BLAST_PATH).trim();
+      String blastDBPath = properties.getProperty(KEY_BLAST_PATH_DB).trim();
 
       // Check paths needed in configuration aozan
       if (blastPath == null
@@ -141,7 +147,7 @@ public class OverrepresentedSequencesBlast {
       else {
 
         try {
-          // Add arguments from configuration aozan
+          // Add arguments from configuration Aozan
           String blastArguments = properties.getProperty(KEY_BLAST_ARGUMENTS);
 
           this.blastCommonCommandLine =
@@ -182,6 +188,47 @@ public class OverrepresentedSequencesBlast {
   }
 
   /**
+   * Add in hashMap all sequences identified like to fail blastn analysis for
+   * skipping them
+   */
+  private void loadSequencesToIgnore() {
+
+    BufferedReader br = null;
+    try {
+      br =
+          new BufferedReader(new InputStreamReader(this.getClass()
+              .getResourceAsStream(SEQUENCES_NOT_USE_FILE),
+              Globals.DEFAULT_FILE_ENCODING));
+
+      String sequence = "";
+
+      while ((sequence = br.readLine()) != null) {
+
+        if (!sequence.startsWith("#"))
+          if (sequence.trim().length() > 0)
+            this.sequencesAlreadyAnalysis.put(sequence, new BlastResultHit(
+                sequence));
+
+      }
+      br.close();
+
+    } catch (IOException e) {
+
+    } finally {
+      if (br != null)
+        try {
+          br.close();
+        } catch (IOException e) {
+        }
+    }
+
+  }
+
+  //
+  // Methods to build command line
+  //
+
+  /**
    * Build the command line, part common to all sequences
    * @param blastPath path to blastall
    * @param blastDBPath path to blastn database
@@ -216,11 +263,67 @@ public class OverrepresentedSequencesBlast {
   }
 
   /**
+   * Check argument for blastn from configuration aozan. This parameters can't
+   * been modified : -d, -m, -a. The parameters are returned in a list.
+   * @param argBlast parameters for blastn
+   * @return parameters for blastn in a list
+   * @throws AozanException occurs if the parameters syntax not conforms.
+   */
+  public static List<String> checkArgBlast(final String argBlast)
+      throws AozanException {
+
+    // Check coherence with default parameter defined in Aozan
+    List<String> paramEvalue = Lists.newArrayList();
+    paramEvalue.add("-e");
+    paramEvalue.add("0.0001");
+
+    if (argBlast == null || argBlast.length() == 0)
+      return paramEvalue;
+
+    StringTokenizer tokens = new StringTokenizer(argBlast.trim(), " .,");
+    List<String> args = Lists.newArrayList();
+
+    // Set of pair tokens : first must begin with '-'
+    while (tokens.hasMoreTokens()) {
+      String param = tokens.nextToken();
+      String val = tokens.nextToken();
+
+      if (!param.startsWith("-"))
+        throw new AozanException("FastQC-step blast : parameters not conforme "
+            + argBlast);
+
+      // Parameters can not redefined
+      if (param.equals("-d")
+          || param.equals("-p") || param.equals("-m") || param.equals("-a"))
+        continue;
+
+      if (param.equals("-e")) {
+        // Replace initial value
+        paramEvalue.clear();
+        paramEvalue.add("-e");
+        paramEvalue.add(val);
+        continue;
+      }
+
+      args.add(param);
+      args.add(val);
+    }
+
+    args.addAll(paramEvalue);
+
+    return args;
+  }
+
+  //
+  // Methods to analysis sequences
+  //
+
+  /**
    * Launch blastn and parse result xml file for identify the best hit.
    * @param sequence query blastn
    * @return a ContaminantHit for the best hit return by blastn or null
    */
-  public ContaminantHit blastSequence(final String sequence)
+  public synchronized ContaminantHit blastSequence(final String sequence)
       throws IOException, AozanException {
 
     // Test if the instance has been configured
@@ -237,11 +340,13 @@ public class OverrepresentedSequencesBlast {
       blastResult = this.sequencesAlreadyAnalysis.get(sequence);
 
     else {
+
       // The sequence has not been blasted
       blastResult = blastNewSequence(sequence);
 
       // Save sequence in multithreading context
       this.sequencesAlreadyAnalysis.put(sequence, blastResult);
+
     }
 
     if (blastResult.isNull())
@@ -261,63 +366,48 @@ public class OverrepresentedSequencesBlast {
   private BlastResultHit blastNewSequence(final String sequence)
       throws IOException, AozanException {
 
-    final BlastResultHit result = new BlastResultHit(sequence);
-
     File resultXMLFile = null;
+    BlastResultHit blastResult = null;
 
+    // Create temporary file
+    resultXMLFile =
+        FileUtils.createTempFile(new File(this.tmpPath), "blast_",
+            "_result.xml");
+
+    // Check if the temporary file already exists
+    checkExistingFile(resultXMLFile,
+        "FastQC-step blast : path to output file doesn't exist for the sequence "
+            + sequence);
+
+    // Clone command line
+    final List<String> finalCommand = newArrayList(this.blastCommonCommandLine);
+
+    // Add output file result
+    finalCommand.add("-o");
+    finalCommand.add(resultXMLFile.getAbsolutePath());
+
+    // Launch blast
+    launchBlastSearch(finalCommand, sequence);
+
+    // Wait writing xml file
     try {
-
-      // Create temporary file
-      resultXMLFile =
-          FileUtils.createTempFile(new File(this.tmpPath), "blast_",
-              "_result.xml");
-
-      // Check if the temporary file already exists
-      checkExistingFile(resultXMLFile,
-          "FastQC-step blast : path to output file doesn't exist for the sequence "
-              + sequence);
-
-      // Clone command line
-      final List<String> finalCommand =
-          newArrayList(this.blastCommonCommandLine);
-
-      // Add output file result
-      finalCommand.add("-o");
-      finalCommand.add(resultXMLFile.getAbsolutePath());
-
-      // Launch blast
-      launchBlastSearch(finalCommand, sequence);
-
-      // Wait writing xml file
-      try {
-        Thread.sleep(100);
-      } catch (InterruptedException e) {
-        // Do nothing
-      }
-
-      // Parse result file if not empty
-      if (resultXMLFile.length() > 0)
-        parseDocument(result, resultXMLFile, sequence);
-
-    } catch (IOException e) {
-
-      LOGGER.severe(StringUtils.join(e.getStackTrace(), "\n\t"));
-      throw e;
-    } catch (AozanException e) {
-
-      LOGGER.severe(StringUtils.join(e.getStackTrace(), "\n\t"));
-      throw e;
-    } finally {
-
-      // Remove XML file
-      if (resultXMLFile.exists())
-        if (!resultXMLFile.delete())
-          LOGGER
-              .warning("FastQC-step blast : Can not delete xml file with result from blast : "
-                  + resultXMLFile.getAbsolutePath());
+      Thread.sleep(100);
+    } catch (InterruptedException e) {
+      // Do nothing
     }
 
-    return result;
+    // Parse result file if not empty
+    if (resultXMLFile.length() > 0)
+      blastResult = parseDocument(resultXMLFile, sequence);
+
+    // Remove XML file
+    if (resultXMLFile.exists())
+      if (!resultXMLFile.delete())
+        LOGGER
+            .warning("FastQC-step blast : Can not delete xml file with result from blast : "
+                + resultXMLFile.getAbsolutePath());
+    return blastResult;
+
   }
 
   /**
@@ -331,6 +421,7 @@ public class OverrepresentedSequencesBlast {
 
     final ProcessBuilder builder = new ProcessBuilder(cmd);
 
+    // TODO
     System.out.println(sequence
         + " -> " + Joiner.on(' ').join(builder.command()));
     Process process;
@@ -339,7 +430,9 @@ public class OverrepresentedSequencesBlast {
       process = builder.start();
 
       // Writing on standard input
-      OutputStreamWriter os = new OutputStreamWriter(process.getOutputStream());
+      Writer os =
+          new OutputStreamWriter(process.getOutputStream(),
+              Globals.DEFAULT_FILE_ENCODING);
       os.write(sequence);
       os.flush();
       os.close();
@@ -358,18 +451,21 @@ public class OverrepresentedSequencesBlast {
       // e.printStackTrace();
       throw new AozanException(e);
     }
-
   }
+
+  //
+  // Methods to parsing xml file.
+  //
 
   /**
    * Parse xml file result to identify the best hit.
-   * @param the best hit or null
    * @param resultXML result file from blastn
    * @param sequence query blastn
+   * @return the best hit or null
    * @throws AozanException occurs if the parsing fails.
    */
-  private void parseDocument(final BlastResultHit blastResult,
-      final File resultXML, final String sequence) throws AozanException {
+  private BlastResultHit parseDocument(final File resultXML,
+      final String sequence) throws AozanException {
 
     InputStream is = null;
     try {
@@ -388,10 +484,10 @@ public class OverrepresentedSequencesBlast {
       // Parse general information on blastn
       parseHeaderDocument(doc);
 
-      // Search the best hit
-      parseHit(blastResult, doc, sequence);
-
       is.close();
+      // Search the best hit
+      return parseHit(doc, sequence);
+
     } catch (IOException e) {
       throw new AozanException(e);
     } catch (SAXException e) {
@@ -403,7 +499,6 @@ public class OverrepresentedSequencesBlast {
       try {
         is.close();
       } catch (IOException e) {
-        // e.printStackTrace();
       }
     }
   }
@@ -452,12 +547,11 @@ public class OverrepresentedSequencesBlast {
 
   /**
    * Search hit in xml result file.
-   * @param best hit contained in xml file or null
    * @param doc root of the xml file
    * @param sequence query blastn
+   * @return best hit contained in xml file or null
    */
-  private void parseHit(final BlastResultHit blastResult, final Document doc,
-      final String sequence) {
+  private BlastResultHit parseHit(final Document doc, final String sequence) {
 
     List<Element> responses = XMLUtils.getElementsByTagName(doc, "Iteration");
     Element elemIteration = responses.get(0);
@@ -470,98 +564,10 @@ public class OverrepresentedSequencesBlast {
 
     // No hit found
     if (countHits == 0)
-      return;
+      return null;
 
-    // Parse the document
-    blastResult.addHitData(hits.get(0), countHits, queryLength);
-
-  }
-
-  /**
-   * Check argument for blastn from configuration aozan. This parameters can't
-   * been modified : -d, -m, -a. The parameters are returned in a list.
-   * @param argBlast parameters for blastn
-   * @return parameters for blastn in a list
-   * @throws AozanException occurs if the parameters syntax not conforms.
-   */
-  public static List<String> checkArgBlast(final String argBlast)
-      throws AozanException {
-
-    // Check coherence with default parameter defined in Aozan
-    List<String> paramEvalue = Lists.newArrayList();
-    paramEvalue.add("-e");
-    paramEvalue.add("0.0001");
-
-    if (argBlast == null || argBlast.length() == 0)
-      return paramEvalue;
-
-    StringTokenizer tokens = new StringTokenizer(argBlast.trim(), " .,");
-    List<String> args = Lists.newArrayList();
-
-    // Set of pair tokens : first must begin with '-'
-    while (tokens.hasMoreTokens()) {
-      String param = tokens.nextToken();
-      String val = tokens.nextToken();
-
-      if (!param.startsWith("-"))
-        throw new AozanException("FastQC-step blast : parameters not conforme "
-            + argBlast);
-
-      // Parameters can not redefine
-      if (param.equals("-d")
-          || param.equals("-p") || param.equals("-m") || param.equals("-a"))
-        continue;
-
-      if (param.equals("-e")) {
-        // Replace initial value
-        paramEvalue.clear();
-        paramEvalue.add("-e");
-        paramEvalue.add(val);
-        continue;
-      }
-
-      args.add(param);
-      args.add(val);
-    }
-
-    args.addAll(paramEvalue);
-
-    return args;
-  }
-
-  /**
-   * Add in hashMap all sequences identified like to fail blastn analysis for
-   * skipping them
-   */
-  private void loadSequencesToIgnore() {
-
-    BufferedReader br = null;
-    try {
-      br =
-          new BufferedReader(new InputStreamReader(this.getClass()
-              .getResourceAsStream(SEQUENCES_NOT_USE_FILE)));
-
-      String sequence = "";
-
-      while ((sequence = br.readLine()) != null) {
-
-        if (!sequence.startsWith("#"))
-          if (sequence.trim().length() > 0)
-            this.sequencesAlreadyAnalysis.put(sequence, new BlastResultHit(
-                sequence));
-
-      }
-      br.close();
-
-    } catch (IOException e) {
-
-    } finally {
-      if (br != null)
-        try {
-          br.close();
-        } catch (IOException e) {
-        }
-    }
+    // Parse the first hit to build result
+    return new BlastResultHit(hits.get(0), countHits, queryLength, sequence);
 
   }
 
@@ -573,7 +579,7 @@ public class OverrepresentedSequencesBlast {
    * Get the singleton instance.
    * @return the unique instance of the class
    */
-  public static final OverrepresentedSequencesBlast getInstance() {
+  public static synchronized final OverrepresentedSequencesBlast getInstance() {
 
     if (singleton == null)
       singleton = new OverrepresentedSequencesBlast();

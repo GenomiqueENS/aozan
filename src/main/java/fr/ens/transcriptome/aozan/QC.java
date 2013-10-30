@@ -23,14 +23,11 @@
 
 package fr.ens.transcriptome.aozan;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +38,7 @@ import java.util.logging.Logger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.collectors.CollectorRegistry;
@@ -186,8 +184,7 @@ public class QC {
 
     try {
       final Writer writer =
-          new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-              outputFile), Globals.DEFAULT_FILE_ENCODING));
+          Files.newWriter(outputFile, Globals.DEFAULT_FILE_ENCODING);
 
       writer.write(report.toXML());
 
@@ -226,7 +223,8 @@ public class QC {
 
     } finally {
       try {
-        is.close();
+        if (is != null)
+          is.close();
       } catch (IOException e) {
       }
     }
@@ -244,8 +242,7 @@ public class QC {
 
     try {
       final Writer writer =
-          new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-              outputFile), Globals.DEFAULT_FILE_ENCODING));
+          Files.newWriter(outputFile, Globals.DEFAULT_FILE_ENCODING);
 
       writer.write(report.export(xslIs));
 
@@ -281,8 +278,7 @@ public class QC {
 
     try {
       final Writer writer =
-          new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-              outputFile), Globals.DEFAULT_FILE_ENCODING));
+          Files.newWriter(outputFile, Globals.DEFAULT_FILE_ENCODING);
 
       writer.write(report.getData().toString());
 

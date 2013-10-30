@@ -130,6 +130,7 @@ public class IlluminaIntensityMetrics {
 
     // Read date/time for CIF creation, not used
     // TODO get date create cif file to finalize
+    @SuppressWarnings("unused")
     ByteBuffer buf = bb.get(new byte[8]);
 
   }

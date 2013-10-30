@@ -23,7 +23,6 @@
 
 package fr.ens.transcriptome.aozan.fastqc;
 
-import static fr.ens.transcriptome.aozan.util.XMLUtilsParser.extractFirstValueToDouble;
 import static fr.ens.transcriptome.aozan.util.XMLUtilsParser.extractFirstValueToInt;
 import static fr.ens.transcriptome.aozan.util.XMLUtilsParser.extractFirstValueToString;
 
@@ -49,22 +48,18 @@ class BlastResultHit {
 
   // print version blast BlastOutput_version
   private static final String tag_hitDef = "Hit_def";
-  private static final String tag_hspBitScore = "Hsp_bit-score";
   private static final String tag_hspEValue = "Hsp_evalue";
   private static final String tag_hspIdentity = "Hsp_identity";
   private static final String tag_hspAlignLen = "Hsp_align-len";
-  private static final String tag_hspQseq = "Hsp_qseq";
 
   private final String sequence;
 
   private int queryLength;
   private String result;
-  private double hspBitScore;
   private String hspEValue;
   private int hspIdentity;
   private int hspAlignLen;
   private int countHits;
-  private String qSeq;
   private int prcIdentity;
   private int queryCover;
 
@@ -76,7 +71,7 @@ class BlastResultHit {
    * @param countHits number hits retrieved by blast
    * @param queryLength number base in sequence query
    */
-  public void addHitData(Element firstHit, final int countHits,
+  private void addHitData(Element firstHit, final int countHits,
       final int queryLength) {
 
     // No hit found for this sequence
@@ -87,15 +82,14 @@ class BlastResultHit {
     this.countHits = countHits;
 
     this.result = extractFirstValueToString(firstHit, tag_hitDef);
-    this.hspBitScore = extractFirstValueToDouble(firstHit, tag_hspBitScore);
     this.hspEValue = extractFirstValueToString(firstHit, tag_hspEValue);
     this.hspIdentity = extractFirstValueToInt(firstHit, tag_hspIdentity);
     this.hspAlignLen = extractFirstValueToInt(firstHit, tag_hspAlignLen);
-    this.qSeq = extractFirstValueToString(firstHit, tag_hspQseq);
+    int countGap = queryLength - hspAlignLen;
+
     this.prcIdentity =
         (int) ((double) this.hspIdentity / this.queryLength * 100);
 
-    int countGap = queryLength - hspAlignLen;
     this.queryCover = (int) ((double) countGap / this.queryLength * 100);
 
     this.isNull = false;

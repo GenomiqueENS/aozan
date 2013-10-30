@@ -47,7 +47,6 @@ import uk.ac.babraham.FastQC.Modules.PerSequenceGCContent;
 import uk.ac.babraham.FastQC.Modules.PerSequenceQualityScores;
 import uk.ac.babraham.FastQC.Modules.QCModule;
 import uk.ac.babraham.FastQC.Modules.SequenceLengthDistribution;
-import uk.ac.babraham.FastQC.Report.HTMLReportArchive;
 import uk.ac.babraham.FastQC.Sequence.Sequence;
 import uk.ac.babraham.FastQC.Sequence.SequenceFactory;
 import uk.ac.babraham.FastQC.Sequence.SequenceFile;

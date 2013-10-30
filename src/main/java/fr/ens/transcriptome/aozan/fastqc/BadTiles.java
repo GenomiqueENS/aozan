@@ -83,6 +83,7 @@ public class BadTiles implements QCModule {
       }
     }
 
+    @SuppressWarnings("unused")
     public long getTotalCount() {
       return totalCounts;
     }
@@ -113,6 +114,7 @@ public class BadTiles implements QCModule {
 
     }
 
+    @SuppressWarnings("unused")
     public double getMean(int offset) {
       long total = 0;
       long count = 0;
@@ -152,6 +154,8 @@ public class BadTiles implements QCModule {
   }
 
   private class ResultsTable extends AbstractTableModel {
+
+    private static final long serialVersionUID = 1L;
 
     public int getColumnCount() {
       return 4;
@@ -244,13 +248,37 @@ public class BadTiles implements QCModule {
     }
 
     @Override
-    public boolean equals(final Object obj) {
-      if (obj instanceof BadTile) {
-        BadTile that = (BadTile) obj;
-        return this.compareTo(that) == 0;
-      }
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + cycle;
+      result = prime * result + lane;
+      long temp;
+      temp = Double.doubleToLongBits(medianScore);
+      result = prime * result + (int) (temp ^ (temp >>> 32));
+      result = prime * result + tile;
+      return result;
+    }
 
-      return false;
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      BadTile other = (BadTile) obj;
+      if (cycle != other.cycle)
+        return false;
+      if (lane != other.lane)
+        return false;
+      if (Double.doubleToLongBits(medianScore) != Double
+          .doubleToLongBits(other.medianScore))
+        return false;
+      if (tile != other.tile)
+        return false;
+      return true;
     }
 
     @Override

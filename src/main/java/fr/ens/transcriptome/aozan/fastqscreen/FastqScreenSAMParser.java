@@ -268,9 +268,6 @@ public class FastqScreenSAMParser implements SAMParserLine {
 
     this.mapOutputFile = mapOutputFile;
     this.fw =
-        new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-            this.mapOutputFile), Globals.DEFAULT_FILE_ENCODING));
-
+        Files.newWriter(this.mapOutputFile, Globals.DEFAULT_FILE_ENCODING);
   }
-
 }

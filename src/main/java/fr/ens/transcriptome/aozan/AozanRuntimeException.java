@@ -40,6 +40,8 @@ public class AozanRuntimeException extends RuntimeException {
   // Constructors
   //
 
+  private static final long serialVersionUID = 1L;
+
   /**
    * Create a new AozanRuntimeException with a message.
    * @param message the message

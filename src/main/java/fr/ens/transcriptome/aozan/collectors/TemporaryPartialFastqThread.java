@@ -26,19 +26,18 @@ package fr.ens.transcriptome.aozan.collectors;
 
 import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
@@ -163,8 +162,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
     Writer fwTmpFastq = null;
     try {
       fwTmpFastq =
-          new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-              this.tmpFastqFile), Globals.DEFAULT_FILE_ENCODING));
+          Files.newWriter(this.tmpFastqFile, Globals.DEFAULT_FILE_ENCODING);
 
       final int step =
           (int) (1 / ((double) countReadsPFtoCopy / pfClusterCountParsed));
@@ -267,8 +265,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
 
     try {
       fwTmpFastq =
-          new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-              this.tmpFastqFile), Globals.DEFAULT_FILE_ENCODING));
+          Files.newWriter(this.tmpFastqFile, Globals.DEFAULT_FILE_ENCODING);
 
       final int step =
           (int) (1 / ((double) countReadsPFtoCopy / this.rawClusterCount));

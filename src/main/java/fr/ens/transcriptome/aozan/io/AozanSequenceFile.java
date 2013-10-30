@@ -25,11 +25,8 @@ package fr.ens.transcriptome.aozan.io;
 
 import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -40,6 +37,7 @@ import uk.ac.babraham.FastQC.Sequence.SequenceFile;
 import uk.ac.babraham.FastQC.Sequence.SequenceFormatException;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
@@ -159,9 +157,7 @@ public class AozanSequenceFile implements SequenceFile {
     this.fastqSample = fastqSample;
 
     try {
-      this.fw =
-          new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-              this.tmpFile), Globals.DEFAULT_FILE_ENCODING));
+      this.fw = Files.newWriter(this.tmpFile, Globals.DEFAULT_FILE_ENCODING);
 
       this.seqFile = SequenceFactory.getSequenceFile(files);
 

@@ -154,14 +154,15 @@ public class FastqScreenResult {
 
     } catch (FileNotFoundException e) {
       throw new AozanException(e);
-    
+
     } finally {
       try {
-        is.close();
+        if (is != null)
+          is.close();
       } catch (IOException e) {
       }
     }
-    
+
     return toXML(fastqSample, data, genomeSample, is);
   }
 

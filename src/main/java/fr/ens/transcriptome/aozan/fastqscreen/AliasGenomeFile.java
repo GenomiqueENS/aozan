@@ -24,19 +24,15 @@
 package fr.ens.transcriptome.aozan.fastqscreen;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.Globals;
 
@@ -114,8 +110,7 @@ public class AliasGenomeFile {
       if (aliasGenomeFile.exists()) {
 
         final BufferedReader br =
-            new BufferedReader(new InputStreamReader(new FileInputStream(
-                aliasGenomeFile), Globals.DEFAULT_FILE_ENCODING));
+            Files.newReader(aliasGenomeFile, Globals.DEFAULT_FILE_ENCODING);
 
         String line = null;
 
@@ -157,8 +152,7 @@ public class AliasGenomeFile {
       if (aliasGenomeFile.exists()) {
 
         final Writer fw =
-            new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                aliasGenomeFile, true), Globals.DEFAULT_FILE_ENCODING));
+            Files.newWriter(aliasGenomeFile, Globals.DEFAULT_FILE_ENCODING);
 
         for (String genomeSample : genomesToAdd)
           fw.write(genomeSample + "=\n");

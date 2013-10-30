@@ -27,12 +27,7 @@ import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,6 +48,7 @@ import javassist.NotFoundException;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
@@ -87,7 +83,7 @@ public class FastqscreenDemo {
       "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_test.conf";
 
   public static Map<String, FastqSample> prefixList;
-  private static boolean paired = true;
+  private static boolean paired = false;
 
   private static String runId;
   private static String date;
@@ -132,14 +128,6 @@ public class FastqscreenDemo {
       // } catch (FileNotFoundException e1) {
       // e1.printStackTrace();
       // }
-      try {
-        System.setOut(new PrintStream(new FileOutputStream(new File(SRC_RUN
-            + "/qc_" + runId + "/console_" + date + ".txt",
-            Globals.DEFAULT_FILE_ENCODING))));
-
-      } catch (FileNotFoundException e1) {
-        e1.printStackTrace();
-      }
 
       Common.initLogger(TMP_DIR + "/" + runId + "_aozan_test.log");
       LOGGER.setLevel(Level.CONFIG);
@@ -169,6 +157,7 @@ public class FastqscreenDemo {
 
   }
 
+  @SuppressWarnings("unused")
   public static void reportQC2() throws AozanException {
 
     qcDir = SRC_RUN + "/qc_" + runId + "/" + runId;
@@ -227,9 +216,8 @@ public class FastqscreenDemo {
     String line;
     try {
       Reader aozanConf =
-          new BufferedReader(new InputStreamReader(new FileInputStream(
-              AOZAN_CONF), Globals.DEFAULT_FILE_ENCODING));
-      
+          Files.newReader(new File(AOZAN_CONF), Globals.DEFAULT_FILE_ENCODING);
+
       BufferedReader br = new BufferedReader(aozanConf);
 
       while ((line = br.readLine()) != null) {
