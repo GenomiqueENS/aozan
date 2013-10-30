@@ -11,3 +11,5 @@
 /maven-eclipse.xml
 
 /install.sh
+
+/src/main/java/fr/ens/transcriptome/aozan/collectors/interop/TestCollectorReadBinary.java

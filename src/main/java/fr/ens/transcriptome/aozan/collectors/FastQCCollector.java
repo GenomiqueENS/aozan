@@ -105,8 +105,9 @@ public class FastQCCollector extends AbstractFastqCollector {
     }
 
     // Check if step blast needed and configure
-    OverrepresentedSequencesBlast.configure(properties);
-    isStepBlastEnable = OverrepresentedSequencesBlast.isStepBlastEnable();
+    OverrepresentedSequencesBlast.getInstance().configure(properties);
+    this.isStepBlastEnable =
+        OverrepresentedSequencesBlast.getInstance().isStepBlastEnable();
 
   }
 
@@ -115,7 +116,7 @@ public class FastQCCollector extends AbstractFastqCollector {
 
     // Rewriting code of the method ContaminantFinder for read the contaminant
     // list in fastqc-0.10.1 jar
-    RuntimePatchFastQC.runPatchFastQC(isStepBlastEnable);
+    RuntimePatchFastQC.runPatchFastQC(this.isStepBlastEnable);
 
     super.collect(data);
   }
