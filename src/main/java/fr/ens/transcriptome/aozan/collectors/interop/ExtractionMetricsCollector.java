@@ -251,7 +251,7 @@ public class ExtractionMetricsCollector implements Collector {
           new StatisticsUtils(intensityCycle1ValuesPerTile.values());
 
       // TODO to check, used only intensity for the base A
-      this.intensityCycle1 = new Double(statCycle1.getMean()).intValue();
+      this.intensityCycle1 = statCycle1.getMean().intValue();
 
       // intensityCycle1 somme intensity / compt(tile) / 4
       this.intensityCycle1SD = statCycle1.getStandardDeviation();

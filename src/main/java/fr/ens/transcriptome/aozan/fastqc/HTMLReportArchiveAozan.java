@@ -35,6 +35,7 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -44,6 +45,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import fr.ens.transcriptome.aozan.Globals;
 import uk.ac.babraham.FastQC.FastQCApplication;
 import uk.ac.babraham.FastQC.Modules.QCModule;
 import uk.ac.babraham.FastQC.Report.HTMLReportArchive;
@@ -63,7 +65,7 @@ public class HTMLReportArchiveAozan extends HTMLReportArchive {
   private ZipOutputStream zip;
   private SequenceFile sequenceFile;
   private byte[] buffer = new byte[1024];
-  private File file;
+  private final File file;
 
   private void unzipZipFile(File file) throws IOException {
     ZipFile zipFile = new ZipFile(file);
@@ -283,9 +285,10 @@ public class HTMLReportArchiveAozan extends HTMLReportArchive {
 
     // VERSION FastQC 0.10.0
     BufferedReader br =
-        new BufferedReader(new InputStreamReader(
-            ClassLoader
-                .getSystemResourceAsStream("Templates/header_template.html")));
+        new BufferedReader(
+            new InputStreamReader(ClassLoader
+                .getSystemResourceAsStream("Templates/header_template.html"),
+                Globals.DEFAULT_FILE_ENCODING));
 
     String line;
     while ((line = br.readLine()) != null) {
@@ -311,7 +314,8 @@ public class HTMLReportArchiveAozan extends HTMLReportArchive {
     super(null, null, null);
 
     this.sequenceFile = sequenceFile;
-    this.modules = modules;
+    this.modules = Arrays.copyOf(modules, modules.length);
+
     this.file = file;
     zip = new ZipOutputStream(new FileOutputStream(file));
     zip.putNextEntry(new ZipEntry(folderName() + "/"));

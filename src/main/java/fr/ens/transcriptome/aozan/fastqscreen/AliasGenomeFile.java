@@ -24,15 +24,21 @@
 package fr.ens.transcriptome.aozan.fastqscreen;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
+import fr.ens.transcriptome.aozan.Globals;
 
 /**
  * This class read the alias genome file. It make correspondence between genome
@@ -108,7 +114,9 @@ public class AliasGenomeFile {
       if (aliasGenomeFile.exists()) {
 
         final BufferedReader br =
-            new BufferedReader(new FileReader(aliasGenomeFile));
+            new BufferedReader(new InputStreamReader(new FileInputStream(
+                aliasGenomeFile), Globals.DEFAULT_FILE_ENCODING));
+
         String line = null;
 
         while ((line = br.readLine()) != null) {
@@ -148,7 +156,9 @@ public class AliasGenomeFile {
     try {
       if (aliasGenomeFile.exists()) {
 
-        final FileWriter fw = new FileWriter(aliasGenomeFile, true);
+        final Writer fw =
+            new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+                aliasGenomeFile, true), Globals.DEFAULT_FILE_ENCODING));
 
         for (String genomeSample : genomesToAdd)
           fw.write(genomeSample + "=\n");

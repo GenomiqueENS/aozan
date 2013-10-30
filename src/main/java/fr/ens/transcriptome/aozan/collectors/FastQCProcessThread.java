@@ -245,7 +245,9 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
     // Keep only the uncompressed data
     if (reportFile.exists()) {
 
-      reportFile.delete();
+      if (! reportFile.delete())
+        LOGGER.warning("FastQC : fail delete report "
+            + reportFile.getAbsolutePath());
     }
   }
 

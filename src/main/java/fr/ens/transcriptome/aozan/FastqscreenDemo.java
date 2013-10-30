@@ -27,11 +27,13 @@ import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -49,9 +51,8 @@ import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.NotFoundException;
 
-import org.python.google.common.collect.Lists;
-
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
@@ -83,17 +84,14 @@ public class FastqscreenDemo {
   public static final String GENOMES_PATH = RESOURCE_ROOT + "/genomes";
 
   public static final String AOZAN_CONF =
-  // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_test.conf";
-      "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_partiel_fastqc.conf";
-  // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_without_fastqc.conf";
+      "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_test.conf";
 
-  public static RunData data = null;
   public static Map<String, FastqSample> prefixList;
   private static boolean paired = true;
 
-  static String runId;
-  static String date;
-  static String qcDir;
+  private static String runId;
+  private static String date;
+  private static String qcDir;
 
   public static final void main(String[] args) {
 
@@ -124,7 +122,7 @@ public class FastqscreenDemo {
         // runId = "130926_SNL110_0085_AH0EYHADXX";
       }
 
-      String date = new SimpleDateFormat("yyMMdd").format(new Date());
+      date = new SimpleDateFormat("yyMMdd").format(new Date());
 
       // Copy console output in a file
       // try {
@@ -136,7 +134,8 @@ public class FastqscreenDemo {
       // }
       try {
         System.setOut(new PrintStream(new FileOutputStream(new File(SRC_RUN
-            + "/qc_" + runId + "/console_" + date + ".txt"))));
+            + "/qc_" + runId + "/console_" + date + ".txt",
+            Globals.DEFAULT_FILE_ENCODING))));
 
       } catch (FileNotFoundException e1) {
         e1.printStackTrace();
@@ -219,10 +218,6 @@ public class FastqscreenDemo {
     }
   }
 
-  public static RunData getRunData() {
-    return data;
-  }
-
   public static Properties getPropertiesDemo() {
     return properties;
   }
@@ -231,7 +226,10 @@ public class FastqscreenDemo {
     Map<String, String> conf = new LinkedHashMap<String, String>();
     String line;
     try {
-      FileReader aozanConf = new FileReader(AOZAN_CONF);
+      Reader aozanConf =
+          new BufferedReader(new InputStreamReader(new FileInputStream(
+              AOZAN_CONF), Globals.DEFAULT_FILE_ENCODING));
+      
       BufferedReader br = new BufferedReader(aozanConf);
 
       while ((line = br.readLine()) != null) {

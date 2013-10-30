@@ -150,7 +150,10 @@ class UncompressFastqThread extends AbstractFastqProcessThread {
     sizeFile = sizeFile / (1024 * 1024 * 1024);
 
     // Rename file for remove '.tmp' final
-    tmpFastqFile.renameTo(new File(fastqStorage.getTemporaryFile(fastqSample)));
+    if (!tmpFastqFile.renameTo(new File(fastqStorage
+        .getTemporaryFile(fastqSample))))
+      LOGGER.warning("Uncompress Fastq : fail to rename tmp fastq file "
+          + fastqSample);
 
   }
 

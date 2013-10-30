@@ -32,6 +32,7 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.Common;
+import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.eoulsan.util.StringUtils;
 import uk.ac.babraham.FastQC.Sequence.Contaminant.Contaminant;
 import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
@@ -111,7 +112,9 @@ public class ContaminantFinder {
                 .getSystemResourceAsStream("Contaminants/contaminant_list.txt");
       }
 
-      BufferedReader br = new BufferedReader(new InputStreamReader(is));
+      BufferedReader br =
+          new BufferedReader(new InputStreamReader(is,
+              Globals.DEFAULT_FILE_ENCODING));
 
       String line;
       while ((line = br.readLine()) != null) {

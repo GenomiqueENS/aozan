@@ -26,6 +26,7 @@ package fr.ens.transcriptome.aozan.collectors.interop;
 import static fr.ens.transcriptome.aozan.collectors.interop.AbstractBinaryFileReader.uShortToInt;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
  * This internal class save a record from ExtractionMetricsOut.bin file,
@@ -82,7 +83,7 @@ public class IlluminaIntensityMetrics {
    * @return float array with the fwhm scores of each channel
    */
   public float[] getFwhm() {
-    return fwhm;
+    return Arrays.copyOf(fwhm, fwhm.length);
   }
 
   /**
@@ -90,7 +91,7 @@ public class IlluminaIntensityMetrics {
    * @return float array with the raw intensities of each channel
    */
   public int[] getIntensities() {
-    return intensities;
+    return Arrays.copyOf(intensities, intensities.length);
   }
 
   /**

@@ -290,7 +290,7 @@ public class OverrepresentedSequencesBlast {
       } finally {
 
         // Remove XML file
-        if (resultXML.exists())
+        if (resultXML != null && resultXML.exists())
           if (!resultXML.delete())
             LOGGER
                 .warning("FastQC-step blast : Can not delete xml file with result from blast : "

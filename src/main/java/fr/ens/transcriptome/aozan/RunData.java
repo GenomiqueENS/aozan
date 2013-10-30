@@ -28,9 +28,11 @@ import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingFile;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Collection;
 import java.util.Map;
 
@@ -190,8 +192,8 @@ public class RunData {
 
     if (strings == null)
       put(key, (String) null);
-
-    put(key, Joiner.on(',').join(strings));
+    else
+      put(key, Joiner.on(',').join(strings));
   }
 
   /**
@@ -203,8 +205,8 @@ public class RunData {
 
     if (strings == null)
       put(key, (String) null);
-
-    put(key, Joiner.on(',').join(strings));
+    else
+      put(key, Joiner.on(',').join(strings));
   }
 
   /**
@@ -271,7 +273,9 @@ public class RunData {
 
     BufferedWriter bw;
 
-    bw = new BufferedWriter(new FileWriter(fileName));
+    bw =
+        new BufferedWriter(new OutputStreamWriter(
+            new FileOutputStream(fileName), Globals.DEFAULT_FILE_ENCODING));
     bw.write(this.toString());
     bw.close();
 
@@ -298,7 +302,9 @@ public class RunData {
 
     checkExistingFile(file, " rundata file doesn't exist");
 
-    final BufferedReader br = new BufferedReader(new FileReader(file));
+    final BufferedReader br =
+        new BufferedReader(new InputStreamReader(new FileInputStream(file),
+            Globals.DEFAULT_FILE_ENCODING));
 
     String line = null;
 
@@ -345,7 +351,8 @@ public class RunData {
     if (file == null)
       throw new NullPointerException("The file parameter is null");
 
-    final BufferedReader br = new BufferedReader(new FileReader(file));
+    final BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file),
+        Globals.DEFAULT_FILE_ENCODING));
 
     String line = null;
 

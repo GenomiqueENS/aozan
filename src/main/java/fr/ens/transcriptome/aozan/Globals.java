@@ -129,6 +129,8 @@ public class Globals {
   /** Default locale of the application. */
   public static final Locale DEFAULT_LOCALE = Locale.US;
 
+  public static final String DEFAULT_FILE_ENCODING = "UTF-8";
+  
   /** Default locale date format in the application. */
   public static final DateFormat DATE_FORMAT = new SimpleDateFormat(
       "EEE dd MMM yyyy", DEFAULT_LOCALE);

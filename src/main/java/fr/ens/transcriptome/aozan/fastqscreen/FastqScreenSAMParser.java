@@ -24,11 +24,14 @@
 package fr.ens.transcriptome.aozan.fastqscreen;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +42,7 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
+import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.eoulsan.bio.SAMParserLine;
 import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.MultiReadAlignmentsFilter;
 import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.ReadAlignmentsFilter;
@@ -55,7 +59,7 @@ public class FastqScreenSAMParser implements SAMParserLine {
 
   private File mapOutputFile = null;
   private String genome;
-  private FileWriter fw;
+  private Writer fw;
 
   private final List<String> genomeDescriptionList;
   private final SAMParser parser;
@@ -130,7 +134,9 @@ public class FastqScreenSAMParser implements SAMParserLine {
         }
       }
       buffer.addAlignment(samRecord);
-      records.clear();
+
+      if (records != null)
+        records.clear();
     }
 
   }
@@ -261,7 +267,9 @@ public class FastqScreenSAMParser implements SAMParserLine {
     this.genomeDescriptionList = new ArrayList<String>();
 
     this.mapOutputFile = mapOutputFile;
-    this.fw = new FileWriter(this.mapOutputFile);
+    this.fw =
+        new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+            this.mapOutputFile), Globals.DEFAULT_FILE_ENCODING));
 
   }
 

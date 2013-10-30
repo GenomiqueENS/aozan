@@ -139,7 +139,9 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
               + "/" + this.fastqSample.getPrefixRead2() + "-fastqscreen.csv");
 
       if (fileR2.exists())
-        fileR2.delete();
+        if (!fileR2.delete())
+          LOGGER.warning("Fastqscreen : fail delete report "
+              + fileR2.getAbsolutePath());
 
       FileUtils.copyFile(file, fileR2);
     }
@@ -169,7 +171,9 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
               + "/" + this.fastqSample.getPrefixRead2() + "-fastqscreen.html");
 
       if (fileR2.exists())
-        fileR2.delete();
+        if (!fileR2.delete())
+          LOGGER.warning("Fastqscreen : fail delete report "
+              + fileR2.getAbsolutePath());
 
       FileUtils.copyFile(file, fileR2);
 
