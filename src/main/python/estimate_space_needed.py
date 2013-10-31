@@ -56,7 +56,7 @@ def estimate(run_id, conf):
     
     # check if free space is available
     if (hiseq_space_needed > hiseq_space_free) or (hiseq_space_remaining_not_enough):
-        error(run_id, 'hiseq files', hiseq_space_needed, hiseq_space_free, hiseq_space_remaining_not_enough, conf['hiseq.data.path'], conf)
+        error(run_id, 'hiseq files', hiseq_space_needed, hiseq_space_free, conf['hiseq.data.path'], conf)
     else:
         log_message(run_id, 'hiseq files', hiseq_space_needed, hiseq_space_free, conf)
     
@@ -77,7 +77,7 @@ def estimate(run_id, conf):
     
     # check if free space is available
     if (bcl_space_needed > bcl_space_free) or (bcl_space_remaining_not_enough):
-        error(run_id, 'bcl files', bcl_space_needed, bcl_space_free, bcl_space_remaining_not_enough, conf['bcl.data.path'], conf)
+        error(run_id, 'bcl files', bcl_space_needed, bcl_space_free, conf['bcl.data.path'], conf)
     else:
         log_message(run_id, 'bcl files', bcl_space_needed, bcl_space_free, conf)
     
@@ -92,13 +92,13 @@ def estimate(run_id, conf):
     
     # check if free space is available
     if (fastq_space_needed > fastq_space_free) or (fastq_space_remaining_not_enough):
-        error(run_id, 'fastq files', fastq_space_needed, fastq_space_free, fastq_space_remaining_not_enough, conf) 
+        error(run_id, 'fastq files', fastq_space_needed, fastq_space_free, conf['fastq.data.path'], conf) 
     else:
-        log_message(run_id, 'fastq files', fastq_space_needed, fastq_space_free, conf['fastq.data.path'], conf) 
+        log_message(run_id, 'fastq files', fastq_space_needed, fastq_space_free,  conf) 
 
 
   
-def error(run_id, type_file, space_needed, space_free, space_remaining_not_enough, dir_path, conf):
+def error(run_id, type_file, space_needed, space_free, dir_path, conf):
     """Error handling.
 
     Arguments:
@@ -106,7 +106,6 @@ def error(run_id, type_file, space_needed, space_free, space_remaining_not_enoug
         type_file: type file concerned
         space_needed: space needed for the run for a type of data
         space_free: space free for the run for a type of data
-        space_remaining_not_enough: true if remaining space in directory at the end is estimated inferior at 5%
         dir_path: directory path
         conf: configuration dictionary
     """
@@ -116,9 +115,6 @@ def error(run_id, type_file, space_needed, space_free, space_remaining_not_enoug
     message = message + '%.2f GB' % (space_needed / 1024 / 1024 / 1024) + ' is needed by Aozan'
     message = message + ' however only %.2f GB' % (space_free / 1024 / 1024 / 1024) + ' of free space is currently available on this storage.'
     
-    if space_remaining_not_enough:
-        message = message + 'Remaining space in the directory at the end is estimated inferior at 5 percent'
-        
     # send warning mail
     common.error('[Aozan] Estimate space needed : ' + short_message, message, conf['aozan.var.path'] + '/space_estimated.lasterr', conf)
     
