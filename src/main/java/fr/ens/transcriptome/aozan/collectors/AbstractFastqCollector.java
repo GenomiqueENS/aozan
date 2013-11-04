@@ -396,7 +396,7 @@ abstract public class AbstractFastqCollector implements Collector {
 
             } else {
               // if success, save results
-              if (!st.isDataSave()) {
+              if (!st.isDataSaved()) {
                 saveResultPart(st.getFastqSample(), st.getResults());
                 st.setDataSave();
               }
@@ -411,6 +411,7 @@ abstract public class AbstractFastqCollector implements Collector {
 
         } else {
           samplesNotProcessed++;
+
         }
 
       }
