@@ -104,7 +104,7 @@ public class OverrepresentedSequencesBlast {
   private String tmpPath;
 
   private boolean firstCall = true;
-  private boolean stepEnable = false;
+  private boolean stepEnabled = false;
 
   private List<String> blastCommonCommandLine;
   private String blastVersionExpected;
@@ -123,11 +123,11 @@ public class OverrepresentedSequencesBlast {
       throw new AozanRuntimeException(
           "OverrepresentedSequencesBlast has been already configured");
 
-    this.stepEnable =
+    this.stepEnabled =
         Boolean.parseBoolean(properties.getProperty(KEY_STEP_BLAST_ENABLE)
             .trim().toLowerCase());
 
-    if (this.stepEnable) {
+    if (this.stepEnabled) {
 
       // Check parameters
       this.blastVersionExpected =
@@ -141,10 +141,21 @@ public class OverrepresentedSequencesBlast {
       // Check paths needed in configuration aozan
       if (blastPath == null
           || blastPath.trim().length() == 0 || blastDBPath == null
-          || blastDBPath.trim().length() == 0)
-        this.stepEnable = false;
+          || blastDBPath.trim().length() == 0) {
+        LOGGER.warning("Empty or incompleted configuration for Blast detected."
+            + " Blast will not be used");
+        this.stepEnabled = false;
+      }
 
-      else {
+      // Check if blast is installed
+      if (!new File(blastPath).exists()) {
+        LOGGER
+            .warning("Blast executable is not installed at the following path: "
+                + blastPath);
+        this.stepEnabled = false;
+      }
+
+      if (this.stepEnabled) {
 
         try {
           // Add arguments from configuration Aozan
@@ -162,12 +173,12 @@ public class OverrepresentedSequencesBlast {
           // TODO
           // e.printStackTrace();
           LOGGER.severe(StringUtils.join(e.getStackTrace(), "\n\t"));
-          this.stepEnable = false;
+          this.stepEnabled = false;
         } catch (AozanException e) {
           // TODO
           // e.printStackTrace();
           LOGGER.info(StringUtils.join(e.getStackTrace(), "\n\t"));
-          this.stepEnable = false;
+          this.stepEnabled = false;
         }
 
         LOGGER.info("FastQC-step blast : step is enable, command line = "
@@ -182,9 +193,9 @@ public class OverrepresentedSequencesBlast {
    * Test if blastall can be launched
    * @return true if blastall can be launched else false
    */
-  public boolean isStepBlastEnable() {
+  public boolean isStepBlastEnabled() {
 
-    return this.stepEnable;
+    return this.stepEnabled;
   }
 
   /**
