@@ -421,9 +421,6 @@ public class OverrepresentedSequencesBlast {
 
     final ProcessBuilder builder = new ProcessBuilder(cmd);
 
-    // TODO
-    System.out.println(sequence
-        + " -> " + Joiner.on(' ').join(builder.command()));
     Process process;
     try {
 

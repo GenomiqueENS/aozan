@@ -115,11 +115,6 @@ class BlastResultHit {
     name.append(" Ident=" + prcIdentity + "%,");
     name.append(" QueryCovergap=" + this.queryCover + "%");
 
-    // TODO
-    System.out
-        .println((this.prcIdentity < MIN_IDENTITY_EXPECTED || this.queryCover > MAX_QUERYCOVERT_EXPECTED)
-            + "  " + name.toString());
-
     // Return only the best hit
     if (this.prcIdentity < MIN_IDENTITY_EXPECTED
         || this.queryCover > MAX_QUERYCOVERT_EXPECTED)
