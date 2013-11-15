@@ -139,7 +139,7 @@ version="1.0">
         
     
     div.header {
-		background-color: #CAD5EB;
+		background-color: #C1C4CA;
         border:0;
         margin:0;
         padding: 0.5em;
@@ -180,9 +180,8 @@ version="1.0">
 
 <div class="header">
 	<div id="header_title">
-		<!-- img src="http://www.transcriptome.ens.fr/aozan/images/aozan_qc_logo.png" alt="Aozan"/>  <xsl:value-of select="/QCReport/RunId"/> Quality report -->
-		<img src="/home/sperrin/workspace/aozan/src/site/resources/images/aozan_qc_logo.png" alt="Aozan"/> &#xA0; &#xA0; <xsl:value-of select="/QCReport/RunId"/> Quality report
-		
+		<img src="http://www.transcriptome.ens.fr/aozan/images/aozan_qc_logo.png" alt="Aozan"/>  
+		&#xA0;&#xA0;<xsl:value-of select="/QCReport/RunId"/> Quality report
 	</div> 
 
 	<div id="header_filename">
