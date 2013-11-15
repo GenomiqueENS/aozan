@@ -52,7 +52,7 @@ public class FastQCCollector extends AbstractFastqCollector {
   private int numberThreads = Runtime.getRuntime().availableProcessors();
 
   private boolean ignoreFilteredSequences = false;
-  private boolean isStepBlastEnable = false;
+  private boolean isStepBlastEnabled = false;
 
   @Override
   public String getName() {
@@ -106,8 +106,8 @@ public class FastQCCollector extends AbstractFastqCollector {
 
     // Check if step blast needed and configure
     OverrepresentedSequencesBlast.getInstance().configure(properties);
-    this.isStepBlastEnable =
-        OverrepresentedSequencesBlast.getInstance().isStepBlastEnable();
+    this.isStepBlastEnabled =
+        OverrepresentedSequencesBlast.getInstance().isStepBlastEnabled();
 
   }
 
@@ -116,7 +116,7 @@ public class FastQCCollector extends AbstractFastqCollector {
 
     // Rewriting code of the method ContaminantFinder for read the contaminant
     // list in fastqc-0.10.1 jar
-    RuntimePatchFastQC.runPatchFastQC(this.isStepBlastEnable);
+    RuntimePatchFastQC.runPatchFastQC(this.isStepBlastEnabled);
 
     super.collect(data);
   }
