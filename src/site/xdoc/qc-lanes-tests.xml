@@ -88,10 +88,15 @@
          <tr><td>qc.test.phasingprephasing.phasing.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of phasing</td></tr>
          <tr><td>qc.test.phasingprephasing.prephasing.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of prephasing</td></tr>
        </table>
-       
+		
+		<!-- Reading interop files  -->
+       <p>Run data are retrieved by parsing Illumina InterOp Binary Metric files. Only three metrics files are used to collect all run data needed for execute lanes quality tests.
+       The control quality report lists this data for each read in the run like in this example.
+       It is possible to collect run data from read1.xml files generate by Illumina for each read. It is enough to set the Aozan property &quot;qc.conf.read.xml.collector.used&quot; at true.
+       </p>
        <p>An example of table built with lanes quality tests.</p>
        <div align="center">
-       		<table><tr><th align="center"><img src="images/qc_lane_test.png" alt="" border="1"></img></th></tr></table>
+       		<img src="images/qc_lane_test_800px.png" alt="" border="1"/>
        </div>
        
 

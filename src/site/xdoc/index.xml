@@ -24,7 +24,7 @@
  */
 -->
 <document>
-
+	
 	<properties>
 		<title>Welcome to Aozan</title>
 		<author email="jourdren@biologie.ens.fr">
@@ -33,44 +33,31 @@
 		
 	</properties>
 		
-
+	
 	<body>
-	        <link rel="alternate" type="application/rss+xml" title="Aozan updates" href="aozan.rss" />
-
+        <link rel="alternate" type="application/rss+xml" title="Aozan updates" href="aozan.rss" />
+        
 		<section name="Welcome to Aozan">
-
-
-
-			<div
-				style="float: right; margin: 0 10px 20px 20px; padding: 5px; border: 1px solid #999; background-color: #eee;">
-				<h5
-					style="margin: 0; font-size: smaller; border-bottom: 1px solid #aaaaaa">
+			<div style="float: right; margin: 0 10px 20px 20px; padding: 5px; border: 1px solid #999; background-color: #eee;">
+				<h5 style="margin: 0; font-size: smaller; border-bottom: 1px solid #aaaaaa">
 					Get Aozan @@@VERSION@@@
 				</h5>
 				<p style="font-size: smaller">
 					<img valign="top"
 						src="http://maven.apache.org/images/folder-open.gif" border="0"
 						alt="" title="Download Aozan" />
-					<a href="aozan-@@@VERSION@@@.tar.gz">Download</a>
-					Aozan Application
-					<br />
+					<a href="aozan-@@@VERSION@@@.tar.gz">Download</a>Aozan Application<br />
 				</p>
 				<ul style="margin-top: 0; list-style-type: disc">
 					<li style="font-size: smaller">
-						<a href="download.html#requirements">
-							System Requirements 
-						</a>
-						and 
-						<a href="installing.html">Installation Instructions</a>.						
+						<a href="download.html#requirements">System Requirements</a>
+						and <a href="installing.html">Installation Instructions</a>.						
 					</li>
 					<li style="font-size: smaller">
-						<a href="quickstart.html">
-							QuickStart tutorial
-						</a>
+						<a href="quickstart.html">QuickStart tutorial</a>
 					</li>
 				</ul>
 			</div>
-
 
 			<p>Aozan has been developped in order to automatically handle data transfert, demultiplexing conversion, quality control
 			and the contamination detection once a HiSeq run has been finished. Through most computer infrastructures and the creation 
@@ -79,38 +66,52 @@
 			an HiSeq sequencer output.</p>
 			
 			<p>Aozan helps to greatly improve efficiency with run data management and to keep tracks of run statistics
-			with several automatic mail information and HTML web pages.				
-			</p>
+			with several automatic mail information and HTML web pages.</p>
+			
 			
 		</section>
 
-		<section name="Samplesheet validator">
-
-			<p>We provide also a <a href="http://www.transcriptome.ens.fr/designvalidator/" target="_blank">CASAVA/bcl2fastq samplesheet validator</a> to help users to check their run design. This tool
-                        use only html and javascript. When you use this tool, no data is sent to our servers.</p>
-
+		<section name="Recent news">
+		
+		<subsection name="Samplesheet validator">
+			<p>We provide also a <a href="http://www.transcriptome.ens.fr/designvalidator/" target="_blank">CASAVA/bcl2fastq samplesheet validator</a> 
+			to help users to check their run design. This tool use only html and javascript. When you use this tool, no data is sent to our servers.</p>
+		</subsection>
+		
+		
+		<subsection name="Additionals modules in FastQC">
+			<p>The control quality steps contains an additional FastQC module named &quot;<b>Bad tiles</b>&quot; that search tiles with BMS (Bottom Middle Swath) issues with Illumina flowcell v3.
+	    	This report is used in further analysis during the read filtering step to discard these bad tiles.
+	    	</p>
+	    	
+	    	<div align="center">
+	    		<a href="qc-samples-tests.html#fastqc"><img src="images/qc_fastqc_bad_tiles_200px.png" alt="module bad tiles" style="vertical-align:middle"/></a>
+	        	<a href="qc-samples-tests.html#fastqc"><img src="images/qc_fastqc_overrepresented_blast_700px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></a>
+	    	</div>
+	    	
+	        <p>Optional, Aozan adds a sub-step in FastQC for complete the module Overrepresented sequences. For sequences with &quot;no hit&quot;, a blastn can be launch with this sequence to estimate the source. 
+	        If blastn returns a hit with 100% identity and 0% gap, the result has been included in report.
+	        </p>
+	        	
+		</subsection>
+		
+		<subsection name="Reading binary interOp Illumina files">
+			<p>Run data are retrieved by parsing Illumina InterOp Binary Metric files. The control quality report lists this data for each read in the run like in this example.</p>
+       		<div align="center"><a href="qc-lanes-tests.html"><img src="images/qc_lane_test_600px.png" alt="" border="1"/></a></div>
+		</subsection>
+		
 		</section>
 
 		<section name="Availability">
-
-			<p>
-				Aozan is distributed under the
-				<a href="license.html">General Public License</a> and <a href="license.html">CeCill</a>.
-			</p>
-			
+			<p>Aozan is distributed under the <a href="license.html">General Public License</a> and <a href="license.html">CeCill</a>.</p>
 		</section>
 
 		<section name="Funding">
-
-		<p>This work was supported by the Infrastructures en Biologie Santé et Agronomie (IBiSA) and France Génomique.</p>
-		<a href="http://www.ibisa.net/"><img src="images/logo_ibisa-40pxh.png"/></a>&#160;&#160;
-		<a href="https://www.france-genomique.org/"><img src="images/logo_francegenomique-40pxh.png"/></a>&#160;&#160;
+			<p>This work was supported by the Infrastructures en Biologie Santé et Agronomie (IBiSA) and France Génomique.</p>
+			<a href="http://www.ibisa.net/"><img src="images/logo_ibisa-40pxh.png"/></a>&#160;&#160;
+			<a href="https://www.france-genomique.org/"><img src="images/logo_francegenomique-40pxh.png"/></a>&#160;&#160;
 		</section>
 		
-	
-		<p><a href="./aozan.rss">Subscribe to Aozan RSS feed<img src="images/feed-icon-14x14.png"/></a></p>
-
-	
-		
+		<p><a href="./aozan.rss">Subscribe to Aozan RSS feed <img src="images/feed-icon-14x14.png"/></a></p>
 	</body>
 </document>
