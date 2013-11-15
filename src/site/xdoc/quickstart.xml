@@ -51,6 +51,7 @@
                                   <ul>
                                     <li><a href="#casava">Installing Casava</a></li>
                                     <li><a href="#bcl2fastq">Installing bcl2fastq</a></li>
+                                    <li><a href="#blastall">Installing blastall (optional)</a></li>
                                   </ul>
                                <li>
 					<a href="#installation">Installation</a>
@@ -195,19 +196,36 @@ $ make install
 # Launch installation
 $ tar -cvjf /usr/local/bcl2fastq-1.8.3.tar.bz2 bcl2fastq-1.8.3/
 </source>
-   
- 
- 
-  <h4>Patching bcl2fastq to allow bzip2 compression of fastq files</h4>
+
+<h4>Patching bcl2fastq to allow bzip2 compression of fastq files</h4>
     
     <p>To enable bzip2 compression in bcl2fastq 1.8.3, you need to comment with a '<tt>#</tt>' the next lines in
       the  <tt>/usr/local/bcl2fastq-1.8.3/share/bcl2fastq-1.8.3/makefiles/Config.mk</tt>:</p>
-<source>
+		<source>
 COMPRESSION:=gzip
 COMPRESSIONSUFFIX:=.gz
-</source>    
+		</source>    
 
-  </subsection>
+ </subsection>
+ 
+ <a name="blastall"/>
+ <subsection name="Installing blastall, optional for quality control">
+ 
+ <p>Installing blastall local, in command line : </p>
+	<source>$ sudo apt-get install blast2</source>
+  <p>Download database &quot;nt&quot; to execute blastn with ftp from ncbi : </p>
+	<source>
+$ ftp ftp.ncbi.nlm.nih.gov
+login anonymous
+pwd
+$ cd blast/db
+$ bin
+$ prompt
+$ mget nt*			
+	</source>
+	  <p>Unzip all files, the first nt.00.tar.gz contains the file nt.nal.</p>
+	  <p>Use the perl script to update the database, you can consult <a href="http://www.ncbi.nlm.nih.gov/books/NBK1762/" target="_blank">the NCBI documentation.</a></p> 
+	 </subsection>
    </section>
   
   
@@ -444,7 +462,7 @@ is the run number, e.g. <tt>design_SNL125_0067.xls</tt>)
    
    <p>An example of email sent to the end of Aozan with the quality control summary as attachment.</p>
    <div align="center">
-   	 <table><tr><th align="center"><img src="images/mail_end_qc.png" alt="" border="1"></img></th></tr></table>
+   	 <img src="images/mail_end_qc_450px.png" alt="" border="1"/>
    </div>
    
  </section>

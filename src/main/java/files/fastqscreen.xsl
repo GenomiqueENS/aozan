@@ -69,8 +69,11 @@ version="1.0">
 </head>
 
 <body>
-
-  <h3>Detection contamination report</h3>
+  <div id="header_title">
+	<img src="http://www.transcriptome.ens.fr/aozan/images/aozan_qc_logo.png" alt="Aozan"/>  
+	&#xA0;&#xA0;<h3>Detection contamination report</h3>
+  </div>	
+  
 
   <ul>
     <li><b>Run Id: </b> <xsl:value-of select="/ReportFastqScreen/RunId"/></li>
