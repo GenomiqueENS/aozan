@@ -36,30 +36,17 @@ def error(short_message, message, conf):
     common.error('[Aozan] synchronizer: ' + short_message, message, conf['aozan.var.path'] + '/sync.lasterr', conf)
 
 
-
-
-def sync(run_id, conf):
-    """Synchronize a run.
+def partial_sync(run_id, conf):
+    """Partial synchronization of a run.
 
         Arguments:
-                runtId: the run id
+                run_id: the run id
                 conf: configuration dictionary
     """
-
-    start_time = time.time()
-    common.log('INFO', 'Sync step: start', conf)
-
+ 
     hiseq_data_path = hiseq_run.find_hiseq_run_path(run_id, conf)
     bcl_data_path = conf['bcl.data.path']
-    reports_data_base_path = conf['reports.data.path']
-    tmp_base_path = conf['tmp.path']
-
-    reports_data_path = reports_data_base_path + '/' + run_id
-    report_prefix = 'report_'
-    hiseq_log_prefix = 'hiseq_log_'
-    report_archive_file = report_prefix + run_id + '.tar.bz2'
-    hiseq_log_archive_file = hiseq_log_prefix + run_id + '.tar.bz2'
-
+    final_output_path = bcl_data_path + '/' + run_id
 
     # Check if hiseq_data_path exists
     if hiseq_data_path == False:
@@ -75,6 +62,65 @@ def sync(run_id, conf):
     if not os.path.exists(bcl_data_path):
         error("Basecalling directory does not exists", "Basecalling directory does not exists: " + bcl_data_path, conf)
         return False
+
+    # Check if final output path already exists
+    if not os.path.exists(final_output_path):
+        error("Basecalling directory for run " + run_id + " already exists", "Basecalling directory for run " + run_id + " already exists: " + final_output_path, conf)
+        return False
+    
+    input_path = hiseq_data_path + '/' + run_id
+    output_path = bcl_data_path + '/' + run_id + '.tmp'
+    input_path_du = common.du(input_path)
+    output_path_du = common.du(output_path)
+    output_path_df = common.df(bcl_data_path)
+    du_factor = float(conf['sync.space.factor'])
+    space_needed = input_path_du * du_factor - output_path_du
+
+    common.log("WARNING", "Sync step: input disk usage: " + str(input_path_du), conf)
+    common.log("WARNING", "Sync step: output disk free: " + str(output_path_df), conf)
+    common.log("WARNING", "Sync step: space needed: " + str(space_needed), conf)
+
+    # Check if free space is available on 
+    if output_path_df < space_needed:
+        error("Not enough disk space to perform synchronization for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id + 
+              '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + bcl_data_path + '.', conf)
+        return False
+
+    # exclude CIF files ?
+    if conf['rsync.exclude.cif'].lower().strip() == 'true':
+        exclude_cif_params = "--exclude '*.cif' --exclude '*_pos.txt' --exclude '*.errorMap' --exclude '*.FWHMMap'"
+    else:
+        exclude_cif_params = ""
+
+   # Copy data from hiseq path to bcl path
+    cmd = 'rsync  -a ' + exclude_cif_params + ' ' + input_path + '/ ' + output_path
+    common.log("WARNING", "exec: " + cmd, conf)
+    if os.system(cmd) != 0:
+        error("error while executing rsync for run " + run_id, 'Error while executing rsync.\nCommand line:\n' + cmd, conf)
+        return False
+    
+
+def sync(run_id, conf):
+    """Synchronize a run.
+
+        Arguments:
+                run_id: the run id
+                conf: configuration dictionary
+    """
+
+    start_time = time.time()
+    common.log('INFO', 'Sync step: start', conf)
+    
+    bcl_data_path = conf['bcl.data.path']
+    reports_data_base_path = conf['reports.data.path']
+    tmp_base_path = conf['tmp.path']
+
+    output_path = bcl_data_path + '/' + run_id
+    reports_data_path = reports_data_base_path + '/' + run_id
+    report_prefix = 'report_'
+    hiseq_log_prefix = 'hiseq_log_'
+    report_archive_file = report_prefix + run_id + '.tar.bz2'
+    hiseq_log_archive_file = hiseq_log_prefix + run_id + '.tar.bz2'
 
     # Check if reports_data_path exists
     if not os.path.exists(reports_data_base_path):
@@ -96,41 +142,17 @@ def sync(run_id, conf):
         error("Temporary directory does not exists", "Temporary directory does not exists: " + tmp_base_path, conf)
         return False
 
-
-
-    input_path = hiseq_data_path + '/' + run_id
-    input_path_du = common.du(input_path)
-    output_df = common.df(bcl_data_path)
-    du_factor = float(conf['sync.space.factor'])
-    space_needed = input_path_du * du_factor
-
-    common.log("WARNING", "Sync step: input disk usage: " + str(input_path_du), conf)
-    common.log("WARNING", "Sync step: output disk free: " + str(output_df), conf)
-    common.log("WARNING", "Sync step: space needed: " + str(space_needed), conf)
-
-    # Check if free space is available on 
-    if output_df < space_needed:
-        error("Not enough disk space to perform synchronization for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id + 
-              '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + bcl_data_path + '.', conf)
-        return False
-
+    # Check if enough space to store reports
     if common.df(reports_data_base_path) < 10 * 1024 * 1024 * 1024:
         error("Not enough disk space to store aozan reports for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id + 
               '.\nNeed more than 10 Gb on ' + reports_data_base_path + '.', conf)
         return False
 
-    # exclude CIF files ?
-    if conf['rsync.exclude.cif'].lower().strip() == 'true':
-        exclude_cif_params = "--exclude '*.cif' --exclude '*_pos.txt' --exclude '*.errorMap' --exclude '*.FWHMMap'"
-    else:
-        exclude_cif_params = ""
-
-    # Copy data from hiseq path to bcl path
-    cmd = 'rsync  -a ' + exclude_cif_params + ' ' + input_path + ' ' + bcl_data_path
-    common.log("WARNING", "exec: " + cmd, conf)
-    if os.system(cmd) != 0:
-        error("error while executing rsync for run " + run_id, 'Error while executing rsync.\nCommand line:\n' + cmd, conf)
-        return False
+    # Do the synchronization
+    partial_sync(run_id, conf)
+    
+    # Rename partial sync directory to final run BCL directory
+    os.rename(output_path + '.tmp', output_path)
 
     # Create if not exists archive directory for the run
     if not os.path.exists(reports_data_path):
@@ -164,7 +186,7 @@ def sync(run_id, conf):
             error("error while removing existing temporary directory", 'Error while removing existing temporary directory.\nCommand line:\n' + cmd, conf)
             return False
     os.mkdir(tmp_path)
-    cmd = 'cd ' + bcl_data_path + '/' + run_id + '/Data' + ' && ' + \
+    cmd = 'cd ' + output_path + '/Data' + ' && ' + \
         'cp -rp Status_Files reports Status.htm ../First_Base_Report.htm ' + tmp_path + ' && ' + \
         'cd ' + tmp_base_path + ' && ' + \
         'mv ' + run_id + ' ' + report_prefix + run_id + ' && ' + \
@@ -186,19 +208,19 @@ def sync(run_id, conf):
 
 
     df_in_bytes = common.df(bcl_data_path)
-    du_in_bytes = common.du(bcl_data_path + '/' + run_id)
+    du_in_bytes = common.du(output_path)
     df = df_in_bytes / (1024 * 1024 * 1024)
     du = du_in_bytes / (1024 * 1024 * 1024)
 
-    common.log("WARNING", "Sync step: output disk free after sync: " + str(df_in_bytes), conf)
-    common.log("WARNING", "Sync step: space used by sync: " + str(du_in_bytes), conf)
+    common.log("INFO", "Sync step: output disk free after sync: " + str(df_in_bytes), conf)
+    common.log("INFO", "Sync step: space used by sync: " + str(du_in_bytes), conf)
 
     duration = time.time() - start_time
 
     msg = 'End of synchronization for run ' + run_id + '.\n' + \
         'Job finished at ' + common.time_to_human_readable(time.time()) + \
         ' with no error in ' + common.duration_to_human_readable(duration) + '.\n\n' + \
-        'Run output files (without .cif files) can be found in the following directory:\n  ' + bcl_data_path + '/' + run_id
+        'Run output files (without .cif files) can be found in the following directory:\n  ' + output_path
 
     # Add path to report if reports.url exists
     if conf['reports.url'] != None and conf['reports.url'] != '':
