@@ -450,8 +450,8 @@ def set_default_conf(conf):
     # Lock file
     conf['lock.file'] = '/var/lock/aozan.lock'
 
-    # Rsync
-    conf['rsync.exclude.cif'] = 'true'
+    # Synchronization
+    conf['sync.exclude.cif'] = 'True'
     conf['sync.partial.sync'] = 'False'
 
     # Casava
