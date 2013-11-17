@@ -99,6 +99,8 @@ def partial_sync(run_id, conf):
         error("error while executing rsync for run " + run_id, 'Error while executing rsync.\nCommand line:\n' + cmd, conf)
         return False
     
+    return True
+    
 
 def sync(run_id, conf):
     """Synchronize a run.
@@ -149,7 +151,8 @@ def sync(run_id, conf):
         return False
 
     # Do the synchronization
-    partial_sync(run_id, conf)
+    if not partial_sync(run_id, conf):
+        return False
     
     # Rename partial sync directory to final run BCL directory
     os.rename(output_path + '.tmp', output_path)

@@ -452,6 +452,7 @@ def set_default_conf(conf):
 
     # Rsync
     conf['rsync.exclude.cif'] = 'true'
+    conf['sync.partial.sync'] = 'False'
 
     # Casava
     conf['casava.samplesheet.format'] = 'xls'
