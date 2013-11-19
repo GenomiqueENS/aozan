@@ -31,6 +31,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -247,7 +249,16 @@ public class FastqScreenResult {
         Globals.APP_BUILD_COMMIT);
 
     XMLUtils.addTagValue(doc, root, "RunId", data.get("run.info.run.id"));
-    XMLUtils.addTagValue(doc, root, "RunDate", data.get("run.info.date"));
+
+    // Convert string to date
+    try {
+      SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
+      Date runDate = sdf.parse(data.get("run.info.date"));
+      XMLUtils.addTagValue(doc, root, "RunDate", DATE_FORMAT.format(runDate));
+    } catch (ParseException e1) {
+      XMLUtils.addTagValue(doc, root, "RunDate", data.get("run.info.date"));
+    }
+
     XMLUtils.addTagValue(doc, root, "FlowcellId",
         data.get("run.info.flow.cell.id"));
     XMLUtils.addTagValue(doc, root, "InstrumentSN",
@@ -262,6 +273,8 @@ public class FastqScreenResult {
     XMLUtils.addTagValue(doc, root, "genomeSample", (genomeSample == null
         ? "no genome" : genomeSample));
     XMLUtils.addTagValue(doc, root, "sampleName", fastqSample.getSampleName());
+    XMLUtils.addTagValue(doc, root, "descriptionSample",
+        fastqSample.getDescriptionSample());
 
     final Element report = doc.createElement("Report");
     root.appendChild(report);
