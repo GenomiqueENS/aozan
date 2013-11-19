@@ -103,11 +103,11 @@ public class FastqScreenResult {
 
     StringBuilder s = new StringBuilder();
 
-    s.append("FastqScreen : for Projet "
-        + fastqSample.getProjectName()
-        + (genomeSample == null ? "" : " (genome reference for sample "
-            + genomeSample) + ").\nresult for sample : "
-        + fastqSample.getSampleName());
+    s.append("FastqScreen : for Projet " + fastqSample.getProjectName());
+    s.append(genomeSample == null ? "" : " (genome reference for sample "
+        + genomeSample + ").");
+    s.append("\nresult for sample : "+fastqSample.getSampleName());
+    s.append("\ndescription of sample : "+ fastqSample.getDescriptionSample());
 
     s.append("\n");
     s.append("\n" + HEADER_COLUMNS_TEXT + "\n");
