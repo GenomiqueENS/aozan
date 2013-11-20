@@ -1,0 +1,14 @@
+FastqScreen : for Projet project_name_1 (genome reference for sample hg19).						
+result for sample : 2013_0001						
+						
+Library 	 %Mapped 	 %Unmapped 	 %One_hit_one_library	 %Multiple_hits_one_library 	 %One_hit_multiple_libraries 	 %Multiple_hits_multiple_libraries
+adapters_	0.00	100.00	0.00	0.00	0.00	0.00
+lsuref___	0.87	99.73	0.02	0.05	0.72	0.08
+ssuref___	1.70	98.30	0.73	0.18	0.79	0.00
+hg19____	71.24	28.76	65.40	5.70	0.00	0.14
+phix_____	3.10	96.90	2.99	0.11	0.00	0.00
+						
+% reads_unmapped_none_genome : 24.11						
+% reads_mapped_at_least_one_genome : 75.89						
+% reads_mapped_except_genome_sample : 5.67						
+reads mapped 151780 / reads processed 200000						
