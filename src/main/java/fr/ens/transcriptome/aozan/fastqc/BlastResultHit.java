@@ -23,7 +23,6 @@
 
 package fr.ens.transcriptome.aozan.fastqc;
 
-import static fr.ens.transcriptome.aozan.util.XMLUtilsParser.extractFirstValueToDouble;
 import static fr.ens.transcriptome.aozan.util.XMLUtilsParser.extractFirstValueToInt;
 import static fr.ens.transcriptome.aozan.util.XMLUtilsParser.extractFirstValueToString;
 
@@ -40,33 +39,29 @@ import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
  */
 class BlastResultHit {
 
-  static final String LINK_NCBI_BLASTN =
+  private static final String LINK_NCBI_BLASTN =
       "\"http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&amp;PAGE=Nucleotides&amp;DATABASE=nr&amp;QUERY=";
 
   // Parameters for return only the best hit
-  static final int MIN_IDENTITY_EXPECTED = 100;
-  static final int MAX_QUERYCOVERT_EXPECTED = 0;
+  private static final int MIN_IDENTITY_EXPECTED = 100;
+  private static final int MAX_QUERYCOVERT_EXPECTED = 0;
 
   // print version blast BlastOutput_version
-  static final String tag_hitDef = "Hit_def";
-  static final String tag_hspBitScore = "Hsp_bit-score";
-  static final String tag_hspEValue = "Hsp_evalue";
-  static final String tag_hspIdentity = "Hsp_identity";
-  static final String tag_hspAlignLen = "Hsp_align-len";
-  static final String tag_hspQseq = "Hsp_qseq";
+  private static final String tag_hitDef = "Hit_def";
+  private static final String tag_hspEValue = "Hsp_evalue";
+  private static final String tag_hspIdentity = "Hsp_identity";
+  private static final String tag_hspAlignLen = "Hsp_align-len";
 
-  final String sequence;
+  private final String sequence;
 
-  int queryLength;
-  String result;
-  double hspBitScore;
-  String hspEValue;
-  int hspIdentity;
-  int hspAlignLen;
-  int countHits;
-  String qSeq;
-  int prcIdentity;
-  int queryCover;
+  private int queryLength;
+  private String result;
+  private String hspEValue;
+  private int hspIdentity;
+  private int hspAlignLen;
+  private int countHits;
+  private int prcIdentity;
+  private int queryCover;
 
   boolean isNull = true;
 
@@ -76,7 +71,7 @@ class BlastResultHit {
    * @param countHits number hits retrieved by blast
    * @param queryLength number base in sequence query
    */
-  public void addHitData(Element firstHit, final int countHits,
+  private void addHitData(Element firstHit, final int countHits,
       final int queryLength) {
 
     // No hit found for this sequence
@@ -87,15 +82,15 @@ class BlastResultHit {
     this.countHits = countHits;
 
     this.result = extractFirstValueToString(firstHit, tag_hitDef);
-    this.hspBitScore = extractFirstValueToDouble(firstHit, tag_hspBitScore);
     this.hspEValue = extractFirstValueToString(firstHit, tag_hspEValue);
     this.hspIdentity = extractFirstValueToInt(firstHit, tag_hspIdentity);
     this.hspAlignLen = extractFirstValueToInt(firstHit, tag_hspAlignLen);
-    this.qSeq = extractFirstValueToString(firstHit, tag_hspQseq);
-    this.prcIdentity = (int) ((double) hspIdentity / this.queryLength * 100);
-
     int countGap = queryLength - hspAlignLen;
-    this.queryCover = (int) ((double) (countGap / this.queryLength * 100));
+
+    this.prcIdentity =
+        (int) ((double) this.hspIdentity / this.queryLength * 100);
+
+    this.queryCover = (int) ((double) countGap / this.queryLength * 100);
 
     this.isNull = false;
 
@@ -105,7 +100,7 @@ class BlastResultHit {
    * Create an object contaminant hit.
    * @return object contaminantHit
    */
-  public ContaminantHit getContaminantHit() {
+  public ContaminantHit toContaminantHit() {
 
     StringBuilder name = new StringBuilder();
     name.append("Search with Blastall+, <a href="
@@ -119,11 +114,6 @@ class BlastResultHit {
     name.append(" Evalue=" + this.hspEValue + ", ");
     name.append(" Ident=" + prcIdentity + "%,");
     name.append(" QueryCovergap=" + this.queryCover + "%");
-
-    // TODO
-    System.out
-        .println((this.prcIdentity < MIN_IDENTITY_EXPECTED || this.queryCover > MAX_QUERYCOVERT_EXPECTED)
-            + "  " + name.toString());
 
     // Return only the best hit
     if (this.prcIdentity < MIN_IDENTITY_EXPECTED

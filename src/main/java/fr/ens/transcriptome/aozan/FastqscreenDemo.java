@@ -26,8 +26,9 @@ package fr.ens.transcriptome.aozan;
 import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -47,6 +48,7 @@ import javassist.NotFoundException;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
@@ -82,13 +84,12 @@ public class FastqscreenDemo {
   // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_partiel_fastqc.conf";
   // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_without_fastqc.conf";
 
-  public static RunData data = null;
   public static Map<String, FastqSample> prefixList;
   private static boolean paired = false;
 
-  static String runId;
-  static String date;
-  static String qcDir;
+  private static String runId;
+  private static String date;
+  private static String qcDir;
 
   public static final void main(String[] args) {
 
@@ -116,7 +117,7 @@ public class FastqscreenDemo {
         // runId = "130722_SNL110_0077_AH0NT2ADXX";
         // runId = "130904_SNL110_0082_AC2BR0ACXX";
         runId = "130910_SNL110_0083_AC2AMKACXX";
-//         runId = "130926_SNL110_0085_AH0EYHADXX";
+        // runId = "130926_SNL110_0085_AH0EYHADXX";
       }
 
       date = new SimpleDateFormat("yyMMdd").format(new Date());
@@ -158,6 +159,7 @@ public class FastqscreenDemo {
 
   }
 
+  @SuppressWarnings("unused")
   public static void reportQC2() throws AozanException {
 
     qcDir = SRC_RUN + "/qc_" + runId + "/" + runId;
@@ -207,10 +209,6 @@ public class FastqscreenDemo {
     }
   }
 
-  public static RunData getRunData() {
-    return data;
-  }
-
   public static Properties getPropertiesDemo() {
     return properties;
   }
@@ -219,7 +217,9 @@ public class FastqscreenDemo {
     Map<String, String> conf = new LinkedHashMap<String, String>();
     String line;
     try {
-      FileReader aozanConf = new FileReader(AOZAN_CONF);
+      Reader aozanConf =
+          Files.newReader(new File(AOZAN_CONF), Globals.DEFAULT_FILE_ENCODING);
+
       BufferedReader br = new BufferedReader(aozanConf);
 
       while ((line = br.readLine()) != null) {

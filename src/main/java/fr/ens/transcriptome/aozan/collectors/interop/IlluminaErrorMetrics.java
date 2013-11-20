@@ -27,7 +27,6 @@ import static fr.ens.transcriptome.aozan.collectors.interop.AbstractBinaryFileRe
 
 import java.nio.ByteBuffer;
 
-
 /**
  * This internal class save a record from ErrorMetricsOut.bin file,
  * corresponding of the description of the EXPECTED_VERSION. An record contains
@@ -86,7 +85,7 @@ public class IlluminaErrorMetrics {
    * @return rate error
    */
   public double getErrorRate() {
-    return new Float(errorRate).doubleValue();
+    return (double) errorRate;
   }
 
   /**

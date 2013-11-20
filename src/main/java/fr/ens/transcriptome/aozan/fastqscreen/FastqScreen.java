@@ -134,7 +134,10 @@ public class FastqScreen {
           + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
       // Remove temporary output file use in map-reduce step
-      new File(tmpDir + "/outputDoReduce.txt").delete();
+      File f = new File(tmpDir + "/outputDoReduce.txt");
+      if (!f.delete())
+        LOGGER.warning("Fastqscreen : fail to delete file "
+            + f.getAbsolutePath());
 
     } catch (IOException e) {
       throw new AozanException(e);

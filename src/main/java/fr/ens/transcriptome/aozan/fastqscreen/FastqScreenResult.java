@@ -145,8 +145,7 @@ public class FastqScreenResult {
           "Error writing a html report fastqScreen : no values available.");
 
     // Call stylesheet file for report
-    InputStream is;
-    // System.out.println("xsl " + fastqscreenXSLFile.getAbsolutePath());
+    InputStream is = null;
     try {
       if (fastqscreenXSLFile == null)
         is =
@@ -157,10 +156,14 @@ public class FastqScreenResult {
 
     } catch (FileNotFoundException e) {
       throw new AozanException(e);
-    }
 
-    if (is == null)
-      return null;
+    } finally {
+      try {
+        if (is != null)
+          is.close();
+      } catch (IOException e) {
+      }
+    }
 
     return toXML(fastqSample, data, genomeSample, is);
   }
@@ -220,7 +223,7 @@ public class FastqScreenResult {
   }
 
   private Document createDocumentXML(final FastqSample fastqSample,
-      final RunData data, final String genomeSample) {
+      final RunData data, final String genomeSample) throws AozanException {
     DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 
     DocumentBuilder docBuilder = null;
@@ -230,11 +233,16 @@ public class FastqScreenResult {
       docBuilder = dbfac.newDocumentBuilder();
       doc = docBuilder.newDocument();
 
+      if (doc == null)
+        throw new AozanException(
+            "Fastsqscreen : creating xml file, DocumentBuilder return null");
+
     } catch (ParserConfigurationException e) {
-      e.printStackTrace();
+      throw new AozanException(e);
     }
 
     // Create the root element and add it to the document
+
     Element root = doc.createElement("ReportFastqScreen");
     root.setAttribute("formatversion", "1.0");
     doc.appendChild(root);

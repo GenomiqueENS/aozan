@@ -52,7 +52,7 @@ public class StatisticsUtils {
    * @return mean or NaN if no values have been added, or 0.0 for a single value
    *         set.
    */
-  public double getMean() {
+  public Double getMean() {
 
     return ds.getMean();
   }
@@ -62,7 +62,7 @@ public class StatisticsUtils {
    * @return mean or NaN if no values have been added, or 0.0 for a single value
    *         set.
    */
-  public double getMeanWithoutZero() {
+  public Double getMeanWithoutZero() {
 
     buildDescriptiveStatisticsWithZero();
 
@@ -80,7 +80,7 @@ public class StatisticsUtils {
    * @return median or NaN if no values have been added, or 0.0 for a single
    *         value set.
    */
-  public double getMedianWithoutZero() {
+  public Double getMedianWithoutZero() {
 
     buildDescriptiveStatisticsWithZero();
 
@@ -94,7 +94,7 @@ public class StatisticsUtils {
    * @return median or NaN if no values have been added, or 0.0 for a single
    *         value set.
    */
-  public double getMediane() {
+  public Double getMediane() {
     return new Median().evaluate(ds.getValues());
   }
 
@@ -103,7 +103,7 @@ public class StatisticsUtils {
    * @return standard deviation or NaN if no values have been added, or 0.0 for
    *         a single value set.
    */
-  public double getStandardDeviation() {
+  public Double getStandardDeviation() {
     return getStandardDeviation(false);
   }
 
@@ -165,7 +165,7 @@ public class StatisticsUtils {
    * @return standard deviation NaN if no values have been added, or 0.0 for a
    *         single value set.
    */
-  public double getStandardDeviation(final boolean isBiasCorrected) {
+  public Double getStandardDeviation(final boolean isBiasCorrected) {
     double result = Double.NaN;
     double average = getMean();
     double sum = 0.0;

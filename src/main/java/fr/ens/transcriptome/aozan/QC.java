@@ -25,7 +25,6 @@ package fr.ens.transcriptome.aozan;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +38,7 @@ import java.util.logging.Logger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.collectors.CollectorRegistry;
@@ -108,8 +108,12 @@ public class QC {
         LOGGER.warning("Data file for this run already exists.");
 
       } catch (IOException e) {
-        dataFile.delete();
+
+        if (!dataFile.delete())
+          LOGGER.warning("IOException, fail delete partiel Data file "
+              + dataFile.getName());
         data = null;
+
       }
     }
 
@@ -179,7 +183,8 @@ public class QC {
       throws AozanException {
 
     try {
-      final Writer writer = new FileWriter(outputFile);
+      final Writer writer =
+          Files.newWriter(outputFile, Globals.DEFAULT_FILE_ENCODING);
 
       writer.write(report.toXML());
 
@@ -204,8 +209,8 @@ public class QC {
     if (outputFilename == null)
       throw new AozanException("The filename for the qc report is null");
 
+    InputStream is = null;
     try {
-      final InputStream is;
 
       if (stylesheetFilename == null)
         is = this.getClass().getResourceAsStream(Globals.EMBEDDED_QC_XSL);
@@ -215,6 +220,13 @@ public class QC {
       writeReport(report, is, new File(outputFilename));
     } catch (IOException e) {
       throw new AozanException(e);
+
+    } finally {
+      try {
+        if (is != null)
+          is.close();
+      } catch (IOException e) {
+      }
     }
   }
 
@@ -229,7 +241,8 @@ public class QC {
       final File outputFile) throws AozanException {
 
     try {
-      final Writer writer = new FileWriter(outputFile);
+      final Writer writer =
+          Files.newWriter(outputFile, Globals.DEFAULT_FILE_ENCODING);
 
       writer.write(report.export(xslIs));
 
@@ -264,7 +277,8 @@ public class QC {
       throws AozanException {
 
     try {
-      final Writer writer = new FileWriter(outputFile);
+      final Writer writer =
+          Files.newWriter(outputFile, Globals.DEFAULT_FILE_ENCODING);
 
       writer.write(report.getData().toString());
 

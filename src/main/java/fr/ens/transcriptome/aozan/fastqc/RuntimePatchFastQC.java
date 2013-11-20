@@ -66,11 +66,11 @@ public class RuntimePatchFastQC {
     CtBehavior cb = cc.getDeclaredMethod("findContaminantHit");
 
     // Add code at the beginnning of the method
-    String codeToAdd = "";
+    final String codeToAdd;
     
     if (asBlastToUse) {
       codeToAdd =
-          "return fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.findContaminantHit_Aozan(sequence);";
+          "return fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.findContaminantHit(sequence);";
 
     } else {
       codeToAdd =

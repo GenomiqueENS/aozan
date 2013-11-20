@@ -16,6 +16,7 @@ from email.mime.audio import MIMEAudio
 from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
 from fr.ens.transcriptome.aozan import Common
+from fr.ens.transcriptome.aozan import Globals
 import mimetypes
 from email import encoders
 
@@ -62,17 +63,17 @@ def send_msg(subject, message, is_error, conf):
 
     send_mail = conf['send.mail'].lower() == 'true'
     smtp_server = conf['smtp.server']
-    
+
     # Specific receiver for error message
     if is_error:
         mail_to = conf['mail.error.to']
-        
+
         # Mail error not define
         if mail_to == None or mail_to == '':
             mail_to = conf['mail.to']
     else:
         mail_to = conf['mail.to']
-        
+
     mail_from = conf['mail.from']
     mail_cc = None
     mail_bcc = None
@@ -329,7 +330,7 @@ def load_conf(conf, conf_file_path):
     converting_table_key['casava.design.format'] = 'casava.samplesheet.format'
     converting_table_key['casava.design.prefix.filename'] = 'casava.samplesheet.prefix.filename'
     converting_table_key['casava.designs.path'] = 'casava.samplesheets.path'
-    
+
     f = open(conf_file_path, 'r')
 
     for l in f:
@@ -339,7 +340,7 @@ def load_conf(conf, conf_file_path):
         fields = s.split('=')
         if len(fields) == 2:
             conf[fields[0].strip()] = fields[1].strip()
-            
+
             # Check if needed to converting key for design fields
             if fields[0].strip() in converting_table_key:
                 conf[converting_table_key[fields[0].strip()]] = fields[1].strip()
@@ -359,10 +360,10 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
 
     """ Since version RTA after 1.17, Illumina stop the generation of the Status and reports files"""
     text_runInfo = ''
-    
+
     path_report = conf['reports.data.path'] + '/' + run_id
     # Check directory report exists
-    
+
     if os.path.exists(path_report + '/report_' + run_id):
         text_runInfo = """<li><a href="report_###RUN_ID###/Status.htm">Run info</a></li>
                <li><a href="report_###RUN_ID###.tar.bz2">All reports(compressed archive)</a></li>"""
@@ -412,7 +413,7 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
         text = ''.join(f_in.readlines())
         f_in.close()
 
-    
+
     lines = text.split('\n');
     write_lines = True
     result = ''
@@ -428,7 +429,7 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
             write_lines = True
         elif write_lines == True:
             result += line.replace('###RUN_ID###', run_id) + '\n'
-        
+
     f_out = open(output_file_path, 'w')
     f_out.write(result)
     f_out.close()
@@ -439,6 +440,7 @@ def set_default_conf(conf):
     # Global
     conf['aozan.enable'] = 'True'
     conf['send.mail'] = 'False'
+    conf['aozan.log.level'] = Globals.LOG_LEVEL
     conf['first.base.report.step'] = 'True'
     conf['hiseq.step'] = 'True'
     conf['sync.step'] = 'True'
@@ -447,9 +449,10 @@ def set_default_conf(conf):
 
     # Lock file
     conf['lock.file'] = '/var/lock/aozan.lock'
-    
-    # Rsync
-    conf['rsync.exclude.cif'] = 'true'
+
+    # Synchronization
+    conf['sync.exclude.cif'] = 'True'
+    conf['sync.partial.sync'] = 'False'
 
     # Casava
     conf['casava.samplesheet.format'] = 'xls'
@@ -483,7 +486,7 @@ def set_default_conf(conf):
     conf['bcl.space.factor'] = str(416000000)
     # estimation factor for hiseq_space_per_lane_per_cycle (cmd du -b)
     conf['hiseq.space.factor'] = str(3180000000)
-    
+
 
     # Mail configuration
     conf['mail.header'] = 'THIS IS AN AUTOMATED MESSAGE.\\n\\n'
