@@ -64,12 +64,17 @@ def partial_sync(run_id, conf):
         return False
 
     # Check if final output path already exists
-    if not os.path.exists(final_output_path):
+    if os.path.exists(final_output_path):
         error("Basecalling directory for run " + run_id + " already exists", "Basecalling directory for run " + run_id + " already exists: " + final_output_path, conf)
         return False
     
     input_path = hiseq_data_path + '/' + run_id
     output_path = bcl_data_path + '/' + run_id + '.tmp'
+    
+    # Create output path for run if not exists
+    if not os.path.exists(output_path):
+        os.mkdir(output_path)    
+
     input_path_du = common.du(input_path)
     output_path_du = common.du(output_path)
     output_path_df = common.df(bcl_data_path)
@@ -87,7 +92,7 @@ def partial_sync(run_id, conf):
         return False
 
     # exclude CIF files ?
-    if conf['rsync.exclude.cif'].lower().strip() == 'true':
+    if conf['sync.exclude.cif'].lower().strip() == 'true':
         exclude_cif_params = "--exclude '*.cif' --exclude '*_pos.txt' --exclude '*.errorMap' --exclude '*.FWHMMap'"
     else:
         exclude_cif_params = ""

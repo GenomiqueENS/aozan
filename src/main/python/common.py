@@ -452,7 +452,7 @@ def set_default_conf(conf):
 
     # Synchronization
     conf['sync.exclude.cif'] = 'True'
-    conf['sync.partial.sync'] = 'False'
+    conf['sync.partial.sync'] = 'True'
 
     # Casava
     conf['casava.samplesheet.format'] = 'xls'
