@@ -36,7 +36,7 @@ def error(short_message, message, conf):
     common.error('[Aozan] synchronizer: ' + short_message, message, conf['aozan.var.path'] + '/sync.lasterr', conf)
 
 
-def partial_sync(run_id, conf):
+def partial_sync(run_id, last_sync, conf):
     """Partial synchronization of a run.
 
         Arguments:
@@ -88,16 +88,37 @@ def partial_sync(run_id, conf):
 
     # exclude CIF files ?
     if conf['rsync.exclude.cif'].lower().strip() == 'true':
-        exclude_cif_params = "--exclude '*.cif' --exclude '*_pos.txt' --exclude '*.errorMap' --exclude '*.FWHMMap'"
+        exclude_files = ['*.cif', '*_pos.txt', '*.errorMap', '*.FWHMMap']
     else:
-        exclude_cif_params = ""
+        exclude_files = []
 
+    rsync_manifest_path = conf['tmp.path'] + '/' + run_id + '.rsync.manifest' 
+    rsync_params = ''
+     
+    if last_sync:
+        for exclude_file in exclude_files:
+            rsync_params += " --exclude '" + exclude_file + "' "
+    else:
+        # Exclude files that will be rewritten severals times during the run
+        exclude_files.extend(['*.bin', '.txt', '*.xml'])
+        cmd = 'cd ' + input_path + ' && find . -type f -mmin +' + conf['sync.partial.sync.min.age.files']
+        for exclude_file in exclude_files:
+            cmd += " -not -name '" + exclude_file + "' "
+        cmd += ' > ' +  rsync_manifest_path
+        if os.system(cmd) != 0:
+            error("error while executing rsync for run " + run_id, 'Error while executing find.\nCommand line:\n' + cmd, conf)
+            return False
+        rsync_params = '--files-from=' + rsync_manifest_path
+    
    # Copy data from hiseq path to bcl path
-    cmd = 'rsync  -a ' + exclude_cif_params + ' ' + input_path + '/ ' + output_path
+    cmd = 'rsync  -a ' + rsync_params + ' ' + input_path + '/ ' + output_path
     common.log("WARNING", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while executing rsync for run " + run_id, 'Error while executing rsync.\nCommand line:\n' + cmd, conf)
         return False
+    
+    if not last_sync:
+        os.remove(rsync_manifest_path)
     
     return True
     
@@ -151,7 +172,7 @@ def sync(run_id, conf):
         return False
 
     # Do the synchronization
-    if not partial_sync(run_id, conf):
+    if not partial_sync(run_id, True, conf):
         return False
     
     # Rename partial sync directory to final run BCL directory

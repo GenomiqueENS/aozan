@@ -211,7 +211,7 @@ def launch_steps(conf):
         for run_id in working_run_ids:
             welcome(conf)
             common.log('INFO', 'Partial synchronization of ' + run_id, conf)
-            if not sync_run.partial_sync(run_id, conf):
+            if not sync_run.partial_sync(run_id, False, conf):
                 return
 
 

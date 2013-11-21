@@ -37,6 +37,7 @@
 	   <tr><td>sync.exclude.cif</td><td>boolean</td><td>True</td><td>Do not copy CIF files</td></tr>
 	   <tr><td>sync.partial.sync</td><td>boolean</td><td>False</td><td>Enable partial synchronization of working runs at each Aozan
 	    launch to avoid a big synchronization at the end of the runs. <b>WARNING:</b> This feature is <u>EXPERIMENTAL</u>.</td></tr>
+	    <tr><td>sync.partial.sync.min.age.files</td><td>integer</td><td>15</td><td>Minimal age of files in minutes to be synchronized in a partial synchronization</td></tr>
      </table>
      
      <p></p>
