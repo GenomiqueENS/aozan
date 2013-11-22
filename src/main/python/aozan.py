@@ -200,10 +200,10 @@ def launch_steps(conf):
     if len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
         launch_steps(conf)
         return
-    
+
     #
     # Partial synchronization
-    # 
+    #
 
     working_run_ids = hiseq_run.get_working_run_ids(conf)
 
@@ -211,7 +211,7 @@ def launch_steps(conf):
         for run_id in working_run_ids:
             welcome(conf)
             common.log('INFO', 'Partial synchronization of ' + run_id, conf)
-            if not sync_run.partial_sync(run_id, conf):
+            if not sync_run.partial_sync(run_id, False, conf):
                 return
 
 
@@ -291,7 +291,7 @@ def aozan_main():
         if not options.quiet:
             print "A lock file exists."
         if not os.path.exists('/proc/%d' % (load_pid_in_lock_file(lock_file_path))):
-            common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf['lock.file'] + 
+            common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf['lock.file'] +
                          ". Please investigate last error and then remove the lock file.", is_error_message, conf['aozan.var.path'] + '/aozan.lasterr', conf)
 
 

@@ -36,14 +36,14 @@ def error(short_message, message, conf):
     common.error('[Aozan] synchronizer: ' + short_message, message, conf['aozan.var.path'] + '/sync.lasterr', conf)
 
 
-def partial_sync(run_id, conf):
+def partial_sync(run_id, last_sync, conf):
     """Partial synchronization of a run.
 
         Arguments:
                 run_id: the run id
                 conf: configuration dictionary
     """
- 
+
     hiseq_data_path = hiseq_run.find_hiseq_run_path(run_id, conf)
     bcl_data_path = conf['bcl.data.path']
     final_output_path = bcl_data_path + '/' + run_id
@@ -67,7 +67,7 @@ def partial_sync(run_id, conf):
     if os.path.exists(final_output_path):
         error("Basecalling directory for run " + run_id + " already exists", "Basecalling directory for run " + run_id + " already exists: " + final_output_path, conf)
         return False
-    
+
     input_path = hiseq_data_path + '/' + run_id
     output_path = bcl_data_path + '/' + run_id + '.tmp'
     
@@ -85,27 +85,48 @@ def partial_sync(run_id, conf):
     common.log("WARNING", "Sync step: output disk free: " + str(output_path_df), conf)
     common.log("WARNING", "Sync step: space needed: " + str(space_needed), conf)
 
-    # Check if free space is available on 
+    # Check if free space is available on
     if output_path_df < space_needed:
-        error("Not enough disk space to perform synchronization for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id + 
+        error("Not enough disk space to perform synchronization for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id +
               '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + bcl_data_path + '.', conf)
         return False
 
     # exclude CIF files ?
     if conf['sync.exclude.cif'].lower().strip() == 'true':
-        exclude_cif_params = "--exclude '*.cif' --exclude '*_pos.txt' --exclude '*.errorMap' --exclude '*.FWHMMap'"
+        exclude_files = ['*.cif', '*_pos.txt', '*.errorMap', '*.FWHMMap']
     else:
-        exclude_cif_params = ""
+        exclude_files = []
+
+    rsync_manifest_path = conf['tmp.path'] + '/' + run_id + '.rsync.manifest'
+    rsync_params = ''
+
+    if last_sync:
+        for exclude_file in exclude_files:
+            rsync_params += " --exclude '" + exclude_file + "' "
+    else:
+        # Exclude files that will be rewritten severals times during the run
+        exclude_files.extend(['*.bin', '.txt', '*.xml'])
+        cmd = 'cd ' + input_path + ' && find . -type f -mmin +' + conf['sync.partial.sync.min.age.files']
+        for exclude_file in exclude_files:
+            cmd += " -not -name '" + exclude_file + "' "
+        cmd += ' > ' + rsync_manifest_path
+        if os.system(cmd) != 0:
+            error("error while executing rsync for run " + run_id, 'Error while executing find.\nCommand line:\n' + cmd, conf)
+            return False
+        rsync_params = '--files-from=' + rsync_manifest_path
 
    # Copy data from hiseq path to bcl path
-    cmd = 'rsync  -a ' + exclude_cif_params + ' ' + input_path + '/ ' + output_path
+    cmd = 'rsync  -a ' + rsync_params + ' ' + input_path + '/ ' + output_path
     common.log("WARNING", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while executing rsync for run " + run_id, 'Error while executing rsync.\nCommand line:\n' + cmd, conf)
         return False
-    
+
+    if not last_sync:
+        os.remove(rsync_manifest_path)
+
     return True
-    
+
 
 def sync(run_id, conf):
     """Synchronize a run.
@@ -117,7 +138,7 @@ def sync(run_id, conf):
 
     start_time = time.time()
     common.log('INFO', 'Sync step: start', conf)
-    
+
     bcl_data_path = conf['bcl.data.path']
     reports_data_base_path = conf['reports.data.path']
     tmp_base_path = conf['tmp.path']
@@ -151,14 +172,14 @@ def sync(run_id, conf):
 
     # Check if enough space to store reports
     if common.df(reports_data_base_path) < 10 * 1024 * 1024 * 1024:
-        error("Not enough disk space to store aozan reports for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id + 
+        error("Not enough disk space to store aozan reports for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
               '.\nNeed more than 10 Gb on ' + reports_data_base_path + '.', conf)
         return False
 
     # Do the synchronization
-    if not partial_sync(run_id, conf):
+    if not partial_sync(run_id, True, conf):
         return False
-    
+
     # Rename partial sync directory to final run BCL directory
     if not os.path.exists(output_path + '.tmp'):
         os.rename(output_path + '.tmp', output_path)
