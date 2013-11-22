@@ -346,6 +346,38 @@ def load_conf(conf, conf_file_path):
     f.close()
     return conf
 
+def generate_html_index_file(conf, output_file_path, run_id):
+    """Create an index.html file that contains links to all the generated reports.
+
+    Arguments:
+        conf: configuration dictionary
+        output_file_path: path of the index.html file to create
+        run_id: The run id
+    """
+    
+    pattern_php_file = '/home/sperrin/home-net/public_html/131107_SNL110_0090_AC2L4PACXX/index_one_run.php'
+    
+    if not os.path.exists(pattern_php_file):
+        error('Pattern file for html page on a run ' + run_id, ' Pattern file for html page on a run ' + run_id +' : this page can not be generate' , conf)        
+        return
+    
+    path_report = conf['reports.data.path'] + '/' + run_id
+    if os.path.exists(path_report + '/report_' + run_id):
+        return
+    
+    txt = '<?php $run_id="'+ run_id+'";?>\n'
+     
+    
+    # Set run_id variable in php file
+    f_in = open(pattern_php_file, 'r')
+    f_out = open(output_file_path, 'w')
+    
+    f_out.write(txt)
+    f_out.write(''.join(f_in.readlines()))
+    
+    f_in.close()
+    f_out.close()
+    
 
 def create_html_index_file(conf, output_file_path, run_id, sections):
     """Create an index.html file that contains links to all the generated reports.
