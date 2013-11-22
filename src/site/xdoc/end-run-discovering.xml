@@ -48,7 +48,11 @@
 	     to send an email to inform users of the end of the run.</td></tr-->
      </table>
 	 
-       
+     <p>An example of email sent to the end of Aozan with the quality control summary as attachment.</p>
+   	 <div align="center">
+   	 	<img src="images/mail_end_run.png" alt="" border="1"/>
+     </div>
+   
      
    </section>
 
