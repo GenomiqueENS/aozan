@@ -105,11 +105,12 @@ def partial_sync(run_id, last_sync, conf):
             rsync_params += " --exclude '" + exclude_file + "' "
     else:
         # Exclude files that will be rewritten severals times during the run
-        exclude_files.extend(['*.bin', '.txt', '*.xml'])
+        exclude_files.extend(['*.bin', '*.txt', '*.xml'])
         cmd = 'cd ' + input_path + ' && find . -type f -mmin +' + conf['sync.partial.sync.min.age.files']
         for exclude_file in exclude_files:
             cmd += " -not -name '" + exclude_file + "' "
         cmd += ' > ' + rsync_manifest_path
+        common.log("WARNING", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
             error("error while executing rsync for run " + run_id, 'Error while executing find.\nCommand line:\n' + cmd, conf)
             return False
