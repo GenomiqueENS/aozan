@@ -125,6 +125,9 @@ public class Globals {
   /** Embedded XSL QC stylesheet. */
   public static final String EMBEDDED_QC_XSL = "/aozan.xsl";
   public static final String EMBEDDED_FASTQSCREEN_XSL = "/fastqscreen.xsl";
+  
+  /** */
+  public static final String TEMPLATE_INDEX_RUN_PHP = "/template_index_run.php";
 
   /** Default locale of the application. */
   public static final Locale DEFAULT_LOCALE = Locale.US;
