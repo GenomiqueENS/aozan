@@ -7,6 +7,8 @@ Created on 25 oct. 2011
 '''
 
 import smtplib, os.path, time
+import mimetypes
+
 from java.io import File
 from java.lang import Runtime
 from java.util.logging import Level
@@ -15,9 +17,10 @@ from email.mime.text import MIMEText
 from email.mime.audio import MIMEAudio
 from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
-from fr.ens.transcriptome.aozan import Common
-import mimetypes
 from email import encoders
+
+from fr.ens.transcriptome.aozan import Common
+from fr.ens.transcriptome.aozan import Globals
 
 
 
@@ -355,10 +358,12 @@ def generate_html_index_file(conf, output_file_path, run_id):
         run_id: The run id
     """
     
-    pattern_php_file = '/home/sperrin/home-net/public_html/131107_SNL110_0090_AC2L4PACXX/index_one_run.php'
+    template_php_file = Globals.TEMPLATE_INDEX_RUN_PHP
     
-    if not os.path.exists(pattern_php_file):
-        error('Pattern file for html page on a run ' + run_id, ' Pattern file for html page on a run ' + run_id +' : this page can not be generate' , conf)        
+    print 'template path ' + template_php_file
+    
+    if not os.path.exists(template_php_file):
+        error('Template file for html page on a run ' + run_id, ' Template file for html page on a run ' + run_id +' : this page can not be generate' , conf)        
         return
     
     path_report = conf['reports.data.path'] + '/' + run_id
@@ -369,7 +374,7 @@ def generate_html_index_file(conf, output_file_path, run_id):
      
     
     # Set run_id variable in php file
-    f_in = open(pattern_php_file, 'r')
+    f_in = open(template_php_file, 'r')
     f_out = open(output_file_path, 'w')
     
     f_out.write(txt)
