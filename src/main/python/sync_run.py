@@ -182,7 +182,7 @@ def sync(run_id, conf):
         return False
 
     # Rename partial sync directory to final run BCL directory
-    if not os.path.exists(output_path + '.tmp'):
+    if os.path.exists(output_path + '.tmp'):
         os.rename(output_path + '.tmp', output_path)
 
     # Create if not exists archive directory for the run
