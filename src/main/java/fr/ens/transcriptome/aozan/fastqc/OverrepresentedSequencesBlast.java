@@ -150,13 +150,9 @@ public class OverrepresentedSequencesBlast {
           loadSequencesToIgnoreFile();
 
         } catch (IOException e) {
-          // TODO
-          // e.printStackTrace();
           LOGGER.severe(StringUtils.join(e.getStackTrace(), "\n\t"));
           stepEnable = false;
         } catch (AozanException e) {
-          // TODO
-          // e.printStackTrace();
           LOGGER.info(StringUtils.join(e.getStackTrace(), "\n\t"));
           stepEnable = false;
         }
@@ -235,7 +231,7 @@ public class OverrepresentedSequencesBlast {
    * @return a ContaminantHit for the best hit return by blastn or null
    */
   @SuppressWarnings("static-access")
-  public ContaminantHit searchSequenceInBlast(final String sequence) {
+  public synchronized ContaminantHit searchSequenceInBlast(final String sequence) {
 
     BlastResultHit blastResult = null;
     File resultXML = null;
@@ -254,20 +250,7 @@ public class OverrepresentedSequencesBlast {
         resultXML = FileUtils.createTempFile("blast_", "_result.xml");
 
         // Synchronize
-        // TODO remove after test
-        System.out.println(Thread.currentThread().getName()
-            + "\t" + toTimeHumanReadable(new Date().getTime())
-            + "\tBefore_blast\t" + resultXML.getAbsolutePath() + "\t"
-            + sequence);
-
         launchBlastSearch(createCommandLine(resultXML, sequence), sequence);
-
-        // TODO remove after test
-        System.out
-            .println(Thread.currentThread().getName()
-                + "\t" + toTimeHumanReadable(new Date().getTime())
-                + "\tAfter_blast\t" + resultXML.getAbsolutePath() + "\t"
-                + sequence);
 
         try {
           // Wait writing xml file
@@ -298,7 +281,7 @@ public class OverrepresentedSequencesBlast {
       }
     }
 
-    if (blastResult.isNull())
+    if (blastResult == null || blastResult.isNull())
       // No hit found
       return null;
 
@@ -312,7 +295,7 @@ public class OverrepresentedSequencesBlast {
    * @param sequence query blastn
    * @throws AozanException occurs if the process fails
    */
-  private static synchronized void launchBlastSearch(final List<String> cmd,
+  private static void launchBlastSearch(final List<String> cmd,
       final String sequence) throws AozanException {
 
     final ProcessBuilder builder = new ProcessBuilder(cmd);
