@@ -67,6 +67,33 @@ public class Common {
   public static void initLogger(final String logPath) throws SecurityException,
       IOException, AozanException {
 
+    initLogger(logPath, (String) null);
+  }
+
+  /**
+   * Initialize the logger for the application.
+   * @param logPath path of the log file
+   * @param logLevel log level
+   * @throws SecurityException if an error occurs while initializing the logger
+   * @throws IOException if cannot open/create the log file
+   */
+  public static void initLogger(final String logPath, final String logLevel)
+      throws SecurityException, IOException, AozanException {
+
+    initLogger(logPath,
+        logLevel == null ? Globals.LOG_LEVEL : Level.parse(logLevel.toUpperCase()));
+  }
+
+  /**
+   * Initialize the logger for the application.
+   * @param logPath path of the log file
+   * @param logLevel log level
+   * @throws SecurityException if an error occurs while initializing the logger
+   * @throws IOException if cannot open/create the log file
+   */
+  public static void initLogger(final String logPath, final Level logLevel)
+      throws SecurityException, IOException, AozanException {
+
     final Logger eoulsanLogger = getLogger();
 
     eoulsanLogger.setLevel(Level.OFF);
@@ -81,7 +108,7 @@ public class Common {
     }
 
     // Set default log level
-    eoulsanLogger.setLevel(fr.ens.transcriptome.aozan.Globals.LOG_LEVEL);
+    eoulsanLogger.setLevel(logLevel);
 
     final Handler fh = new FileHandler(logPath, true);
     fh.setFormatter(fr.ens.transcriptome.eoulsan.Globals.LOG_FORMATTER);

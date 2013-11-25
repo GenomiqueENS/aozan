@@ -69,7 +69,7 @@ public class BadTiles implements QCModule {
   private IlluminaReadId irid;
   private boolean calculated = false;
 
-  private class QualityCount {
+  private static class QualityCount {
     private HashMap<Character, Long> counts = new HashMap<Character, Long>();
 
     private long totalCounts = 0;
@@ -83,6 +83,7 @@ public class BadTiles implements QCModule {
       }
     }
 
+    @SuppressWarnings("unused")
     public long getTotalCount() {
       return totalCounts;
     }
@@ -113,6 +114,7 @@ public class BadTiles implements QCModule {
 
     }
 
+    @SuppressWarnings("unused")
     public double getMean(int offset) {
       long total = 0;
       long count = 0;
@@ -152,6 +154,8 @@ public class BadTiles implements QCModule {
   }
 
   private class ResultsTable extends AbstractTableModel {
+
+    private static final long serialVersionUID = 1L;
 
     public int getColumnCount() {
       return 4;
@@ -225,25 +229,56 @@ public class BadTiles implements QCModule {
       if (that == null)
         return 1;
 
-      final BadTile t1 = this;
-      final BadTile t2 = that;
-
-      if (t1 == t2)
+      if (this == that)
         return 0;
 
-      final int r1 = t1.lane - t2.lane;
+      final int r1 = this.lane - that.lane;
       if (r1 != 0)
         return r1;
 
-      final int r2 = t1.cycle - t2.cycle;
+      final int r2 = this.cycle - that.cycle;
       if (r2 != 0)
         return r2;
 
-      final int r3 = t1.tile - t2.tile;
+      final int r3 = this.tile - that.tile;
       if (r3 != 0)
         return r3;
 
-      return Double.compare(t1.medianScore, t2.medianScore);
+      return Double.compare(this.medianScore, that.medianScore);
+    }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + cycle;
+      result = prime * result + lane;
+      long temp;
+      temp = Double.doubleToLongBits(medianScore);
+      result = prime * result + (int) (temp ^ (temp >>> 32));
+      result = prime * result + tile;
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      BadTile other = (BadTile) obj;
+      if (cycle != other.cycle)
+        return false;
+      if (lane != other.lane)
+        return false;
+      if (Double.doubleToLongBits(medianScore) != Double
+          .doubleToLongBits(other.medianScore))
+        return false;
+      if (tile != other.tile)
+        return false;
+      return true;
     }
 
     @Override

@@ -44,7 +44,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
 
   protected AozanException exception;
   protected boolean success;
-  protected boolean dataSave;
+  protected boolean dataSaved;
 
   /**
    * Create a report file for the sample treated.
@@ -91,9 +91,9 @@ abstract class AbstractFastqProcessThread implements Runnable {
    * Test if the data file is saving
    * @return true if the data file is saving else false
    */
-  public boolean isDataSave() {
+  public boolean isDataSaved() {
 
-    return this.dataSave;
+    return this.dataSaved;
   }
 
   /**
@@ -101,7 +101,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
    */
   public void setDataSave() {
 
-    this.dataSave = true;
+    this.dataSaved = true;
   }
 
   /**
@@ -136,7 +136,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
       throw new AozanException("No fastq file defined");
 
     this.results = new RunData();
-
+    this.dataSaved = false;
     this.fastqStorage = FastqStorage.getInstance();
 
   }

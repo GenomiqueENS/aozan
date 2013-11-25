@@ -165,6 +165,7 @@ public class TileMetricsCollector implements Collector {
     private long numberCluster = 0L; // code in binary file 102
     private long numberClusterPF = 0L; // code in binary file 103
     private double prcPFClusters = 0.0;
+    @SuppressWarnings("unused")
     private Double controlLane = 0.0; // code in binary file 400
 
     private Map<Integer, Map<Integer, Double>> metricsPerTilePerCode;
@@ -285,9 +286,7 @@ public class TileMetricsCollector implements Collector {
           // For each tile
           if (clusters.getKey().equals(clustersPF.getKey())) {
 
-            Double prc =
-                new Double(clustersPF.getValue())
-                    / new Double(clusters.getValue());
+            Double prc = clustersPF.getValue() / clusters.getValue();
 
             stat.addValues(prc);
 
@@ -438,19 +437,14 @@ public class TileMetricsCollector implements Collector {
       public void addValue(final int code, final StatisticsUtils stat) {
 
         if (code >= PCR_ALIGNED_PHIX_CODE && code < 400) {
-          this.percentAlignedPhix = new Double(stat.getMean()).doubleValue();
-          this.percentAlignedPhixSD =
-              new Double(stat.getStandardDeviation()).doubleValue();
+          this.percentAlignedPhix = stat.getMean();
+          this.percentAlignedPhixSD = stat.getStandardDeviation();
 
         } else if (code % 2 == 0) {
           // Compute the mediane with using value = 0.0
-
-          this.phasing =
-              new Double(stat.getMedianWithoutZero()).doubleValue() * 100;
-
+          this.phasing = stat.getMedianWithoutZero() * 100;
         } else {
-          this.prephasing =
-              new Double(stat.getMedianWithoutZero()).doubleValue() * 100;
+          this.prephasing = stat.getMedianWithoutZero() * 100;
         }
       }
 

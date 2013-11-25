@@ -48,16 +48,16 @@ def exception_msg(exp, conf):
         exp: exception
         conf: configuration dictionary
     """
-    
+
     if conf['aozan.debug'] == 'true':
-        
+
         if isinstance(exp, AozanException) and exp.getWrappedException() != None:
             exp = exp.getWrappedException()
-        
+
         return str(exp.getClass().getName()) + ": " + str(exp.getMessage()) + '\n' + str(StringUtils.join(exp.getStackTrace(), '\n\t'))
     else:
         return str(exp.getMessage())
-   
+
 
 def qc(run_id, conf):
     """Proceed to quality control of a run.
@@ -75,7 +75,7 @@ def qc(run_id, conf):
     reports_data_path = reports_data_base_path + '/' + run_id
     qc_output_dir = reports_data_path + '/qc_' + run_id
     tmp_extension = '.tmp'
-    
+
     # Check if input root bcl data exists
     if not os.path.exists(conf['bcl.data.path']):
         error("Basecalling data directory does not exists", "Basecalling data directory does not exists: " + conf['bcl.data.path'], conf)
@@ -110,13 +110,13 @@ def qc(run_id, conf):
 
     # Check if enough free space is available
     if common.df(conf['reports.data.path']) < 1 * 1024 * 1024 * 1024:
-        error("Not enough disk space to store aozan quality control for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id + 
+        error("Not enough disk space to store aozan quality control for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
               '.\nNeed more than 10 Gb on ' + conf['reports.data.path'] + '.', conf)
         return False
 
     # Create temporary temporary directory
     qc_output_dir = qc_output_dir + tmp_extension
-     
+
     # Initialize the QC object
     qc = QC(conf, bcl_input_dir, fastq_input_dir, qc_output_dir, conf['tmp.path'], run_id)
 
@@ -126,7 +126,7 @@ def qc(run_id, conf):
     except AozanException, exp:
         error("error while computing qc report for run " + run_id + ".", exception_msg(exp, conf), conf)
         return False
-    except Throwable, exp:  
+    except Throwable, exp:
         error("error while computing qc report for run " + run_id + ".", exception_msg(exp, conf), conf)
         return False
 
@@ -153,7 +153,7 @@ def qc(run_id, conf):
     # Remove tmp extension of temporary qc directory
     os.rename(qc_output_dir, qc_output_dir[:-len(tmp_extension)])
     qc_output_dir = qc_output_dir[:-len(tmp_extension)]
-    
+
     # Write the HTML report
     html_report_file = qc_output_dir + '/' + run_id + '.html'
     try:
@@ -173,7 +173,7 @@ def qc(run_id, conf):
         error("error while computing qc report for run " + run_id + ".", "No html report generated", conf)
         return False
 
-    
+
 
     # Archive the reports
     cmd = 'cd ' + reports_data_path + '  && ' + \

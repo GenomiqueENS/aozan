@@ -173,7 +173,7 @@ def demux(run_id, conf):
 
     # Check if free space is available
     if output_df < space_needed:
-        error("Not enough disk space to perform demultiplexing for run " + run_id, "Not enough disk space to perform demultiplexing for run " + run_id + 
+        error("Not enough disk space to perform demultiplexing for run " + run_id, "Not enough disk space to perform demultiplexing for run " + run_id +
               '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + fastq_output_dir + '.', conf)
         return False
 
@@ -184,7 +184,7 @@ def demux(run_id, conf):
         # Check if the xls design exists
         if not os.path.exists(input_design_xls_path):
             error("no casava sample-sheet found", "No casava sample-sheet found for " + run_id + " run.\n" + \
-              'You must provide a '+conf['casava.samplesheet.prefix.filename']+'-%04d.xls file' % run_number + ' in ' + conf['casava.samplesheets.path'] + \
+              'You must provide a ' + conf['casava.samplesheet.prefix.filename'] + '-%04d.xls file' % run_number + ' in ' + conf['casava.samplesheets.path'] + \
               ' directory to demultiplex and create fastq files for this run.\n', conf)
             return False
 
@@ -199,10 +199,10 @@ def demux(run_id, conf):
             CasavaDesignCSVWriter(design_csv_path).writer(design)
 
         except IOException, exp:
-            error("error while converting "+conf['casava.samplesheet.prefix.filename']+"-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
+            error("error while converting " + conf['casava.samplesheet.prefix.filename'] + "-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
             return False
         except EoulsanException, exp:
-            error("error while converting "+conf['casava.samplesheet.prefix.filename']+"-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
+            error("error while converting " + conf['casava.samplesheet.prefix.filename'] + "-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
             return False
 
     elif conf['casava.samplesheet.format'].strip().lower() == 'csv':
@@ -212,7 +212,7 @@ def demux(run_id, conf):
         # Check if the xls design exists
         if not os.path.exists(input_design_csv_path):
             error("no casava sample-sheet found", "No casava sample-sheet found for " + run_id + " run.\n" + \
-              'You must provide a '+conf['casava.samplesheet.prefix.filename']+'-%04d.csv file' % run_number + ' in ' + conf['casava.samplesheets.path'] + \
+              'You must provide a ' + conf['casava.samplesheet.prefix.filename'] + '-%04d.csv file' % run_number + ' in ' + conf['casava.samplesheets.path'] + \
               ' directory to demultiplex and create fastq files for this run.\n', conf)
             return False
 
@@ -258,10 +258,10 @@ def demux(run_id, conf):
         design_warnings = CasavaDesignUtil.checkCasavaDesign(design, flow_cell_id)
 
     except IOException, exp:
-        error("error while converting "+conf['casava.samplesheet.prefix.filename']+"-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
+        error("error while converting " + conf['casava.samplesheet.prefix.filename'] + "-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
         return False
     except EoulsanException, exp:
-        error("error while converting "+conf['casava.samplesheet.prefix.filename']+"-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
+        error("error while converting " + conf['casava.samplesheet.prefix.filename'] + "-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
         return False
 
     # Log Casava design warning
@@ -289,7 +289,7 @@ def demux(run_id, conf):
         cmd = cmd + ' --with-failed-reads'
     if conf['casava.adapter.fasta.file.path'] != '':
         cmd = cmd + ' --adapter-sequence ' + conf['casava.adapter.fasta.file.path']
-    
+
     if conf['casava.additionnal.arguments'] != '':
         cmd = cmd + ' ' + conf['casava.additionnal.arguments']
 
