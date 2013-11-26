@@ -80,8 +80,6 @@ public class OverrepresentedSequencesBlast {
       "/sequences_nohit_with_blastn.txt";
 
   // Key for parameters in Aozan configuration
-  public static final String KEY_STEP_BLAST_REQUIRED =
-      "qc.conf.step.blast.enable";
   public static final String KEY_BLAST_PATH = "qc.conf.blast.path";
   public static final String KEY_BLAST_PATH_DB = "qc.conf.blast.path.db";
   public static final String KEY_BLAST_ARGUMENTS = "qc.conf.blast.arguments";
@@ -511,9 +509,8 @@ public class OverrepresentedSequencesBlast {
   /**
    * Retrieve general informations of blastn, call once.
    * @param doc root of xml file result for blastn
-   * @throws AozanException occurs if the parsing fails.
    */
-  private void parseHeaderDocument(final Document doc) throws AozanException {
+  private void parseHeaderDocument(final Document doc)  {
 
     if (firstCall) {
 

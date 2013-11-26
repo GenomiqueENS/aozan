@@ -47,7 +47,6 @@
 	   		<tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
 	   		<tr><td>first.base.report.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
 	 	</table>
-     	<p></p>
      	<p>An example of email sent for the first base report step.</p>
        <div align="center">
          <img src="images/mail_firstbasereport_450px.png" alt="" border="1"/>

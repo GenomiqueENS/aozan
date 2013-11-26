@@ -108,7 +108,7 @@ public class TileMetricsCollector implements Collector {
 
   /**
    * Initialize TileMetrics map.
-   * @return map
+   * @param data result data object
    */
   private void initMetricsMap(final RunData data) {
 
@@ -156,9 +156,9 @@ public class TileMetricsCollector implements Collector {
     private static final int PREPHASING_CODE = 201;
     private static final int PCR_ALIGNED_PHIX_CODE = 300;
 
-    private int laneNumber;
-    private int countTiles;
-    private double densityRatio;
+    private final int laneNumber;
+    private final int countTiles;
+    private final double densityRatio;
 
     private double clusterDensity = 0.0; // code in binary file 100
     private double clusterDensityPF = 0.0; // code in binary file 101
@@ -168,7 +168,7 @@ public class TileMetricsCollector implements Collector {
     @SuppressWarnings("unused")
     private Double controlLane = 0.0; // code in binary file 400
 
-    private Map<Integer, Map<Integer, Double>> metricsPerTilePerCode;
+    private final Map<Integer, Map<Integer, Double>> metricsPerTilePerCode;
 
     // Standard deviation
     private double clusterDensitySD = 0.0;
@@ -178,7 +178,7 @@ public class TileMetricsCollector implements Collector {
     private double prcPFClustersSD = 0.0;
 
     // All metrics per read
-    private List<ReadTileMetrics> listReads;
+    private final List<ReadTileMetrics> listReads;
     private boolean dataToCompute = true;
 
     /**
@@ -210,9 +210,9 @@ public class TileMetricsCollector implements Collector {
      */
     public void computeData() {
 
-      StatisticsUtils stat = null;
-      Number mean = null;
-      Number sd = null;
+      StatisticsUtils stat ;
+      Number mean ;
+      Number sd ;
 
       // Compute statistics for each code
       for (Map.Entry<Integer, Map<Integer, Double>> entry : metricsPerTilePerCode
@@ -415,7 +415,7 @@ public class TileMetricsCollector implements Collector {
      */
     private static final class ReadTileMetrics {
 
-      private int readNumber; // N
+      private final int readNumber; // N
       private Double phasing = 0.0; // code in binary file 200+(N-1)*2
       private Double prephasing = 0.0; // code in binary file 201+(N-1)*2
       private Double percentAlignedPhix = 0.0; // code in binary file 300+N-1
@@ -431,7 +431,7 @@ public class TileMetricsCollector implements Collector {
 
       /**
        * Initialize a value according to code.
-       * @param code
+       * @param code metrics code
        * @param stat object contains all metrics
        */
       public void addValue(final int code, final StatisticsUtils stat) {

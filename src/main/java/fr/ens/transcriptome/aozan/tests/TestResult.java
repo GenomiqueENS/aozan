@@ -74,7 +74,7 @@ public class TestResult {
    * @param value number object
    * @return the Class of this object for TestResult
    */
-  private static final String getNumberClass(final Number value) {
+  private static String getNumberClass(final Number value) {
 
     if (value == null)
       return null;
@@ -96,7 +96,6 @@ public class TestResult {
   /**
    * Public constructor.
    * @param score score of a test
-   * @param message result message of a test
    * @param percent true if value is a percent
    */
   public TestResult(final int score, final Number value, boolean percent) {
@@ -113,8 +112,7 @@ public class TestResult {
   /**
    * Public constructor.
    * @param score score of a test
-   * @param message result message of a test
-   * @param percent true if value is a percent
+   * @param value result message of a test
    */
   public TestResult(final int score, final Number value) {
 
@@ -123,7 +121,7 @@ public class TestResult {
 
   /**
    * Public constructor.
-   * @param message result message of a test
+   * @param value result message of a test
    */
   public TestResult(final Number value) {
 
@@ -132,7 +130,7 @@ public class TestResult {
 
   /**
    * Public constructor.
-   * @param message result message of a test
+   * @param value result message of a test
    * @param percent true if value is a percent
    */
   public TestResult(final Number value, final boolean percent) {

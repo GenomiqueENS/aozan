@@ -40,16 +40,14 @@ import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 
 public class ReadingInteropBinaryFileTest extends TestCase {
-  static final String SR50_FILE = "SR50.data";
-  static final String PE100_FILE = "PE100.data";
+  private static final String SR50_FILE = "SR50.data";
+  private static final String PE100_FILE = "PE100.data";
 
-  final ReadCollector readCollector = new ReadCollector();
-  final RunInfoCollector runInfoCollector = new RunInfoCollector();
+  private final ReadCollector readCollector = new ReadCollector();
+  private final RunInfoCollector runInfoCollector = new RunInfoCollector();
 
-  final List<String> KEYS = Lists.newArrayList();
-
-  final Properties props = new Properties();
-  String path;
+  private final Properties props = new Properties();
+  private String path;
 
   public void testPE100() throws AozanException, IOException {
     compareRunData("PE100", "InterOp_PE100", PE100_FILE);
@@ -76,11 +74,10 @@ public class ReadingInteropBinaryFileTest extends TestCase {
     readCollector.collect(dataTest);
 
     // Read source rundata
-    BufferedReader br = null;
-    br =
+    BufferedReader br =
         new BufferedReader(new FileReader(new File(path + "/" + dir,
             runDataFile)));
-    String line = "";
+    String line ;
 
     while ((line = br.readLine()) != null) {
 

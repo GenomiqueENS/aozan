@@ -39,7 +39,7 @@ import fr.ens.transcriptome.aozan.AozanRuntimeException;
 public class CollectorRegistry {
 
   private static CollectorRegistry instance;
-  private Map<String, Collector> collectors = Maps.newHashMap();
+  private final Map<String, Collector> collectors = Maps.newHashMap();
 
   /**
    * Get a Collector.
@@ -95,14 +95,11 @@ public class CollectorRegistry {
    */
   private CollectorRegistry() {
 
-    final Iterator<Collector> it =
-        ServiceLoader.load(Collector.class).iterator();
+      for (Collector collector : ServiceLoader.load(Collector.class)) {
 
-    while (it.hasNext()) {
+          register(collector);
 
-      register(it.next());
-
-    }
+      }
   }
 
 }

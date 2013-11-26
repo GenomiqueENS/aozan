@@ -31,7 +31,7 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.aozan.io.FastqStorage;
 
 /**
- * The abstract class define a thread, it calls by AbtractFastqCollector.
+ * The abstract class define a thread, it calls by AbstractFastqCollector.
  * @since 1.0
  * @author Laurent Jourdren
  * @author Sandrine Perrin
@@ -44,7 +44,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
 
   protected AozanException exception;
   protected boolean success;
-  protected boolean dataSaved;
+  private boolean dataSaved;
 
   /**
    * Create a report file for the sample treated.

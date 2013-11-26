@@ -100,7 +100,7 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
    * @param cell cell to parse
    * @return a String with the cell content
    */
-  private static final String parseCell(final HSSFCell cell) {
+  private static String parseCell(final HSSFCell cell) {
 
     if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
       final double doubleValue = cell.getNumericCellValue();
@@ -117,7 +117,7 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
    * @param list the list to test
    * @return true if all the elements of the list are empty
    */
-  private static final boolean isFieldsEmpty(final List<String> list) {
+  private static boolean isFieldsEmpty(final List<String> list) {
 
     if (list == null)
       return true;

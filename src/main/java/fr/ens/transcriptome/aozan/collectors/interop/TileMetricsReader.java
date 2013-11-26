@@ -47,7 +47,7 @@ public class TileMetricsReader extends
 
   @Override
   protected File getMetricsFile() {
-    return new File(dirInterOpPath + TILE_METRICS_FILE);
+    return new File(getDirPathInterOP() + TILE_METRICS_FILE);
   }
 
   @Override

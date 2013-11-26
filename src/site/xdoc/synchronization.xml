@@ -40,7 +40,6 @@
 	    <tr><td>sync.partial.sync.min.age.files</td><td>integer</td><td>15</td><td>Minimal age of files in minutes to be synchronized in a partial synchronization</td></tr>
      </table>
      
-     <p></p>
      <p>An example of email sent at the end of synchronization step.</p>
        <div align="center">
        		<img src="images/mail_synchro.png" alt="" border="1"/>

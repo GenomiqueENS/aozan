@@ -44,7 +44,7 @@ import com.google.common.io.Files;
  */
 public class RunData {
 
-  private Map<String, String> map = Maps.newLinkedHashMap();
+  private final Map<String, String> map = Maps.newLinkedHashMap();
 
   //
   // Getters
@@ -133,7 +133,7 @@ public class RunData {
   /**
    * Set a key with a boolean value.
    * @param key key to set
-   * @param value value of the key
+   * @param boolValue value of the key
    */
   public void put(final String key, final boolean boolValue) {
 
@@ -143,7 +143,7 @@ public class RunData {
   /**
    * Set a key with an integer value.
    * @param key key to set
-   * @param value value of the key
+   * @param intValue value of the key
    */
   public void put(final String key, final int intValue) {
 
@@ -153,7 +153,7 @@ public class RunData {
   /**
    * Set a key with a long value.
    * @param key key to set
-   * @param value value of the key
+   * @param longValue value of the key
    */
   public void put(final String key, final long longValue) {
 
@@ -163,7 +163,7 @@ public class RunData {
   /**
    * Set a key with a float value.
    * @param key key to set
-   * @param value value of the key
+   * @param floatValue value of the key
    */
   public void put(final String key, final float floatValue) {
 
@@ -173,7 +173,7 @@ public class RunData {
   /**
    * Set a key with a double value.
    * @param key key to set
-   * @param value value of the key
+   * @param doubleValue value of the key
    */
   public void put(final String key, final double doubleValue) {
 
@@ -183,7 +183,7 @@ public class RunData {
   /**
    * Set a key with an array of strings as value.
    * @param key key to set
-   * @param value value of the key
+   * @param strings list of the key
    */
   public void put(final String key, final String... strings) {
 
@@ -196,7 +196,7 @@ public class RunData {
   /**
    * Set a key with a collection of strings as value.
    * @param key key to set
-   * @param value value of the key
+   * @param strings set of the key
    */
   public void put(final String key, final Collection<String> strings) {
 
@@ -248,8 +248,7 @@ public class RunData {
 
   /**
    * Create the data file
-   * @param filePath path destination
-   * @throws AozanException if an error occurs while writing the data file
+   * @param fileName path destination
    */
   public void createRunDataFile(final String fileName) throws IOException {
     createRunDataFile(new File(fileName));
@@ -257,8 +256,7 @@ public class RunData {
 
   /**
    * Create the data file
-   * @param filePath file destination
-   * @throws AozanException if an error occurs while writing the data file
+   * @param fileName file destination
    */
   public void createRunDataFile(final File fileName) throws IOException {
 
@@ -278,7 +276,7 @@ public class RunData {
 
   /**
    * Add the data file in the rundata
-   * @param file file source
+   * @param fileName file source
    * @throws IOException if an error occurs while reading the data file
    */
   public void addDataFileInRundata(final String fileName) throws IOException {
@@ -300,7 +298,7 @@ public class RunData {
     final BufferedReader br =
         Files.newReader(file, Globals.DEFAULT_FILE_ENCODING);
 
-    String line = null;
+    String line ;
 
     while ((line = br.readLine()) != null) {
 
@@ -348,7 +346,7 @@ public class RunData {
     final BufferedReader br =
         Files.newReader(file, Globals.DEFAULT_FILE_ENCODING);
 
-    String line = null;
+    String line ;
 
     while ((line = br.readLine()) != null) {
 

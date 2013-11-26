@@ -43,7 +43,7 @@ import com.google.common.collect.Lists;
 public class StatisticsUtils {
 
   /** object maintains a dataset of values of a single variable */
-  private DescriptiveStatistics ds;
+  private final DescriptiveStatistics ds;
   /** copy dataset without values == 0 */
   private DescriptiveStatistics dsWithZero = null;
 
@@ -199,7 +199,7 @@ public class StatisticsUtils {
 
   /**
    * Add values in dataset
-   * @param number
+   * @param number new values to put in dataset
    */
   public void addValues(Number number) {
     Double val = number.doubleValue();
@@ -258,7 +258,6 @@ public class StatisticsUtils {
 
   /**
    * Public constructor with a empty dataset.
-   * @param list values
    */
   public StatisticsUtils() {
     this.ds = new DescriptiveStatistics();

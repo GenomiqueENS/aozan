@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
 import fr.ens.transcriptome.eoulsan.util.StringUtils;
@@ -114,18 +113,20 @@ public class FastqSample {
   /**
    * Receive the type of compression use for fastq files, only one possible per
    * sample
-   * @throws AozanException
    */
   public CompressionType setCompressionExtension() {
+    if (compressionType != null) {
+        return compressionType;
+    }
 
     if (StringUtils.extension(fastqFiles.get(0).getName()).equals("fastq"))
       return CompressionType.NONE;
 
-    CompressionType zType =
+    compressionType =
         CompressionType.getCompressionTypeByFilename(fastqFiles.get(0)
             .getName());
 
-    return zType;
+    return compressionType;
   }
 
   /**
@@ -256,7 +257,7 @@ public class FastqSample {
 
   /**
    * Get the prefix corresponding on read 2 for this sample, this value exists
-   * only in mode paire-end
+   * only in mode paired
    * @return prefix for read 2
    */
   public String getPrefixRead2() {

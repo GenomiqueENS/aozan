@@ -41,7 +41,7 @@ import fr.ens.transcriptome.aozan.util.ScoreInterval;
  */
 public class PercentPFSampleTest extends AbstractSampleTest {
 
-  private ScoreInterval interval = new ScoreInterval();
+  private final ScoreInterval interval = new ScoreInterval();
 
   @Override
   public List<String> getCollectorsNamesRequiered() {

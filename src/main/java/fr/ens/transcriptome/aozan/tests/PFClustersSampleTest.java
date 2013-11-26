@@ -63,7 +63,7 @@ public class PFClustersSampleTest extends AbstractSimpleSampleTest {
   }
 
   //
-  // Constuctor
+  // Constructor
   //
 
   /**

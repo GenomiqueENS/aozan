@@ -64,15 +64,12 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
   private static final Logger LOGGER = Common.getLogger();
 
   /** Timer **/
-  private Stopwatch timer = new Stopwatch();
+  private final Stopwatch timer = new Stopwatch();
 
   // count reads pf necessary for create a temporary partial fastq
   private int countReadsPFtoCopy;
-  // Limit parse initial fastq file to the first reads,
-  // if it is -1 parse integral fastq file
-  private final int maxReadsPFtoParse;
 
-  private final int rawClusterCount;
+    private final int rawClusterCount;
   private final int pfClusterCountParsed;
 
   private final File tmpFastqFile;
@@ -248,7 +245,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
       if (fwTmpFastq != null)
         try {
           fwTmpFastq.close();
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
 
     }
@@ -338,7 +335,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
       try {
         if (fwTmpFastq != null)
           fwTmpFastq.close();
-      } catch (IOException e) {
+      } catch (IOException ignored) {
       }
     }
   }
@@ -396,7 +393,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
       throws AozanException {
     super(fastqSample);
 
-    this.maxReadsPFtoParse = maxReadsToParse;
+      int maxReadsPFtoParse = maxReadsToParse;
     this.countReadsPFtoCopy = numberReadsToCopy;
 
     this.rawClusterCount = rawClusterCount;

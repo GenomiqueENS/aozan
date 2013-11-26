@@ -147,7 +147,7 @@ public class ErrorMetricsCollector implements Collector {
 
   /**
    * Initialize ErrorMetrics map.
-   * @return map
+   * @param data result data object
    */
   private void initMetricsMap(final RunData data) {
 
@@ -159,7 +159,7 @@ public class ErrorMetricsCollector implements Collector {
         // lane skiping with phix
         if (data.getBoolean("run.info.align.to.phix.lane" + lane)) {
           errorRatesMetrics.put(getKeyMap(lane, read), new ErrorRatesPerLane(
-              lane, read, readsCount, read1CycleCount, read2LastCycleNumber,
+              lane, read, read1CycleCount, read2LastCycleNumber,
               read3CycleCount));
 
         } else {
@@ -173,7 +173,7 @@ public class ErrorMetricsCollector implements Collector {
 
   /**
    * Define the readNumber corresponding to the cycle
-   * @param cycle
+   * @param cycle number cycle in the run
    * @return readNumber
    */
   private int getReadNumber(final int cycle) {
@@ -199,7 +199,7 @@ public class ErrorMetricsCollector implements Collector {
 
         int keyMap = lane * 100 + read;
         errorRatesMetrics.put(keyMap, new ErrorRatesPerLane(lane, read,
-            readsCount, true, read1CycleCount, read2LastCycleNumber,
+            true, read1CycleCount, read2LastCycleNumber,
             read3CycleCount));
       }
     }
@@ -209,8 +209,7 @@ public class ErrorMetricsCollector implements Collector {
   /**
    * In SR : count cycles final = 50 only for read1 In PE : count cycles final =
    * 208, ie read1:100 (instead of 101), read2:107, read3:208.
-   * @param data
-   * @return
+   * @param data result data object
    */
   private void defineReadLastCycleNumber(final RunData data) {
 
@@ -251,8 +250,8 @@ public class ErrorMetricsCollector implements Collector {
    */
   private static final class ErrorRatesPerLane {
 
-    private int laneNumber;
-    private int readNumber;
+    private final int laneNumber;
+    private final int readNumber;
 
     private int threshold_35_cycle = -1;
     private int threshold_75_cycle = -1;
@@ -276,21 +275,21 @@ public class ErrorMetricsCollector implements Collector {
     private boolean dataToCompute = true;
 
     // Save pair tile-rate error for all cycles for a lane
-    private ListMultimap<Integer, Number> allErrorRates = ArrayListMultimap
+    private final ListMultimap<Integer, Number> allErrorRates = ArrayListMultimap
         .create();
 
     // Save pair tile-rate error for cycles (1 to 35) for all tiles
-    private ListMultimap<Integer, Number> error35 = ArrayListMultimap.create();
+    private final ListMultimap<Integer, Number> error35 = ArrayListMultimap.create();
 
     // Save pair tile-rate error for cycles (1 to 75) for all tiles, for run PE
-    private ListMultimap<Integer, Number> error75 = ArrayListMultimap.create();
+    private final ListMultimap<Integer, Number> error75 = ArrayListMultimap.create();
 
     // Save pair tile-rate error for cycles (1 to 100) for all tiles, for run PE
-    private ListMultimap<Integer, Number> error100 = ArrayListMultimap.create();
+    private final ListMultimap<Integer, Number> error100 = ArrayListMultimap.create();
 
     /**
      * Save a record from TileMetricsOut.bin file.
-     * @param itm illumina tile metrics
+     * @param iem Illumina tile metrics
      */
     public void addMetric(final IlluminaErrorMetrics iem) {
 
@@ -301,12 +300,12 @@ public class ErrorMetricsCollector implements Collector {
         error35.put(iem.getTileNumber(), iem.getErrorRate());
       }
 
-      // seuil = 0 in run SR
+      // Threshold = 0 in run SR
       if (cycle <= threshold_75_cycle) {
         error75.put(iem.getTileNumber(), iem.getErrorRate());
       }
 
-      // seuil = 0 in run SR
+      // Threshold = 0 in run SR
       if (cycle <= threshold_100_cycle) {
         error100.put(iem.getTileNumber(), iem.getErrorRate());
       }
@@ -379,8 +378,9 @@ public class ErrorMetricsCollector implements Collector {
       for (Map.Entry<Integer, Collection<Number>> entry : errorValuePerTile
           .entrySet()) {
 
-        List<Number> list =
-            Arrays.asList(entry.getValue().toArray(new Number[] {}));
+          Collection<Number> value = entry.getValue();
+          List<Number> list =
+            Arrays.asList(value.toArray(new Number[value.size()]));
 
         StatisticsUtils stat = new StatisticsUtils(list);
         errorRatePerTile.add(stat.getMean());
@@ -437,11 +437,10 @@ public class ErrorMetricsCollector implements Collector {
      * Constructor
      * @param lane lane number
      * @param read read number
-     * @param readsCount number read for the run
      * @param asEmpty if true, all values are default values (0.0),
      *          corresponding to a control lane or without skipping Phix
      */
-    ErrorRatesPerLane(final int lane, final int read, final int readsCount,
+    ErrorRatesPerLane(final int lane, final int read,
         final boolean asEmpty, final int read1CycleCount,
         final int read2LastCycleNumber, final int read3CycleCount) {
       this.laneNumber = lane;
@@ -486,10 +485,10 @@ public class ErrorMetricsCollector implements Collector {
 
     }
 
-    ErrorRatesPerLane(final int lane, final int read, final int readsCount,
+    ErrorRatesPerLane(final int lane, final int read,
         final int read1CycleCount, final int read2LastCycleNumber,
         final int read3CycleCount) {
-      this(lane, read, readsCount, false, read1CycleCount,
+      this(lane, read, false, read1CycleCount,
           read2LastCycleNumber, read3CycleCount);
     }
   }

@@ -63,7 +63,7 @@ public class RawClustersSampleTest extends AbstractSimpleSampleTest {
   }
 
   //
-  // Constuctor
+  // Constructor
   //
 
   /**

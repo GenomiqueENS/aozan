@@ -247,7 +247,7 @@ public class Globals {
       Manifest manifest = new Manifest(new URL(manifestPath).openStream());
       manifestAttributes = manifest.getMainAttributes();
 
-    } catch (IOException e) {
+    } catch (IOException ignored) {
     }
   }
 

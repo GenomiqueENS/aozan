@@ -57,7 +57,7 @@ $ ./aozan.sh /etc/aozan.conf</source>
 	</ul>
 
 		<!-- 
-      	<p>If you want to run Aozan on a local Hadoop cluster, see the <a href="hadoopmode.html">Hadoop configuration page</a> for more informations about Hadoop installation and configuration.</p>
+      	<p>If you want to run Aozan on a local Hadoop cluster, see the <a href="hadoopmode.html">Hadoop configuration page</a> for more information about Hadoop installation and configuration.</p>
       	-->
 
    </section>

@@ -51,7 +51,7 @@ public class FastQCCollector extends AbstractFastqCollector {
 
   private int numberThreads = Runtime.getRuntime().availableProcessors();
 
-  private boolean ignoreFilteredSequences = false;
+  private final boolean ignoreFilteredSequences = false;
   private boolean isStepBlastEnabled = false;
 
   @Override
@@ -100,7 +100,7 @@ public class FastQCCollector extends AbstractFastqCollector {
         if (confThreads > 0)
           this.numberThreads = confThreads;
 
-      } catch (NumberFormatException e) {
+      } catch (NumberFormatException ignored) {
       }
     }
 

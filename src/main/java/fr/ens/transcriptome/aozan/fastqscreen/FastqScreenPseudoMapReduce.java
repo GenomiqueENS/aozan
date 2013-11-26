@@ -64,7 +64,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   /** Logger */
   private static final Logger LOGGER = Common.getLogger();
 
-  protected static final String COUNTER_GROUP = "reads_mapping";
+  private static final String COUNTER_GROUP = "reads_mapping";
   private final Reporter reporter;
 
   private int mapperThreads = Runtime.getRuntime().availableProcessors();
@@ -72,14 +72,14 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   private GenomeDescStorage storage;
   private GenomeDescription desc = null;
   private FastqScreenResult fastqScreenResult;
-  private String tmpDir;
+  private final String tmpDir;
 
   private String newArgumentsMapper;
-  private Pattern pattern = Pattern.compile("\t");
+  private final Pattern pattern = Pattern.compile("\t");
 
   private int readsprocessed = 0;
   private int readsmapped = 0;
-  private boolean pairedMode;
+  private final boolean pairedMode;
   private String genomeReference;
 
   /**
@@ -88,13 +88,12 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @param fastqRead fastq file
    * @param listGenomes list of reference genome
    * @param genomeSample genome reference corresponding to sample
-   * @param properties properties for mapping
+   * @param numberThreads number threads used for mapping
    * @throws AozanException if an error occurs while mapping
-   * @throws BadBioEntryException if an error occurs while creating index genome
    */
   public void doMap(final File fastqRead, final List<String> listGenomes,
       final String genomeSample, final int numberThreads)
-      throws AozanException, BadBioEntryException {
+      throws AozanException {
 
     this.doMap(fastqRead, null, listGenomes, genomeSample, numberThreads);
   }
@@ -103,15 +102,11 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * Mapper Receive value in SAM format, only the read mapped are added in
    * output with reference genome
    * @param fastqRead1 fastq file
-   * @param fastqRead1 fastq file in mode paired
+   * @param fastqRead2 fastq file in mode paired
    * @param listGenomes list of genome reference
    * @param genomeSample genome reference corresponding to sample
-   * @param properties properties for mapping
-   * @param paired true if a pair-end run and option paired mode equals true
-   *          else false
+   * @param numberThreads number threads used for mapping
    * @throws AozanException if an error occurs while mapping
-   * @throws BadBioEntryException if an error occurs while creating index genome
-   * @throws InterruptedException if an error occurs during mapper process
    */
   public void doMap(final File fastqRead1, final File fastqRead2,
       final List<String> listGenomes, final String genomeSample,
@@ -196,7 +191,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * Create a index with bowtie from the fasta file genome
    * @param bowtie mapper
    * @param genomeDataFile fasta file of genome
-   * @param tmpDir temporary directory
    * @return File file of genome index
    * @throws BadBioEntryException if an error occurs while creating index genome
    * @throws IOException if an error occurs while using file index genome
@@ -314,7 +308,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     // the read on one genome and after name of the genome
     while (values.hasNext()) {
       String s = values.next();
-      oneHit = s.charAt(0) == '1' ? true : false;
+      oneHit = s.charAt(0) == '1';
 
       currentGenome = s.substring(1);
 
@@ -439,9 +433,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     DataFile genomeDescStoragePath =
         new DataFile(settings.getGenomeDescStoragePath());
 
-    if (genomeDescStoragePath != null)
-      this.storage = SimpleGenomeDescStorage.getInstance(genomeDescStoragePath);
-
+    this.storage = SimpleGenomeDescStorage.getInstance(genomeDescStoragePath);
     this.fastqScreenResult = new FastqScreenResult();
 
     LOGGER.info("FASTQSCREEN : init  mapper "

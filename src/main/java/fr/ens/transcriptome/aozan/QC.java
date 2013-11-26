@@ -119,14 +119,12 @@ public class QC {
 
     // If no data file or it is empty, the collector must be launch
     if (data == null || data.size() == 0) {
-      if (RTAOutputDir == null
-          || !RTAOutputDir.exists() || !RTAOutputDir.isDirectory())
+      if (!RTAOutputDir.exists() || !RTAOutputDir.isDirectory())
         throw new AozanException(
             "The BCL directory does not exist or is not a directory: "
                 + RTAOutputDir);
 
-      if (casavaOutputDir == null
-          || !casavaOutputDir.exists() || !casavaOutputDir.isDirectory())
+      if (!casavaOutputDir.exists() || !casavaOutputDir.isDirectory())
         throw new AozanException(
             "The Casava output directory does not exist or is not a directory: "
                 + casavaOutputDir);
@@ -225,7 +223,7 @@ public class QC {
       try {
         if (is != null)
           is.close();
-      } catch (IOException e) {
+      } catch (IOException ignored) {
       }
     }
   }
@@ -233,7 +231,7 @@ public class QC {
   /**
    * Write the report usually in HTML) in a file.
    * @param report the QCReport object
-   * @param xslIs XSL stylesheet input strea,
+   * @param xslIs XSL stylesheet input stream
    * @param outputFile the report file
    * @throws AozanException if an error occurs while creating the report
    */
@@ -255,7 +253,7 @@ public class QC {
   /**
    * Write the raw data of the QC.
    * @param report the QCReport object
-   * @param outputFile the raw data file
+   * @param outputFilename the raw data file
    * @throws AozanException if an error occurs while writing the file
    */
   public void writeRawData(final QCReport report, final String outputFilename)
@@ -355,7 +353,7 @@ public class QC {
    * Configure an Aozan Test.
    * @param test Aozan test to configure
    * @param properties Aozan configuration
-   * @param enableKey key that enable the test
+   * @param prefix key that enable the test
    * @return list of Aozan tests
    * @throws AozanException if an error occurs while configuring the test
    */

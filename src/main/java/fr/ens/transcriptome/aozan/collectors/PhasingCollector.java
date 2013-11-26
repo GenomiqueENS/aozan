@@ -152,7 +152,7 @@ public class PhasingCollector implements Collector {
     is.close();
   }
 
-  private static final Map<Integer, Integer> getCyclesPhasing(final RunData data) {
+  private static Map<Integer, Integer> getCyclesPhasing(final RunData data) {
 
     // run.info.read.count=2
     // run.info.read1.cycles=51

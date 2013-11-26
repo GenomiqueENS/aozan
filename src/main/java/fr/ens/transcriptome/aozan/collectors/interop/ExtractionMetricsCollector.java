@@ -117,7 +117,6 @@ public class ExtractionMetricsCollector implements Collector {
 
   /**
    * Initialize TileMetrics map.
-   * @return map
    */
   private void initMetricsMap(final RunData data) throws AozanException {
 
@@ -138,7 +137,7 @@ public class ExtractionMetricsCollector implements Collector {
 
   /**
    * Define the readNumber corresponding to the cycle
-   * @param cycle
+   * @param cycle number cycle in the run
    * @return readNumber
    */
   private int getReadNumber(final int cycle) {
@@ -167,7 +166,7 @@ public class ExtractionMetricsCollector implements Collector {
    * Build a map : number read with number cycle corresponding to end of read
    * @param data on run
    */
-  private final void defineReadsStartEndCycleNumber(final RunData data) {
+  private void defineReadsStartEndCycleNumber(final RunData data) {
 
     final int readCount = data.getInt("run.info.read.count");
 
@@ -203,8 +202,8 @@ public class ExtractionMetricsCollector implements Collector {
    */
   private static final class ExtractionMetricsPerLane {
 
-    private int laneNumber;
-    private int readNumber;
+    private final int laneNumber;
+    private final int readNumber;
 
     private int firstCycleNumber;
     private int twentiethCycleNumber;
@@ -290,9 +289,7 @@ public class ExtractionMetricsCollector implements Collector {
     }
 
     /**
-     * @param intensityCycle1Values all intensities values for the cycle 1
-     * @param intensityCycle20Values all intensities values for the cycle 20
-     * @return standard deviation to the ratio intensity in cycle 20.
+     * Compute mean and standard deviation for intensity cycle 20th
      */
     private void computeRatioIntensityCycle20() {
 
@@ -308,9 +305,9 @@ public class ExtractionMetricsCollector implements Collector {
       for (int i = 0; i < intensityCycle1Values.size(); i++) {
 
         Double intensityC1 =
-            new Double(intensityCycle1Values.get(i).intValue());
+                (double) intensityCycle1Values.get(i).intValue();
         Double intensityC20 =
-            new Double(intensityCycle20Values.get(i).intValue());
+                (double) intensityCycle20Values.get(i).intValue();
 
         if (intensityC1 > 0) {
           stat.addValues(intensityC20 / intensityC1 * 100);

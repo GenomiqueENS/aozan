@@ -47,8 +47,10 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
  */
 public class FastqScreenCollector extends AbstractFastqCollector {
 
+    /** Collector name */
   public static final String COLLECTOR_NAME = "fastqscreen";
-  private static final String KEY_GENOMES = "qc.conf.fastqscreen.genomes";
+
+  public static final String KEY_GENOMES = "qc.conf.fastqscreen.genomes";
   public static final String KEY_SKIP_CONTROL_LANE =
       "qc.conf.skip.control.lane";
   public static final String KEY_IGNORE_PAIRED_MODE =
@@ -65,7 +67,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
   private File fastqscreenXSLFile = null;
 
   // List of genome for fastqscreen specific of a sample
-  private List<String> genomesConfiguration = new ArrayList<String>();
+  private final List<String> genomesConfiguration = new ArrayList<String>();
 
   @Override
   public String getName() {
@@ -88,7 +90,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
   /**
    * Configure fastqScreen with properties from file aozan.conf.
-   * @param properties
+   * @param properties object with the collector configuration
    */
   @Override
   public void configure(final Properties properties) {

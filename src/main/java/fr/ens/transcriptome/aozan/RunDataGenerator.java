@@ -72,7 +72,7 @@ public class RunDataGenerator {
 
   /**
    * Collect data and return a RunData object
-   * @return a RunData object with all informations about the run
+   * @return a RunData object with all data about the run
    * @throws AozanException if an error occurs while collecting data
    */
   public RunData collect() throws AozanException {

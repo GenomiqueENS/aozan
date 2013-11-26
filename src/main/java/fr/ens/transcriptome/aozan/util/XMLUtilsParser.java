@@ -124,7 +124,7 @@ public final class XMLUtilsParser {
   /**
    * Return the first value at a specific index corresponding to the tag name in
    * the document.
-   * @param e root element
+   * @param doc document
    * @param tagName tag name to extract
    * @param index value
    * @return value of tag
@@ -153,7 +153,7 @@ public final class XMLUtilsParser {
   /**
    * Return the first value at a specific index corresponding to the tag name in
    * the document.
-   * @param e root element
+   * @param doc document
    * @param tagName tag name to extract
    * @param index value
    * @return value of tag
@@ -181,7 +181,7 @@ public final class XMLUtilsParser {
   /**
    * Return the first value at a specific index corresponding to the tag name in
    * the document.
-   * @param e root element
+   * @param doc document
    * @param tagName tag name to extract
    * @param index value
    * @return value of tag

@@ -51,7 +51,6 @@ public class FastqScreen {
   /** Logger */
   private static final Logger LOGGER = Common.getLogger();
 
-  protected static final String COUNTER_GROUP = "fastqscreen";
 
   public static final String KEY_NUMBER_THREAD = "qc.conf.fastqc.threads";
   public static final String KEY_TMP_DIR = "tmp.dir";
@@ -67,16 +66,16 @@ public class FastqScreen {
   public static final String KEY_MAPPER_ARGUMENT =
       "qc.conf.fastqscreen.mapper.argument";
 
-  private String tmpDir;
+  private final String tmpDir;
   private int confThreads;
-  private String mapperName;
-  private String mapperArgument;
+  private final String mapperName;
+  private final String mapperArgument;
 
   /**
    * Mode pair-end : execute fastqscreen
-   * @param fastqRead1 fastq file input for mapper
-   * @param fastqRead2 fastq file input for mapper
-   * @param listGenomes list or reference genome, used by mapper
+   * @param fastqRead fastq file input for mapper
+   * @param fastqSample instance to describe fastq sample
+   * @param genomes list or reference genome, used by mapper
    * @param genomeSample genome reference corresponding to sample
    * @return FastqScreenResult object contains results for each reference genome
    * @throws AozanException
@@ -92,10 +91,12 @@ public class FastqScreen {
 
   /**
    * Mode single-end : execute fastqscreen
-   * @param fastqFile fastq file input for mapper
-   * @param listGenomes list or reference genome, used by mapper
+   * @param fastqRead1 fastq read1 file input for mapper
+   * @param fastqRead2 fastq read2 file input for mapper
+   * @param fastqSample instance to describe fastq sample
+   * @param genomes list or reference genome, used by mapper
    * @param genomeSample genome reference corresponding to sample
-   * @param paired true if a pair-end run and option paired mode equals true
+   * @param pairedMode true if a pair-end run and option paired mode equals true
    *          else false
    * @throws AozanException
    */
@@ -141,9 +142,6 @@ public class FastqScreen {
 
     } catch (IOException e) {
       throw new AozanException(e);
-
-    } catch (BadBioEntryException bad) {
-      throw new AozanException(bad);
 
     } finally {
       timer.stop();

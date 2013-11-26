@@ -56,7 +56,7 @@ public class ErrorMetricsReader extends
 
   @Override
   protected File getMetricsFile() {
-    return new File(dirInterOpPath + ERROR_METRICS_FILE);
+    return new File(getDirPathInterOP() + ERROR_METRICS_FILE);
   }
 
   @Override
@@ -90,7 +90,7 @@ public class ErrorMetricsReader extends
       AozanException {
     super(dirPath);
 
-    if (!new File(dirInterOpPath + ERROR_METRICS_FILE).exists())
+    if (!new File(getDirPathInterOP() + ERROR_METRICS_FILE).exists())
       throw new FileNotFoundException();
   }
 

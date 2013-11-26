@@ -66,8 +66,8 @@ public class QCReport {
 
   private final RunData data;
 
-  private List<LaneTest> laneTests = Lists.newArrayList();
-  private List<SampleTest> sampleTests = Lists.newArrayList();
+  private final List<LaneTest> laneTests = Lists.newArrayList();
+  private final List<SampleTest> sampleTests = Lists.newArrayList();
   private Document doc;
 
   /**

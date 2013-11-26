@@ -57,17 +57,15 @@ class BlastResultHit {
   private int queryLength;
   private String result;
   private String hspEValue;
-  private int hspIdentity;
-  private int hspAlignLen;
   private int countHits;
   private int prcIdentity;
   private int queryCover;
 
-  boolean isNull = true;
+  private boolean isNull = true;
 
   /**
    * Generate hit data
-   * @param hit first hit retrieved by blast
+   * @param firstHit first hit retrieved by blast
    * @param countHits number hits retrieved by blast
    * @param queryLength number base in sequence query
    */
@@ -83,12 +81,12 @@ class BlastResultHit {
 
     this.result = extractFirstValueToString(firstHit, tag_hitDef);
     this.hspEValue = extractFirstValueToString(firstHit, tag_hspEValue);
-    this.hspIdentity = extractFirstValueToInt(firstHit, tag_hspIdentity);
-    this.hspAlignLen = extractFirstValueToInt(firstHit, tag_hspAlignLen);
+      int hspIdentity = extractFirstValueToInt(firstHit, tag_hspIdentity);
+      int hspAlignLen = extractFirstValueToInt(firstHit, tag_hspAlignLen);
     int countGap = queryLength - hspAlignLen;
 
     this.prcIdentity =
-        (int) ((double) this.hspIdentity / this.queryLength * 100);
+        (int) ((double) hspIdentity / this.queryLength * 100);
 
     this.queryCover = (int) ((double) countGap / this.queryLength * 100);
 
@@ -104,8 +102,8 @@ class BlastResultHit {
 
     StringBuilder name = new StringBuilder();
     name.append("Search with Blastall+, <a href="
-        + LINK_NCBI_BLASTN + this.sequence + "\""
-        + " target=\"_blank\">more detail</a>");
+            + LINK_NCBI_BLASTN + this.sequence + "\""
+            + " target=\"_blank\">more detail</a>");
     name.append(" First hit on "
         + (countHits > 100 ? "+100" : countHits) + " : ");
     name.append(" <br/>");
@@ -142,9 +140,9 @@ class BlastResultHit {
   //
 
   /**
-   * Public constructor. Object contains all informations for one blast response
+   * Public constructor. Object contains all information for one blast response
    * to a query.
-   * @param hit first hit retrieved by blast
+   * @param sequence query blast
    */
   public BlastResultHit(final String sequence) {
 
@@ -153,7 +151,7 @@ class BlastResultHit {
   }
 
   /**
-   * Public constructor. Object contains all informations for one blast response
+   * Public constructor. Object contains all information for one blast response
    * to a query.
    * @param hit first hit retrieved by blast
    * @param countHits number hits retrieved by blast

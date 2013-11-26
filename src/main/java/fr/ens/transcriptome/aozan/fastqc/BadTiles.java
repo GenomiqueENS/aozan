@@ -63,14 +63,14 @@ public class BadTiles implements QCModule {
   // public QualityCount[] qualityCounts = new QualityCount[0];
   private final Map<Integer, QualityCount[]> tiles =
       new HashMap<Integer, QualityCount[]>();
-  final List<BadTile> badTiles = new ArrayList<BadTile>();
-  final Set<Integer> tilesWithOneOrMoreDefect = new HashSet<Integer>();
+  private final List<BadTile> badTiles = new ArrayList<BadTile>();
+  private final Set<Integer> tilesWithOneOrMoreDefect = new HashSet<Integer>();
 
   private IlluminaReadId irid;
   private boolean calculated = false;
 
   private static class QualityCount {
-    private HashMap<Character, Long> counts = new HashMap<Character, Long>();
+    private final HashMap<Character, Long> counts = new HashMap<Character, Long>();
 
     private long totalCounts = 0;
 
@@ -90,12 +90,10 @@ public class BadTiles implements QCModule {
 
     public char getMinChar() {
       char minChar = 10000;
-      Iterator<Character> c = counts.keySet().iterator();
-      while (c.hasNext()) {
-        Character thisChar = c.next();
-        if (thisChar < minChar)
-          minChar = thisChar;
-      }
+        for (Character thisChar : counts.keySet()) {
+            if (thisChar < minChar)
+                minChar = thisChar;
+        }
 
       return minChar;
     }
@@ -103,12 +101,10 @@ public class BadTiles implements QCModule {
     public char getMaxChar() {
       char maxChar = 0;
 
-      Iterator<Character> c = counts.keySet().iterator();
-      while (c.hasNext()) {
-        Character thisChar = c.next();
-        if (thisChar > maxChar)
-          maxChar = thisChar;
-      }
+        for (Character thisChar : counts.keySet()) {
+            if (thisChar > maxChar)
+                maxChar = thisChar;
+        }
 
       return maxChar;
 
@@ -118,9 +114,8 @@ public class BadTiles implements QCModule {
     public double getMean(int offset) {
       long total = 0;
       long count = 0;
-      Iterator<Character> c = counts.keySet().iterator();
-      while (c.hasNext()) {
-        Character thisChar = c.next();
+
+      for(Character thisChar : counts.keySet()){
         total += counts.get(thisChar) * (thisChar - offset);
         count += counts.get(thisChar);
       }
@@ -132,20 +127,20 @@ public class BadTiles implements QCModule {
       Character[] chars = counts.keySet().toArray(new Character[0]);
       Arrays.sort(chars);
       long total = 0;
-      for (int c = 0; c < chars.length; c++) {
-        total += counts.get(chars[c]);
-      }
+        for (Character aChar : chars) {
+            total += counts.get(aChar);
+        }
 
       total *= percentile;
       total /= 100;
 
       long count = 0;
-      for (int c = 0; c < chars.length; c++) {
-        count += counts.get(chars[c]);
-        if (count >= total) {
-          return (chars[c] - offset);
+        for (Character aChar : chars) {
+            count += counts.get(aChar);
+            if (count >= total) {
+                return (aChar - offset);
+            }
         }
-      }
 
       return -1;
 
@@ -276,9 +271,7 @@ public class BadTiles implements QCModule {
       if (Double.doubleToLongBits(medianScore) != Double
           .doubleToLongBits(other.medianScore))
         return false;
-      if (tile != other.tile)
-        return false;
-      return true;
+        return tile == other.tile;
     }
 
     @Override

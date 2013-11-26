@@ -75,14 +75,14 @@ abstract public class AbstractFastqCollector implements Collector {
   private static final int CHECKING_DELAY_MS = 5000;
   private static final int WAIT_SHUTDOWN_MINUTES = 60;
 
-  protected List<AbstractFastqProcessThread> threads;
-  protected List<Future<? extends AbstractFastqProcessThread>> futureThreads;
-  protected ExecutorService executor;
+  private List<AbstractFastqProcessThread> threads;
+  private List<Future<? extends AbstractFastqProcessThread>> futureThreads;
+  private ExecutorService executor;
 
   /**
    * Collect data for a fastqSample
-   * @param data
-   * @param fastqSample
+   * @param data result data object
+   * @param fastqSample sample object
    * @param runPE true if it is a run PE else false
    * @throws AozanException if an error occurs while execution
    */
@@ -149,7 +149,7 @@ abstract public class AbstractFastqCollector implements Collector {
     createListFastqSamples(data);
 
     final boolean isRunPE =
-        data.get(KEY_RUN_MODE).toUpperCase().equals("PE") ? true : false;
+            data.get(KEY_RUN_MODE).toUpperCase().equals("PE");
 
     RunData resultPart = null;
     if (this.getThreadsNumber() > 1) {
@@ -243,7 +243,7 @@ abstract public class AbstractFastqCollector implements Collector {
   /**
    * Estimate the size needed for all uncompresses fastq files and construct the
    * map with all samples to treat.
-   * @param data data used
+   * @param data result data object
    */
   private void createListFastqSamples(final RunData data) {
 
@@ -291,7 +291,7 @@ abstract public class AbstractFastqCollector implements Collector {
 
   /**
    * Restore rundata from the save file if it exists.
-   * @param fastqSample
+   * @param fastqSample sample object
    * @return RunData corresponding to the file or null
    */
   private RunData loadResultPart(final FastqSample fastqSample) {
@@ -328,7 +328,7 @@ abstract public class AbstractFastqCollector implements Collector {
 
   /**
    * Save rundata for a sample in a file in a qc report directory
-   * @param fastqSample sample
+   * @param fastqSample sample object
    * @param data RunData corresponding to one sample
    */
   protected void saveResultPart(final FastqSample fastqSample,

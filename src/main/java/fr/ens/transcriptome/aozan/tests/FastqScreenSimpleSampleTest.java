@@ -63,8 +63,8 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
   private static final Pattern pattern = Pattern.compile(".,;:/-_'");
 
-  private String genomeReference;
-  private boolean isGenomeContamination;
+  private final String genomeReference;
+  private final boolean isGenomeContamination;
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -91,7 +91,6 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   /**
    * Transform the score : if genome of sample is the same as reference genome
    * then the score is reverse for change the color in QC report
-   * @param value value to transform
    * @param data run data
    * @param read index of read
    * @param readSample index of read without indexed reads
@@ -241,7 +240,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   public FastqScreenSimpleSampleTest(String genome,
       boolean isGenomeContamination) {
     super("fsqmapped", "", "fastqscreen "
-        + (isGenomeContamination ? "" : "uniq ") + "mapped on " + genome, "%");
+        + (isGenomeContamination ? "" : "single ") + "mapped on " + genome, "%");
     this.genomeReference = genome;
     this.isGenomeContamination = isGenomeContamination;
   }

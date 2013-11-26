@@ -29,11 +29,13 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 
+import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
 
 /**
@@ -45,12 +47,16 @@ import fr.ens.transcriptome.aozan.Globals;
  */
 public class AliasGenomeFile {
 
+
+  /** Logger */
+  private static final Logger LOGGER = Common.getLogger();
+
   private static AliasGenomeFile singleton;
 
   // Correspondence between genome name in casava design file
-  private Map<String, String> aliasGenomes = Maps.newHashMap();
+  private final Map<String, String> aliasGenomes = Maps.newHashMap();
   // Correspondence between genome sample in run and genome name reference
-  private Map<String, String> aliasGenomesForRun = Maps.newHashMap();
+  private final Map<String, String> aliasGenomesForRun = Maps.newHashMap();
 
   /**
    * Make the correspondence between genome sample and the reference genomes
@@ -130,7 +136,8 @@ public class AliasGenomeFile {
         br.close();
       }
 
-    } catch (IOException io) {
+    } catch (IOException ignored) {
+        LOGGER.warning("Reading alias genomes file failed : none genome sample can be used for detection contamination.");
     }
 
   }
@@ -160,7 +167,8 @@ public class AliasGenomeFile {
         fw.flush();
         fw.close();
       }
-    } catch (IOException io) {
+    } catch (IOException ignored) {
+        LOGGER.warning("Writing alias genomes file failed : file can not be updated.");
     }
   }
 

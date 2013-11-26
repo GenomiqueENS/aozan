@@ -72,7 +72,7 @@ public class ReadCollector implements Collector {
         properties.getProperty(READ_XML_COLLECTOR_SPECIFIED).trim()
             .toLowerCase();
 
-    // Build the list of subcollector
+    // Build the list of sub-collector
     if (readXMLCollectorUsed.equals("true")) {
 
       // file read.xml exists

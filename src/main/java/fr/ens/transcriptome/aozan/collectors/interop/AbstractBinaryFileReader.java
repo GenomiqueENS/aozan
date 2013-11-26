@@ -42,30 +42,30 @@ import fr.ens.transcriptome.eoulsan.util.FileUtils;
  * @author Sandrine Perrin
  * @since 1.1
  */
-public abstract class AbstractBinaryFileReader<M> {
+abstract class AbstractBinaryFileReader<M> {
 
-  protected String dirInterOpPath;
+  private final String dirInterOpPath;
 
   // 2 bytes: 1 for file version number and 1 for length for each record
-  protected static final int HEADER_SIZE = 2;
+  private static final int HEADER_SIZE = 2;
 
   /**
-   * @return
+   * @return collector name
    */
   abstract public String getName();
 
   /**
-   * @return
+   * @return metrics filename
    */
   abstract protected File getMetricsFile();
 
   /**
-   * @return
+   * @return expected record size
    */
   abstract protected int getExpectedRecordSize();
 
   /**
-   * @return
+   * @return expected version of binary file
    */
   abstract protected int getExpectedVersion();
 
@@ -74,7 +74,7 @@ public abstract class AbstractBinaryFileReader<M> {
   }
 
   /**
-   * @return
+   * @return set Illumina metrics corresponding to one binary InterOp file
    * @throws AozanException
    */
   public List<M> getSetIlluminaMetrics() throws AozanException {
@@ -139,7 +139,8 @@ public abstract class AbstractBinaryFileReader<M> {
       final List<M> collection, final ByteBuffer bb);
 
   /**
-   * @param header
+   * Check version file corresponding to the implemented code
+   * @param header header file
    * @throws AozanException occurs if the checking fails
    */
   private void checkVersionFile(final ByteBuffer header) throws AozanException {

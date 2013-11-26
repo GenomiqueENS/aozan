@@ -32,7 +32,7 @@ public abstract class AbstractSampleTest implements SampleTest {
 
   private final String name;
   private final String description;
-  private final String colunmnName;
+  private final String columnName;
   private final String unit;
 
   //
@@ -54,7 +54,7 @@ public abstract class AbstractSampleTest implements SampleTest {
   @Override
   public String getColumnName() {
 
-    return this.colunmnName;
+    return this.columnName;
   }
 
   @Override
@@ -99,7 +99,7 @@ public abstract class AbstractSampleTest implements SampleTest {
 
     this.name = name;
     this.description = description;
-    this.colunmnName = columnName;
+    this.columnName = columnName;
     this.unit = unit;
   }
 

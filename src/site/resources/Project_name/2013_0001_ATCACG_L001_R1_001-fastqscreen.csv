@@ -1,4 +1,4 @@
-FastqScreen : for Projet project_name_1 (genome reference for sample hg19).						
+FastqScreen : for Project project_name_1 (genome reference for sample hg19).
 result for sample : 2013_0001						
 						
 Library 	 %Mapped 	 %Unmapped 	 %One_hit_one_library	 %Multiple_hits_one_library 	 %One_hit_multiple_libraries 	 %Multiple_hits_multiple_libraries

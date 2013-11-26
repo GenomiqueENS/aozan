@@ -60,7 +60,7 @@ public class FastqscreenDemo {
       .getLogger(fr.ens.transcriptome.aozan.Globals.APP_NAME);
 
   /** Timer */
-  private static Stopwatch timer = new Stopwatch();
+  private static final Stopwatch timer = new Stopwatch();
 
   public static final Properties properties = new Properties();
 
@@ -85,7 +85,7 @@ public class FastqscreenDemo {
   // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_without_fastqc.conf";
 
   public static Map<String, FastqSample> prefixList;
-  private static boolean paired = false;
+  private static final boolean paired = false;
 
   private static String runId;
   private static String date;
@@ -178,7 +178,7 @@ public class FastqscreenDemo {
     qc.writeXMLReport(report, qcDir + "_qc_tmp/" + runId + "_reportXmlFile.xml");
 
     // Save HTML report
-    qc.writeReport(report, (String) null, qcDir
+    qc.writeReport(report, null, qcDir
         + "_qc_tmp/" + runId + "_reportHtmlFile.html");
   }
 

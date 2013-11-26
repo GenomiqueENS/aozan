@@ -52,7 +52,7 @@ public class ExtractionMetricsReader extends
 
   @Override
   protected File getMetricsFile() {
-    return new File(dirInterOpPath + EXTRACTION_METRICS_FILE);
+    return new File(getDirPathInterOP() + EXTRACTION_METRICS_FILE);
   }
 
   @Override

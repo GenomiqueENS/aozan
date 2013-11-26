@@ -55,7 +55,7 @@ import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.RemoveUnmappedReadAlig
 public class FastqScreenSAMParser implements SAMParserLine {
 
   private File mapOutputFile = null;
-  private String genome;
+  private final String genome;
   private Writer fw;
 
   private final List<String> genomeDescriptionList;
@@ -63,8 +63,6 @@ public class FastqScreenSAMParser implements SAMParserLine {
   private boolean headerParsed = false;
   private boolean pairedMode = false;
 
-  private final List<ReadAlignmentsFilter> listFilters;
-  private final ReadAlignmentsFilter filter;
   private final ReadAlignmentsFilterBuffer buffer;
 
   private int readsprocessed = 0;
@@ -241,7 +239,7 @@ public class FastqScreenSAMParser implements SAMParserLine {
    * filters used for parsing SAM file
    * @param mapOutputFile file result from mapping
    * @param genome name genome
-   * @param paired true if a pair-end run and option paired mode equals true
+   * @param pairedMode true if a pair-end run and option paired mode equals true
    *          else false
    * @throws IOException if an error occurs while initializing mapOutputFile
    */
@@ -255,10 +253,10 @@ public class FastqScreenSAMParser implements SAMParserLine {
     this.parser = new SAMParser();
 
     // object used for the Sam read alignments filter
-    this.listFilters = Lists.newArrayList();
-    this.listFilters.add(new RemoveUnmappedReadAlignmentsFilter());
+      List<ReadAlignmentsFilter> listFilters = Lists.newArrayList();
+    listFilters.add(new RemoveUnmappedReadAlignmentsFilter());
 
-    this.filter = new MultiReadAlignmentsFilter(listFilters);
+      ReadAlignmentsFilter filter = new MultiReadAlignmentsFilter(listFilters);
     this.buffer = new ReadAlignmentsFilterBuffer(filter);
 
     this.genomeDescriptionList = new ArrayList<String>();

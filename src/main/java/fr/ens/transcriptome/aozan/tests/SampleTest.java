@@ -38,7 +38,7 @@ public interface SampleTest extends AozanTest {
    * @param read index of read
    * @param readSample index of read without indexed reads
    * @param lane the index of the lane
-   * @param sample name of the sample to test. If null test must process
+   * @param sampleName name of the sample to test. If null test must process
    *          undetermined indexes reads
    * @return a TestResult object with the result of the test
    */

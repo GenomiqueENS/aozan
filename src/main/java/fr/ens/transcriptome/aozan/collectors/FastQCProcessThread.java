@@ -147,7 +147,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
    * @throws AozanException if the implementation of BasicStat has changed and
    *           is incompatible this method
    */
-  private static final int getClusterNumberFromBasicStatsModule(
+  private static int getClusterNumberFromBasicStatsModule(
       final BasicStats bs) throws AozanException {
 
     try {
@@ -221,7 +221,6 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
   /**
    * Create the report file.
-   * @param directory who save qc report
    * @throws AozanException if an error occurs while processing data
    * @throws IOException if an error occurs while processing data
    */

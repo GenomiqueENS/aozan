@@ -64,8 +64,6 @@ public class ContaminantFinder {
     for (int c = 0; c < contaminants.length; c++) {
       ContaminantHit thisHit = contaminants[c].findMatch(sequence);
 
-      // System.out.println("Best hit from "+c+" is "+thisHit);
-
       if (thisHit == null)
         continue; // No hit
 

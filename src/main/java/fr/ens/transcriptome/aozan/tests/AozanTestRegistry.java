@@ -39,7 +39,7 @@ import fr.ens.transcriptome.aozan.AozanRuntimeException;
 public class AozanTestRegistry {
 
   private static AozanTestRegistry instance;
-  private Map<String, AozanTest> tests = Maps.newHashMap();
+  private final Map<String, AozanTest> tests = Maps.newHashMap();
 
   /**
    * Get a the test instance.

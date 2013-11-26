@@ -38,7 +38,7 @@ import fr.ens.transcriptome.aozan.util.ScoreInterval;
  */
 public abstract class AbstractSimpleLaneTest extends AbstractLaneTest {
 
-  private ScoreInterval interval = new ScoreInterval();
+  private final ScoreInterval interval = new ScoreInterval();
 
   @Override
   public List<AozanTest> configure(final Map<String, String> properties)

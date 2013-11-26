@@ -79,7 +79,7 @@ public class FastqScreenResult {
           + "\t %Multiple_hits_one_library \t %One_hit_multiple_libraries \t "
           + "%Multiple_hits_multiple_libraries";
 
-  private Map<String, DataPerGenome> resultsPerGenome =
+  private final Map<String, DataPerGenome> resultsPerGenome =
       new HashMap<String, DataPerGenome>();
   private double percentUnmappedNoneGenome = 0.0;
   private double percentMappedAtLeastOneGenome = 0.0;
@@ -161,7 +161,7 @@ public class FastqScreenResult {
       try {
         if (is != null)
           is.close();
-      } catch (IOException e) {
+      } catch (IOException ignored) {
       }
     }
 
@@ -328,7 +328,7 @@ public class FastqScreenResult {
       }
     }
 
-    // Bilan report fastqscreen
+    // Build report fastqscreen
     final Element unmappedElement = doc.createElement("ReadsUnmapped");
     unmappedElement.setAttribute("name", "reads_unmapped_none_genome");
     unmappedElement.setTextContent(Double.toString(DataPerGenome
@@ -426,7 +426,6 @@ public class FastqScreenResult {
 
   /**
    * Update rundata with results from fastqscreen
-   * @param data rundata
    * @param prefix name of sample
    * @throws AozanException if no value.
    */
@@ -492,13 +491,13 @@ public class FastqScreenResult {
     private boolean isGenomeSample;
 
     // Specific legend : represent key in rundata
-    private String unMappedLegend = "unmapped";
-    private String oneHitOneLibraryLegend = "one.hit.one.library";
-    private String multipleHitsOneLibraryLegend = "multiple.hits.one.library";
-    private String oneHitMultipleLibrariesLegend = "one.hit.multiple.libraries";
-    private String multipleHitsMultipleLibrariesLegend =
+    private final String unMappedLegend = "unmapped";
+    private final String oneHitOneLibraryLegend = "one.hit.one.library";
+    private final String multipleHitsOneLibraryLegend = "multiple.hits.one.library";
+    private final String oneHitMultipleLibrariesLegend = "one.hit.multiple.libraries";
+    private final String multipleHitsMultipleLibrariesLegend =
         "multiple.hits.multiple.libraries";
-    private String mappedLegend = "mapped";
+    private final String mappedLegend = "mapped";
 
     private double oneHitOneLibraryPercent = 0.0;
     private double multipleHitsOneLibraryPercent = 0.0;
@@ -613,17 +612,13 @@ public class FastqScreenResult {
     /**
      * Retrieve the percent of reads which mapped only on genome sample, zero if
      * genome is not the genome sample
-     * @param readsprocessed number reads total
      * @return percent
      */
     double getPercentMappedOnlyOnGenomeSample() {
 
       if (isGenomeSample) {
 
-        double readsMappedOnlyOnGenomeSample =
-            oneHitOneLibraryPercent + multipleHitsOneLibraryPercent;
-
-        return readsMappedOnlyOnGenomeSample;
+        return oneHitOneLibraryPercent + multipleHitsOneLibraryPercent;
       }
       return 0.0;
     }

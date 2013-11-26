@@ -48,9 +48,6 @@ public final class FastqStorage {
 
   private static FastqStorage singleton;
 
-  public static final String KEY_READ_COUNT = "run.info.read.count";
-  public static final String KEY_READ_X_INDEXED = "run.info.read";
-
   private String tmpPath;
 
   /**
@@ -92,7 +89,7 @@ public final class FastqStorage {
   /**
    * Check if a temporary file corresponding with fastq files has already
    * created
-   * @param fastqFiles fastq files
+   * @param fastqSample fastq instance which describe an sample
    * @return true if map of files contains a entry with the same key or false
    */
   public boolean tmpFileExists(final FastqSample fastqSample) {
@@ -101,26 +98,6 @@ public final class FastqStorage {
       return false;
 
     return new File(getTemporaryFile(fastqSample)).exists();
-
-  }
-
-  /**
-   * Compile name of all files of array.
-   * @param tab array of files
-   * @return key
-   */
-  public static String keyFiles_old(final List<File> tab) {
-
-    StringBuilder key = new StringBuilder();
-    String separator = "\t";
-
-    for (File f : tab) {
-      key.append(f.getName());
-      key.append(separator);
-    }
-    int end = key.length() - separator.length();
-
-    return key.toString().substring(0, end);
 
   }
 
@@ -153,7 +130,7 @@ public final class FastqStorage {
 
   /**
    * Return the temporary if exists which correspond to the key.
-   * @param keyFastqFiles key of a array of fastq files.
+   * @param fastqSample fastq instance which describe an sample
    * @return File temporary file or null if it not exists
    */
   public String getTemporaryFile(final FastqSample fastqSample) {
@@ -167,7 +144,7 @@ public final class FastqStorage {
 
   /**
    * Define the path used for FastqStorage.
-   * @param path of the temporary directory
+   * @param tmp of the temporary directory
    */
   public void setTmpDir(final String tmp) {
 

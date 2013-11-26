@@ -194,8 +194,6 @@ version="1.0">
 </div>
 
 <div class="report">
-  <h1></h1> 
-
   <ul>
     <li><b>Run Id: </b> <xsl:value-of select="/QCReport/RunId"/></li>
     <li><b>Flow cell: </b> <xsl:value-of select="/QCReport/FlowcellId"/></li>

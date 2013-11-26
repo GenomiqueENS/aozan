@@ -135,7 +135,7 @@ public class QCDemo {
         qc.writeXMLReport(report, reportXmlFile);
 
         // Save HTML report
-        qc.writeReport(report, (String) null, reportHtmlFile.getAbsolutePath());
+        qc.writeReport(report, null, reportHtmlFile.getAbsolutePath());
       }
 
     }

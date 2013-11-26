@@ -47,17 +47,19 @@ import java.util.Arrays;
  */
 public class IlluminaIntensityMetrics {
 
-  static final int BASE_A = 0;
-  static final int BASE_C = 1;
-  static final int BASE_G = 2;
-  static final int BASE_T = 3;
+  // Index array fwhm or intensities : corresponding reading order from binary file
+  private static final int BASE_A = 0;
+  private static final int BASE_C = 1;
+  private static final int BASE_G = 2;
+  private static final int BASE_T = 3;
+
+  private final float[] fwhm = new float[4]; // A C G T - float
+  private final int[] intensities = new int[4]; // A C G T - uint16
 
   private final int laneNumber; // uint16
   private final int tileNumber; // uint16
 
   private final int cycleNumber; // uint16
-  private final float[] fwhm = new float[4]; // A C G T - float
-  private final int[] intensities = new int[4]; // A C G T - uint16
 
   /** Get the number lane */
   public int getLaneNumber() {
@@ -100,9 +102,9 @@ public class IlluminaIntensityMetrics {
    */
   public int getAverageIntensities() {
     int sum = 0;
-    for (int n = 0; n < intensities.length; n++) {
-      sum += intensities[n];
-    }
+      for (int intensity : intensities) {
+          sum += intensity;
+      }
     return sum / intensities.length;
   }
 

@@ -54,7 +54,7 @@ class UncompressFastqThread extends AbstractFastqProcessThread {
   private static final Logger LOGGER = Common.getLogger();
 
   /** Timer **/
-  private Stopwatch timer = new Stopwatch();
+  private final Stopwatch timer = new Stopwatch();
 
   private long sizeFile = 0L;
 
@@ -108,7 +108,6 @@ class UncompressFastqThread extends AbstractFastqProcessThread {
 
   /**
    * Uncompresses and compiles files of array.
-   * @return file compile all files
    * @throws AozanException if an error occurs while creating file
    */
   @Override
@@ -168,7 +167,7 @@ class UncompressFastqThread extends AbstractFastqProcessThread {
 
   /**
    * Thread constructor.
-   * @param FastqSample
+   * @param fastqSample sample object
    * @throws AozanException if an error occurs while creating sequence file for
    *           FastQC
    */

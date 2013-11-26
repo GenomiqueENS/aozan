@@ -96,7 +96,7 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
   @Override
   public void collect(final RunData data) throws AozanException {
     super.collect(data);
-    controlPreCollect(data, this.qcReportOutputPath);
+    controlPreCollect();
 
   }
 
@@ -137,12 +137,9 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
    * Realize all preliminary control before execute AbstractFastqCollector, it
    * check if the free space in tmp directory is enough for save all
    * uncompressed fastq files.
-   * @param data data used
-   * @param qcReportOutputPath path to save qc report
    * @throws AozanException
    */
-  private void controlPreCollect(final RunData data,
-      final String qcReportOutputPath) throws AozanException {
+  private void controlPreCollect() throws AozanException {
 
     LOGGER.fine("Collector uncompressed fastq files : step preparation");
 
@@ -170,7 +167,7 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
               + " Go in directory "
               + new File(this.tmpPath).getAbsolutePath()
               + ", and we need "
-              + uncompressedSizeNeeded + " Go. Echec Aozan");
+              + uncompressedSizeNeeded + " Go. Fail Aozan");
 
     LOGGER
         .fine("Enough disk space to store uncompressed fastq files for step fastqScreen. We are "

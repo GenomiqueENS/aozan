@@ -48,14 +48,9 @@ public class RuntimePatchFastQC {
    *           could not be found.
    * @throws CannotCompileException thrown when bytecode transformation has
    *           failed.
-   * @throws InstantiationException it occurs when fail to reflectively create
-   *           an instance
-   * @throws IllegalAccessException it occurs when fail to reflectively modify
-   *           an instance
    */
   public static void rewriteContaminantFinderMethod(final boolean asBlastToUse)
-      throws NotFoundException, CannotCompileException, InstantiationException,
-      IllegalAccessException {
+      throws NotFoundException, CannotCompileException {
 
     // Get the class to modify
     CtClass cc =
@@ -65,7 +60,7 @@ public class RuntimePatchFastQC {
     // Retrieve the method to modify
     CtBehavior cb = cc.getDeclaredMethod("findContaminantHit");
 
-    // Add code at the beginnning of the method
+    // Add code at the beginning of the method
     final String codeToAdd;
     
     if (asBlastToUse) {
@@ -91,14 +86,9 @@ public class RuntimePatchFastQC {
    *           could not be found.
    * @throws CannotCompileException thrown when bytecode transformation has
    *           failed.
-   * @throws InstantiationException it occurs when fail to reflectively create
-   *           an instance
-   * @throws IllegalAccessException it occurs when fail to reflectively modify
-   *           an instance
    */
   public static void modifyConstructorHtmlReportArchive()
-      throws NotFoundException, CannotCompileException, InstantiationException,
-      IllegalAccessException {
+      throws NotFoundException, CannotCompileException {
 
     // Get the class to modify
     CtClass cc =
@@ -128,7 +118,7 @@ public class RuntimePatchFastQC {
   
   /**
    * Execute method who patch code from FastQC before call in Aozan
-   * @param true if blast will be used else false 
+   * @param asBlastToUse if blast will be used else false
    * @throws AozanException throw an error occurs during modification bytecode
    *           fastqc
    */
@@ -146,23 +136,7 @@ public class RuntimePatchFastQC {
     } catch (CannotCompileException e) {
       throw new AozanException(e);
 
-    } catch (InstantiationException e) {
-      throw new AozanException(e);
-
-    } catch (IllegalAccessException e) {
-      throw new AozanException(e);
     }
-
-  }
-
-  /** Test method */
-  public static void main(String[] args) throws NotFoundException,
-      CannotCompileException, InstantiationException, IllegalAccessException {
-
-    rewriteContaminantFinderMethod(false);
-    // new ContaminantFinder().findContaminantHit("COUCoU lolo !");
-    uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminentFinder
-        .findContaminantHit("hello");
 
   }
 }

@@ -50,7 +50,7 @@ public class AozanException extends Exception {
 
   /**
    * Create a new AozanException from the message of another exception.
-   * @param exception exception with the message to use
+   * @param e exception with the message to use
    */
   public AozanException(final Exception e) {
 

@@ -38,7 +38,7 @@ import fr.ens.transcriptome.aozan.util.ScoreInterval;
  */
 public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
 
-  private ScoreInterval interval = new ScoreInterval();
+  private final ScoreInterval interval = new ScoreInterval();
 
   /**
    * Get the the key in the RunData object for the value to test
@@ -70,7 +70,7 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
 
   /**
    * Transform the score.
-   * @param value value to transform
+   * @param score value to transform
    * @param data run data
    * @param read index of read
    * @param readSample index of read without indexed reads

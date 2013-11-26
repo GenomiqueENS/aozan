@@ -59,12 +59,12 @@ import uk.ac.babraham.FastQC.Sequence.SequenceFile;
  */
 public class HTMLReportArchiveAozan extends HTMLReportArchive {
 
-  private StringBuffer html = new StringBuffer();
-  private StringBuffer data = new StringBuffer();
+  private final StringBuffer html = new StringBuffer();
+  private final StringBuffer data = new StringBuffer();
   private QCModule[] modules;
   private ZipOutputStream zip;
   private SequenceFile sequenceFile;
-  private byte[] buffer = new byte[1024];
+  private final byte[] buffer = new byte[1024];
   private final File file;
 
   private void unzipZipFile(File file) throws IOException {
@@ -75,8 +75,6 @@ public class HTMLReportArchiveAozan extends HTMLReportArchive {
 
     while (entries.hasMoreElements()) {
       ZipEntry entry = entries.nextElement();
-
-      // System.out.println("Going to extract '"+entry.getName()+"'");
 
       if (entry.isDirectory()) {
         File dir = new File(file.getParent() + "/" + entry.getName());
@@ -262,6 +260,8 @@ public class HTMLReportArchiveAozan extends HTMLReportArchive {
       return null;
     } catch (URISyntaxException e) {
       return null;
+    } catch (NullPointerException e) {
+        return null;
     }
 
   }

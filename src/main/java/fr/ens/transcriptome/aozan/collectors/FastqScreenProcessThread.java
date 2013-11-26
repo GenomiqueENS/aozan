@@ -185,7 +185,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     File read1 = new File(fastqStorage.getTemporaryFile(fastqSample));
 
-    if (read1 == null || !read1.exists())
+    if (!read1.exists())
       return;
 
     File read2 = null;
@@ -193,7 +193,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     if (this.isPairedMode) {
       read2 = new File(fastqStorage.getTemporaryFile(fastqSampleR2));
 
-      if (read2 == null || !read2.exists())
+      if (!read2.exists())
         return;
     }
 
@@ -240,10 +240,10 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @param fastqSampleR2 fastqSample corresponding to the read 2
    * @param fastqscreen instance of fastqscreen
    * @param data object rundata on the run
-   * @param listGenomes list of references genomes for FastqScreen
+   * @param genomes list of references genomes for FastqScreen
    * @param genomeSample genome reference corresponding to sample
    * @param reportDir path for the directory who save the FastqScreen report
-   * @param paired true if a pair-end run and option paired mode equals true
+   * @param isPairedMode true if a pair-end run and option paired mode equals true
    *          else false
    * @param isRunPE true if the run is PE else false
    * @throws AozanException if an error occurs during create thread, if no fastq
@@ -268,10 +268,10 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @param fastqSample fastqSample corresponding to the read 1
    * @param fastqscreen instance of fastqscreen
    * @param data object rundata on the run
-   * @param listGenomes list of references genomes for FastqScreen
+   * @param genomes list of references genomes for FastqScreen
    * @param genomeSample genome reference corresponding to sample
    * @param reportDir path for the directory who save the FastqScreen report
-   * @param paired true if a pair-end run and option paired mode equals true
+   * @param isPairedMode true if a pair-end run and option paired mode equals true
    *          else false
    * @param isRunPE true if the run is PE else false
    * @throws AozanException if an error occurs during create thread, if no fastq

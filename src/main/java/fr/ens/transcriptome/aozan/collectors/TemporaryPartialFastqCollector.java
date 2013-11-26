@@ -99,7 +99,7 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
         if (confThreads > 0)
           this.numberThreads = confThreads;
 
-      } catch (NumberFormatException e) {
+      } catch (NumberFormatException ignored) {
       }
     }
 
