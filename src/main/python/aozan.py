@@ -201,6 +201,19 @@ def launch_steps(conf):
         launch_steps(conf)
         return
 
+    #
+    # Partial synchronization
+    #
+
+    working_run_ids = hiseq_run.get_working_run_ids(conf)
+
+    if conf['sync.partial.sync'].lower().strip() == 'true':
+        for run_id in working_run_ids:
+            welcome(conf)
+            common.log('INFO', 'Partial synchronization of ' + run_id, conf)
+            if not sync_run.partial_sync(run_id, False, conf):
+                return
+
 
 def aozan_main():
     """Aozan main method.

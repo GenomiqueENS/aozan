@@ -274,10 +274,13 @@ abstract public class AbstractFastqCollector implements Collector {
           String projectName =
               data.get("design.lane"
                   + lane + "." + sampleName + ".sample.project");
+          // Get description on sample
+          String descriptionSample =
+              data.get("design.lane" + lane + "." + sampleName + ".description");
 
           FastqSample fastqSample =
               new FastqSample(this.casavaOutputPath, read, lane, sampleName,
-                  projectName, index);
+                  projectName, descriptionSample, index);
           fastqSamples.add(fastqSample);
 
         } // sample

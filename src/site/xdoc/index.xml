@@ -71,35 +71,45 @@
 			
 		</section>
 
-		<section name="Recent news">
-		
-		<subsection name="Samplesheet validator">
+		<section name="Samplesheet validator">
 			<p>We provide also a <a href="http://www.transcriptome.ens.fr/designvalidator/" target="_blank">CASAVA/bcl2fastq samplesheet validator</a> 
 			to help users to check their run design. This tool use only html and javascript. When you use this tool, no data is sent to our servers.</p>
-		</subsection>
+			
+			<p><a href="./example_control_quality_report.html">Link to an example on control quality run.</a></p>
+		</section>
 		
+		<section name="News on Aozan">
 		
-		<subsection name="Additionals modules in FastQC">
-			<p>The control quality steps contains an additional FastQC module named &quot;<b>Bad tiles</b>&quot; that search tiles with BMS (Bottom Middle Swath) issues with Illumina flowcell v3.
-	    	This report is used in further analysis during the read filtering step to discard these bad tiles.
-	    	</p>
-	    	
-	    	<div align="center">
-	    		<a href="qc-samples-tests.html#fastqc"><img src="images/qc_fastqc_bad_tiles_200px.png" alt="module bad tiles" style="vertical-align:middle"/></a>
-	        	<a href="qc-samples-tests.html#fastqc"><img src="images/qc_fastqc_overrepresented_blast_700px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></a>
-	    	</div>
-	    	
-	        <p>Optional, Aozan adds a sub-step in FastQC for complete the module Overrepresented sequences. For sequences with &quot;no hit&quot;, a blastn can be launch with this sequence to estimate the source. 
-	        If blastn returns a hit with 100% identity and 0% gap, the result has been included in report.
-	        </p>
-	        	
-		</subsection>
-		
-		<subsection name="Reading binary interOp Illumina files">
-			<p>Run data are retrieved by parsing Illumina InterOp Binary Metric files. The control quality report lists this data for each read in the run like in this example.</p>
-       		<div align="center"><a href="qc-lanes-tests.html"><img src="images/qc_lane_test_600px.png" alt="" border="1"/></a></div>
-		</subsection>
-		
+			<subsection name="Control quality with FastQC and enhancement.">
+				<p>The control quality steps contains an additional FastQC module named &quot;<b>Bad tiles</b>&quot; that search tiles with BMS (Bottom Middle Swath) issues with Illumina flowcell v3.
+		    	This report is used in further analysis during the read filtering step to discard these bad tiles.
+		    	</p>
+		    	
+		    	<div align="center">
+		    		<a href="qc-samples-tests.html#fastqc"><img src="images/qc_fastqc_bad_tiles_height.png" alt="module bad tiles" style="vertical-align:middle"/></a>
+		        	<a href="qc-samples-tests.html#fastqc"><img src="images/qc_fastqc_overrepresented_blast_h250px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></a>
+		    	</div>
+		    	
+		        <p>Optional, Aozan adds a sub-step in FastQC for complete the module Overrepresented sequences. For sequences with &quot;no hit&quot;, a blastn can be launch with this sequence to estimate the source. 
+		        If blastn returns a hit with 100% identity and 0% gap, the result has been included in report.
+		        </p>
+		        	
+			</subsection>
+			
+			<subsection name="Detection contamination with FastQ-Screen">
+				<p>Uses the principles from FastQ Screen. Maps reads on a list of reference genomes for assessing sample contamination and on the genome of the sample. Creates a report file with values for each genome.
+				This step assesses the sample contamination from the fastq files. To do Aozan uses the principles from FastQ Screen.</p>
+		    	<div align="center">
+		        	<a href="qc-samples-tests.html#contamination"><img src="images/qc_report_html_fastqscreen_400px.png" alt="example on report fastqscreen"/></a>
+		    	</div>
+		    	
+			</subsection>
+			
+			<subsection name="Reading binary interOp Illumina files">
+				<p>Run data are retrieved by parsing Illumina InterOp Binary Metric files. The control quality report lists this data for each read in the run like in this example.</p>
+	       		<div align="center"><a href="qc-lanes-tests.html"><img src="images/qc_lane_test_600px.png" alt="" border="1"/></a></div>
+			</subsection>
+			
 		</section>
 
 		<section name="Availability">

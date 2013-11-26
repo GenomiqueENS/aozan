@@ -51,6 +51,7 @@ public class FastqSample {
   private final int lane;
   private final String sampleName;
   private final String projectName;
+  private final String descriptionSample;
   private final String index;
 
   private final String runFastqPath;
@@ -238,6 +239,14 @@ public class FastqSample {
   }
 
   /**
+   * Get the description of the sample in run
+   * @return description of the sample
+   */
+  public String getDescriptionSample() {
+    return this.descriptionSample;
+  }
+  
+  /**
    * Get list of fastq files for this sample
    * @return list fastq files
    */
@@ -289,17 +298,19 @@ public class FastqSample {
    * @param lane lane number
    * @param sampleName name of the sample
    * @param projectName name of the project
+   * @param descriptionSample description of the sample
    * @param index value of index or if doesn't exists, NoIndex
    */
   public FastqSample(final String casavaOutputPath, final int read,
       final int lane, final String sampleName, final String projectName,
-      final String index) {
+      final String descriptionSample, final String index) {
 
     // Ignore number 2 (index), not used in fastq files name
     this.read = (read == 3 ? 2 : read);
     this.lane = lane;
     this.sampleName = sampleName;
     this.projectName = projectName;
+    this.descriptionSample = descriptionSample;
     this.index = index;
 
     this.runFastqPath = casavaOutputPath;

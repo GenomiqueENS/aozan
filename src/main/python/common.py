@@ -7,6 +7,8 @@ Created on 25 oct. 2011
 '''
 
 import smtplib, os.path, time
+import mimetypes
+
 from java.io import File
 from java.lang import Runtime
 from java.util.logging import Level
@@ -15,10 +17,10 @@ from email.mime.text import MIMEText
 from email.mime.audio import MIMEAudio
 from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
+from email import encoders
+
 from fr.ens.transcriptome.aozan import Common
 from fr.ens.transcriptome.aozan import Globals
-import mimetypes
-from email import encoders
 
 
 
@@ -347,6 +349,40 @@ def load_conf(conf, conf_file_path):
     f.close()
     return conf
 
+def generate_html_index_file(conf, output_file_path, run_id):
+    """Create an index.html file that contains links to all the generated reports.
+
+    Arguments:
+        conf: configuration dictionary
+        output_file_path: path of the index.html file to create
+        run_id: The run id
+    """
+    
+    template_php_file = './template_index_run.php'
+    
+    print 'template path ' + template_php_file
+    
+    if not os.path.exists(template_php_file):
+        error('[Aozan] common : File index html page', ' Template file for html page on a run ' + run_id +' : this page can not be generate' , conf['aozan.var.path'] + '/common.lasterr', conf)        
+        return
+    
+    path_report = conf['reports.data.path'] + '/' + run_id
+    if os.path.exists(path_report + '/report_' + run_id):
+        return
+    
+    txt = '<?php $run_id="'+ run_id+'";?>\n'
+     
+    
+    # Set run_id variable in php file
+    f_in = open(template_php_file, 'r')
+    f_out = open(output_file_path, 'w')
+    
+    f_out.write(txt)
+    f_out.write(''.join(f_in.readlines()))
+    
+    f_in.close()
+    f_out.close()
+    
 
 def create_html_index_file(conf, output_file_path, run_id, sections):
     """Create an index.html file that contains links to all the generated reports.
@@ -450,8 +486,10 @@ def set_default_conf(conf):
     # Lock file
     conf['lock.file'] = '/var/lock/aozan.lock'
 
-    # Rsync
-    conf['rsync.exclude.cif'] = 'true'
+    # Synchronization
+    conf['sync.exclude.cif'] = 'True'
+    conf['sync.partial.sync'] = 'True'
+    conf['sync.partial.sync.min.age.files'] = '15'
 
     # Casava
     conf['casava.samplesheet.format'] = 'xls'

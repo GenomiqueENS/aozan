@@ -170,13 +170,9 @@ public class OverrepresentedSequencesBlast {
           loadSequencesToIgnore();
 
         } catch (IOException e) {
-          // TODO
-          // e.printStackTrace();
           LOGGER.severe(StringUtils.join(e.getStackTrace(), "\n\t"));
           this.stepEnabled = false;
         } catch (AozanException e) {
-          // TODO
-          // e.printStackTrace();
           LOGGER.info(StringUtils.join(e.getStackTrace(), "\n\t"));
           this.stepEnabled = false;
         }
@@ -334,6 +330,7 @@ public class OverrepresentedSequencesBlast {
    * @param sequence query blastn
    * @return a ContaminantHit for the best hit return by blastn or null
    */
+  @SuppressWarnings("static-access")
   public synchronized ContaminantHit blastSequence(final String sequence)
       throws IOException, AozanException {
 
@@ -360,7 +357,7 @@ public class OverrepresentedSequencesBlast {
 
     }
 
-    if (blastResult.isNull())
+    if (blastResult == null || blastResult.isNull())
       // No hit found
       return null;
 
@@ -427,7 +424,7 @@ public class OverrepresentedSequencesBlast {
    * @param sequence query blastn
    * @throws AozanException occurs if the process fails
    */
-  private static synchronized void launchBlastSearch(final List<String> cmd,
+  private static void launchBlastSearch(final List<String> cmd,
       final String sequence) throws AozanException {
 
     final ProcessBuilder builder = new ProcessBuilder(cmd);
