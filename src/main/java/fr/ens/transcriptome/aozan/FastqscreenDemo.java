@@ -81,6 +81,8 @@ public class FastqscreenDemo {
 
   public static final String AOZAN_CONF =
       "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_test.conf";
+  // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_partiel_fastqc.conf";
+  // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_without_fastqc.conf";
 
   public static Map<String, FastqSample> prefixList;
   private static boolean paired = false;
