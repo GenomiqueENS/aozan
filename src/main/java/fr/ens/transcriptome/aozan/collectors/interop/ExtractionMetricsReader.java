@@ -40,7 +40,8 @@ public class ExtractionMetricsReader extends
 
   public static final String NAME = "ExtractionMetricsOut";
 
-  public static final String EXTRACTION_METRICS_FILE = "ExtractionMetricsOut.bin";
+  public static final String EXTRACTION_METRICS_FILE =
+      "ExtractionMetricsOut.bin";
 
   private static final int EXPECTED_RECORD_SIZE = 38;
   private static final int EXPECTED_VERSION = 2;

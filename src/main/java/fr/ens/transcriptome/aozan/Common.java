@@ -80,8 +80,10 @@ public class Common {
   public static void initLogger(final String logPath, final String logLevel)
       throws SecurityException, IOException, AozanException {
 
-    initLogger(logPath,
-        logLevel == null ? Globals.LOG_LEVEL : Level.parse(logLevel.toUpperCase()));
+    initLogger(
+        logPath,
+        logLevel == null ? Globals.LOG_LEVEL : Level.parse(logLevel
+            .toUpperCase()));
   }
 
   /**

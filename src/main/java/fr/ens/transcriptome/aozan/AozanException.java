@@ -32,7 +32,7 @@ package fr.ens.transcriptome.aozan;
 public class AozanException extends Exception {
 
   private static final long serialVersionUID = -749903788412172296L;
-  
+
   private Exception exception;
 
   /**

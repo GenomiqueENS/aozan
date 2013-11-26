@@ -147,8 +147,8 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
    * @throws AozanException if the implementation of BasicStat has changed and
    *           is incompatible this method
    */
-  private static int getClusterNumberFromBasicStatsModule(
-      final BasicStats bs) throws AozanException {
+  private static int getClusterNumberFromBasicStatsModule(final BasicStats bs)
+      throws AozanException {
 
     try {
 
@@ -243,7 +243,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
     // Keep only the uncompressed data
     if (reportFile.exists()) {
 
-      if (! reportFile.delete())
+      if (!reportFile.delete())
         LOGGER.warning("FastQC : fail delete report "
             + reportFile.getAbsolutePath());
     }

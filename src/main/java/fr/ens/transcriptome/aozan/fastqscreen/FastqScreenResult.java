@@ -106,8 +106,8 @@ public class FastqScreenResult {
     s.append("FastqScreen : for Projet " + fastqSample.getProjectName());
     s.append(genomeSample == null ? "" : " (genome reference for sample "
         + genomeSample + ").");
-    s.append("\nresult for sample : "+fastqSample.getSampleName());
-    s.append("\ndescription of sample : "+ fastqSample.getDescriptionSample());
+    s.append("\nresult for sample : " + fastqSample.getSampleName());
+    s.append("\ndescription of sample : " + fastqSample.getDescriptionSample());
 
     s.append("\n");
     s.append("\n" + HEADER_COLUMNS_TEXT + "\n");
@@ -493,8 +493,10 @@ public class FastqScreenResult {
     // Specific legend : represent key in rundata
     private final String unMappedLegend = "unmapped";
     private final String oneHitOneLibraryLegend = "one.hit.one.library";
-    private final String multipleHitsOneLibraryLegend = "multiple.hits.one.library";
-    private final String oneHitMultipleLibrariesLegend = "one.hit.multiple.libraries";
+    private final String multipleHitsOneLibraryLegend =
+        "multiple.hits.one.library";
+    private final String oneHitMultipleLibrariesLegend =
+        "one.hit.multiple.libraries";
     private final String multipleHitsMultipleLibrariesLegend =
         "multiple.hits.multiple.libraries";
     private final String mappedLegend = "mapped";

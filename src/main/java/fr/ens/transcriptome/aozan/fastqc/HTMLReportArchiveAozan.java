@@ -261,7 +261,7 @@ public class HTMLReportArchiveAozan extends HTMLReportArchive {
     } catch (URISyntaxException e) {
       return null;
     } catch (NullPointerException e) {
-        return null;
+      return null;
     }
 
   }

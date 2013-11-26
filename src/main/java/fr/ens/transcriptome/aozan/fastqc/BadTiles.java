@@ -70,7 +70,8 @@ public class BadTiles implements QCModule {
   private boolean calculated = false;
 
   private static class QualityCount {
-    private final HashMap<Character, Long> counts = new HashMap<Character, Long>();
+    private final HashMap<Character, Long> counts =
+        new HashMap<Character, Long>();
 
     private long totalCounts = 0;
 
@@ -90,10 +91,10 @@ public class BadTiles implements QCModule {
 
     public char getMinChar() {
       char minChar = 10000;
-        for (Character thisChar : counts.keySet()) {
-            if (thisChar < minChar)
-                minChar = thisChar;
-        }
+      for (Character thisChar : counts.keySet()) {
+        if (thisChar < minChar)
+          minChar = thisChar;
+      }
 
       return minChar;
     }
@@ -101,10 +102,10 @@ public class BadTiles implements QCModule {
     public char getMaxChar() {
       char maxChar = 0;
 
-        for (Character thisChar : counts.keySet()) {
-            if (thisChar > maxChar)
-                maxChar = thisChar;
-        }
+      for (Character thisChar : counts.keySet()) {
+        if (thisChar > maxChar)
+          maxChar = thisChar;
+      }
 
       return maxChar;
 
@@ -115,7 +116,7 @@ public class BadTiles implements QCModule {
       long total = 0;
       long count = 0;
 
-      for(Character thisChar : counts.keySet()){
+      for (Character thisChar : counts.keySet()) {
         total += counts.get(thisChar) * (thisChar - offset);
         count += counts.get(thisChar);
       }
@@ -127,20 +128,20 @@ public class BadTiles implements QCModule {
       Character[] chars = counts.keySet().toArray(new Character[0]);
       Arrays.sort(chars);
       long total = 0;
-        for (Character aChar : chars) {
-            total += counts.get(aChar);
-        }
+      for (Character aChar : chars) {
+        total += counts.get(aChar);
+      }
 
       total *= percentile;
       total /= 100;
 
       long count = 0;
-        for (Character aChar : chars) {
-            count += counts.get(aChar);
-            if (count >= total) {
-                return (aChar - offset);
-            }
+      for (Character aChar : chars) {
+        count += counts.get(aChar);
+        if (count >= total) {
+          return (aChar - offset);
         }
+      }
 
       return -1;
 
@@ -271,7 +272,7 @@ public class BadTiles implements QCModule {
       if (Double.doubleToLongBits(medianScore) != Double
           .doubleToLongBits(other.medianScore))
         return false;
-        return tile == other.tile;
+      return tile == other.tile;
     }
 
     @Override

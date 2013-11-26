@@ -298,7 +298,7 @@ public class RunData {
     final BufferedReader br =
         Files.newReader(file, Globals.DEFAULT_FILE_ENCODING);
 
-    String line ;
+    String line;
 
     while ((line = br.readLine()) != null) {
 
@@ -346,7 +346,7 @@ public class RunData {
     final BufferedReader br =
         Files.newReader(file, Globals.DEFAULT_FILE_ENCODING);
 
-    String line ;
+    String line;
 
     while ((line = br.readLine()) != null) {
 

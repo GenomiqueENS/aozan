@@ -77,7 +77,7 @@ public class ReadingInteropBinaryFileTest extends TestCase {
     BufferedReader br =
         new BufferedReader(new FileReader(new File(path + "/" + dir,
             runDataFile)));
-    String line ;
+    String line;
 
     while ((line = br.readLine()) != null) {
 

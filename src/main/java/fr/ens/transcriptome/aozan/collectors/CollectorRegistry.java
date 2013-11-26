@@ -95,11 +95,11 @@ public class CollectorRegistry {
    */
   private CollectorRegistry() {
 
-      for (Collector collector : ServiceLoader.load(Collector.class)) {
+    for (Collector collector : ServiceLoader.load(Collector.class)) {
 
-          register(collector);
+      register(collector);
 
-      }
+    }
   }
 
 }

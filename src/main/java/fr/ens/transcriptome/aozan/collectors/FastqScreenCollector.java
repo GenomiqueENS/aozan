@@ -47,7 +47,7 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
  */
 public class FastqScreenCollector extends AbstractFastqCollector {
 
-    /** Collector name */
+  /** Collector name */
   public static final String COLLECTOR_NAME = "fastqscreen";
 
   public static final String KEY_GENOMES = "qc.conf.fastqscreen.genomes";

@@ -198,9 +198,8 @@ public class ErrorMetricsCollector implements Collector {
       for (int read = 1; read <= readsCount; read++) {
 
         int keyMap = lane * 100 + read;
-        errorRatesMetrics.put(keyMap, new ErrorRatesPerLane(lane, read,
-            true, read1CycleCount, read2LastCycleNumber,
-            read3CycleCount));
+        errorRatesMetrics.put(keyMap, new ErrorRatesPerLane(lane, read, true,
+            read1CycleCount, read2LastCycleNumber, read3CycleCount));
       }
     }
 
@@ -275,17 +274,20 @@ public class ErrorMetricsCollector implements Collector {
     private boolean dataToCompute = true;
 
     // Save pair tile-rate error for all cycles for a lane
-    private final ListMultimap<Integer, Number> allErrorRates = ArrayListMultimap
-        .create();
+    private final ListMultimap<Integer, Number> allErrorRates =
+        ArrayListMultimap.create();
 
     // Save pair tile-rate error for cycles (1 to 35) for all tiles
-    private final ListMultimap<Integer, Number> error35 = ArrayListMultimap.create();
+    private final ListMultimap<Integer, Number> error35 = ArrayListMultimap
+        .create();
 
     // Save pair tile-rate error for cycles (1 to 75) for all tiles, for run PE
-    private final ListMultimap<Integer, Number> error75 = ArrayListMultimap.create();
+    private final ListMultimap<Integer, Number> error75 = ArrayListMultimap
+        .create();
 
     // Save pair tile-rate error for cycles (1 to 100) for all tiles, for run PE
-    private final ListMultimap<Integer, Number> error100 = ArrayListMultimap.create();
+    private final ListMultimap<Integer, Number> error100 = ArrayListMultimap
+        .create();
 
     /**
      * Save a record from TileMetricsOut.bin file.
@@ -378,8 +380,8 @@ public class ErrorMetricsCollector implements Collector {
       for (Map.Entry<Integer, Collection<Number>> entry : errorValuePerTile
           .entrySet()) {
 
-          Collection<Number> value = entry.getValue();
-          List<Number> list =
+        Collection<Number> value = entry.getValue();
+        List<Number> list =
             Arrays.asList(value.toArray(new Number[value.size()]));
 
         StatisticsUtils stat = new StatisticsUtils(list);
@@ -440,9 +442,9 @@ public class ErrorMetricsCollector implements Collector {
      * @param asEmpty if true, all values are default values (0.0),
      *          corresponding to a control lane or without skipping Phix
      */
-    ErrorRatesPerLane(final int lane, final int read,
-        final boolean asEmpty, final int read1CycleCount,
-        final int read2LastCycleNumber, final int read3CycleCount) {
+    ErrorRatesPerLane(final int lane, final int read, final boolean asEmpty,
+        final int read1CycleCount, final int read2LastCycleNumber,
+        final int read3CycleCount) {
       this.laneNumber = lane;
       this.readNumber = read;
 
@@ -488,8 +490,8 @@ public class ErrorMetricsCollector implements Collector {
     ErrorRatesPerLane(final int lane, final int read,
         final int read1CycleCount, final int read2LastCycleNumber,
         final int read3CycleCount) {
-      this(lane, read, false, read1CycleCount,
-          read2LastCycleNumber, read3CycleCount);
+      this(lane, read, false, read1CycleCount, read2LastCycleNumber,
+          read3CycleCount);
     }
   }
 

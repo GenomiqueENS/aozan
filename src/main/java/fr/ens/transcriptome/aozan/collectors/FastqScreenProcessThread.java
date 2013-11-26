@@ -243,8 +243,8 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @param genomes list of references genomes for FastqScreen
    * @param genomeSample genome reference corresponding to sample
    * @param reportDir path for the directory who save the FastqScreen report
-   * @param isPairedMode true if a pair-end run and option paired mode equals true
-   *          else false
+   * @param isPairedMode true if a pair-end run and option paired mode equals
+   *          true else false
    * @param isRunPE true if the run is PE else false
    * @throws AozanException if an error occurs during create thread, if no fastq
    *           file was found
@@ -271,8 +271,8 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @param genomes list of references genomes for FastqScreen
    * @param genomeSample genome reference corresponding to sample
    * @param reportDir path for the directory who save the FastqScreen report
-   * @param isPairedMode true if a pair-end run and option paired mode equals true
-   *          else false
+   * @param isPairedMode true if a pair-end run and option paired mode equals
+   *          true else false
    * @param isRunPE true if the run is PE else false
    * @throws AozanException if an error occurs during create thread, if no fastq
    *           file was found

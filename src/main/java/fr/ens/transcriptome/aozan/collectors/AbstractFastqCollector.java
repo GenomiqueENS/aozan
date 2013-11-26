@@ -148,8 +148,7 @@ abstract public class AbstractFastqCollector implements Collector {
 
     createListFastqSamples(data);
 
-    final boolean isRunPE =
-            data.get(KEY_RUN_MODE).toUpperCase().equals("PE");
+    final boolean isRunPE = data.get(KEY_RUN_MODE).toUpperCase().equals("PE");
 
     RunData resultPart = null;
     if (this.getThreadsNumber() > 1) {

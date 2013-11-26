@@ -62,7 +62,7 @@ public class RuntimePatchFastQC {
 
     // Add code at the beginning of the method
     final String codeToAdd;
-    
+
     if (asBlastToUse) {
       codeToAdd =
           "return fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.findContaminantHit(sequence);";
@@ -110,12 +110,11 @@ public class RuntimePatchFastQC {
    * @throws AozanException throw an error occurs during modification bytecode
    *           fastqc
    */
-  
-  public static void runPatchFastQC()
-      throws AozanException {
+
+  public static void runPatchFastQC() throws AozanException {
     runPatchFastQC(false);
   }
-  
+
   /**
    * Execute method who patch code from FastQC before call in Aozan
    * @param asBlastToUse if blast will be used else false

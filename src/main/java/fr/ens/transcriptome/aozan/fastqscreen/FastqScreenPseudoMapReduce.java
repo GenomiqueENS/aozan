@@ -92,8 +92,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @throws AozanException if an error occurs while mapping
    */
   public void doMap(final File fastqRead, final List<String> listGenomes,
-      final String genomeSample, final int numberThreads)
-      throws AozanException {
+      final String genomeSample, final int numberThreads) throws AozanException {
 
     this.doMap(fastqRead, null, listGenomes, genomeSample, numberThreads);
   }

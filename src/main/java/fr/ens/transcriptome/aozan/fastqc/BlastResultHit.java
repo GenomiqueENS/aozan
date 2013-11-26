@@ -81,12 +81,11 @@ class BlastResultHit {
 
     this.result = extractFirstValueToString(firstHit, tag_hitDef);
     this.hspEValue = extractFirstValueToString(firstHit, tag_hspEValue);
-      int hspIdentity = extractFirstValueToInt(firstHit, tag_hspIdentity);
-      int hspAlignLen = extractFirstValueToInt(firstHit, tag_hspAlignLen);
+    int hspIdentity = extractFirstValueToInt(firstHit, tag_hspIdentity);
+    int hspAlignLen = extractFirstValueToInt(firstHit, tag_hspAlignLen);
     int countGap = queryLength - hspAlignLen;
 
-    this.prcIdentity =
-        (int) ((double) hspIdentity / this.queryLength * 100);
+    this.prcIdentity = (int) ((double) hspIdentity / this.queryLength * 100);
 
     this.queryCover = (int) ((double) countGap / this.queryLength * 100);
 
@@ -102,8 +101,8 @@ class BlastResultHit {
 
     StringBuilder name = new StringBuilder();
     name.append("Search with Blastall+, <a href="
-            + LINK_NCBI_BLASTN + this.sequence + "\""
-            + " target=\"_blank\">more detail</a>");
+        + LINK_NCBI_BLASTN + this.sequence + "\""
+        + " target=\"_blank\">more detail</a>");
     name.append(" First hit on "
         + (countHits > 100 ? "+100" : countHits) + " : ");
     name.append(" <br/>");

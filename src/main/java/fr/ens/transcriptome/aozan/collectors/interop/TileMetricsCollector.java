@@ -210,9 +210,9 @@ public class TileMetricsCollector implements Collector {
      */
     public void computeData() {
 
-      StatisticsUtils stat ;
-      Number mean ;
-      Number sd ;
+      StatisticsUtils stat;
+      Number mean;
+      Number sd;
 
       // Compute statistics for each code
       for (Map.Entry<Integer, Map<Integer, Double>> entry : metricsPerTilePerCode

@@ -47,7 +47,6 @@ import fr.ens.transcriptome.aozan.Globals;
  */
 public class AliasGenomeFile {
 
-
   /** Logger */
   private static final Logger LOGGER = Common.getLogger();
 
@@ -137,7 +136,8 @@ public class AliasGenomeFile {
       }
 
     } catch (IOException ignored) {
-        LOGGER.warning("Reading alias genomes file failed : none genome sample can be used for detection contamination.");
+      LOGGER
+          .warning("Reading alias genomes file failed : none genome sample can be used for detection contamination.");
     }
 
   }
@@ -168,7 +168,8 @@ public class AliasGenomeFile {
         fw.close();
       }
     } catch (IOException ignored) {
-        LOGGER.warning("Writing alias genomes file failed : file can not be updated.");
+      LOGGER
+          .warning("Writing alias genomes file failed : file can not be updated.");
     }
   }
 

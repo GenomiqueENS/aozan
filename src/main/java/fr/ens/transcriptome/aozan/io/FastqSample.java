@@ -116,7 +116,7 @@ public class FastqSample {
    */
   public CompressionType setCompressionExtension() {
     if (compressionType != null) {
-        return compressionType;
+      return compressionType;
     }
 
     if (StringUtils.extension(fastqFiles.get(0).getName()).equals("fastq"))
@@ -246,7 +246,7 @@ public class FastqSample {
   public String getDescriptionSample() {
     return this.descriptionSample;
   }
-  
+
   /**
    * Get list of fastq files for this sample
    * @return list fastq files

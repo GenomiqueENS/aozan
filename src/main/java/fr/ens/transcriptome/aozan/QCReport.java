@@ -278,7 +278,7 @@ public class QCReport {
 
       XMLUtils
           .addTagValue(doc, root, "RunId", this.data.get("run.info.run.id"));
-      
+
       // Convert string to date
       try {
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
@@ -288,7 +288,7 @@ public class QCReport {
         XMLUtils.addTagValue(doc, root, "RunDate",
             this.data.get("run.info.date"));
       }
-      
+
       XMLUtils.addTagValue(doc, root, "FlowcellId",
           this.data.get("run.info.flow.cell.id"));
       XMLUtils.addTagValue(doc, root, "InstrumentSN",

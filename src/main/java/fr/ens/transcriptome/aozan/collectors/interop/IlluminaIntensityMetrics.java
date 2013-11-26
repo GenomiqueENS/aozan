@@ -47,7 +47,8 @@ import java.util.Arrays;
  */
 public class IlluminaIntensityMetrics {
 
-  // Index array fwhm or intensities : corresponding reading order from binary file
+  // Index array fwhm or intensities : corresponding reading order from binary
+  // file
   private static final int BASE_A = 0;
   private static final int BASE_C = 1;
   private static final int BASE_G = 2;
@@ -102,9 +103,9 @@ public class IlluminaIntensityMetrics {
    */
   public int getAverageIntensities() {
     int sum = 0;
-      for (int intensity : intensities) {
-          sum += intensity;
-      }
+    for (int intensity : intensities) {
+      sum += intensity;
+    }
     return sum / intensities.length;
   }
 

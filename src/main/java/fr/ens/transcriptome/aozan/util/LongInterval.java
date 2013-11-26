@@ -100,7 +100,7 @@ public class LongInterval implements Interval {
     if (this.maxInclude && val > max)
       return false;
 
-      return !(!this.maxInclude && val >= max);
+    return !(!this.maxInclude && val >= max);
 
   }
 

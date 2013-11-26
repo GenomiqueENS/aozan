@@ -304,10 +304,8 @@ public class ExtractionMetricsCollector implements Collector {
       // Compute % intensity C20 / intensity C1 for each tile
       for (int i = 0; i < intensityCycle1Values.size(); i++) {
 
-        Double intensityC1 =
-                (double) intensityCycle1Values.get(i).intValue();
-        Double intensityC20 =
-                (double) intensityCycle20Values.get(i).intValue();
+        Double intensityC1 = (double) intensityCycle1Values.get(i).intValue();
+        Double intensityC20 = (double) intensityCycle20Values.get(i).intValue();
 
         if (intensityC1 > 0) {
           stat.addValues(intensityC20 / intensityC1 * 100);

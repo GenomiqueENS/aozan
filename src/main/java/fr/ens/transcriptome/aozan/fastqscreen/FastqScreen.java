@@ -51,7 +51,6 @@ public class FastqScreen {
   /** Logger */
   private static final Logger LOGGER = Common.getLogger();
 
-
   public static final String KEY_NUMBER_THREAD = "qc.conf.fastqc.threads";
   public static final String KEY_TMP_DIR = "tmp.dir";
 
@@ -162,7 +161,7 @@ public class FastqScreen {
   public FastqScreen(final Properties properties) {
 
     this.tmpDir = properties.getProperty(KEY_TMP_DIR);
-    
+
     if (properties.containsKey(KEY_TMP_DIR)) {
       try {
         confThreads =

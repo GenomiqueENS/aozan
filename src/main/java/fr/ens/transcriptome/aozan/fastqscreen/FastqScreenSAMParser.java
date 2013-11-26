@@ -253,10 +253,10 @@ public class FastqScreenSAMParser implements SAMParserLine {
     this.parser = new SAMParser();
 
     // object used for the Sam read alignments filter
-      List<ReadAlignmentsFilter> listFilters = Lists.newArrayList();
+    List<ReadAlignmentsFilter> listFilters = Lists.newArrayList();
     listFilters.add(new RemoveUnmappedReadAlignmentsFilter());
 
-      ReadAlignmentsFilter filter = new MultiReadAlignmentsFilter(listFilters);
+    ReadAlignmentsFilter filter = new MultiReadAlignmentsFilter(listFilters);
     this.buffer = new ReadAlignmentsFilterBuffer(filter);
 
     this.genomeDescriptionList = new ArrayList<String>();

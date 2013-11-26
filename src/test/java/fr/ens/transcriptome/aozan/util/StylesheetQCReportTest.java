@@ -77,7 +77,7 @@ public class StylesheetQCReportTest extends TestCase {
       return true;
     } catch (TransformerException ae) {
       return false;
-    } 
+    }
 
   }
 

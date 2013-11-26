@@ -510,7 +510,7 @@ public class OverrepresentedSequencesBlast {
    * Retrieve general informations of blastn, call once.
    * @param doc root of xml file result for blastn
    */
-  private void parseHeaderDocument(final Document doc)  {
+  private void parseHeaderDocument(final Document doc) {
 
     if (firstCall) {
 

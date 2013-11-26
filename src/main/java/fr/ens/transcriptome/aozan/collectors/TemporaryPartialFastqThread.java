@@ -69,7 +69,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
   // count reads pf necessary for create a temporary partial fastq
   private int countReadsPFtoCopy;
 
-    private final int rawClusterCount;
+  private final int rawClusterCount;
   private final int pfClusterCountParsed;
 
   private final File tmpFastqFile;
@@ -393,7 +393,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
       throws AozanException {
     super(fastqSample);
 
-      int maxReadsPFtoParse = maxReadsToParse;
+    int maxReadsPFtoParse = maxReadsToParse;
     this.countReadsPFtoCopy = numberReadsToCopy;
 
     this.rawClusterCount = rawClusterCount;
