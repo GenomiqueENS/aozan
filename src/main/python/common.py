@@ -360,8 +360,6 @@ def generate_html_index_file(conf, output_file_path, run_id):
     
     template_php_file = './template_index_run.php'
     
-    print 'template path ' + template_php_file
-    
     if not os.path.exists(template_php_file):
         error('[Aozan] common : File index html page', ' Template file for html page on a run ' + run_id +' : this page can not be generate' , conf['aozan.var.path'] + '/common.lasterr', conf)        
         return
