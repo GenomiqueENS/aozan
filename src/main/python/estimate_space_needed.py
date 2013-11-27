@@ -41,62 +41,50 @@ def estimate(run_id, conf):
     #
     # Estimate space needed +10%
     #
-
-    # set factor
+    
+    # Set factor and ratio util   
     run_factor = lane_count * cycle_count * 1.10
-
-    # for hiseq data
-    hiseq_space_needed = int(conf['hiseq.space.factor']) * run_factor
-    hiseq_space_free = common.df(conf['hiseq.data.path'])
-
-    # check if the remaining space on the directory is inferior at 5 percent
-    hiseq_space_remaining_not_enough = (hiseq_space_free - hiseq_space_needed) < (long(File(conf['hiseq.data.path']).getTotalSpace()) * 0.05)
-
-    print 'hiseq tot ' + str(long(File(conf['hiseq.data.path']).getTotalSpace())) + 'hiseq_space_remaining_not_enough' + str(hiseq_space_remaining_not_enough)
-
-    # check if free space is available
-    if (hiseq_space_needed > hiseq_space_free) or (hiseq_space_remaining_not_enough):
-        error(run_id, 'hiseq files', hiseq_space_needed, hiseq_space_free, conf['hiseq.data.path'], conf)
-    else:
-        log_message(run_id, 'hiseq files', hiseq_space_needed, hiseq_space_free, conf)
-
-    # for bcl files
     # bcl file : compressed or not, info in runParameters.xml
     ratio_bcl = ratio_bcl_compressed(run_param_path)
 
     # quality data for Q30 : compressed or not
     ratio_quality = compressed_quality_data(run_param_path)
 
-    bcl_space_needed = int(conf['bcl.space.factor']) * run_factor * ratio_bcl * ratio_quality
-    bcl_space_free = common.df(conf['bcl.data.path'])
-
-    # check if the remaining space on the directory is inferior at 5 percent
-    bcl_space_remaining_not_enough = (bcl_space_free - bcl_space_needed) < (long(File(conf['bcl.data.path']).getTotalSpace()) * 0.05)
-
-    print 'bcl tot ' + str(long(File(conf['bcl.data.path']).getTotalSpace())) + 'bcl_space_remaining_not_enough ' + str(bcl_space_remaining_not_enough)
-
-    # check if free space is available
-    if (bcl_space_needed > bcl_space_free) or (bcl_space_remaining_not_enough):
-        error(run_id, 'bcl files', bcl_space_needed, bcl_space_free, conf['bcl.data.path'], conf)
-    else:
-        log_message(run_id, 'bcl files', bcl_space_needed, bcl_space_free, conf)
-
+    # for hiseq data
+    check_space_needed_and_free(run_id, 'hiseq', run_factor, conf)
+    
+    # for bcl files
+    check_space_needed_and_free(run_id, 'bcl', run_factor * ratio_bcl * ratio_quality, conf)
+    
     # for fastq files
-    fastq_space_needed = int(conf['fastq.space.factor']) * run_factor
-    fastq_space_free = common.df(conf['fastq.data.path'])
+    check_space_needed_and_free(run_id, 'fastq', run_factor, conf)
+
+
+def check_space_needed_and_free(run_id, type_file, run_factor, conf):
+    """Compute free and needed space for type file and send warning mail if not enough.
+
+    Arguments:
+        run_id: the run id 
+        type_file: type file concerned
+        factor: factor to estimate space needed by current run
+        conf: configuration dictionary
+    """
+    
+    space_unit = int(conf[type_file + '.space.factor'])
+    data_path = conf[type_file + '.data.path']
+        
+    space_needed = space_unit * run_factor
+    space_free = common.df(data_path)
 
     # check if the remaining space on the directory is inferior at 5 percent
-    fastq_space_remaining_not_enough = (fastq_space_free - fastq_space_needed) < (long(File(conf['fastq.data.path']).getTotalSpace()) * 0.05)
-
-    print 'fastq tot ' + str(long(File(conf['fastq.data.path']).getTotalSpace())) + 'fastq_space_remaining_not_enough ' + str(fastq_space_remaining_not_enough)
+    space_remaining_not_enough = (space_free - space_needed) < (long(File(data_path).getTotalSpace()) * 0.05)
 
     # check if free space is available
-    if (fastq_space_needed > fastq_space_free) or (fastq_space_remaining_not_enough):
-        error(run_id, 'fastq files', fastq_space_needed, fastq_space_free, conf['fastq.data.path'], conf)
+    if (space_needed > space_free) or (space_remaining_not_enough):
+        error(run_id, type_file + ' files', space_needed, space_free, data_path, conf)
     else:
-        log_message(run_id, 'fastq files', fastq_space_needed, fastq_space_free, conf)
-
-
+        log_message(run_id, type_file + ' files', space_needed, space_free, conf)
+    
 
 def error(run_id, type_file, space_needed, space_free, dir_path, conf):
     """Error handling.
