@@ -163,6 +163,9 @@ def launch_steps(conf):
     # Demultiplexing
     #
 
+    if conf['demux.use.hiseq.output'].lower().strip() == 'true':
+        sync_run_ids_done = hiseq_run_ids_done
+        
     demux_run_ids_done = demux_run.load_processed_run_ids(conf)
 
     if conf['demux.step'].lower().strip() == 'true':

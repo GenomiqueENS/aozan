@@ -424,6 +424,7 @@ def set_default_conf(conf):
     conf['sync.partial.sync.min.age.files'] = '15'
 
     # Casava
+    conf['demux.use.hiseq.output'] = 'False'
     conf['casava.samplesheet.format'] = 'xls'
     conf['casava.samplesheet.prefix.filename'] = 'design'
     conf['casava.path'] = '/usr/local/casava'

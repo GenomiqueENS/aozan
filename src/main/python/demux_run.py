@@ -105,7 +105,17 @@ def demux(run_id, conf):
     reports_data_base_path = conf['reports.data.path']
     reports_data_path = reports_data_base_path + '/' + run_id
 
-
+    input_bcl_path = conf['bcl.data.path'] + '/' + run_id
+    
+    # Check if must use the direct output of the HiSeq
+    if conf['demux.use.hiseq.output'].lower().strip() == 'true':
+        # Retrieve the path of run data directory on HiSeq
+        input_bcl_path = hiseq_run.find_hiseq_run_path(run_id, conf)
+        # Path not found
+        if input_bcl_path == False:
+            error("HiSeq data directory does not exists", "HiSeq data directory does not exists for the run : " + run_id, conf)
+            return False
+    
     run_number = hiseq_run.get_run_number(run_id)
     instrument_sn = hiseq_run.get_instrument_sn(run_id)
     flow_cell_id = hiseq_run.get_flow_cell(run_id)
@@ -122,8 +132,8 @@ def demux(run_id, conf):
     common.log("INFO", "Flowcell id: " + flow_cell_id, conf)
 
     # Check if root input bcl data directory exists
-    if not os.path.exists(conf['bcl.data.path']):
-        error("Basecalling data directory does not exists", "Basecalling data directory does not exists: " + conf['bcl.data.path'], conf)
+    if not os.path.exists(input_bcl_path):
+        error("Basecalling data directory does not exists", "Basecalling data directory does not exists: " + input_bcl_path, conf)
         return False
 
     # Check if root input fastq data directory exists
@@ -162,7 +172,7 @@ def demux(run_id, conf):
         return False
 
     # Compute disk usage and disk free to check if enough disk space is available
-    input_path_du = common.du(conf['bcl.data.path'] + '/' + run_id)
+    input_path_du = common.du(input_bcl_path)
     output_df = common.df(conf['fastq.data.path'])
     du_factor = float(conf['demux.space.factor'])
     space_needed = input_path_du * du_factor
@@ -173,7 +183,7 @@ def demux(run_id, conf):
 
     # Check if free space is available
     if output_df < space_needed:
-        error("Not enough disk space to perform demultiplexing for run " + run_id, "Not enough disk space to perform demultiplexing for run " + run_id +
+        error("Not enough disk space to perform demultiplexing for run " + run_id, "Not enough disk space to perform demultiplexing for run " + run_id + 
               '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + fastq_output_dir + '.', conf)
         return False
 
@@ -282,7 +292,7 @@ def demux(run_id, conf):
           '--compression ' + conf['casava.compression'] + ' ' + \
           '--gz-level ' + conf['casava.compression.level'] + ' ' \
           '--mismatches ' + conf['casava.mismatches'] + ' ' + \
-          '--input-dir ' + conf['bcl.data.path'] + '/' + run_id + '/Data/Intensities/BaseCalls ' + \
+          '--input-dir ' + input_bcl_path + '/Data/Intensities/BaseCalls ' + \
           '--sample-sheet ' + design_csv_path + ' ' + \
           '--output-dir ' + fastq_output_dir
     if conf['casava.with.failed.reads'] == 'True':

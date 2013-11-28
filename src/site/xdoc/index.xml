@@ -105,6 +105,10 @@
 		    	
 			</subsection>
 			
+			<subsection name="Synchronization continue of HiSeq data">
+				<p></p>
+			</subsection>
+			
 			<subsection name="Reading binary interOp Illumina files">
 				<p>Run data are retrieved by parsing Illumina InterOp Binary Metric files. The control quality report lists this data for each read in the run like in this example.</p>
 	       		<div align="center"><a href="qc-lanes-tests.html"><img src="images/qc_lane_test_600px.png" alt="" border="1"/></a></div>

@@ -70,6 +70,7 @@
 	     <tr><td>casava.with.failed.reads</td><td>boolean</td><td>True</td><td>Add reads that not pass Illumina filter in fastq files</td></tr>
 	     <tr><td>casava.additionnal.arguments</td><td>string</td><td>Not set</td><td>Additional arguments for CASAVA</td></tr>
 	     <tr><td>casava.threads</td><td>integer</td><td>Number of computer cores</td><td>Number of threads to use for demultiplexing </td></tr>
+	     <tr><td>demux.use.hiseq.output</td><td>boolean</td><td>False</td><td>If true : no synchronization step, use direct Hiseq output for demultiplexage step.</td></tr>
 	   </table>
      
         <p>An example of email sent at the end of demultiplexing step.</p>
