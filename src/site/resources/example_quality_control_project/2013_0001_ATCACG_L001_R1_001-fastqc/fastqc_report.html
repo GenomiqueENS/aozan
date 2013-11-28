@@ -1,0 +1,583 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN">
+<html>
+<head><title>2013_0019polyA_CAGATC_L001_R1_001.fastq.bz2 FastQC Report</title>
+
+<style type="text/css">
+
+ @media screen {
+  div.summary {
+    width: 18em;
+    position:fixed;
+    top: 3em;
+    margin:1em 0 0 1em;
+  }
+  
+  div.main {
+    display:block;
+    position:absolute;
+    overflow:auto;
+    height:auto;
+    width:auto;
+    top:4.5em;
+    bottom:2.3em;
+    left:18em;
+    right:0;
+    border-left: 1px solid #CCC;
+    padding:0 0 0 1em;
+    background-color: white;
+    z-index:1;
+  }
+  
+  div.header {
+    background-color: #EEE;
+    border:0;
+    margin:0;
+    padding: 0.5em;
+    font-size: 200%;
+    font-weight: bold;
+    position:fixed;
+    width:100%;
+    top:0;
+    left:0;
+    z-index:2;
+  }
+
+  div.footer {
+    background-color: #EEE;
+    border:0;
+    margin:0;
+	padding:0.5em;
+    height: 1.3em;
+	overflow:hidden;
+    font-size: 100%;
+    font-weight: bold;
+    position:fixed;
+    bottom:0;
+    width:100%;
+    z-index:2;
+  }
+  
+  img.indented {
+    margin-left: 3em;
+  }
+ }
+ 
+ @media print {
+	img {
+		max-width:100% !important;
+		page-break-inside: avoid;
+	}
+	h2, h3 {
+		page-break-after: avoid;
+	}
+	div.header {
+      background-color: #FFF;
+    }
+	
+ }
+ 
+ body {    
+  font-family: sans-serif;   
+  color: #000;   
+  background-color: #FFF;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  }
+  
+  div.header {
+  border:0;
+  margin:0;
+  padding: 0.5em;
+  font-size: 200%;
+  font-weight: bold;
+  width:100%;
+  }    
+  
+  #header_title {
+  display:inline-block;
+  float:left;
+  clear:left;
+  }
+  #header_filename {
+  display:inline-block;
+  float:right;
+  clear:right;
+  font-size: 50%;
+  margin-right:2em;
+  text-align: right;
+  }
+
+  div.header h3 {
+  font-size: 50%;
+  margin-bottom: 0;
+  }
+  
+  div.summary ul {
+  padding-left:0;
+  list-style-type:none;
+  }
+  
+  div.summary ul li img {
+  margin-bottom:-0.5em;
+  margin-top:0.5em;
+  }
+	  
+  div.main {
+  background-color: white;
+  }
+      
+  div.module {
+  padding-bottom:1.5em;
+  padding-top:1.5em;
+  }
+	  
+  div.footer {
+  background-color: #EEE;
+  border:0;
+  margin:0;
+  padding: 0.5em;
+  font-size: 100%;
+  font-weight: bold;
+  width:100%;
+  }
+
+
+  a {
+  color: #000080;
+  }
+
+  a:hover {
+  color: #800000;
+  }
+      
+  h2 {
+  color: #800000;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  clear:left;
+  }
+
+  table { 
+  margin-left: 3em;
+  text-align: center;
+  }
+  
+  th { 
+  text-align: center;
+  background-color: #000080;
+  color: #FFF;
+  padding: 0.4em;
+  }      
+  
+  td { 
+  font-family: monospace; 
+  text-align: left;
+  background-color: #EEE;
+  color: #000;
+  padding: 0.4em;
+  }
+
+  img {
+  padding-top: 0;
+  margin-top: 0;
+  border-top: 0;
+  }
+
+  
+  p {
+  padding-top: 0;
+  margin-top: 0;
+  }
+  
+</style>
+
+</head>
+<body>
+<div class="header">
+<div id="header_title"><img src="Icons/fastqc_icon.png" alt="FastQC">FastQC Report</div>
+<div id="header_filename">
+Mon 21 Oct 2013<br />
+2013_0001_CAGATC_L001_R1_001.fastq.bz2
+</div>
+</div>
+<div class="summary">
+<h2>Summary</h2>
+<ul>
+<li><img src="Icons/tick.png" alt="[PASS]"> <a href="#M0">Basic Statistics</a></li>
+<li><img src="Icons/tick.png" alt="[PASS]"> <a href="#M1">Per base sequence quality</a></li>
+<li><img src="Icons/tick.png" alt="[PASS]"> <a href="#M2">Per sequence quality scores</a></li>
+<li><img src="Icons/error.png" alt="[FAIL]"> <a href="#M3">Per base sequence content</a></li>
+<li><img src="Icons/error.png" alt="[FAIL]"> <a href="#M4">Per base GC content</a></li>
+<li><img src="Icons/error.png" alt="[FAIL]"> <a href="#M5">Per sequence GC content</a></li>
+<li><img src="Icons/tick.png" alt="[PASS]"> <a href="#M6">Per base N content</a></li>
+<li><img src="Icons/tick.png" alt="[PASS]"> <a href="#M7">Sequence Length Distribution</a></li>
+<li><img src="Icons/error.png" alt="[FAIL]"> <a href="#M8">Sequence Duplication Levels</a></li>
+<li><img src="Icons/error.png" alt="[FAIL]"> <a href="#M9">Overrepresented sequences</a></li>
+<li><img src="Icons/error.png" alt="[FAIL]"> <a href="#M10">Kmer Content</a></li>
+<li><img src="Icons/warning.png" alt="[WARNING]"> <a href="#M11">Bad tiles</a></li>
+</ul>
+</div>
+<div class="main">
+<div class="module"><h2 id="M0"><img src="Icons/tick.png" alt="[OK]"> Basic Statistics</h2>
+<table>
+<tr>
+<th>Measure</th>
+<th>Value</th>
+</tr>
+<tr>
+<td>Filename</td>
+<td>2013_0001_CAGATC_L001_R1_001.fastq.bz2</td>
+</tr>
+<tr>
+<td>File type</td>
+<td>Conventional base calls</td>
+</tr>
+<tr>
+<td>Encoding</td>
+<td>Sanger / Illumina 1.9</td>
+</tr>
+<tr>
+<td>Total Sequences</td>
+<td>6838184</td>
+</tr>
+<tr>
+<td>Filtered Sequences</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Sequence length</td>
+<td>51</td>
+</tr>
+<tr>
+<td>%GC</td>
+<td>40</td>
+</tr>
+</table>
+</div>
+<div class="module"><h2 id="M1"><img src="Icons/tick.png" alt="[OK]"> Per base sequence quality</h2>
+<p><img class="indented" src="Images/per_base_quality.png" alt="Per base quality graph"></p>
+</div>
+<div class="module"><h2 id="M2"><img src="Icons/tick.png" alt="[OK]"> Per sequence quality scores</h2>
+<p><img class="indented" src="Images/per_sequence_quality.png" alt="Per Sequence quality graph"></p>
+</div>
+<div class="module"><h2 id="M3"><img src="Icons/error.png" alt="[FAIL]"> Per base sequence content</h2>
+<p><img class="indented" src="Images/per_base_sequence_content.png" alt="Per base sequence content"></p>
+</div>
+<div class="module"><h2 id="M4"><img src="Icons/error.png" alt="[FAIL]"> Per base GC content</h2>
+<p><img class="indented" src="Images/per_base_gc_content.png" alt="Per base GC content graph"></p>
+</div>
+<div class="module"><h2 id="M5"><img src="Icons/error.png" alt="[FAIL]"> Per sequence GC content</h2>
+<p><img class="indented" src="Images/per_sequence_gc_content.png" alt="Per sequence GC content graph"></p>
+</div>
+<div class="module"><h2 id="M6"><img src="Icons/tick.png" alt="[OK]"> Per base N content</h2>
+<p><img class="indented" src="Images/per_base_n_content.png" alt="N content graph"></p>
+</div>
+<div class="module"><h2 id="M7"><img src="Icons/tick.png" alt="[OK]"> Sequence Length Distribution</h2>
+<p><img class="indented" src="Images/sequence_length_distribution.png" alt="Sequence length distribution"></p>
+</div>
+<div class="module"><h2 id="M8"><img src="Icons/error.png" alt="[FAIL]"> Sequence Duplication Levels</h2>
+<p><img class="indented" src="Images/duplication_levels.png" alt="Duplication level graph"></p>
+</div>
+<div class="module"><h2 id="M9"><img src="Icons/error.png" alt="[FAIL]"> Overrepresented sequences</h2>
+<table>
+<tr>
+<th>Sequence</th>
+<th>Count</th>
+<th>Percentage</th>
+<th>Possible Source</th>
+</tr>
+<tr>
+<td>AACTTTCAACAACGGATCTCTTGGCTCTCGCATCGATGAAGAACGCAGCGA</td>
+<td>1443252</td>
+<td>21.105778961197885</td>
+<td>Search with Blastall+, <a href="http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&amp;PAGE=Nucleotides&amp;DATABASE=nr&amp;QUERY=AACTTTCAACAACGGATCTCTTGGCTCTCGCATCGATGAAGAACGCAGCGA" target="_blank">more detail</a> First hit on +100 :  <br/>Hygrocybe nitida isolate DJL05NC65c5 voucher TENN:61894 18S ribosomal RNA gene, partial sequence; internal transcribed spacer 1, 5.8S ribosomal RNA gene, and internal transcribed spacer 2, complete sequence; and large subunit ribosomal RNA gene, partial sequence <br/> Evalue=3.87318e-19,  Ident=100%, QueryCovergap=0%</td>
+</tr>
+<tr>
+<td>CAACTTTCAACAACGGATCTCTTGGCTCTCGCATCGATGAAGAACGCAGCG</td>
+<td>395417</td>
+<td>5.782485525396801</td>
+<td>Search with Blastall+, <a href="http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&amp;PAGE=Nucleotides&amp;DATABASE=nr&amp;QUERY=CAACTTTCAACAACGGATCTCTTGGCTCTCGCATCGATGAAGAACGCAGCG" target="_blank">more detail</a> First hit on +100 :  <br/>Hygrocybe nitida isolate DJL05NC65c5 voucher TENN:61894 18S ribosomal RNA gene, partial sequence; internal transcribed spacer 1, 5.8S ribosomal RNA gene, and internal transcribed spacer 2, complete sequence; and large subunit ribosomal RNA gene, partial sequence <br/> Evalue=3.87318e-19,  Ident=100%, QueryCovergap=0%</td>
+</tr>
+<tr>
+<td>AATGGCTTAAAGGATCCGTAGAATGACATGTAATATAAACATGTAAGAGTT</td>
+<td>106935</td>
+<td>1.5637923752856022</td>
+<td>Search with Blastall+, <a href="http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&amp;PAGE=Nucleotides&amp;DATABASE=nr&amp;QUERY=AATGGCTTAAAGGATCCGTAGAATGACATGTAATATAAACATGTAAGAGTT" target="_blank">more detail</a> First hit on 8 :  <br/>Issatchenkia orientalis strain NRRL Y-5396 small subunit ribosomal RNA gene, partial sequence; mitochondrial <br/> Evalue=3.87318e-19,  Ident=100%, QueryCovergap=0%</td>
+</tr>
+<tr>
+<td>TAATACAACTTTCAACAACGGATCTCTTGGCTCTCGCATCGATGAAGAACG</td>
+<td>73070</td>
+<td>1.0685585529725437</td>
+<td>Search with Blastall+, <a href="http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&amp;PAGE=Nucleotides&amp;DATABASE=nr&amp;QUERY=TAATACAACTTTCAACAACGGATCTCTTGGCTCTCGCATCGATGAAGAACG" target="_blank">more detail</a> First hit on +100 :  <br/>Gloeodontia sp. LWZ-2012a voucher Dai 12080 internal transcribed spacer 1, partial sequence; 5.8S ribosomal RNA gene, complete sequence; and internal transcribed spacer 2, partial sequence <br/> Evalue=3.87318e-19,  Ident=100%, QueryCovergap=0%</td>
+</tr>
+<tr>
+<td>AGATCGGAAGAGCACACGTCTGAACTCCAGTCACCAGATCATCTCGTATGC</td>
+<td>66492</td>
+<td>0.9723634228034812</td>
+<td>TruSeq Adapter, Index 7 (100% over 50bp)</td>
+</tr>
+<tr>
+<td>TCTGACCTCAAATCAGGTAGGACTACCCGCTGAACTTAAGCATATCAATAA</td>
+<td>65261</td>
+<td>0.9543615673401009</td>
+<td>Search with Blastall+, <a href="http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&amp;PAGE=Nucleotides&amp;DATABASE=nr&amp;QUERY=TCTGACCTCAAATCAGGTAGGACTACCCGCTGAACTTAAGCATATCAATAA" target="_blank">more detail</a> First hit on +100 :  <br/>Ganoderma lucidum strain 77002 18S ribosomal RNA gene, partial sequence; internal transcribed spacer 1, 5.8S ribosomal RNA gene, and internal transcribed spacer 2, complete sequence; and 28S ribosomal RNA gene, partial sequence <br/> Evalue=3.87318e-19,  Ident=100%, QueryCovergap=0%</td>
+</tr>
+<tr>
+<td>TATAGAAGTCTTAACCAAAATTAGTGCCAGCAGTTGCGGCTAAACTAAGGA</td>
+<td>52283</td>
+<td>0.7645743372801902</td>
+<td>Search with Blastall+, <a href="http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&amp;PAGE=Nucleotides&amp;DATABASE=nr&amp;QUERY=TATAGAAGTCTTAACCAAAATTAGTGCCAGCAGTTGCGGCTAAACTAAGGA" target="_blank">more detail</a> First hit on +100 :  <br/>Pichia kluyveri strain CBS 7907 mitochondrion, complete genome <br/> Evalue=3.87318e-19,  Ident=100%, QueryCovergap=0%</td>
+</tr>
+<tr>
+<td>TAGAAGTCTTAACCAAAATTAGTGCCAGCAGTTGCGGCTAAACTAAGGAGG</td>
+<td>51167</td>
+<td>0.7482542148617235</td>
+<td>No Hit</td>
+</tr>
+</table>
+</div>
+<div class="module"><h2 id="M10"><img src="Icons/error.png" alt="[FAIL]"> Kmer Content</h2>
+<p><img class="indented" src="Images/kmer_profiles.png" alt="Kmer graph"></p>
+<table>
+<tr>
+<th>Sequence</th>
+<th>Count</th>
+<th>Obs/Exp Overall</th>
+<th>Obs/Exp Max</th>
+<th>Max Obs/Exp Position</th>
+</tr>
+<tr>
+<td>GGCTC</td>
+<td>2465020</td>
+<td>17.326965</td>
+<td>514.437</td>
+<td>23</td>
+</tr>
+<tr>
+<td>CTCGC</td>
+<td>2321625</td>
+<td>16.85571</td>
+<td>530.9967</td>
+<td>27</td>
+</tr>
+<tr>
+<td>TGGCT</td>
+<td>2619540</td>
+<td>14.546461</td>
+<td>406.0737</td>
+<td>22</td>
+</tr>
+<tr>
+<td>CTCTC</td>
+<td>2404245</td>
+<td>14.243504</td>
+<td>432.82974</td>
+<td>25</td>
+</tr>
+<tr>
+<td>TCTCG</td>
+<td>2423440</td>
+<td>13.900087</td>
+<td>418.55917</td>
+<td>26</td>
+</tr>
+<tr>
+<td>GCTCT</td>
+<td>2409615</td>
+<td>13.820791</td>
+<td>419.4777</td>
+<td>24</td>
+</tr>
+<tr>
+<td>CTTGG</td>
+<td>2466735</td>
+<td>13.697926</td>
+<td>407.09335</td>
+<td>20</td>
+</tr>
+<tr>
+<td>TTGGC</td>
+<td>2427785</td>
+<td>13.481634</td>
+<td>406.5073</td>
+<td>21</td>
+</tr>
+<tr>
+<td>TCTCT</td>
+<td>2534130</td>
+<td>11.860344</td>
+<td>342.645</td>
+<td>17</td>
+</tr>
+<tr>
+<td>GCAGC</td>
+<td>2226615</td>
+<td>11.813418</td>
+<td>388.54602</td>
+<td>45</td>
+</tr>
+<tr>
+<td>CTCTT</td>
+<td>2497515</td>
+<td>11.688976</td>
+<td>342.99817</td>
+<td>18</td>
+</tr>
+<tr>
+<td>CGCAG</td>
+<td>2202295</td>
+<td>11.684387</td>
+<td>388.18805</td>
+<td>44</td>
+</tr>
+<tr>
+<td>TCTTG</td>
+<td>2514075</td>
+<td>11.391834</td>
+<td>331.6411</td>
+<td>19</td>
+</tr>
+<tr>
+<td>CAGCG</td>
+<td>2125740</td>
+<td>11.278221</td>
+<td>388.38452</td>
+<td>46</td>
+</tr>
+<tr>
+<td>CTTTC</td>
+<td>2400355</td>
+<td>11.234243</td>
+<td>342.226</td>
+<td>3</td>
+</tr>
+<tr>
+<td>GGATC</td>
+<td>2573210</td>
+<td>10.78539</td>
+<td>306.99347</td>
+<td>14</td>
+</tr>
+<tr>
+<td>CATCG</td>
+<td>2459430</td>
+<td>10.64751</td>
+<td>316.92673</td>
+<td>31</td>
+</tr>
+<tr>
+<td>CGATG</td>
+<td>2467020</td>
+<td>10.340304</td>
+<td>307.0026</td>
+<td>34</td>
+</tr>
+<tr>
+<td>GCATC</td>
+<td>2372400</td>
+<td>10.270734</td>
+<td>316.436</td>
+<td>30</td>
+</tr>
+<tr>
+<td>CGCAT</td>
+<td>2342140</td>
+<td>10.13973</td>
+<td>316.23984</td>
+<td>29</td>
+</tr>
+<tr>
+<td>TCGCA</td>
+<td>2331950</td>
+<td>10.095614</td>
+<td>316.0132</td>
+<td>28</td>
+</tr>
+<tr>
+<td>CGGAT</td>
+<td>2400025</td>
+<td>10.0595</td>
+<td>306.60126</td>
+<td>13</td>
+</tr>
+</table>
+</div>
+<div class="module"><h2 id="M11"><img src="Icons/warning.png" alt="[WARN]"> Bad tiles</h2>
+<table>
+<tr>
+<th>Lane</th>
+<th>Cycle</th>
+<th>Tile</th>
+<th>Median score</th>
+</tr>
+<tr>
+<td>2</td>
+<td>38</td>
+<td>2104</td>
+<td>9.0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>38</td>
+<td>2204</td>
+<td>18.0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>43</td>
+<td>2203</td>
+<td>19.0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>55</td>
+<td>2102</td>
+<td>19.0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>86</td>
+<td>2209</td>
+<td>11.0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>96</td>
+<td>2105</td>
+<td>18.0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>98</td>
+<td>2208</td>
+<td>18.0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>98</td>
+<td>2209</td>
+<td>2.0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>99</td>
+<td>2209</td>
+<td>2.0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>100</td>
+<td>2209</td>
+<td>2.0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>101</td>
+<td>2209</td>
+<td>2.0</td>
+</tr>
+</table>
+</div>
+</div><div class="footer">Produced by <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC</a> (version 0.10.1)</div>
+</body></html>

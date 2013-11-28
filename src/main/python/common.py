@@ -10,7 +10,9 @@ import smtplib, os.path, time
 import mimetypes
 
 from java.io import File
+from java.io import BufferedReader
 from java.lang import Runtime
+from java.lang import Class
 from java.util.logging import Level
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -314,7 +316,7 @@ def add_run_id_to_processed_run_ids(run_id, done_file_path, conf):
         conf: configuration dictionary
     """
 
-    log('WARNING', 'Add ' + run_id + ' to ' + os.path.basename(done_file_path), conf)
+    log('INFO', 'Add ' + run_id + ' to ' + os.path.basename(done_file_path), conf)
 
     f = open(done_file_path, 'a')
 
@@ -349,39 +351,6 @@ def load_conf(conf, conf_file_path):
     f.close()
     return conf
 
-def generate_html_index_file(conf, output_file_path, run_id):
-    """Create an index.html file that contains links to all the generated reports.
-
-    Arguments:
-        conf: configuration dictionary
-        output_file_path: path of the index.html file to create
-        run_id: The run id
-    """
-    
-    template_php_file = './template_index_run.php'
-    
-    if not os.path.exists(template_php_file):
-        error('[Aozan] common : File index html page', ' Template file for html page on a run ' + run_id +' : this page can not be generate' , conf['aozan.var.path'] + '/common.lasterr', conf)        
-        return
-    
-    path_report = conf['reports.data.path'] + '/' + run_id
-    if os.path.exists(path_report + '/report_' + run_id):
-        return
-    
-    txt = '<?php $run_id="'+ run_id+'";?>\n'
-     
-    
-    # Set run_id variable in php file
-    f_in = open(template_php_file, 'r')
-    f_out = open(output_file_path, 'w')
-    
-    f_out.write(txt)
-    f_out.write(''.join(f_in.readlines()))
-    
-    f_in.close()
-    f_out.close()
-    
-
 def create_html_index_file(conf, output_file_path, run_id, sections):
     """Create an index.html file that contains links to all the generated reports.
 
@@ -396,51 +365,16 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
     text_runInfo = ''
 
     path_report = conf['reports.data.path'] + '/' + run_id
+    
     # Check directory report exists
-
-    if os.path.exists(path_report + '/report_' + run_id):
-        text_runInfo = """<li><a href="report_###RUN_ID###/Status.htm">Run info</a></li>
-               <li><a href="report_###RUN_ID###.tar.bz2">All reports(compressed archive)</a></li>"""
-
-    text = """<html>
-        <head>
-                <title>Run ###RUN_ID###</title>
-        </head>
-        <body>
-                <h1>Run ###RUN_ID### reports</h1>
-
-###START_SECTION sync
-                <h2>HiSeq reports</h2>
-
-                <ul>
-                        <li><a href="report_###RUN_ID###/First_Base_Report.htm">First base report</a></li>
-                        %s
-                        <li><a href="hiseq_log_###RUN_ID###.tar.bz2">HiSeq log (compressed archive)</a></li>
-                </ul>
-###END_SECTION
-
-###START_SECTION demux
-                <h2>Demultiplexing reports</h2>
-
-                <ul>
-                        <li><a href="basecall_stats_###RUN_ID###/All.htm">All</a></li>
-                        <li><a href="basecall_stats_###RUN_ID###/IVC.htm">IVC</a></li>
-                        <li><a href="basecall_stats_###RUN_ID###/Demultiplex_Stats.htm">Demultiplex stats</a></li>
-                        <li><a href="basecall_stats_###RUN_ID###.tar.bz2">All reports(compressed archive)</a></li>
-                </ul>
-###END_SECTION
-
-###START_SECTION qc
-                <h2>Quality control reports</h2>
-
-                <ul>
-                        <li><a href="qc_###RUN_ID###/###RUN_ID###.html">QC report</a></li>
-                </ul>
-###END_SECTION
-
-        </body>
-</html>""" % (text_runInfo)
-
+    
+    classSrc = Globals.globalsClass
+    
+    # Retrieve BufferedReader on index html template
+    br = BufferedReader(classSrc.getResourceAsStream(Globals.INDEX_HTML_TEMPLATE_FILENAME))
+    
+    print str(br.readline())
+    
     template_path = conf['index.html.template']
     if template_path != None and template_path != '' and os.path.exists(template_path):
         f_in = open(template_path, 'r')
