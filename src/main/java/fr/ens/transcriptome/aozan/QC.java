@@ -105,7 +105,7 @@ public class QC {
 
       try {
         data = new RunData(dataFile);
-        LOGGER.warning("Data file for this run already exists.");
+        LOGGER.info("Data file for this run already exists.");
 
       } catch (IOException e) {
 
@@ -134,7 +134,7 @@ public class QC {
           throw new AozanException("Cannot create QC directory : "
               + QCOutputDir);
       } else {
-        LOGGER.warning("Temporary QC directory already exists");
+        LOGGER.info("Temporary QC directory already exists");
       }
 
       // Create RunDataGenerator object

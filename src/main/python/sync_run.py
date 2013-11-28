@@ -110,7 +110,7 @@ def partial_sync(run_id, last_sync, conf):
         for exclude_file in exclude_files:
             cmd += " -not -name '" + exclude_file + "' "
         cmd += ' > ' + rsync_manifest_path
-        common.log("WARNING", "exec: " + cmd, conf)
+        common.log("SEVERE", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
             error("error while executing rsync for run " + run_id, 'Error while executing find.\nCommand line:\n' + cmd, conf)
             return False
@@ -118,7 +118,7 @@ def partial_sync(run_id, last_sync, conf):
 
    # Copy data from hiseq path to bcl path
     cmd = 'rsync  -a ' + rsync_params + ' ' + input_path + '/ ' + output_path
-    common.log("WARNING", "exec: " + cmd, conf)
+    common.log("SEVERE", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while executing rsync for run " + run_id, 'Error while executing rsync.\nCommand line:\n' + cmd, conf)
         return False
@@ -193,7 +193,7 @@ def sync(run_id, conf):
     tmp_path = tmp_base_path + '/' + run_id
     if os.path.exists(tmp_path):
         cmd = 'rm -rf ' + tmp_path
-        common.log("WARNING", "exec: " + cmd, conf)
+        common.log("SEVERE", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
             error("error while removing existing temporary directory", 'Error while removing existing temporary directory.\nCommand line:\n' + cmd, conf)
             return False
@@ -204,7 +204,7 @@ def sync(run_id, conf):
         'mv ' + run_id + ' ' + hiseq_log_prefix + run_id + ' && ' + \
         'tar cjf ' + reports_data_path + '/' + hiseq_log_archive_file + ' ' + hiseq_log_prefix + run_id + ' && ' + \
         'rm -rf ' + tmp_path + ' && rm -rf ' + hiseq_log_prefix + run_id
-    common.log("WARNING", "exec: " + cmd, conf)
+    common.log("SEVERE", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while saving Illumina quality control for run " + run_id, 'Error saving Illumina quality control.\nCommand line:\n' + cmd, conf)
         return False
@@ -212,7 +212,7 @@ def sync(run_id, conf):
     # Save html reports
     if os.path.exists(tmp_path):
         cmd = 'rm -rf ' + tmp_path
-        common.log("WARNING", "exec: " + cmd, conf)
+        common.log("SEVERE", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
             error("error while removing existing temporary directory", 'Error while removing existing temporary directory.\nCommand line:\n' + cmd, conf)
             return False
@@ -225,7 +225,7 @@ def sync(run_id, conf):
         'mv ' + report_prefix + run_id + ' ' + reports_data_path
         # 'cd ' + base_dir_path + ' && ' + \
         # 'cp -p ../First_Base_Report.htm ' + reports_data_path + '/' + run_id + '/ && ' + \
-    common.log("WARNING", "exec: " + cmd, conf)
+    common.log("SEVERE", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while saving Illumina html reports for run " + run_id, 'Error saving Illumina html reports.\nCommand line:\n' + cmd, conf)
         return False
@@ -243,8 +243,8 @@ def sync(run_id, conf):
     df = df_in_bytes / (1024 * 1024 * 1024)
     du = du_in_bytes / (1024 * 1024 * 1024)
 
-    common.log("INFO", "Sync step: output disk free after sync: " + str(df_in_bytes), conf)
-    common.log("INFO", "Sync step: space used by sync: " + str(du_in_bytes), conf)
+    common.log("WARNING", "Sync step: output disk free after sync: " + str(df_in_bytes), conf)
+    common.log("WARNING", "Sync step: space used by sync: " + str(du_in_bytes), conf)
 
     duration = time.time() - start_time
 

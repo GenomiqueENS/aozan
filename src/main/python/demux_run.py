@@ -119,7 +119,7 @@ def demux(run_id, conf):
     basecall_stats_file = basecall_stats_prefix + run_id + '.tar.bz2'
 
 
-    common.log("WARNING", "Flowcell id: " + flow_cell_id, conf)
+    common.log("INFO", "Flowcell id: " + flow_cell_id, conf)
 
     # Check if root input bcl data directory exists
     if not os.path.exists(conf['bcl.data.path']):
@@ -167,9 +167,9 @@ def demux(run_id, conf):
     du_factor = float(conf['demux.space.factor'])
     space_needed = input_path_du * du_factor
 
-    common.log("SEVERE", "Demux step: input disk usage: " + str(input_path_du), conf)
-    common.log("SEVERE", "Demux step: output disk free: " + str(output_df), conf)
-    common.log("SEVERE", "Demux step: space needed: " + str(space_needed), conf)
+    common.log("WARNING", "Demux step: input disk usage: " + str(input_path_du), conf)
+    common.log("WARNING", "Demux step: output disk free: " + str(output_df), conf)
+    common.log("WARNING", "Demux step: space needed: " + str(space_needed), conf)
 
     # Check if free space is available
     if output_df < space_needed:
@@ -274,7 +274,7 @@ def demux(run_id, conf):
             else:
                 msg += ' '
             msg += warn
-        common.log("INFO", "casava sample-sheet warnings: " + msg, conf)
+        common.log("WARNING", "casava sample-sheet warnings: " + msg, conf)
 
     # Create casava makefile
     cmd = conf['casava.path'] + '/bin/configureBclToFastq.pl ' + \
@@ -371,8 +371,8 @@ def demux(run_id, conf):
     df = df_in_bytes / (1024 * 1024 * 1024)
     du = du_in_bytes / (1024 * 1024 * 1024)
 
-    common.log("SEVERE", "Demux step: output disk free after demux: " + str(df_in_bytes), conf)
-    common.log("SEVERE", "Demux step: space used by demux: " + str(du_in_bytes), conf)
+    common.log("WARNING", "Demux step: output disk free after demux: " + str(df_in_bytes), conf)
+    common.log("WARNING", "Demux step: space used by demux: " + str(du_in_bytes), conf)
 
     duration = time.time() - start_time
 

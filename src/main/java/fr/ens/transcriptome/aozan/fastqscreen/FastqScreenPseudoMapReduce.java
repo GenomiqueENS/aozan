@@ -214,7 +214,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     GenomeMapperIndexer indexer = new GenomeMapperIndexer(bowtie);
     indexer.createIndex(genomeDataFile, desc, result);
 
-    LOGGER.fine("FASTQSCREEN : create/retrieve index for "
+    LOGGER.info("FASTQSCREEN : create/retrieve index for "
         + genomeDataFile.getName() + " in "
         + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 

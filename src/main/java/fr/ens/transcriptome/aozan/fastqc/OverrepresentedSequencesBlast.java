@@ -168,10 +168,10 @@ public class OverrepresentedSequencesBlast {
           loadSequencesToIgnore();
 
         } catch (IOException e) {
-          LOGGER.severe(StringUtils.join(e.getStackTrace(), "\n\t"));
+          LOGGER.warning(StringUtils.join(e.getStackTrace(), "\n\t"));
           this.stepEnabled = false;
         } catch (AozanException e) {
-          LOGGER.info(StringUtils.join(e.getStackTrace(), "\n\t"));
+          LOGGER.warning(StringUtils.join(e.getStackTrace(), "\n\t"));
           this.stepEnabled = false;
         }
 
