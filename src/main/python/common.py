@@ -9,11 +9,11 @@ Created on 25 oct. 2011
 import smtplib, os.path, time
 import mimetypes
 
-from java.io import File
+from java.io import File, InputStreamReader
 from java.io import BufferedReader
 from java.lang import Runtime
-from java.lang import Class
 from java.util.logging import Level
+from com.google.common.io import CharStreams
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.audio import MIMEAudio
@@ -23,6 +23,7 @@ from email import encoders
 
 from fr.ens.transcriptome.aozan import Common
 from fr.ens.transcriptome.aozan import Globals
+from fr.ens.transcriptome.aozan.util import FileUtils
 
 
 
@@ -362,41 +363,41 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
     """
 
     """ Since version RTA after 1.17, Illumina stop the generation of the Status and reports files"""
-    text_runInfo = ''
 
     path_report = conf['reports.data.path'] + '/' + run_id
     
-    # Check directory report exists
-    
-    classSrc = Globals.globalsClass
-    
     # Retrieve BufferedReader on index html template
-    br = BufferedReader(classSrc.getResourceAsStream(Globals.INDEX_HTML_TEMPLATE_FILENAME))
-    
-    print str(br.readline())
-    
     template_path = conf['index.html.template']
     if template_path != None and template_path != '' and os.path.exists(template_path):
         f_in = open(template_path, 'r')
         text = ''.join(f_in.readlines())
+        lines = text.split('\n');
         f_in.close()
-
-
-    lines = text.split('\n');
+    
+    else:
+        # Use default template save in aozan jar file
+        jar_is = Globals.getResourceAsStream(Globals.INDEX_HTML_TEMPLATE_FILENAME)
+        lines = FileUtils.readFileByLines(jar_is)
+    
+    print str(path_report + '/report_' + run_id) + '  ' +str(os.path.exists(path_report + '/report_' + run_id))
+    if 'sync' in sections and os.path.exists(path_report + '/report_' + run_id):
+        sections.append('optional')
+            
     write_lines = True
     result = ''
 
     for line in lines:
-        if line.startswith('###START_SECTION'):
+        if line.startswith('<!--START_SECTION'):
             section_name = line.split(' ')[1]
-            if section_name in  sections:
+            if section_name in sections:
                 write_lines = True
             else:
                 write_lines = False
-        elif line.startswith('###END_SECTION'):
+        elif line.startswith('<!--END_SECTION'):
             write_lines = True
+        
         elif write_lines == True:
-            result += line.replace('###RUN_ID###', run_id) + '\n'
+            result += line.replace('${RUN_ID}', run_id) + '\n'
 
     f_out = open(output_file_path, 'w')
     f_out.write(result)
