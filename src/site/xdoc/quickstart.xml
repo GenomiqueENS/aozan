@@ -409,7 +409,7 @@ is the run number, e.g. <tt>design_SNL125_0067.xls</tt>)
 	   <tr><td>lock.file</td><td>string</td><td>/var/lock/aozan.lock</td><td>Aozan lock file that prevent
 	     two instances of Aozan running at the same time</td></tr>
 	   <tr><td>index.html.template</td><td>string</td><td>Not set</td><td>HTML page template that 
-	     describe a run. (deprecated)</td></tr>
+	     describe a run, use instead of this present in aozan jar file.</td></tr>
 	   <tr><td>reports.url</td><td>string</td><td>Not set</td><td>Run reports URL</td></tr>
 	   <tr><td>hiseq.critical.min.space</td><td>integer</td><td>1099511627776</td><td>Threshold before sending 
 	     a email at each Aozan start if not enough space is available on HiSeq output disk, the value corresponds 1 Tb in bytes.</td></tr>
