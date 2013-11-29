@@ -129,6 +129,9 @@ public class Globals {
   public static final String EMBEDDED_QC_XSL = "/aozan.xsl";
   public static final String EMBEDDED_FASTQSCREEN_XSL = "/fastqscreen.xsl";
 
+  public static final String INDEX_HTML_TEMPLATE_FILENAME =
+      "/template_index_run.txt";
+
   /** Default locale of the application. */
   public static final Locale DEFAULT_LOCALE = Locale.US;
 
@@ -249,6 +252,16 @@ public class Globals {
 
     } catch (IOException ignored) {
     }
+  }
+
+  //
+  // Constructor
+  //
+
+  /**
+   * Private constructor.
+   */
+  private Globals() {
   }
 
 }
