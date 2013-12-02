@@ -421,8 +421,8 @@ def set_default_conf(conf):
 
     # Synchronization
     conf['sync.exclude.cif'] = 'True'
-    conf['sync.continue.sync'] = 'True'
-    conf['sync.continue.sync.min.age.files'] = '15'
+    conf['sync.continuous.sync'] = 'True'
+    conf['sync.continuous.sync.min.age.files'] = '15'
 
     # Casava
     conf['demux.use.hiseq.output'] = 'False'

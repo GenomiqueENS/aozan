@@ -114,6 +114,7 @@ public class FastqscreenDemo {
         // runId = "130726_SNL110_0078_AC2AJTACXX";
         // runId = "130709_SNL110_0075_AD2C79ACXX";
         // runId = "130715_SNL110_0076_AD2C4UACXX";
+        // RUN rapid
         // runId = "130722_SNL110_0077_AH0NT2ADXX";
         // runId = "130904_SNL110_0082_AC2BR0ACXX";
         runId = "130910_SNL110_0083_AC2AMKACXX";
@@ -167,10 +168,15 @@ public class FastqscreenDemo {
     String fastqDir = "/home/sperrin/shares-net/sequencages/fastq/" + runId;
     // String bclDir, String fastqDir, String qcDir, File tmpDir
 
-    QC qc =
-        new QC(getMapAozanConf(), qcDir, fastqDir, qcDir + "_qc_tmp", TMP_DIR,
-            runId);
+    QC qc = null;
+    try {
 
+      qc =
+          new QC(getMapAozanConf(), qcDir, fastqDir, qcDir + "_qc_tmp",
+              TMP_DIR, runId);
+    } catch (ClassCastException cce) {
+      cce.printStackTrace();
+    }
     // Compute report
     QCReport report = qc.computeReport();
 
