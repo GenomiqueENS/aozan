@@ -168,15 +168,10 @@ public class FastqscreenDemo {
     String fastqDir = "/home/sperrin/shares-net/sequencages/fastq/" + runId;
     // String bclDir, String fastqDir, String qcDir, File tmpDir
 
-    QC qc = null;
-    try {
+    QC qc =
+        new QC(getMapAozanConf(), qcDir, fastqDir, qcDir + "_qc_tmp", TMP_DIR,
+            runId);
 
-      qc =
-          new QC(getMapAozanConf(), qcDir, fastqDir, qcDir + "_qc_tmp",
-              TMP_DIR, runId);
-    } catch (ClassCastException cce) {
-      cce.printStackTrace();
-    }
     // Compute report
     QCReport report = qc.computeReport();
 
@@ -248,6 +243,8 @@ public class FastqscreenDemo {
 
     // conf.put("qc.conf.read.xml.collector.used", "false");
     conf.put("qc.conf.cluster.density.ratio", "0.3472222");
+    conf.put("qc.conf.fastqscreen.genomes", "phix");
+    conf.put("qc.conf.step.blast.enable", "false");
 
     System.out.println("genomes : "
         + conf.get("qc.conf.fastqscreen.genomes") + " mapping mode "
