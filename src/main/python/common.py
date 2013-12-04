@@ -379,7 +379,6 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
         jar_is = Globals.getResourceAsStream(Globals.INDEX_HTML_TEMPLATE_FILENAME)
         lines = FileUtils.readFileByLines(jar_is)
     
-    print str(path_report + '/report_' + run_id) + '  ' +str(os.path.exists(path_report + '/report_' + run_id))
     if 'sync' in sections and os.path.exists(path_report + '/report_' + run_id):
         sections.append('optional')
             
@@ -409,7 +408,7 @@ def set_default_conf(conf):
     # Global
     conf['aozan.enable'] = 'True'
     conf['send.mail'] = 'False'
-    conf['aozan.log.level'] = Globals.LOG_LEVEL
+    conf['aozan.log.level'] = str(Globals.LOG_LEVEL)
     conf['first.base.report.step'] = 'True'
     conf['hiseq.step'] = 'True'
     conf['sync.step'] = 'True'

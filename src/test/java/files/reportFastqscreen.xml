@@ -14,6 +14,7 @@
 <projectName>project name</projectName>
 <genomeSample>genome name</genomeSample>
 <sampleName>2013_124</sampleName>
+<descriptionSample>description sample</descriptionSample>
 <Report>
 <Columns>
 <Column name="Library">Library</Column>

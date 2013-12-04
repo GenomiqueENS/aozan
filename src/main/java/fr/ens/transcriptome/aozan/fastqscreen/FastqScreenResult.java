@@ -154,18 +154,11 @@ public class FastqScreenResult {
       else
         is = new FileInputStream(fastqscreenXSLFile);
 
+      return toXML(fastqSample, data, genomeSample, is);
+
     } catch (FileNotFoundException e) {
       throw new AozanException(e);
-
-    } finally {
-      try {
-        if (is != null)
-          is.close();
-      } catch (IOException ignored) {
-      }
     }
-
-    return toXML(fastqSample, data, genomeSample, is);
   }
 
   private String toXML(final FastqSample fastqSample, final RunData data,
@@ -201,15 +194,15 @@ public class FastqScreenResult {
       // Transform the document
       transformer.transform(new DOMSource(doc), new StreamResult(writer));
 
-      // Close input stream
-      isXSLFile.close();
-
       // Print document XML
       // StringWriter swxml = new StringWriter();
       // StreamResult resultxml = new StreamResult(swxml);
       // DOMSource sourcexml = new DOMSource(doc);
       // trans.transform(sourcexml, resultxml);
       // System.out.println(swxml.toString());
+
+      // Close input stream
+      isXSLFile.close();
 
       // Return the result of the transformation
       return writer.toString();
