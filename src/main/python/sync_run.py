@@ -116,7 +116,7 @@ def partial_sync(run_id, last_sync, conf):
             return False
         rsync_params = '--files-from=' + rsync_manifest_path
 
-   # Copy data from hiseq path to bcl path
+    # Copy data from hiseq path to bcl path
     cmd = 'rsync  -a ' + rsync_params + ' ' + input_path + '/ ' + output_path
     common.log("SEVERE", "exec: " + cmd, conf)
     if os.system(cmd) != 0:

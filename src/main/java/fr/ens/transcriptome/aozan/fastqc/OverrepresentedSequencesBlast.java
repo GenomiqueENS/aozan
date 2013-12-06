@@ -328,7 +328,6 @@ public class OverrepresentedSequencesBlast {
    * @param sequence query blastn
    * @return a ContaminantHit for the best hit return by blastn or null
    */
-  @SuppressWarnings("static-access")
   public synchronized ContaminantHit blastSequence(final String sequence)
       throws IOException, AozanException {
 

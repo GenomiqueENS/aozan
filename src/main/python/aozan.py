@@ -211,7 +211,7 @@ def launch_steps(conf):
     working_run_ids = hiseq_run.get_working_run_ids(conf)
 
     if conf['sync.continuous.sync'].lower().strip() == 'true':
-        for run_id in working_run_ids:
+        for run_id in (working_run_ids - sync_run_ids_done - hiseq_run_ids_do_not_process):
             welcome(conf)
             common.log('INFO', 'Partial synchronization of ' + run_id, conf)
             if not sync_run.partial_sync(run_id, False, conf):
