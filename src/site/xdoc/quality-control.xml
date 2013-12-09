@@ -43,7 +43,7 @@
      <p>This step creates a report file including the thresholds fixed for quality controls with : </p>
 	 <ul>
 	   <li><a href="./qc-lanes-tests.html">Lanes quality tests</a> with Illumina reports</li>
-	   <li><a href="./qc-_samples-tests.html">Samples quality tests</a> with Illumina reports, 
+	   <li><a href="./qc-samples-tests.html">Samples quality tests</a> with Illumina reports, 
 		 <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC, </a>a quality control tool for high throughput sequence data. 
 				and a optional module for the contamination detection.</li>
 	  </ul>
