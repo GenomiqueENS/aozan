@@ -46,7 +46,7 @@
 					<img valign="top"
 						src="http://maven.apache.org/images/folder-open.gif" border="0"
 						alt="" title="Download Aozan" />
-					<a href="aozan-@@@VERSION@@@.tar.gz">Download</a>Aozan Application<br />
+					<a href="aozan-@@@VERSION@@@.tar.gz">Download </a>Aozan Application<br />
 				</p>
 				<ul style="margin-top: 0; list-style-type: disc">
 					<li style="font-size: smaller">

@@ -201,8 +201,7 @@
       			Add a new mode for continuous synchronize hiseq data on storage. If Aozan is a cron job, at each launch it synchronizes data. 
       </action>
       <action dev="perrin" type="add">
-      			File to formatter text code in eclipse or other IDE, download 
-      			<a href="http://code.google.com/p/aozan/source/browse/aozan-eclipse-formatter-style.xml">here</a>.
+      			File to formatter text code in eclipse or other IDE, download on code.google.com aozan site.
       </action>
     </release>
   </body>
