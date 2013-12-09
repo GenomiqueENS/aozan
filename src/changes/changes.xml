@@ -186,5 +186,24 @@
 		Fix bug : change directory to save index mapper (selected by parameter tmp.path instead of /tmp).
       </action>
    </release>
+   <release version="1.2" description="Aozan version 1.2" date="2013-12-09">
+      <action dev="perrin" type="add">
+      			An optional module blast associated with module of FastQC 'Overrepresented Sequences' :  
+      			for unidentified sequences, a blastn has been launched, the first hit is added in report FastQC. 
+      </action>
+      <action dev="perrin" type="add">
+      			In Aozan configuration, possibility to specify several parameter of FastQC : file with list of contaminants, kmers size, group.  
+      </action>
+      <action dev="perrin" type="update">
+      			In CASAVA/bcl2fastq samplesheet validator, add a tag to check genome sample. 
+      </action>
+      <action dev="perrin" type="add">
+      			Add a new mode for continuous synchronize hiseq data on storage. If Aozan is a cron job, at each launch it synchronizes data. 
+      </action>
+      <action dev="perrin" type="add">
+      			File to formatter text code in eclipse or other IDE, download 
+      			<a href="http://code.google.com/p/aozan/source/browse/aozan-eclipse-formatter-style.xml">here</a>.
+      </action>
+    </release>
   </body>
 </document>
