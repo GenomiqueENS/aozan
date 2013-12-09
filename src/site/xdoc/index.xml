@@ -110,7 +110,7 @@
 			</subsection>
 			
 			<subsection name="Synchronization continuous of HiSeq data">
-				<p>Enable partial synchronization of working runs at each Aozan launch to avoid a big synchronization at the end of the runs.</p>
+				<p>Enable continuous synchronization of working runs at each Aozan launch to avoid a big synchronization at the end of the runs.</p>
 			</subsection>
 			
 			
