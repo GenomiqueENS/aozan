@@ -278,12 +278,13 @@ AOZAN_USER=nobody
 # Path to Aozan base directory
 AOZAN_DIR=/usr/local/aozan
 
-# Path to Aozan data (not data processed by Aozan)
+# Path to Aozan configuration
 AOZAN_CONF=/etc/aozan.conf
 
-su $AOZAN_USER -c "$AOZAN_DIR/aozan.sh $AOZAN_CONF"
+su $AOZAN_USER -c "$AOZAN_DIR/aozan.sh --quiet $AOZAN_CONF"
 </source>
 
+ <p>The <tt>--quiet</tt> option avoid displaying message if another Aozan instance is currently running.</p>
 
  <p>Then we set the permission on the Aozan cron script:</p>
 
