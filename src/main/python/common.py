@@ -329,7 +329,7 @@ def add_run_id_to_processed_run_ids(run_id, done_file_path, conf):
 def load_conf(conf, conf_file_path):
     """Load configuration file"""
 
-    # in version Aozan 1.1.1 change key in configuration to replace design by samplesheet
+    # in version Aozan 1.1.1 change key in configuration to replace design by sample sheet
     # converting table between old and new key
     converting_table_key = {}
     converting_table_key['casava.design.format'] = 'casava.samplesheet.format'
@@ -396,7 +396,12 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
             write_lines = True
         
         elif write_lines == True:
-            result += line.replace('${RUN_ID}', run_id) + '\n'
+            if '${RUN_ID}' in line:
+                result += line.replace('${RUN_ID}', run_id) + '\n'
+            elif '${VERSION}' in line:
+                result += line.replace('${VERSION}', Globals.APP_VERSION_STRING) + '\n'
+            else:
+                result += line + '\n' 
 
     f_out = open(output_file_path, 'w')
     f_out.write(result)
