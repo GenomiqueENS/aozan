@@ -48,12 +48,12 @@
 				<li>
 					<a href="#requirements">Requirements</a>
 				</li>
-                                  <ul>
-                                    <li><a href="#casava">Installing Casava</a></li>
-                                    <li><a href="#bcl2fastq">Installing bcl2fastq</a></li>
-                                    <li><a href="#blastall">Installing blastall (optional)</a></li>
-                                  </ul>
-                               <li>
+                    <ul>
+	                      <li><a href="#casava">Installing Casava</a></li>
+	                      <li><a href="#bcl2fastq">Installing bcl2fastq</a></li>
+	                      <li><a href="#blastall">Installing blastall (optional)</a></li>
+                    </ul>
+	            <li>
 					<a href="#installation">Installation</a>
 				</li>
 				<li>
@@ -371,7 +371,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
    <tr><td>fastq.data.path</td><td>/mnt/storage/fastq</td><td>Directory for the output of 
      demultiplexing with CASAVA or bcl2fastq.</td></tr>
    <tr><td>reports.data.path</td><td>/mnt/storage/reports</td><td>Directory for the qc report.</td></tr>
-   <tr><td>casava.designs.path</td><td>/mnt/storage/casava_designs</td><td>Directory with CASAVA samplesheets (with files 
+   <tr><td>casava.designs.path</td><td>/mnt/storage/casava_designs</td><td>Directory with CASAVA sample sheets (with files 
 like <tt>design_INSTRUMENT-SN_RUN-NUMBER$runId.xls</tt> where INSTRUMENT-SN is the instrument serial number and RUN-NUMBER 
 is the run number, e.g. <tt>design_SNL125_0067.xls</tt>)
      for demultiplexing. If a custom script is used to generate CSV design files, this directory will no be used.</td></tr>

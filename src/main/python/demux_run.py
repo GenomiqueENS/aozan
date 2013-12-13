@@ -143,7 +143,7 @@ def demux(run_id, conf):
 
     # Check if casava designs path exists
     if not os.path.exists(conf['casava.samplesheets.path']):
-        error("Casava sample-sheets directory does not exists", "Casava sample-sheets does not exists: " + conf['casava.samplesheets.path'], conf)
+        error("Casava sample sheets directory does not exists", "Casava sample sheets does not exists: " + conf['casava.samplesheets.path'], conf)
         return False
 
     # Check if temporary directory exists
@@ -193,7 +193,7 @@ def demux(run_id, conf):
 
         # Check if the xls design exists
         if not os.path.exists(input_design_xls_path):
-            error("no casava sample-sheet found", "No casava sample-sheet found for " + run_id + " run.\n" + \
+            error("no casava sample sheet found", "No casava sample sheet found for " + run_id + " run.\n" + \
               'You must provide a ' + conf['casava.samplesheet.prefix.filename'] + '-%04d.xls file' % run_number + ' in ' + conf['casava.samplesheets.path'] + \
               ' directory to demultiplex and create fastq files for this run.\n', conf)
             return False
@@ -221,7 +221,7 @@ def demux(run_id, conf):
 
         # Check if the xls design exists
         if not os.path.exists(input_design_csv_path):
-            error("no casava sample-sheet found", "No casava sample-sheet found for " + run_id + " run.\n" + \
+            error("no casava sample sheet found", "No casava sample sheet found for " + run_id + " run.\n" + \
               'You must provide a ' + conf['casava.samplesheet.prefix.filename'] + '-%04d.csv file' % run_number + ' in ' + conf['casava.samplesheets.path'] + \
               ' directory to demultiplex and create fastq files for this run.\n', conf)
             return False
@@ -229,35 +229,35 @@ def demux(run_id, conf):
         cmd = 'cp ' + input_design_csv_path + ' ' + design_csv_path
         common.log("SEVERE", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
-            error("error while copying Casava CSV sample-sheet file to temporary directory for run " + run_id,
-                  'Error while copying Casava CSV sample-sheet file to temporary directory.\nCommand line:\n' + cmd, conf)
+            error("error while copying Casava CSV sample sheet file to temporary directory for run " + run_id,
+                  'Error while copying Casava CSV sample sheet file to temporary directory.\nCommand line:\n' + cmd, conf)
             return False
 
     elif conf['casava.samplesheet.format'].strip().lower() == 'command':
 
         if conf['casava.design.generator.command'] == None or conf['casava.design.generator.command'].strip() == '':
-            error("error while creating Casava CSV sample-sheet file for run " + run_id,
-                  'Error while creating Casava CSV sample-sheet file, the command is empty.', conf)
+            error("error while creating Casava CSV sample sheet file for run " + run_id,
+                  'Error while creating Casava CSV sample sheet file, the command is empty.', conf)
             return False
 
         cmd = conf['casava.design.generator.command'] + ' ' + run_id + ' ' + design_csv_path
         common.log("SEVERE", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
-            error("error while creating Casava CSV sample-sheet file for run " + run_id,
-                  'Error while creating Casava CSV sample-sheet file.\nCommand line:\n' + cmd, conf)
+            error("error while creating Casava CSV sample sheet file for run " + run_id,
+                  'Error while creating Casava CSV sample sheet file.\nCommand line:\n' + cmd, conf)
 
         if not os.path.exists(design_csv_path):
-            error("error while creating Casava CSV sample-sheet file for run " + run_id,
-                  'Error while creating Casava CSV sample-sheet file, the external command did not create Casava CSV file:\n' + cmd, conf)
+            error("error while creating Casava CSV sample sheet file for run " + run_id,
+                  'Error while creating Casava CSV sample sheet file, the external command did not create Casava CSV file:\n' + cmd, conf)
     else:
-        error("error while creating Casava CSV sample-sheet file for run " + run_id,
-                  'No method to get Casava sample-sheet file has been defined. Please, set the "casava.samplesheet.format" property.\n', conf)
+        error("error while creating Casava CSV sample sheet file for run " + run_id,
+                  'No method to get Casava sample sheet file has been defined. Please, set the "casava.samplesheet.format" property.\n', conf)
 
 
     # Check if Casava CSV design file has been created
     if not os.path.exists(design_csv_path):
-            error("error while reading Casava CSV sample-sheet file for run " + run_id,
-                  'Error while reading Casava CSV sample-sheet file, the sample-sheet file does not exist: \n' + design_csv_path, conf)
+            error("error while reading Casava CSV sample sheet file for run " + run_id,
+                  'Error while reading Casava CSV sample sheet file, the sample sheet file does not exist: \n' + design_csv_path, conf)
 
     # Check Casava CSV design file
     try:
@@ -284,7 +284,7 @@ def demux(run_id, conf):
             else:
                 msg += ' '
             msg += warn
-        common.log("WARNING", "casava sample-sheet warnings: " + msg, conf)
+        common.log("WARNING", "casava sample sheet warnings: " + msg, conf)
 
     # Create casava makefile
     cmd = conf['casava.path'] + '/bin/configureBclToFastq.pl ' + \
@@ -326,7 +326,7 @@ def demux(run_id, conf):
     cmd = "cp -p " + design_csv_path + ' ' + fastq_output_dir
     common.log("SEVERE", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
-        error("error while copying sample-sheet file to the fastq directory for run " + run_id, 'Error while copying sample-sheet file to fastq directory.\nCommand line:\n' + cmd, conf)
+        error("error while copying sample sheet file to the fastq directory for run " + run_id, 'Error while copying sample sheet file to fastq directory.\nCommand line:\n' + cmd, conf)
         return False
 
     # Archive basecall stats
@@ -365,7 +365,7 @@ def demux(run_id, conf):
 
     common.log("SEVERE", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
-        error("error while archiving the sample-sheet file for " + run_id, 'Error while archiving the sample-sheet file for.\nCommand line:\n' + cmd, conf)
+        error("error while archiving the sample sheet file for " + run_id, 'Error while archiving the sample sheet file for.\nCommand line:\n' + cmd, conf)
         return False
 
     # Remove temporary design files
@@ -393,7 +393,7 @@ def demux(run_id, conf):
         'can be found in the following directory:\n  ' + fastq_output_dir
 
     if design_warnings.size() > 0:
-        msg += '\n\nSample-sheet warnings:'
+        msg += '\n\nSample sheet warnings:'
         for warn in design_warnings:
             msg += "\n  - " + warn
 

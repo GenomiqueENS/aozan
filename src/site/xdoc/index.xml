@@ -61,7 +61,7 @@
 
 			<p>Aozan has been developped in order to automatically handle data transfert, demultiplexing conversion, quality control
 			and the contamination detection once a HiSeq run has been finished. Through most computer infrastructures and the creation 
-			of a run samplesheet, Aozan is able to get at the end of each run a whole data quality reporting in order to evaluate each
+			of a run sample sheet, Aozan is able to get at the end of each run a whole data quality reporting in order to evaluate each
 			sequencing parameter. This software is involved in the primary data analysis and produce compressed fastq files from 
 			an HiSeq sequencer output.</p>
 			
@@ -71,7 +71,7 @@
 			
 		</section>
 
-		<section name="Samplesheet validator">
+		<section name="Sample sheet validator">
 			<p>We provide also a <a href="http://www.transcriptome.ens.fr/designvalidator/" target="_blank">CASAVA/bcl2fastq samplesheet validator</a> 
 			to help users to check their run design. This tool use only html and javascript. When you use this tool, no data is sent to our servers.</p>
 			
@@ -87,7 +87,7 @@
 		    	
 		    	<div align="center">
 		    		<a href="qc-samples-tests.html#fastqc"><img src="images/qc_fastqc_bad_tiles_height.png" alt="module bad tiles" style="vertical-align:middle"/></a>
-		        	<a href="qc-samples-tests.html#fastqc"><img src="images/qc_fastqc_overrepresented_blast_h250px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></a>
+		        	<a href="qc-samples-tests.html#fastqc"><img src="images/qc_fastqc_overrepresented_blast_h350px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></a>
 		    	</div>
 		    	
 		        <p>Optional, Aozan adds a sub-step in FastQC for complete the module Overrepresented sequences. For sequences with &quot;no hit&quot;, a blastn can be launch with this sequence to estimate the source. 

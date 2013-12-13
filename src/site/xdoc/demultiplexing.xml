@@ -34,12 +34,12 @@
 
 	 <section name="Demultiplexing step">
      
-     <p>This step allow to launch demultiplexing using CASAVA or bcl2fastq. Aozan can use samplesheet in XLS format or generated
-     by an external tool in addition of samplesheet in CSV format. Using samplesheet in XLS format allow
+     <p>This step allow to launch demultiplexing using CASAVA or bcl2fastq. Aozan can use sample sheet in XLS format or generated
+     by an external tool in addition of sample sheet in CSV format. Using sample sheet in XLS format allow
      to use alias for adapters sequences indexes.
      <br/><a href="./samplesheet_SNL110_template.xls" target="_blank">See an example of casava design file.</a></p>
 
-	 <p>Alongside Aozan, we provide a standalone CASAVA samplesheet validator available on our website that allows you to check 
+	 <p>Alongside Aozan, we provide a standalone CASAVA sample sheet validator available on our website that allows you to check 
 	 your run design and generate a valid CSV design file.
 	 The tool is available <a href="http://www.transcriptome.ens.fr/designvalidator/" target="_blank">here.</a>
 	 </p>
@@ -58,11 +58,11 @@
 	     <tr><td>casava.adapter.fasta.file.path</td><td>string</td><td>Not set</td><td>Adapter sequence file to use when launch CASAVA/bcl2fastq</td></tr>
 	     <tr><td>casava.compression</td><td>string</td><td>bzip2</td><td>Compression to use (gzip or bzip2)</td></tr>
 	     <tr><td>casava.compression.level</td><td>integer</td><td>9</td><td>Compression level</td></tr>
-	     <tr><td>casava.samplesheet.format</td><td>string</td><td>xls</td><td>CASAVA samplesheet format ("csv", "xls" or "command"). (before Aozan-1.1, name casava.design.format)</td></tr>
-	     <tr><td>casava.samplesheet.prefix.filename</td><td>string</td><td>samplesheet</td><td>prefix for CASAVA samplesheet file <a href="./samplesheet_SNL110_template.xls" target="_blank">(example).</a></td></tr>
-	     <tr><td>casava.design.generator.command</td><td>String</td><td>Not set</td><td>Command to execute to generate the CASAVA samplesheet 
+	     <tr><td>casava.samplesheet.format</td><td>string</td><td>xls</td><td>CASAVA sample sheet format ("csv", "xls" or "command"). (before Aozan-1.1, name casava.design.format)</td></tr>
+	     <tr><td>casava.samplesheet.prefix.filename</td><td>string</td><td>samplesheet</td><td>prefix for CASAVA sample sheet file <a href="./samplesheet_SNL110_template.xls" target="_blank">(example).</a></td></tr>
+	     <tr><td>casava.design.generator.command</td><td>String</td><td>Not set</td><td>Command to execute to generate the CASAVA sample sheet 
   in CSV format when <b>casava.samplesheet.format</b> parameter is set to "command"</td></tr>
-	     <tr><td>casava.samplesheets.path</td><td>string</td><td>Not set</td><td>Path to CSV/XLS samplesheet files. (before Aozan-1.1, name casava.designs.path)</td></tr>
+	     <tr><td>casava.samplesheets.path</td><td>string</td><td>Not set</td><td>Path to CSV/XLS sample sheet files. (before Aozan-1.1, name casava.designs.path)</td></tr>
 	     <tr><td>casava.fastq.cluster.count</td><td>integer</td><td>0</td><td>Cluster number by fastq file. When set to 0 no limit 
   will be set</td></tr>
 	     <tr><td>casava.mismatches</td><td>integer</td><td>0</td><td>Number of mismatches allowed in adapters indexes</td></tr>

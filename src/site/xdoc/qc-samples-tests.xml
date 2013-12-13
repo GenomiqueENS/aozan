@@ -78,13 +78,13 @@
     	This report is used in further analysis during the read filtering step to discard these bad tiles.
     	</p>
     	
-    	<p><img src="images/qc_fastqc_bad_tiles_300px.png" alt="module bad tiles"/></p>
+    	<div align="center"><img src="images/qc_fastqc_bad_tiles_300px.png" alt="module bad tiles"/></div>
         
         <p>The module overrepresented sequences in FastQC. 
         Optional, in association with detection contamination module, the output of &#145;Overrepresented Sequences&#146; module from FastQC has been improved 
         for sequences not found in contaminants list. We launch a blast on sequences with &#145;no hit&#146; source. The report prints the best hit.
         </p>
-        <p><img src="images/qc_fastqc_overrepresented_blast_900px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></p>
+        <div align="center"><img src="images/qc_fastqc_overrepresented_blast_900px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></div>
         
         <table>
          <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
@@ -135,7 +135,7 @@
 		<p>The code has been rewriting in Aozan and additional values have been creating.
 		Here we use <a href="http://bowtie-bio.sourceforge.net/manual.shtml"  target="_blank">bowtie</a> to align reads 
 		to reference genomes or contaminant databases like adapter sequences, PhiX and <a href="http://www.arb-silva.de/no_cache/download/archive/release_111/Exports">ribosomes databases</a>.
-		Moreover it aligns on the genome of the sample based on the data in the casava sample-sheet file.
+		Moreover it aligns on the genome of the sample based on the data in the casava sample sheet file.
 		</p>
 
 		<p>Currently all the reads are aligned. The runtime is very long, even with the multithreading option of bowtie. 
@@ -262,11 +262,11 @@
                 <p>If no FastQ Screen test property is set, FastQ Screen will not be launch on FastQ data.</p>
        
         <p>The last column contains a link to the report html fastqscreen. An example of a report html of quality control with major values of fastqscreen : 
-			<div><img src="images/qc_sample_fqs_500px.png" alt=""/></div>
+			<div align="center"><img src="images/qc_sample_fqs_500px.png" alt=""/></div>
 		</p>
 		
 		<p>An example of a report html fastqscreen with four reference genomes and the genome sample (mm10) :
-			<div><img src="images/qc_report_html_fastqscreen_500px.png" alt="example report html fastqscreen"/></div>
+			<div align="center"><img src="images/qc_report_html_fastqscreen_500px.png" alt="example report html fastqscreen"/></div>
 		</p>
 		<p>The report exists in csv format.</p>
 		

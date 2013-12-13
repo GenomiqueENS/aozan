@@ -79,7 +79,7 @@
                         Fix typo in mail message when the end of run is discovered.
       </action>
       <action dev="jourdren" type="update">
-      		Now use <a href="http://transcriptome.ens.fr/eoulsan/index.html">Eoulsan</a> 1.2-SNAPSHOT as dependency. New Casava samplesheet check:  
+      		Now use <a href="http://transcriptome.ens.fr/eoulsan/index.html">Eoulsan</a> 1.2-SNAPSHOT as dependency. New Casava sample sheet check:  
 1) Allow the use of a sample in several lanes; 2) new error if a sample is used by more than one project; 3) new warning if a sample exists in more than one lane;
 4) new warning with the list of line where is a sample (if the number of lanes >1); 5) new errors if a sample is defined several time by with not the same sequence index.
       </action>
@@ -195,7 +195,7 @@
       			In Aozan configuration, possibility to specify several parameter of FastQC : file with list of contaminants, kmers size, group.  
       </action>
       <action dev="perrin" type="update">
-      			In CASAVA/bcl2fastq samplesheet validator, add a tag to check genome sample. 
+      			In CASAVA/bcl2fastq sample sheet validator, add a tag to check genome sample. 
       </action>
       <action dev="perrin" type="add">
       			Add a new mode for continuous synchronize hiseq data on storage. If Aozan is a cron job, at each launch it synchronizes data. 
