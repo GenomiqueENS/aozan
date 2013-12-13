@@ -186,7 +186,7 @@ version="1.0">
    </p>
    
    <p><a href="http://www.transcriptome.ens.fr/aozan/qc-samples-tests.html#contamination" target="_blank">Contamination detection detail report</a></p>
-   <p>End report</p>
+   <p>&#xA0;</p>
    </div>
    
 	<div class="footer">

@@ -290,7 +290,7 @@ version="1.0">
     
    </table>
   </xsl:for-each>
-<p>End QC report</p>
+  <p>&#xA0;</p>
 <!-- End div report -->
 </div>
 
