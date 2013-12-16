@@ -303,12 +303,22 @@ def demux(run_id, conf):
     if conf['casava.additionnal.arguments'] != '':
         cmd = cmd + ' ' + conf['casava.additionnal.arguments']
 
+    # Retrieve output in file
+    cmd = cmd + ' > /tmp/bcl2fastq_output_' + run_id + '.out 2> /tmp/bcl2fastq_output_' + run_id + '.err'
+    
     common.log("SEVERE", "exec: " + cmd, conf)
     exit_code = os.system(cmd)
     if exit_code != 0:
         error("error while creating Casava makefile for run " + run_id, 'Error while creating Casava makefile (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
         return False
-
+    
+    # Configuration bcl2fastq success, move command output file in fastq_output_dir
+    cmd = os.system('mv /tmp/bcl2fastq_output_' + run_id + '.*  ' + fastq_output_dir)
+    common.log("SEVERE", "exec: " + cmd, conf)
+    exit_code = os.system(cmd)
+    if exit_code != 0:
+        error("error while moving command output files for run " + run_id, 'Error while moving command output files (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
+    
     # Get the number of cpu
     cpu_count = int(conf['casava.threads'])
     if cpu_count < 1:
