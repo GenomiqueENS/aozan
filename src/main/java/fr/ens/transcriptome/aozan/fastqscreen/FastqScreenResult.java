@@ -31,6 +31,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -406,13 +407,17 @@ public class FastqScreenResult {
           e.getValue().getPercentMappedOnlyOnGenomeSample();
     }
 
+    // Variable temporary to save double result
+
     // Convert value in percentage for the global values
     this.percentUnmappedNoneGenome =
         ((double) (readsprocessed - readsMapped)) / readsprocessed;
-    this.percentMappedAtLeastOneGenome = 1.0 - this.percentUnmappedNoneGenome;
+
+    this.percentMappedAtLeastOneGenome =
+        Math.round((1.0 - this.percentUnmappedNoneGenome) * 100000.0) / 100000.0;
 
     this.percentMappedExceptGenomeSample =
-        percentMappedAtLeastOneGenome - percentMappedOnlyOnGenomeSample;
+        Math.round((percentMappedAtLeastOneGenome - percentMappedOnlyOnGenomeSample) * 100000.0) / 100000.0;
 
     isComputedPercent = true;
   }
@@ -531,7 +536,8 @@ public class FastqScreenResult {
      * Convert values from fastqscreen in percentage.
      * @param readsprocessed number reads total
      */
-    void countPercentValue(int readsprocessed) {
+    void countPercentValue(int readscount) {
+      double readsprocessed = readscount * 1.0;
       this.oneHitOneLibraryPercent =
           (double) this.oneHitOneLibraryCount / readsprocessed;
       this.multipleHitsOneLibraryPercent =
