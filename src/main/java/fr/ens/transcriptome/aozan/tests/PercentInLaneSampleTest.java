@@ -32,7 +32,6 @@ import com.google.common.collect.ImmutableList;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.FlowcellDemuxSummaryCollector;
-import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
 /**
  * This class define a sample percent in lane test.
@@ -41,7 +40,8 @@ import fr.ens.transcriptome.aozan.util.ScoreInterval;
  */
 public class PercentInLaneSampleTest extends AbstractSampleTest {
 
-  private final ScoreInterval interval = new ScoreInterval();
+  private final static String KEY_MARGE_PERCENT_IN_LANE = "distance";
+  private double DISTANCE;
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -52,6 +52,12 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
   @Override
   public TestResult test(final RunData data, final int read,
       final int readSample, final int lane, final String sampleName) {
+
+    // Configure interval
+    final double homogeneityInLane =
+        data.getDouble("design.lane" + lane + ".percent.homogeneity");
+    final double min = homogeneityInLane - DISTANCE;
+    final double max = homogeneityInLane + DISTANCE;
 
     final String rawSampleKey;
 
@@ -75,11 +81,12 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
       final long all = data.getLong(rawAll);
 
       final double percent = (double) raw / (double) all;
+      final int score = (percent > max || percent < min) ? 4 : 9;
 
-      if (interval == null || sampleName == null)
+      if (sampleName == null)
         return new TestResult(percent, true);
 
-      return new TestResult(this.interval.getScore(percent), percent, true);
+      return new TestResult(score, percent, true);
 
     } catch (NumberFormatException e) {
 
@@ -98,7 +105,8 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
     if (properties == null)
       throw new NullPointerException("The properties object is null");
 
-    this.interval.configureDoubleInterval(properties);
+    this.DISTANCE =
+        Double.parseDouble(properties.get(KEY_MARGE_PERCENT_IN_LANE));
 
     return Collections.singletonList((AozanTest) this);
   }

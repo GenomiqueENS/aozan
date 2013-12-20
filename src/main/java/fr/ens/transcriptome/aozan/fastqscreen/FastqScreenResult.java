@@ -407,8 +407,6 @@ public class FastqScreenResult {
           e.getValue().getPercentMappedOnlyOnGenomeSample();
     }
 
-    // Variable temporary to save double result
-
     // Convert value in percentage for the global values
     this.percentUnmappedNoneGenome =
         ((double) (readsprocessed - readsMapped)) / readsprocessed;
