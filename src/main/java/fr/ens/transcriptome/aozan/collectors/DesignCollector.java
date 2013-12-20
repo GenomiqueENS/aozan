@@ -110,8 +110,15 @@ public class DesignCollector implements Collector {
         samplesInLane.add(s.getSampleId());
       }
 
-      for (Map.Entry<Integer, List<String>> e : samples.entrySet())
+      // List samples by lane
+      for (Map.Entry<Integer, List<String>> e : samples.entrySet()) {
         data.put("design.lane" + e.getKey() + ".samples.names", e.getValue());
+
+        // Check homogeneity between sample in lane
+        // add in rundata interval for percent sample for each lane
+        final double percent = 1.0 / (double) e.getValue().size();
+        data.put("design.lane" + e.getKey() + ".percent.homogeneity", percent);
+      }
 
     } catch (IOException e) {
       throw new AozanException(e);
@@ -121,4 +128,5 @@ public class DesignCollector implements Collector {
   @Override
   public void clear() {
   }
+
 }
