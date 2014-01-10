@@ -64,7 +64,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
   private static final Logger LOGGER = Common.getLogger();
 
   /** Timer **/
-  private final Stopwatch timer = new Stopwatch();
+  private final Stopwatch timer = Stopwatch.createUnstarted();
 
   // count reads pf necessary for create a temporary partial fastq
   private int countReadsPFtoCopy;

@@ -60,7 +60,7 @@ public class FastqscreenDemo {
       .getLogger(fr.ens.transcriptome.aozan.Globals.APP_NAME);
 
   /** Timer */
-  private static final Stopwatch timer = new Stopwatch();
+  private static final Stopwatch timer = Stopwatch.createStarted();
 
   public static final Properties properties = new Properties();
 
@@ -93,8 +93,6 @@ public class FastqscreenDemo {
 
   public static final void main(String[] args) {
 
-    timer.start();
-
     try {
       Locale.setDefault(Locale.US);
       inactiveCollectorClearMethod();
@@ -121,7 +119,7 @@ public class FastqscreenDemo {
         // runId = "130926_SNL110_0085_AH0EYHADXX";
       }
 
-      date = new SimpleDateFormat("yyMMdd").format(new Date());
+      // date = new SimpleDateFormat("yyMMdd").format(new Date());
 
       // Copy console output in a file
       // try {
@@ -244,7 +242,7 @@ public class FastqscreenDemo {
     // conf.put("qc.conf.read.xml.collector.used", "false");
     conf.put("qc.conf.cluster.density.ratio", "0.3472222");
     conf.put("qc.conf.fastqscreen.genomes", "phix");
-    conf.put("qc.conf.step.blast.enable", "false");
+    conf.put("qc.conf.step.blast.enable", "False");
 
     System.out.println("genomes : "
         + conf.get("qc.conf.fastqscreen.genomes") + " mapping mode "

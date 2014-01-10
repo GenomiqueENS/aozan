@@ -162,7 +162,7 @@ public class AozanSequenceFile implements SequenceFile {
       this.seqFile = SequenceFactory.getSequenceFile(files);
 
       // Init timer
-      this.timer = new Stopwatch().start();
+      this.timer = Stopwatch.createStarted();
 
     } catch (SequenceFormatException e) {
       throw new AozanException(e);

@@ -49,10 +49,10 @@ public class IlluminaIntensityMetrics {
 
   // Index array fwhm or intensities : corresponding reading order from binary
   // file
-  private static final int BASE_A = 0;
-  private static final int BASE_C = 1;
-  private static final int BASE_G = 2;
-  private static final int BASE_T = 3;
+  // private static final int BASE_A = 0;
+  // private static final int BASE_C = 1;
+  // private static final int BASE_G = 2;
+  // private static final int BASE_T = 3;
 
   private final float[] fwhm = new float[4]; // A C G T - float
   private final int[] intensities = new int[4]; // A C G T - uint16

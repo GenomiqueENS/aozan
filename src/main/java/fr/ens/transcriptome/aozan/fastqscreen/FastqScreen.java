@@ -39,7 +39,6 @@ import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
 import fr.ens.transcriptome.eoulsan.Settings;
-import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 
 /**
  * This class execute fastqscreen pair-end mode or single-end
@@ -105,7 +104,7 @@ public class FastqScreen {
       final boolean pairedMode) throws AozanException {
 
     // Timer
-    final Stopwatch timer = new Stopwatch().start();
+    final Stopwatch timer = Stopwatch.createStarted();
 
     FastqScreenPseudoMapReduce pmr =
         new FastqScreenPseudoMapReduce(tmpDir, pairedMode, mapperName,

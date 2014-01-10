@@ -98,14 +98,14 @@ public class RunDataGenerator {
       throw new AozanException("Temporary directory is not set.");
 
     // Timer
-    final Stopwatch timerGlobal = new Stopwatch().start();
+    final Stopwatch timerGlobal = Stopwatch.createStarted();
 
     LOGGER.info("Step collector start");
 
     // For all collectors
     for (final Collector collector : this.collectors) {
 
-      Stopwatch timerCollector = new Stopwatch().start();
+      Stopwatch timerCollector = Stopwatch.createStarted();
       LOGGER.info(collector.getName().toUpperCase() + " start");
 
       // Configure

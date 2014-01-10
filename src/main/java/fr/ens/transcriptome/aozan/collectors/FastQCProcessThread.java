@@ -80,7 +80,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
   @Override
   public void run() {
     // Timer
-    final Stopwatch timer = new Stopwatch().start();
+    final Stopwatch timer = Stopwatch.createStarted();
 
     LOGGER.fine("FASTQC : start for " + fastqSample.getKeyFastqSample());
     try {
