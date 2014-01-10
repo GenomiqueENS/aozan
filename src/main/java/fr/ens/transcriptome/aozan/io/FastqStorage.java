@@ -26,7 +26,6 @@ package fr.ens.transcriptome.aozan.io;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Logger;
 
 import uk.ac.babraham.FastQC.Sequence.SequenceFactory;

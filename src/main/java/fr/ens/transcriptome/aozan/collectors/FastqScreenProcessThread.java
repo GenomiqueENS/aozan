@@ -72,7 +72,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   public void run() {
 
     // Timer
-    final Stopwatch timer = new Stopwatch().start();
+    final Stopwatch timer = Stopwatch.createStarted();
 
     LOGGER.fine("FASTQSCREEN : start for "
         + this.fastqSample.getKeyFastqSample());

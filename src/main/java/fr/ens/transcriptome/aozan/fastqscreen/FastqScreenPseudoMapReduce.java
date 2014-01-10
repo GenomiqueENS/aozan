@@ -116,7 +116,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     for (String genome : listGenomes) {
       // Timer : for step mapping on genome
-      final Stopwatch timer = new Stopwatch().start();
+      final Stopwatch timer = Stopwatch.createStarted();
 
       try {
         DataFile genomeFile = new DataFile("genome://" + genome);
@@ -198,7 +198,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       final DataFile genomeDataFile) throws BadBioEntryException, IOException {
 
     // Timer :
-    final Stopwatch timer = new Stopwatch().start();
+    final Stopwatch timer = Stopwatch.createStarted();
 
     final DataFile result =
         new DataFile(this.tmpDir
