@@ -15,7 +15,7 @@ import first_base_report
 from java.util import LinkedHashMap
 from fr.ens.transcriptome.aozan import Globals
 from fr.ens.transcriptome.aozan import Common
-
+from fr.ens.transcriptome.aozan import Settings
 
 def create_lock_file(lock_file_path):
     """Create the lock file.
@@ -96,7 +96,8 @@ def discover_new_run(conf):
 
     first_base_report_sent = first_base_report.load_processed_run_ids(conf)
 
-    if conf['first.base.report.step'].lower().strip() == 'true':
+    if conf[Settings.FIRST_BASE_REPORT_STEP_KEY].lower().strip() == 'true':
+    # if conf['first.base.report.step'].lower().strip() == 'true':
         for run_id in (first_base_report.get_available_run_ids(conf) - first_base_report_sent):
             welcome(conf)
             common.log('INFO', 'First base report ' + run_id, conf)
@@ -113,7 +114,8 @@ def discover_new_run(conf):
 
     hiseq_run_ids_done = hiseq_run.load_processed_run_ids(conf)
 
-    if conf['hiseq.step'].lower().strip() == 'true':
+    if conf[Settings.HISEQ_STEP_KEY].lower().strip() == 'true':
+    # if conf['hiseq.step'].lower().strip() == 'true':
         for run_id in (hiseq_run.get_available_run_ids(conf) - hiseq_run_ids_done):
             welcome(conf)
             common.log('INFO', 'Discover ' + run_id, conf)
@@ -143,7 +145,8 @@ def launch_steps(conf):
     sync_run_ids_done = sync_run.load_processed_run_ids(conf)
 
     # Get the list of run available on HiSeq output
-    if conf['sync.step'].lower().strip() == 'true':
+    if conf[Settings.SYNC_STEP_KEY].lower().strip() == 'true':
+    # if conf['sync.step'].lower().strip() == 'true':
         for run_id in (hiseq_run_ids_done - sync_run_ids_done - hiseq_run_ids_do_not_process):
             welcome(conf)
             common.log('INFO', 'Synchronize ' + run_id, conf)
@@ -163,12 +166,14 @@ def launch_steps(conf):
     # Demultiplexing
     #
 
-    if conf['demux.use.hiseq.output'].lower().strip() == 'true':
+    if conf[Settings.DEMUX_USE_HISEQ_OUTPUT_KEY].lower().strip() == 'true':
+    # if conf['demux.use.hiseq.output'].lower().strip() == 'true':
         sync_run_ids_done = hiseq_run_ids_done
         
     demux_run_ids_done = demux_run.load_processed_run_ids(conf)
-
-    if conf['demux.step'].lower().strip() == 'true':
+    
+    if conf[Settings.DEMUX_STEP_KEY].lower().strip() == 'true':
+    # if conf['demux.step'].lower().strip() == 'true':
         for run_id in (sync_run_ids_done - demux_run_ids_done):
             welcome(conf)
             common.log('INFO', 'Demux ' + run_id, conf)
@@ -188,8 +193,9 @@ def launch_steps(conf):
     #
 
     qc_run_ids_done = qc_run.load_processed_run_ids(conf)
-
-    if conf['qc.step'].lower().strip() == 'true':
+    
+    if conf[Settings.QC_STEP_KEY].lower().strip() == 'true':
+    # if conf['qc.step'].lower().strip() == 'true':
         for run_id in (demux_run_ids_done - qc_run_ids_done):
             welcome(conf)
             common.log('INFO', 'Quality control ' + run_id, conf)
@@ -210,7 +216,8 @@ def launch_steps(conf):
 
     working_run_ids = hiseq_run.get_working_run_ids(conf)
 
-    if conf['sync.continuous.sync'].lower().strip() == 'true':
+    if conf[Settings.SYNC_CONTINUOUS_SYNC_KEY].lower().strip() == 'true':
+    # if conf['sync.continuous.sync'].lower().strip() == 'true':
         for run_id in (working_run_ids - sync_run_ids_done - hiseq_run_ids_do_not_process):
             welcome(conf)
             common.log('INFO', 'Partial synchronization of ' + run_id, conf)
@@ -251,16 +258,19 @@ def aozan_main():
     common.load_conf(conf, args[0])
 
     # End of Aozan if aozan is not enable
-    if conf['aozan.enable'].lower().strip() == 'false':
+    if conf[Settings.AOZAN_ENABLE_KEY].lower().strip() == 'false':
+    # if conf['aozan.enable'].lower().strip() == 'false':
         sys.exit(0)
 
     # Init logger
-    Common.initLogger(conf['aozan.log.path'], conf['aozan.log.level'])
+    Common.initLogger(conf[Settings.AOZAN_LOG_PATH_KEY], conf[Settings.AOZAN_LOG_LEVEL_KEY])
+    # Common.initLogger(conf['aozan.log.path'], conf['aozan.log.level'])
 
     # Check critical free space available
     hiseq_run.send_mail_if_critical_free_space_available(conf)
 
-    lock_file_path = conf['lock.file']
+    lock_file_path = conf[Settings.LOCK_FILE_KEY]
+    # lock_file_path = conf['lock.file']
 
     # Run only if there is no lock
     # if not os.path.exists(lock_file_path):
@@ -294,8 +304,8 @@ def aozan_main():
         if not options.quiet:
             print "A lock file exists."
         if not os.path.exists('/proc/%d' % (load_pid_in_lock_file(lock_file_path))):
-            common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf['lock.file'] +
-                         ". Please investigate last error and then remove the lock file.", is_error_message, conf['aozan.var.path'] + '/aozan.lasterr', conf)
+            common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf[Settings.LOCK_FILE_KEY] + 
+                         ". Please investigate last error and then remove the lock file.", is_error_message, conf[Settings.AOZAN_VAR_PATH_KEY] + '/aozan.lasterr', conf)
 
 
 # Launch Aozan main

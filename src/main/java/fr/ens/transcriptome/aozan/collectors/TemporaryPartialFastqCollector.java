@@ -31,6 +31,7 @@ import java.util.Properties;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
 /**
@@ -42,13 +43,6 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
 public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
 
   public static final String COLLECTOR_NAME = "tmppartialfastq";
-  public static final String KEY_SKIP_CONTROL_LANE =
-      "qc.conf.skip.control.lane";
-  public static final String KEY_IGNORE_PAIRED_MODE =
-      "qc.conf.ignore.paired.mode";
-  public static final String KEY_READS_PF_USED = "qc.conf.reads.pf.used";
-  public static final String KEY_MAX_READS_PF_PARSING =
-      "qc.conf.max.reads.parsed";
 
   /** Parameters configuration */
   private boolean skipControlLane;
@@ -90,12 +84,12 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
     super.configure(properties);
 
     // Set the number of threads
-    if (properties.containsKey("qc.conf.fastqc.threads")) {
+    if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
 
       try {
         int confThreads =
-            Integer.parseInt(properties.getProperty("qc.conf.fastqc.threads")
-                .trim());
+            Integer.parseInt(properties.getProperty(
+                Settings.QC_CONF_THREADS_KEY).trim());
         if (confThreads > 0)
           this.numberThreads = confThreads;
 
@@ -105,7 +99,8 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
 
     try {
       this.skipControlLane =
-          Boolean.parseBoolean(properties.getProperty(KEY_SKIP_CONTROL_LANE));
+          Boolean.parseBoolean(properties
+              .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY));
     } catch (Exception e) {
       // Default value
       this.skipControlLane = true;
@@ -113,7 +108,8 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
 
     try {
       this.ignorePairedMode =
-          Boolean.parseBoolean(properties.getProperty(KEY_IGNORE_PAIRED_MODE));
+          Boolean.parseBoolean(properties
+              .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY));
 
     } catch (Exception e) {
       // Default value
@@ -121,7 +117,8 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
     }
 
     int readsToCopy =
-        Integer.parseInt(properties.getProperty(KEY_READS_PF_USED));
+        Integer.parseInt(properties
+            .getProperty(Settings.QC_CONF_FASTQSCREEN_FASTQ_READS_PF_USED_KEY));
     if (readsToCopy == -1) {
       // Use a fully fastq file, force uncompress fastq file independently
       // number reads
@@ -131,7 +128,9 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
     }
 
     final int countReads =
-        Integer.parseInt(properties.getProperty(KEY_MAX_READS_PF_PARSING));
+        Integer
+            .parseInt(properties
+                .getProperty(Settings.QC_CONF_FASTQSCREEN_FASTQ_MAX_READS_PARSED_KEY));
     if (countReads == -1) {
       // Parsing fully fastq file
       this.maxReadsPFtoParse = Integer.MAX_VALUE;

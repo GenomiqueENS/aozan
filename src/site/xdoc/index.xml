@@ -83,18 +83,15 @@
 
 		<section name="News on Aozan">
 
-			<subsection name="Control quality with FastQC and enhancement.">
+			<subsection name="FastQC and enhancement">
 				<p>The control quality steps contains an additional FastQC module named &quot;<b>Bad tiles</b>&quot; that search tiles with BMS (Bottom Middle Swath) issues with Illumina flowcell v3.</p>
 
+		        <p>Optionally, Aozan adds a sub-step in FastQC to enhance the Overrepresented sequences module. For sequences with &quot;no hit&quot;, a blastn can be launch to estimate the source.
+		        Blastn results with 100% identity and 0% gap will be included in report.</p>
 		    	<div align="center">
 		    		<a href="qc-samples-tests.html#fastqc"><img src="images/qc_fastqc_bad_tiles_height.png" alt="module bad tiles" style="vertical-align:middle"/></a>
 		        	<a href="qc-samples-tests.html#fastqc"><img src="images/qc_fastqc_overrepresented_blast_h350px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></a>
-		    	</div>
-
-		        <p>Optionally, Aozan adds a sub-step in FastQC to enhance the Overrepresented sequences module. For sequences with &quot;no hit&quot;, a blastn can be launch to estimate the source.
-		        Blastn results with 100% identity and 0% gap will be included in report.
-		        </p>
-
+		    	</div> 
 			</subsection>
 
 			<subsection name="Contamination detection with FastQ-Screen">
@@ -107,14 +104,12 @@
 
 			<subsection name="Reading Illumina InterOp binary files">
 				<p>Run data are now retrieved by parsing Illumina InterOp Binary Metric files as Illumina XML run files are now deprecated.</p>
-	       		<div align="center"><a href="qc-lanes-tests.html"><img src="images/qc_lane_test_600px.png" alt="" border="1"/></a></div>
+	       		<div align="center"><a href="qc-lanes-tests.html"><img src="images/qc_lane_test_read1_600px.png" alt="" border="1"/></a></div>
 			</subsection>
 
 			<subsection name="Continuous synchronization of HiSeq data">
-				<p>Enable continuous synchronization of working runs to avoid a big synchronization at the end of the runs.</p>
+				<p>Aozan can now perform continuous synchronizations of working runs to avoid a big synchronizations at the end of the runs.</p>
 			</subsection>
-
-
 
 		</section>
 

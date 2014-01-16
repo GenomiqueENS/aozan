@@ -32,6 +32,7 @@ import java.util.Properties;
 import junit.framework.TestCase;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 
@@ -95,7 +96,7 @@ public class ReadingInteropBinaryFileTest extends TestCase {
   public void setUp() {
 
     // Reading binary files
-    props.put(ReadCollector.READ_XML_COLLECTOR_SPECIFIED, "false");
+    props.put(Settings.QC_CONF_READ_XML_COLLECTOR_USED_KEY, "false");
     // Constant
     props.put("qc.conf.cluster.density.ratio", "0.3472222");
     // Path to directory InterOP

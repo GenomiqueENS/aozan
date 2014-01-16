@@ -33,6 +33,7 @@ import com.google.common.base.Splitter;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.fastqscreen.AliasGenomeFile;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreen;
 import fr.ens.transcriptome.aozan.io.FastqSample;
@@ -49,16 +50,6 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
   /** Collector name */
   public static final String COLLECTOR_NAME = "fastqscreen";
-
-  public static final String KEY_GENOMES = "qc.conf.fastqscreen.genomes";
-  public static final String KEY_SKIP_CONTROL_LANE =
-      "qc.conf.skip.control.lane";
-  public static final String KEY_IGNORE_PAIRED_MODE =
-      "qc.conf.ignore.paired.mode";
-
-  // Optional in configuration Aozan, not call default xsl file.
-  public static final String KEY_FASTQSCREEN_XSL_FILE =
-      "qc.conf.fastqscreen.xsl.file";
 
   private FastqScreen fastqscreen;
 
@@ -102,13 +93,16 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     final Splitter s = Splitter.on(',').trimResults().omitEmptyStrings();
 
     // Set list of reference genome for fastqscreen
-    for (String g : s.split(properties.getProperty(KEY_GENOMES))) {
+    for (String g : s.split(properties
+        .getProperty(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY))) {
       genomesConfiguration.add(g);
     }
 
     try {
       this.ignorePairedMode =
-          Boolean.parseBoolean(properties.getProperty(KEY_IGNORE_PAIRED_MODE));
+          Boolean
+              .parseBoolean(properties
+                  .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY));
 
     } catch (Exception e) {
       // Default value
@@ -117,14 +111,17 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
     try {
       this.skipControlLane =
-          Boolean.parseBoolean(properties.getProperty(KEY_SKIP_CONTROL_LANE));
+          Boolean
+              .parseBoolean(properties
+                  .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY));
     } catch (Exception e) {
       // Default value
       this.skipControlLane = true;
     }
 
     try {
-      String filename = properties.getProperty(KEY_FASTQSCREEN_XSL_FILE);
+      String filename =
+          properties.getProperty(Settings.QC_CONF_FASTQSCREEN_XSL_FILE_KEY);
       if (new File(filename).exists())
         this.fastqscreenXSLFile = new File(filename);
     } catch (Exception e) {

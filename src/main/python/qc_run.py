@@ -5,6 +5,7 @@ Created on 28 oct. 2011
 '''
 import os.path, stat
 import common, time
+from fr.ens.transcriptome.aozan import Settings
 from fr.ens.transcriptome.aozan import QC
 from fr.ens.transcriptome.aozan import AozanException
 from fr.ens.transcriptome.eoulsan.util import StringUtils
@@ -17,7 +18,7 @@ def load_processed_run_ids(conf):
         conf: configuration dictionary
     """
 
-    return common.load_processed_run_ids(conf['aozan.var.path'] + '/qc.done')
+    return common.load_processed_run_ids(conf[Settings.AOZAN_VAR_PATH_KEY] + '/qc.done')
 
 def add_run_id_to_processed_run_ids(run_id, conf):
     """Add a processed run id to the list of the run ids.
@@ -27,7 +28,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-    common.add_run_id_to_processed_run_ids(run_id, conf['aozan.var.path'] + '/qc.done', conf)
+    common.add_run_id_to_processed_run_ids(run_id, conf[Settings.AOZAN_VAR_PATH_KEY] + '/qc.done', conf)
 
 
 def error(short_message, message, conf):
@@ -39,7 +40,7 @@ def error(short_message, message, conf):
         conf: configuration dictionary
     """
 
-    common.error('[Aozan] qc: ' + short_message, message, conf['aozan.var.path'] + '/qc.lasterr', conf)
+    common.error('[Aozan] qc: ' + short_message, message, conf[Settings.AOZAN_VAR_PATH_KEY] + '/qc.lasterr', conf)
 
 def exception_msg(exp, conf):
     """Create error message when an AozanException is thrown.
@@ -49,7 +50,7 @@ def exception_msg(exp, conf):
         conf: configuration dictionary
     """
 
-    if conf['aozan.debug'] == 'true':
+    if conf[Settings.AOZAN_DEBUG_KEY] == 'true':
 
         if isinstance(exp, AozanException) and exp.getWrappedException() != None:
             exp = exp.getWrappedException()
@@ -69,21 +70,21 @@ def qc(run_id, conf):
 
     start_time = time.time()
 
-    fastq_input_dir = conf['fastq.data.path'] + '/' + run_id
-    bcl_input_dir = conf['bcl.data.path'] + '/' + run_id
-    reports_data_base_path = conf['reports.data.path']
+    fastq_input_dir = conf[Settings.FASTQ_DATA_PATH_KEY] + '/' + run_id
+    bcl_input_dir = conf[Settings.BCL_DATA_PATH_KEY] + '/' + run_id
+    reports_data_base_path = conf[Settings.REPORTS_DATA_PATH_KEY]
     reports_data_path = reports_data_base_path + '/' + run_id
     qc_output_dir = reports_data_path + '/qc_' + run_id
     tmp_extension = '.tmp'
 
     # Check if input root bcl data exists
-    if not os.path.exists(conf['bcl.data.path']):
-        error("Basecalling data directory does not exists", "Basecalling data directory does not exists: " + conf['bcl.data.path'], conf)
+    if not os.path.exists(conf[Settings.BCL_DATA_PATH_KEY]):
+        error("Basecalling data directory does not exists", "Basecalling data directory does not exists: " + conf[Settings.BCL_DATA_PATH_KEY], conf)
         return False
 
     # Check if input root fastq root data exists
-    if not os.path.exists(conf['fastq.data.path']):
-        error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf['fastq.data.path'], conf)
+    if not os.path.exists(conf[Settings.FASTQ_DATA_PATH_KEY]):
+        error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf[Settings.FASTQ_DATA_PATH_KEY], conf)
         return False
 
     # Check if reports path directory exists
@@ -92,8 +93,8 @@ def qc(run_id, conf):
         return False
 
     # Check if temporary directory exists
-    if not os.path.exists(conf['tmp.path']):
-        error("Temporary directory does not exists", "Temporary directory does not exists: " + conf['tmp.path'], conf)
+    if not os.path.exists(conf[Settings.TMP_PATH_KEY]):
+        error("Temporary directory does not exists", "Temporary directory does not exists: " + conf[Settings.TMP_PATH_KEY], conf)
         return False
 
     # Check if the output directory already exists
@@ -109,16 +110,16 @@ def qc(run_id, conf):
         return False
 
     # Check if enough free space is available
-    if common.df(conf['reports.data.path']) < 1 * 1024 * 1024 * 1024:
+    if common.df(conf[Settings.REPORTS_DATA_PATH_KEY]) < 1 * 1024 * 1024 * 1024:
         error("Not enough disk space to store aozan quality control for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
-              '.\nNeed more than 10 Gb on ' + conf['reports.data.path'] + '.', conf)
+              '.\nNeed more than 10 Gb on ' + conf[Settings.REPORTS_DATA_PATH_KEY] + '.', conf)
         return False
 
     # Create temporary temporary directory
     qc_output_dir = qc_output_dir + tmp_extension
 
     # Initialize the QC object
-    qc = QC(conf, bcl_input_dir, fastq_input_dir, qc_output_dir, conf['tmp.path'], run_id)
+    qc = QC(conf, bcl_input_dir, fastq_input_dir, qc_output_dir, conf[Settings.TMP_PATH_KEY], run_id)
 
     # Compute the report
     try:
@@ -131,7 +132,7 @@ def qc(run_id, conf):
         return False
 
     # Remove qc data if not demand
-    if conf['qc.report.save.raw.data'].lower().strip() == 'false':
+    if conf[Settings.QC_REPORT_SAVE_RAW_DATA_KEY].lower().strip() == 'false':
         try:
             os.remove(qc_output_dir + '/data-' + run_id + '.txt')
             # qc.writeRawData(report, qc_output_dir + '/data-' + run_id + '.txt')
@@ -140,7 +141,7 @@ def qc(run_id, conf):
             return False
 
     # Write the XML report
-    if conf['qc.report.save.report.data'].lower().strip() == 'true':
+    if conf[Settings.QC_REPORT_SAVE_REPORT_DATA_KEY].lower().strip() == 'true':
         try:
             qc.writeXMLReport(report, qc_output_dir + '/' + run_id + '.xml')
         except AozanException, exp:
@@ -157,10 +158,10 @@ def qc(run_id, conf):
     # Write the HTML report
     html_report_file = qc_output_dir + '/' + run_id + '.html'
     try:
-        if conf['qc.report.stylesheet'] == '':
+        if conf[Settings.QC_REPORT_STYLESHEET_KEY] == '':
             qc.writeReport(report, None, html_report_file)
         else:
-            qc.writeReport(report, conf['qc.report.stylesheet'], html_report_file)
+            qc.writeReport(report, conf[Settings.QC_REPORT_STYLESHEET_KEY], html_report_file)
     except AozanException, exp:
         error("error while computing qc report HTML for run " + run_id + ".", exception_msg(exp, conf), conf)
         return False
@@ -219,8 +220,8 @@ def qc(run_id, conf):
         'can be found in the following directory:\n  ' + qc_output_dir
 
     # Add path to report if reports.url exists
-    if conf['reports.url'] != None and conf['reports.url'] != '':
-        msg += '\n\nRun reports can be found at following location:\n  ' + conf['reports.url'] + '/' + run_id
+    if conf[Settings.REPORTS_URL_KEY] != None and conf[Settings.REPORTS_URL_KEY] != '':
+        msg += '\n\nRun reports can be found at following location:\n  ' + conf[Settings.REPORTS_URL_KEY] + '/' + run_id
 
     msg += '\n\nFor this task %.2f MB has been used and %.2f GB still free.' % (du, df)
 

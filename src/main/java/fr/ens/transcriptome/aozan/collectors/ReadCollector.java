@@ -31,6 +31,7 @@ import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.collectors.interop.ErrorMetricsCollector;
 import fr.ens.transcriptome.aozan.collectors.interop.ExtractionMetricsCollector;
 import fr.ens.transcriptome.aozan.collectors.interop.TileMetricsCollector;
@@ -44,8 +45,6 @@ public class ReadCollector implements Collector {
 
   /** The collector name. */
   public static final String COLLECTOR_NAME = "read";
-  public static final String READ_XML_COLLECTOR_SPECIFIED =
-      "qc.conf.read.xml.collector.used";
 
   private final List<Collector> subCollectionList = Lists.newArrayList();
 
@@ -69,8 +68,8 @@ public class ReadCollector implements Collector {
 
     // Use ReadXMLCollector, if specified in aozan.conf
     String readXMLCollectorUsed =
-        properties.getProperty(READ_XML_COLLECTOR_SPECIFIED).trim()
-            .toLowerCase();
+        properties.getProperty(Settings.QC_CONF_READ_XML_COLLECTOR_USED_KEY)
+            .trim().toLowerCase();
 
     // Build the list of sub-collector
     if (readXMLCollectorUsed.equals("true")) {

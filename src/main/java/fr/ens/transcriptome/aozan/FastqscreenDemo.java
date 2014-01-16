@@ -69,7 +69,7 @@ public class FastqscreenDemo {
   public static final String SRC_RUN =
       "/home/sperrin/Documents/FastqScreenTest/runtest";
   public static final String TMP_DIR =
-      "/home/sperrin/Documents/FastqScreenTest/tmp_bis";
+      "/home/sperrin/Documents/FastqScreenTest/tmp";
   public static final String ALIAS_GENOME_PATH =
       "/home/sperrin/Documents/FastqScreenTest/resources/alias_name_genome_fastqscreen.txt";
 
@@ -240,13 +240,13 @@ public class FastqscreenDemo {
     }
 
     // conf.put("qc.conf.read.xml.collector.used", "false");
-    conf.put("qc.conf.cluster.density.ratio", "0.3472222");
-    conf.put("qc.conf.fastqscreen.genomes", "phix");
-    conf.put("qc.conf.step.blast.enable", "False");
+    conf.put(Settings.QC_CONF_CLUSTER_DENSITY_RATIO_KEY, "0.3472222");
+    conf.put(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY, "phix");
+    conf.put(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY, "True");
 
     System.out.println("genomes : "
-        + conf.get("qc.conf.fastqscreen.genomes") + " mapping mode "
-        + conf.get("qc.conf.ignore.paired.mode"));
+        + conf.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY) + " mapping mode "
+        + conf.get(Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY));
 
     return conf;
   }

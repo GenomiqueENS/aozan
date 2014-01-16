@@ -12,10 +12,12 @@ from java.io import IOException
 from java.lang import Runtime
 from java.util import HashMap
 from fr.ens.transcriptome.eoulsan import EoulsanException
+from fr.ens.transcriptome.aozan import Settings
 from fr.ens.transcriptome.aozan.io import CasavaDesignXLSReader
 from fr.ens.transcriptome.eoulsan.illumina import CasavaDesignUtil
 from fr.ens.transcriptome.eoulsan.illumina.io import CasavaDesignCSVReader
 from fr.ens.transcriptome.eoulsan.illumina.io import CasavaDesignCSVWriter
+
 
 def load_processed_run_ids(conf):
     """Load the list of the processed run ids.
@@ -24,7 +26,7 @@ def load_processed_run_ids(conf):
         conf: configuration dictionary
     """
 
-    return common.load_processed_run_ids(conf['aozan.var.path'] + '/demux.done')
+    return common.load_processed_run_ids(conf[Settings.AOZAN_VAR_PATH_KEY] + '/demux.done')
 
 def add_run_id_to_processed_run_ids(run_id, conf):
     """Add a processed run id to the list of the run ids.
@@ -34,7 +36,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-    common.add_run_id_to_processed_run_ids(run_id, conf['aozan.var.path'] + '/demux.done', conf)
+    common.add_run_id_to_processed_run_ids(run_id, conf[Settings.AOZAN_VAR_PATH_KEY] + '/demux.done', conf)
 
 
 def error(short_message, message, conf):
@@ -46,7 +48,7 @@ def error(short_message, message, conf):
         conf: configuration dictionary
     """
 
-    common.error('[Aozan] demultiplexer: ' + short_message, message, conf['aozan.var.path'] + '/demux.lasterr', conf)
+    common.error('[Aozan] demultiplexer: ' + short_message, message, conf[Settings.AOZAN_VAR_PATH_KEY] + '/demux.lasterr', conf)
 
 
 def load_index_sequences(conf):
@@ -58,12 +60,12 @@ def load_index_sequences(conf):
 
     result = HashMap()
 
-    if conf['index.sequences'] == '' or not os.path.exists(conf['index.sequences']):
+    if conf[Settings.INDEX_SEQUENCES_KEY] == '' or not os.path.exists(conf[Settings.INDEX_SEQUENCES_KEY]):
             return result
 
 
 
-    f = open(conf['index.sequences'], 'r')
+    f = open(conf[Settings.INDEX_SEQUENCES_KEY], 'r')
 
     for l in f:
         l = l[:-1]
@@ -102,13 +104,13 @@ def demux(run_id, conf):
     start_time = time.time()
     common.log('INFO', 'Demux step: start', conf)
 
-    reports_data_base_path = conf['reports.data.path']
+    reports_data_base_path = conf[Settings.REPORTS_DATA_PATH_KEY]
     reports_data_path = reports_data_base_path + '/' + run_id
 
-    input_bcl_path = conf['bcl.data.path'] + '/' + run_id
+    input_bcl_path = conf[Settings.BCL_DATA_PATH_KEY] + '/' + run_id
     
     # Check if must use the direct output of the HiSeq
-    if conf['demux.use.hiseq.output'].lower().strip() == 'true':
+    if conf[Settings.DEMUX_USE_HISEQ_OUTPUT_KEY].lower().strip() == 'true':
         # Retrieve the path of run data directory on HiSeq
         input_bcl_path = hiseq_run.find_hiseq_run_path(run_id, conf)
         # Path not found
@@ -120,10 +122,10 @@ def demux(run_id, conf):
     instrument_sn = hiseq_run.get_instrument_sn(run_id)
     flow_cell_id = hiseq_run.get_flow_cell(run_id)
 
-    input_design_xls_path = conf['casava.samplesheets.path'] + '/' + conf['casava.samplesheet.prefix.filename'] + '_' + instrument_sn + '_%04d.xls' % run_number
-    input_design_csv_path = conf['casava.samplesheets.path'] + '/' + conf['casava.samplesheet.prefix.filename'] + '_' + instrument_sn + '_%04d.csv' % run_number
-    design_csv_path = conf['tmp.path'] + '/' + conf['casava.samplesheet.prefix.filename'] + '_' + instrument_sn + '_%04d.csv' % run_number
-    fastq_output_dir = conf['fastq.data.path'] + '/' + run_id
+    input_design_xls_path = conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + '_' + instrument_sn + '_%04d.xls' % run_number
+    input_design_csv_path = conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + '_' + instrument_sn + '_%04d.csv' % run_number
+    design_csv_path = conf[Settings.TMP_PATH_KEY] + '/' + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + '_' + instrument_sn + '_%04d.csv' % run_number
+    fastq_output_dir = conf[Settings.FASTQ_DATA_PATH_KEY] + '/' + run_id
 
     basecall_stats_prefix = 'basecall_stats_'
     basecall_stats_file = basecall_stats_prefix + run_id + '.tar.bz2'
@@ -137,18 +139,18 @@ def demux(run_id, conf):
         return False
 
     # Check if root input fastq data directory exists
-    if not os.path.exists(conf['fastq.data.path']):
-        error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf['fastq.data.path'], conf)
+    if not os.path.exists(conf[Settings.FASTQ_DATA_PATH_KEY]):
+        error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf[Settings.FASTQ_DATA_PATH_KEY], conf)
         return False
 
     # Check if casava designs path exists
-    if not os.path.exists(conf['casava.samplesheets.path']):
-        error("Casava sample sheets directory does not exists", "Casava sample sheets does not exists: " + conf['casava.samplesheets.path'], conf)
+    if not os.path.exists(conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY]):
+        error("Casava sample sheets directory does not exists", "Casava sample sheets does not exists: " + conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY], conf)
         return False
 
     # Check if temporary directory exists
-    if not os.path.exists(conf['tmp.path']):
-        error("Temporary directory does not exists", "Temporary directory does not exists: " + conf['tmp.path'], conf)
+    if not os.path.exists(conf[Settings.TMP_PATH_KEY]):
+        error("Temporary directory does not exists", "Temporary directory does not exists: " + conf[Settings.TMP_PATH_KEY], conf)
         return False
 
     # Check if reports_data_path exists
@@ -173,8 +175,8 @@ def demux(run_id, conf):
 
     # Compute disk usage and disk free to check if enough disk space is available
     input_path_du = common.du(input_bcl_path)
-    output_df = common.df(conf['fastq.data.path'])
-    du_factor = float(conf['demux.space.factor'])
+    output_df = common.df(conf[Settings.FASTQ_DATA_PATH_KEY])
+    du_factor = float(conf[Settings.DEMUX_SPACE_FACTOR_KEY])
     space_needed = input_path_du * du_factor
 
     common.log("WARNING", "Demux step: input disk usage: " + str(input_path_du), conf)
@@ -187,14 +189,14 @@ def demux(run_id, conf):
               '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + fastq_output_dir + '.', conf)
         return False
 
-    if conf['casava.samplesheet.format'].strip().lower() == 'xls':
+    if conf[Settings.CASAVA_SAMPLESHEET_FORMAT_KEY].strip().lower() == 'xls':
 
         # Convert design in XLS format to CSV format
 
         # Check if the xls design exists
         if not os.path.exists(input_design_xls_path):
             error("no casava sample sheet found", "No casava sample sheet found for " + run_id + " run.\n" + \
-              'You must provide a ' + conf['casava.samplesheet.prefix.filename'] + '-%04d.xls file' % run_number + ' in ' + conf['casava.samplesheets.path'] + \
+              'You must provide a ' + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + '-%04d.xls file' % run_number + ' in ' + conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + \
               ' directory to demultiplex and create fastq files for this run.\n', conf)
             return False
 
@@ -209,20 +211,20 @@ def demux(run_id, conf):
             CasavaDesignCSVWriter(design_csv_path).writer(design)
 
         except IOException, exp:
-            error("error while converting " + conf['casava.samplesheet.prefix.filename'] + "-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
+            error("error while converting " + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + "-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
             return False
         except EoulsanException, exp:
-            error("error while converting " + conf['casava.samplesheet.prefix.filename'] + "-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
+            error("error while converting " + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + "-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
             return False
 
-    elif conf['casava.samplesheet.format'].strip().lower() == 'csv':
+    elif conf[Settings.CASAVA_SAMPLESHEET_FORMAT_KEY].strip().lower() == 'csv':
 
         # Copy the CSV file
 
         # Check if the xls design exists
         if not os.path.exists(input_design_csv_path):
             error("no casava sample sheet found", "No casava sample sheet found for " + run_id + " run.\n" + \
-              'You must provide a ' + conf['casava.samplesheet.prefix.filename'] + '-%04d.csv file' % run_number + ' in ' + conf['casava.samplesheets.path'] + \
+              'You must provide a ' + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + '-%04d.csv file' % run_number + ' in ' + conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + \
               ' directory to demultiplex and create fastq files for this run.\n', conf)
             return False
 
@@ -233,7 +235,7 @@ def demux(run_id, conf):
                   'Error while copying Casava CSV sample sheet file to temporary directory.\nCommand line:\n' + cmd, conf)
             return False
 
-    elif conf['casava.samplesheet.format'].strip().lower() == 'command':
+    elif conf[Settings.CASAVA_SAMPLESHEET_FORMAT_KEY].strip().lower() == 'command':
 
         if conf['casava.design.generator.command'] == None or conf['casava.design.generator.command'].strip() == '':
             error("error while creating Casava CSV sample sheet file for run " + run_id,
@@ -268,10 +270,10 @@ def demux(run_id, conf):
         design_warnings = CasavaDesignUtil.checkCasavaDesign(design, flow_cell_id)
 
     except IOException, exp:
-        error("error while converting " + conf['casava.samplesheet.prefix.filename'] + "-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
+        error("error while converting " + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + "-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
         return False
     except EoulsanException, exp:
-        error("error while converting " + conf['casava.samplesheet.prefix.filename'] + "-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
+        error("error while converting " + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + "-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
         return False
 
     # Log Casava design warning
@@ -287,21 +289,21 @@ def demux(run_id, conf):
         common.log("WARNING", "casava sample sheet warnings: " + msg, conf)
 
     # Create casava makefile
-    cmd = conf['casava.path'] + '/bin/configureBclToFastq.pl ' + \
-          '--fastq-cluster-count ' + conf['casava.fastq.cluster.count'] + ' ' + \
-          '--compression ' + conf['casava.compression'] + ' ' + \
-          '--gz-level ' + conf['casava.compression.level'] + ' ' \
-          '--mismatches ' + conf['casava.mismatches'] + ' ' + \
+    cmd = conf[Settings.CASAVA_PATH_KEY] + '/bin/configureBclToFastq.pl ' + \
+          '--fastq-cluster-count ' + conf[Settings.CASAVA_FASTQ_CLUSTER_COUNT_KEY] + ' ' + \
+          '--compression ' + conf[Settings.CASAVA_COMPRESSION_KEY] + ' ' + \
+          '--gz-level ' + conf[Settings.CASAVA_COMPRESSION_LEVEL_KEY] + ' ' \
+          '--mismatches ' + conf[Settings.CASAVA_MISMATCHES_KEY] + ' ' + \
           '--input-dir ' + input_bcl_path + '/Data/Intensities/BaseCalls ' + \
           '--sample-sheet ' + design_csv_path + ' ' + \
           '--output-dir ' + fastq_output_dir
-    if conf['casava.with.failed.reads'] == 'True':
+    if conf[Settings.CASAVA_WITH_FAILED_READS_KEY] == 'True':
         cmd = cmd + ' --with-failed-reads'
-    if conf['casava.adapter.fasta.file.path'] != '':
-        cmd = cmd + ' --adapter-sequence ' + conf['casava.adapter.fasta.file.path']
+    if conf[Settings.CASAVA_ADAPTER_FASTA_FILE_PATH_KEY] != '':
+        cmd = cmd + ' --adapter-sequence ' + conf[Settings.CASAVA_ADAPTER_FASTA_FILE_PATH_KEY]
 
-    if conf['casava.additionnal.arguments'] != '':
-        cmd = cmd + ' ' + conf['casava.additionnal.arguments']
+    if conf[Settings.CASAVA_ADDITIONNAL_ARGUMENTS_KEY] != '':
+        cmd = cmd + ' ' + conf[Settings.CASAVA_ADDITIONNAL_ARGUMENTS_KEY]
 
     # Retrieve output in file
     cmd = cmd + ' > /tmp/bcl2fastq_output_' + run_id + '.out 2> /tmp/bcl2fastq_output_' + run_id + '.err'
@@ -320,7 +322,7 @@ def demux(run_id, conf):
         error("error while moving command output files for run " + run_id, 'Error while moving command output files (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
     
     # Get the number of cpu
-    cpu_count = int(conf['casava.threads'])
+    cpu_count = int(conf[Settings.CASAVA_THREADS_KEY])
     if cpu_count < 1:
         cpu_count = Runtime.getRuntime().availableProcessors()
 
@@ -363,14 +365,14 @@ def demux(run_id, conf):
 
 
     # Add design to the archive of designs
-    if conf['casava.samplesheet.format'].strip().lower() == 'xls':
-        cmd = 'cp ' + input_design_xls_path + ' ' + conf['tmp.path'] + \
-        ' && cd ' + conf['tmp.path'] + \
-        ' && zip ' + conf['casava.samplesheets.path'] + '/' + conf['casava.samplesheet.prefix.filename'] + 's.zip ' + \
+    if conf[Settings.CASAVA_SAMPLESHEET_FORMAT_KEY].strip().lower() == 'xls':
+        cmd = 'cp ' + input_design_xls_path + ' ' + conf[Settings.TMP_PATH_KEY] + \
+        ' && cd ' + conf[Settings.TMP_PATH_KEY] + \
+        ' && zip ' + conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip ' + \
         os.path.basename(design_csv_path) + ' ' + os.path.basename(input_design_xls_path)
     else:
-        cmd = 'cd ' + conf['tmp.path'] + \
-        ' && zip ' + conf['casava.samplesheets.path'] + '/' + conf['casava.samplesheet.prefix.filename'] + 's.zip ' + \
+        cmd = 'cd ' + conf[Settings.TMP_PATH_KEY] + \
+        ' && zip ' + conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip ' + \
         os.path.basename(design_csv_path)
 
     common.log("SEVERE", "exec: " + cmd, conf)
@@ -380,8 +382,8 @@ def demux(run_id, conf):
 
     # Remove temporary design files
     os.remove(design_csv_path)
-    if conf['casava.samplesheet.format'].strip().lower() == 'xls':
-        os.remove(conf['tmp.path'] + '/' + os.path.basename(input_design_xls_path))
+    if conf[Settings.CASAVA_SAMPLESHEET_FORMAT_KEY].strip().lower() == 'xls':
+        os.remove(conf[Settings.TMP_PATH_KEY] + '/' + os.path.basename(input_design_xls_path))
 
     # Create index.hml file
     common.create_html_index_file(conf, reports_data_path + '/index.html', run_id, ['sync', 'demux'])
@@ -408,8 +410,8 @@ def demux(run_id, conf):
             msg += "\n  - " + warn
 
     # Add path to report if reports.url exists
-    if conf['reports.url'] != None and conf['reports.url'] != '':
-        msg += '\n\nRun reports can be found at following location:\n  ' + conf['reports.url'] + '/' + run_id
+    if conf[Settings.REPORTS_URL_KEY] != None and conf[Settings.REPORTS_URL_KEY] != '':
+        msg += '\n\nRun reports can be found at following location:\n  ' + conf[Settings.REPORTS_URL_KEY] + '/' + run_id
 
     msg += '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df)
 

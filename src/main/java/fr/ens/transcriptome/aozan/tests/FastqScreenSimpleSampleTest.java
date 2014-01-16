@@ -36,6 +36,7 @@ import com.google.common.collect.Sets;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
 import fr.ens.transcriptome.aozan.fastqscreen.AliasGenomeFile;
 import fr.ens.transcriptome.eoulsan.illumina.CasavaDesign;
@@ -56,10 +57,10 @@ import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignCSVReader;
  */
 public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
-  private static final String KEY_GENOMES = "qc.conf.fastqscreen.genomes";
-  // Key for retrieve the path of alias file
-  private static final String KEY_ALIAS_GENOME_PATH =
-      "qc.conf.genome.alias.path";
+  // private static final String KEY_GENOMES = "qc.conf.fastqscreen.genomes";
+  // // Key for retrieve the path of alias file
+  // private static final String KEY_ALIAS_GENOME_PATH =
+  // "qc.conf.genome.alias.path";
 
   private static final Pattern pattern = Pattern.compile(".,;:/-_'");
 
@@ -129,7 +130,8 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
       throw new NullPointerException("The properties object is null");
 
     // Set reference genomes defined in configuration aozan file
-    String genomesPerDefault = properties.get(KEY_GENOMES);
+    String genomesPerDefault =
+        properties.get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY);
 
     if (genomesPerDefault == null || genomesPerDefault.length() == 0)
       throw new AozanException(
@@ -140,8 +142,10 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
     // Set list of genome from samples to use in fastqscreen
     Set<String> genomesSamples =
-        setGenomesNameReferenceSample(properties.get(QC.CASAVA_DESIGN_PATH),
-            properties.get(KEY_ALIAS_GENOME_PATH));
+        setGenomesNameReferenceSample(
+            properties.get(QC.CASAVA_DESIGN_PATH),
+            properties
+                .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
 
     // Set a global list of the run
     genomes.addAll(genomesSamples);

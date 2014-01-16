@@ -361,32 +361,32 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
  <table>
    <tr><th>Aozan property</th><th>Sample value</th><th>description</th></tr>
    <tr><td>aozan.var.path (*)</td><td>/var/lib/aozan</td><td>Aozan internal data directory. It contains
-     log files and history of processed runs.</td></tr>
-   <tr><td>aozan.log.path</td><td>/var/log/aozan</td><td>Path to the Aozan log files.</td></tr>
+     log files and history of processed runs</td></tr>
+   <tr><td>aozan.log.path</td><td>/var/log/aozan</td><td>Path to the Aozan log files</td></tr>
    <tr><td>hiseq.data.path</td><td>/mnt/hiseq01_f,/mnt/hiseq01_g</td><td>Hiseq output directories.
      Multplie values are allowed if there is several HiSeq or 2 output directories for each flow cell of
-     an HiSeq 2000.</td></tr>
+     an HiSeq 2000</td></tr>
    <tr><td>bcl.data.path</td><td>/mnt/storage/bcl</td><td>Hiseq output data after synchronization. Usualy cif files
-     are not copied in this directory.</td></tr>
+     are not copied in this directory</td></tr>
    <tr><td>fastq.data.path</td><td>/mnt/storage/fastq</td><td>Directory for the output of
-     demultiplexing with CASAVA or bcl2fastq.</td></tr>
-   <tr><td>reports.data.path</td><td>/mnt/storage/reports</td><td>Directory for the qc report.</td></tr>
+     demultiplexing with CASAVA or bcl2fastq</td></tr>
+   <tr><td>reports.data.path</td><td>/mnt/storage/reports</td><td>Directory for the qc report</td></tr>
    <tr><td>casava.designs.path</td><td>/mnt/storage/casava_designs</td><td>Directory with CASAVA sample sheets (with files
-like <tt>design_INSTRUMENT-SN_RUN-NUMBER$runId.xls</tt> where INSTRUMENT-SN is the instrument serial number and RUN-NUMBER
-is the run number, e.g. <tt>design_SNL125_0067.xls</tt>)
+	 like <tt>design_INSTRUMENT-SN_RUN-NUMBER$runId.xls</tt> where INSTRUMENT-SN is the instrument serial number and RUN-NUMBER
+	 is the run number, e.g. <tt>design_SNL125_0067.xls</tt>)
      for demultiplexing. If a custom script is used to generate CSV design files, this directory will no be used.</td></tr>
-   <tr><td>tmp.path</td><td>/tmp</td><td>Temporary directory.</td></tr>
+   <tr><td>tmp.path</td><td>/tmp</td><td>Temporary directory</td></tr>
  </table>
 
 	<p>(*) The directory specified in field aozan.var.path contains the following files.
 	Aozan allows to process several runs at the same time. At the end of a step, it adds the run id of that run that has been processed in the step log file.
 		<ul>
-			<li><b>first_base_report.done</b> : list of the run ids treated for the first base report step</li>
+			<li><b>first_base_report.done</b> : list of the run ids treated for the first base report step;</li>
 			<li><b>hiseq.done</b> : list of the run ids treated for the end run discovering step;</li>
-			<li><b>hiseq.deny</b> : list of the run ids not to treat (in this file, manual entry)</li>
-			<li><b>sync.done</b> : list of the run ids treated for the synchronization step</li>
-			<li><b>demux.done</b> : list of the run ids treated for the demuliplexing step</li>
-			<li><b>qc.done</b> : list of the run ids treated for the quality control step</li>
+			<li><b>hiseq.deny</b> : list of the run ids not to treat (in this file, manual entry);</li>
+			<li><b>sync.done</b> : list of the run ids treated for the synchronization step;</li>
+			<li><b>demux.done</b> : list of the run ids treated for the demuliplexing step;</li>
+			<li><b>qc.done</b> : list of the run ids treated for the quality control step;</li>
 		</ul>
 	</p>
 
@@ -410,10 +410,10 @@ is the run number, e.g. <tt>design_SNL125_0067.xls</tt>)
 	   <tr><td>lock.file</td><td>string</td><td>/var/lock/aozan.lock</td><td>Aozan lock file that prevent
 	     two instances of Aozan running at the same time</td></tr>
 	   <tr><td>index.html.template</td><td>string</td><td>Not set</td><td>HTML page template that
-	     describe a run. If not set, the default template in aozan jar file will be used.</td></tr>
+	     describe a run. If not set, the default template in aozan jar file will be used</td></tr>
 	   <tr><td>reports.url</td><td>string</td><td>Not set</td><td>Run reports URL</td></tr>
 	   <tr><td>hiseq.critical.min.space</td><td>integer</td><td>1099511627776</td><td>Threshold before sending
-	     a email at each Aozan start if not enough space is available on HiSeq output disk, the value corresponds 1 Tb in bytes.</td></tr>
+	     a email at each Aozan start if not enough space is available on HiSeq output disk, the value corresponds 1 Tb in bytes</td></tr>
 
 	 </table>
 
@@ -429,7 +429,7 @@ is the run number, e.g. <tt>design_SNL125_0067.xls</tt>)
 	     <tr><td>smtp.server</td><td>string</td><td>Not set</td><td>SMTP server address</td></tr>
 	     <tr><td>mail.from</td><td>string</td><td>Not set</td><td>Email of the sender</td></tr>
 	     <tr><td>mail.to</td><td>string</td><td>Not set</td><td>Email recipient</td></tr>
-	     <tr><td>mail.error.to</td><td>string</td><td>Not set</td><td>Email recipient when an error occurs during Aozan.</td></tr>
+	     <tr><td>mail.error.to</td><td>string</td><td>Not set</td><td>Email recipient when an error occurs during Aozan</td></tr>
 	     <tr><td>mail.header</td><td>string</td><td>THIS IS AN AUTOMATED MESSAGE.\n\n</td><td>Email header</td></tr>
 	     <tr><td>mail.footer</td><td>string</td><td>\n\nThe Aozan team.\n</td><td>Email footer</td></tr>
        </table>
@@ -437,8 +437,9 @@ is the run number, e.g. <tt>design_SNL125_0067.xls</tt>)
    </subsection>
 
     <subsection name="Illumina configuration">
-	    <p>In the lastest versions of HSC (HSC-2.x.x), <tt>Status_Files/</tt> and <tt>reports/</tt> directories in <tt>Basecalls/Data</tt> are no more created by default. This files are useful to display run statistics of working run without requiering SAV.</p>
-	    <p>You reanable the creation of the directories by editing the <tt>C:\Illumina\RTA\Configs\HiSeq.Configuration.xml</tt> file and adding the following line :
+	    <p>In the lastest versions of HSC (HSC-2.x.x), <tt>Status_Files/</tt> and <tt>reports/</tt> directories in <tt>Basecalls/Data</tt> are no more created by default.
+	    This files are useful to display run statistics of working run without requiering SAV.</p>
+	    <p>You can force the creation of the directories by editing the <tt>C:\Illumina\RTA\Configs\HiSeq.Configuration.xml</tt> file and adding the following line :
 		<tt>&lt;SaveHtmReportFiles&gt;true&lt;/SaveHtmReportFiles&gt;</tt>. This can be added at the first level, within the <tt>&lt;RTAConfiguration&gt;</tt> tags.
 	</p>
 	</subsection>
@@ -449,7 +450,7 @@ is the run number, e.g. <tt>design_SNL125_0067.xls</tt>)
  <section name="Steps">
 
    <p>The quality control step is the longest step, it can last several days.
-   If Aozan is stopped before the end, it is possible to relaunch him. Restore points allow get back at the last sample treated.
+   If Aozan is stopped before the end, it is possible to relaunch it. Restore points allow get back at the last sample treated.
    The intermediary data are saved in the quality control directory in files with the extension <tt>&quot;.data&quot;</tt>.
    </p>
 

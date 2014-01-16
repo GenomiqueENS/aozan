@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
+import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.eoulsan.util.StringUtils;
 import uk.ac.babraham.FastQC.Sequence.Contaminant.Contaminant;
 import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
@@ -103,9 +104,9 @@ public class ContaminantFinder {
 
       final InputStream is;
 
-      if (System.getProperty("fastqc.contaminant_file") != null
-          && System.getProperty("fastqc.contaminant_file").length() > 0) {
-        is = new FileInputStream(System.getProperty("fastqc.contaminant_file"));
+      if (System.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY) != null
+          && System.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY).length() > 0) {
+        is = new FileInputStream(System.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY));
       } else {
         is =
             ClassLoader

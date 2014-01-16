@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
 /**
@@ -78,11 +79,11 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     super.configure(properties);
 
     // Set the number of threads
-    if (properties.containsKey("qc.conf.fastqc.threads")) {
+    if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
 
       try {
         int confThreads =
-            Integer.parseInt(properties.getProperty("qc.conf.fastqc.threads")
+            Integer.parseInt(properties.getProperty(Settings.QC_CONF_THREADS_KEY)
                 .trim());
         if (confThreads > 0)
           this.numberThreads = confThreads;

@@ -36,6 +36,7 @@ import com.google.common.collect.Maps;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.util.StatisticsUtils;
@@ -80,7 +81,7 @@ public class TileMetricsCollector implements Collector {
 
     densityRatio =
         Double.parseDouble(properties
-            .getProperty("qc.conf.cluster.density.ratio"));
+            .getProperty(Settings.QC_CONF_CLUSTER_DENSITY_RATIO_KEY));
   }
 
   /**

@@ -36,9 +36,10 @@ import com.google.common.base.Stopwatch;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
+import fr.ens.transcriptome.aozan.QC;
+import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
-import fr.ens.transcriptome.eoulsan.Settings;
 
 /**
  * This class execute fastqscreen pair-end mode or single-end
@@ -49,20 +50,6 @@ public class FastqScreen {
 
   /** Logger */
   private static final Logger LOGGER = Common.getLogger();
-
-  public static final String KEY_NUMBER_THREAD = "qc.conf.fastqc.threads";
-  public static final String KEY_TMP_DIR = "tmp.dir";
-
-  public static final String KEY_GENOMES_DESC_PATH =
-      "qc.conf.settings.genomes.desc.path";
-  public static final String KEY_MAPPERS_INDEXES_PATH =
-      "qc.conf.settings.mappers.indexes.path";
-  public static final String KEY_GENOMES_PATH = "qc.conf.settings.genomes";
-
-  // Configuration mapper for fastqscreen, optional
-  public static final String KEY_MAPPER_NAME = "qc.conf.fastqscreen.mapper";
-  public static final String KEY_MAPPER_ARGUMENT =
-      "qc.conf.fastqscreen.mapper.argument";
 
   private final String tmpDir;
   private int confThreads;
@@ -159,27 +146,35 @@ public class FastqScreen {
    */
   public FastqScreen(final Properties properties) {
 
-    this.tmpDir = properties.getProperty(KEY_TMP_DIR);
+    this.tmpDir = properties.getProperty(QC.TMP_DIR);
 
-    if (properties.containsKey(KEY_TMP_DIR)) {
+    if (properties.containsKey(QC.TMP_DIR)) {
       try {
         confThreads =
-            Integer.parseInt(properties.getProperty(KEY_NUMBER_THREAD));
+            Integer.parseInt(properties
+                .getProperty(Settings.QC_CONF_THREADS_KEY));
       } catch (Exception e) {
       }
     }
 
     // Parameter mapper instead of default value
-    this.mapperName = properties.getProperty(KEY_MAPPER_NAME);
-    this.mapperArgument = properties.getProperty(KEY_MAPPER_ARGUMENT);
+    this.mapperName =
+        properties.getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPER_KEY);
+    this.mapperArgument =
+        properties
+            .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPER_ARGUMENT_KEY);
 
-    Settings settings = EoulsanRuntime.getSettings();
+    fr.ens.transcriptome.eoulsan.Settings settings =
+        EoulsanRuntime.getSettings();
 
-    settings.setGenomeDescStoragePath(properties
-        .getProperty(KEY_GENOMES_DESC_PATH));
-    settings.setGenomeMapperIndexStoragePath(properties
-        .getProperty(KEY_MAPPERS_INDEXES_PATH));
-    settings.setGenomeStoragePath(properties.getProperty(KEY_GENOMES_PATH));
+    settings
+        .setGenomeDescStoragePath(properties
+            .getProperty(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
+    settings
+        .setGenomeMapperIndexStoragePath(properties
+            .getProperty(Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY));
+    settings.setGenomeStoragePath(properties
+        .getProperty(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY));
 
   }
 }

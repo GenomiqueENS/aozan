@@ -58,9 +58,9 @@ abstract public class AbstractFastqCollector implements Collector {
   /** Logger */
   private static final Logger LOGGER = Common.getLogger();
 
-  public static final String KEY_RUN_MODE = "run.info.run.mode";
-  public static final String KEY_READ_COUNT = "run.info.read.count";
-  public static final String KEY_LANE_COUNT = "run.info.flow.cell.lane.count";
+  public static final String RUN_MODE_KEY = "run.info.run.mode";
+  public static final String READ_COUNT_KEY = "run.info.read.count";
+  public static final String LANE_COUNT_KEY = "run.info.flow.cell.lane.count";
 
   protected FastqStorage fastqStorage;
   protected String casavaOutputPath;
@@ -148,7 +148,7 @@ abstract public class AbstractFastqCollector implements Collector {
 
     createListFastqSamples(data);
 
-    final boolean isRunPE = data.get(KEY_RUN_MODE).toUpperCase().equals("PE");
+    final boolean isRunPE = data.get(RUN_MODE_KEY).toUpperCase().equals("PE");
 
     RunData resultPart = null;
     if (this.getThreadsNumber() > 1) {
@@ -249,8 +249,8 @@ abstract public class AbstractFastqCollector implements Collector {
     if (!fastqSamples.isEmpty())
       return;
 
-    final int laneCount = data.getInt(KEY_LANE_COUNT);
-    final int readCount = data.getInt(KEY_READ_COUNT);
+    final int laneCount = data.getInt(LANE_COUNT_KEY);
+    final int readCount = data.getInt(READ_COUNT_KEY);
 
     for (int read = 1; read <= readCount; read++) {
 

@@ -9,11 +9,9 @@ Created on 25 oct. 2011
 import smtplib, os.path, time
 import mimetypes
 
-from java.io import File, InputStreamReader
-from java.io import BufferedReader
+from java.io import File
 from java.lang import Runtime
 from java.util.logging import Level
-from com.google.common.io import CharStreams
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.audio import MIMEAudio
@@ -23,6 +21,7 @@ from email import encoders
 
 from fr.ens.transcriptome.aozan import Common
 from fr.ens.transcriptome.aozan import Globals
+from fr.ens.transcriptome.aozan import Settings
 from fr.ens.transcriptome.aozan.util import FileUtils
 
 
@@ -66,25 +65,32 @@ def send_msg(subject, message, is_error, conf):
     """
 
 
-    send_mail = conf['send.mail'].lower() == 'true'
-    smtp_server = conf['smtp.server']
+    send_mail = conf[Settings.SEND_MAIL_KEY].lower() == 'true'
+    # send_mail = conf['send.mail'].lower() == 'true'
+    smtp_server = conf[Settings.SMTP_SERVER_KEY]
+    # smtp_server = conf['smtp.server']
 
     # Specific receiver for error message
     if is_error:
-        mail_to = conf['mail.error.to']
+        mail_to = conf[Settings.MAIL_ERROR_TO_KEY]
+        # mail_to = conf['mail.error.to']
 
         # Mail error not define
         if mail_to == None or mail_to == '':
-            mail_to = conf['mail.to']
+            mail_to = conf[Settings.MAIL_TO_KEY]
+            # mail_to = conf['mail.to']
     else:
-        mail_to = conf['mail.to']
+        mail_to = conf[Settings.MAIL_TO_KEY]
+        # mail_to = conf['mail.to']
 
-    mail_from = conf['mail.from']
+    mail_from = conf[Settings.MAIL_FROM_KEY]
+    # mail_from = conf['mail.from']
     mail_cc = None
     mail_bcc = None
     COMMASPACE = ', '
-
-    message = conf['mail.header'].replace('\\n', '\n') + message + conf['mail.footer'].replace('\\n', '\n')
+    
+    message = conf[Settings.MAIL_HEADER_KEY].replace('\\n', '\n') + message + conf[Settings.MAIL_FOOTER_KEY].replace('\\n', '\n')
+    # message = conf['mail.header'].replace('\\n', '\n') + message + conf['mail.footer'].replace('\\n', '\n')
     message = message.replace('\n', '\r\n')
     msg = ''
 
@@ -126,15 +132,19 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
     """Send a message to the user about the data extraction."""
 
 
-    send_mail = conf['send.mail'].lower() == 'true'
-    smtp_server = conf['smtp.server']
-    mail_to = conf['mail.to']
-    mail_from = conf['mail.from']
+    # send_mail = conf['send.mail'].lower() == 'true'
+    # smtp_server = conf['smtp.server']
+    # mail_to = conf['mail.to']
+    # mail_from = conf['mail.from']
+    send_mail = conf[Settings.SEND_MAIL_KEY].lower() == 'true'
+    smtp_server = conf[Settings.SMTP_SERVER_KEY]
+    mail_to = conf[Settings.MAIL_TO_KEY]
+    mail_from = conf[Settings.MAIL_FROM_KEY]
     mail_cc = None
     mail_bcc = None
     COMMASPACE = ', '
 
-    message = conf['mail.header'].replace('\\n', '\n') + message + conf['mail.footer'].replace('\\n', '\n')
+    message = conf[Settings.MAIL_HEADER_KEY].replace('\\n', '\n') + message + conf[Settings.MAIL_FOOTER_KEY].replace('\\n', '\n')
 
 
 
@@ -332,10 +342,27 @@ def load_conf(conf, conf_file_path):
     # in version Aozan 1.1.1 change key in configuration to replace design by sample sheet
     # converting table between old and new key
     converting_table_key = {}
-    converting_table_key['casava.design.format'] = 'casava.samplesheet.format'
-    converting_table_key['casava.design.prefix.filename'] = 'casava.samplesheet.prefix.filename'
-    converting_table_key['casava.designs.path'] = 'casava.samplesheets.path'
-
+    converting_table_key['casava.design.format'] = Settings.CASAVA_SAMPLESHEET_FORMAT_KEY  # 'casava.samplesheet.format'
+    converting_table_key['casava.design.prefix.filename'] = Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY  # 'casava.samplesheet.prefix.filename'
+    converting_table_key['casava.designs.path'] = Settings.CASAVA_SAMPLESHEETS_PATH_KEY  # 'casava.samplesheets.path'
+    
+    converting_table_key['qc.conf.fastqc.threads'] = Settings.QC_CONF_THREADS_KEY  # 'qc.conf.threads'
+    converting_table_key['qc.conf.blast.arguments'] = Settings.QC_CONF_FASTQSCREEN_BLAST_ARGUMENTS_KEY  # 'qc.conf.fastqscreen.blast.arguments'
+    converting_table_key['qc.conf.blast.db.path'] = Settings.QC_CONF_FASTQSCREEN_BLAST_DB_PATH_KEY  # 'qc.conf.fastqscreen.blast.db.path'
+    converting_table_key['qc.conf.blast.path'] = Settings.QC_CONF_FASTQSCREEN_BLAST_PATH_KEY  # 'qc.conf.fastqscreen.blast.path'
+    converting_table_key['qc.conf.blast.version.expected'] = Settings.QC_CONF_FASTQSCREEN_BLAST_VERSION_EXPECTED_KEY  # 'qc.conf.fastqscreen.blast.version.expected'
+    converting_table_key['qc.conf.step.blast.enable'] = Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY  # 'qc.conf.fastqscreen.blast.enable'
+    
+    converting_table_key['qc.conf.ignore.paired.mode'] = Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY  # 'qc.conf.fastqscreen.mapping.ignore.paired.mode'
+    converting_table_key['qc.conf.max.reads.parsed'] = Settings.QC_CONF_FASTQSCREEN_FASTQ_MAX_READS_PARSED_KEY  # 'qc.conf.fastqscreen.fastq.max.reads.parsed'
+    converting_table_key['qc.conf.reads.pf.used'] = Settings.QC_CONF_FASTQSCREEN_FASTQ_READS_PF_USED_KEY  # 'qc.conf.fastqscreen.fastq.reads.pf.used'
+    converting_table_key['qc.conf.skip.control.lane'] = Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY  # 'qc.conf.fastqscreen.mapping.skip.control.lane'
+    
+    converting_table_key['qc.conf.genome.alias.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY  # 'qc.conf.fastqscreen.settings.genomes.alias.path'
+    converting_table_key['qc.conf.settings.genomes'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY  # 'qc.conf.fastqscreen.settings.genomes'
+    converting_table_key['qc.conf.settings.genomes.desc.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY  # 'qc.conf.fastqscreen.settings.genomes.desc.path'
+    converting_table_key['qc.conf.settings.mappers.indexes.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY  # 'qc.conf.fastqscreen.settings.mappers.indexes.path'
+    
     f = open(conf_file_path, 'r')
 
     for l in f:
@@ -364,10 +391,12 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
 
     """ Since version RTA after 1.17, Illumina stop the generation of the Status and reports files"""
 
-    path_report = conf['reports.data.path'] + '/' + run_id
+    path_report = conf[Settings.REPORTS_DATA_PATH_KEY] + '/' + run_id
+    # path_report = conf['reports.data.path'] + '/' + run_id
     
     # Retrieve BufferedReader on index html template
-    template_path = conf['index.html.template']
+    template_path = conf[Settings.INDEX_HTML_TEMPLATE_KEY]
+    #template_path = conf['index.html.template']
     if template_path != None and template_path != '' and os.path.exists(template_path):
         f_in = open(template_path, 'r')
         text = ''.join(f_in.readlines())
@@ -411,73 +440,73 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
 def set_default_conf(conf):
 
     # Global
-    conf['aozan.enable'] = 'True'
-    conf['send.mail'] = 'False'
-    conf['aozan.log.level'] = str(Globals.LOG_LEVEL)
-    conf['first.base.report.step'] = 'True'
-    conf['hiseq.step'] = 'True'
-    conf['sync.step'] = 'True'
-    conf['demux.step'] = 'True'
-    conf['qc.step'] = 'False'
+    conf[Settings.AOZAN_ENABLE_KEY] = 'True'
+    conf[Settings.SEND_MAIL_KEY] = 'False'
+    conf[Settings.AOZAN_LOG_LEVEL_KEY] = str(Globals.LOG_LEVEL)
+    conf[Settings.FIRST_BASE_REPORT_STEP_KEY] = 'True'
+    conf[Settings.HISEQ_STEP_KEY] = 'True'
+    conf[Settings.SYNC_STEP_KEY] = 'True'
+    conf[Settings.DEMUX_STEP_KEY] = 'True'
+    conf[Settings.QC_STEP_KEY] = 'False'
 
     # Lock file
-    conf['lock.file'] = '/var/lock/aozan.lock'
+    conf[Settings.LOCK_FILE_KEY] = '/var/lock/aozan.lock'
 
     # Synchronization
-    conf['sync.exclude.cif'] = 'True'
-    conf['sync.continuous.sync'] = 'False'
-    conf['sync.continuous.sync.min.age.files'] = '15'
+    conf[Settings.SYNC_EXCLUDE_CIF_KEY] = 'True'
+    conf[Settings.SYNC_CONTINUOUS_SYNC_KEY] = 'False'
+    conf[Settings.SYNC_CONTINUOUS_SYNC_MIN_AGE_FILES_KEY] = '15'
 
     # Casava
-    conf['demux.use.hiseq.output'] = 'False'
-    conf['casava.samplesheet.format'] = 'xls'
-    conf['casava.samplesheet.prefix.filename'] = 'design'
-    conf['casava.path'] = '/usr/local/casava'
-    conf['casava.compression'] = 'bzip2'
-    conf['casava.fastq.cluster.count'] = '0'
-    conf['casava.compression.level'] = '9'
-    conf['casava.mismatches'] = '0'
-    conf['casava.threads'] = str(Runtime.getRuntime().availableProcessors())
-    conf['casava.adapter.fasta.file.path'] = ''
-    conf['casava.with.failed.reads'] = 'True'
-    conf['casava.additionnal.arguments'] = ''
+    conf[Settings.DEMUX_USE_HISEQ_OUTPUT_KEY] = 'False'
+    conf[Settings.CASAVA_SAMPLESHEET_FORMAT_KEY] = 'xls'
+    conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] = 'design'
+    conf[Settings.CASAVA_PATH_KEY] = '/usr/local/casava'
+    conf[Settings.CASAVA_COMPRESSION_KEY] = 'bzip2'
+    conf[Settings.CASAVA_FASTQ_CLUSTER_COUNT_KEY] = '0'
+    conf[Settings.CASAVA_COMPRESSION_KEY] = '9'
+    conf[Settings.CASAVA_MISMATCHES_KEY] = '0'
+    conf[Settings.CASAVA_THREADS_KEY] = str(Runtime.getRuntime().availableProcessors())
+    conf[Settings.CASAVA_ADAPTER_FASTA_FILE_PATH_KEY] = ''
+    conf[Settings.CASAVA_WITH_FAILED_READS_KEY] = 'True'
+    conf[Settings.CASAVA_ADDITIONNAL_ARGUMENTS_KEY] = ''
 
     # Data path
-    conf['tmp.path'] = '/tmp'
-    conf['index.sequences'] = ''
-    conf['index.html.template'] = ''
-    conf['reports.url'] = ''
-    conf['qc.report.stylesheet'] = ''
+    conf[Settings.TMP_PATH_KEY] = '/tmp'
+    conf[Settings.INDEX_SEQUENCES_KEY] = ''
+    conf[Settings.INDEX_HTML_TEMPLATE_KEY] = ''
+    conf[Settings.REPORTS_URL_KEY] = ''
+    conf[Settings.QC_REPORT_STYLESHEET_KEY] = ''
 
     # Space needed
-    conf['hiseq.warning.min.space'] = str(3 * 1024 * 1024 * 1024 * 1024)
-    conf['hiseq.critical.min.space'] = str(1 * 1024 * 1024 * 1024 * 1024)
-    conf['sync.space.factor'] = str(0.2)
-    conf['demux.space.factor'] = str(0.7)
+    conf[Settings.HISEQ_WARNING_MIN_SPACE_KEY] = str(3 * 1024 * 1024 * 1024 * 1024)
+    conf[Settings.HISEQ_CRITICAL_MIN_SPACE_KEY] = str(1 * 1024 * 1024 * 1024 * 1024)
+    conf[Settings.SYNC_SPACE_FACTOR_KEY] = str(0.2)
+    conf[Settings.DEMUX_SPACE_FACTOR_KEY] = str(0.7)
     # Value for step estimated space needed during first base report
     # estimation factor for fastq_space_per_lane_per_cycle (cmd du -b)
-    conf['fastq.space.factor'] = str(224000000)
+    conf[Settings.FASTQ_SPACE_FACTOR_KEY] = str(224000000)
     # estimation factor for bcl_space_per_lane_per_cycle (cmd du -b)
-    conf['bcl.space.factor'] = str(416000000)
+    conf[Settings.BCL_SPACE_FACTOR_KEY] = str(416000000)
     # estimation factor for hiseq_space_per_lane_per_cycle (cmd du -b)
-    conf['hiseq.space.factor'] = str(3180000000)
+    conf[Settings.HISEQ_SPACE_FACTOR_KEY] = str(3180000000)
 
 
     # Mail configuration
-    conf['mail.header'] = 'THIS IS AN AUTOMATED MESSAGE.\\n\\n'
-    conf['mail.footer'] = '\\n\\nThe Aozan team.\\n'
+    conf[Settings.MAIL_HEADER_KEY] = 'THIS IS AN AUTOMATED MESSAGE.\\n\\n'
+    conf[Settings.MAIL_FOOTER_KEY] = '\\n\\nThe Aozan team.\\n'
 
     # Collectors configuration
     # ReadCollector
-    conf['qc.conf.read.xml.collector.used'] = 'false'
+    conf[Settings.QC_CONF_READ_XML_COLLECTOR_USED_KEY] = 'false'
     # TileMetricsCollector
-    conf['qc.conf.cluster.density.ratio'] = str(0.3472222)
+    conf[Settings.QC_CONF_CLUSTER_DENSITY_RATIO_KEY] = str(0.3472222)
     # TemporaryPartialFastqCollector
-    conf['qc.conf.reads.pf.used'] = str(200000)
+    conf[Settings.QC_CONF_FASTQSCREEN_FASTQ_READS_PF_USED_KEY] = str(200000)
     # Use only the first X reads pf in fastq file
-    conf['qc.conf.max.reads.parsed'] = str(30000000)
+    conf[Settings.QC_CONF_FASTQSCREEN_FASTQ_MAX_READS_PARSED_KEY] = str(30000000)
     # Configuration FastqscreenCollector, parameters for mapping
     # no detection contamination for control lane
-    conf['qc.conf.skip.control.lane'] = 'true'
+    conf[Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY] = 'true'
     # run paired : no paired mapping
-    conf['qc.conf.ignore.paired.mode'] = 'true'
+    conf[Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY] = 'true'

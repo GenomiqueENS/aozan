@@ -61,6 +61,7 @@ import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.QC;
+import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 import fr.ens.transcriptome.eoulsan.util.StringUtils;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
@@ -78,15 +79,6 @@ public class OverrepresentedSequencesBlast {
 
   private static final String SEQUENCES_NOT_USE_FILE =
       "/sequences_nohit_with_blastn.txt";
-
-  // Key for parameters in Aozan configuration
-  public static final String KEY_BLAST_PATH = "qc.conf.blast.path";
-  public static final String KEY_BLAST_PATH_DB = "qc.conf.blast.path.db";
-  public static final String KEY_BLAST_ARGUMENTS = "qc.conf.blast.arguments";
-  public static final String KEY_BLAST_VERSION_EXPECTED =
-      "qc.conf.blast.version.expected";
-  public static final String KEY_STEP_BLAST_ENABLE =
-      "qc.conf.step.blast.enable";
 
   // Tag configuration general of blast
   private static final String tag_queryLength = "Iteration_query-len";
@@ -122,19 +114,26 @@ public class OverrepresentedSequencesBlast {
           "OverrepresentedSequencesBlast has been already configured");
 
     this.stepEnabled =
-        Boolean.parseBoolean(properties.getProperty(KEY_STEP_BLAST_ENABLE)
-            .trim().toLowerCase());
+        Boolean.parseBoolean(properties
+            .getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY).trim()
+            .toLowerCase());
 
     if (this.stepEnabled) {
 
       // Check parameters
       this.blastVersionExpected =
-          properties.getProperty(KEY_BLAST_VERSION_EXPECTED);
+          properties
+              .getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_VERSION_EXPECTED_KEY);
 
       this.tmpPath = properties.getProperty(QC.TMP_DIR);
 
-      String blastPath = properties.getProperty(KEY_BLAST_PATH).trim();
-      String blastDBPath = properties.getProperty(KEY_BLAST_PATH_DB).trim();
+      String blastPath =
+          properties.getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_PATH_KEY)
+              .trim();
+      String blastDBPath =
+          properties
+              .getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_DB_PATH_KEY)
+              .trim();
 
       // Check paths needed in configuration aozan
       if (blastPath == null
@@ -157,7 +156,9 @@ public class OverrepresentedSequencesBlast {
 
         try {
           // Add arguments from configuration Aozan
-          String blastArguments = properties.getProperty(KEY_BLAST_ARGUMENTS);
+          String blastArguments =
+              properties
+                  .getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_ARGUMENTS_KEY);
 
           this.blastCommonCommandLine =
               createCommonBlastCommandLine(blastPath, blastDBPath,
