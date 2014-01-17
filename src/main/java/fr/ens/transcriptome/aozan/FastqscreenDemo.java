@@ -29,8 +29,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -80,7 +78,8 @@ public class FastqscreenDemo {
   public static final String GENOMES_PATH = RESOURCE_ROOT + "/genomes";
 
   public static final String AOZAN_CONF =
-      "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_test.conf";
+      "/home/sperrin/home-net/aozan_validation-1.2.1.conf";
+  // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_test.conf";
   // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_partiel_fastqc.conf";
   // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_without_fastqc.conf";
 
@@ -88,7 +87,7 @@ public class FastqscreenDemo {
   private static final boolean paired = false;
 
   private static String runId;
-  private static String date;
+//  private static String date;
   private static String qcDir;
 
   public static final void main(String[] args) {
@@ -115,8 +114,8 @@ public class FastqscreenDemo {
         // RUN rapid
         // runId = "130722_SNL110_0077_AH0NT2ADXX";
         // runId = "130904_SNL110_0082_AC2BR0ACXX";
-        runId = "130910_SNL110_0083_AC2AMKACXX";
-        // runId = "130926_SNL110_0085_AH0EYHADXX";
+        // runId = "130910_SNL110_0083_AC2AMKACXX";
+        runId = "130926_SNL110_0085_AH0EYHADXX";
       }
 
       // date = new SimpleDateFormat("yyMMdd").format(new Date());
@@ -244,9 +243,12 @@ public class FastqscreenDemo {
     conf.put(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY, "phix");
     conf.put(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY, "True");
 
-    System.out.println("genomes : "
-        + conf.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY) + " mapping mode "
-        + conf.get(Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY));
+    System.out
+        .println("genomes : "
+            + conf.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY)
+            + " mapping mode "
+            + conf
+                .get(Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY));
 
     return conf;
   }

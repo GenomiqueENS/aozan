@@ -48,8 +48,8 @@
        			<ul>
        				<li><a href="#fcconfiguration">General configuration</a></li>
        				<li><a href="#fctests">Configuration tests</a></li>
-       				<li><a href="#badtiles">Additional module Bad tiles</a></li>
-       				<li><a href="#overrepresented">Additional module Bad tiles</a></li>
+       				<li><a href="#badtiles">New module for Bad tiles</a></li>
+       				<li><a href="#overrepresented">Enhancement of module Overrepresented sequences</a></li>
        			</ul>
        		</li>
        		<li><a href="#contamination">Contamination detection with FastQ Screen</a>
@@ -119,11 +119,11 @@
 
 	    <p>An example of table built with sample quality tests</p>
 	    <div align="center">
-	    	<img src="images/qc_sample_test_800px.png" alt="" />
+	    	<img src="images/qc_sample_test_800px.png" alt="example on report with demultiplexing and fastqc data" />
 	    </div>
 		
 		<a name="badtiles"/>
-		<p><b>Additional module &#145;Bad tiles&#146;</b></p>
+		<p><b>New module for &#145;Bad tiles&#146;</b></p>
 		<p>It contains an additional FastQC step named "<b>Bad tiles</b>" that search tiles with BMS (Bottom Middle Swath) issues with Illumina flowcell v3.
     	During the Quality Control development phase of the project with the new V3 chemistry, we set up a new FastQC module in order to detect bad tiles caused by the BMS problem.</p>
 
@@ -136,7 +136,7 @@
 		<div align="center"><img src="images/qc_fastqc_bad_tiles_300px.png" alt="module bad tiles"/></div>
 		
 		 <a name="overrepresented"/>
-		<p><b>Enhancement module &#145;Overrepresented sequences&#146;</b></p>
+		<p><b>Enhancement to module &#145;Overrepresented sequences&#146;</b></p>
 	    <p>The module overrepresented sequences in FastQC.
 	      The output of &#145;Overrepresented Sequences&#146; module from FastQC has been improved for sequences not found in contaminants list. 
 	      We (optionally) launch a blast on sequences with &#145;no hit&#146; source. The report prints the best hit.
@@ -291,7 +291,7 @@ especially the <a href="http://transcriptome.ens.fr/eoulsan/datarepositories.htm
 		<p>The explanation to construct intervals is <a href="#syntax_interval">here.</a></p>
 
         <p>The last column contains a link to the report html fastqscreen. An example of a report html of quality control with major values of fastqscreen :
-			<div align="center"><img src="images/qc_sample_fqs_500px.png" alt=""/></div>
+			<div align="center"><img src="images/qc_sample_fqs_500px.png" alt="example on report with fastqscreen data"/></div>
 		</p>
 
 		<p>An example of a report html fastqscreen with four reference genomes and the genome sample (mm10) :

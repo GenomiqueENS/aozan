@@ -72,8 +72,9 @@
 		</section>
 
 		<section name="Quality control report example">
-			<p><a href="./quality_control_example_report.html">Link to an example on control quality run.</a></p>
-			<p>TODO: Insert an image instead of a link</p>
+			<p><a href="./quality_control_example_report.html" target="_blank">
+				<img src="images/quality_control_example_report_300px.png" alt="Example on control quality run report">
+			</a></p>
 		</section>
 
 		<section name="Sample sheet validator">
@@ -89,8 +90,8 @@
 		        <p>Optionally, Aozan adds a sub-step in FastQC to enhance the Overrepresented sequences module. For sequences with &quot;no hit&quot;, a blastn can be launch to estimate the source.
 		        Blastn results with 100% identity and 0% gap will be included in report.</p>
 		    	<div align="center">
-		    		<a href="qc-samples-tests.html#fastqc"><img src="images/qc_fastqc_bad_tiles_height.png" alt="module bad tiles" style="vertical-align:middle"/></a>
-		        	<a href="qc-samples-tests.html#fastqc"><img src="images/qc_fastqc_overrepresented_blast_h350px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></a>
+		    		<a href="qc-samples-tests.html#badtiles"><img src="images/qc_fastqc_bad_tiles_height.png" alt="module bad tiles" style="vertical-align:middle"/></a>
+		        	<a href="qc-samples-tests.html#overrepresented"><img src="images/qc_fastqc_overrepresented_blast_h350px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></a>
 		    	</div> 
 			</subsection>
 
@@ -104,7 +105,7 @@
 
 			<subsection name="Reading Illumina InterOp binary files">
 				<p>Run data are now retrieved by parsing Illumina InterOp Binary Metric files as Illumina XML run files are now deprecated.</p>
-	       		<div align="center"><a href="qc-lanes-tests.html"><img src="images/qc_lane_test_read1_600px.png" alt="" border="1"/></a></div>
+	       		<div align="center"><a href="qc-lanes-tests.html"><img src="images/qc_lane_test_read1_600px.png" alt="example on report with run data" border="1"/></a></div>
 			</subsection>
 
 			<subsection name="Continuous synchronization of HiSeq data">

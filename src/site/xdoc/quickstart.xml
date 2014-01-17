@@ -464,7 +464,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
 
    <p>An example of email sent to the end of Aozan with the quality control summary as attachment.</p>
    <div align="center">
-   	 <img src="images/mail_end_qc_450px.png" alt="" border="1"/>
+   	 <img src="images/mail_end_qc_450px.png" alt="example of mail sent at the end on quality control" border="1"/>
    </div>
 
  </section>
