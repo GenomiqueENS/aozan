@@ -315,7 +315,7 @@ def demux(run_id, conf):
         return False
     
     # Configuration bcl2fastq success, move command output file in fastq_output_dir
-    cmd = os.system('mv /tmp/bcl2fastq_output_' + run_id + '.*  ' + fastq_output_dir)
+    cmd = 'mv /tmp/bcl2fastq_output_' + run_id + '.*  ' + fastq_output_dir
     common.log("SEVERE", "exec: " + cmd, conf)
     exit_code = os.system(cmd)
     if exit_code != 0:
