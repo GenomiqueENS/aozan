@@ -1,208 +1,262 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <document>
-  <properties>
-    <title>Change log</title>
-    <author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
-  </properties>
-  <body>
+	<properties>
+		<title>Change log</title>
+		<author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
+	</properties>
+	<body>
 
-    <release version="0.1" description="Aozan version 0.1" date="2011-12-08">
-      <action dev="jourdren" type="update">
-      Initial version.
-      </action>
-    </release>
-		
-    <release version="0.2" description="Aozan version 0.2" date="2011-12-09">
-      <action dev="jourdren" type="add">
-      While a run is running on HiSeq, send the first base report when available.
-      </action>
-    </release>
-        
-    <release version="0.3" description="Aozan version 0.3" date="2011-12-09">
-      <action dev="jourdren" type="add">
-                        Add a hiseq.deny file that contains all the run ids to not process.
-      </action>
-      <action dev="jourdren" type="fix">
-                        Now save a file with the pid of aozan. Now send a mail with the lock error only when the lock pid no more exists.
-      </action>
-      <action dev="jourdren" type="fix">
-                        Remove temporary files (design, hiseq_log_ directory).
-      </action>
-      <action dev="jourdren" type="fix">
-                        Fix issue when zip design files.
-      </action>
-    </release>
+		<release version="0.1" description="Aozan version 0.1" date="2011-12-08">
+			<action dev="jourdren" type="update">
+				Initial version.
+			</action>
+		</release>
 
-    <release version="0.4" description="Aozan version 0.4" date="2011-12-09">
-      <action dev="jourdren" type="fix">
-                        Fix issue with pid checking of already running aozan process.
-      </action>
-    </release>
-        
-    <release version="0.5" description="Aozan version 0.5" date="2011-12-12">
-      <action dev="jourdren" type="add">
-                        Aozan has now a log file name aozan.log.
-      </action>
-      <action dev="jourdren" type="add">
-                        Trace exception in log file.
-      </action>
-      <action dev="jourdren" type="fix">
-                        Issue with pid of currently running instance of Aozan.
-      </action>
-      <action dev="jourdren" type="fix">
-                        Now get the good Basecall_Stats_FLOWCELLID path even for RTA 1.10.36.
-      </action>
-      <action dev="jourdren" type="add">
-                        Now show in log the new disk usage and disk free at the end of sync step and demux step.
-      </action>
-      <action dev="jourdren" type="fix">
-                        Demux space estimation.
-      </action>
-    </release> 
-		
-		
-    <release version="0.6" description="Aozan version 0.6" date="2011-12-16">
-      <action dev="jourdren" type="fix">
-                        Fix mail message when a run is discovered.
-      </action>
-      <action dev="jourdren" type="update">
-                        Don't show Aozan welcome message when there is nothing to do.
-      </action>
-      <action dev="jourdren" type="fix">
-                        Change <a href="http://transcriptome.ens.fr/eoulsan/index.html">Eoulsan</a> version dependency. Prevent errors with Casava design CSV file with comma in cell value.
-      </action>
-    </release>
-        
-    <release version="0.7" description="Aozan version 0.7" date="2012-02-24">
-      <action dev="jourdren" type="fix">
-                        Fix typo in mail message when the end of run is discovered.
-      </action>
-      <action dev="jourdren" type="update">
-      		Now use <a href="http://transcriptome.ens.fr/eoulsan/index.html">Eoulsan</a> 1.2-SNAPSHOT as dependency. New Casava sample sheet check:  
-1) Allow the use of a sample in several lanes; 2) new error if a sample is used by more than one project; 3) new warning if a sample exists in more than one lane;
-4) new warning with the list of line where is a sample (if the number of lanes >1); 5) new errors if a sample is defined several time by with not the same sequence index.
-      </action>
-      <action dev="jourdren" type="update">
-                        In demux step, add Casava design warnings to log and to the success mail send to users.
-      </action>
-      <action dev="jourdren" type="update">
-                        The default number of threads is now the number of available processors/cores.
-      </action>
-    </release>
-        
-    <release version="0.8" description="Aozan version 0.8" date="2012-05-16">
-      <action dev="jourdren" type="add">
-                Add support for Casava 1.8.2.
-      </action>
-      <action dev="jourdren" type="add">
-                Add Quality control report step.
-      </action>
-    </release>
-        
-    <release version="0.9" description="Aozan version 0.9" date="2012-06-20">
-      <action dev="jourdren" type="update">
-                When an exception is thrown, send a mail with the exception message and traceback.
-      </action>
-      <action dev="jourdren" type="fix">
-                When checking critical space available on HiSeq computer at every Aozan startup do not send a message if the HiSeq data path is not reachable.
-      </action>
-      <action dev="jourdren" type="fix">
-                In Casava design checking now only allow strings using ascii charset.
-      </action>
-      <action dev="jourdren" type="fix">
-                Aozan qc test do not fail if data to test does not exist.
-      </action>
-      <action dev="jourdren" type="fix">
-                <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC</a> don't throw exception if no read read.
-      </action>
-      <action dev="jourdren" type="update">
-                No write the qc raw data before the xml qc report.
-      </action>
-      <action dev="jourdren" type="update">
-                If an unexcepted exception is thrown in qc step, now send a mail.
-      </action>
-    </release>
-        
-    <release version="0.10" description="Aozan version 0.10" date="2012-10-08">
-      <action dev="jourdren" type="add">
-                Jython is now bundled in Aozan.
-      </action>
-    </release>
-		
-    <release version="1.0" description="Aozan version 1.0" date="2013-04-26">
-      <action dev="perrin" type="add">
-                Quality control contains a optional module for assessing sample contamination, 
-                based on FastQ Screen model.
-      </action>
-      <action dev="perrin" type="add">
-      			Quality control contains points of restoration if a hardware problem occurs before the end. 
-      </action>
-      <action dev="perrin" type="add">
-      			Estimate the space needed for the current run and check free space in directory for next step. If not send a warning mail.  
-      </action>
-      <action dev="perrin" type="add">
-      			A logger commun for java and python code. 
-      </action>
-    </release>
-    <release version="1.1" description="Aozan version 1.1" date="2013-09-02">
-      <action dev="perrin" type="add">
-      			Module of contamination detection uses partial fastq files for decrease the runtime without lost of information.
-      </action>
-      <action dev="perrin" type="add">
-      			Collector for reading TileOutMetrics.bin InterOp binary files for collect data on the run. 
-      </action>
-      <action dev="perrin" type="add">
-      			Collector for reading ErrorOutMetrics.bin InterOp binary files for collect data on the run. 
-      </action>
-      <action dev="perrin" type="add">
-      			Collector for reading ExtractionOutMetrics.bin InterOp binary files for collect data on the run. 
-      </action>
-      <action dev="perrin" type="update">
-      			Report of detection contamination : available in two formats in html and csv. 
-      </action>
-      <action dev="perrin" type="fix">
-      			Contamination detection for pair-end run. Two modes : single (mapping used R1 fastq) or paired (mapping used two fastq R1 and R2). 
-      </action>
-      <action dev="perrin" type="add">
-      			Mode debug, in configuration Aozan file. 
-      </action>
-    </release>
-    <release version="1.1.1" description="Aozan version 1.1.1" date="2013-09-20">
-      <action dev="perrin" type="update">      			
+		<release version="0.2" description="Aozan version 0.2" date="2011-12-09">
+			<action dev="jourdren" type="add">
+				While a run is running on HiSeq, send the first base report when
+				available.
+			</action>
+		</release>
+
+		<release version="0.3" description="Aozan version 0.3" date="2011-12-09">
+			<action dev="jourdren" type="add">
+				Add a hiseq.deny file that contains all the run ids to not process.
+			</action>
+			<action dev="jourdren" type="fix">
+				Now save a file with the pid of aozan. Now send a mail with the lock
+				error only when the lock pid no more exists.
+			</action>
+			<action dev="jourdren" type="fix">
+				Remove temporary files (design, hiseq_log_ directory).
+			</action>
+			<action dev="jourdren" type="fix">
+				Fix issue when zip design files.
+			</action>
+		</release>
+
+		<release version="0.4" description="Aozan version 0.4" date="2011-12-09">
+			<action dev="jourdren" type="fix">
+				Fix issue with pid checking of already running aozan process.
+			</action>
+		</release>
+
+		<release version="0.5" description="Aozan version 0.5" date="2011-12-12">
+			<action dev="jourdren" type="add">
+				Aozan has now a log file name aozan.log.
+			</action>
+			<action dev="jourdren" type="add">
+				Trace exception in log file.
+			</action>
+			<action dev="jourdren" type="fix">
+				Issue with pid of currently running instance of Aozan.
+			</action>
+			<action dev="jourdren" type="fix">
+				Now get the good Basecall_Stats_FLOWCELLID path even for RTA 1.10.36.
+			</action>
+			<action dev="jourdren" type="add">
+				Now show in log the new disk usage and disk free at the end of sync
+				step and demux step.
+			</action>
+			<action dev="jourdren" type="fix">
+				Demux space estimation.
+			</action>
+		</release>
+
+
+		<release version="0.6" description="Aozan version 0.6" date="2011-12-16">
+			<action dev="jourdren" type="fix">
+				Fix mail message when a run is discovered.
+			</action>
+			<action dev="jourdren" type="update">
+				Don't show Aozan welcome message when there is nothing to do.
+			</action>
+			<action dev="jourdren" type="fix">
+				Change
+				<a href="http://transcriptome.ens.fr/eoulsan/index.html">Eoulsan</a>
+				version dependency. Prevent errors with Casava design CSV file with
+				comma in cell value.
+			</action>
+		</release>
+
+		<release version="0.7" description="Aozan version 0.7" date="2012-02-24">
+			<action dev="jourdren" type="fix">
+				Fix typo in mail message when the end of run is discovered.
+			</action>
+			<action dev="jourdren" type="update">
+				Now use
+				<a href="http://transcriptome.ens.fr/eoulsan/index.html">Eoulsan</a>
+				1.2-SNAPSHOT as dependency. New Casava sample sheet check:
+				1) Allow the use of a sample in several lanes; 2) new error if a
+				sample is used by more than one project; 3) new warning if a sample
+				exists in more than one lane;
+				4) new warning with the list of line where is a sample (if the number
+				of lanes >1); 5) new errors if a sample is defined several time by
+				with not the same sequence index.
+			</action>
+			<action dev="jourdren" type="update">
+				In demux step, add Casava design warnings to log and to the success
+				mail send to users.
+			</action>
+			<action dev="jourdren" type="update">
+				The default number of threads is now the number of available
+				processors/cores.
+			</action>
+		</release>
+
+		<release version="0.8" description="Aozan version 0.8" date="2012-05-16">
+			<action dev="jourdren" type="add">
+				Add support for Casava 1.8.2.
+			</action>
+			<action dev="jourdren" type="add">
+				Add Quality control report step.
+			</action>
+		</release>
+
+		<release version="0.9" description="Aozan version 0.9" date="2012-06-20">
+			<action dev="jourdren" type="update">
+				When an exception is thrown, send a mail with the exception message and
+				traceback.
+			</action>
+			<action dev="jourdren" type="fix">
+				When checking critical space available on HiSeq computer at every Aozan
+				startup do not send a message if the HiSeq data path is not
+				reachable.
+			</action>
+			<action dev="jourdren" type="fix">
+				In Casava design checking now only allow strings using ascii charset.
+			</action>
+			<action dev="jourdren" type="fix">
+				Aozan qc test do not fail if data to test does not exist.
+			</action>
+			<action dev="jourdren" type="fix">
+				<a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC</a>
+				don't throw exception if no read read.
+			</action>
+			<action dev="jourdren" type="update">
+				No write the qc raw data before the xml qc report.
+			</action>
+			<action dev="jourdren" type="update">
+				If an unexcepted exception is thrown in qc step, now send a mail.
+			</action>
+		</release>
+
+		<release version="0.10" description="Aozan version 0.10" date="2012-10-08">
+			<action dev="jourdren" type="add">
+				Jython is now bundled in Aozan.
+			</action>
+		</release>
+
+		<release version="1.0" description="Aozan version 1.0" date="2013-04-26">
+			<action dev="perrin" type="add">
+				Quality control contains a optional module for assessing sample
+				contamination,
+				based on FastQ Screen model.
+			</action>
+			<action dev="perrin" type="add">
+				Quality control contains points of restoration if a hardware problem occurs
+				before the end.
+			</action>
+			<action dev="perrin" type="add">
+				Estimate the space needed for the current run and check free space in
+				directory for next step. If not send a warning mail.
+			</action>
+			<action dev="perrin" type="add">
+				A logger commun for java and python code.
+			</action>
+		</release>
+		<release version="1.1" description="Aozan version 1.1" date="2013-09-02">
+			<action dev="perrin" type="add">
+				Module of contamination detection uses partial fastq files for decrease
+				the runtime without lost of information.
+			</action>
+			<action dev="perrin" type="add">
+				Collector for reading TileOutMetrics.bin InterOp binary files for collect
+				data on the run.
+			</action>
+			<action dev="perrin" type="add">
+				Collector for reading ErrorOutMetrics.bin InterOp binary files for collect
+				data on the run.
+			</action>
+			<action dev="perrin" type="add">
+				Collector for reading ExtractionOutMetrics.bin InterOp binary files for
+				collect data on the run.
+			</action>
+			<action dev="perrin" type="update">
+				Report of detection contamination : available in two formats in html and
+				csv.
+			</action>
+			<action dev="perrin" type="fix">
+				Contamination detection for pair-end run. Two modes : single (mapping used R1
+				fastq) or paired (mapping used two fastq R1 and R2).
+			</action>
+			<action dev="perrin" type="add">
+				Mode debug, in configuration Aozan file.
+			</action>
+		</release>
+		<release version="1.1.1" description="Aozan version 1.1.1"
+			date="2013-09-20">
+			<action dev="perrin" type="update">
 				Use FastQC version 0.10.1.
-      </action>
-      <action dev="perrin" type="fix">      			
-                       Replace NA in qc report in Undetermined line by value.
-      </action>
-    </release>
-    <release version="1.1.2" description="Aozan version 1.1.2" date="2013-09-24">
-      <action dev="perrin" type="fix">      			
-      		Fix bugs : files xsl (missing closing tags).
-	</action>
-   </release>
-    <release version="1.1.3" description="Aozan version 1.1.3" date="2013-10-14">
-      <action dev="perrin" type="fix">      			
-		Fix bug : change directory to save index mapper (selected by parameter tmp.path instead of /tmp).
-      </action>
-   </release>
-   <release version="1.2" description="Aozan version 1.2" date="2013-12-09">
-      <action dev="perrin" type="add">
-      			An optional module blast associated with module of FastQC 'Overrepresented Sequences' :  
-      			for unidentified sequences, a blastn has been launched, the first hit is added in report FastQC. 
-      </action>
-      <action dev="perrin" type="add">
-      			In Aozan configuration, possibility to specify several parameter of FastQC : file with list of contaminants, kmers size, group.  
-      </action>
-      <action dev="perrin" type="update">
-      			In CASAVA/bcl2fastq sample sheet validator, add a tag to check genome sample. 
-      </action>
-      <action dev="perrin" type="add">
-      			Add a new mode for continuous synchronize hiseq data on storage. If Aozan is a cron job, at each launch it synchronizes data. 
-      </action>
-      <action dev="perrin" type="add">
-      			File to formatter text code in eclipse or other IDE, download on code.google.com aozan site.
-      </action>
-    </release>
-  </body>
+			</action>
+			<action dev="perrin" type="fix">
+				Replace NA in qc report in Undetermined line by value.
+			</action>
+		</release>
+		<release version="1.1.2" description="Aozan version 1.1.2"
+			date="2013-09-24">
+			<action dev="perrin" type="fix">
+				Fix bugs : files xsl (missing closing tags).
+			</action>
+		</release>
+		<release version="1.1.3" description="Aozan version 1.1.3"
+			date="2013-10-14">
+			<action dev="perrin" type="fix">
+				Fix bug : change directory to save index mapper (selected by parameter
+				tmp.path instead of /tmp).
+			</action>
+		</release>
+		<release version="1.2" description="Aozan version 1.2" date="2013-12-09">
+			<action dev="perrin" type="add">
+				An optional module blast associated with module of FastQC
+				'Overrepresented Sequences' :
+				for unidentified sequences, a blastn has been launched, the first hit
+				is added in report FastQC.
+			</action>
+			<action dev="perrin" type="add">
+				In Aozan configuration, possibility to specify several parameter of
+				FastQC : file with list of contaminants, kmers size, group.
+			</action>
+			<action dev="perrin" type="update">
+				In CASAVA/bcl2fastq sample sheet validator, add a tag to check genome
+				sample.
+			</action>
+			<action dev="perrin" type="add">
+				Add a new mode for continuous synchronize hiseq data on storage. If
+				Aozan is a cron job, at each launch it synchronizes data.
+			</action>
+			<action dev="perrin" type="add">
+				File to formatter text code in eclipse or other IDE, download on
+				code.google.com aozan site.
+			</action>
+		</release>
+
+		<release version="1.2.1" description="Aozan version 1.2.1"
+			date="2014-01-17">
+			<action dev="perrin" type="add">
+				Homogeization key from parameters configuration. To retrieve value, now using the
+				new class Settings.
+			</action>
+			<action dev="perrin" type="update">
+				Update the test on demultiplexing
+				data 'percentinlanesample', add a score depends count samples in
+				lane.
+			</action>
+			<action dev="perrin" type="update">
+				Changes Guava library version from 14.0.1 to 15.1.
+			</action>
+		</release>
+
+	</body>
 </document>
