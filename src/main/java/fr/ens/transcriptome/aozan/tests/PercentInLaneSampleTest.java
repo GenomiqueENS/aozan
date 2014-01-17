@@ -40,7 +40,7 @@ import fr.ens.transcriptome.aozan.collectors.FlowcellDemuxSummaryCollector;
  */
 public class PercentInLaneSampleTest extends AbstractSampleTest {
 
-  private final static String KEY_MARGE_PERCENT_IN_LANE = "distance";
+  private final static String MARGE_PERCENT_IN_LANE_KEY = "distance";
   private double DISTANCE = 0.0;
 
   @Override
@@ -112,10 +112,10 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
     if (properties == null)
       throw new NullPointerException("The properties object is null");
 
-    final String d = properties.get(KEY_MARGE_PERCENT_IN_LANE);
+    final String d = properties.get(MARGE_PERCENT_IN_LANE_KEY);
     if (d != null) {
       this.DISTANCE =
-          Double.parseDouble(properties.get(KEY_MARGE_PERCENT_IN_LANE));
+          Double.parseDouble(properties.get(MARGE_PERCENT_IN_LANE_KEY));
 
       if (this.DISTANCE >= 1.0) {
         this.DISTANCE = 0.0;

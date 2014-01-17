@@ -57,11 +57,6 @@ import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignCSVReader;
  */
 public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
-  // private static final String KEY_GENOMES = "qc.conf.fastqscreen.genomes";
-  // // Key for retrieve the path of alias file
-  // private static final String KEY_ALIAS_GENOME_PATH =
-  // "qc.conf.genome.alias.path";
-
   private static final Pattern pattern = Pattern.compile(".,;:/-_'");
 
   private final String genomeReference;
@@ -131,7 +126,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
     // Set reference genomes defined in configuration aozan file
     String genomesPerDefault =
-        properties.get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY);
+        properties.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
 
     if (genomesPerDefault == null || genomesPerDefault.length() == 0)
       throw new AozanException(

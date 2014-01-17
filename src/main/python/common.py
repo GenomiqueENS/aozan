@@ -66,31 +66,24 @@ def send_msg(subject, message, is_error, conf):
 
 
     send_mail = conf[Settings.SEND_MAIL_KEY].lower() == 'true'
-    # send_mail = conf['send.mail'].lower() == 'true'
     smtp_server = conf[Settings.SMTP_SERVER_KEY]
-    # smtp_server = conf['smtp.server']
 
     # Specific receiver for error message
     if is_error:
         mail_to = conf[Settings.MAIL_ERROR_TO_KEY]
-        # mail_to = conf['mail.error.to']
 
         # Mail error not define
         if mail_to == None or mail_to == '':
             mail_to = conf[Settings.MAIL_TO_KEY]
-            # mail_to = conf['mail.to']
     else:
         mail_to = conf[Settings.MAIL_TO_KEY]
-        # mail_to = conf['mail.to']
 
     mail_from = conf[Settings.MAIL_FROM_KEY]
-    # mail_from = conf['mail.from']
     mail_cc = None
     mail_bcc = None
     COMMASPACE = ', '
     
     message = conf[Settings.MAIL_HEADER_KEY].replace('\\n', '\n') + message + conf[Settings.MAIL_FOOTER_KEY].replace('\\n', '\n')
-    # message = conf['mail.header'].replace('\\n', '\n') + message + conf['mail.footer'].replace('\\n', '\n')
     message = message.replace('\n', '\r\n')
     msg = ''
 
@@ -131,11 +124,6 @@ def send_msg(subject, message, is_error, conf):
 def send_msg_with_attachment(subject, message, attachment_file, conf):
     """Send a message to the user about the data extraction."""
 
-
-    # send_mail = conf['send.mail'].lower() == 'true'
-    # smtp_server = conf['smtp.server']
-    # mail_to = conf['mail.to']
-    # mail_from = conf['mail.from']
     send_mail = conf[Settings.SEND_MAIL_KEY].lower() == 'true'
     smtp_server = conf[Settings.SMTP_SERVER_KEY]
     mail_to = conf[Settings.MAIL_TO_KEY]
@@ -145,8 +133,6 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
     COMMASPACE = ', '
 
     message = conf[Settings.MAIL_HEADER_KEY].replace('\\n', '\n') + message + conf[Settings.MAIL_FOOTER_KEY].replace('\\n', '\n')
-
-
 
     msg = MIMEMultipart()
 
@@ -342,26 +328,26 @@ def load_conf(conf, conf_file_path):
     # in version Aozan 1.1.1 change key in configuration to replace design by sample sheet
     # converting table between old and new key
     converting_table_key = {}
-    converting_table_key['casava.design.format'] = Settings.CASAVA_SAMPLESHEET_FORMAT_KEY  # 'casava.samplesheet.format'
-    converting_table_key['casava.design.prefix.filename'] = Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY  # 'casava.samplesheet.prefix.filename'
-    converting_table_key['casava.designs.path'] = Settings.CASAVA_SAMPLESHEETS_PATH_KEY  # 'casava.samplesheets.path'
+    converting_table_key['casava.design.format'] = Settings.CASAVA_SAMPLESHEET_FORMAT_KEY
+    converting_table_key['casava.design.prefix.filename'] = Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY
+    converting_table_key['casava.designs.path'] = Settings.CASAVA_SAMPLESHEETS_PATH_KEY
     
-    converting_table_key['qc.conf.fastqc.threads'] = Settings.QC_CONF_THREADS_KEY  # 'qc.conf.threads'
-    converting_table_key['qc.conf.blast.arguments'] = Settings.QC_CONF_FASTQSCREEN_BLAST_ARGUMENTS_KEY  # 'qc.conf.fastqscreen.blast.arguments'
-    converting_table_key['qc.conf.blast.db.path'] = Settings.QC_CONF_FASTQSCREEN_BLAST_DB_PATH_KEY  # 'qc.conf.fastqscreen.blast.db.path'
-    converting_table_key['qc.conf.blast.path'] = Settings.QC_CONF_FASTQSCREEN_BLAST_PATH_KEY  # 'qc.conf.fastqscreen.blast.path'
-    converting_table_key['qc.conf.blast.version.expected'] = Settings.QC_CONF_FASTQSCREEN_BLAST_VERSION_EXPECTED_KEY  # 'qc.conf.fastqscreen.blast.version.expected'
-    converting_table_key['qc.conf.step.blast.enable'] = Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY  # 'qc.conf.fastqscreen.blast.enable'
-    
-    converting_table_key['qc.conf.ignore.paired.mode'] = Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY  # 'qc.conf.fastqscreen.mapping.ignore.paired.mode'
-    converting_table_key['qc.conf.max.reads.parsed'] = Settings.QC_CONF_FASTQSCREEN_FASTQ_MAX_READS_PARSED_KEY  # 'qc.conf.fastqscreen.fastq.max.reads.parsed'
-    converting_table_key['qc.conf.reads.pf.used'] = Settings.QC_CONF_FASTQSCREEN_FASTQ_READS_PF_USED_KEY  # 'qc.conf.fastqscreen.fastq.reads.pf.used'
-    converting_table_key['qc.conf.skip.control.lane'] = Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY  # 'qc.conf.fastqscreen.mapping.skip.control.lane'
-    
-    converting_table_key['qc.conf.genome.alias.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY  # 'qc.conf.fastqscreen.settings.genomes.alias.path'
-    converting_table_key['qc.conf.settings.genomes'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY  # 'qc.conf.fastqscreen.settings.genomes'
-    converting_table_key['qc.conf.settings.genomes.desc.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY  # 'qc.conf.fastqscreen.settings.genomes.desc.path'
-    converting_table_key['qc.conf.settings.mappers.indexes.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY  # 'qc.conf.fastqscreen.settings.mappers.indexes.path'
+    converting_table_key['qc.conf.fastqc.threads'] = Settings.QC_CONF_THREADS_KEY
+    converting_table_key['qc.conf.blast.arguments'] = Settings.QC_CONF_FASTQSCREEN_BLAST_ARGUMENTS_KEY
+    converting_table_key['qc.conf.blast.db.path'] = Settings.QC_CONF_FASTQSCREEN_BLAST_DB_PATH_KEY
+    converting_table_key['qc.conf.blast.path'] = Settings.QC_CONF_FASTQSCREEN_BLAST_PATH_KEY
+    converting_table_key['qc.conf.blast.version.expected'] = Settings.QC_CONF_FASTQSCREEN_BLAST_VERSION_EXPECTED_KEY
+    converting_table_key['qc.conf.step.blast.enable'] = Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY
+     
+    converting_table_key['qc.conf.ignore.paired.mode'] = Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY
+    converting_table_key['qc.conf.max.reads.parsed'] = Settings.QC_CONF_FASTQSCREEN_FASTQ_MAX_READS_PARSED_KEY
+    converting_table_key['qc.conf.reads.pf.used'] = Settings.QC_CONF_FASTQSCREEN_FASTQ_READS_PF_USED_KEY
+    converting_table_key['qc.conf.skip.control.lane'] = Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY
+     
+    converting_table_key['qc.conf.genome.alias.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY
+    converting_table_key['qc.conf.settings.genomes'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY
+    converting_table_key['qc.conf.settings.genomes.desc.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY
+    converting_table_key['qc.conf.settings.mappers.indexes.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY
     
     f = open(conf_file_path, 'r')
 
@@ -392,11 +378,9 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
     """ Since version RTA after 1.17, Illumina stop the generation of the Status and reports files"""
 
     path_report = conf[Settings.REPORTS_DATA_PATH_KEY] + '/' + run_id
-    # path_report = conf['reports.data.path'] + '/' + run_id
     
     # Retrieve BufferedReader on index html template
     template_path = conf[Settings.INDEX_HTML_TEMPLATE_KEY]
-    #template_path = conf['index.html.template']
     if template_path != None and template_path != '' and os.path.exists(template_path):
         f_in = open(template_path, 'r')
         text = ''.join(f_in.readlines())
