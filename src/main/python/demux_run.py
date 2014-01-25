@@ -368,11 +368,11 @@ def demux(run_id, conf):
     if conf[Settings.CASAVA_SAMPLESHEET_FORMAT_KEY].strip().lower() == 'xls':
         cmd = 'cp ' + input_design_xls_path + ' ' + conf[Settings.TMP_PATH_KEY] + \
         ' && cd ' + conf[Settings.TMP_PATH_KEY] + \
-        ' && zip ' + conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip ' + \
+        ' && zip -q ' + conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip ' + \
         os.path.basename(design_csv_path) + ' ' + os.path.basename(input_design_xls_path)
     else:
         cmd = 'cd ' + conf[Settings.TMP_PATH_KEY] + \
-        ' && zip ' + conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip ' + \
+        ' && zip -q ' + conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip ' + \
         os.path.basename(design_csv_path)
 
     common.log("SEVERE", "exec: " + cmd, conf)
