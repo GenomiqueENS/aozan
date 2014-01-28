@@ -257,6 +257,13 @@
 				Changes Guava library version from 14.0.1 to 15.1.
 			</action>
 		</release>
+		
+		<release version="1.2.2" description="Aozan version 1.2.2"
+			date="2014-01-28">
+			<action dev="perrin" type="fix">
+				Mapping for detection contamination was launched in mono-thread mode.
+			</action>
+		</release>
 
 	</body>
 </document>
