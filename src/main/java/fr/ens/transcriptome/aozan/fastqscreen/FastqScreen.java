@@ -148,7 +148,7 @@ public class FastqScreen {
 
     this.tmpDir = properties.getProperty(QC.TMP_DIR);
 
-    if (properties.containsKey(QC.TMP_DIR)) {
+    if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
       try {
         confThreads =
             Integer.parseInt(properties
