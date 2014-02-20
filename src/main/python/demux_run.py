@@ -112,7 +112,7 @@ def demux(run_id, conf):
     # Check if must use the direct output of the HiSeq
     if conf[Settings.DEMUX_USE_HISEQ_OUTPUT_KEY].lower().strip() == 'true':
         # Retrieve the path of run data directory on HiSeq
-        input_bcl_path = hiseq_run.find_hiseq_run_path(run_id, conf)
+        input_bcl_path = hiseq_run.find_hiseq_run_path(run_id, conf) + '/' + run_id
         # Path not found
         if input_bcl_path == False:
             error("HiSeq data directory does not exists", "HiSeq data directory does not exists for the run : " + run_id, conf)
