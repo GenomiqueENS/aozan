@@ -155,7 +155,7 @@ def launch_steps(conf):
 
 
     # Check if new run appears while sync step
-    if len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
+    if  conf[Settings.SYNC_STEP_KEY].lower().strip() == 'true' and len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
         launch_steps(conf)
         return
 
@@ -179,7 +179,7 @@ def launch_steps(conf):
                 return
 
     # Check if new run appears while demux step
-    if len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
+    if conf[Settings.DEMUX_STEP_KEY].lower().strip() == 'true' and len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
         launch_steps(conf)
         return
 
@@ -200,7 +200,7 @@ def launch_steps(conf):
                 return
 
     # Check if new run appears while quality control step
-    if len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
+    if conf[Settings.QC_STEP_KEY].lower().strip() == 'true' and len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
         launch_steps(conf)
         return
 
