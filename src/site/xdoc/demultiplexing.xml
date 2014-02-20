@@ -53,6 +53,7 @@
 	     <tr><td>demux.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
 	     <tr><td>demux.space.factor</td><td>double</td><td>0.7</td><td>Factor to use to get the estimation of space needed
 	     in fastq directory for the run from the space used in bcl directory by the run</td></tr>
+	     <tr><td>demux.use.hiseq.output</td><td>boolean</td><td>False</td><td>If true : no synchronization step, use direct Hiseq output for demultiplexage step</td></tr>
 	     <tr><td>index.sequences</td><td>string</td><td>Not set</td><td>Path to a file that contains alias
 	     for adapters sequences indexes. <a href="./indexes-sequences.txt" target="_blank">See an example.</a></td></tr>
 	     <tr><td>casava.adapter.fasta.file.path</td><td>string</td><td>Not set</td><td>Adapter sequence file to use when launch CASAVA/bcl2fastq</td></tr>
@@ -70,7 +71,6 @@
 	     <tr><td>casava.with.failed.reads</td><td>boolean</td><td>True</td><td>Add reads that not pass Illumina filter in fastq files</td></tr>
 	     <tr><td>casava.additionnal.arguments</td><td>string</td><td>Not set</td><td>Additional arguments for CASAVA</td></tr>
 	     <tr><td>casava.threads</td><td>integer</td><td>Number of computer cores</td><td>Number of threads to use for demultiplexing</td></tr>
-	     <tr><td>demux.use.hiseq.output</td><td>boolean</td><td>False</td><td>If true : no synchronization step, use direct Hiseq output for demultiplexage step</td></tr>
 	   </table>
 
         <p>An example of email sent at the end of demultiplexing step.</p>
