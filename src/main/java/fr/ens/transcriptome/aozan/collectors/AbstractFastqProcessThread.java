@@ -38,13 +38,17 @@ import fr.ens.transcriptome.aozan.io.FastqStorage;
  */
 abstract class AbstractFastqProcessThread implements Runnable {
 
-  protected final FastqSample fastqSample;
-  protected final RunData results;
-  protected final FastqStorage fastqStorage;
+  private final FastqSample fastqSample;
+  private final RunData results;
+  private final FastqStorage fastqStorage;
 
-  protected AozanException exception;
-  protected boolean success;
+  private AozanException exception;
+  private boolean success;
   private boolean dataSaved;
+
+  //
+  // Abstract methods
+  //
 
   /**
    * Create a report file for the sample treated.
@@ -58,6 +62,10 @@ abstract class AbstractFastqProcessThread implements Runnable {
    * @throws AozanException
    */
   abstract protected void processResults() throws AozanException;
+
+  //
+  // Getters
+  //
 
   /**
    * Get the results of the analysis.
@@ -110,6 +118,35 @@ abstract class AbstractFastqProcessThread implements Runnable {
    */
   public FastqSample getFastqSample() {
     return this.fastqSample;
+  }
+
+  /**
+   * Get the Fastq storage.
+   * @return a FastqStorage object
+   */
+  protected FastqStorage getFastqStorage() {
+
+    return this.fastqStorage;
+  }
+
+  //
+  // Setters
+  //
+
+  /**
+   * Set the exception if occurs
+   * @param exception the exception
+   */
+  protected void setException(final AozanException exception) {
+    this.exception = exception;
+  }
+
+  /**
+   * Set if the process has been successful.
+   * @param success the success result
+   */
+  protected void setSuccess(boolean success) {
+    this.success = success;
   }
 
   //

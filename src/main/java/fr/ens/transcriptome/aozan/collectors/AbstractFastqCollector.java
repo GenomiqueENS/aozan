@@ -62,10 +62,10 @@ abstract public class AbstractFastqCollector implements Collector {
   public static final String READ_COUNT_KEY = "run.info.read.count";
   public static final String LANE_COUNT_KEY = "run.info.flow.cell.lane.count";
 
-  protected FastqStorage fastqStorage;
-  protected String casavaOutputPath;
-  protected String qcReportOutputPath;
-  protected String tmpPath;
+  private FastqStorage fastqStorage;
+  private String casavaOutputPath;
+  private String qcReportOutputPath;
+  private File tmpDir;
 
   // Set samples to treat
   protected final static Set<FastqSample> fastqSamples =
@@ -79,6 +79,10 @@ abstract public class AbstractFastqCollector implements Collector {
   private List<Future<? extends AbstractFastqProcessThread>> futureThreads;
   private ExecutorService executor;
 
+  //
+  // Abstract methods
+  //
+
   /**
    * Collect data for a fastqSample
    * @param data result data object
@@ -86,7 +90,7 @@ abstract public class AbstractFastqCollector implements Collector {
    * @param runPE true if it is a run PE else false
    * @throws AozanException if an error occurs while execution
    */
-  abstract protected AbstractFastqProcessThread collectSample(
+  protected abstract AbstractFastqProcessThread collectSample(
       final RunData data, final FastqSample fastqSample, final File reportDir,
       final boolean runPE) throws AozanException;
 
@@ -94,14 +98,61 @@ abstract public class AbstractFastqCollector implements Collector {
    * Return the number of thread that the collector can be used for execution.
    * @return number of thread
    */
-  abstract protected int getThreadsNumber();
+  protected abstract int getThreadsNumber();
 
   /**
-   * Get the name of the collector
-   * @return the name of the collector
+   * Test if standard samples must be processed.
+   * @return true if standard samples must be processed
    */
-  @Override
-  abstract public String getName();
+  protected boolean isProcessStandardSamples() {
+
+    return true;
+  }
+
+  /**
+   * Test if undetermined indices samples must be processed.
+   * @return true if undetermined indices samples must be processed
+   */
+  protected boolean isProcessUndeterminedIndicesSamples() {
+
+    return false;
+  }
+
+  /**
+   * Test if all reads (e.g. first end and second ends) must be processed or
+   * only one.
+   * @return true if all reads must be processed
+   */
+  protected boolean isProcessAllReads() {
+
+    return true;
+  }
+
+  /**
+   * Get the temporary path.
+   * @return a File object with the temporary path
+   */
+  protected File getTemporaryDir() {
+
+    return this.tmpDir;
+  }
+
+  //
+  // Getters
+  //
+
+  /**
+   * Get the fastq storage.
+   * @return the instance of the FastqStorage of the collector
+   */
+  protected FastqStorage getFastqStorage() {
+
+    return this.fastqStorage;
+  }
+
+  //
+  // Collector methods
+  //
 
   /**
    * Get the name of the collectors required to run this collector.
@@ -122,10 +173,10 @@ abstract public class AbstractFastqCollector implements Collector {
 
     this.casavaOutputPath = properties.getProperty(QC.CASAVA_OUTPUT_DIR);
     this.qcReportOutputPath = properties.getProperty(QC.QC_OUTPUT_DIR);
-    this.tmpPath = properties.getProperty(QC.TMP_DIR);
+    this.tmpDir = new File(properties.getProperty(QC.TMP_DIR));
 
     this.fastqStorage = FastqStorage.getInstance();
-    this.fastqStorage.setTmpDir(this.tmpPath);
+    this.fastqStorage.setTmpDir(this.tmpDir);
 
     if (this.getThreadsNumber() > 1) {
 
@@ -163,9 +214,15 @@ abstract public class AbstractFastqCollector implements Collector {
           } else {
 
             // Create directory for the sample
-            final File reportDir =
-                new File(this.qcReportOutputPath
-                    + "/Project_" + fs.getProjectName());
+            final File reportDir;
+
+            if (fs.isIndeterminedIndices())
+              reportDir =
+                  new File(this.qcReportOutputPath + "/Undetermined_indices");
+            else
+              reportDir =
+                  new File(this.qcReportOutputPath
+                      + "/Project_" + fs.getProjectName());
 
             if (!reportDir.exists())
               if (!reportDir.mkdirs())
@@ -205,9 +262,16 @@ abstract public class AbstractFastqCollector implements Collector {
 
           if (resultPart == null) {
 
-            final File reportDir =
-                new File(this.qcReportOutputPath
-                    + "/Project_" + fs.getProjectName());
+            // Create directory for the sample
+            final File reportDir;
+
+            if (fs.isIndeterminedIndices())
+              reportDir =
+                  new File(this.qcReportOutputPath + "/Undetermined_indices");
+            else
+              reportDir =
+                  new File(this.qcReportOutputPath
+                      + "/Project_" + fs.getProjectName());
 
             if (!reportDir.exists())
               if (!reportDir.mkdirs())
@@ -224,7 +288,7 @@ abstract public class AbstractFastqCollector implements Collector {
             pseudoThread.run();
 
             // Throw exception from fastqscreen collector thread if not success
-            if (!pseudoThread.success)
+            if (!pseudoThread.isSuccess())
               throw new AozanException(pseudoThread.getException());
             else {
               // Save result
@@ -252,10 +316,14 @@ abstract public class AbstractFastqCollector implements Collector {
     final int laneCount = data.getInt(LANE_COUNT_KEY);
     final int readCount = data.getInt(READ_COUNT_KEY);
 
+    int readIndexedCount = 0;
+
     for (int read = 1; read <= readCount; read++) {
 
       if (data.getBoolean("run.info.read" + read + ".indexed"))
         continue;
+
+      readIndexedCount++;
 
       for (int lane = 1; lane <= laneCount; lane++) {
 
@@ -263,29 +331,40 @@ abstract public class AbstractFastqCollector implements Collector {
             Lists.newArrayList(Splitter.on(',').split(
                 data.get("design.lane" + lane + ".samples.names")));
 
-        for (String sampleName : sampleNames) {
+        if (isProcessStandardSamples())
+          for (String sampleName : sampleNames) {
 
-          // Get the sample index
-          String index =
-              data.get("design.lane" + lane + "." + sampleName + ".index");
+            // Get the sample index
+            String index =
+                data.get("design.lane" + lane + "." + sampleName + ".index");
 
-          // Get project name
-          String projectName =
-              data.get("design.lane"
-                  + lane + "." + sampleName + ".sample.project");
-          // Get description on sample
-          String descriptionSample =
-              data.get("design.lane" + lane + "." + sampleName + ".description");
+            // Get project name
+            String projectName =
+                data.get("design.lane"
+                    + lane + "." + sampleName + ".sample.project");
+            // Get description on sample
+            String descriptionSample =
+                data.get("design.lane"
+                    + lane + "." + sampleName + ".description");
 
-          FastqSample fastqSample =
-              new FastqSample(this.casavaOutputPath, read, lane, sampleName,
-                  projectName, descriptionSample, index);
-          fastqSamples.add(fastqSample);
+            fastqSamples.add(new FastqSample(this.casavaOutputPath,
+                readIndexedCount, lane, sampleName, projectName,
+                descriptionSample, index));
 
-        } // sample
+          } // Sample
 
-      }// lane
-    }// read
+        // Add undetermined indices samples
+        if (isProcessUndeterminedIndicesSamples())
+          fastqSamples.add(new FastqSample(this.casavaOutputPath,
+              readIndexedCount, lane));
+
+      } // Lane
+
+      // Process only one read if needed
+      if (!isProcessAllReads())
+        break;
+
+    } // Read
   }
 
   /**

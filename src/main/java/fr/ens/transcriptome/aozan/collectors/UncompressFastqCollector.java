@@ -83,8 +83,8 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
 
       try {
         int confThreads =
-            Integer.parseInt(properties.getProperty(Settings.QC_CONF_THREADS_KEY)
-                .trim());
+            Integer.parseInt(properties.getProperty(
+                Settings.QC_CONF_THREADS_KEY).trim());
         if (confThreads > 0)
           this.numberThreads = confThreads;
 
@@ -113,7 +113,7 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     }
 
     // Check if the uncompressed fastq file exists
-    if (fastqStorage.tmpFileExists(fastqSample))
+    if (getFastqStorage().tmpFileExists(fastqSample))
       return null;
 
     // Create the thread object
@@ -144,14 +144,16 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
 
     LOGGER.fine("Collector uncompressed fastq files : step preparation");
 
+    // Get the temporary path
+    final File tmpDir = getTemporaryDir();
+
     // Count size from all fastq files used
-    long freeSpace = new File(this.tmpPath).getFreeSpace();
+    long freeSpace = tmpDir.getFreeSpace();
     freeSpace = freeSpace / (1024 * 1024 * 1024);
 
     for (FastqSample fastqSample : fastqSamples) {
       // Check temporary fastq files exists
-      if (!(new File(tmpPath + "/" + fastqSample.getNameTemporaryFastqFiles())
-          .exists())) {
+      if (!(new File(tmpDir, fastqSample.getNameTemporaryFastqFiles()).exists())) {
         this.uncompressedSizeFiles += fastqSample.getUncompressedSize();
       }
 
@@ -166,17 +168,15 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
           "Not enough disk space to store uncompressed fastq files for step fastqScreen. We are "
               + freeSpace
               + " Go in directory "
-              + new File(this.tmpPath).getAbsolutePath()
-              + ", and we need "
-              + uncompressedSizeNeeded + " Go. Fail Aozan");
+              + tmpDir.getAbsolutePath()
+              + ", and we need " + uncompressedSizeNeeded + " Go. Fail Aozan");
 
     LOGGER
         .fine("Enough disk space to store uncompressed fastq files for step fastqScreen. We are "
             + freeSpace
             + " Go in directory "
-            + new File(this.tmpPath).getAbsolutePath()
-            + ", and we need "
-            + uncompressedSizeNeeded + " Go.");
+            + tmpDir.getAbsolutePath()
+            + ", and we need " + uncompressedSizeNeeded + " Go.");
 
   }
 }

@@ -99,8 +99,9 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
 
     try {
       this.skipControlLane =
-          Boolean.parseBoolean(properties
-              .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY));
+          Boolean
+              .parseBoolean(properties
+                  .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY));
     } catch (Exception e) {
       // Default value
       this.skipControlLane = true;
@@ -108,8 +109,9 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
 
     try {
       this.ignorePairedMode =
-          Boolean.parseBoolean(properties
-              .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY));
+          Boolean
+              .parseBoolean(properties
+                  .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY));
 
     } catch (Exception e) {
       // Default value
@@ -166,7 +168,7 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
       return null;
 
     // Check if the temporary partial fastq file exists
-    if (fastqStorage.tmpFileExists(fastqSample))
+    if (getFastqStorage().tmpFileExists(fastqSample))
       return null;
 
     // Retrieve number of passing filter Illumina reads for this fastq

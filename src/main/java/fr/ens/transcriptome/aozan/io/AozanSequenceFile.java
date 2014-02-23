@@ -97,8 +97,8 @@ public class AozanSequenceFile implements SequenceFile {
         sizeFile /= (1024 * 1024 * 1024);
 
         // Rename file for remove '.tmp' final
-        if (!tmpFile.renameTo(new File(FastqStorage.getInstance()
-            .getTemporaryFile(fastqSample))))
+        if (!tmpFile.renameTo(FastqStorage.getInstance().getTemporaryFile(
+            fastqSample)))
           LOGGER.warning("Aozan sequence : fail to rename file "
               + tmpFile.getAbsolutePath());
 

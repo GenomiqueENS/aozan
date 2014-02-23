@@ -47,7 +47,7 @@ public final class FastqStorage {
 
   private static FastqStorage singleton;
 
-  private String tmpPath;
+  private File tmpPath;
 
   /**
    * Return a sequenceFile for all fastq files present to treat in the sample.
@@ -96,7 +96,7 @@ public final class FastqStorage {
     if (fastqSample.getFastqFiles().isEmpty())
       return false;
 
-    return new File(getTemporaryFile(fastqSample)).exists();
+    return getTemporaryFile(fastqSample).exists();
 
   }
 
@@ -107,7 +107,7 @@ public final class FastqStorage {
   public void clear() {
     LOGGER.info("Delete temporaries fastq and map files");
 
-    File[] files = new File(tmpPath).listFiles(new FileFilter() {
+    File[] files = tmpPath.listFiles(new FileFilter() {
 
       public boolean accept(final File pathname) {
         return (pathname.getName().startsWith("aozan_fastq_") && (pathname
@@ -132,9 +132,9 @@ public final class FastqStorage {
    * @param fastqSample fastq instance which describe an sample
    * @return File temporary file or null if it not exists
    */
-  public String getTemporaryFile(final FastqSample fastqSample) {
+  public File getTemporaryFile(final FastqSample fastqSample) {
 
-    return tmpPath + "/" + fastqSample.getNameTemporaryFastqFiles();
+    return new File(this.tmpPath, fastqSample.getNameTemporaryFastqFiles());
   }
 
   //
@@ -143,11 +143,11 @@ public final class FastqStorage {
 
   /**
    * Define the path used for FastqStorage.
-   * @param tmp of the temporary directory
+   * @param tmpDir of the temporary directory
    */
-  public void setTmpDir(final String tmp) {
+  public void setTmpDir(final File tmpDir) {
 
-    tmpPath = tmp;
+    this.tmpPath = tmpDir;
   }
 
   //
@@ -170,8 +170,8 @@ public final class FastqStorage {
    * Get absolute path of the temporary directory
    * @return path of the temporary directory
    */
-  public String getTmpDir() {
-    return tmpPath;
+  public File getTmpDir() {
+    return this.tmpPath;
   }
 
   //

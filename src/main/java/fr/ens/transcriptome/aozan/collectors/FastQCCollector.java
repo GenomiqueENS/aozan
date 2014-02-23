@@ -24,7 +24,6 @@
 package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
-import java.util.List;
 import java.util.Properties;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -69,14 +68,16 @@ public class FastQCCollector extends AbstractFastqCollector {
     // Check contaminant file specify in configuration Aozan for module
     // OverRepresented
     if (properties.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY) != null
-        && properties.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY).length() > 0) {
+        && properties.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY)
+            .length() > 0) {
 
       System.setProperty("fastqc.contaminant_file",
           properties.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY));
     }
 
     if (properties.getProperty(Settings.QC_CONF_FASTQC_KMER_SIZE_KEY) != null
-        && properties.getProperty(Settings.QC_CONF_FASTQC_KMER_SIZE_KEY).length() > 0)
+        && properties.getProperty(Settings.QC_CONF_FASTQC_KMER_SIZE_KEY)
+            .length() > 0)
 
       System.setProperty("fastqc.kmer_size",
           properties.getProperty(Settings.QC_CONF_FASTQC_KMER_SIZE_KEY));
@@ -92,8 +93,8 @@ public class FastQCCollector extends AbstractFastqCollector {
 
       try {
         int confThreads =
-            Integer.parseInt(properties.getProperty(Settings.QC_CONF_THREADS_KEY)
-                .trim());
+            Integer.parseInt(properties.getProperty(
+                Settings.QC_CONF_THREADS_KEY).trim());
         if (confThreads > 0)
           this.numberThreads = confThreads;
 
@@ -123,9 +124,7 @@ public class FastQCCollector extends AbstractFastqCollector {
       final FastqSample fastqSample, final File reportDir, final boolean runPE)
       throws AozanException {
 
-    final List<File> fastqFiles = fastqSample.getFastqFiles();
-
-    if (fastqFiles.isEmpty()) {
+    if (fastqSample.getFastqFiles().isEmpty()) {
       return null;
     }
 

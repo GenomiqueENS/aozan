@@ -133,7 +133,7 @@ public class FastqscreenDemo {
       LOGGER.setLevel(Level.CONFIG);
 
       System.out.println("Create report qc for run "
-          + runId + "  " + FastqSample.VALUE);
+          + runId + "  " + FastqSample.FASTQ_EXTENSION);
 
       reportQC2();
 

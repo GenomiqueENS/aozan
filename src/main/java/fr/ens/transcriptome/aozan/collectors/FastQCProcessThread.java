@@ -79,25 +79,25 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
   @Override
   public void run() {
+
     // Timer
     final Stopwatch timer = Stopwatch.createStarted();
 
-    LOGGER.fine("FASTQC : start for " + fastqSample.getKeyFastqSample());
+    LOGGER.fine("FASTQC: start for " + getFastqSample().getKeyFastqSample());
     try {
       processSequences(this.seqFile);
-      success = true;
+      setSuccess(true);
 
     } catch (AozanException e) {
-      exception = e;
+      setException(e);
 
     } finally {
 
       timer.stop();
 
-      LOGGER.fine("FASTQC : end for "
-          + fastqSample.getKeyFastqSample() + " in "
+      LOGGER.fine("FASTQC: end for "
+          + getFastqSample().getKeyFastqSample() + " in "
           + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
-
     }
 
   }
@@ -186,7 +186,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
   protected void processResults() throws AozanException {
 
     // Set the prefix for the run data entries
-    final String prefix = "fastqc" + this.fastqSample.getPrefixRundata();
+    final String prefix = "fastqc" + getFastqSample().getPrefixRundata();
 
     int nClusters = -1;
 
@@ -204,8 +204,8 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
           break;
       }
 
-      this.results.put(keyPrefix + ".error", module.raisesError());
-      this.results.put(keyPrefix + ".warning", module.raisesWarning());
+      getResults().put(keyPrefix + ".error", module.raisesError());
+      getResults().put(keyPrefix + ".warning", module.raisesWarning());
 
     }
 
@@ -227,7 +227,8 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
   protected void createReportFile() throws AozanException, IOException {
 
     // Set the name of the prefix of the report file
-    final String filename = fastqSample.getKeyFastqSample() + "-fastqc.zip";
+    final String filename =
+        getFastqSample().getKeyFastqSample() + "-fastqc.zip";
 
     final File reportFile = new File(reportDir, filename);
 
@@ -238,7 +239,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
         this.moduleList.toArray(new QCModule[] {}), reportFile);
 
     LOGGER.fine("FASTQC : "
-        + fastqSample.getKeyFastqSample() + " creation qc report html");
+        + getFastqSample().getKeyFastqSample() + " creation qc report html");
 
     // Keep only the uncompressed data
     if (reportFile.exists()) {
@@ -268,11 +269,10 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
     this.reportDir = reportDir;
 
     try {
-      // this.seqFile = this.fastqStorage.getSequenceFile(this.fastqSample);
 
       this.seqFile =
           SequenceFactory.getSequenceFile(fastqSample.getFastqFiles().toArray(
-              new File[0]));
+              new File[fastqSample.getFastqFiles().size()]));
 
     } catch (IOException io) {
       throw new AozanException(io);

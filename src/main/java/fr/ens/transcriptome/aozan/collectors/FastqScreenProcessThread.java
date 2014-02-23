@@ -75,22 +75,22 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     final Stopwatch timer = Stopwatch.createStarted();
 
     LOGGER.fine("FASTQSCREEN : start for "
-        + this.fastqSample.getKeyFastqSample());
+        + getFastqSample().getKeyFastqSample());
 
     try {
       processResults();
-      this.success = true;
+      setSuccess(true);
     } catch (AozanException e) {
-      this.exception = e;
+      setException(e);
     } finally {
 
       timer.stop();
 
       LOGGER.fine("FASTQSCREEN : end for "
-          + this.fastqSample.getKeyFastqSample()
+          + getFastqSample().getKeyFastqSample()
           + " in mode "
           + (isPairedMode ? "paired" : "single")
-          + (this.success
+          + (isSuccess()
               ? " on genome(s) "
                   + this.genomes + " in "
                   + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS))
@@ -105,14 +105,14 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     final String report =
         this.reportDir.getAbsolutePath()
-            + "/" + this.fastqSample.getKeyFastqSample() + "-fastqscreen";
+            + "/" + getFastqSample().getKeyFastqSample() + "-fastqscreen";
 
     writeCSV(report);
     // Report with a link in qc html page
     writeHtml(report);
 
     LOGGER.fine("FASTQSCREEN : save "
-        + this.fastqSample.getKeyFastqSample() + " report fastqscreen");
+        + getFastqSample().getKeyFastqSample() + " report fastqscreen");
 
   }
 
@@ -127,7 +127,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     File file = new File(fileName + ".csv");
 
     BufferedWriter br = Files.newWriter(file, Charsets.UTF_8);
-    br.append(this.resultsFastqscreen.reportToCSV(this.fastqSample,
+    br.append(this.resultsFastqscreen.reportToCSV(getFastqSample(),
         this.genomeSample));
 
     br.close();
@@ -136,7 +136,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     if (this.isRunPE) {
       File fileR2 =
           new File(this.reportDir.getAbsolutePath()
-              + "/" + this.fastqSample.getPrefixRead2() + "-fastqscreen.csv");
+              + "/" + getFastqSample().getPrefixRead2() + "-fastqscreen.csv");
 
       if (fileR2.exists())
         if (!fileR2.delete())
@@ -159,7 +159,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     File file = new File(fileName + ".html");
 
     BufferedWriter br = Files.newWriter(file, Charsets.UTF_8);
-    br.append(this.resultsFastqscreen.reportToHtml(this.fastqSample, this.data,
+    br.append(this.resultsFastqscreen.reportToHtml(getFastqSample(), this.data,
         this.genomeSample, this.fastqscreenXSLFile));
 
     br.close();
@@ -168,7 +168,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     if (this.isRunPE) {
       File fileR2 =
           new File(this.reportDir.getAbsolutePath()
-              + "/" + this.fastqSample.getPrefixRead2() + "-fastqscreen.html");
+              + "/" + getFastqSample().getPrefixRead2() + "-fastqscreen.html");
 
       if (fileR2.exists())
         if (!fileR2.delete())
@@ -183,7 +183,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   @Override
   protected void processResults() throws AozanException {
 
-    File read1 = new File(fastqStorage.getTemporaryFile(fastqSample));
+    File read1 = getFastqStorage().getTemporaryFile(getFastqSample());
 
     if (!read1.exists())
       return;
@@ -191,7 +191,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     File read2 = null;
     // mode paired
     if (this.isPairedMode) {
-      read2 = new File(fastqStorage.getTemporaryFile(fastqSampleR2));
+      read2 = getFastqStorage().getTemporaryFile(fastqSampleR2);
 
       if (!read2.exists())
         return;
@@ -199,26 +199,27 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     // Add read2 in command line
     resultsFastqscreen =
-        fastqscreen.execute(read1, read2, fastqSample, genomes, genomeSample,
-            isPairedMode);
+        fastqscreen.execute(read1, read2, getFastqSample(), genomes,
+            genomeSample, isPairedMode);
 
     if (resultsFastqscreen == null)
       throw new AozanException("Fastqscreen returns no result for sample "
-          + String.format("/Project_%s/Sample_%s",
-              fastqSample.getProjectName(), fastqSample.getSampleName()));
+          + String.format("/Project_%s/Sample_%s", getFastqSample()
+              .getProjectName(), getFastqSample().getSampleName()));
 
     // Create rundata for the sample
-    this.results.put(resultsFastqscreen.createRundata("fastqscreen"
-        + fastqSample.getPrefixRundata()));
+    getResults().put(
+        resultsFastqscreen.createRundata("fastqscreen"
+            + getFastqSample().getPrefixRundata()));
 
     // run paired : same values for fastqSample R2
     if (this.isRunPE) {
 
       final String prefixR2 =
-          fastqSample.getPrefixRundata().replace(".read1.", ".read2.");
+          getFastqSample().getPrefixRundata().replace(".read1.", ".read2.");
 
-      this.results.put(resultsFastqscreen.createRundata("fastqscreen"
-          + prefixR2));
+      getResults().put(
+          resultsFastqscreen.createRundata("fastqscreen" + prefixR2));
     }
 
     try {
