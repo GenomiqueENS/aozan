@@ -26,6 +26,7 @@ package fr.ens.transcriptome.aozan.collectors;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
@@ -68,7 +69,7 @@ abstract public class AbstractFastqCollector implements Collector {
   private File tmpDir;
 
   // Set samples to treat
-  protected final static Set<FastqSample> fastqSamples =
+  private final Set<FastqSample> fastqSamples =
       new LinkedHashSet<FastqSample>();
 
   // mode threaded
@@ -148,6 +149,15 @@ abstract public class AbstractFastqCollector implements Collector {
   protected FastqStorage getFastqStorage() {
 
     return this.fastqStorage;
+  }
+
+  /**
+   * Get the FASTQ samples.
+   * @return a set with the FASTQ samples
+   */
+  protected Set<FastqSample> getFastqSamples() {
+
+    return Collections.unmodifiableSet(this.fastqSamples);
   }
 
   //

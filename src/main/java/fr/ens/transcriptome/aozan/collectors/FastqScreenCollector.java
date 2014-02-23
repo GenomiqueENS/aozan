@@ -174,7 +174,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
       // Search fasqtSample which corresponding to fastqSample R1
       String prefixRead2 = fastqSample.getPrefixRead2();
 
-      for (FastqSample fastqSampleR2 : fastqSamples) {
+      for (FastqSample fastqSampleR2 : getFastqSamples()) {
         if (fastqSampleR2.getKeyFastqSample().equals(prefixRead2)) {
 
           return new FastqScreenProcessThread(fastqSample, fastqSampleR2,

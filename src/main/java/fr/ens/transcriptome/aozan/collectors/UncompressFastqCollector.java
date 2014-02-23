@@ -151,7 +151,7 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     long freeSpace = tmpDir.getFreeSpace();
     freeSpace = freeSpace / (1024 * 1024 * 1024);
 
-    for (FastqSample fastqSample : fastqSamples) {
+    for (FastqSample fastqSample : getFastqSamples()) {
       // Check temporary fastq files exists
       if (!(new File(tmpDir, fastqSample.getNameTemporaryFastqFiles()).exists())) {
         this.uncompressedSizeFiles += fastqSample.getUncompressedSize();
