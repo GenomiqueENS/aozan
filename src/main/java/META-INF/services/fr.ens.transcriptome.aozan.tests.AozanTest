@@ -31,3 +31,4 @@ fr.ens.transcriptome.aozan.tests.BadTilesFastQCSampleTest
 fr.ens.transcriptome.aozan.tests.HitNoLibrariesFastqScreenSampleTest
 fr.ens.transcriptome.aozan.tests.FastqScreenSimpleSampleTest
 fr.ens.transcriptome.aozan.tests.FastqScreenSimpleSampleLienReportTest
+fr.ens.transcriptome.aozan.tests.RecoverablePFClusterSampleTest
