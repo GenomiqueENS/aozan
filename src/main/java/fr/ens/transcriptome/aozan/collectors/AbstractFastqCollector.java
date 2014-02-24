@@ -423,12 +423,24 @@ abstract public class AbstractFastqCollector implements Collector {
       final RunData data) {
 
     try {
-      String dataFilePath =
-          this.qcReportOutputPath
-              + "/Project_" + fastqSample.getProjectName() + "/" + getName()
-              + "_" + fastqSample.getKeyFastqSample() + ".data";
 
-      data.createRunDataFile(dataFilePath);
+      // Define the part result directory
+      final File dataFileDir;
+      if (fastqSample.isIndeterminedIndices())
+        dataFileDir =
+            new File(this.qcReportOutputPath + "/Undetermined_indices");
+      else
+        dataFileDir =
+            new File(this.qcReportOutputPath
+                + "/Project_" + fastqSample.getProjectName());
+
+      // Define the part result file
+      final File dataFile =
+          new File(dataFileDir, getName()
+              + "_" + fastqSample.getKeyFastqSample() + ".data");
+
+      // Create the result part file
+      data.createRunDataFile(dataFile);
 
       LOGGER.fine(this.getName().toUpperCase()
           + " : " + fastqSample.getKeyFastqSample() + " save data file");
@@ -437,8 +449,8 @@ abstract public class AbstractFastqCollector implements Collector {
 
       LOGGER.warning("For the "
           + this.getName()
-          + " : Error during writing data file for the sample "
-          + fastqSample.getKeyFastqSample());
+          + " collector: Error during writing data file for the sample "
+          + fastqSample.getKeyFastqSample() + "(" + ae.getMessage() + ")");
     }
   }
 
@@ -538,12 +550,13 @@ abstract public class AbstractFastqCollector implements Collector {
         });
 
         // delete datafile
-        for (File f : dataFiles) {
-          if (f.exists())
-            if (!f.delete())
-              LOGGER.warning("Can not delete data file : "
-                  + f.getAbsolutePath());
-        }
+        if (dataFiles != null)
+          for (File f : dataFiles) {
+            if (f.exists())
+              if (!f.delete())
+                LOGGER.warning("Can not delete data file : "
+                    + f.getAbsolutePath());
+          }
       }
     }
   }
