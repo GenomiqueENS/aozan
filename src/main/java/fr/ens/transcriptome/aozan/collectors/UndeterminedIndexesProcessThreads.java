@@ -60,6 +60,7 @@ public class UndeterminedIndexesProcessThreads extends
   private final File reportDir;
 
   private final Map<String, String> sampleIndexes;
+  private final Map<String, String> reverseSampleIndexes;
   private Multiset<String> rawUndeterminedIndices = HashMultiset.create();
   private Multiset<String> pfUndeterminedIndices = HashMultiset.create();
   private final Multimap<String, String> newSamplesIndexes = ArrayListMultimap
@@ -425,7 +426,7 @@ public class UndeterminedIndexesProcessThreads extends
       final int pfClusterCount =
           this.pfUndeterminedIndices.count(e.getElement());
 
-      final Collection<String> samplesCollection = this.newIndexes.get(index);
+      List<String> samplesCollection = getSampleForNewIndex(index);
       final String samples =
           samplesCollection.size() > 0 ? "Recovery possible for sample(s) "
               + joiner.join(samplesCollection) : "";
@@ -435,6 +436,21 @@ public class UndeterminedIndexesProcessThreads extends
     }
 
     writeCSV(entries, totalEntry);
+  }
+
+  /**
+   * Get the list of samples that can be recovered for an index.
+   * @param newIndex the index
+   * @return a list with the names of the samples
+   */
+  private List<String> getSampleForNewIndex(final String newIndex) {
+
+    final Collection<String> indexesCollection = this.newIndexes.get(newIndex);
+    final List<String> samplesCollection = Lists.newArrayList();
+    for (String i : indexesCollection)
+      samplesCollection.add(this.reverseSampleIndexes.get(i));
+
+    return samplesCollection;
   }
 
   /**
@@ -615,6 +631,24 @@ public class UndeterminedIndexesProcessThreads extends
   }
 
   /**
+   * Reverse a map.
+   * @param map the original map
+   * @return a new map with the inversed key-values
+   */
+  private Map<String, String> reverse(Map<String, String> map) {
+
+    if (map == null)
+      return null;
+
+    final Map<String, String> result = Maps.newHashMap();
+
+    for (Map.Entry<String, String> e : map.entrySet())
+      result.put(e.getValue(), e.getKey());
+
+    return result;
+  }
+
+  /**
    * Get a map with for each sample the index.
    * @return a Map object
    */
@@ -716,6 +750,7 @@ public class UndeterminedIndexesProcessThreads extends
     this.reportDir = reportDir;
 
     this.sampleIndexes = getSampleIndexes();
+    this.reverseSampleIndexes = reverse(this.sampleIndexes);
 
     try {
 
