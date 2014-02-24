@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
-import fr.ens.transcriptome.eoulsan.util.StringUtils;
 
 /**
  * The class correspond of one entity to treat by AbstractFastqCollector, so a
@@ -166,6 +165,10 @@ public class FastqSample {
    * @return directory of fastq files for a fastqSample
    */
   private File casavaOutputDir() {
+
+    if (this.undeterminedIndices)
+      return new File(this.runFastqPath
+          + "/Undetermined_indices/Sample_lane" + lane);
 
     return new File(this.runFastqPath
         + "/Project_" + projectName + "/Sample_" + sampleName);

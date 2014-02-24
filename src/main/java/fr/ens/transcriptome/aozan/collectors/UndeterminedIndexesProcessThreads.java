@@ -359,8 +359,10 @@ public class UndeterminedIndexesProcessThreads extends
         }
       }
 
+    final String fastqDir =
+        this.seqFile.getFile().getParentFile().getAbsolutePath() + "/../..";
     final FastqSample s =
-        new FastqSample("", this.read, this.lane, sampleName,
+        new FastqSample(fastqDir, this.read, this.lane, sampleName,
             getProjectSample(sampleName), getSampleDescription(sampleName),
             this.sampleIndexes.get(sampleName));
 
