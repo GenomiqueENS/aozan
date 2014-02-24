@@ -96,19 +96,16 @@ public class UndeterminedIndexesProcessThreads extends
      */
     public String toCSV() {
 
-      return String.format("%s\t%d\t%d\t%.2d%%\t%.2d%%\t%.2d%%\t%.2d%%\t%s\n",
+      return String.format("%s\t%d\t%d\t%.02f%%\t%.02f%%\t%.02f%%\t%s\n",
           this.index, this.rawClusterCount, this.pfClusterCount,
           this.pfPercent, this.inRawUndeterminedIndicePercent,
           this.inPFUndeterminedIndicePercent, this.comment);
     }
 
     @Override
-    public int compareTo(final LaneResultEntry o) {
+    public int compareTo(final LaneResultEntry that) {
 
-      final LaneResultEntry that = (LaneResultEntry) o;
-
-      return -((Integer) this.pfClusterCount)
-          .compareTo((Integer) that.pfClusterCount);
+      return -((Integer) this.pfClusterCount).compareTo(that.pfClusterCount);
     }
 
     //
@@ -131,7 +128,7 @@ public class UndeterminedIndexesProcessThreads extends
       this.index = index;
       this.rawClusterCount = rawClusterCount;
       this.pfClusterCount = pfClusterCount;
-      this.pfPercent = 100.0 * rawClusterCount / pfClusterCount;
+      this.pfPercent = 100.0 * pfClusterCount / rawClusterCount;
       this.inRawUndeterminedIndicePercent =
           100.0 * rawClusterCount / totalRawClusterCount;
       this.inPFUndeterminedIndicePercent =
@@ -171,19 +168,16 @@ public class UndeterminedIndexesProcessThreads extends
      */
     public String toCSV() {
 
-      return String.format("%s\t%d\t%d\t%.2d%%\t%.2d%%\t%.2d%%\t%.2d%%\t%s\n",
+      return String.format("%s\t%d\t%d\t%.02f%%\t%.02f%%\t%.02f%%\t%s\n",
           this.index, this.rawClusterCount, this.pfClusterCount,
           this.pfPercent, this.rawClusterPercent, this.pfClusterPercent,
           this.comment);
     }
 
     @Override
-    public int compareTo(final SampleResultEntry o) {
+    public int compareTo(final SampleResultEntry that) {
 
-      final SampleResultEntry that = (SampleResultEntry) o;
-
-      return -((Integer) this.pfClusterCount)
-          .compareTo((Integer) that.pfClusterCount);
+      return -((Integer) this.pfClusterCount).compareTo(that.pfClusterCount);
     }
 
     //
@@ -323,7 +317,7 @@ public class UndeterminedIndexesProcessThreads extends
               this.rawUndeterminedIndices, ".recoverable.raw.cluster.count");
       recoverablePFClusterCount +=
           computeRecoverableSampleClusterCount(sampleName,
-              this.rawUndeterminedIndices, ".recoverable.pf.cluster.count");
+              this.pfUndeterminedIndices, ".recoverable.pf.cluster.count");
     }
 
     // Set the result for the lane
@@ -335,6 +329,13 @@ public class UndeterminedIndexesProcessThreads extends
         "undeterminedindices.lane"
             + this.lane + ".recoverable.pf.cluster.count",
         recoverablePFClusterCount);
+
+    // Create report
+    try {
+      createReportFile();
+    } catch (IOException e) {
+      throw new AozanException(e);
+    }
   }
 
   /**
@@ -544,9 +545,8 @@ public class UndeterminedIndexesProcessThreads extends
 
     final File reportFile =
         new File(this.reportDir.getAbsolutePath()
-            + "/../Project_" + getProjectSample(sampleName) + "/"
-            + getFastqSample().getKeyFastqSample() + "-potentialindices"
-            + extension);
+            + "/../Project_" + getProjectSample(sampleName) + "/" + sampleName
+            + "-potentialindices" + extension);
 
     // Create parent directory if necessary
     final File parentDir = reportFile.getParentFile();
