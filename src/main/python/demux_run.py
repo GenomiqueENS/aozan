@@ -122,9 +122,11 @@ def demux(run_id, conf):
     instrument_sn = hiseq_run.get_instrument_sn(run_id)
     flow_cell_id = hiseq_run.get_flow_cell(run_id)
 
-    input_design_xls_path = conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + '_' + instrument_sn + '_%04d.xls' % run_number
-    input_design_csv_path = conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + '_' + instrument_sn + '_%04d.csv' % run_number
-    design_csv_path = conf[Settings.TMP_PATH_KEY] + '/' + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + '_' + instrument_sn + '_%04d.csv' % run_number
+    design_filename = conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + '_' + instrument_sn + '_%04d' % run_number
+    input_design_xls_path = conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + design_filename + '.xls'
+    input_design_csv_path = conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + design_filename + '.csv'
+    design_csv_path = conf[Settings.TMP_PATH_KEY] + '/' + design_filename + '.csv'
+    
     fastq_output_dir = conf[Settings.FASTQ_DATA_PATH_KEY] + '/' + run_id
 
     basecall_stats_prefix = 'basecall_stats_'
@@ -196,7 +198,7 @@ def demux(run_id, conf):
         # Check if the xls design exists
         if not os.path.exists(input_design_xls_path):
             error("no casava sample sheet found", "No casava sample sheet found for " + run_id + " run.\n" + \
-              'You must provide a ' + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + '-%04d.xls file' % run_number + ' in ' + conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + \
+              'You must provide a ' + design_filename + '.xls file in ' + conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + \
               ' directory to demultiplex and create fastq files for this run.\n', conf)
             return False
 
@@ -211,20 +213,20 @@ def demux(run_id, conf):
             CasavaDesignCSVWriter(design_csv_path).writer(design)
 
         except IOException, exp:
-            error("error while converting " + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + "-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
+            error("error while converting " + design_filename + ".xls to CSV format", exp.getMessage(), conf)
             return False
         except EoulsanException, exp:
-            error("error while converting " + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + "-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
+            error("error while converting " + design_filename + ".xls to CSV format", exp.getMessage(), conf)
             return False
 
     elif conf[Settings.CASAVA_SAMPLESHEET_FORMAT_KEY].strip().lower() == 'csv':
 
         # Copy the CSV file
 
-        # Check if the xls design exists
+        # Check if the csv design exists
         if not os.path.exists(input_design_csv_path):
             error("no casava sample sheet found", "No casava sample sheet found for " + run_id + " run.\n" + \
-              'You must provide a ' + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + '-%04d.csv file' % run_number + ' in ' + conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + \
+              'You must provide a ' + + design_filename + '.csv file in ' + conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + \
               ' directory to demultiplex and create fastq files for this run.\n', conf)
             return False
 
@@ -263,17 +265,17 @@ def demux(run_id, conf):
 
     # Check Casava CSV design file
     try:
-        # Load XLS design file
+        # Load CSV design file
         design = CasavaDesignCSVReader(design_csv_path).read()
 
         # Check values of design file
         design_warnings = CasavaDesignUtil.checkCasavaDesign(design, flow_cell_id)
 
     except IOException, exp:
-        error("error while converting " + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + "-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
+        error("error while checking " + design_filename + ".csv file ", exp.getMessage(), conf)
         return False
     except EoulsanException, exp:
-        error("error while converting " + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + "-%04d" % run_number + ".xls to CSV format", exp.getMessage(), conf)
+        error("error while checking " + design_filename + ".csv file ", exp.getMessage(), conf)
         return False
 
     # Log Casava design warning
