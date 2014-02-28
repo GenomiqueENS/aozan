@@ -60,7 +60,7 @@ def load_index_sequences(conf):
 
     result = HashMap()
 
-    if conf[Settings.INDEX_SEQUENCES_KEY] == '' or not os.path.exists(conf[Settings.INDEX_SEQUENCES_KEY]):
+    if not common.isPathExists(Settings.INDEX_SEQUENCES_KEY, conf):
             return result
 
 
@@ -110,7 +110,7 @@ def demux(run_id, conf):
     input_bcl_path = conf[Settings.BCL_DATA_PATH_KEY] + '/' + run_id
     
     # Check if must use the direct output of the HiSeq
-    if conf[Settings.DEMUX_USE_HISEQ_OUTPUT_KEY].lower().strip() == 'true':
+    if common.isTrue(Settings.DEMUX_USE_HISEQ_OUTPUT_KEY, conf):
         # Retrieve the path of run data directory on HiSeq
         input_bcl_path = hiseq_run.find_hiseq_run_path(run_id, conf) + '/' + run_id
         # Path not found
@@ -141,17 +141,17 @@ def demux(run_id, conf):
         return False
 
     # Check if root input fastq data directory exists
-    if not os.path.exists(conf[Settings.FASTQ_DATA_PATH_KEY]):
+    if not common.isPathExists(Settings.FASTQ_DATA_PATH_KEY, conf):
         error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf[Settings.FASTQ_DATA_PATH_KEY], conf)
         return False
 
     # Check if casava designs path exists
-    if not os.path.exists(conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY]):
+    if not common.isPathExists(Settings.CASAVA_SAMPLESHEETS_PATH_KEY, conf):
         error("Casava sample sheets directory does not exists", "Casava sample sheets does not exists: " + conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY], conf)
         return False
 
     # Check if temporary directory exists
-    if not os.path.exists(conf[Settings.TMP_PATH_KEY]):
+    if not common.isPathExists(Settings.TMP_PATH_KEY, conf):
         error("Temporary directory does not exists", "Temporary directory does not exists: " + conf[Settings.TMP_PATH_KEY], conf)
         return False
 
@@ -191,7 +191,7 @@ def demux(run_id, conf):
               '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + fastq_output_dir + '.', conf)
         return False
 
-    if conf[Settings.CASAVA_SAMPLESHEET_FORMAT_KEY].strip().lower() == 'xls':
+    if common.isDefine(Settings.CASAVA_SAMPLESHEET_FORMAT_KEY, 'xls', conf):
 
         # Convert design in XLS format to CSV format
 
@@ -219,14 +219,14 @@ def demux(run_id, conf):
             error("error while converting " + design_filename + ".xls to CSV format", exp.getMessage(), conf)
             return False
 
-    elif conf[Settings.CASAVA_SAMPLESHEET_FORMAT_KEY].strip().lower() == 'csv':
+    elif common.isDefine(Settings.CASAVA_SAMPLESHEET_FORMAT_KEY, 'csv', conf):
 
         # Copy the CSV file
 
         # Check if the csv design exists
         if not os.path.exists(input_design_csv_path):
             error("no casava sample sheet found", "No casava sample sheet found for " + run_id + " run.\n" + \
-              'You must provide a ' + + design_filename + '.csv file in ' + conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + \
+              'You must provide a ' + design_filename + '.csv file in ' + conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + \
               ' directory to demultiplex and create fastq files for this run.\n', conf)
             return False
 
@@ -237,7 +237,7 @@ def demux(run_id, conf):
                   'Error while copying Casava CSV sample sheet file to temporary directory.\nCommand line:\n' + cmd, conf)
             return False
 
-    elif conf[Settings.CASAVA_SAMPLESHEET_FORMAT_KEY].strip().lower() == 'command':
+    elif common.isDefine(Settings.CASAVA_SAMPLESHEET_FORMAT_KEY, 'command', conf):
 
         if conf['casava.design.generator.command'] == None or conf['casava.design.generator.command'].strip() == '':
             error("error while creating Casava CSV sample sheet file for run " + run_id,
@@ -299,12 +299,12 @@ def demux(run_id, conf):
           '--input-dir ' + input_bcl_path + '/Data/Intensities/BaseCalls ' + \
           '--sample-sheet ' + design_csv_path + ' ' + \
           '--output-dir ' + fastq_output_dir
-    if conf[Settings.CASAVA_WITH_FAILED_READS_KEY] == 'True':
+    if common.isTrue(Settings.CASAVA_WITH_FAILED_READS_KEY, conf):
         cmd = cmd + ' --with-failed-reads'
-    if conf[Settings.CASAVA_ADAPTER_FASTA_FILE_PATH_KEY] != '':
+    if common.isExists(Settings.CASAVA_ADAPTER_FASTA_FILE_PATH_KEY, conf):
         cmd = cmd + ' --adapter-sequence ' + conf[Settings.CASAVA_ADAPTER_FASTA_FILE_PATH_KEY]
 
-    if conf[Settings.CASAVA_ADDITIONNAL_ARGUMENTS_KEY] != '':
+    if common.isExists(Settings.CASAVA_ADDITIONNAL_ARGUMENTS_KEY, conf):
         cmd = cmd + ' ' + conf[Settings.CASAVA_ADDITIONNAL_ARGUMENTS_KEY]
 
     # Retrieve output in file
@@ -367,7 +367,7 @@ def demux(run_id, conf):
 
 
     # Add design to the archive of designs
-    if conf[Settings.CASAVA_SAMPLESHEET_FORMAT_KEY].strip().lower() == 'xls':
+    if common.isDefine(Settings.CASAVA_SAMPLESHEET_FORMAT_KEY, 'xls', conf):
         cmd = 'cp ' + input_design_xls_path + ' ' + conf[Settings.TMP_PATH_KEY] + \
         ' && cd ' + conf[Settings.TMP_PATH_KEY] + \
         ' && zip -q ' + conf[Settings.CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip ' + \
@@ -384,7 +384,7 @@ def demux(run_id, conf):
 
     # Remove temporary design files
     os.remove(design_csv_path)
-    if conf[Settings.CASAVA_SAMPLESHEET_FORMAT_KEY].strip().lower() == 'xls':
+    if common.isDefine(Settings.CASAVA_SAMPLESHEET_FORMAT_KEY, 'xls', conf):
         os.remove(conf[Settings.TMP_PATH_KEY] + '/' + os.path.basename(input_design_xls_path))
 
     # Create index.hml file
@@ -412,7 +412,7 @@ def demux(run_id, conf):
             msg += "\n  - " + warn
 
     # Add path to report if reports.url exists
-    if conf[Settings.REPORTS_URL_KEY] != None and conf[Settings.REPORTS_URL_KEY] != '':
+    if common.isExists(Settings.REPORTS_URL_KEY, conf):
         msg += '\n\nRun reports can be found at following location:\n  ' + conf[Settings.REPORTS_URL_KEY] + '/' + run_id
 
     msg += '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df)

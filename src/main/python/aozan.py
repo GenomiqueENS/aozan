@@ -96,7 +96,7 @@ def discover_new_run(conf):
 
     first_base_report_sent = first_base_report.load_processed_run_ids(conf)
 
-    if conf[Settings.FIRST_BASE_REPORT_STEP_KEY].lower().strip() == 'true':
+    if common.isTrue(Settings.FIRST_BASE_REPORT_STEP_KEY, conf):
         for run_id in (first_base_report.get_available_run_ids(conf) - first_base_report_sent):
             welcome(conf)
             common.log('INFO', 'First base report ' + run_id, conf)
@@ -113,7 +113,7 @@ def discover_new_run(conf):
 
     hiseq_run_ids_done = hiseq_run.load_processed_run_ids(conf)
 
-    if conf[Settings.HISEQ_STEP_KEY].lower().strip() == 'true':
+    if common.isTrue(Settings.HISEQ_STEP_KEY, conf):
         for run_id in (hiseq_run.get_available_run_ids(conf) - hiseq_run_ids_done):
             welcome(conf)
             common.log('INFO', 'Discover ' + run_id, conf)
@@ -143,7 +143,7 @@ def launch_steps(conf):
     sync_run_ids_done = sync_run.load_processed_run_ids(conf)
 
     # Get the list of run available on HiSeq output
-    if conf[Settings.SYNC_STEP_KEY].lower().strip() == 'true':
+    if common.isTrue(Settings.SYNC_STEP_KEY, conf):
         for run_id in (hiseq_run_ids_done - sync_run_ids_done - hiseq_run_ids_do_not_process):
             welcome(conf)
             common.log('INFO', 'Synchronize ' + run_id, conf)
@@ -155,7 +155,7 @@ def launch_steps(conf):
 
 
     # Check if new run appears while sync step
-    if  conf[Settings.SYNC_STEP_KEY].lower().strip() == 'true' and len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
+    if  common.isTrue(Settings.SYNC_STEP_KEY, conf) and len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
         launch_steps(conf)
         return
 
@@ -163,12 +163,12 @@ def launch_steps(conf):
     # Demultiplexing
     #
 
-    if conf[Settings.DEMUX_USE_HISEQ_OUTPUT_KEY].lower().strip() == 'true':
+    if common.isTrue(Settings.DEMUX_USE_HISEQ_OUTPUT_KEY, conf):
         sync_run_ids_done = hiseq_run_ids_done
         
     demux_run_ids_done = demux_run.load_processed_run_ids(conf)
     
-    if conf[Settings.DEMUX_STEP_KEY].lower().strip() == 'true':
+    if common.isTrue(Settings.DEMUX_STEP_KEY, conf):
         for run_id in (sync_run_ids_done - demux_run_ids_done):
             welcome(conf)
             common.log('INFO', 'Demux ' + run_id, conf)
@@ -179,7 +179,7 @@ def launch_steps(conf):
                 return
 
     # Check if new run appears while demux step
-    if conf[Settings.DEMUX_STEP_KEY].lower().strip() == 'true' and len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
+    if common.isTrue(Settings.DEMUX_STEP_KEY, conf) and len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
         launch_steps(conf)
         return
 
@@ -189,7 +189,7 @@ def launch_steps(conf):
 
     qc_run_ids_done = qc_run.load_processed_run_ids(conf)
     
-    if conf[Settings.QC_STEP_KEY].lower().strip() == 'true':
+    if common.isTrue(Settings.QC_STEP_KEY, conf):
         for run_id in (demux_run_ids_done - qc_run_ids_done):
             welcome(conf)
             common.log('INFO', 'Quality control ' + run_id, conf)
@@ -200,7 +200,7 @@ def launch_steps(conf):
                 return
 
     # Check if new run appears while quality control step
-    if conf[Settings.QC_STEP_KEY].lower().strip() == 'true' and len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
+    if common.isTrue(Settings.QC_STEP_KEY, conf) and len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
         launch_steps(conf)
         return
 
@@ -210,7 +210,7 @@ def launch_steps(conf):
 
     working_run_ids = hiseq_run.get_working_run_ids(conf)
 
-    if conf[Settings.SYNC_CONTINUOUS_SYNC_KEY].lower().strip() == 'true':
+    if common.isTrue(Settings.SYNC_CONTINUOUS_SYNC_KEY, conf):
         for run_id in (working_run_ids - sync_run_ids_done - hiseq_run_ids_do_not_process):
             welcome(conf)
             common.log('INFO', 'Partial synchronization of ' + run_id, conf)
@@ -251,7 +251,7 @@ def aozan_main():
     common.load_conf(conf, args[0])
 
     # End of Aozan if aozan is not enable
-    if conf[Settings.AOZAN_ENABLE_KEY].lower().strip() == 'false':
+    if common.isDefine(Settings.AOZAN_ENABLE_KEY, 'false', conf):
         sys.exit(0)
 
     # Init logger

@@ -93,7 +93,7 @@ def partial_sync(run_id, last_sync, conf):
         return False
 
     # exclude CIF files ?
-    if conf[Settings.SYNC_EXCLUDE_CIF_KEY].lower().strip() == 'true':
+    if common.isTrue(Settings.SYNC_EXCLUDE_CIF_KEY, conf):
         exclude_files = ['*.cif', '*_pos.txt', '*.errorMap', '*.FWHMMap']
     else:
         exclude_files = []
@@ -255,7 +255,7 @@ def sync(run_id, conf):
         'Run output files (without .cif files) can be found in the following directory:\n  ' + output_path
 
     # Add path to report if reports.url exists
-    if conf[Settings.REPORTS_URL_KEY] != None and conf[Settings.REPORTS_URL_KEY] != '':
+    if common.isExists(Settings.REPORTS_URL_KEY, conf):
         msg += '\n\nRun reports can be found at following location:\n  ' + conf[Settings.REPORTS_URL_KEY] + '/' + run_id
 
     msg += '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df)

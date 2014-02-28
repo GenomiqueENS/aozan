@@ -53,6 +53,65 @@ def du(path):
 
     return long(lines[0].split('\t')[0])
 
+def isTrue(settings_key, conf):
+    """Check a property exists in configuration object and value equals 'true'
+    
+    Arguments:
+        settings_key: key in configuration for the property
+        conf: configuration dictionnary
+        return boolean
+    """
+    return isDefine(settings_key, 'true', conf)
+
+def isExists(settings_key, conf):
+    """Check a property exists in configuration object 
+    
+    Arguments:
+        settings_key: key in configuration for the property
+        conf: configuration dictionnary
+        return boolean
+    """
+
+    return isDefine(settings_key, None, conf)
+
+def isPathExists(settings_key, conf):
+    """Check a path corresponding to a property in configuration exists
+    
+    Arguments:
+        settings_key: key in configuration for the property
+        conf: configuration dictionnary
+        return boolean
+    """
+    
+    exist = isExist(settings_key, conf)
+    
+    if not exist:
+        return False
+    
+    path = conf[settings_key].lower().strip()
+    return os.path.exists(path)
+
+    
+def isDefine(settings_key, value, conf):
+    """Check a property exists in configuration object with a specific value (if it's different None or empty
+    
+    Arguments:
+        settings_key: key in configuration for the property
+        value: value of property wanted
+        conf: configuration dictionnary
+        return boolean
+    """
+    
+    exist = not (conf[settings_key] == None or conf[settings_key].strip() == '')
+    
+    # Check if property exists
+    if (value == None):
+        return exit
+    
+    # Check if property equals a specific value
+    value = value.lower().strip()
+    return exist and conf[settings_key].lower().strip() == value
+
 
 def send_msg(subject, message, is_error, conf):
     """Send a message to the user about the data extraction.
@@ -65,7 +124,7 @@ def send_msg(subject, message, is_error, conf):
     """
 
 
-    send_mail = conf[Settings.SEND_MAIL_KEY].lower() == 'true'
+    send_mail = isTrue(Settings.SEND_MAIL_KEY, conf)
     smtp_server = conf[Settings.SMTP_SERVER_KEY]
 
     # Specific receiver for error message
@@ -124,7 +183,7 @@ def send_msg(subject, message, is_error, conf):
 def send_msg_with_attachment(subject, message, attachment_file, conf):
     """Send a message to the user about the data extraction."""
 
-    send_mail = conf[Settings.SEND_MAIL_KEY].lower() == 'true'
+    send_mail = isTrue(Settings.SEND_MAIL_KEY, conf)
     smtp_server = conf[Settings.SMTP_SERVER_KEY]
     mail_to = conf[Settings.MAIL_TO_KEY]
     mail_from = conf[Settings.MAIL_FROM_KEY]

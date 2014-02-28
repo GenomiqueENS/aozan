@@ -50,7 +50,7 @@ def exception_msg(exp, conf):
         conf: configuration dictionary
     """
 
-    if conf[Settings.AOZAN_DEBUG_KEY] == 'true':
+    if common.isTrue(Settings.AOZAN_DEBUG_KEY, conf):
 
         if isinstance(exp, AozanException) and exp.getWrappedException() != None:
             exp = exp.getWrappedException()
@@ -78,12 +78,12 @@ def qc(run_id, conf):
     tmp_extension = '.tmp'
 
     # Check if input root bcl data exists
-    if not os.path.exists(conf[Settings.BCL_DATA_PATH_KEY]):
+    if not common.isPathExist(Settings.BCL_DATA_PATH_KEY, conf):
         error("Basecalling data directory does not exists", "Basecalling data directory does not exists: " + conf[Settings.BCL_DATA_PATH_KEY], conf)
         return False
 
     # Check if input root fastq root data exists
-    if not os.path.exists(conf[Settings.FASTQ_DATA_PATH_KEY]):
+    if not common.isPathExist(Settings.FASTQ_DATA_PATH_KEY, conf):
         error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf[Settings.FASTQ_DATA_PATH_KEY], conf)
         return False
 
@@ -93,7 +93,7 @@ def qc(run_id, conf):
         return False
 
     # Check if temporary directory exists
-    if not os.path.exists(conf[Settings.TMP_PATH_KEY]):
+    if not common.isPathExist(Settings.TMP_PATH_KEY, conf):
         error("Temporary directory does not exists", "Temporary directory does not exists: " + conf[Settings.TMP_PATH_KEY], conf)
         return False
 
@@ -132,7 +132,7 @@ def qc(run_id, conf):
         return False
 
     # Remove qc data if not demand
-    if conf[Settings.QC_REPORT_SAVE_RAW_DATA_KEY].lower().strip() == 'false':
+    if common.isDefine(Settings.QC_REPORT_SAVE_RAW_DATA_KEY, 'false', conf):
         try:
             os.remove(qc_output_dir + '/data-' + run_id + '.txt')
             # qc.writeRawData(report, qc_output_dir + '/data-' + run_id + '.txt')
@@ -141,7 +141,7 @@ def qc(run_id, conf):
             return False
 
     # Write the XML report
-    if conf[Settings.QC_REPORT_SAVE_REPORT_DATA_KEY].lower().strip() == 'true':
+    if common.isTrue(Settings.QC_REPORT_SAVE_REPORT_DATA_KEY, conf):
         try:
             qc.writeXMLReport(report, qc_output_dir + '/' + run_id + '.xml')
         except AozanException, exp:
@@ -158,7 +158,7 @@ def qc(run_id, conf):
     # Write the HTML report
     html_report_file = qc_output_dir + '/' + run_id + '.html'
     try:
-        if conf[Settings.QC_REPORT_STYLESHEET_KEY] == '':
+        if not common.isExists(Settings.QC_REPORT_STYLESHEET_KEY, conf):
             qc.writeReport(report, None, html_report_file)
         else:
             qc.writeReport(report, conf[Settings.QC_REPORT_STYLESHEET_KEY], html_report_file)
@@ -220,7 +220,7 @@ def qc(run_id, conf):
         'can be found in the following directory:\n  ' + qc_output_dir
 
     # Add path to report if reports.url exists
-    if conf[Settings.REPORTS_URL_KEY] != None and conf[Settings.REPORTS_URL_KEY] != '':
+    if common.isExists(Settings.REPORTS_URL_KEY, conf):
         msg += '\n\nRun reports can be found at following location:\n  ' + conf[Settings.REPORTS_URL_KEY] + '/' + run_id
 
     msg += '\n\nFor this task %.2f MB has been used and %.2f GB still free.' % (du, df)
