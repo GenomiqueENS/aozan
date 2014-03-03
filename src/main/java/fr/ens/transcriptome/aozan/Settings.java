@@ -90,7 +90,10 @@ public final class Settings {
   /** Casava with failed reads */
   public static final String CASAVA_WITH_FAILED_READS_KEY =
       "casava.with.failed.reads";
-
+  /** Casava design generator command */
+  public static final String CASAVA_DESIGN_GENERATOR_COMMAND_KEY =
+      "casava.design.generator.command";
+  
   /** Demultiplex space factor */
   public static final String DEMUX_SPACE_FACTOR_KEY = "demux.space.factor";
   /** Demultiplex step */
@@ -159,7 +162,7 @@ public final class Settings {
   /** Collector FastQC contaminant file */
   public static final String QC_CONF_FASTQC_CONTAMINANT_FILE_KEY =
       "qc.conf.fastqc.contaminant.file";
-  /** Collector FastQC kmer size*/
+  /** Collector FastQC kmer size */
   public static final String QC_CONF_FASTQC_KMER_SIZE_KEY =
       "qc.conf.fastqc.kmer.size";
   /** Collector FastQC nogroup */
