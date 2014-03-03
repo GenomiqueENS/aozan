@@ -2,8 +2,42 @@
 
 import os, stat, time
 import common, hiseq_run
-from fr.ens.transcriptome.aozan import Settings
 
+from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import BCL_DATA_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import HISEQ_DATA_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import SYNC_STEP_KEY
+from fr.ens.transcriptome.aozan.Settings import SYNC_SPACE_FACTOR_KEY
+from fr.ens.transcriptome.aozan.Settings import SYNC_EXCLUDE_CIF_KEY
+from fr.ens.transcriptome.aozan.Settings import SYNC_CONTINUOUS_SYNC_MIN_AGE_FILES_KEY
+from fr.ens.transcriptome.aozan.Settings import TMP_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import REPORTS_URL_KEY
+
+def is_sync_step_enable(conf):
+    """Check if all parameters useful for synchronization step are defined
+
+    Arguments:
+        conf: configuration dictionary        
+    """
+    
+    # Synchronization step: True
+    if common.is_conf_value_equals_true(SYNC_STEP_KEY, conf):
+        
+        # Check bcl path must be defined
+        if common.is_conf_key_exists(BCL_DATA_PATH_KEY, conf):
+            bcl_path = conf[BCL_DATA_PATH_KEY]
+             
+            # Check bcl not same hiseq output path
+            for path in hiseq_run.get_hiseq_data_paths(conf):
+                if path == bcl_path:
+                    error('error configuration.' , 
+                          'Basecalling path and hiseq output data path are the same: ' + bcl_path ,conf) 
+                    return False
+                
+            return True
+        
+    return False
 
 def load_processed_run_ids(conf):
     """Load the list of the processed run ids.
@@ -12,7 +46,7 @@ def load_processed_run_ids(conf):
         conf: configuration dictionary
     """
 
-    return common.load_processed_run_ids(conf[Settings.AOZAN_VAR_PATH_KEY] + '/sync.done')
+    return common.load_processed_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/sync.done')
 
 def add_run_id_to_processed_run_ids(run_id, conf):
     """Add a processed run id to the list of the run ids.
@@ -22,7 +56,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-    common.add_run_id_to_processed_run_ids(run_id, conf[Settings.AOZAN_VAR_PATH_KEY] + '/sync.done', conf)
+    common.add_run_id_to_processed_run_ids(run_id, conf[AOZAN_VAR_PATH_KEY] + '/sync.done', conf)
 
 
 def error(short_message, message, conf):
@@ -34,7 +68,7 @@ def error(short_message, message, conf):
         conf: configuration dictionary
     """
 
-    common.error('[Aozan] synchronizer: ' + short_message, message, conf[Settings.AOZAN_VAR_PATH_KEY] + '/sync.lasterr', conf)
+    common.error('[Aozan] synchronizer: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/sync.lasterr', conf)
 
 
 def partial_sync(run_id, last_sync, conf):
@@ -46,12 +80,12 @@ def partial_sync(run_id, last_sync, conf):
     """
 
     hiseq_data_path = hiseq_run.find_hiseq_run_path(run_id, conf)
-    bcl_data_path = conf[Settings.BCL_DATA_PATH_KEY]
+    bcl_data_path = conf[BCL_DATA_PATH_KEY]
     final_output_path = bcl_data_path + '/' + run_id
 
     # Check if hiseq_data_path exists
     if hiseq_data_path == False:
-        error('HiSeq run data not found', 'HiSeq data for run ' + run_id + 'not found in HiSeq directories (' + conf[Settings.HISEQ_DATA_PATH_KEY] + ')', conf)
+        error('HiSeq run data not found', 'HiSeq data for run ' + run_id + 'not found in HiSeq directories (' + conf[HISEQ_DATA_PATH_KEY] + ')', conf)
         return False
 
     # Check if hiseq_data_path exists
@@ -79,7 +113,7 @@ def partial_sync(run_id, last_sync, conf):
     input_path_du = common.du(input_path)
     output_path_du = common.du(output_path)
     output_path_df = common.df(bcl_data_path)
-    du_factor = float(conf[Settings.SYNC_SPACE_FACTOR_KEY])
+    du_factor = float(conf[SYNC_SPACE_FACTOR_KEY])
     space_needed = input_path_du * du_factor - output_path_du
 
     common.log("WARNING", "Sync step: input disk usage: " + str(input_path_du), conf)
@@ -88,17 +122,17 @@ def partial_sync(run_id, last_sync, conf):
 
     # Check if free space is available on
     if output_path_df < space_needed:
-        error("Not enough disk space to perform synchronization for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id +
+        error("Not enough disk space to perform synchronization for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id + 
               '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + bcl_data_path + '.', conf)
         return False
 
     # exclude CIF files ?
-    if common.isTrue(Settings.SYNC_EXCLUDE_CIF_KEY, conf):
+    if common.is_conf_value_equals_true(SYNC_EXCLUDE_CIF_KEY, conf):
         exclude_files = ['*.cif', '*_pos.txt', '*.errorMap', '*.FWHMMap']
     else:
         exclude_files = []
 
-    rsync_manifest_path = conf[Settings.TMP_PATH_KEY] + '/' + run_id + '.rsync.manifest'
+    rsync_manifest_path = conf[TMP_PATH_KEY] + '/' + run_id + '.rsync.manifest'
     rsync_params = ''
 
     if last_sync:
@@ -107,7 +141,7 @@ def partial_sync(run_id, last_sync, conf):
     else:
         # Exclude files that will be rewritten severals times during the run
         exclude_files.extend(['*.bin', '*.txt', '*.xml'])
-        cmd = 'cd ' + input_path + ' && find . -type f -mmin +' + conf[Settings.SYNC_CONTINUOUS_SYNC_MIN_AGE_FILES_KEY]
+        cmd = 'cd ' + input_path + ' && find . -type f -mmin +' + conf[SYNC_CONTINUOUS_SYNC_MIN_AGE_FILES_KEY]
         for exclude_file in exclude_files:
             cmd += " -not -name '" + exclude_file + "' "
         cmd += ' > ' + rsync_manifest_path
@@ -141,9 +175,9 @@ def sync(run_id, conf):
     start_time = time.time()
     common.log('INFO', 'Sync step: start', conf)
 
-    bcl_data_path = conf[Settings.BCL_DATA_PATH_KEY]
-    reports_data_base_path = conf[Settings.REPORTS_DATA_PATH_KEY]
-    tmp_base_path = conf[Settings.TMP_PATH_KEY]
+    bcl_data_path = conf[BCL_DATA_PATH_KEY]
+    reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
+    tmp_base_path = conf[TMP_PATH_KEY]
 
     output_path = bcl_data_path + '/' + run_id
     reports_data_path = reports_data_base_path + '/' + run_id
@@ -174,7 +208,7 @@ def sync(run_id, conf):
 
     # Check if enough space to store reports
     if common.df(reports_data_base_path) < 10 * 1024 * 1024 * 1024:
-        error("Not enough disk space to store aozan reports for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
+        error("Not enough disk space to store aozan reports for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id + 
               '.\nNeed more than 10 Gb on ' + reports_data_base_path + '.', conf)
         return False
 
@@ -199,16 +233,25 @@ def sync(run_id, conf):
             error("error while removing existing temporary directory", 'Error while removing existing temporary directory.\nCommand line:\n' + cmd, conf)
             return False
     os.mkdir(tmp_path)
-    cmd = 'cd ' + bcl_data_path + '/' + run_id + ' && ' + \
-        'cp -rp InterOp RunInfo.xml runParameters.xml ' + tmp_path + ' && ' + \
-        'cd ' + tmp_base_path + ' && ' + \
-        'mv ' + run_id + ' ' + hiseq_log_prefix + run_id + ' && ' + \
-        'tar cjf ' + reports_data_path + '/' + hiseq_log_archive_file + ' ' + hiseq_log_prefix + run_id + ' && ' + \
-        'rm -rf ' + tmp_path + ' && rm -rf ' + hiseq_log_prefix + run_id
-    common.log("SEVERE", "exec: " + cmd, conf)
-    if os.system(cmd) != 0:
-        error("error while saving Illumina quality control for run " + run_id, 'Error saving Illumina quality control.\nCommand line:\n' + cmd, conf)
-        return False
+    
+    # Define set file to copy in report archive, check if exists (depend on parameters Illumina)
+    path_source = bcl_data_path + '/' + run_id
+    files = ['InterOp' , 'RunInfo.xml' , 'runParameters.xml']
+    files_to_copy = common.list_files_existing(path_source, files)
+    
+    if (files_to_copy == None):
+        common.log("WARNING", "Archive " + hiseq_log_archive_file + " not create: none file exists " + files + ' in ' + path_source, conf)
+    else:
+        cmd = 'cd ' + path_source + ' && ' + \
+            'cp -rp ' + files_to_copy + tmp_path + ' && ' + \
+            'cd ' + tmp_base_path + ' && ' + \
+            'mv ' + run_id + ' ' + hiseq_log_prefix + run_id + ' && ' + \
+            'tar cjf ' + reports_data_path + '/' + hiseq_log_archive_file + ' ' + hiseq_log_prefix + run_id + ' && ' + \
+            'rm -rf ' + tmp_path + ' && rm -rf ' + hiseq_log_prefix + run_id
+        common.log("SEVERE", "exec: " + cmd, conf)
+        if os.system(cmd) != 0:
+            error("error while saving Illumina quality control for run " + run_id, 'Error saving Illumina quality control.\nCommand line:\n' + cmd, conf)
+            return False
 
     # Save html reports
     if os.path.exists(tmp_path):
@@ -218,18 +261,26 @@ def sync(run_id, conf):
             error("error while removing existing temporary directory", 'Error while removing existing temporary directory.\nCommand line:\n' + cmd, conf)
             return False
     os.mkdir(tmp_path)
-    cmd = 'cd ' + output_path + '/Data' + ' && ' + \
-        'cp -rp Status_Files reports Status.htm ../First_Base_Report.htm ' + tmp_path + ' && ' + \
-        'cd ' + tmp_base_path + ' && ' + \
-        'mv ' + run_id + ' ' + report_prefix + run_id + ' && ' + \
-        'tar cjf ' + reports_data_path + '/' + report_archive_file + ' ' + report_prefix + run_id + ' && ' + \
-        'mv ' + report_prefix + run_id + ' ' + reports_data_path
-        # 'cd ' + base_dir_path + ' && ' + \
-        # 'cp -p ../First_Base_Report.htm ' + reports_data_path + '/' + run_id + '/ && ' + \
-    common.log("SEVERE", "exec: " + cmd, conf)
-    if os.system(cmd) != 0:
-        error("error while saving Illumina html reports for run " + run_id, 'Error saving Illumina html reports.\nCommand line:\n' + cmd, conf)
-        return False
+    
+    # Define set file to copy in report archive, check if exists (depend on parameters Illumina)
+    path_source = output_path + '/Data'
+    files = ['Status_Files', 'reports', 'Status.htm', '../First_Base_Report.htm' ]
+    files_to_copy = common.list_files_existing(path_source, files)
+    if (files_to_copy == None):
+        common.log("WARNING", "Archive " + report_archive_file + " not create: none file exists " + files + ' in ' + path_source, conf)
+    else: 
+        cmd = 'cd ' + path_source + ' && ' + \
+            'cp -rp ' + files_to_copy + tmp_path + ' && ' + \
+            'cd ' + tmp_base_path + ' && ' + \
+            'mv ' + run_id + ' ' + report_prefix + run_id + ' && ' + \
+            'tar cjf ' + reports_data_path + '/' + report_archive_file + ' ' + report_prefix + run_id + ' && ' + \
+            'mv ' + report_prefix + run_id + ' ' + reports_data_path
+            # 'cd ' + base_dir_path + ' && ' + \
+            # 'cp -p ../First_Base_Report.htm ' + reports_data_path + '/' + run_id + '/ && ' + \
+        common.log("SEVERE", "exec: " + cmd, conf)
+        if os.system(cmd) != 0:
+            error("error while saving Illumina html reports for run " + run_id, 'Error saving Illumina html reports.\nCommand line:\n' + cmd, conf)
+            return False
 
     # Create index.hml file
     common.create_html_index_file(conf, reports_data_path + '/index.html', run_id, ['sync'])
@@ -255,8 +306,8 @@ def sync(run_id, conf):
         'Run output files (without .cif files) can be found in the following directory:\n  ' + output_path
 
     # Add path to report if reports.url exists
-    if common.isExists(Settings.REPORTS_URL_KEY, conf):
-        msg += '\n\nRun reports can be found at following location:\n  ' + conf[Settings.REPORTS_URL_KEY] + '/' + run_id
+    if common.is_conf_key_exists(REPORTS_URL_KEY, conf):
+        msg += '\n\nRun reports can be found at following location:\n  ' + conf[REPORTS_URL_KEY] + '/' + run_id
 
     msg += '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df)
 

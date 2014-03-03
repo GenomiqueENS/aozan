@@ -6,6 +6,7 @@ Created on 25 oct. 2011
 @author: Laurent Jourdren
 '''
 
+import hiseq_run, sync_run
 import smtplib, os.path, time
 import mimetypes
 
@@ -24,6 +25,24 @@ from fr.ens.transcriptome.aozan import Globals
 from fr.ens.transcriptome.aozan import Settings
 from fr.ens.transcriptome.aozan.util import FileUtils
 
+from fr.ens.transcriptome.aozan.Settings import SEND_MAIL_KEY
+from fr.ens.transcriptome.aozan.Settings import SMTP_SERVER_KEY
+from fr.ens.transcriptome.aozan.Settings import MAIL_ERROR_TO_KEY
+from fr.ens.transcriptome.aozan.Settings import MAIL_FOOTER_KEY
+from fr.ens.transcriptome.aozan.Settings import MAIL_FROM_KEY
+from fr.ens.transcriptome.aozan.Settings import MAIL_HEADER_KEY
+from fr.ens.transcriptome.aozan.Settings import MAIL_TO_KEY
+from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import INDEX_HTML_TEMPLATE_KEY
+from fr.ens.transcriptome.aozan.Settings import DEMUX_USE_HISEQ_OUTPUT_KEY
+from fr.ens.transcriptome.aozan.Settings import BCL_DATA_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import AOZAN_LOG_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import SYNC_STEP_KEY
+from fr.ens.transcriptome.aozan.Settings import FASTQ_DATA_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import TMP_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import CASAVA_SAMPLESHEETS_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import CASAVA_PATH_KEY
 
 
 def df(path):
@@ -53,37 +72,37 @@ def du(path):
 
     return long(lines[0].split('\t')[0])
 
-def isTrue(settings_key, conf):
+def is_conf_value_equals_true(settings_key, conf):
     """Check a property exists in configuration object and value equals 'true'
     
     Arguments:
         settings_key: key in configuration for the property
-        conf: configuration dictionnary
+        conf: configuration dictionary
         return boolean
     """
-    return isDefine(settings_key, 'true', conf)
+    return is_conf_value_defined(settings_key, 'true', conf)
 
-def isExists(settings_key, conf):
+def is_conf_key_exists(settings_key, conf):
     """Check a property exists in configuration object 
     
     Arguments:
         settings_key: key in configuration for the property
-        conf: configuration dictionnary
+        conf: configuration dictionary
         return boolean
     """
 
-    return isDefine(settings_key, None, conf)
+    return is_conf_value_defined(settings_key, None, conf)
 
-def isPathExists(settings_key, conf):
+def is_path_exists(settings_key, conf):
     """Check a path corresponding to a property in configuration exists
     
     Arguments:
         settings_key: key in configuration for the property
-        conf: configuration dictionnary
+        conf: configuration dictionary
         return boolean
     """
     
-    exist = isExist(settings_key, conf)
+    exist = is_conf_key_exists(settings_key, conf)
     
     if not exist:
         return False
@@ -92,13 +111,13 @@ def isPathExists(settings_key, conf):
     return os.path.exists(path)
 
     
-def isDefine(settings_key, value, conf):
+def is_conf_value_defined(settings_key, value, conf):
     """Check a property exists in configuration object with a specific value (if it's different None or empty
     
     Arguments:
         settings_key: key in configuration for the property
         value: value of property wanted
-        conf: configuration dictionnary
+        conf: configuration dictionary
         return boolean
     """
     
@@ -106,12 +125,61 @@ def isDefine(settings_key, value, conf):
     
     # Check if property exists
     if (value == None):
-        return exit
+        return exist
     
     # Check if property equals a specific value
     value = value.lower().strip()
     return exist and conf[settings_key].lower().strip() == value
 
+def list_files_existing(path, files_array):
+    """Return string with existing files from array  
+    
+    Arguments:
+        path: path to directory
+        files_array: all files to check
+        conf: configuration dictionary
+    """
+    s = ''
+    for filename in files_array:
+        if (os.path.exists(path + '/' + filename)):
+            s = filename + ' ' + s
+    
+    if (s == ''):
+        return None
+    
+    return s + ' '
+
+def get_input_run_data_path(run_id, conf):
+    """Return the path to input run data according to hiseq and synchronization step parameters  
+    
+    Arguments:
+        run_id: run id
+        conf: configuration dictionary
+    """
+    
+    path = None
+    last_err_path = conf[AOZAN_VAR_PATH_KEY] + '/aozan.lasterr'
+    
+    # Case: input run data in bcl path
+    if sync_run.is_sync_step_enable(conf):
+        path = conf[BCL_DATA_PATH_KEY]
+    
+    # Case without synchronization
+    # Set a bcl path
+    if is_conf_value_defined(SYNC_STEP_KEY, 'false', conf) and is_conf_value_defined(DEMUX_USE_HISEQ_OUTPUT_KEY,'false', conf):
+        path = conf[BCL_DATA_PATH_KEY]
+    
+    # Case without synchronization and use the hiseq outut path
+    # Check if must use the direct output of the HiSeq
+    if is_conf_value_defined(SYNC_STEP_KEY, 'false', conf) and is_conf_value_equals_true(DEMUX_USE_HISEQ_OUTPUT_KEY, conf):
+        # Retrieve the path of run data directory on HiSeq
+        path = hiseq_run.find_hiseq_run_path(run_id, conf)
+        
+    if path == None or not os.path.exists(path):
+        error("Run data directory does not exists", "Run data data directory does not exists: " + str(path), last_err_path, conf)
+        return None
+    
+    return path + '/' + run_id
 
 def send_msg(subject, message, is_error, conf):
     """Send a message to the user about the data extraction.
@@ -124,25 +192,25 @@ def send_msg(subject, message, is_error, conf):
     """
 
 
-    send_mail = isTrue(Settings.SEND_MAIL_KEY, conf)
-    smtp_server = conf[Settings.SMTP_SERVER_KEY]
+    send_mail = is_conf_value_equals_true(SEND_MAIL_KEY, conf)
+    smtp_server = conf[SMTP_SERVER_KEY]
 
     # Specific receiver for error message
     if is_error:
-        mail_to = conf[Settings.MAIL_ERROR_TO_KEY]
+        mail_to = conf[MAIL_ERROR_TO_KEY]
 
         # Mail error not define
         if mail_to == None or mail_to == '':
-            mail_to = conf[Settings.MAIL_TO_KEY]
+            mail_to = conf[MAIL_TO_KEY]
     else:
-        mail_to = conf[Settings.MAIL_TO_KEY]
+        mail_to = conf[MAIL_TO_KEY]
 
-    mail_from = conf[Settings.MAIL_FROM_KEY]
+    mail_from = conf[MAIL_FROM_KEY]
     mail_cc = None
     mail_bcc = None
     COMMASPACE = ', '
     
-    message = conf[Settings.MAIL_HEADER_KEY].replace('\\n', '\n') + message + conf[Settings.MAIL_FOOTER_KEY].replace('\\n', '\n')
+    message = conf[MAIL_HEADER_KEY].replace('\\n', '\n') + message + conf[MAIL_FOOTER_KEY].replace('\\n', '\n')
     message = message.replace('\n', '\r\n')
     msg = ''
 
@@ -183,15 +251,15 @@ def send_msg(subject, message, is_error, conf):
 def send_msg_with_attachment(subject, message, attachment_file, conf):
     """Send a message to the user about the data extraction."""
 
-    send_mail = isTrue(Settings.SEND_MAIL_KEY, conf)
-    smtp_server = conf[Settings.SMTP_SERVER_KEY]
-    mail_to = conf[Settings.MAIL_TO_KEY]
-    mail_from = conf[Settings.MAIL_FROM_KEY]
+    send_mail = is_conf_value_equals_true(SEND_MAIL_KEY, conf)
+    smtp_server = conf[SMTP_SERVER_KEY]
+    mail_to = conf[MAIL_TO_KEY]
+    mail_from = conf[MAIL_FROM_KEY]
     mail_cc = None
     mail_bcc = None
     COMMASPACE = ', '
 
-    message = conf[Settings.MAIL_HEADER_KEY].replace('\\n', '\n') + message + conf[Settings.MAIL_FOOTER_KEY].replace('\\n', '\n')
+    message = conf[MAIL_HEADER_KEY].replace('\\n', '\n') + message + conf[MAIL_FOOTER_KEY].replace('\\n', '\n')
 
     msg = MIMEMultipart()
 
@@ -282,7 +350,7 @@ def error(short_message, message, last_error_file_path, conf):
         conf: configuration dictionary
     """
 
-    new_error = short_message + message
+    new_error = short_message + ' ' + message
     new_error.replace('\n', ' ')
     log('SEVERE', new_error, conf)
 
@@ -380,6 +448,113 @@ def add_run_id_to_processed_run_ids(run_id, done_file_path, conf):
 
     f.close()
 
+def create_html_index_file(conf, output_file_path, run_id, sections):
+    """Create an index.html file that contains links to all the generated reports.
+
+    Arguments:
+        conf: configuration dictionary
+        output_file_path: path of the index.html file to create
+        run_id: The run id
+        sections: The list of section to write
+    """
+
+    """ Since version RTA after 1.17, Illumina stop the generation of the Status and reports files"""
+
+    path_report = conf[REPORTS_DATA_PATH_KEY] + '/' + run_id
+    
+    # Retrieve BufferedReader on index html template
+    template_path = conf[INDEX_HTML_TEMPLATE_KEY]
+    if template_path != None and template_path != '' and os.path.exists(template_path):
+        f_in = open(template_path, 'r')
+        text = ''.join(f_in.readlines())
+        lines = text.split('\n');
+        f_in.close()
+    
+    else:
+        # Use default template save in aozan jar file
+        jar_is = Globals.getResourceAsStream(Globals.INDEX_HTML_TEMPLATE_FILENAME)
+        lines = FileUtils.readFileByLines(jar_is)
+    
+    if 'sync' in sections and os.path.exists(path_report + '/report_' + run_id):
+        sections.append('optional')
+            
+    write_lines = True
+    result = ''
+
+    for line in lines:
+        if line.startswith('<!--START_SECTION'):
+            section_name = line.split(' ')[1]
+            if section_name in sections:
+                write_lines = True
+            else:
+                write_lines = False
+        elif line.startswith('<!--END_SECTION'):
+            write_lines = True
+        
+        elif write_lines == True:
+            if '${RUN_ID}' in line:
+                result += line.replace('${RUN_ID}', run_id) + '\n'
+            elif '${VERSION}' in line:
+                result += line.replace('${VERSION}', Globals.APP_VERSION_STRING) + '\n'
+            else:
+                result += line + '\n' 
+
+    f_out = open(output_file_path, 'w')
+    f_out.write(result)
+    f_out.close()
+
+def check_conf_path(conf):
+    """ Check if path useful exists
+    
+    Arguments:
+        conf: configuration dictionary
+    """
+    
+    no_error = True
+    last_err_path = conf[AOZAN_VAR_PATH_KEY] + '/aozan.lasterr'
+    msg = ''
+    
+    # Check if hiseq_data_path exists
+    for hiseq_output_path in hiseq_run.get_hiseq_data_paths(conf):
+        if not os.path.exists(hiseq_output_path):
+            msg = "HiSeq directory does not exists: " + hiseq_output_path + '\n\t' + msg
+            no_error = False
+
+    # Check if bcl_data_path exists
+    if is_conf_value_equals_true(SYNC_STEP_KEY, conf):
+        if not is_path_exists(BCL_DATA_PATH_KEY, conf):
+            msg = "Basecalling directory does not exists: " + conf[BCL_DATA_PATH_KEY] + '\n\t' + msg
+            no_error = False
+    
+    # 
+    if not is_path_exists(AOZAN_LOG_PATH_KEY, conf):
+        msg = "aozan log path doesn't exists : " + conf[AOZAN_LOG_PATH_KEY] + '\n\t' + msg
+        no_error = False
+    
+    # Check if casava designs path exists
+    if not is_path_exists(CASAVA_SAMPLESHEETS_PATH_KEY, conf):
+        msg = "Casava sample sheets does not exists: " + conf[CASAVA_SAMPLESHEETS_PATH_KEY] + '\n\t' + msg
+        no_error = False
+    
+    # Check if root input fastq data directory exists
+    if not is_path_exists(FASTQ_DATA_PATH_KEY, conf):
+        msg = "Fastq data directory does not exists: " + conf[FASTQ_DATA_PATH_KEY] + '\n\t' + msg
+        no_error = False
+    
+    # Check if casava designs path exists
+    if not is_path_exists(CASAVA_PATH_KEY, conf):
+        msg = "Casava/bcl2fastq path does not exists: " + conf[CASAVA_PATH_KEY] + '\n\t' + msg
+        no_error = False
+    
+    # Check if temporary directory exists
+    if not is_path_exists(TMP_PATH_KEY, conf):
+        msg = "Temporary directory does not exists: " + conf[TMP_PATH_KEY] + '\n\t' + msg
+        no_error = False
+    
+    if not no_error:
+        error("Check configuration Aozan: ", '\n\t' + msg, last_err_path, conf)
+    
+    return no_error
 
 def load_conf(conf, conf_file_path):
     """Load configuration file"""
@@ -424,60 +599,6 @@ def load_conf(conf, conf_file_path):
     f.close()
     return conf
 
-def create_html_index_file(conf, output_file_path, run_id, sections):
-    """Create an index.html file that contains links to all the generated reports.
-
-    Arguments:
-        conf: configuration dictionary
-        output_file_path: path of the index.html file to create
-        run_id: The run id
-        sections: The list of section to write
-    """
-
-    """ Since version RTA after 1.17, Illumina stop the generation of the Status and reports files"""
-
-    path_report = conf[Settings.REPORTS_DATA_PATH_KEY] + '/' + run_id
-    
-    # Retrieve BufferedReader on index html template
-    template_path = conf[Settings.INDEX_HTML_TEMPLATE_KEY]
-    if template_path != None and template_path != '' and os.path.exists(template_path):
-        f_in = open(template_path, 'r')
-        text = ''.join(f_in.readlines())
-        lines = text.split('\n');
-        f_in.close()
-    
-    else:
-        # Use default template save in aozan jar file
-        jar_is = Globals.getResourceAsStream(Globals.INDEX_HTML_TEMPLATE_FILENAME)
-        lines = FileUtils.readFileByLines(jar_is)
-    
-    if 'sync' in sections and os.path.exists(path_report + '/report_' + run_id):
-        sections.append('optional')
-            
-    write_lines = True
-    result = ''
-
-    for line in lines:
-        if line.startswith('<!--START_SECTION'):
-            section_name = line.split(' ')[1]
-            if section_name in sections:
-                write_lines = True
-            else:
-                write_lines = False
-        elif line.startswith('<!--END_SECTION'):
-            write_lines = True
-        
-        elif write_lines == True:
-            if '${RUN_ID}' in line:
-                result += line.replace('${RUN_ID}', run_id) + '\n'
-            elif '${VERSION}' in line:
-                result += line.replace('${VERSION}', Globals.APP_VERSION_STRING) + '\n'
-            else:
-                result += line + '\n' 
-
-    f_out = open(output_file_path, 'w')
-    f_out.write(result)
-    f_out.close()
 
 
 def set_default_conf(conf):

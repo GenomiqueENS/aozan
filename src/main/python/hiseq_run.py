@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import os, time
-from xml.etree.ElementTree import ElementTree
 import common
-from fr.ens.transcriptome.aozan import Settings
+from xml.etree.ElementTree import ElementTree
 
+from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import HISEQ_CRITICAL_MIN_SPACE_KEY
+from fr.ens.transcriptome.aozan.Settings import HISEQ_DATA_PATH_KEY
 
 def load_processed_run_ids(conf):
 	"""Load the list of the processed run ids.
@@ -13,7 +15,7 @@ def load_processed_run_ids(conf):
         conf: configuration dictionary
     """
 
-	return common.load_processed_run_ids(conf[Settings.AOZAN_VAR_PATH_KEY] + '/hiseq.done')
+	return common.load_processed_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/hiseq.done')
 
 def load_deny_run_ids(conf):
 	"""Load the list of the run ids to not process.
@@ -22,7 +24,7 @@ def load_deny_run_ids(conf):
         conf: configuration dictionary
     """
 
-	return common.load_processed_run_ids(conf[Settings.AOZAN_VAR_PATH_KEY] + '/hiseq.deny')
+	return common.load_processed_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/hiseq.deny')
 
 def add_run_id_to_processed_run_ids(run_id, conf):
 	"""Add a processed run id to the list of the run ids.
@@ -32,7 +34,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-	common.add_run_id_to_processed_run_ids(run_id, conf[Settings.AOZAN_VAR_PATH_KEY] + '/hiseq.done', conf)
+	common.add_run_id_to_processed_run_ids(run_id, conf[AOZAN_VAR_PATH_KEY] + '/hiseq.done', conf)
 
 
 
@@ -220,7 +222,7 @@ def send_mail_if_critical_free_space_available(conf):
 
 		if os.path.exists(path):
 			df = common.df(path)
-			free_space_threshold = long(conf[Settings.HISEQ_CRITICAL_MIN_SPACE_KEY])
+			free_space_threshold = long(conf[HISEQ_CRITICAL_MIN_SPACE_KEY])
 			if df < free_space_threshold:
 				common.send_msg('[Aozan] Critical: Not enough disk space on Hiseq storage for current run',
 							'There is only %.2f' % (df / (1024 * 1024 * 1024)) + ' Gb left for Hiseq run storage in ' + path + '. '
@@ -245,7 +247,7 @@ def send_mail_if_recent_run(run_id, secs, conf):
 
 def get_hiseq_data_paths(conf):
 
-	paths = conf[Settings.HISEQ_DATA_PATH_KEY].split(':')
+	paths = conf[HISEQ_DATA_PATH_KEY].split(':')
 	for i in range(len(paths)):
 		paths[i] = paths[i].strip()
 
