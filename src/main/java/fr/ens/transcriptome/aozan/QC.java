@@ -397,6 +397,12 @@ public class QC {
     for (SampleTest lt : this.sampleTests)
       testsList.add(lt);
 
+    // Test if number test enable in configuration empty
+    if (testsList.isEmpty()) {
+      throw new AozanException(
+          "None test enabled, it must at least one test selected to launch collectors of the qc step.");
+    }
+
     // Get the necessary collectors
     for (final AozanTest test : testsList)
       addCollectors(test.getCollectorsNamesRequiered(), collectors);
