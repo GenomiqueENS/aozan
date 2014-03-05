@@ -175,14 +175,14 @@ def demux(run_id, conf):
         error("Report directory does not exists", "Report directory does not exists: " + reports_data_base_path, conf)
         return False
 
+    # Create if not exists report directory for the run
+    if not os.path.exists(reports_data_path):
+        os.mkdir(reports_data_path)
+
     # Check if basecall stats archive exists
     if os.path.exists(reports_data_path + '/' + basecall_stats_file):
         error('Basecall stats archive already exists for run ' + run_id, 'Basecall stats archive already exists for run ' + run_id + ': ' + basecall_stats_file, conf)
         return False
-
-    # Create if not exists archive directory for the run
-    if not os.path.exists(reports_data_base_path + '/' + run_id):
-        os.mkdir(reports_data_base_path + '/' + run_id)
 
     # Check if the output directory already exists
     if os.path.exists(fastq_output_dir):

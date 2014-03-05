@@ -97,10 +97,9 @@ def qc(run_id, conf):
         error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf[FASTQ_DATA_PATH_KEY], conf)
         return False
 
-    # Check if reports path directory exists
+    # Create if not exists report directory for the run
     if not os.path.exists(reports_data_path):
-        error("Report directory does not exists", "Report directory does not exists: " + reports_data_path, conf)
-        return False
+        os.mkdir(reports_data_path)
 
     # Check if temporary directory exists
     if not common.is_path_exists(TMP_PATH_KEY, conf):
