@@ -47,6 +47,8 @@ def get_reads_number(run_id, conf):
 	"""
 
 	hiseq_data_path = find_hiseq_run_path(run_id, conf)
+	if hiseq_data_path == False:
+		return -1
 
 	run_parameters_path = hiseq_data_path + '/' + run_id + "/runParameters.xml"
 

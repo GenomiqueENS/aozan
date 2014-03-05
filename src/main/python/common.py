@@ -111,25 +111,39 @@ def is_path_exists(settings_key, conf):
     return os.path.exists(path)
 
     
-def is_conf_value_defined(settings_key, value, conf):
-    """Check a property exists in configuration object with a specific value (if it's different None or empty
+def is_conf_value_defined(settings_key, expected_value, conf):
+    """Check a property exists in configuration object with a specific expected_value (if it's different None or empty
     
     Arguments:
         settings_key: key in configuration for the property
-        value: value of property wanted
+        expected_value: expected_value of property wanted
         conf: configuration dictionary
         return boolean
     """
     
-    exist = not (conf[settings_key] == None or conf[settings_key].strip() == '')
+    # Get value
+    value = conf[settings_key]
     
-    # Check if property exists
-    if (value == None):
-        return exist
-    
-    # Check if property equals a specific value
+    # Test if value is defined
+    if value == None:
+        return False
+        
+    # Trim value
     value = value.lower().strip()
-    return exist and conf[settings_key].lower().strip() == value
+    
+    # Test if value is empty
+    if len(value) == 0:
+        return False
+    
+    # Test if value must be compared to expected_value
+    if (expected_value == None):
+        return True
+    
+    # Trim and lower expected value
+    expected_value = expected_value.lower().strip()
+    
+    return value == expected_value
+
 
 def list_files_existing(path, files_array):
     """Return string with existing files from array  
@@ -166,7 +180,7 @@ def get_input_run_data_path(run_id, conf):
     
     # Case without synchronization
     # Set a bcl path
-    if is_conf_value_defined(SYNC_STEP_KEY, 'false', conf) and is_conf_value_defined(DEMUX_USE_HISEQ_OUTPUT_KEY,'false', conf):
+    if is_conf_value_defined(SYNC_STEP_KEY, 'false', conf) and is_conf_value_defined(DEMUX_USE_HISEQ_OUTPUT_KEY, 'false', conf):
         path = conf[BCL_DATA_PATH_KEY]
     
     # Case without synchronization and use the hiseq outut path
@@ -174,9 +188,9 @@ def get_input_run_data_path(run_id, conf):
     if is_conf_value_defined(SYNC_STEP_KEY, 'false', conf) and is_conf_value_equals_true(DEMUX_USE_HISEQ_OUTPUT_KEY, conf):
         # Retrieve the path of run data directory on HiSeq
         path = hiseq_run.find_hiseq_run_path(run_id, conf)
-        
-    if path == None or not os.path.exists(path):
-        error("Run data directory does not exists", "Run data data directory does not exists: " + str(path), last_err_path, conf)
+    
+    if path == None or path == False or not os.path.exists(path):
+        error("Run data directory does not exists.", "Run data data directory does not exists: " + str(path), last_err_path, conf)
         return None
     
     return path + '/' + run_id
