@@ -363,9 +363,9 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
    <tr><td>aozan.var.path (*)</td><td>/var/lib/aozan</td><td>Aozan internal data directory. It contains
      log files and history of processed runs</td></tr>
    <tr><td>aozan.log.path</td><td>/var/log/aozan</td><td>Path to the Aozan log files</td></tr>
-   <tr><td>hiseq.data.path</td><td>/mnt/hiseq01_f,/mnt/hiseq01_g</td><td>Hiseq output directories.
+   <tr><td>hiseq.data.path</td><td>/mnt/hiseq01_f:/mnt/hiseq01_g</td><td>Hiseq output directories.
      Multplie values are allowed if there is several HiSeq or 2 output directories for each flow cell of
-     an HiSeq 2000</td></tr>
+     an HiSeq 2000 (paths separated by ':')</td></tr>
    <tr><td>bcl.data.path</td><td>/mnt/storage/bcl</td><td>Hiseq output data after synchronization. Usualy cif files
      are not copied in this directory</td></tr>
    <tr><td>fastq.data.path</td><td>/mnt/storage/fastq</td><td>Directory for the output of
