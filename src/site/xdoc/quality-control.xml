@@ -53,6 +53,7 @@
 
        <table>
          <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+         <tr><td>qc.step</td><td>boolean</td><td>True</td><td>Enable the step. <b>If True, at least one test (lane or sample) must be at 'True', otherwise none data collected for the report.</b></td></tr>
          <tr><td>qc.report.save.raw.data</td><td>boolean</td><td>False</td><td>Save raw data generated for the tests</td></tr>
          <tr><td>qc.report.save.report.data</td><td>boolean</td><td>False</td><td>Save report data in XML format (before applying the stylesheet)</td></tr>
          <tr><td>qc.report.stylesheet</td><td>string</td><td>Not set</td><td>Path to the stylesheet to use </td></tr>

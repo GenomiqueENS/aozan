@@ -78,7 +78,8 @@ public class FastqscreenDemo {
   public static final String GENOMES_PATH = RESOURCE_ROOT + "/genomes";
 
   public static final String AOZAN_CONF =
-      "/home/sperrin/home-net/aozan_validation-1.2.1.conf";
+  // "/home/sperrin/home-net/aozan_validation-1.2.1.conf";
+      "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_without_test.conf";
   // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_test.conf";
   // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_partiel_fastqc.conf";
   // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_without_fastqc.conf";
@@ -87,7 +88,7 @@ public class FastqscreenDemo {
   private static final boolean paired = false;
 
   private static String runId;
-//  private static String date;
+  // private static String date;
   private static String qcDir;
 
   public static final void main(String[] args) {
@@ -112,10 +113,10 @@ public class FastqscreenDemo {
         // runId = "130709_SNL110_0075_AD2C79ACXX";
         // runId = "130715_SNL110_0076_AD2C4UACXX";
         // RUN rapid
-        // runId = "130722_SNL110_0077_AH0NT2ADXX";
+        runId = "130722_SNL110_0077_AH0NT2ADXX";
         // runId = "130904_SNL110_0082_AC2BR0ACXX";
         // runId = "130910_SNL110_0083_AC2AMKACXX";
-        runId = "130926_SNL110_0085_AH0EYHADXX";
+        // runId = "130926_SNL110_0085_AH0EYHADXX";
       }
 
       // date = new SimpleDateFormat("yyMMdd").format(new Date());
@@ -241,7 +242,6 @@ public class FastqscreenDemo {
     // conf.put("qc.conf.read.xml.collector.used", "false");
     conf.put(Settings.QC_CONF_CLUSTER_DENSITY_RATIO_KEY, "0.3472222");
     conf.put(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY, "phix");
-    conf.put(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY, "True");
 
     System.out
         .println("genomes : "
