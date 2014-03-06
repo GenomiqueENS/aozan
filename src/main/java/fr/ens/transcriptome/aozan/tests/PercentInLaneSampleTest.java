@@ -31,6 +31,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.FlowcellDemuxSummaryCollector;
 
 /**
@@ -46,7 +47,8 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(FlowcellDemuxSummaryCollector.COLLECTOR_NAME);
+    return ImmutableList.of(FlowcellDemuxSummaryCollector.COLLECTOR_NAME,
+        DesignCollector.COLLECTOR_NAME);
   }
 
   @Override

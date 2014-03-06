@@ -33,6 +33,7 @@ import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.PhasingCollector;
 import fr.ens.transcriptome.aozan.util.DoubleInterval;
 import fr.ens.transcriptome.aozan.util.Interval;
@@ -90,7 +91,8 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(PhasingCollector.COLLECTOR_NAME);
+    return ImmutableList.of(PhasingCollector.COLLECTOR_NAME,
+        DesignCollector.COLLECTOR_NAME);
   }
 
   //
