@@ -65,7 +65,20 @@
     </developer>
   </developers>
 
-  <contributors/>
+  <contributors>	
+    <contributor>
+	  <name>Darren Hart</name>
+	  <email />
+	  <url />
+      <organization>Department of Biochemistry in University of Otago </organization>
+	  <organizationUrl>http://biochem.otago.ac.nz</organizationUrl>
+	  <roles>
+		<role>Testing</role>
+	  </roles>
+	  <timezone>1</timezone>
+	  <properties />
+    </contributor>
+  </contributors>
 
   <licenses>
     <license>
