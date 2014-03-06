@@ -32,17 +32,18 @@ from fr.ens.transcriptome.aozan.Settings import MAIL_FOOTER_KEY
 from fr.ens.transcriptome.aozan.Settings import MAIL_FROM_KEY
 from fr.ens.transcriptome.aozan.Settings import MAIL_HEADER_KEY
 from fr.ens.transcriptome.aozan.Settings import MAIL_TO_KEY
-from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import SYNC_STEP_KEY
 from fr.ens.transcriptome.aozan.Settings import INDEX_HTML_TEMPLATE_KEY
 from fr.ens.transcriptome.aozan.Settings import DEMUX_USE_HISEQ_OUTPUT_KEY
+from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import BCL_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import AOZAN_LOG_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import SYNC_STEP_KEY
 from fr.ens.transcriptome.aozan.Settings import FASTQ_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import TMP_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import CASAVA_SAMPLESHEETS_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import CASAVA_SAMPLESHEETS_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import CASAVA_COMPRESSION_KEY
 
 
 def df(path):
@@ -172,7 +173,6 @@ def get_input_run_data_path(run_id, conf):
     """
     
     path = None
-    last_err_path = conf[AOZAN_VAR_PATH_KEY] + '/aozan.lasterr'
     
     # Case: input run data in bcl path
     if sync_run.is_sync_step_enable(conf):
@@ -190,7 +190,7 @@ def get_input_run_data_path(run_id, conf):
         path = hiseq_run.find_hiseq_run_path(run_id, conf)
     
     if path == None or path == False or not os.path.exists(path):
-        error("Run data directory does not exists.", "Run data data directory does not exists: " + str(path), last_err_path, conf)
+        error("Run data directory does not exists.", "Run data data directory does not exists: " + str(path), get_last_error_file(conf), conf)
         return None
     
     return path + '/' + run_id
@@ -354,6 +354,13 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
         print composed
         print '-------------'
 
+def get_last_error_file(conf):
+    """Return path to the file which saves last error throws in common operation.
+
+    Arguments:
+        conf: configuration dictionary
+    """
+    return conf[AOZAN_VAR_PATH_KEY] + '/aozan.lasterr'
 
 def error(short_message, message, last_error_file_path, conf):
     """Error handling.
@@ -525,7 +532,6 @@ def check_conf_path(conf):
     """
     
     no_error = True
-    last_err_path = conf[AOZAN_VAR_PATH_KEY] + '/aozan.lasterr'
     msg = ''
     
     # Check if hiseq_data_path exists
@@ -566,10 +572,47 @@ def check_conf_path(conf):
         no_error = False
     
     if not no_error:
-        error("Check configuration Aozan: ", '\n\t' + msg, last_err_path, conf)
+        error("Check configuration Aozan: ", '\n\t' + msg, get_last_error_file(conf), conf)
     
+    # Demultiplexing step: 
+    # Check compression type: three values None, gzip (default) bzip2
+    no_error = no_error and check_compression_type_fastq(conf)
+                
     return no_error
 
+def check_compression_type_fastq(conf):
+    """ Check compression format fastq for bcl2fastq
+        Three possible : None, gzip, bzip2, other exist aozan
+        
+    Arguments:
+        conf: configuration dictionary
+    """
+    # Demultiplexing step: 
+    # Check compression type: three values None, gzip (default) bzip2
+    if not is_conf_key_exists(CASAVA_COMPRESSION_KEY, conf):
+        compression = 'none'
+    
+    else:    
+        compression = conf[CASAVA_COMPRESSION_KEY].lower().strip()
+    
+        if compression == 'none':
+            # No compression
+            compression = 'none'
+        
+        elif compression == 'gz':
+        # Convert in gzip if equals gz 
+            compression = 'gzip'
+    
+        # Invalid value, use default compression type
+        elif not (compression == 'gzip' or compression == 'bzip2'):
+            error('Check configuration Aozan: ',  'Demux step bcl2fastq compression type  invalid: ' + compression + '.', get_last_error_file(conf), conf)
+            return False
+        
+    # Redefine in configuration dictionnary
+    conf[CASAVA_COMPRESSION_KEY] = compression
+    
+    return True
+    
 def load_conf(conf, conf_file_path):
     """Load configuration file"""
 
@@ -640,7 +683,7 @@ def set_default_conf(conf):
     conf[Settings.CASAVA_SAMPLESHEET_FORMAT_KEY] = 'xls'
     conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] = 'design'
     conf[Settings.CASAVA_PATH_KEY] = '/usr/local/casava'
-    conf[Settings.CASAVA_COMPRESSION_KEY] = 'bzip2'
+    conf[Settings.CASAVA_COMPRESSION_KEY] = 'gzip'
     conf[Settings.CASAVA_FASTQ_CLUSTER_COUNT_KEY] = '0'
     conf[Settings.CASAVA_COMPRESSION_KEY] = '9'
     conf[Settings.CASAVA_MISMATCHES_KEY] = '0'
