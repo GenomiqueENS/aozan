@@ -269,6 +269,7 @@ def aozan_main():
     Common.initLogger(conf[AOZAN_LOG_PATH_KEY], conf[AOZAN_LOG_LEVEL_KEY])
 
     if not common.check_conf_path(conf):
+        common.log('SEVERE', 'Aozan can not be executed', conf)
         sys.exit(1)
         
     # Check critical free space available

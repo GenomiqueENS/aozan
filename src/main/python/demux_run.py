@@ -305,6 +305,10 @@ def demux(run_id, conf):
             msg += warn
         common.log("WARNING", "casava sample sheet warnings: " + msg, conf)
 
+    # Check format compression bcl2fastq
+    if not common.check_compression_type_fastq(conf):
+        return False
+
     # Create casava makefile
     cmd = conf[CASAVA_PATH_KEY] + '/bin/configureBclToFastq.pl ' + \
           '--fastq-cluster-count ' + conf[CASAVA_FASTQ_CLUSTER_COUNT_KEY] + ' ' + \
