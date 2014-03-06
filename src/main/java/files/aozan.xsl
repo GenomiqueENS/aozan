@@ -205,6 +205,7 @@ version="1.0">
     <li><b>Creation date: </b> <xsl:value-of select="/QCReport/ReportDate"/></li>
   </ul>
 
+  <xsl:if test="/QCReport[ReadsReport]">
   <a name="lane"/>
   <h2>Lanes Quality report</h2>
 
@@ -234,8 +235,10 @@ version="1.0">
 
    </table>
   </xsl:for-each>
+  </xsl:if>
 
-<a name="sample"/>
+  <xsl:if test="/QCReport[SamplesReport]">
+  <a name="sample"/>
   <h2>Samples Quality report</h2>
 
   <xsl:for-each select="/QCReport/SamplesReport/Reads/Read">
@@ -290,6 +293,7 @@ version="1.0">
     
    </table>
   </xsl:for-each>
+  </xsl:if>
   <p>&#xA0;</p>
 <!-- End div report -->
 </div>

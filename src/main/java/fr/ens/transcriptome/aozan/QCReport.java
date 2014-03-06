@@ -298,8 +298,11 @@ public class QCReport {
       XMLUtils.addTagValue(doc, root, "ReportDate",
           DATE_FORMAT.format(new Date()));
 
-      doLanesTests(root);
-      doSamplesTests(root);
+      if (!this.laneTests.isEmpty())
+        doLanesTests(root);
+
+      if (!this.sampleTests.isEmpty())
+        doSamplesTests(root);
 
     } catch (ParserConfigurationException e) {
       throw new AozanException(e);

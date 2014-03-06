@@ -42,6 +42,8 @@ import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.collectors.CollectorRegistry;
+import fr.ens.transcriptome.aozan.collectors.DesignCollector;
+import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.AozanTestRegistry;
 import fr.ens.transcriptome.aozan.tests.LaneTest;
@@ -402,6 +404,16 @@ public class QC {
       throw new AozanException(
           "None test enabled, it must at least one test selected to launch collectors of the qc step.");
     }
+
+    // Get necessary collector for the qc report for lane test
+    if (!this.laneTests.isEmpty())
+      addCollectors(Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME),
+          collectors);
+
+    // Get necessary collector for the qc report for sample test
+    if (!this.sampleTests.isEmpty())
+      addCollectors(Lists.newArrayList(DesignCollector.COLLECTOR_NAME),
+          collectors);
 
     // Get the necessary collectors
     for (final AozanTest test : testsList)
