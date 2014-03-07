@@ -128,6 +128,9 @@ def demux(run_id, conf):
 
     input_run_data_path = common.get_input_run_data_path(run_id, conf)
     
+    if input_run_data_path == None:
+        return False
+    
     run_number = hiseq_run.get_run_number(run_id)
     instrument_sn = hiseq_run.get_instrument_sn(run_id)
     flow_cell_id = hiseq_run.get_flow_cell(run_id)
@@ -186,7 +189,7 @@ def demux(run_id, conf):
 
     # Check if the output directory already exists
     if os.path.exists(fastq_output_dir):
-        error("fastq output directory already exists for run " + run_id,
+        error("Fastq output directory already exists for run " + run_id,
               'The fastq output directory already exists for run ' + run_id + ': ' + fastq_output_dir, conf)
         return False
 

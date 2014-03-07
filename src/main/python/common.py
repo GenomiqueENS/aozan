@@ -190,7 +190,7 @@ def get_input_run_data_path(run_id, conf):
         path = hiseq_run.find_hiseq_run_path(run_id, conf)
     
     if path == None or path == False or not os.path.exists(path):
-        error("Run data directory does not exists.", "Run data data directory does not exists: " + str(path), get_last_error_file(conf), conf)
+        error("Hiseq data directory does not exists.", "Hiseq data data directory does not exists.", get_last_error_file(conf), conf)
         return None
     
     return path + '/' + run_id

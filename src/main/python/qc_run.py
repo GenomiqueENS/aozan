@@ -80,7 +80,10 @@ def qc(run_id, conf):
     start_time = time.time()
 
     input_run_data_path = common.get_input_run_data_path(run_id, conf)
-
+    
+    if input_run_data_path == None:
+        return False
+    
     fastq_input_dir = conf[FASTQ_DATA_PATH_KEY] + '/' + run_id
     reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
     reports_data_path = reports_data_base_path + '/' + run_id
