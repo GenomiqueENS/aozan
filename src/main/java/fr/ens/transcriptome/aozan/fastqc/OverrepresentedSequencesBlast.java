@@ -110,8 +110,7 @@ public class OverrepresentedSequencesBlast {
   public void configure(final Properties properties) {
 
     if (this.configured)
-      throw new AozanRuntimeException(
-          "OverrepresentedSequencesBlast has been already configured");
+      return;
 
     this.stepEnabled =
         Boolean.parseBoolean(properties
