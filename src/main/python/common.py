@@ -44,7 +44,8 @@ from fr.ens.transcriptome.aozan.Settings import TMP_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_SAMPLESHEETS_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_COMPRESSION_KEY
-
+from fr.ens.transcriptome.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY
 
 def df(path):
     """Get the free space on a partition.
@@ -569,6 +570,11 @@ def check_conf_path(conf):
     # Check if temporary directory exists
     if not is_path_exists(TMP_PATH_KEY, conf):
         msg = "Temporary directory does not exists: " + conf[TMP_PATH_KEY] + '\n\t' + msg
+        no_error = False
+    
+    # Check path to blast if step enable
+    if is_conf_value_equals_true(QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY, conf) and not is_path_exists(QC_CONF_FASTQSCREEN_BLAST_PATH_KEY, conf):
+        msg = "Blast enable, blast path does not exists: "  + conf[QC_CONF_FASTQSCREEN_BLAST_PATH_KEY] + '\n\t' + msg
         no_error = False
     
     if not no_error:
