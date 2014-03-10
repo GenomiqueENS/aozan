@@ -158,6 +158,93 @@ public class FastqscreenDemo {
 
   }
 
+  /**
+   * Create qc report with only on aozan test at true. FastQCCollector must be
+   * modified, it is initialize by a register (singleton), the method to patch
+   * FastQC must be call once.
+   * @throws AozanException
+   */
+  public static void testBuildReportForEachAozanTest() throws AozanException {
+    final List<String> list = Lists.newArrayList();
+
+    list.add("qc.test.rawclusters.enable");
+    list.add("qc.test.pfclusters.enable");
+    list.add("qc.test.pfclusterspercent.enable");
+    list.add("qc.test.clusterdensity.enable");
+    list.add("qc.test.percentalign.enable");
+    list.add("qc.test.errorrate.enable");
+    list.add("qc.test.errorrate35cycle.enable");
+    list.add("qc.test.errorrate75cycle.enable");
+    list.add("qc.test.errorrate100cycle.enable");
+    list.add("qc.test.firstcycleintensity.enable");
+    list.add("qc.test.percentintensitycycle20.enable");
+    list.add("qc.test.phasingprephasing.enable");
+    list.add("qc.test.rawclusterssamples.enable");
+    list.add("qc.test.pfclusterssamples.enable");
+    list.add("qc.test.percentpfsample.enable");
+    list.add("qc.test.percentinlanesample.enable");
+    list.add("qc.test.percentq30.enable");
+    list.add("qc.test.meanqualityscorepf.enable");
+    list.add("qc.test.basicstats.enable");
+    list.add("qc.test.perbasequalityscores.enable");
+    list.add("qc.test.persequencequalityscores.enable");
+    list.add("qc.test.perbasesequencecontent.enable");
+    list.add("qc.test.perbasegccontent.enable");
+    list.add("qc.test.persequencegccontent.enable");
+    list.add("qc.test.ncontent.enable");
+    list.add("qc.test.sequencelengthdistribution.enable");
+    list.add("qc.test.duplicationlevel.enable");
+    list.add("qc.test.overrepresentedseqs.enable");
+    list.add("qc.test.kmercontent.enable");
+    list.add("qc.test.badtiles.enable");
+    list.add("qc.test.hitnolibraries.enable");
+    list.add("qc.test.fsqmapped.enable");
+    list.add("qc.test.linkreport.enable");
+
+    Map<String, String> conf = getMapAozanConf();
+    String previousTestName = "";
+    int comp = 0;
+    qcDir = SRC_RUN + "/qc_" + runId + "/" + runId;
+    String fastqDir = "/home/sperrin/shares-net/sequencages/fastq/" + runId;
+    // String bclDir, String fastqDir, String qcDir, File tmpDir
+    File dataRun =
+        new File(qcDir + "_qc_tmp/data-130722_SNL110_0077_AH0NT2ADXX.txt");
+
+    for (String testName : list) {
+      // Replace False the previous tests
+      conf.put(previousTestName, "False");
+
+      // Replace current test at True
+      conf.put(testName, "true");
+
+      LOGGER.warning("TEST aozan test "
+          + testName + "----------------------------------");
+      // Init qc
+      QC qc = new QC(conf, qcDir, fastqDir, qcDir + "_qc_tmp", TMP_DIR, runId);
+      comp++;
+
+      // Compute report
+      QCReport report = qc.computeReport();
+
+      // Save report data
+      qc.writeXMLReport(report, qcDir
+          + "_qc_tmp/aozanTest/" + comp + "_" + testName + "_reportXmlFile.xml");
+
+      // Save HTML report
+      qc.writeReport(report, null, qcDir
+          + "_qc_tmp/aozanTest/" + comp + "_" + testName
+          + "_reportHtmlFile.html");
+
+      // Rename run data, generate for each test
+      if (!dataRun.renameTo(new File(qcDir
+          + "_qc_tmp/aozanTest/" + comp + "_data_" + testName + ".txt")))
+        throw new AozanException("Fail rename data file for test " + testName);
+
+      previousTestName = testName;
+    }
+
+  }
+
   @SuppressWarnings("unused")
   public static void reportQC2() throws AozanException {
 
