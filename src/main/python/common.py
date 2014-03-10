@@ -226,7 +226,7 @@ def send_msg(subject, message, is_error, conf):
     
     message = conf[MAIL_HEADER_KEY].replace('\\n', '\n') + message + conf[MAIL_FOOTER_KEY].replace('\\n', '\n')
     message = message.replace('\n', '\r\n')
-    msg = ''
+    msg = "From: %s\r\n" % mail_from
 
     if mail_to != None :
         if type(mail_to) == str or type(mail_to) == unicode:
