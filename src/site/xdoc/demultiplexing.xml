@@ -53,7 +53,7 @@
 	     <tr><td>demux.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
 	     <tr><td>demux.space.factor</td><td>double</td><td>0.7</td><td>Factor to use to get the estimation of space needed
 	     in fastq directory for the run from the space used in bcl directory by the run</td></tr>
-	     <tr><td>demux.use.hiseq.output</td><td>boolean</td><td>False</td><td>If true : no synchronization step, use direct Hiseq output for demultiplexage step</td></tr>
+	     <tr><td>demux.use.hiseq.output</td><td>boolean</td><td>False</td><td>If it is true and no synchronization step, use direct Hiseq output for demultiplexage step</td></tr>
 	     <tr><td>index.sequences</td><td>string</td><td>Not set</td><td>Path to a file that contains alias
 	     for adapters sequences indexes. <a href="./indexes-sequences.txt" target="_blank">See an example.</a></td></tr>
 	     <tr><td>casava.compression</td><td>string</td><td>bzip2</td><td>Compression to use (None, gzip or bzip2). <a href="./quickstart.html#bcl2fastq">To use format bzip2, read &#130;how installing bcl2fastq&#130;.</a></td></tr>
