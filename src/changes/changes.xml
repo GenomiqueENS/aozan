@@ -269,7 +269,7 @@
 		<release version="1.2.3" description="Aozan version 1.2.3"
 			date="2014-03-11">
 			<action dev="perrin" type="fix">
-				The alias genomes names file used during the <a href="">detection contamination by FastQScreen</a> is updated and not more writed a new file. 
+				The alias genomes names file used during the detection contamination by FastQScreen is updated and not more writed a new file. 
 			</action>
 			<action dev="perrin" type="add">
 				Checking principals parameters from configuration before starting Aozan.
@@ -281,7 +281,7 @@
 			<action dev="perrin" type="fix">
 				Generation qc report: now it can created with only one &apos;qc.test&apos; enable, call the usefull collectors automatically.
 			</action>
-			<action dev="perrin" type="fix">
+			<action dev="jourdren" type="fix">
 				The &apos;From&apos; field header of mails sent by Aozan was not set.
 			</action>
 			
