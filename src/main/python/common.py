@@ -277,7 +277,8 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
     message = conf[MAIL_HEADER_KEY].replace('\\n', '\n') + message + conf[MAIL_FOOTER_KEY].replace('\\n', '\n')
 
     msg = MIMEMultipart()
-
+    msg['From'] = mail_from
+    
     if mail_to != None :
         if type(mail_to) == str or type(mail_to) == unicode:
             mail_to = [mail_to]
@@ -574,7 +575,7 @@ def check_conf_path(conf):
     
     # Check path to blast if step enable
     if is_conf_value_equals_true(QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY, conf) and not is_path_exists(QC_CONF_FASTQSCREEN_BLAST_PATH_KEY, conf):
-        msg = "Blast enable, blast path does not exists: "  + conf[QC_CONF_FASTQSCREEN_BLAST_PATH_KEY] + '\n\t' + msg
+        msg = "Blast enable, blast path does not exists: " + conf[QC_CONF_FASTQSCREEN_BLAST_PATH_KEY] + '\n\t' + msg
         no_error = False
     
     if not no_error:
@@ -611,7 +612,7 @@ def check_compression_type_fastq(conf):
     
         # Invalid value, use default compression type
         elif not (compression == 'gzip' or compression == 'bzip2'):
-            error('Check configuration Aozan: ',  'Demux step bcl2fastq compression type  invalid: ' + compression + '.', get_last_error_file(conf), conf)
+            error('Check configuration Aozan: ', 'Demux step bcl2fastq compression type  invalid: ' + compression + '.', get_last_error_file(conf), conf)
             return False
         
     # Redefine in configuration dictionnary
