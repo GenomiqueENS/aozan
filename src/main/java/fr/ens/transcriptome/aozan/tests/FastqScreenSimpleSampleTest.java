@@ -24,6 +24,7 @@
 package fr.ens.transcriptome.aozan.tests;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -202,7 +203,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
 
     } catch (Exception e) {
       // Return empty list
-      return genomesFromCasavaDesign;
+      return Collections.emptySet();
     }
 
     // Retrieve all genome sample included in casava design file
@@ -210,7 +211,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
       String genomeSample =
           casavaSample.getSampleRef().replaceAll("\"", "").toLowerCase();
 
-      // Remplace all symbols not letters or numbers by space
+      // Replace all symbols not letters or numbers by space
       pattern.matcher(genomeSample).replaceAll(" ");
 
       genomesFromCasavaDesign.add(genomeSample.trim());
