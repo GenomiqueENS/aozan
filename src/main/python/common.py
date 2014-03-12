@@ -109,7 +109,7 @@ def is_path_exists(settings_key, conf):
     if not exist:
         return False
 
-    path = conf[settings_key].lower().strip()
+    path = conf[settings_key].strip()
     return os.path.exists(path)
 
 
