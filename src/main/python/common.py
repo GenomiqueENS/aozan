@@ -531,6 +531,10 @@ def check_configuration(conf, configuration_file_path):
     
     Arguments:
         conf: configuration dictionary
+        configuration_file_path: path of the configuration file
+
+    Returns:
+        True if the configuration is valid
     """
 
     msg = ''
@@ -582,9 +586,12 @@ def check_configuration(conf, configuration_file_path):
 def is_fastq_compression_format_valid(conf):
     """ Check compression format fastq for bcl2fastq
         Three possible : None, gzip, bzip2, other exist aozan
-        
+
     Arguments:
         conf: configuration dictionary
+
+    Returns:
+        True if the FASTQ compression format is valid
     """
 
     # Get the compression format defined by user
