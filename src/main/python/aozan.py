@@ -268,7 +268,7 @@ def aozan_main():
     # Init logger
     Common.initLogger(conf[AOZAN_LOG_PATH_KEY], conf[AOZAN_LOG_LEVEL_KEY])
 
-    if not common.check_configuration_file(conf, args[0]):
+    if not common.check_configuration(conf, args[0]):
         common.log('SEVERE', 'Aozan can not be executed', conf)
         sys.exit(1)
         

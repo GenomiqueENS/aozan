@@ -526,7 +526,7 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
     f_out.write(result)
     f_out.close()
 
-def check_configuration_file(conf, configuration_file_path):
+def check_configuration(conf, configuration_file_path):
     """ Check if path useful exists
     
     Arguments:
