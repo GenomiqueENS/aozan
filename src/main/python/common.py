@@ -573,7 +573,7 @@ def check_configuration(conf, configuration_file_path):
         msg += '\n\t* Invalid FASTQ compression format: ' + conf[CASAVA_COMPRESSION_KEY]
 
     if len(msg) > 0:
-        msg = 'Error(s) found in Aozan configuration file (' + configuration_file_path + '):\n' + msg
+        msg = 'Error(s) found in Aozan configuration file (' + os.path.abspath(configuration_file_path) + '):' + msg
         error("[Aozan] check configuration: error(s) in configuration file", msg , get_last_error_file(conf), conf)
         return False
 
