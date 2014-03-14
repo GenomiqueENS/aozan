@@ -95,24 +95,42 @@ def is_conf_key_exists(settings_key, conf):
 
     return is_conf_value_defined(settings_key, None, conf)
 
-def is_path_exists(settings_key, conf):
-    """Check a path corresponding to a property in configuration exists
+
+def is_dir_exists(settings_key, conf):
+    """Check a directory path corresponding to a property in configuration exists
     
     Arguments:
         settings_key: key in configuration for the property
         conf: configuration dictionary
         return boolean
     """
-
+    
     exist = is_conf_key_exists(settings_key, conf)
 
     if not exist:
         return False
 
     path = conf[settings_key].strip()
-    return os.path.exists(path)
+    return os.path.exists(path) and os.path.isdir(path)
 
 
+def is_file_exists(settings_key, conf):
+    """Check a file path corresponding to a property in configuration exists
+    
+    Arguments:
+        settings_key: key in configuration for the property
+        conf: configuration dictionary
+        return boolean
+    """
+    exist = is_conf_key_exists(settings_key, conf)
+
+    if not exist:
+        return False
+
+    path = conf[settings_key].strip()
+    return os.path.exists(path) and os.path.isfile(path)
+
+    
 def is_conf_value_defined(settings_key, expected_value, conf):
     """Check a property exists in configuration object with a specific expected_value (if it's different None or empty
     
@@ -546,31 +564,31 @@ def check_configuration(conf, configuration_file_path):
 
     # Check if bcl_data_path exists
     if is_conf_value_equals_true(SYNC_STEP_KEY, conf):
-        if not is_path_exists(BCL_DATA_PATH_KEY, conf):
+        if not is_dir_exists(BCL_DATA_PATH_KEY, conf):
             msg += '\n\t* Basecalling directory does not exists: ' + conf[BCL_DATA_PATH_KEY]
     #
-    if not is_path_exists(AOZAN_LOG_PATH_KEY, conf):
-        msg += '\n\t* Aozan log path does not exists : ' + conf[AOZAN_LOG_PATH_KEY]
+    if not is_file_exists(AOZAN_LOG_PATH_KEY, conf):
+        msg += '\n\t* Aozan log file path does not exists : ' + conf[AOZAN_LOG_PATH_KEY]
 
     # Check if casava designs path exists
-    if not is_path_exists(CASAVA_SAMPLESHEETS_PATH_KEY, conf):
-        msg += '\n\t* Casava sample sheets does not exists: ' + conf[CASAVA_SAMPLESHEETS_PATH_KEY]
+    if not is_dir_exists(CASAVA_SAMPLESHEETS_PATH_KEY, conf):
+        msg += '\n\t* Casava sample sheets directory does not exists: ' + conf[CASAVA_SAMPLESHEETS_PATH_KEY]
 
     # Check if root input fastq data directory exists
-    if not is_path_exists(FASTQ_DATA_PATH_KEY, conf):
+    if not is_dir_exists(FASTQ_DATA_PATH_KEY, conf):
         msg += '\n\t* Fastq data directory does not exists: ' + conf[FASTQ_DATA_PATH_KEY]
 
     # Check if casava designs path exists
-    if not is_path_exists(CASAVA_PATH_KEY, conf):
-        msg += '\n\t* Casava/bcl2fastq path does not exists: ' + conf[CASAVA_PATH_KEY]
+    if not is_dir_exists(CASAVA_PATH_KEY, conf):
+        msg += '\n\t* Casava/bcl2fastq path directory does not exists: ' + conf[CASAVA_PATH_KEY]
 
     # Check if temporary directory exists
-    if not is_path_exists(TMP_PATH_KEY, conf):
+    if not is_dir_exists(TMP_PATH_KEY, conf):
         msg += '\n\t* Temporary directory does not exists: ' + conf[TMP_PATH_KEY]
 
     # Check path to blast if step enable
-    if is_conf_value_equals_true(QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY, conf) and not is_path_exists(QC_CONF_FASTQSCREEN_BLAST_PATH_KEY, conf):
-        msg += '\n\t* Blast enable, blast path does not exists: ' + conf[QC_CONF_FASTQSCREEN_BLAST_PATH_KEY]
+    if is_conf_value_equals_true(QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY, conf) and not is_file_exists(QC_CONF_FASTQSCREEN_BLAST_PATH_KEY, conf):
+        msg += '\n\t* Blast enable, blast file path does not exists: ' + conf[QC_CONF_FASTQSCREEN_BLAST_PATH_KEY]
 
     # Check compression type: three values None, gzip (default) bzip2
     if not is_fastq_compression_format_valid(conf):
@@ -578,7 +596,7 @@ def check_configuration(conf, configuration_file_path):
 
     if len(msg) > 0:
         msg = 'Error(s) found in Aozan configuration file (' + os.path.abspath(configuration_file_path) + '):' + msg
-        error("[Aozan] check configuration: error(s) in configuration file", msg , get_last_error_file(conf), conf)
+        error("[Aozan] check configuration: error(s) in configuration file.", msg , get_last_error_file(conf), conf)
         return False
 
     return True

@@ -79,7 +79,7 @@ def load_index_sequences(conf):
 
     result = HashMap()
 
-    if not common.is_path_exists(INDEX_SEQUENCES_KEY, conf):
+    if not common.is_file_exists(INDEX_SEQUENCES_KEY, conf):
             return result
 
 
@@ -154,22 +154,22 @@ def demux(run_id, conf):
         return False
 
     # Check if root input fastq data directory exists
-    if not common.is_path_exists(FASTQ_DATA_PATH_KEY, conf):
+    if not common.is_dir_exists(FASTQ_DATA_PATH_KEY, conf):
         error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf[FASTQ_DATA_PATH_KEY], conf)
         return False
 
     # Check if casava designs path exists
-    if not common.is_path_exists(CASAVA_SAMPLESHEETS_PATH_KEY, conf):
+    if not common.is_dir_exists(CASAVA_SAMPLESHEETS_PATH_KEY, conf):
         error("Casava sample sheets directory does not exists", "Casava sample sheets does not exists: " + conf[CASAVA_SAMPLESHEETS_PATH_KEY], conf)
         return False
     
     # Check if casava/bcl2fastq basedir path exists
-    if not common.is_path_exists(CASAVA_PATH_KEY, conf):
-        error("Casava/bcl2fastq path does not exists", "Casava/bcl2fastq path does not exists: " + conf[CASAVA_SAMPLESHEETS_PATH_KEY], conf)
+    if not common.is_dir_exists(CASAVA_PATH_KEY, conf):
+        error("Casava/bcl2fastq directory path does not exists", "Casava/bcl2fastq path does not exists: " + conf[CASAVA_SAMPLESHEETS_PATH_KEY], conf)
         return False
     
     # Check if temporary directory exists
-    if not common.is_path_exists(TMP_PATH_KEY, conf):
+    if not common.is_dir_exists(TMP_PATH_KEY, conf):
         error("Temporary directory does not exists", "Temporary directory does not exists: " + conf[TMP_PATH_KEY], conf)
         return False
 

@@ -96,7 +96,7 @@ def qc(run_id, conf):
         return False
     
     # Check if input root fastq root data exists
-    if not common.is_path_exists(FASTQ_DATA_PATH_KEY, conf):
+    if not common.is_dir_exists(FASTQ_DATA_PATH_KEY, conf):
         error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf[FASTQ_DATA_PATH_KEY], conf)
         return False
 
@@ -105,7 +105,7 @@ def qc(run_id, conf):
         os.mkdir(reports_data_path)
 
     # Check if temporary directory exists
-    if not common.is_path_exists(TMP_PATH_KEY, conf):
+    if not common.is_dir_exists(TMP_PATH_KEY, conf):
         error("Temporary directory does not exists", "Temporary directory does not exists: " + conf[TMP_PATH_KEY], conf)
         return False
 
