@@ -79,6 +79,7 @@ public class OverrepresentedSequencesBlast {
 
   private static final String SEQUENCES_NOT_USE_FILE =
       "/sequences_nohit_with_blastn.txt";
+  private static final String PREFIX_FILENAME_DATABASE = "/nt";
 
   // Tag configuration general of blast
   private static final String tag_queryLength = "Iteration_query-len";
@@ -126,13 +127,17 @@ public class OverrepresentedSequencesBlast {
 
       this.tmpPath = properties.getProperty(QC.TMP_DIR);
 
+      // Path to blast executable
       String blastPath =
           properties.getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_PATH_KEY)
               .trim();
+
+      // Path to database for blast, need to add prefix filename used "nt"
       String blastDBPath =
           properties
               .getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_DB_PATH_KEY)
-              .trim();
+              .trim()
+              + PREFIX_FILENAME_DATABASE;
 
       // Check paths needed in configuration aozan
       if (blastPath == null
