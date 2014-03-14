@@ -286,5 +286,18 @@
 			</action>
 			
 		</release>
+		
+		<release version="1.2.4" description="Aozan version 1.2.4"
+			date="2014-03-14">
+			<action dev="jourdren" type="fix">
+				Check principals path from configuration, remove to lower. 
+			</action>
+			<action dev="jourdren" type="update">
+				Adding key to set compression format for bcl2fastq/casava (.bz2, .gz, none, bzip2, gz, gzip).
+			</action>
+			<action dev="perrin" type="fix">
+				Field in configuration: blast database path, remove the prefix filename in path.
+			</action>
+		</release>
 	</body>
 </document>
