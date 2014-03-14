@@ -309,7 +309,8 @@ def demux(run_id, conf):
         common.log("WARNING", "casava sample sheet warnings: " + msg, conf)
 
     # Check format compression bcl2fastq
-    if not common.check_compression_type_fastq(conf):
+    if not common.is_fastq_compression_format_valid(conf):
+        error("error while checking FASTQ compression format", "Invalid FASTQ compression format: " + conf[CASAVA_COMPRESSION_KEY], conf)
         return False
 
     # Create casava makefile
