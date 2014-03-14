@@ -380,7 +380,12 @@ def get_last_error_file(conf):
     Arguments:
         conf: configuration dictionary
     """
-    return conf[AOZAN_VAR_PATH_KEY] + '/aozan.lasterr'
+    
+    if is_dir_exists(conf[AOZAN_VAR_PATH_KEY], conf):
+        return conf[AOZAN_VAR_PATH_KEY].strip() + '/aozan.lasterr'
+    
+    return False
+
 
 def error(short_message, message, last_error_file_path, conf):
     """Error handling.
@@ -390,6 +395,10 @@ def error(short_message, message, last_error_file_path, conf):
         message: message
         conf: configuration dictionary
     """
+    
+    # No write in last error file, directory does not exists
+    if last_error_file_path == False:
+        return
 
     new_error = short_message + ' ' + message
     new_error.replace('\n', ' ')
