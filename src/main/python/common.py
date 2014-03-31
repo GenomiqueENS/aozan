@@ -381,7 +381,7 @@ def get_last_error_file(conf):
         conf: configuration dictionary
     """
     
-    if is_dir_exists(conf[AOZAN_VAR_PATH_KEY], conf):
+    if is_dir_exists(AOZAN_VAR_PATH_KEY, conf):
         return conf[AOZAN_VAR_PATH_KEY].strip() + '/aozan.lasterr'
     
     return False
