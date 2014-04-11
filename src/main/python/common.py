@@ -597,7 +597,7 @@ def check_configuration(conf, configuration_file_path):
 
     # Check path to blast if step enable
     if is_conf_value_equals_true(QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY, conf) and not is_file_exists(QC_CONF_FASTQSCREEN_BLAST_PATH_KEY, conf):
-        msg += '\n\t* Blast enable, blast file path does not exists: ' + conf[QC_CONF_FASTQSCREEN_BLAST_PATH_KEY]
+        msg += '\n\t* Blast enabled but blast file path does not exists: ' + conf[QC_CONF_FASTQSCREEN_BLAST_PATH_KEY]
 
     # Check compression type: three values None, gzip (default) bzip2
     if not is_fastq_compression_format_valid(conf):

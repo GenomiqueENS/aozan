@@ -293,7 +293,7 @@ public class RunData {
     if (file == null)
       throw new NullPointerException("The file parameter is null");
 
-    checkExistingFile(file, " rundata file doesn't exist");
+    checkExistingFile(file, " rundata file ");
 
     final BufferedReader br =
         Files.newReader(file, Globals.DEFAULT_FILE_ENCODING);
