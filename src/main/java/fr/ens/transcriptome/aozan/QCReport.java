@@ -52,6 +52,7 @@ import org.w3c.dom.Element;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
+import fr.ens.transcriptome.aozan.tests.GlobalTest;
 import fr.ens.transcriptome.aozan.tests.LaneTest;
 import fr.ens.transcriptome.aozan.tests.SampleTest;
 import fr.ens.transcriptome.aozan.tests.TestResult;
@@ -66,6 +67,7 @@ public class QCReport {
 
   private final RunData data;
 
+  private final List<GlobalTest> globalTests = Lists.newArrayList();
   private final List<LaneTest> laneTests = Lists.newArrayList();
   private final List<SampleTest> sampleTests = Lists.newArrayList();
   private Document doc;
@@ -80,14 +82,52 @@ public class QCReport {
   }
 
   /**
+   * Generate the QC report for global tests.
+   * @param parentElement parent Element
+   */
+  private void doGlobalTests(final Element parentElement) {
+
+    final Document doc = this.doc;
+
+    final Element root = doc.createElement("GlobalReport");
+    parentElement.appendChild(root);
+
+    final Element columns = doc.createElement("Columns");
+    root.appendChild(columns);
+
+    for (GlobalTest test : this.globalTests) {
+      final Element columnElement = doc.createElement("Column");
+      columnElement.setAttribute("testname", test.getName());
+      columnElement.setAttribute("description", test.getDescription());
+      columnElement.setAttribute("unit", test.getUnit());
+      columnElement.setTextContent(test.getColumnName());
+      columns.appendChild(columnElement);
+    }
+
+    final Element runElement = doc.createElement("Run");
+    root.appendChild(runElement);
+
+    for (GlobalTest test : this.globalTests) {
+      final TestResult result = test.test(this.data);
+
+      final Element testElement = doc.createElement("Test");
+      testElement.setAttribute("name", test.getName());
+      testElement.setAttribute("score", Integer.toString(result.getScore()));
+      testElement.setAttribute("type", result.getType());
+      testElement.setTextContent(result.getMessage());
+      runElement.appendChild(testElement);
+    }
+  }
+
+  /**
    * Generate the QC report for lane tests.
    * @param parentElement parent Element
    */
   private void doLanesTests(final Element parentElement) {
 
     final Document doc = this.doc;
-    final int readCount = data.getInt("run.info.read.count");
-    final int laneCount = data.getInt("run.info.flow.cell.lane.count");
+    final int readCount = this.data.getInt("run.info.read.count");
+    final int laneCount = this.data.getInt("run.info.flow.cell.lane.count");
 
     final Element root = doc.createElement("ReadsReport");
     parentElement.appendChild(root);
@@ -95,7 +135,7 @@ public class QCReport {
     final Element columns = doc.createElement("Columns");
     root.appendChild(columns);
 
-    for (LaneTest test : laneTests) {
+    for (LaneTest test : this.laneTests) {
       final Element columnElement = doc.createElement("Column");
       columnElement.setAttribute("testname", test.getName());
       columnElement.setAttribute("description", test.getDescription());
@@ -109,7 +149,7 @@ public class QCReport {
 
     for (int read = 1; read <= readCount; read++) {
 
-      final int cycles = data.getInt("run.info.read" + read + ".cycles");
+      final int cycles = this.data.getInt("run.info.read" + read + ".cycles");
       final boolean indexedRead =
           data.getBoolean("run.info.read" + read + ".indexed");
 
@@ -148,8 +188,8 @@ public class QCReport {
   private void doSamplesTests(final Element parentElement) {
 
     final Document doc = this.doc;
-    final int readCount = data.getInt("run.info.read.count");
-    final int laneCount = data.getInt("run.info.flow.cell.lane.count");
+    final int readCount = this.data.getInt("run.info.read.count");
+    final int laneCount = this.data.getInt("run.info.flow.cell.lane.count");
 
     final Element root = doc.createElement("SamplesReport");
     parentElement.appendChild(root);
@@ -172,7 +212,7 @@ public class QCReport {
 
     for (int read = 1; read <= readCount; read++) {
 
-      if (data.getBoolean("run.info.read" + read + ".indexed"))
+      if (this.data.getBoolean("run.info.read" + read + ".indexed"))
         continue;
 
       readSample++;
@@ -197,15 +237,16 @@ public class QCReport {
 
           // Get the sample index
           final String index =
-              data.get("design.lane" + lane + "." + sampleName + ".index");
+              this.data.get("design.lane" + lane + "." + sampleName + ".index");
 
           // Get the sample description
           final String desc =
-              data.get("design.lane" + lane + "." + sampleName + ".description");
+              this.data.get("design.lane"
+                  + lane + "." + sampleName + ".description");
 
           // Get the sample project
           final String projectName =
-              data.get("design.lane"
+              this.data.get("design.lane"
                   + lane + "." + sampleName + ".sample.project");
 
           addSample(readElement, read, readSample, lane, sampleName, desc,
@@ -238,7 +279,7 @@ public class QCReport {
     for (SampleTest test : this.sampleTests) {
 
       final TestResult result =
-          test.test(data, read, readSample, lane, sampleName);
+          test.test(this.data, read, readSample, lane, sampleName);
 
       final Element testElement = doc.createElement("Test");
       testElement.setAttribute("name", test.getName());
@@ -297,6 +338,9 @@ public class QCReport {
           this.data.get("run.info.run.number"));
       XMLUtils.addTagValue(doc, root, "ReportDate",
           DATE_FORMAT.format(new Date()));
+
+      if (!this.globalTests.isEmpty())
+        doGlobalTests(root);
 
       if (!this.laneTests.isEmpty())
         doLanesTests(root);
@@ -404,13 +448,17 @@ public class QCReport {
   /**
    * Public constructor.
    * @param data Run data
+   * @param globalTests list of the global tests
    * @param laneTests list of the read tests
    * @param sampleTests list of the sample tests
    */
-  public QCReport(RunData data, List<LaneTest> laneTests,
-      List<SampleTest> sampleTests) {
+  public QCReport(RunData data, List<GlobalTest> globalTests,
+      List<LaneTest> laneTests, List<SampleTest> sampleTests) {
 
     this.data = data;
+
+    if (globalTests != null)
+      this.globalTests.addAll(globalTests);
 
     if (laneTests != null)
       this.laneTests.addAll(laneTests);

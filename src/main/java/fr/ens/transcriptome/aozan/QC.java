@@ -47,6 +47,7 @@ import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.AozanTestRegistry;
 import fr.ens.transcriptome.aozan.tests.LaneTest;
+import fr.ens.transcriptome.aozan.tests.GlobalTest;
 import fr.ens.transcriptome.aozan.tests.SampleTest;
 
 /**
@@ -83,6 +84,7 @@ public class QC {
   private final String runId;
 
   private final List<Collector> collectors = Lists.newArrayList();
+  private final List<GlobalTest> globalTests = Lists.newArrayList();
   private final List<LaneTest> laneTests = Lists.newArrayList();
   private final List<SampleTest> sampleTests = Lists.newArrayList();
   private final Map<String, String> globalConf = Maps.newHashMap();
@@ -153,7 +155,8 @@ public class QC {
       throw new AozanException("No data collected.");
 
     // Create the report
-    QCReport qcReport = new QCReport(data, this.laneTests, this.sampleTests);
+    QCReport qcReport =
+        new QCReport(data, this.globalTests, this.laneTests, this.sampleTests);
 
     // Create the completed raw data file
     writeRawData(qcReport, dataFile);
@@ -321,8 +324,13 @@ public class QC {
           tests =
               configureTest(test, properties, TEST_KEY_PREFIX + testName + ".");
 
-          // Add the test to laneTests or sampleTests
-          if (test instanceof LaneTest) {
+          // Add the test to runTests, laneTests or sampleTests
+          if (test instanceof GlobalTest) {
+            for (AozanTest t : tests) {
+              this.globalTests.add((GlobalTest) t);
+              mapTests.put(key, t);
+            }
+          } else if (test instanceof LaneTest) {
             for (AozanTest t : tests) {
               this.laneTests.add((LaneTest) t);
               mapTests.put(key, t);
@@ -344,11 +352,12 @@ public class QC {
     initCollectors();
 
     // Initialize tests
+    for (GlobalTest test : this.globalTests)
+      test.init();
     for (LaneTest test : this.laneTests)
       test.init();
     for (SampleTest test : this.sampleTests)
       test.init();
-
   }
 
   /**
@@ -394,10 +403,12 @@ public class QC {
     final Set<Collector> collectors = Sets.newHashSet();
 
     List<AozanTest> testsList = Lists.newArrayList();
+    for (GlobalTest gt : this.globalTests)
+      testsList.add(gt);
     for (LaneTest lt : this.laneTests)
       testsList.add(lt);
-    for (SampleTest lt : this.sampleTests)
-      testsList.add(lt);
+    for (SampleTest st : this.sampleTests)
+      testsList.add(st);
 
     // Test if number test enable in configuration empty
     if (testsList.isEmpty()) {
@@ -406,7 +417,7 @@ public class QC {
     }
 
     // Get necessary collector for the qc report for lane test
-    if (!this.laneTests.isEmpty())
+    if (!this.laneTests.isEmpty() || !this.globalTests.isEmpty())
       addCollectors(Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME),
           collectors);
 

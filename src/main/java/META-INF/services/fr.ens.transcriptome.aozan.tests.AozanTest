@@ -31,3 +31,8 @@ fr.ens.transcriptome.aozan.tests.BadTilesFastQCSampleTest
 fr.ens.transcriptome.aozan.tests.HitNoLibrariesFastqScreenSampleTest
 fr.ens.transcriptome.aozan.tests.FastqScreenSimpleSampleTest
 fr.ens.transcriptome.aozan.tests.FastqScreenSimpleSampleLienReportTest
+fr.ens.transcriptome.aozan.tests.RawClustersGlobalTest
+fr.ens.transcriptome.aozan.tests.PFClustersGlobalTest
+fr.ens.transcriptome.aozan.tests.PFClustersPercentGlobalTest
+fr.ens.transcriptome.aozan.tests.NonIndexedBaseCountGlobalTest
+fr.ens.transcriptome.aozan.tests.BaseCountGlobalTest

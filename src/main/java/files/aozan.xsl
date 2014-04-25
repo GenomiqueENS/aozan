@@ -2,8 +2,8 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 version="1.0">
 
-<xsl:template match="/">
 <xsl:decimal-format name="aozan" decimal-separator="." grouping-separator=" "/>
+<xsl:template match="/">
 
 <html>
 <head>
@@ -188,7 +188,7 @@ version="1.0">
 
 	<div id="header_filename">
 		Generated <xsl:value-of select="/QCReport/ReportDate"/><br/>
-		<a href="#lane">Lanes</a> / <a href="#sample">Samples</a>
+		<a href="#global">Global</a> / <a href="#lane">Lanes</a> / <a href="#sample">Samples</a>
 	</div>
 	
 </div>
@@ -204,6 +204,31 @@ version="1.0">
     	(revision <xsl:value-of select="/QCReport/GeneratorRevision"/>)</li>
     <li><b>Creation date: </b> <xsl:value-of select="/QCReport/ReportDate"/></li>
   </ul>
+
+  <xsl:if test="/QCReport[GlobalReport]">
+  <a name="global"/>
+  <h2>Global report</h2>
+
+
+  <table>
+  <tr>
+    <xsl:for-each select="/QCReport/GlobalReport/Columns/Column">
+      <th><xsl:value-of select="."/><xsl:if test="@unit!=''"> (<xsl:value-of select="@unit"/>)</xsl:if></th>
+    </xsl:for-each>
+  </tr>
+  <tr>
+    <xsl:for-each select="/QCReport/GlobalReport/Run/Test">
+      <td class="score{@score}">
+        <xsl:if test="@type='int'"><xsl:value-of select="format-number(.,'### ### ### ### ###','aozan')"/></xsl:if>
+        <xsl:if test="@type='float'"><xsl:value-of select="format-number(.,'### ### ### ##0.00','aozan')"/></xsl:if>
+        <xsl:if test="@type='percent'"><xsl:value-of select="format-number(.,'#0.00%','aozan')"/></xsl:if>
+        <xsl:if test="@type='string'"><xsl:value-of select="."/></xsl:if>
+        <xsl:if test="@type='url'"><a href="{.}">link</a></xsl:if>
+      </td>
+    </xsl:for-each>
+  </tr>
+  </table>
+  </xsl:if>
 
   <xsl:if test="/QCReport[ReadsReport]">
   <a name="lane"/>
