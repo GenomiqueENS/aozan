@@ -299,10 +299,18 @@
 				Field in configuration: blast database path, remove the prefix filename in path.
 			</action>
 		</release>
+
 		<release version="1.2.5" description="Aozan version 1.2.5"
-			date="2014-04-4">
+			date="2014-04-04">
 			<action dev="perrin" type="fix">
 				Check aozan configuration file at the beginning, if failed, now it sends a mail.		
+			</action>
+		</release>
+
+		<release version="1.x" description="Aozan version 1.x"
+			date="TBD">
+			<action dev="jourdren" type="add">
+				Add global tests to the QC step. This new type of test comes with some global tests.
 			</action>
 		</release>
 	</body>
