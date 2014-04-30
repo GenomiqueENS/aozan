@@ -27,12 +27,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.Common;
@@ -78,7 +80,7 @@ public class AliasGenomeFile {
 
     if (aliasGenomes.isEmpty())
       // Return a empty set
-      return genomesNameReference;
+      return Collections.emptySet();
 
     for (String sampleGenomes : genomes) {
 
@@ -159,7 +161,8 @@ public class AliasGenomeFile {
       if (aliasGenomeFile.exists()) {
 
         final Writer fw =
-            Files.newWriter(aliasGenomeFile, Globals.DEFAULT_FILE_ENCODING);
+            Files.asCharSink(aliasGenomeFile, Globals.DEFAULT_FILE_ENCODING,
+                FileWriteMode.APPEND).openStream();
 
         for (String genomeSample : genomesToAdd)
           fw.write(genomeSample + "=\n");

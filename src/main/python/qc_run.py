@@ -5,11 +5,20 @@ Created on 28 oct. 2011
 '''
 import os.path, stat
 import common, time
-from fr.ens.transcriptome.aozan import Settings
 from fr.ens.transcriptome.aozan import QC
 from fr.ens.transcriptome.aozan import AozanException
 from fr.ens.transcriptome.eoulsan.util import StringUtils
 from java.lang import Throwable
+
+from fr.ens.transcriptome.aozan.Settings import FASTQ_DATA_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import REPORTS_URL_KEY
+from fr.ens.transcriptome.aozan.Settings import QC_REPORT_SAVE_RAW_DATA_KEY
+from fr.ens.transcriptome.aozan.Settings import AOZAN_DEBUG_KEY
+from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import QC_REPORT_STYLESHEET_KEY
+from fr.ens.transcriptome.aozan.Settings import QC_REPORT_SAVE_REPORT_DATA_KEY
+from fr.ens.transcriptome.aozan.Settings import TMP_PATH_KEY
 
 def load_processed_run_ids(conf):
     """Load the list of the processed run ids.
@@ -18,7 +27,7 @@ def load_processed_run_ids(conf):
         conf: configuration dictionary
     """
 
-    return common.load_processed_run_ids(conf[Settings.AOZAN_VAR_PATH_KEY] + '/qc.done')
+    return common.load_processed_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/qc.done')
 
 def add_run_id_to_processed_run_ids(run_id, conf):
     """Add a processed run id to the list of the run ids.
@@ -28,7 +37,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-    common.add_run_id_to_processed_run_ids(run_id, conf[Settings.AOZAN_VAR_PATH_KEY] + '/qc.done', conf)
+    common.add_run_id_to_processed_run_ids(run_id, conf[AOZAN_VAR_PATH_KEY] + '/qc.done', conf)
 
 
 def error(short_message, message, conf):
@@ -40,7 +49,7 @@ def error(short_message, message, conf):
         conf: configuration dictionary
     """
 
-    common.error('[Aozan] qc: ' + short_message, message, conf[Settings.AOZAN_VAR_PATH_KEY] + '/qc.lasterr', conf)
+    common.error('[Aozan] qc: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/qc.lasterr', conf)
 
 def exception_msg(exp, conf):
     """Create error message when an AozanException is thrown.
@@ -50,7 +59,7 @@ def exception_msg(exp, conf):
         conf: configuration dictionary
     """
 
-    if conf[Settings.AOZAN_DEBUG_KEY] == 'true':
+    if common.is_conf_value_equals_true(AOZAN_DEBUG_KEY, conf):
 
         if isinstance(exp, AozanException) and exp.getWrappedException() != None:
             exp = exp.getWrappedException()
@@ -70,31 +79,34 @@ def qc(run_id, conf):
 
     start_time = time.time()
 
-    fastq_input_dir = conf[Settings.FASTQ_DATA_PATH_KEY] + '/' + run_id
-    bcl_input_dir = conf[Settings.BCL_DATA_PATH_KEY] + '/' + run_id
-    reports_data_base_path = conf[Settings.REPORTS_DATA_PATH_KEY]
+    input_run_data_path = common.get_input_run_data_path(run_id, conf)
+    
+    if input_run_data_path == None:
+        return False
+    
+    fastq_input_dir = conf[FASTQ_DATA_PATH_KEY] + '/' + run_id
+    reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
     reports_data_path = reports_data_base_path + '/' + run_id
     qc_output_dir = reports_data_path + '/qc_' + run_id
     tmp_extension = '.tmp'
 
-    # Check if input root bcl data exists
-    if not os.path.exists(conf[Settings.BCL_DATA_PATH_KEY]):
-        error("Basecalling data directory does not exists", "Basecalling data directory does not exists: " + conf[Settings.BCL_DATA_PATH_KEY], conf)
+    # Check if input run data data exists
+    if input_run_data_path == None:
+        error("Basecalling data directory does not exists", "Basecalling data directory does not exists." , conf)
         return False
-
+    
     # Check if input root fastq root data exists
-    if not os.path.exists(conf[Settings.FASTQ_DATA_PATH_KEY]):
-        error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf[Settings.FASTQ_DATA_PATH_KEY], conf)
+    if not common.is_dir_exists(FASTQ_DATA_PATH_KEY, conf):
+        error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf[FASTQ_DATA_PATH_KEY], conf)
         return False
 
-    # Check if reports path directory exists
+    # Create if not exists report directory for the run
     if not os.path.exists(reports_data_path):
-        error("Report directory does not exists", "Report directory does not exists: " + reports_data_path, conf)
-        return False
+        os.mkdir(reports_data_path)
 
     # Check if temporary directory exists
-    if not os.path.exists(conf[Settings.TMP_PATH_KEY]):
-        error("Temporary directory does not exists", "Temporary directory does not exists: " + conf[Settings.TMP_PATH_KEY], conf)
+    if not common.is_dir_exists(TMP_PATH_KEY, conf):
+        error("Temporary directory does not exists", "Temporary directory does not exists: " + conf[TMP_PATH_KEY], conf)
         return False
 
     # Check if the output directory already exists
@@ -110,16 +122,16 @@ def qc(run_id, conf):
         return False
 
     # Check if enough free space is available
-    if common.df(conf[Settings.REPORTS_DATA_PATH_KEY]) < 1 * 1024 * 1024 * 1024:
-        error("Not enough disk space to store aozan quality control for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
-              '.\nNeed more than 10 Gb on ' + conf[Settings.REPORTS_DATA_PATH_KEY] + '.', conf)
+    if common.df(conf[REPORTS_DATA_PATH_KEY]) < 1 * 1024 * 1024 * 1024:
+        error("Not enough disk space to store aozan quality control for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id + 
+              '.\nNeed more than 10 Gb on ' + conf[REPORTS_DATA_PATH_KEY] + '.', conf)
         return False
 
     # Create temporary temporary directory
     qc_output_dir = qc_output_dir + tmp_extension
 
     # Initialize the QC object
-    qc = QC(conf, bcl_input_dir, fastq_input_dir, qc_output_dir, conf[Settings.TMP_PATH_KEY], run_id)
+    qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id)
 
     # Compute the report
     try:
@@ -132,7 +144,7 @@ def qc(run_id, conf):
         return False
 
     # Remove qc data if not demand
-    if conf[Settings.QC_REPORT_SAVE_RAW_DATA_KEY].lower().strip() == 'false':
+    if common.is_conf_value_defined(QC_REPORT_SAVE_RAW_DATA_KEY, 'false', conf):
         try:
             os.remove(qc_output_dir + '/data-' + run_id + '.txt')
             # qc.writeRawData(report, qc_output_dir + '/data-' + run_id + '.txt')
@@ -141,7 +153,7 @@ def qc(run_id, conf):
             return False
 
     # Write the XML report
-    if conf[Settings.QC_REPORT_SAVE_REPORT_DATA_KEY].lower().strip() == 'true':
+    if common.is_conf_value_equals_true(QC_REPORT_SAVE_REPORT_DATA_KEY, conf):
         try:
             qc.writeXMLReport(report, qc_output_dir + '/' + run_id + '.xml')
         except AozanException, exp:
@@ -158,10 +170,10 @@ def qc(run_id, conf):
     # Write the HTML report
     html_report_file = qc_output_dir + '/' + run_id + '.html'
     try:
-        if conf[Settings.QC_REPORT_STYLESHEET_KEY] == '':
+        if not common.is_conf_key_exists(QC_REPORT_STYLESHEET_KEY, conf):
             qc.writeReport(report, None, html_report_file)
         else:
-            qc.writeReport(report, conf[Settings.QC_REPORT_STYLESHEET_KEY], html_report_file)
+            qc.writeReport(report, conf[QC_REPORT_STYLESHEET_KEY], html_report_file)
     except AozanException, exp:
         error("error while computing qc report HTML for run " + run_id + ".", exception_msg(exp, conf), conf)
         return False
@@ -220,8 +232,8 @@ def qc(run_id, conf):
         'can be found in the following directory:\n  ' + qc_output_dir
 
     # Add path to report if reports.url exists
-    if conf[Settings.REPORTS_URL_KEY] != None and conf[Settings.REPORTS_URL_KEY] != '':
-        msg += '\n\nRun reports can be found at following location:\n  ' + conf[Settings.REPORTS_URL_KEY] + '/' + run_id
+    if common.is_conf_key_exists(REPORTS_URL_KEY, conf):
+        msg += '\n\nRun reports can be found at following location:\n  ' + conf[REPORTS_URL_KEY] + '/' + run_id
 
     msg += '\n\nFor this task %.2f MB has been used and %.2f GB still free.' % (du, df)
 

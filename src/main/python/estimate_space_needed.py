@@ -7,9 +7,11 @@ Created on 15 avril 2012
 
 import common
 from java.io import File
-from fr.ens.transcriptome.aozan import Settings
 from fr.ens.transcriptome.eoulsan.illumina import RunInfo
 from xml.dom.minidom import parse
+
+from fr.ens.transcriptome.aozan.Settings import HISEQ_DATA_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
 
 def estimate(run_id, conf):
     """Estimate space needed in directories : hiseq, bcl and fastq
@@ -21,7 +23,7 @@ def estimate(run_id, conf):
     """
 
     # ratio space by cycle by informations type
-    hiseq_run_path = conf[Settings.HISEQ_DATA_PATH_KEY] + '/' + run_id
+    hiseq_run_path = conf[HISEQ_DATA_PATH_KEY] + '/' + run_id
 
     # retrieve data from RunInfo.xml
     run_info_path = hiseq_run_path + "/RunInfo.xml"
@@ -105,7 +107,7 @@ def error(run_id, type_file, space_needed, space_free, dir_path, conf):
     message = message + ' however only %.2f GB' % (space_free / 1024 / 1024 / 1024) + ' of free space is currently available on this storage.'
 
     # send warning mail
-    common.error('[Aozan] Estimate space needed : ' + short_message, message, conf[Settings.AOZAN_VAR_PATH_KEY] + '/space_estimated.lasterr', conf)
+    common.error('[Aozan] Estimate space needed : ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/space_estimated.lasterr', conf)
 
 
 def log_message(run_id, type_file, space_needed, space_free, conf):

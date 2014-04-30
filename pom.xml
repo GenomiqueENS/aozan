@@ -4,7 +4,7 @@
 
   <groupId>fr.ens.transcriptome</groupId>
   <artifactId>aozan</artifactId>
-  <version>1.2.2-SNAPSHOT</version>
+  <version>1.2.6-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Aozan</name>
@@ -65,7 +65,20 @@
     </developer>
   </developers>
 
-  <contributors/>
+  <contributors>	
+    <contributor>
+	  <name>Darren Hart</name>
+	  <email />
+	  <url />
+      <organization>Department of Biochemistry in University of Otago </organization>
+	  <organizationUrl>http://biochem.otago.ac.nz</organizationUrl>
+	  <roles>
+		<role>Testing</role>
+	  </roles>
+	  <timezone>1</timezone>
+	  <properties />
+    </contributor>
+  </contributors>
 
   <licenses>
     <license>

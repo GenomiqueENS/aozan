@@ -148,7 +148,7 @@
 	         <tr><td>qc.conf.fastqscreen.blast.path</td><td>string</td><td>/usr/bin/blastall</td><td>Path to blastn</td></tr>
 	         <tr><td>qc.conf.fastqscreen.blast.version.expected</td><td>string</td><td>blastn 2.2.26 [Sep-21-2011]</td><td>Blast version: field &lt;BlastOutput_version&gt; in xml file.
 	         	In log file, an entry is added if it is different the local version</td></tr>
-	         <tr><td>qc.conf.fastqscreen.blast.db.path</td><td>string</td><td>/home/aozan/ncbi_database_nt/nt</td><td>Path to the database nt (where is located nt.pal file)</td></tr>
+	         <tr><td>qc.conf.fastqscreen.blast.db.path</td><td>string</td><td>/home/aozan/ncbi_database_nt/nt</td><td>Path to the database nt (where is located nt.nal file)</td></tr>
 	         <tr><td>qc.conf.fastqscreen.blast.arguments</td><td>string</td><td>Not set</td><td>Blast parameters. DO NOT use the following blast options: -d (blastn), -p (path to database),
 	         	-m (output type, must be in xml) and -a (number processor)</td></tr>
 		</table>

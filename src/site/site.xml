@@ -73,6 +73,7 @@
 				<item name="Demultiplexing" href="/demultiplexing.html"/>
 				
 				<item name="Quality Control" href="/quality-control.html" collapse="true">
+					<item name="Global tests" href="/qc-global-tests.html"/>
 					<item name="Lanes tests" href="/qc-lanes-tests.html"/>
 					<item name="Samples tests" href="/qc-samples-tests.html"/>
 				</item>

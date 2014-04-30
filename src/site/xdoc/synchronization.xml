@@ -52,6 +52,7 @@
 	   <tr><td>sync.continuous.sync</td><td>boolean</td><td>False</td><td>Enable continuous synchronization of working runs at each Aozan launch 
 	   	 to avoid a big synchronization at the end of the runs. <b>WARNING:</b> This feature is <u>EXPERIMENTAL</u></td></tr>
 	    <tr><td>sync.continuous.sync.min.age.files</td><td>integer</td><td>15</td><td>Minimal age of files in minutes to be synchronized in a partial synchronization</td></tr>
+ 	    <tr><td>demux.use.hiseq.output</td><td>boolean</td><td>False</td><td>If it is true and no synchronization step, use direct Hiseq output for demultiplexage step</td></tr>
      </table>
 
      <p>An example of email sent at the end of synchronization step.</p>

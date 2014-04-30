@@ -78,8 +78,8 @@ public class FastqscreenDemo {
   public static final String GENOMES_PATH = RESOURCE_ROOT + "/genomes";
 
   public static final String AOZAN_CONF =
-      "/home/sperrin/home-net/aozan_validation-1.2.1.conf";
-  // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_test.conf";
+      "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_test.conf";
+  // "/home/sperrin/home-net/aozan_validation-1.2.1.conf";
   // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_partiel_fastqc.conf";
   // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_without_fastqc.conf";
 
@@ -87,7 +87,7 @@ public class FastqscreenDemo {
   private static final boolean paired = false;
 
   private static String runId;
-//  private static String date;
+  // private static String date;
   private static String qcDir;
 
   public static final void main(String[] args) {
@@ -114,8 +114,8 @@ public class FastqscreenDemo {
         // RUN rapid
         // runId = "130722_SNL110_0077_AH0NT2ADXX";
         // runId = "130904_SNL110_0082_AC2BR0ACXX";
-        // runId = "130910_SNL110_0083_AC2AMKACXX";
-        runId = "130926_SNL110_0085_AH0EYHADXX";
+        runId = "130910_SNL110_0083_AC2AMKACXX";
+        // runId = "130926_SNL110_0085_AH0EYHADXX";
       }
 
       // date = new SimpleDateFormat("yyMMdd").format(new Date());
@@ -154,6 +154,93 @@ public class FastqscreenDemo {
     }
 
     timer.stop();
+
+  }
+
+  /**
+   * Create qc report with only on aozan test at true. FastQCCollector must be
+   * modified, it is initialize by a register (singleton), the method to patch
+   * FastQC must be call once.
+   * @throws AozanException
+   */
+  public static void testBuildReportForEachAozanTest() throws AozanException {
+    final List<String> list = Lists.newArrayList();
+
+    list.add("qc.test.rawclusters.enable");
+    list.add("qc.test.pfclusters.enable");
+    list.add("qc.test.pfclusterspercent.enable");
+    list.add("qc.test.clusterdensity.enable");
+    list.add("qc.test.percentalign.enable");
+    list.add("qc.test.errorrate.enable");
+    list.add("qc.test.errorrate35cycle.enable");
+    list.add("qc.test.errorrate75cycle.enable");
+    list.add("qc.test.errorrate100cycle.enable");
+    list.add("qc.test.firstcycleintensity.enable");
+    list.add("qc.test.percentintensitycycle20.enable");
+    list.add("qc.test.phasingprephasing.enable");
+    list.add("qc.test.rawclusterssamples.enable");
+    list.add("qc.test.pfclusterssamples.enable");
+    list.add("qc.test.percentpfsample.enable");
+    list.add("qc.test.percentinlanesample.enable");
+    list.add("qc.test.percentq30.enable");
+    list.add("qc.test.meanqualityscorepf.enable");
+    list.add("qc.test.basicstats.enable");
+    list.add("qc.test.perbasequalityscores.enable");
+    list.add("qc.test.persequencequalityscores.enable");
+    list.add("qc.test.perbasesequencecontent.enable");
+    list.add("qc.test.perbasegccontent.enable");
+    list.add("qc.test.persequencegccontent.enable");
+    list.add("qc.test.ncontent.enable");
+    list.add("qc.test.sequencelengthdistribution.enable");
+    list.add("qc.test.duplicationlevel.enable");
+    list.add("qc.test.overrepresentedseqs.enable");
+    list.add("qc.test.kmercontent.enable");
+    list.add("qc.test.badtiles.enable");
+    list.add("qc.test.hitnolibraries.enable");
+    list.add("qc.test.fsqmapped.enable");
+    list.add("qc.test.linkreport.enable");
+
+    Map<String, String> conf = getMapAozanConf();
+    String previousTestName = "";
+    int comp = 0;
+    qcDir = SRC_RUN + "/qc_" + runId + "/" + runId;
+    String fastqDir = "/home/sperrin/shares-net/sequencages/fastq/" + runId;
+    // String bclDir, String fastqDir, String qcDir, File tmpDir
+    File dataRun =
+        new File(qcDir + "_qc_tmp/data-130722_SNL110_0077_AH0NT2ADXX.txt");
+
+    for (String testName : list) {
+      // Replace False the previous tests
+      conf.put(previousTestName, "False");
+
+      // Replace current test at True
+      conf.put(testName, "true");
+
+      LOGGER.warning("TEST aozan test "
+          + testName + "----------------------------------");
+      // Init qc
+      QC qc = new QC(conf, qcDir, fastqDir, qcDir + "_qc_tmp", TMP_DIR, runId);
+      comp++;
+
+      // Compute report
+      QCReport report = qc.computeReport();
+
+      // Save report data
+      qc.writeXMLReport(report, qcDir
+          + "_qc_tmp/aozanTest/" + comp + "_" + testName + "_reportXmlFile.xml");
+
+      // Save HTML report
+      qc.writeReport(report, null, qcDir
+          + "_qc_tmp/aozanTest/" + comp + "_" + testName
+          + "_reportHtmlFile.html");
+
+      // Rename run data, generate for each test
+      if (!dataRun.renameTo(new File(qcDir
+          + "_qc_tmp/aozanTest/" + comp + "_data_" + testName + ".txt")))
+        throw new AozanException("Fail rename data file for test " + testName);
+
+      previousTestName = testName;
+    }
 
   }
 
@@ -240,8 +327,10 @@ public class FastqscreenDemo {
 
     // conf.put("qc.conf.read.xml.collector.used", "false");
     conf.put(Settings.QC_CONF_CLUSTER_DENSITY_RATIO_KEY, "0.3472222");
-    conf.put(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY, "phix");
-    conf.put(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY, "True");
+    conf.put(
+        Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY,
+        "/home/sperrin/Documents/FastqScreenTest/resources/alias_name_genome_fastqscreen.txt");
+    conf.put(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY, "true");
 
     System.out
         .println("genomes : "

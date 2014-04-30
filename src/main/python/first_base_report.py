@@ -10,7 +10,9 @@ import common, hiseq_run
 import os
 from java.io import File
 from fr.ens.transcriptome.eoulsan.illumina import RunInfo
-from fr.ens.transcriptome.aozan import Settings
+
+from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import HISEQ_DATA_PATH_KEY
 
 def load_processed_run_ids(conf):
     """Load the list of the processed run ids.
@@ -19,7 +21,7 @@ def load_processed_run_ids(conf):
         conf: configuration dictionary
     """
 
-    return common.load_processed_run_ids(conf[Settings.AOZAN_VAR_PATH_KEY] + '/first_base_report.done')
+    return common.load_processed_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/first_base_report.done')
 
 def add_run_id_to_processed_run_ids(run_id, conf):
     """Add a processed run id to the list of the run ids.
@@ -29,7 +31,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-    common.add_run_id_to_processed_run_ids(run_id, conf[Settings.AOZAN_VAR_PATH_KEY] + '/first_base_report.done', conf)
+    common.add_run_id_to_processed_run_ids(run_id, conf[AOZAN_VAR_PATH_KEY] + '/first_base_report.done', conf)
 
 
 def get_available_run_ids(conf):
@@ -67,7 +69,7 @@ def send_report(run_id, conf):
     # Retrieve features the current run in RunInfos.xml file
     #
 
-    hiseq_run_path = conf[Settings.HISEQ_DATA_PATH_KEY] + '/' + run_id
+    hiseq_run_path = conf[HISEQ_DATA_PATH_KEY] + '/' + run_id
 
     run_info_path = hiseq_run_path + "/RunInfo.xml"
     run_info = RunInfo()
@@ -113,6 +115,6 @@ def send_report(run_id, conf):
 
     description_run += "\t- " + "estimated run type : " + type_run_estimated + ".\n"
 
-    attachment_file = hiseq_run.find_hiseq_run_path(run_id, conf) + '/' + run_id + '/First_Base_Report.htm'
+    attachment_file = str(hiseq_run.find_hiseq_run_path(run_id, conf)) + '/' + run_id + '/First_Base_Report.htm'
     message = 'You will find attached to this message the first base report for the run ' + run_id + '.\n\n' + description_run
     common.send_msg_with_attachment('[Aozan] First base report for HiSeq run ' + type_run_estimated + '  ' + run_id , message, attachment_file, conf)

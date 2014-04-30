@@ -257,6 +257,61 @@
 				Changes Guava library version from 14.0.1 to 15.1.
 			</action>
 		</release>
+		
+		<release version="1.2.2" description="Aozan version 1.2.2"
+			date="2014-01-28">
+			<action dev="perrin" type="fix">
+				Mapping for detection contamination was launched in mono-thread mode.
+			</action>
+		</release>
 
+
+		<release version="1.2.3" description="Aozan version 1.2.3"
+			date="2014-03-11">
+			<action dev="perrin" type="fix">
+				The alias genomes names file used during the detection contamination by FastQScreen is updated and not more writed a new file. 
+			</action>
+			<action dev="perrin" type="add">
+				Checking principals parameters from configuration before starting Aozan.
+			</action>
+			<action dev="perrin" type="fix">
+				Launching steps when synchronization step is skipped without entry in infini loop.
+				The usefull directory and archives for next steps are been created. 
+			</action>
+			<action dev="perrin" type="fix">
+				Generation qc report: now it can created with only one &apos;qc.test&apos; enable, call the usefull collectors automatically.
+			</action>
+			<action dev="jourdren" type="fix">
+				The &apos;From&apos; field header of mails sent by Aozan was not set.
+			</action>
+			
+		</release>
+		
+		<release version="1.2.4" description="Aozan version 1.2.4"
+			date="2014-03-14">
+			<action dev="jourdren" type="fix">
+				Check principals path from configuration, remove to lower. 
+			</action>
+			<action dev="jourdren" type="update">
+				Adding key to set compression format for bcl2fastq/casava (.bz2, .gz, none, bzip2, gz, gzip).
+			</action>
+			<action dev="perrin" type="fix">
+				Field in configuration: blast database path, remove the prefix filename in path.
+			</action>
+		</release>
+
+		<release version="1.2.5" description="Aozan version 1.2.5"
+			date="2014-04-04">
+			<action dev="perrin" type="fix">
+				Check aozan configuration file at the beginning, if failed, now it sends a mail.		
+			</action>
+		</release>
+
+		<release version="1.x" description="Aozan version 1.x"
+			date="TBD">
+			<action dev="jourdren" type="add">
+				Add global tests to the QC step. This new type of test comes with some global tests.
+			</action>
+		</release>
 	</body>
 </document>
