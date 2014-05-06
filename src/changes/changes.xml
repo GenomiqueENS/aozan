@@ -305,5 +305,11 @@
 				Check aozan configuration file at the beginning, if failed, now it sends a mail.		
 			</action>
 		</release>
+		<release version="1.2.6" description="Aozan version 1.2.6"
+			date="2014-05-06">
+			<action dev="perrin" type="fix">
+				Check fastq not empty before create partial fastq used by FastqScreen for detection contamination.		
+			</action>
+		</release>
 	</body>
 </document>
