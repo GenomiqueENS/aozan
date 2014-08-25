@@ -9,6 +9,7 @@ Created on 25 oct. 2011
 import hiseq_run, sync_run
 import smtplib, os.path, time
 import mimetypes
+from email.utils import formatdate 
 
 from java.io import File
 from java.lang import Runtime
@@ -231,40 +232,35 @@ def send_msg(subject, message, is_error, conf):
     # Specific receiver for error message
     if is_error:
         mail_to = conf[MAIL_ERROR_TO_KEY]
-
+ 
         # Mail error not define
         if mail_to == None or mail_to == '':
             mail_to = conf[MAIL_TO_KEY]
     else:
         mail_to = conf[MAIL_TO_KEY]
-
+ 
     mail_from = conf[MAIL_FROM_KEY]
     mail_cc = None
     mail_bcc = None
-    COMMASPACE = ', '
-
-    message = conf[MAIL_HEADER_KEY].replace('\\n', '\n') + message + conf[MAIL_FOOTER_KEY].replace('\\n', '\n')
-    message = message.replace('\n', '\r\n')
-    msg = "From: %s\r\n" % mail_from
-
+    
     if mail_to != None :
         if type(mail_to) == str or type(mail_to) == unicode:
             mail_to = [mail_to]
-        msg = msg + ("To: %s\r\n" % COMMASPACE.join(mail_to))
-
+         
     if mail_cc != None :
         if type(mail_cc) == str or type(mail_cc) == unicode:
             mail_cc = [mail_cc]
-        msg = msg + ("Cc: %s\r\n" % COMMASPACE.join(mail_cc))
-
+ 
     if mail_bcc != None :
         if type(mail_bcc) == str or type(mail_bcc) == unicode:
             mail_bcc = [mail_bcc]
-        msg = msg + ("Bcc: %s\r\n" % COMMASPACE.join(mail_bcc))
+ 
+    # Create object msg
+    msg = create_msg(mail_from, mail_to, mail_cc, mail_bcc, subject, message, conf)
 
-
-    msg = msg + "Subject: " + subject + "\r\n" + message
-
+    # Now send or store the message
+    composed = msg.as_string()
+    
     if send_mail:
         server = smtplib.SMTP(smtp_server)
         dests = []
@@ -273,13 +269,12 @@ def send_msg(subject, message, is_error, conf):
             dests.extend(mail_cc)
         if mail_bcc != None :
             dests.extend(mail_bcc)
-        server.sendmail(mail_from, dests, msg)
+        server.sendmail(mail_from, dests, composed)
         server.quit()
     else:
         print '-------------'
-        print msg
+        print composed
         print '-------------'
-
 
 def send_msg_with_attachment(subject, message, attachment_file, conf):
     """Send a message to the user about the data extraction."""
@@ -290,37 +285,21 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
     mail_from = conf[MAIL_FROM_KEY]
     mail_cc = None
     mail_bcc = None
-    COMMASPACE = ', '
-
-    message = conf[MAIL_HEADER_KEY].replace('\\n', '\n') + message + conf[MAIL_FOOTER_KEY].replace('\\n', '\n')
-
-    msg = MIMEMultipart()
-    msg['From'] = mail_from
-
+    
     if mail_to != None :
         if type(mail_to) == str or type(mail_to) == unicode:
             mail_to = [mail_to]
-        msg['To'] = COMMASPACE.join(mail_to)
-
+    
     if mail_cc != None :
         if type(mail_cc) == str or type(mail_cc) == unicode:
             mail_cc = [mail_cc]
-        msg['Cc'] = COMMASPACE.join(mail_cc)
-
+    
     if mail_bcc != None :
         if type(mail_bcc) == str or type(mail_bcc) == unicode:
             mail_bcc = [mail_bcc]
-        msg['Bcc'] = COMMASPACE.join(mail_bcc)
 
-    msg['Subject'] = subject
-
-    # Not seen
-    msg.preamble = message
-
-    # The message
-    part1 = MIMEText(message, 'plain')
-    msg.attach(part1)
-
+    # Create object msg
+    msg = create_msg(mail_from, mail_to, mail_cc, mail_bcc, subject, message, conf)
 
     ctype, encoding = mimetypes.guess_type(attachment_file)
 
@@ -373,6 +352,48 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
         print '-------------'
         print composed
         print '-------------'
+
+def create_msg(mail_from, mail_to, mail_cc, mail_bcc, subject, message, conf):
+    """Create a message to send.
+    
+    Arguments:
+        mail_from : senders
+        mail_to : receivers
+        mail_cc : other receivers 
+        mail_bcc : masked receivers
+        subject: subject of message
+        message: text mail
+        is_error: true if it is a error message
+        conf: configuration object
+    """
+    
+    COMMASPACE = ', '
+    message = conf[MAIL_HEADER_KEY].replace('\\n', '\n') + message + conf[MAIL_FOOTER_KEY].replace('\\n', '\n')
+    message = message.replace('\n', '\r\n')
+    
+    msg = MIMEMultipart()
+    msg['From'] = mail_from
+    
+    if mail_to != None:
+        msg['To'] = COMMASPACE.join(mail_to)
+    
+    if mail_cc != None:
+        msg['Cc'] = COMMASPACE.join(mail_cc)
+        
+    if mail_bcc != None: 
+        msg['Bcc'] = COMMASPACE.join(mail_bcc)
+    
+    msg['Subject'] = subject
+    msg['Date'] = formatdate()
+
+    # Not seen
+    msg.preamble = message
+    
+    # The message
+    part1 = MIMEText(message, 'plain')
+    msg.attach(part1)
+    
+    return msg
 
 def get_last_error_file(conf):
     """Return path to the file which saves last error throws in common operation.
