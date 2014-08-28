@@ -196,6 +196,11 @@ public class TileMetricsCollector implements Collector {
         // One value by tile by code
         if (!metricsPerTilePerCode.get(code).containsKey(tileNumber)) {
           metricsPerTilePerCode.get(code).put(tileNumber, value);
+          
+        } else if (metricsPerTilePerCode.get(code).get(tileNumber) == 0.0) {
+          
+          // Replace value by numeric in case several value exist per tile
+          metricsPerTilePerCode.get(code).put(tileNumber, value);
         }
 
       } else {
@@ -443,9 +448,9 @@ public class TileMetricsCollector implements Collector {
 
         } else if (code % 2 == 0) {
           // Compute the mediane with using value = 0.0
-          this.phasing = stat.getMedianWithoutZero() * 100;
+          this.phasing = stat.getMedianWithoutZero();
         } else {
-          this.prephasing = stat.getMedianWithoutZero() * 100;
+          this.prephasing = stat.getMedianWithoutZero();
         }
       }
 
