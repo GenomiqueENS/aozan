@@ -86,8 +86,8 @@ public class ReadingInteropBinaryFileTest extends TestCase {
       final String value = line.substring(pos + 1);
 
       // Compare runData test and original for each line
-      assertTrue("For " + runName + " : " + key + " must be same ? ",
-          value.equals(dataTest.get(key)));
+      assertEquals("For " + runName + " : " + key + " must be same ? ", value,
+          dataTest.get(key));
 
     }
     br.close();
