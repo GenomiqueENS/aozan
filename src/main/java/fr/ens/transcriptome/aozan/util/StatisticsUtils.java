@@ -45,7 +45,7 @@ public class StatisticsUtils {
   /** object maintains a dataset of values of a single variable */
   private final DescriptiveStatistics ds;
   /** copy dataset without values == 0 */
-  private DescriptiveStatistics dsWithZero = null;
+  private DescriptiveStatistics dsWithoutZero = null;
 
   /**
    * Compute the mean for values
@@ -69,10 +69,10 @@ public class StatisticsUtils {
     // Build dataset of values from dataset initial
     for (Double d : ds.getValues()) {
       if (d != 0.0)
-        dsWithZero.addValue(d);
+        dsWithoutZero.addValue(d);
     }
 
-    return dsWithZero.getMean();
+    return dsWithoutZero.getMean();
   }
 
   /**
@@ -84,7 +84,7 @@ public class StatisticsUtils {
 
     buildDescriptiveStatisticsWithZero();
 
-    return (dsWithZero.getN() == 0 ? 0.0 : new Median().evaluate(dsWithZero
+    return (dsWithoutZero.getN() == 0 ? 0.0 : new Median().evaluate(dsWithoutZero
         .getValues()));
 
   }
@@ -123,17 +123,17 @@ public class StatisticsUtils {
   public DescriptiveStatistics getDescriptiveStatisticsWithZero() {
     buildDescriptiveStatisticsWithZero();
 
-    return this.dsWithZero;
+    return this.dsWithoutZero;
   }
 
   /**
    * Print dataset
    * @return string of dataset
    */
-  public String printValuesWithZero() {
+  public String printValuesWithoutZero() {
     buildDescriptiveStatisticsWithZero();
 
-    return printValues(dsWithZero);
+    return printValues(dsWithoutZero);
   }
 
   /**
@@ -215,11 +215,11 @@ public class StatisticsUtils {
    */
   private void buildDescriptiveStatisticsWithZero() {
 
-    this.dsWithZero = new DescriptiveStatistics();
+    this.dsWithoutZero = new DescriptiveStatistics();
 
     for (Double d : ds.getValues()) {
       if (d != 0.0)
-        dsWithZero.addValue(d);
+        dsWithoutZero.addValue(d);
     }
   }
 
