@@ -132,7 +132,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
         FastqScreenSAMParser parser =
             new FastqScreenSAMParser(this.getMapOutputTempFile(), genome,
-                this.pairedMode);
+                this.pairedMode, desc);
 
         this.setGenomeReference(genome, genomeSample);
 
