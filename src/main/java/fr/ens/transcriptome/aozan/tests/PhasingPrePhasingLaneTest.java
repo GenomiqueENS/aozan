@@ -54,7 +54,7 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
 
     try {
 
-      final String keyPrefix = "phasing.read" + read + ".lane" + lane;
+      final String keyPrefix = "read" + read + ".lane" + lane;
       final double phasing = data.getDouble(keyPrefix + ".phasing");
       final double prephasing = data.getDouble(keyPrefix + ".prephasing");
 
