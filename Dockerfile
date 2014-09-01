@@ -46,7 +46,7 @@ RUN echo -e  '#! /bin/bash\n\n/usr/bin/legacy_blast.pl blastall $@\n' > /usr/loc
 
 ## Examples to build Aozan workspace repository, corresponding with path in Aozan configuration file. 
 
-#Build usefull directory for Aozan
+# Mount usefull directory for Aozan
 RUN mkdir -p /aozan_data/var_aozan
 RUN mkdir -p /aozan_data/conf
 RUN mkdir -p /aozan_data/log
@@ -64,4 +64,4 @@ RUN mkdir -p /aozan_data/ressources/mappers_indexes
 
 
 ## Command to launch docker Aozan-1.2.7
-# docker run -i -t --rm -v /mnt/data01/test_aozan/var_aozan:/aozan_data/var_aozan -v /mnt/data01/test_aozan/conf:/aozan_data/conf -v /import/freki01:/aozan_data/hiseq -v /mnt/data01/test_aozan/bcl:/aozan_data/bcl -v /mnt/data01/test_aozan/fastq:/aozan_data/fastq -v /mnt/data01/test_aozan/sequencages/runs:/aozan_data/runs -v /mnt/data01/test_aozan/sequencages/casava_designs:/aozan_data/casava_samplesheet -v /mnt/data01/test_aozan/aozan_tests_tmp:/aozan_data/aozan_tmp -v /import/mimir03/ressources/sequencages:/aozan_data/ressources -v /import/mimir03/ressources/sequencages/ncbi_nt:/aozan_data/ncbi_nt -v /import/mimir03/ressources/sequencages/genomes:/aozan_data/ressources/genomes -v /import/mimir03/ressources/sequencages/genomes_descs:/aozan_data/ressources/genomes_descs -v /import/mimir03/ressources/sequencages/mappers_indexes:/aozan_data/ressources/mappers_indexes genomicpariscentre/aozan:1.2.6 bash
+# docker run -i -t --rm -v /path/to/real/dir/var_aozan:/aozan_data/var_aozan -v /path/to/real/dir/conf:/aozan_data/conf -v /path/to/real/dir/hiseq:/aozan_data/hiseq -v /path/to/real/dir/bcl:/aozan_data/bcl -v /path/to/real/dir/fastq:/aozan_data/fastq -v /path/to/real/dir/runs:/aozan_data/runs -v /path/to/real/dir/casava_designs:/aozan_data/casava_samplesheet -v /path/to/real/dir/aozan_tmp:/aozan_data/aozan_tmp -v /path/to/real/dir/ressources:/aozan_data/ressources -v /path/to/real/dir/ncbi_nt:/aozan_data/ncbi_nt -v /path/to/real/dir/ressources/genomes:/aozan_data/ressources/genomes -v /path/to/real/dir/ressources/genomes_descs:/aozan_data/ressources/genomes_descs -v /path/to/real/dir/ressources/mappers_indexes:/aozan_data/ressources/mappers_indexes genomicpariscentre/aozan:1.2.7 bash
