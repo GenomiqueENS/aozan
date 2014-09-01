@@ -58,7 +58,7 @@ public class FastqscreenDemo {
       .getLogger(fr.ens.transcriptome.aozan.Globals.APP_NAME);
 
   /** Timer */
-  private static final Stopwatch timer = Stopwatch.createStarted();
+  private static final Stopwatch timer = Stopwatch.createUnstarted();
 
   public static final Properties properties = new Properties();
 
@@ -78,83 +78,70 @@ public class FastqscreenDemo {
   public static final String GENOMES_PATH = RESOURCE_ROOT + "/genomes";
 
   public static final String AOZAN_CONF =
-      "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_test.conf";
-  // "/home/sperrin/home-net/aozan_validation-1.2.1.conf";
-  // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_partiel_fastqc.conf";
-  // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_without_fastqc.conf";
+      "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_light.conf";
 
   public static Map<String, FastqSample> prefixList;
   private static final boolean paired = false;
 
-  private static String runId;
   // private static String date;
   private static String qcDir;
 
   public static final void main(String[] args) {
 
-    try {
-      Locale.setDefault(Locale.US);
-      inactiveCollectorClearMethod();
+    Locale.setDefault(Locale.US);
+    inactiveCollectorClearMethod();
 
-      if (paired) {
-        // run test pair-end
-        // runId = "120830_SNL110_0055_AD16D9ACXX";
-        // runId = "130801_SNL110_0079_AD2CR3ACXX";
+    final List<String> runIds;
+    if (paired) {
+      // Validation (mm10) - PE150
+      runIds = Lists.newArrayList("131015_SNL110_0088_AH13M0ADXX");
+    } else {
 
-        // Mais - SR50
-        // runId = "131004_SNL110_0087_AD297LACXX";
-
-        // Validation (mm10) - PE150
-        runId = "131015_SNL110_0088_AH13M0ADXX";
-      } else {
-
-        // runId = "130726_SNL110_0078_AC2AJTACXX";
-        // runId = "130709_SNL110_0075_AD2C79ACXX";
-        // runId = "130715_SNL110_0076_AD2C4UACXX";
-        // RUN rapid
-        // runId = "130722_SNL110_0077_AH0NT2ADXX";
-        // runId = "130904_SNL110_0082_AC2BR0ACXX";
-        runId = "130910_SNL110_0083_AC2AMKACXX";
-        // runId = "130926_SNL110_0085_AH0EYHADXX";
-      }
-
-      // date = new SimpleDateFormat("yyMMdd").format(new Date());
-
-      // Copy console output in a file
-      // try {
-      // System.setOut(new PrintStream(new FileOutputStream(new File(SRC_RUN
-      // + "/qc_" + runId + "/console_" + date + ".txt"))));
-      //
-      // } catch (FileNotFoundException e1) {
-      // e1.printStackTrace();
-      // }
-
-      Common.initLogger(TMP_DIR + "/" + runId + "_aozan_test.log");
-      LOGGER.setLevel(Level.CONFIG);
-
-      System.out.println("Create report qc for run "
-          + runId + "  " + FastqSample.VALUE);
-
-      reportQC2();
-
-      LOGGER.info("Runtime for demo with a run "
-          + runId + " "
-          + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
-
-    } catch (AozanException ae) {
-      if (ae.getWrappedException() == null)
-        ae.printStackTrace();
-      else
-        ae.getWrappedException().printStackTrace();
-
-    } catch (Exception e) {
-      LOGGER.severe(e.getMessage());
-      e.printStackTrace();
-      System.out.println(e.getMessage());
+      runIds =
+          Lists.newArrayList("140805_SNL110_0126_AC55P4ACXX",
+              "140811_SNL110_0127_AH9AP9ADXX");
     }
 
-    timer.stop();
+    // date = new SimpleDateFormat("yyMMdd").format(new Date());
 
+    // Copy console output in a file
+    // try {
+    // System.setOut(new PrintStream(new FileOutputStream(new File(SRC_RUN
+    // + "/qc_" + runId + "/console_" + date + ".txt"))));
+    //
+    // } catch (FileNotFoundException e1) {
+    // e1.printStackTrace();
+    // }
+
+    for (String runId : runIds) {
+      try {
+        timer.start();
+        Common.initLogger(TMP_DIR + "/" + runId + "_aozan_test.log");
+        LOGGER.setLevel(Level.CONFIG);
+
+        System.out.println("Create report qc for run "
+            + runId + "  " + FastqSample.VALUE);
+
+        reportQC2(runId);
+
+        LOGGER.info("Runtime for demo with a run "
+            + runId + " "
+            + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
+
+      } catch (AozanException ae) {
+        if (ae.getWrappedException() == null)
+          ae.printStackTrace();
+        else
+          ae.getWrappedException().printStackTrace();
+
+      } catch (Exception e) {
+        LOGGER.severe(e.getMessage());
+        e.printStackTrace();
+        System.out.println(e.getMessage());
+      } finally {
+        timer.stop();
+      }
+    }
   }
 
   /**
@@ -163,7 +150,8 @@ public class FastqscreenDemo {
    * FastQC must be call once.
    * @throws AozanException
    */
-  public static void testBuildReportForEachAozanTest() throws AozanException {
+  public static void testBuildReportForEachAozanTest(final String runId)
+      throws AozanException {
     final List<String> list = Lists.newArrayList();
 
     list.add("qc.test.rawclusters.enable");
@@ -245,7 +233,7 @@ public class FastqscreenDemo {
   }
 
   @SuppressWarnings("unused")
-  public static void reportQC2() throws AozanException {
+  public static void reportQC2(final String runId) throws AozanException {
 
     qcDir = SRC_RUN + "/qc_" + runId + "/" + runId;
     String bclDir = "/home/sperrin/shares-net/sequencages/bcl/" + runId;
