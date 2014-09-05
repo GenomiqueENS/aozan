@@ -1,15 +1,18 @@
 <?xml version="1.0"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+
+<xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes" 
+	doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN"
+	doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" />
 
 <xsl:template match="/">
 <xsl:decimal-format name="aozan" decimal-separator="." grouping-separator=" "/>
 <xsl:decimal-format name="thousand" decimal-separator="." grouping-separator=" "/>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <title>fastqscreen <xsl:value-of select="/ReportFastqScreen/sampleName"/></title>
-  <style TYPE="text/css">
+  <style type="text/css">
     
     #genomeSample{
     	color:#9B1319;
