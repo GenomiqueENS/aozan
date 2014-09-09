@@ -134,7 +134,7 @@ public class RuntimePatchFastQC {
     try {
       rewriteContaminantFinderMethod(asBlastToUse);
 
-      modifyConstructorHtmlReportArchive();
+      // modifyConstructorHtmlReportArchive();
 
     } catch (NotFoundException e) {
       throw new AozanException(e);
