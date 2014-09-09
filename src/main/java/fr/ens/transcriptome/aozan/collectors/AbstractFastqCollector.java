@@ -240,8 +240,7 @@ abstract public class AbstractFastqCollector implements Collector {
   }
 
   /**
-   * Estimate the size needed for all uncompresses fastq files and construct the
-   * map with all samples to treat.
+   * Construct the map with all samples to treat.
    * @param data result data object
    */
   private void createListFastqSamples(final RunData data) {

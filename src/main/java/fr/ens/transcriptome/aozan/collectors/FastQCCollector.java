@@ -25,6 +25,7 @@ package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -57,43 +58,71 @@ public class FastQCCollector extends AbstractFastqCollector {
     return COLLECTOR_NAME;
   }
 
-  @Override
-  public void configure(final Properties properties) {
-
-    super.configure(properties);
+  public final static void initFastQC(Map<String, String> globalConf) {
 
     // Define parameters of FastQC
     System.setProperty("java.awt.headless", "true");
     System.setProperty("fastqc.unzip", "true");
 
-    // Check contaminant file specify in configuration Aozan for module
-    // OverRepresented
-    if (properties.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY) != null
-        && properties.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY).length() > 0) {
+    // Contaminant file
+    final String contaminantFile =
+        globalConf.get(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY);
 
-      System.setProperty("fastqc.contaminant_file",
-          properties.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY));
+    if (contaminantFile != null && contaminantFile.trim().length() > 0) {
+      System.setProperty("fastqc.contaminant_file", contaminantFile);
     }
 
-    if (properties.getProperty(Settings.QC_CONF_FASTQC_KMER_SIZE_KEY) != null
-        && properties.getProperty(Settings.QC_CONF_FASTQC_KMER_SIZE_KEY).length() > 0)
+    // Adapter file
+    final String adapterFile =
+        globalConf.get(Settings.QC_CONF_FASTQC_ADAPTER_FILE_KEY);
 
-      System.setProperty("fastqc.kmer_size",
-          properties.getProperty(Settings.QC_CONF_FASTQC_KMER_SIZE_KEY));
+    if (adapterFile != null && adapterFile.trim().length() > 0) {
+      System.setProperty("fastqc.adapter_file", adapterFile);
+    }
 
-    if (properties.getProperty(Settings.QC_CONF_FASTQC_NOGROUP_KEY) != null
-        && properties.getProperty(Settings.QC_CONF_FASTQC_NOGROUP_KEY).length() > 0)
+    // Limits file
+    final String limitsFile =
+        globalConf.get(Settings.QC_CONF_FASTQC_LIMITS_FILE_KEY);
 
-      System.setProperty("fastqc.nogroup",
-          properties.getProperty(Settings.QC_CONF_FASTQC_NOGROUP_KEY));
+    if (limitsFile != null && limitsFile.trim().length() > 0) {
+      System.setProperty("fastqc.limits_file", limitsFile);
+    }
+
+    // Kmer Size
+    final String kmerSize = globalConf.get(Settings.QC_CONF_FASTQC_KMER_SIZE_KEY);
+    if (kmerSize != null && kmerSize.trim().length() > 0) {
+      System.setProperty("fastqc.kmer_size", kmerSize);
+    }
+
+    // Set fastQC nogroup
+    final String fastqcNoGroup = globalConf.get(Settings.QC_CONF_FASTQC_NOGROUP_KEY);
+    if (fastqcNoGroup != null && fastqcNoGroup.trim().length() > 0) {
+      System.setProperty("fastqc.nogroup", fastqcNoGroup);
+    }
+
+    // Set fastQC expgroup
+    final String fastqcExpgroup = globalConf.get(Settings.QC_CONF_FASTQC_EXPGROUP_KEY);
+    if (fastqcExpgroup != null && fastqcExpgroup.trim().length() > 0) {
+      System.setProperty("fastqc.expgroup", fastqcExpgroup);
+    }
+
+    // Set the number of threads of FastQC at one
+    System.setProperty("fastqc.threads", "1");
+
+  }
+
+  @Override
+  public void configure(final Properties properties) {
+
+    super.configure(properties);
 
     // Set the number of threads
     if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
 
       try {
         int confThreads =
-            Integer.parseInt(properties.getProperty(Settings.QC_CONF_THREADS_KEY)
-                .trim());
+            Integer.parseInt(properties.getProperty(
+                Settings.QC_CONF_THREADS_KEY).trim());
         if (confThreads > 0)
           this.numberThreads = confThreads;
 

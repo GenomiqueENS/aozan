@@ -43,6 +43,7 @@ import com.google.common.io.Files;
 import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.collectors.CollectorRegistry;
 import fr.ens.transcriptome.aozan.collectors.DesignCollector;
+import fr.ens.transcriptome.aozan.collectors.FastQCCollector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.AozanTestRegistry;
@@ -498,6 +499,9 @@ public class QC {
     this.globalConf.put(QC_OUTPUT_DIR, qcDir);
     this.globalConf.put(TMP_DIR, tmpDir.getAbsolutePath());
 
+    // Initialize FastQC v0.11.2 must be make before initialize AozanTest to
+    // FastQCSample
+    FastQCCollector.initFastQC(this.globalConf);
   }
 
   /**
