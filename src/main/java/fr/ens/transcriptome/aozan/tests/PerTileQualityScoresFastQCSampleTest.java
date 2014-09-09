@@ -27,17 +27,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import uk.ac.babraham.FastQC.Modules.PerBaseGCContent;
+import uk.ac.babraham.FastQC.Modules.PerTileQualityScores;
 import fr.ens.transcriptome.aozan.AozanException;
 
 /**
- * This class define a sample test for FastQC per base GC content module.
- * @since 0.8
+ * This class define a sample test for FastQC per tile sequence quality module.
+ * @since 1.3
+ * @author Sandrine Perrin
  * @author Laurent Jourdren
  */
-public class PerBaseGCContentFastQCSampleTest extends AbstractFastQCSampleTest {
+public class PerTileQualityScoresFastQCSampleTest extends
+    AbstractFastQCSampleTest {
 
-  private static final String FASTQC_MODULE_NAME = new PerBaseGCContent()
+  private static final String FASTQC_MODULE_NAME = new PerTileQualityScores()
       .name();
 
   @Override
@@ -55,7 +57,7 @@ public class PerBaseGCContentFastQCSampleTest extends AbstractFastQCSampleTest {
   @Override
   protected int getHTMLAnchorIndex() {
 
-    return 4;
+    return 2;
   }
 
   //
@@ -65,9 +67,10 @@ public class PerBaseGCContentFastQCSampleTest extends AbstractFastQCSampleTest {
   /**
    * Public constructor.
    */
-  public PerBaseGCContentFastQCSampleTest() {
+  public PerTileQualityScoresFastQCSampleTest() {
 
-    super("perbasegccontent", "per base GC content", "Per base GC content");
+    super("pertilesequencequality", "per tile sequence quality",
+        "Per tile sequence quality");
   }
 
 }
