@@ -45,6 +45,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import javax.xml.stream.XMLStreamException;
+
 import fr.ens.transcriptome.aozan.Globals;
 import uk.ac.babraham.FastQC.FastQCApplication;
 import uk.ac.babraham.FastQC.Modules.QCModule;
@@ -309,7 +311,7 @@ public class HTMLReportArchiveAozan extends HTMLReportArchive {
   //
 
   public HTMLReportArchiveAozan(SequenceFile sequenceFile, QCModule[] modules,
-      File file) throws IOException {
+      File file) throws IOException, XMLStreamException {
 
     super(null, null, null);
 
