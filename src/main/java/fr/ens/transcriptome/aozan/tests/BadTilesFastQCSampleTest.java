@@ -55,7 +55,7 @@ public class BadTilesFastQCSampleTest extends AbstractFastQCSampleTest {
   @Override
   protected int getHTMLAnchorIndex() {
 
-    return 11;
+    return 12;
   }
 
   //

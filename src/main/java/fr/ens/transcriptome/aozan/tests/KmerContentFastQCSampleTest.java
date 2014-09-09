@@ -54,7 +54,7 @@ public class KmerContentFastQCSampleTest extends AbstractFastQCSampleTest {
   @Override
   protected int getHTMLAnchorIndex() {
 
-    return 10;
+    return 11;
   }
 
   //

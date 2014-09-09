@@ -57,7 +57,7 @@ public class PerSequenceQualityScoresFastQCSampleTest extends
   @Override
   protected int getHTMLAnchorIndex() {
 
-    return 2;
+    return 3;
   }
 
   //
