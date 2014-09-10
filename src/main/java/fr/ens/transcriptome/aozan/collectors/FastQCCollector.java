@@ -89,19 +89,22 @@ public class FastQCCollector extends AbstractFastqCollector {
     }
 
     // Kmer Size
-    final String kmerSize = globalConf.get(Settings.QC_CONF_FASTQC_KMER_SIZE_KEY);
+    final String kmerSize =
+        globalConf.get(Settings.QC_CONF_FASTQC_KMER_SIZE_KEY);
     if (kmerSize != null && kmerSize.trim().length() > 0) {
       System.setProperty("fastqc.kmer_size", kmerSize);
     }
 
     // Set fastQC nogroup
-    final String fastqcNoGroup = globalConf.get(Settings.QC_CONF_FASTQC_NOGROUP_KEY);
+    final String fastqcNoGroup =
+        globalConf.get(Settings.QC_CONF_FASTQC_NOGROUP_KEY);
     if (fastqcNoGroup != null && fastqcNoGroup.trim().length() > 0) {
       System.setProperty("fastqc.nogroup", fastqcNoGroup);
     }
 
     // Set fastQC expgroup
-    final String fastqcExpgroup = globalConf.get(Settings.QC_CONF_FASTQC_EXPGROUP_KEY);
+    final String fastqcExpgroup =
+        globalConf.get(Settings.QC_CONF_FASTQC_EXPGROUP_KEY);
     if (fastqcExpgroup != null && fastqcExpgroup.trim().length() > 0) {
       System.setProperty("fastqc.expgroup", fastqcExpgroup);
     }

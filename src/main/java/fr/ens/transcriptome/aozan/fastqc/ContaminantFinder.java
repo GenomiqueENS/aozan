@@ -105,12 +105,21 @@ public class ContaminantFinder {
       final InputStream is;
 
       if (System.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY) != null
-          && System.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY).length() > 0) {
-        is = new FileInputStream(System.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY));
+          && System.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY)
+              .length() > 0) {
+        is =
+            new FileInputStream(
+                System
+                    .getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY));
       } else {
+        // FastQC v0.11.2
         is =
             ClassLoader
-                .getSystemResourceAsStream("Contaminants/contaminant_list.txt");
+                .getSystemResourceAsStream("Configuration/contaminant_list.txt");
+        // FastQC v0.10
+        // ClassLoader
+        // .getSystemResourceAsStream("Contaminants/contaminant_list.txt");
+
       }
 
       BufferedReader br =
