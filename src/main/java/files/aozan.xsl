@@ -2,6 +2,10 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 version="1.0">
 
+<xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"
+	doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN"
+	doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" />
+
 <xsl:template match="/">
 <xsl:decimal-format name="aozan" decimal-separator="." grouping-separator=" "/>
 
@@ -182,8 +186,8 @@ version="1.0">
 
 <div class="header">
 	<div id="header_title">
-		<img src="http://www.transcriptome.ens.fr/aozan/images/logo_aozan_qc.png" alt="Aozan"/>  
-		&#xA0;&#xA0;Quality report on run <xsl:value-of select="/QCReport/RunId"/> 
+		<span><img src="http://www.transcriptome.ens.fr/aozan/images/logo_aozan_qc.png" alt="Aozan"/></span>  
+		<span>Quality report on run <xsl:value-of select="/QCReport/RunId"/></span> 
 	</div> 
 
 	<div id="header_filename">
@@ -294,7 +298,8 @@ version="1.0">
    </table>
   </xsl:for-each>
   </xsl:if>
-  <p>&#xA0;</p>
+  
+  <p>_</p>
 <!-- End div report -->
 </div>
 
