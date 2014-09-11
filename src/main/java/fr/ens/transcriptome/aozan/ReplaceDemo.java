@@ -20,17 +20,32 @@ import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.NotFoundException;
+import uk.ac.babraham.FastQC.Modules.AbstractQCModule;
+import uk.ac.babraham.FastQC.Modules.AdapterContent;
+import uk.ac.babraham.FastQC.Modules.BasicStats;
+import uk.ac.babraham.FastQC.Modules.KmerContent;
+import uk.ac.babraham.FastQC.Modules.NContent;
+import uk.ac.babraham.FastQC.Modules.OverRepresentedSeqs;
+import uk.ac.babraham.FastQC.Modules.PerBaseQualityScores;
+import uk.ac.babraham.FastQC.Modules.PerBaseSequenceContent;
+import uk.ac.babraham.FastQC.Modules.PerSequenceGCContent;
+import uk.ac.babraham.FastQC.Modules.PerSequenceQualityScores;
+import uk.ac.babraham.FastQC.Modules.PerTileQualityScores;
+import uk.ac.babraham.FastQC.Modules.QCModule;
+import uk.ac.babraham.FastQC.Modules.SequenceLengthDistribution;
+import uk.ac.babraham.FastQC.Report.HTMLReportArchive;
+import uk.ac.babraham.FastQC.Sequence.Sequence;
+import uk.ac.babraham.FastQC.Sequence.SequenceFactory;
+import uk.ac.babraham.FastQC.Sequence.SequenceFile;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
-import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.Common;
-import fr.ens.transcriptome.aozan.Globals;
-import fr.ens.transcriptome.aozan.QC;
-import fr.ens.transcriptome.aozan.QCReport;
-import fr.ens.transcriptome.aozan.Settings;
+import fr.ens.transcriptome.aozan.collectors.ReadCollector;
+import fr.ens.transcriptome.aozan.fastqc.BadTiles;
+import fr.ens.transcriptome.aozan.fastqc.OverrepresentedSequencesBlast;
+import fr.ens.transcriptome.aozan.fastqc.RuntimePatchFastQC;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
 public class ReplaceDemo {
@@ -69,6 +84,38 @@ public class ReplaceDemo {
   // private static String date;
 
   public static final void main(String[] args) {
+
+    try {
+      // testModules();
+
+      runReadCollector();
+
+    } catch (Throwable e) {
+      e.printStackTrace();
+    }
+
+  }
+
+  public static void runReadCollector() throws Exception {
+
+    String dir =
+        "/home/sperrin/Documents/FastqScreenTest/runtest/qc_140805_SNL110_0126_AC55P4ACXX/140805_SNL110_0126_AC55P4ACXX_qc_tmp";
+
+    Properties props = getPropertiesAozanConf();
+    props.setProperty(Settings.QC_CONF_READ_XML_COLLECTOR_USED_KEY, "false");
+    props.setProperty(QC.RTA_OUTPUT_DIR, dir);
+
+    File f = new File(dir, "startData.txt");
+    RunData data = new RunData(f);
+
+    ReadCollector rc = new ReadCollector();
+    rc.configure(props);
+    rc.collect(data);
+
+    data.createRunDataFile(new File(dir, "newData.txt"));
+  }
+
+  public static void runAozanTest() {
 
     Locale.setDefault(Locale.US);
     inactiveCollectorClearMethod();
@@ -134,6 +181,58 @@ public class ReplaceDemo {
         timer.stop();
       }
     }
+  }
+
+  public static void testModules() throws Exception {
+
+    RuntimePatchFastQC.runPatchFastQC(true);
+
+    Properties propsAozan = getPropertiesAozanConf();
+    propsAozan.setProperty("tmp.dir", "/tmp");
+
+    OverrepresentedSequencesBlast.getInstance().configure(propsAozan);
+
+    // Configuration
+    System.setProperty("fastqc.unzip", "true");
+    System.setProperty("fastqc.threads", "1");
+
+    // final File fastq =
+    // new File("/home/sperrin/Documents/FastqScreenTest/tmp",
+    // "aozan_fastq_2014_355_GATCAG_L007_R1_001.fastq");
+
+    final File fastq = new File("/tmp/essai.fastq");
+
+    // Pach code
+
+    final SequenceFile seqFile = SequenceFactory.getSequenceFile(fastq);
+
+    final OverRepresentedSeqs os = new OverRepresentedSeqs();
+    // Define modules list
+    final List<AbstractQCModule> modules =
+        Lists.newArrayList(new BasicStats(), new PerBaseQualityScores(),
+            new PerTileQualityScores(), new PerSequenceQualityScores(),
+            new PerBaseSequenceContent(), new PerSequenceGCContent(),
+            new NContent(), new SequenceLengthDistribution(),
+            os.duplicationLevelModule(), os, new AdapterContent(),
+            new KmerContent(), new BadTiles());
+    while (seqFile.hasNext()) {
+      final Sequence seq = seqFile.next();
+      for (final QCModule module : modules) {
+        module.processSequence(seq);
+      }
+    }
+
+    final String filename = "example-fastqc.html";
+    final File reportFile =
+        new File("/home/sperrin/Documents/FastqScreenTest/tmp", filename);
+
+    // TODO Change with FastQC v0.11.2
+    System.out.println("QC report file " + reportFile.getAbsolutePath());
+    // new HTMLReportArchiveAozan(seqFile,
+    // this.moduleList.toArray(new QCModule[] {}), reportFile);
+
+    new HTMLReportArchive(seqFile, modules.toArray(new QCModule[] {}),
+        reportFile);
   }
 
   /**
