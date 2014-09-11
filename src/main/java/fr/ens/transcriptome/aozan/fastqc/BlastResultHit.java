@@ -52,8 +52,8 @@ class BlastResultHit {
   private static final String tag_hspIdentity = "Hsp_identity";
   private static final String tag_hspAlignLen = "Hsp_align-len";
 
+  private final boolean htmlTypeOutput;
   private final String sequence;
-
   private int queryLength;
   private String result;
   private String hspEValue;
@@ -98,6 +98,57 @@ class BlastResultHit {
    * @return object contaminantHit
    */
   public ContaminantHit toContaminantHit() {
+    final String resultContaminant;
+    if (this.htmlTypeOutput) {
+      resultContaminant = contaminantHitToHtmlType();
+    } else {
+      resultContaminant = contaminantHitToTextType();
+    }
+
+    final Contaminant cont = new Contaminant(resultContaminant, "");
+
+    // Override method
+    return new ContaminantHit(cont, 1, this.queryLength, this.prcIdentity) {
+
+      @Override
+      public String toString() {
+
+        return cont.name();
+      }
+    };
+  }
+
+  /**
+   * Return result search on contaminant hit in text type to display in control
+   * quality report.
+   * @return result search on contaminant hit in text type.
+   */
+  private String contaminantHitToTextType() {
+
+    StringBuilder name = new StringBuilder();
+    name.append("Search with Blastall+");
+    name.append(" First hit on "
+        + (countHits > 100 ? "+100" : countHits) + " : ");
+    name.append(this.result);
+    name.append(" Evalue=" + this.hspEValue + ", ");
+    name.append(" Ident=" + prcIdentity + "%,");
+    name.append(" QueryCovergap=" + this.queryCover + "%");
+
+    // Return only the best hit
+    if (this.prcIdentity < MIN_IDENTITY_EXPECTED
+        || this.queryCover > MAX_QUERYCOVERT_EXPECTED)
+      return "No hit";
+
+    return name.toString();
+
+  }
+
+  /**
+   * Return result search on contaminant hit in text type to display in control
+   * quality report.
+   * @return result search on contaminant hit in text type.
+   */
+  private String contaminantHitToHtmlType() {
 
     StringBuilder name = new StringBuilder();
     name.append("Search with Blastall+, <a href="
@@ -115,19 +166,9 @@ class BlastResultHit {
     // Return only the best hit
     if (this.prcIdentity < MIN_IDENTITY_EXPECTED
         || this.queryCover > MAX_QUERYCOVERT_EXPECTED)
-      return null;
+      return "No hit";
 
-    final Contaminant cont = new Contaminant(name.toString(), "");
-
-    // Override method
-    return new ContaminantHit(cont, 1, this.queryLength, this.prcIdentity) {
-
-      @Override
-      public String toString() {
-
-        return cont.name();
-      }
-    };
+    return name.toString();
   }
 
   public boolean isNull() {
@@ -146,6 +187,7 @@ class BlastResultHit {
   public BlastResultHit(final String sequence) {
 
     this.sequence = sequence;
+    this.htmlTypeOutput = false;
 
   }
 
@@ -156,11 +198,13 @@ class BlastResultHit {
    * @param countHits number hits retrieved by blast
    * @param queryLength number base in sequence query
    * @param sequence query blast
+   * @param htmlTypeOutput true if output in html type, otherwise in text type
    */
   public BlastResultHit(final Element hit, final int countHits,
-      final int queryLength, final String sequence) {
+      final int queryLength, final String sequence, final boolean htmlTypeOutput) {
 
     this.sequence = sequence;
+    this.htmlTypeOutput = htmlTypeOutput;
 
     addHitData(hit, countHits, queryLength);
   }

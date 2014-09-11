@@ -81,6 +81,8 @@ public class OverrepresentedSequencesBlast {
       "/sequences_nohit_with_blastn.txt";
   private static final String PREFIX_FILENAME_DATABASE = "/nt";
 
+  private static final boolean BLAST_RESULT_HTML_TYPE = false;
+
   // Tag configuration general of blast
   private static final String tag_queryLength = "Iteration_query-len";
   private static final String tag_blastVersion = "BlastOutput_version";
@@ -171,7 +173,7 @@ public class OverrepresentedSequencesBlast {
           // Add in map all sequences to do not analysis, return a resultBlast
           // with no hit
           loadSequencesToIgnore();
-          
+
           LOGGER.info("FastQC-step blast : step is enable, command line = "
               + Joiner.on(' ').join(this.blastCommonCommandLine));
 
@@ -179,7 +181,7 @@ public class OverrepresentedSequencesBlast {
           LOGGER.warning(e.getMessage()
               + "\n\t" + StringUtils.join(e.getStackTrace(), "\n\t"));
           this.stepEnabled = false;
-          
+
         } catch (AozanException e) {
           LOGGER.warning(e.getMessage()
               + "\n\t" + StringUtils.join(e.getStackTrace(), "\n\t"));
@@ -573,7 +575,8 @@ public class OverrepresentedSequencesBlast {
       return null;
 
     // Parse the first hit to build result
-    return new BlastResultHit(hits.get(0), countHits, queryLength, sequence);
+    return new BlastResultHit(hits.get(0), countHits, queryLength, sequence,
+        BLAST_RESULT_HTML_TYPE);
 
   }
 
