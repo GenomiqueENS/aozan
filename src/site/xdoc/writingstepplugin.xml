@@ -60,7 +60,7 @@
 	    <li>An Internet connection</li>
 	  </ul>
 	  
-	  <p>If you use Ubuntu 11.10 (Oneiric Ocelot), you can install all the 
+	  <p>If you use Ubuntu 14.04 (Trusty Tahr), you can install all the 
 	  requirements with the next command line:</p>
 <source>
 $ sudo apt-get install openjdk-7-jdk maven2 eclipse-jdt
@@ -75,7 +75,7 @@ $ sudo apt-get install openjdk-7-jdk maven2 eclipse-jdt
       to build our project. It is not mandatory to use Maven but it is quite harder without.</p>
     
       <ul>
-        <li>First we generate the skeleton of our plugin with Maven.</li>
+        <li>First we generate the skeleton of our plugin with Maven. NB: pom.xml should not exist in the current folder.</li>
     
 <source>
 $ mvn archetype:generate \
@@ -136,7 +136,7 @@ myaozanplugin
       &lt;scope>test&lt;/scope&gt;
     &lt;/dependency&gt;
     
-    &lt;!-- Add specific librairy needed by plugin --&gt;
+    &lt;!-- Add specific library needed for plugin --&gt;
     &lt;dependency&gt;
   	  &lt;!-- jsoup HTML parser library @ http://jsoup.org/ --&gt;
   	  &lt;groupId&gt;org.jsoup&lt;/groupId&gt;
@@ -166,8 +166,8 @@ myaozanplugin
         &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
         &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
         &lt;configuration&gt;
-          &lt;source&gt;1.6&lt;/source&gt;
-          &lt;target&gt;1.6&lt;/target&gt;
+          &lt;source&gt;1.7&lt;/source&gt;
+          &lt;target&gt;1.7&lt;/target&gt;
         &lt;/configuration&gt;
       &lt;/plugin&gt;
     &lt;/plugins&gt;
@@ -311,7 +311,7 @@ public class FocusScoreCollector implements Collector {
    * @param data result data object
    * @throws AozanException
    */
-  public void parse(final Document doc, final RunData data)
+  private void parse(final Document doc, final RunData data)
       throws AozanException {
 
     final String endFirstColumnName = "Focus Score";
@@ -364,7 +364,7 @@ public class FocusScoreCollector implements Collector {
     boolean first = true;
     String base = "";
 
-    // Keeping columns order ??
+    // Parse elements of a row
     for (Element col : focusRow.select("td")) {
       // Skip name line
       if (first) {
@@ -428,6 +428,69 @@ public class FocusScoreCollector implements Collector {
       	that extends <code>AbstractSimpleLaneTest</code>. The class define a test to configure in Aozan configuration file. 
       	A new column appears in table lane quality control report. 
       	</li>
+<source>
+	/*
+	 *                  Aozan development code
+	 *
+	 * This code may be freely distributed and modified under the
+	 * terms of the GNU General Public License version 3 or later
+	 * and CeCILL. This should be distributed with the code. If you
+	 * do not have a copy, see:
+	 *
+	 *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+	 *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+	 *
+	 * Copyright for this code is held jointly by the Genomic platform
+	 * of the Institut de Biologie de l'École Normale Supérieure and
+	 * the individual authors. These should be listed in @author doc
+	 * comments.
+	 *
+	 * For more information on the Aozan project and its aims,
+	 * or to join the Aozan Google group, visit the home page at:
+	 *
+	 *      http://www.transcriptome.ens.fr/aozan
+	 *
+	 */
+	package fr.ens.transcriptome.aozan.tests;
+	
+	import java.util.List;
+	
+	import com.google.common.collect.ImmutableList;
+	
+	import fr.ens.transcriptome.aozan.collectors.FocusScoreCollector;
+	import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
+	
+	public class FocusScoreLaneTest extends AbstractSimpleLaneTest {
+	
+	  // private final ScoreInterval interval = new ScoreInterval();
+	
+	  @Override
+	  protected String getKey(int read, boolean indexedRead, int lane) {
+	
+	    return FocusScoreCollector.PREFIX_DATA + ".lane" + lane;
+	  }
+	
+	  @Override
+	  protected Class&lt;?> getValueType() {
+	
+	    return Double.class;
+	  }
+	
+	  @Override
+	  public List&lt;String> getCollectorsNamesRequiered() {
+	    return ImmutableList.of(RunInfoCollector.COLLECTOR_NAME,
+	        FocusScoreCollector.COLLECTOR_NAME);
+	  }
+	
+	  //
+	  // Public constructor
+	  //
+	  public FocusScoreLaneTest() {
+	    super("focusscore", "from first base report",
+	        "Focus Score (first estimation)");
+	  }
+	}
+</source>
 	    
      </ul>
    </subsection>
@@ -438,7 +501,7 @@ public class FocusScoreCollector implements Collector {
    <p>Like many java components (JDBC, JCE, JNDI...), Aozan use the Service provider Interface (spi) 
    system for its plugin system. To get a functional spi plugin, you need a class that implements an 
    interface (here <code>FocusScoreCollector</code> implements the <code>Collector</code> interface and 
-   <code>FocusScoreLaneTest</code> implements <code>LaneTest</code>) and a declaration of your implementation 
+   <code>FocusScoreLaneTest</code> extends <code>AbstractSimpleLaneTest</code>) and a declaration of your implementation 
    of the interface in the metadata. To register your collector and laneTest in the metadata:</p>
    
 <source>
@@ -472,11 +535,11 @@ $ mvn clean install
     
     <p>You must update Aozan configuration file and add parameters for the collector. In this file, you add this two lines for example, 
     the laneTest is called also the collector will be executed.</p> 
-      <p>qc.test.focusscore.enable=True</p>
-	  <p>qc.test.focusscore.interval=[75.0, 100.0]</p>
+      <p>qc.test.focusscore.enable=True<br/>
+	     qc.test.focusscore.interval=[75.0, 100.0]</p>
 	
 	<div border="1">Example of personal quality control report html.
-	  <img src="images/qc_report_aozan-plugin.png" alt="control quality report after plugin execution" border="1"/> 
+	  <p><img src="images/qc_report_aozan-plugin.png" alt="control quality report after plugin execution" border="1"/></p> 
     </div>
     
     </subsection>

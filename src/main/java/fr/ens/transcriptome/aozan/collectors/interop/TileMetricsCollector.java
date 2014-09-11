@@ -448,9 +448,9 @@ public class TileMetricsCollector implements Collector {
 
         } else if (code % 2 == 0) {
           // Compute the mediane with using value = 0.0
-          this.phasing = stat.getMedianWithoutZero();
+          this.phasing = stat.getMedianWithoutZero() * 100;
         } else {
-          this.prephasing = stat.getMedianWithoutZero();
+          this.prephasing = stat.getMedianWithoutZero() * 100;
         }
       }
 
