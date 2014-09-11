@@ -16,3 +16,5 @@ aozan.iml
 
 /src/main/java/fr/ens/transcriptome/aozan/FastqscreenDemo.java
 /src/main/java/fr/ens/transcriptome/aozan/collectors/interop/TestCollectorReadBinary.java
+
+./myaozanplugin

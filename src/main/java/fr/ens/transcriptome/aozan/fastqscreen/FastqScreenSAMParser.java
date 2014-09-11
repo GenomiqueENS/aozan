@@ -32,7 +32,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.samtools.SAMParser;
+import net.sf.samtools.SAMLineParser;
 import net.sf.samtools.SAMRecord;
 
 import com.google.common.base.Charsets;
@@ -40,7 +40,8 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.Globals;
-import fr.ens.transcriptome.eoulsan.bio.SAMParserLine;
+import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
+import fr.ens.transcriptome.eoulsan.bio.SAMUtils;
 import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.MultiReadAlignmentsFilter;
 import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.ReadAlignmentsFilter;
 import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.ReadAlignmentsFilterBuffer;
@@ -52,14 +53,13 @@ import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.RemoveUnmappedReadAlig
  * @since 1.0
  * @author Sandrine Perrin
  */
-public class FastqScreenSAMParser implements SAMParserLine {
+public class FastqScreenSAMParser {
 
   private File mapOutputFile = null;
   private final String genome;
   private Writer fw;
 
-  private final List<String> genomeDescriptionList;
-  private final SAMParser parser;
+  private final SAMLineParser parser;
   private boolean headerParsed = false;
   private boolean pairedMode = false;
 
@@ -75,7 +75,6 @@ public class FastqScreenSAMParser implements SAMParserLine {
    * @param SAMline parse SAM line
    * @throws IOException if an error occurs while writing in mapOutputFile
    */
-  @Override
   public void parseLine(final String SAMline) throws IOException {
 
     if (SAMline == null || SAMline.length() == 0)
@@ -84,19 +83,11 @@ public class FastqScreenSAMParser implements SAMParserLine {
     if (!headerParsed) {
 
       if (SAMline.charAt(0) == '@') {
-
-        // Store header line
-        genomeDescriptionList.add(SAMline);
-
         return;
 
       } else {
-
         // Set the chromosomes sizes in the parser
-        parser.setGenomeDescription(genomeDescriptionList);
-        genomeDescriptionList.clear();
         headerParsed = true;
-
       }
 
     }
@@ -213,11 +204,9 @@ public class FastqScreenSAMParser implements SAMParserLine {
 
   }
 
-  @Override
   public void cleanup() {
   }
 
-  @Override
   public void setup() {
   }
 
@@ -239,18 +228,21 @@ public class FastqScreenSAMParser implements SAMParserLine {
    * filters used for parsing SAM file
    * @param mapOutputFile file result from mapping
    * @param genome name genome
+   * @param genomeDescription description of the genome
    * @param pairedMode true if a pair-end run and option paired mode equals true
    *          else false
    * @throws IOException if an error occurs while initializing mapOutputFile
    */
   public FastqScreenSAMParser(final File mapOutputFile, final String genome,
-      final boolean pairedMode) throws IOException {
+      final boolean pairedMode, final GenomeDescription genomeDescription)
+      throws IOException {
 
     this.genome = genome;
     this.pairedMode = pairedMode;
 
     // Create parser object
-    this.parser = new SAMParser();
+    this.parser =
+        new SAMLineParser(SAMUtils.newSAMFileHeader(genomeDescription));
 
     // object used for the Sam read alignments filter
     List<ReadAlignmentsFilter> listFilters = Lists.newArrayList();
@@ -258,8 +250,6 @@ public class FastqScreenSAMParser implements SAMParserLine {
 
     ReadAlignmentsFilter filter = new MultiReadAlignmentsFilter(listFilters);
     this.buffer = new ReadAlignmentsFilterBuffer(filter);
-
-    this.genomeDescriptionList = new ArrayList<String>();
 
     this.mapOutputFile = mapOutputFile;
     this.fw =

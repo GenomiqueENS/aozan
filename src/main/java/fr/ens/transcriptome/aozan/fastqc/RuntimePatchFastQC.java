@@ -57,25 +57,28 @@ public class RuntimePatchFastQC {
         ClassPool.getDefault().get(
             "uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminentFinder");
 
-    // Retrieve the method to modify
-    CtBehavior cb = cc.getDeclaredMethod("findContaminantHit");
+    // Check class not frozen
+    if (!cc.isFrozen()) {
+      // Retrieve the method to modify
+      CtBehavior cb = cc.getDeclaredMethod("findContaminantHit");
 
-    // Add code at the beginning of the method
-    final String codeToAdd;
+      // Add code at the beginning of the method
+      final String codeToAdd;
 
-    if (asBlastToUse) {
-      codeToAdd =
-          "return fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.findContaminantHit(sequence);";
+      if (asBlastToUse) {
+        codeToAdd =
+            "return fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.findContaminantHit(sequence);";
 
-    } else {
-      codeToAdd =
-          "if (contaminants == null) {\n contaminants = "
-              + "fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.makeContaminantList();\n}";
+      } else {
+        codeToAdd =
+            "if (contaminants == null) {\n contaminants = "
+                + "fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.makeContaminantList();\n}";
+      }
+      cb.insertBefore(codeToAdd);
+
+      // Load the class by the ClassLoader
+      cc.toClass();
     }
-    cb.insertBefore(codeToAdd);
-
-    // Load the class by the ClassLoader
-    cc.toClass();
   }
 
   /**
@@ -95,14 +98,18 @@ public class RuntimePatchFastQC {
         ClassPool.getDefault().get(
             "uk.ac.babraham.FastQC.Report.HTMLReportArchive");
 
-    // Retrieve the constructor
-    CtConstructor[] constructors = cc.getConstructors();
+    // Check class not frozen
+    if (!cc.isFrozen()) {
 
-    // Modify constructor, it does nothing
-    constructors[0].setBody(null);
+      // Retrieve the constructor
+      CtConstructor[] constructors = cc.getConstructors();
 
-    // Load the class by the ClassLoader
-    cc.toClass();
+      // Modify constructor, it does nothing
+      constructors[0].setBody(null);
+
+      // Load the class by the ClassLoader
+      cc.toClass();
+    }
   }
 
   /**

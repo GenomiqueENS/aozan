@@ -307,11 +307,43 @@
 			</action>
 		</release>
 
+		<release version="1.2.6" description="Aozan version 1.2.6"
+			date="2014-05-06">
+			<action dev="perrin" type="fix">
+				Check fastq not empty before create partial fastq used by FastqScreen for detection contamination.		
+			</action>
+		</release>
+		<release version="1.2.7" description="Aozan version 1.2.7"
+			date="2014-09-01">
+			<action dev="perrin" type="update">
+				Now, Aozan run with JRE 1.7 and use new package of samtools v1.92.  
+			</action>
+			<action dev="perrin" type="fix">
+				Change format data of sending message.   
+			</action>
+			<action dev="perrin" type="update">
+				Compute phasing and prephasing values with RTA v1.18, ignore null tiles metric Interop file.
+			</action>
+			<action dev="perrin" type="add">
+				Add page in web site to explain who create a plugin for Aozan.
+			</action>
+		</release>
+		<release version="1.2.8" description="Aozan version 1.2.8"
+			date="2014-09-11">
+			<action dev="perrin" type="fix">
+				Compute phasing and prephasing values from Tiles metric Interop file: multiple by 100 to save in run data file, like before v1.2.7.
+			</action>
+			<action dev="perrin" type="fix">
+				Order indentation in html report, display error for lines > 1000 characters with some server mail.
+			</action>
+		</release>
+		
 		<release version="1.x" description="Aozan version 1.x"
 			date="TBD">
 			<action dev="jourdren" type="add">
 				Add global tests to the QC step. This new type of test comes with some global tests.
 			</action>
 		</release>
+				
 	</body>
 </document>

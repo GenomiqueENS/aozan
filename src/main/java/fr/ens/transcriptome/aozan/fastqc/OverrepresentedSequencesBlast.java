@@ -171,17 +171,20 @@ public class OverrepresentedSequencesBlast {
           // Add in map all sequences to do not analysis, return a resultBlast
           // with no hit
           loadSequencesToIgnore();
+          
+          LOGGER.info("FastQC-step blast : step is enable, command line = "
+              + Joiner.on(' ').join(this.blastCommonCommandLine));
 
         } catch (IOException e) {
-          LOGGER.warning(StringUtils.join(e.getStackTrace(), "\n\t"));
+          LOGGER.warning(e.getMessage()
+              + "\n\t" + StringUtils.join(e.getStackTrace(), "\n\t"));
           this.stepEnabled = false;
+          
         } catch (AozanException e) {
-          LOGGER.warning(StringUtils.join(e.getStackTrace(), "\n\t"));
+          LOGGER.warning(e.getMessage()
+              + "\n\t" + StringUtils.join(e.getStackTrace(), "\n\t"));
           this.stepEnabled = false;
         }
-
-        LOGGER.info("FastQC-step blast : step is enable, command line = "
-            + Joiner.on(' ').join(this.blastCommonCommandLine));
       }
     }
 
@@ -249,11 +252,10 @@ public class OverrepresentedSequencesBlast {
       final String blastPath, final String blastDBPath,
       final List<String> argBlast) throws IOException {
 
-    checkExistingFile(new File(blastPath),
-        "FastQC-step blast : path to blast doesn't exist.");
+    checkExistingFile(new File(blastPath), "FastQC-step blast : path to blast ");
     // Check nt.nal file exists
     checkExistingFile(new File(blastDBPath + ".nal"),
-        " FastQC-step blast : path to database blast doesn't exist.");
+        " FastQC-step blast : path to database blast");
 
     final List<String> result = Lists.newArrayList();
 
@@ -386,8 +388,7 @@ public class OverrepresentedSequencesBlast {
 
     // Check if the temporary file already exists
     checkExistingFile(resultXMLFile,
-        "FastQC-step blast : path to output file doesn't exist for the sequence "
-            + sequence);
+        "FastQC-step blast : path to output file for the sequence " + sequence);
 
     // Clone command line
     final List<String> finalCommand = newArrayList(this.blastCommonCommandLine);
@@ -476,8 +477,7 @@ public class OverrepresentedSequencesBlast {
 
     InputStream is = null;
     try {
-      checkExistingFile(resultXML,
-          "FastQC-step blast : query result xml doesn't exist");
+      checkExistingFile(resultXML, "FastQC-step blast : query result xml");
 
       // Create the input stream
       is = new FileInputStream(resultXML);

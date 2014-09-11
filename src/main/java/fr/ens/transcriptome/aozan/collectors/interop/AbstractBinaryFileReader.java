@@ -90,7 +90,7 @@ abstract class AbstractBinaryFileReader<M> {
 
     try {
       FileUtils.checkExistingFile(getMetricsFile(), "Error binary file "
-          + getMetricsFile().getAbsolutePath() + " doesn't exist !");
+          + getMetricsFile().getAbsolutePath());
 
       final FileInputStream is = new FileInputStream(getMetricsFile());
       final FileChannel channel = is.getChannel();

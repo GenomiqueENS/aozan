@@ -178,6 +178,11 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
             + fastqSample.getLane() + ".sample." + fastqSample.getSampleName()
             + ".read" + fastqSample.getRead();
 
+    // Check value exist in rundata, if not then fastq is empty
+    if (data.get(prefix + ".pf.cluster.count") == null
+        || data.get(prefix + ".raw.cluster.count") == null)
+      return null;
+
     int pfClusterCount = data.getInt(prefix + ".pf.cluster.count");
     int rawClusterCount = data.getInt(prefix + ".raw.cluster.count");
 

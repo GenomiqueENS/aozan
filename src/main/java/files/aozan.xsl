@@ -1,14 +1,17 @@
-<?xml version="1.0"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-version="1.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+
+<xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"
+	doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN"
+	doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" />
 
 <xsl:decimal-format name="aozan" decimal-separator="." grouping-separator=" "/>
 <xsl:template match="/">
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <title><xsl:value-of select="/QCReport/RunId"/> run quality report</title>
-  <style TYPE="text/css">
+  <style type="text/css">
   	
     .score-1 {
     }
@@ -182,8 +185,8 @@ version="1.0">
 
 <div class="header">
 	<div id="header_title">
-		<img src="http://www.transcriptome.ens.fr/aozan/images/logo_aozan_qc.png" alt="Aozan"/>  
-		&#xA0;&#xA0;Quality report on run <xsl:value-of select="/QCReport/RunId"/> 
+		<span><img src="http://www.transcriptome.ens.fr/aozan/images/logo_aozan_qc.png" alt="Aozan"/></span>  
+		<span>Quality report on run <xsl:value-of select="/QCReport/RunId"/></span> 
 	</div> 
 
 	<div id="header_filename">
@@ -231,7 +234,7 @@ version="1.0">
   </xsl:if>
 
   <xsl:if test="/QCReport[ReadsReport]">
-  <a name="lane"/>
+  <a name="lane"></a>
   <h2>Lanes Quality report</h2>
 
   <xsl:for-each select="/QCReport/ReadsReport/Reads/Read">
@@ -262,8 +265,8 @@ version="1.0">
   </xsl:for-each>
   </xsl:if>
 
+  <a name="sample"></a>
   <xsl:if test="/QCReport[SamplesReport]">
-  <a name="sample"/>
   <h2>Samples Quality report</h2>
 
   <xsl:for-each select="/QCReport/SamplesReport/Reads/Read">
@@ -319,7 +322,8 @@ version="1.0">
    </table>
   </xsl:for-each>
   </xsl:if>
-  <p>&#xA0;</p>
+  
+  <p>_</p>
 <!-- End div report -->
 </div>
 
