@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import uk.ac.babraham.FastQC.Modules.PerTileQualityScores;
+import uk.ac.babraham.FastQC.Modules.AdapterContent;
 import fr.ens.transcriptome.aozan.AozanException;
 
 /**
@@ -16,7 +16,7 @@ import fr.ens.transcriptome.aozan.AozanException;
 public class AdapterContentFastQCSampleTest extends
     AbstractFastQCSampleTest {
 
-  private static final String FASTQC_MODULE_NAME = new PerTileQualityScores()
+  private static final String FASTQC_MODULE_NAME = new AdapterContent()
       .name();
 
   @Override
