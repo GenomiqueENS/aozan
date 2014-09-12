@@ -81,6 +81,8 @@ public class UndeterminedIndexesCollector extends AbstractFastqCollector {
 
     // TODO Parse setting for maximum number of mismatches
 
+    // TODO check demultiplexage make with 1 mismatch, if true all values in
+    // runData at 0.
   }
 
   @Override

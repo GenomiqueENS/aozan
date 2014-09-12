@@ -48,6 +48,7 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
+import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
 public class FastqscreenDemo {
@@ -78,10 +79,7 @@ public class FastqscreenDemo {
   public static final String GENOMES_PATH = RESOURCE_ROOT + "/genomes";
 
   public static final String AOZAN_CONF =
-      "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_test.conf";
-  // "/home/sperrin/home-net/aozan_validation-1.2.1.conf";
-  // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_partiel_fastqc.conf";
-  // "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_without_fastqc.conf";
+      "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_plugins.conf";
 
   public static Map<String, FastqSample> prefixList;
   private static final boolean paired = false;
@@ -93,29 +91,44 @@ public class FastqscreenDemo {
   public static final void main(String[] args) {
 
     try {
+      runAozanTest();
+
+    } catch (Throwable e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static void runReadCollector() throws Exception {
+
+    String dir =
+        "/home/sperrin/Documents/FastqScreenTest/runtest/qc_140805_SNL110_0126_AC55P4ACXX/140805_SNL110_0126_AC55P4ACXX_qc_tmp";
+
+    Properties props = getPropertiesAozanConf();
+    props.setProperty(Settings.QC_CONF_READ_XML_COLLECTOR_USED_KEY, "false");
+    props.setProperty(QC.RTA_OUTPUT_DIR, dir);
+
+    File f = new File(dir, "startData.txt");
+    RunData data = new RunData(f);
+
+    ReadCollector rc = new ReadCollector();
+    rc.configure(props);
+    rc.collect(data);
+
+    data.createRunDataFile(new File(dir, "newData.txt"));
+  }
+
+  public static void runAozanTest() {
+
+    try {
       Locale.setDefault(Locale.US);
       inactiveCollectorClearMethod();
 
       if (paired) {
-        // run test pair-end
-        // runId = "120830_SNL110_0055_AD16D9ACXX";
-        // runId = "130801_SNL110_0079_AD2CR3ACXX";
-
-        // Mais - SR50
-        // runId = "131004_SNL110_0087_AD297LACXX";
 
         // Validation (mm10) - PE150
         runId = "131015_SNL110_0088_AH13M0ADXX";
       } else {
-
-        // runId = "130726_SNL110_0078_AC2AJTACXX";
-        // runId = "130709_SNL110_0075_AD2C79ACXX";
-        // runId = "130715_SNL110_0076_AD2C4UACXX";
-        // RUN rapid
-        // runId = "130722_SNL110_0077_AH0NT2ADXX";
-        // runId = "130904_SNL110_0082_AC2BR0ACXX";
-        runId = "130910_SNL110_0083_AC2AMKACXX";
-        // runId = "130926_SNL110_0085_AH0EYHADXX";
+        runId = "140811_SNL110_0127_AH9AP9ADXX";
       }
 
       // date = new SimpleDateFormat("yyMMdd").format(new Date());
@@ -330,7 +343,6 @@ public class FastqscreenDemo {
     conf.put(
         Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY,
         "/home/sperrin/Documents/FastqScreenTest/resources/alias_name_genome_fastqscreen.txt");
-    conf.put(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY, "true");
 
     System.out
         .println("genomes : "

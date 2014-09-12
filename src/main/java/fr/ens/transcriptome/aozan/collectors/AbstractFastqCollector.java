@@ -364,10 +364,18 @@ abstract public class AbstractFastqCollector implements Collector {
           } // Sample
 
         // Add undetermined indices samples
-        if (isProcessUndeterminedIndicesSamples())
-          fastqSamples.add(new FastqSample(this.casavaOutputPath,
-              readIndexedCount, lane));
+        if (isProcessUndeterminedIndicesSamples()) {
 
+          // Check Undetermined fastq exist for this lane
+          String asBarcodeUndetermined =
+              data.get("demux.lane" + lane + ".sample.lane" + lane + ".barcode");
+          if (asBarcodeUndetermined != null) {
+
+            // Add undetermined sample
+            fastqSamples.add(new FastqSample(this.casavaOutputPath,
+                readIndexedCount, lane));
+          }
+        }
       } // Lane
 
       // Process only one read if needed
