@@ -25,14 +25,12 @@ package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.fastqc.OverrepresentedSequencesBlast;
-import fr.ens.transcriptome.aozan.fastqc.RuntimePatchFastQC;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
 /**
@@ -50,68 +48,11 @@ public class FastQCCollector extends AbstractFastqCollector {
   private int numberThreads = Runtime.getRuntime().availableProcessors();
 
   private final boolean ignoreFilteredSequences = false;
-  private boolean isStepBlastEnabled = false;
 
   @Override
   public String getName() {
 
     return COLLECTOR_NAME;
-  }
-
-  public final static void initFastQC(Map<String, String> globalConf) {
-
-    // Define parameters of FastQC
-    System.setProperty("java.awt.headless", "true");
-    System.setProperty("fastqc.unzip", "true");
-
-    // Contaminant file
-    final String contaminantFile =
-        globalConf.get(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY);
-
-    if (contaminantFile != null && contaminantFile.trim().length() > 0) {
-      System.setProperty("fastqc.contaminant_file", contaminantFile);
-    }
-
-    // Adapter file
-    final String adapterFile =
-        globalConf.get(Settings.QC_CONF_FASTQC_ADAPTER_FILE_KEY);
-
-    if (adapterFile != null && adapterFile.trim().length() > 0) {
-      System.setProperty("fastqc.adapter_file", adapterFile);
-    }
-
-    // Limits file
-    final String limitsFile =
-        globalConf.get(Settings.QC_CONF_FASTQC_LIMITS_FILE_KEY);
-
-    if (limitsFile != null && limitsFile.trim().length() > 0) {
-      System.setProperty("fastqc.limits_file", limitsFile);
-    }
-
-    // Kmer Size
-    final String kmerSize =
-        globalConf.get(Settings.QC_CONF_FASTQC_KMER_SIZE_KEY);
-    if (kmerSize != null && kmerSize.trim().length() > 0) {
-      System.setProperty("fastqc.kmer_size", kmerSize);
-    }
-
-    // Set fastQC nogroup
-    final String fastqcNoGroup =
-        globalConf.get(Settings.QC_CONF_FASTQC_NOGROUP_KEY);
-    if (fastqcNoGroup != null && fastqcNoGroup.trim().length() > 0) {
-      System.setProperty("fastqc.nogroup", fastqcNoGroup);
-    }
-
-    // Set fastQC expgroup
-    final String fastqcExpgroup =
-        globalConf.get(Settings.QC_CONF_FASTQC_EXPGROUP_KEY);
-    if (fastqcExpgroup != null && fastqcExpgroup.trim().length() > 0) {
-      System.setProperty("fastqc.expgroup", fastqcExpgroup);
-    }
-
-    // Set the number of threads of FastQC at one
-    System.setProperty("fastqc.threads", "1");
-
   }
 
   @Override
@@ -135,17 +76,11 @@ public class FastQCCollector extends AbstractFastqCollector {
 
     // Check if step blast needed and configure
     OverrepresentedSequencesBlast.getInstance().configure(properties);
-    this.isStepBlastEnabled =
-        OverrepresentedSequencesBlast.getInstance().isStepBlastEnabled();
 
   }
 
   @Override
   public void collect(final RunData data) throws AozanException {
-
-    // Rewriting code of the method ContaminantFinder for read the contaminant
-    // list in fastqc-0.10.1 jar
-    RuntimePatchFastQC.runPatchFastQC(this.isStepBlastEnabled);
 
     super.collect(data);
   }
