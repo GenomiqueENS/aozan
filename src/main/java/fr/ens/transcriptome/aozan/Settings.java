@@ -177,6 +177,12 @@ public final class Settings {
   /** Use exponential base groups in graph */
   public static final String QC_CONF_FASTQC_EXPGROUP_KEY =
       "qc.conf.fastqc.expgroup";
+  /** Format fastq type casava/Illumina  */
+  public static final String QC_CONF_FASTQC_CASAVA_KEY =
+      "qc.conf.fastqc.casava";
+  /** Option for filter fastq file if casava=true for all modules */
+  public static final String QC_CONF_FASTQC_NOFILTER_KEY =
+      "qc.conf.fastqc.nofilter";
   
   /** Collector cluster density ratio */
   public static final String QC_CONF_CLUSTER_DENSITY_RATIO_KEY =

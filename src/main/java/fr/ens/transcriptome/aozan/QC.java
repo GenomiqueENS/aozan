@@ -542,6 +542,14 @@ public class QC {
     addSystemProperty(properties, Settings.QC_CONF_FASTQC_EXPGROUP_KEY,
         "fastqc.expgroup");
 
+    // Set fastQC format fastq
+    addSystemProperty(properties, Settings.QC_CONF_FASTQC_CASAVA_KEY,
+        "fastqc.casava");
+
+    // Set fastQC nofilter default false, if casava=true, filter fastq file
+    addSystemProperty(properties, Settings.QC_CONF_FASTQC_NOFILTER_KEY,
+        "fastqc.nofilter");
+
     // Patch FastQC classes
     RuntimePatchFastQC.runPatchFastQC(Boolean.valueOf(properties
         .get(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY)));
