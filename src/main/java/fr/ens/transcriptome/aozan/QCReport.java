@@ -52,10 +52,10 @@ import org.w3c.dom.Element;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
-import fr.ens.transcriptome.aozan.tests.GlobalTest;
-import fr.ens.transcriptome.aozan.tests.LaneTest;
-import fr.ens.transcriptome.aozan.tests.SampleTest;
 import fr.ens.transcriptome.aozan.tests.TestResult;
+import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
+import fr.ens.transcriptome.aozan.tests.lane.LaneTest;
+import fr.ens.transcriptome.aozan.tests.sample.SampleTest;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**

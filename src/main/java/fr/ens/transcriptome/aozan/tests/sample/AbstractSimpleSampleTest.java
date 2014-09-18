@@ -1,0 +1,214 @@
+/*
+ *                  Aozan development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU General Public License version 3 or later 
+ * and CeCILL. This should be distributed with the code. If you 
+ * do not have a copy, see:
+ *
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+ *
+ * Copyright for this code is held jointly by the Genomic platform
+ * of the Institut de Biologie de l'École Normale Supérieure and
+ * the individual authors. These should be listed in @author doc
+ * comments.
+ *
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page at:
+ *
+ *      http://www.transcriptome.ens.fr/aozan
+ *
+ */
+
+package fr.ens.transcriptome.aozan.tests.sample;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.tests.AozanTest;
+import fr.ens.transcriptome.aozan.tests.TestResult;
+import fr.ens.transcriptome.aozan.util.ScoreInterval;
+
+/**
+ * This class define a simple sample test.
+ * @since 0.8
+ * @author Laurent Jourdren
+ */
+public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
+
+  private final ScoreInterval interval = new ScoreInterval();
+
+  /**
+   * Get the the key in the RunData object for the value to test
+   * @param read index of the read
+   * @param readSample index of read without indexed reads
+   * @param lane index of the lane
+   * @param sampleName name of the sample. If null, must return the key for
+   *          undetermined indexes
+   * @return a String with the required key
+   */
+  protected abstract String getKey(final int read, int readSample,
+      final int lane, final String sampleName);
+
+  /**
+   * Transform the value.
+   * @param value value to transform
+   * @param data run data
+   * @param read index of read
+   * @param readSample index of read without indexed reads
+   * @param lane lane index
+   * @param sampleName sample name
+   * @return the transformed value
+   */
+  protected Number transformValue(final Number value, final RunData data,
+      final int read, int readSample, final int lane, final String sampleName) {
+
+    return value;
+  }
+
+  /**
+   * Transform the score.
+   * @param score value to transform
+   * @param data run data
+   * @param read index of read
+   * @param readSample index of read without indexed reads
+   * @param lane lane index
+   * @param sampleName sample name
+   * @return the transformed score
+   */
+  protected int transformScore(final int score, final RunData data,
+      final int read, int readSample, final int lane, final String sampleName) {
+
+    return score;
+  }
+
+  /**
+   * Test if the value is a percent.
+   * @return true if the value is a percent
+   */
+  protected boolean isValuePercent() {
+
+    return false;
+  }
+
+  /**
+   * Get the type of the value.
+   * @return a Class object with the type
+   */
+  protected abstract Class<?> getValueType();
+
+  @Override
+  public TestResult test(final RunData data, final int read, int readSample,
+      final int lane, final String sampleName) {
+
+    final String key = getKey(read, readSample, lane, sampleName);
+
+    if (key == null)
+      return null;
+
+    // Key not present in data, case with fastqscreen, a genome specific from a
+    // project
+    if (data.get(key) == null)
+      return new TestResult("NA");
+
+    final Class<?> clazz = getValueType();
+    final String msg;
+    final Number value;
+
+    try {
+      if (clazz == Integer.class) {
+
+        value = data.getInt(key);
+        msg = null;
+      } else if (clazz == Long.class) {
+
+        value = data.getLong(key);
+        msg = null;
+      } else if (clazz == Float.class) {
+
+        value = data.getFloat(key);
+        msg = null;
+      } else if (clazz == Double.class) {
+
+        value = data.getDouble(key);
+        msg = null;
+      } else {
+
+        msg = data.get(key);
+        value = null;
+      }
+
+      // Is result a string ?
+      if (value == null)
+        return new TestResult(msg);
+
+      // Transform the value id needed
+      final Number transformedValue =
+          transformValue(value, data, read, readSample, lane, sampleName);
+
+      // Do the test ?
+      if (interval == null || sampleName == null)
+        return new TestResult(transformedValue, isValuePercent());
+
+      int score =
+          transformScore(this.interval.getScore(transformedValue), data, read,
+              readSample, lane, sampleName);
+
+      return new TestResult(score, transformedValue, isValuePercent());
+
+    } catch (NumberFormatException e) {
+
+      return new TestResult("NA");
+    }
+  }
+
+  //
+  // Other methods
+  //
+
+  @Override
+  public List<AozanTest> configure(final Map<String, String> properties)
+      throws AozanException {
+
+    if (properties == null)
+      throw new NullPointerException("The properties object is null");
+
+    this.interval.configureDoubleInterval(properties);
+
+    return Collections.singletonList((AozanTest) this);
+  }
+
+  //
+  // Constructor
+  //
+
+  /**
+   * Constructor that set the field of this abstract test.
+   * @param name name of the test
+   * @param description description of the test
+   * @param columnName column name of the test
+   */
+  protected AbstractSimpleSampleTest(final String name,
+      final String description, final String columnName) {
+
+    super(name, description, columnName);
+  }
+
+  /**
+   * Constructor that set the field of this abstract test.
+   * @param name name of the test
+   * @param description description of the test
+   * @param columnName column name of the test
+   * @param unit unit of the test
+   */
+  protected AbstractSimpleSampleTest(final String name,
+      final String description, final String columnName, final String unit) {
+
+    super(name, description, columnName, unit);
+  }
+
+}

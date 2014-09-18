@@ -46,9 +46,9 @@ import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.AozanTestRegistry;
-import fr.ens.transcriptome.aozan.tests.LaneTest;
-import fr.ens.transcriptome.aozan.tests.GlobalTest;
-import fr.ens.transcriptome.aozan.tests.SampleTest;
+import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
+import fr.ens.transcriptome.aozan.tests.lane.LaneTest;
+import fr.ens.transcriptome.aozan.tests.sample.SampleTest;
 
 /**
  * This class is the main QC class.
