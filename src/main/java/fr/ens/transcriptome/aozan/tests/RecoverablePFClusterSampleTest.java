@@ -29,8 +29,7 @@ public class RecoverablePFClusterSampleTest extends AbstractSimpleSampleTest {
           + lane + ".recoverable.pf.cluster.count";
 
     return "undeterminedindices.lane"
-        + lane + ".sample." + sampleName + ".read" + read + "." + sampleName
-        + ".recoverable.pf.cluster.count";
+        + lane + ".sample." + sampleName + ".recoverable.pf.cluster.count";
   }
 
   @Override
