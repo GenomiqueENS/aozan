@@ -152,9 +152,14 @@ public class FastqScreenCollector extends AbstractFastqCollector {
             + fastqSample.getLane() + "." + fastqSample.getSampleName()
             + ".sample.ref");
 
-    final String genomeReferenceSample =
-        AliasGenomeFile.getInstance().getGenomeReferenceCorresponding(
-            genomeSample);
+    String genomeReferenceSample = null;
+    
+    // No genome reference defined for undetermined fastq
+    if (!fastqSample.isIndeterminedIndices()) {
+      genomeReferenceSample =
+          AliasGenomeFile.getInstance().getGenomeReferenceCorresponding(
+              genomeSample);
+    }
 
     final boolean controlLane =
         data.getBoolean("design.lane"
