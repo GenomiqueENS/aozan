@@ -116,7 +116,7 @@ abstract public class AbstractFastqCollector implements Collector {
    */
   protected boolean isProcessUndeterminedIndicesSamples() {
 
-    return false;
+    return true;
   }
 
   /**
@@ -392,10 +392,7 @@ abstract public class AbstractFastqCollector implements Collector {
    */
   private RunData loadResultPart(final FastqSample fastqSample) {
     // Check for data file
-    File dataFile =
-        new File(this.qcReportOutputPath
-            + "/Project_" + fastqSample.getProjectName() + "/" + getName()
-            + "_" + fastqSample.getKeyFastqSample() + ".data");
+    File dataFile = createTemporaryDataFile(fastqSample);
 
     // Data file doesn't exists
     if (!dataFile.exists())
@@ -431,21 +428,8 @@ abstract public class AbstractFastqCollector implements Collector {
       final RunData data) {
 
     try {
-
       // Define the part result directory
-      final File dataFileDir;
-      if (fastqSample.isIndeterminedIndices())
-        dataFileDir =
-            new File(this.qcReportOutputPath + "/Undetermined_indices");
-      else
-        dataFileDir =
-            new File(this.qcReportOutputPath
-                + "/Project_" + fastqSample.getProjectName());
-
-      // Define the part result file
-      final File dataFile =
-          new File(dataFileDir, getName()
-              + "_" + fastqSample.getKeyFastqSample() + ".data");
+      File dataFile = createTemporaryDataFile(fastqSample);
 
       // Create the result part file
       data.createRunDataFile(dataFile);
@@ -460,6 +444,28 @@ abstract public class AbstractFastqCollector implements Collector {
           + " collector: Error during writing data file for the sample "
           + fastqSample.getKeyFastqSample() + "(" + ae.getMessage() + ")");
     }
+  }
+
+  /**
+   * Return run data file corresponding of a sample or a undetermined fastq
+   * @param fastqSample
+   * @return run data file
+   */
+  private File createTemporaryDataFile(final FastqSample fastqSample) {
+
+    // Define the part result directory
+    final File dataFileDir;
+    if (fastqSample.isIndeterminedIndices())
+      dataFileDir = new File(this.qcReportOutputPath + "/Undetermined_indices");
+    else
+      dataFileDir =
+          new File(this.qcReportOutputPath
+              + "/Project_" + fastqSample.getProjectName());
+
+    // Define the part result file
+    return new File(dataFileDir, getName()
+        + "_" + fastqSample.getKeyFastqSample() + ".data");
+
   }
 
   /**
