@@ -361,16 +361,10 @@ public class UndeterminedIndexesProcessThreads extends
         }
       }
 
-    final String fastqDir =
-        this.seqFile.getFile().getParentFile().getAbsolutePath() + "/../..";
-    final FastqSample s =
-        new FastqSample(fastqDir, this.read, this.lane, sampleName,
-            getProjectSample(sampleName), getSampleDescription(sampleName),
-            this.sampleIndexes.get(sampleName));
-
     // Set the result for the sample
     getResults().put(
-        "undeterminedindices" + s.getPrefixRundata() + resultKeySuffix,
+        "undeterminedindices"
+            + getFastqSample().getPrefixRundata() + resultKeySuffix,
         recoverableClusterCount);
 
     return recoverableClusterCount;
@@ -562,7 +556,7 @@ public class UndeterminedIndexesProcessThreads extends
     final File reportFile =
         new File(this.reportDir.getAbsolutePath()
             + "/../Project_" + getProjectSample(sampleName) + "/" + sampleName
-            + "-potentialindices" + extension);
+            + "_lane" + lane + "-potentialindices" + extension);
 
     // Create parent directory if necessary
     final File parentDir = reportFile.getParentFile();
