@@ -37,3 +37,4 @@ fr.ens.transcriptome.aozan.tests.sample.PercentQ30SampleTest
 fr.ens.transcriptome.aozan.tests.sample.RawClustersSampleTest
 fr.ens.transcriptome.aozan.tests.sample.RecoverablePFClusterSampleTest
 fr.ens.transcriptome.aozan.tests.sample.SequenceLengthDistributionFastQCSampleTest
+fr.ens.transcriptome.aozan.tests.sample.RecoverableClusterLinkReportSampleTest
