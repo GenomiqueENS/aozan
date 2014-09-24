@@ -42,8 +42,22 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
   public TestResult test(final RunData data, final int read,
       final int readSample, final int lane, final String sampleName) {
 
-    if (sampleName == null)
-      return new TestResult("NA");
+    // Check indetermined indexed sample
+    if (sampleName == null) {
+      // return new TestResult("NA");
+      final String projectName = "Undetermined_indices";
+
+      final String dirname =
+          String.format("lane%s_Undetermined_L%03d_R%d_001-fastqc", lane, lane,
+              readSample);
+
+      final String url =
+          projectName
+              + "/" + dirname + "/fastqc_report.html#M" + getHTMLAnchorIndex();
+
+      // Set score test at -1
+      return new TestResult(-1, url, "url");
+    }
 
     final String prefixKey =
         "fastqc.lane"
@@ -54,19 +68,22 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
     if (data.get(prefixKey + ".error") == null)
       return new TestResult("NA");
 
+    // Get HTML report URL, score at -1
     final boolean errorRaise = data.getBoolean(prefixKey + ".error");
     final boolean warningRaise = data.getBoolean(prefixKey + ".warning");
 
     final int score = errorRaise ? 0 : (warningRaise ? 4 : 9);
 
-    // Get HTML report URL
     final String projectName =
         data.get("design.lane" + lane + "." + sampleName + ".sample.project");
+
     final String index =
         data.get("design.lane" + lane + "." + sampleName + ".index");
+
     final String dirname =
         String.format("%s_%s_L%03d_R%d_001-fastqc", sampleName,
             "".equals(index) ? "NoIndex" : index, lane, readSample);
+
     final String url =
         "Project_"
             + projectName + "/" + dirname + "/fastqc_report.html#M"
