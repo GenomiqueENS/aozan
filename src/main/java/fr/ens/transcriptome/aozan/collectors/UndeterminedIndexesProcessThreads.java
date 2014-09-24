@@ -8,9 +8,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -30,7 +30,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -56,7 +55,6 @@ public class UndeterminedIndexesProcessThreads extends
   private final int lane;
   private final int read;
   private final SequenceFile seqFile;
-  private final int maxMismatches;
   private final File reportDir;
 
   private final Map<String, String> sampleIndexes;
@@ -67,6 +65,9 @@ public class UndeterminedIndexesProcessThreads extends
       .create();
   private final Multimap<String, String> newIndexes = ArrayListMultimap
       .create();
+
+  private int maxMismatches = 1;
+  private boolean isSkipProcessResult = false;
 
   /**
    * This class store a result entry for the whole lane.
@@ -184,17 +185,6 @@ public class UndeterminedIndexesProcessThreads extends
     //
     // Constructor
     //
-
-    /**
-     * Constructor.
-     * @param index the index of the entry
-     * @param rawClusterCount raw cluster count
-     * @param pfClusterCount passing filter cluster count
-     * @param totalRawClusterCount total raw cluster count
-     * @param totalPFRawClusterCount total passing filter cluster count
-     * @param comment a comment about the entry
-     */
-
     /**
      * Constructor.
      * @param index the index of the entry
@@ -278,6 +268,9 @@ public class UndeterminedIndexesProcessThreads extends
           this.pfUndeterminedIndices.add(irid.getSequenceIndex());
       }
 
+      // Set max mismatches allowed
+      computeMismatchesAllowed();
+
       // Process results
       processResults();
 
@@ -287,38 +280,76 @@ public class UndeterminedIndexesProcessThreads extends
 
   }
 
-  @Override
-  protected void processResults() throws AozanException {
+  private void computeMismatchesAllowed() {
 
-    // For each sample find the indexes sequences that can be recovered
+    final int maxMismatchAllowed = 2;
+
+    int minMismatchFound = Integer.MAX_VALUE;
+
     for (Map.Entry<String, String> e : this.sampleIndexes.entrySet()) {
 
-      final String sampleName = e.getKey();
-      final String index = e.getValue();
-
       for (String i : this.rawUndeterminedIndices.elementSet()) {
-
+        final String index = e.getValue();
         final int mismatches = mismatches(index, i);
 
-        if (mismatches > 0 && mismatches <= this.maxMismatches) {
+        minMismatchFound = Math.min(minMismatchFound, mismatches);
 
-          this.newSamplesIndexes.put(sampleName, i);
-          this.newIndexes.put(i, index);
-        }
+        // Check minimum found
+        if (minMismatchFound == 1)
+          break;
       }
+
+      if (minMismatchFound == 1)
+        break;
     }
+
+    if (minMismatchFound > maxMismatchAllowed) {
+      // Set mismatches used to recovery reads
+      this.isSkipProcessResult = true;
+      this.maxMismatches = -1;
+    } else {
+      this.maxMismatches = minMismatchFound;
+      getResults()
+          .put(
+              "undeterminedindices.lane"
+                  + this.lane + ".mismatch.recovery.cluster", maxMismatches);
+    }
+  }
+
+  @Override
+  protected void processResults() throws AozanException {
 
     int recoverableRawClusterCount = 0;
     int recoverablePFClusterCount = 0;
 
-    // Compute results for each sample
-    for (String sampleName : getSampleNames()) {
-      recoverableRawClusterCount +=
-          computeRecoverableSampleClusterCount(sampleName,
-              this.rawUndeterminedIndices, ".recoverable.raw.cluster.count");
-      recoverablePFClusterCount +=
-          computeRecoverableSampleClusterCount(sampleName,
-              this.pfUndeterminedIndices, ".recoverable.pf.cluster.count");
+    if (!this.isSkipProcessResult) {
+      // For each sample find the indexes sequences that can be recovered
+      for (Map.Entry<String, String> e : this.sampleIndexes.entrySet()) {
+
+        final String sampleName = e.getKey();
+        final String index = e.getValue();
+
+        for (String i : this.rawUndeterminedIndices.elementSet()) {
+
+          final int mismatches = mismatches(index, i);
+
+          if (mismatches > 0 && mismatches <= this.maxMismatches) {
+
+            this.newSamplesIndexes.put(sampleName, i);
+            this.newIndexes.put(i, index);
+          }
+        }
+      }
+
+      // Compute results for each sample
+      for (String sampleName : getSampleNames()) {
+        recoverableRawClusterCount +=
+            computeRecoverableSampleClusterCount(sampleName,
+                this.rawUndeterminedIndices, ".recoverable.raw.cluster.count");
+        recoverablePFClusterCount +=
+            computeRecoverableSampleClusterCount(sampleName,
+                this.pfUndeterminedIndices, ".recoverable.pf.cluster.count");
+      }
     }
 
     // Set the result for the lane
@@ -351,20 +382,22 @@ public class UndeterminedIndexesProcessThreads extends
 
     int recoverableClusterCount = 0;
 
-    // Sum the number of cluster that can be recovered
-    if (this.newSamplesIndexes.containsKey(sampleName))
-      for (String newIndex : this.newSamplesIndexes.get(sampleName)) {
+    if (!this.isSkipProcessResult) {
+      // Sum the number of cluster that can be recovered
+      if (this.newSamplesIndexes.containsKey(sampleName))
+        for (String newIndex : this.newSamplesIndexes.get(sampleName)) {
 
-        if (indicesCounts.contains(newIndex)) {
-          final int count = indicesCounts.count(newIndex);
-          recoverableClusterCount += count;
+          if (indicesCounts.contains(newIndex)) {
+            final int count = indicesCounts.count(newIndex);
+            recoverableClusterCount += count;
+          }
         }
-      }
+    }
 
     // Set the result for the sample
     getResults().put(
         "undeterminedindices"
-            + getFastqSample().getPrefixRundata() + resultKeySuffix,
+            + ".lane" + this.lane + ".sample." + sampleName + resultKeySuffix,
         recoverableClusterCount);
 
     return recoverableClusterCount;
@@ -398,7 +431,7 @@ public class UndeterminedIndexesProcessThreads extends
     final int totalPFClusterCount = this.pfUndeterminedIndices.size();
 
     // Create sorted set
-    final Set<LaneResultEntry> entries = Sets.newTreeSet();
+    final List<LaneResultEntry> entries = Lists.newArrayList();
 
     // Total entry
     final LaneResultEntry totalEntry =
@@ -417,8 +450,7 @@ public class UndeterminedIndexesProcessThreads extends
 
       final String index = e.getElement();
       final int rawClusterCount = e.getCount();
-      final int pfClusterCount =
-          this.pfUndeterminedIndices.count(e.getElement());
+      final int pfClusterCount = this.pfUndeterminedIndices.count(index);
 
       List<String> samplesCollection = getSampleForNewIndex(index);
       final String samples =
@@ -428,6 +460,9 @@ public class UndeterminedIndexesProcessThreads extends
       entries.add(new LaneResultEntry(index, rawClusterCount, pfClusterCount,
           totalRawClusterCount, totalPFClusterCount, samples));
     }
+
+    // Sort list
+    Collections.sort(entries);
 
     writeCSV(entries, totalEntry);
   }
@@ -455,8 +490,8 @@ public class UndeterminedIndexesProcessThreads extends
   private File createLaneResultFile(final String extension) {
 
     final File reportFile =
-        new File(this.reportDir, getFastqSample().getKeyFastqSample()
-            + "-potentialindices" + extension);
+        new File(this.reportDir, "lane"
+            + this.lane + "_Undetermined" + "-potentialindices" + extension);
 
     // Create parent directory if necessary
     final File parentDir = reportFile.getParentFile();
@@ -472,7 +507,7 @@ public class UndeterminedIndexesProcessThreads extends
    * @param totalEntry total entries summary
    * @throws IOException if an error occurs while writing the file
    */
-  private void writeCSV(final Set<LaneResultEntry> entries,
+  private void writeCSV(final List<LaneResultEntry> entries,
       final LaneResultEntry totalEntry) throws IOException {
 
     BufferedWriter br =
@@ -500,7 +535,7 @@ public class UndeterminedIndexesProcessThreads extends
       throws IOException {
 
     // Create sorted set
-    final Set<SampleResultEntry> entries = Sets.newTreeSet();
+    final List<SampleResultEntry> entries = Lists.newArrayList();
 
     final int sampleRawClusterCount = getSampleRawClusterCount(sampleName);
     final int samplePFClusterCount = getSamplePFClusterCount(sampleName);
@@ -541,6 +576,9 @@ public class UndeterminedIndexesProcessThreads extends
             newIndexesRawClusterCount, newIndexesPFClusterCount,
             sampleRawClusterCount, samplePFClusterCount, "");
 
+    // Sort lists
+    Collections.sort(entries);
+    
     writeCSV(sampleName, demuxEntry, entries, totalEntry);
   }
 
@@ -574,8 +612,9 @@ public class UndeterminedIndexesProcessThreads extends
    * @throws IOException if an error occurs while writing the file
    */
   private void writeCSV(final String sampleName,
-      final SampleResultEntry demuxEntry, final Set<SampleResultEntry> entries,
-      final SampleResultEntry totalEntry) throws IOException {
+      final SampleResultEntry demuxEntry,
+      final List<SampleResultEntry> entries, final SampleResultEntry totalEntry)
+      throws IOException {
 
     BufferedWriter br =
         Files.newWriter(createSampleResultFile(sampleName, ".csv"),
@@ -748,6 +787,10 @@ public class UndeterminedIndexesProcessThreads extends
 
     try {
 
+      // this.seqFile =
+      // SequenceFactory.getSequenceFile(new File(
+      // "/tmp/lane1_undetermined_R1.fastq"));
+      // TODO
       this.seqFile =
           SequenceFactory.getSequenceFile(fastqSample.getFastqFiles().toArray(
               new File[fastqSample.getFastqFiles().size()]));
