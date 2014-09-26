@@ -1,3 +1,26 @@
+/*
+ *                  Aozan development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU General Public License version 3 or later 
+ * and CeCILL. This should be distributed with the code. If you 
+ * do not have a copy, see:
+ *
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+ *
+ * Copyright for this code is held jointly by the Genomic platform
+ * of the Institut de Biologie de l'École Normale Supérieure and
+ * the individual authors. These should be listed in @author doc
+ * comments.
+ *
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page at:
+ *
+ *      http://www.transcriptome.ens.fr/aozan
+ *
+ */
+
 package fr.ens.transcriptome.aozan.collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -7,12 +30,29 @@ import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.testng.internal.annotations.Sets;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import uk.ac.babraham.FastQC.Sequence.Sequence;
 import uk.ac.babraham.FastQC.Sequence.SequenceFactory;
@@ -34,10 +74,12 @@ import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
+import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.eoulsan.EoulsanException;
 import fr.ens.transcriptome.eoulsan.bio.IlluminaReadId;
+import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**
  * This class allow to process the undetermined fastq file of a lane to extract
@@ -50,6 +92,13 @@ public class UndeterminedIndexesProcessThreads extends
 
   /** Logger */
   private static final Logger LOGGER = Common.getLogger();
+
+  private static final Splitter TAB_SPLITTER = Splitter.on("\t").trimResults()
+      .omitEmptyStrings();
+  private static final Splitter COMMA_SPLITTER = Splitter.on(",").trimResults()
+      .omitEmptyStrings();
+
+  private static final Joiner JOINER = Joiner.on(", ");
 
   private final RunData data;
   private final int lane;
@@ -72,8 +121,20 @@ public class UndeterminedIndexesProcessThreads extends
   /**
    * This class store a result entry for the whole lane.
    */
-  private static final class LaneResultEntry implements
+  private static final class LaneResultEntry extends ResultEntry implements
       Comparable<LaneResultEntry> {
+
+    static {
+      HEADER_TYPE =
+          Lists.newArrayList("string", "int", "int", "string", "string",
+              "string", "string");
+
+      HEADER_NAMES =
+          Lists.newArrayList("Index", "Raw cluster count", "PF cluster count",
+              "PF %", "Raw cluster in undetermined %",
+              "PF cluster count in undetermined %",
+              "Recovery possible for sample(s)");
+    }
 
     private final String index;
     private final int rawClusterCount;
@@ -82,15 +143,6 @@ public class UndeterminedIndexesProcessThreads extends
     private final double inRawUndeterminedIndicePercent;
     private final double inPFUndeterminedIndicePercent;
     private final String comment;
-
-    /**
-     * Get CSV header.
-     * @return a string with the CSV header
-     */
-    public static String headerCSV() {
-
-      return "Index\tRaw cluster count\tPF cluster count\tPF %\tRaw clusters in undetermined indices %\tPF clusters in undetermined indices %\tComment\n";
-    }
 
     /**
      * Get the entry in CSV format.
@@ -108,6 +160,45 @@ public class UndeterminedIndexesProcessThreads extends
     public int compareTo(final LaneResultEntry that) {
 
       return -((Integer) this.pfClusterCount).compareTo(that.pfClusterCount);
+    }
+
+    @Override
+    public boolean isCommentFieldEmpty() {
+      return this.comment == null || this.comment.trim().length() == 0;
+    }
+
+    @Override
+    public String getComment() {
+      return this.comment;
+    }
+
+    public static void samplesNameXML(final Document doc, final Element parent,
+        final RunData data, final int lane) {
+
+      final Set<String> samplesName = Sets.newHashSet();
+
+      // Extract all samples names per lane
+      final String samplesNameInLane =
+          data.get("design.lane" + lane + ".samples.names");
+      samplesName.addAll(COMMA_SPLITTER.splitToList(samplesNameInLane));
+
+      // Write all samples name with correct syntax
+      final String txt = "'" + Joiner.on("','").join(samplesName) + "'";
+
+      // Add list sample for lane undetermined sample
+      final Element samples = doc.createElement("Samples");
+      samples.setAttribute("classValue", "samples");
+      samples.setAttribute("cmdJS", txt);
+      parent.appendChild(samples);
+
+      // Add tag XML per sample name
+      for (String sampleName : samplesName) {
+        final Element sample = doc.createElement("Sample");
+        sample.setAttribute("classValue", "sample");
+        sample.setAttribute("cmdJS", "'" + sampleName + "'");
+        sample.setTextContent(sampleName);
+        samples.appendChild(sample);
+      }
     }
 
     //
@@ -144,8 +235,19 @@ public class UndeterminedIndexesProcessThreads extends
   /**
    * This class store a result entry for a sample.
    */
-  private static final class SampleResultEntry implements
+  private static final class SampleResultEntry extends ResultEntry implements
       Comparable<SampleResultEntry> {
+
+    static {
+      HEADER_TYPE =
+          Lists.newArrayList("string", "int", "int", "string", "string",
+              "string", "string");
+
+      HEADER_NAMES =
+          Lists.newArrayList("Index", "Raw cluster count", "PF cluster count",
+              "PF %", "Raw cluster in sample %",
+              "PF cluster count in sample %", "Comment");
+    }
 
     private final String index;
     private final int rawClusterCount;
@@ -154,15 +256,6 @@ public class UndeterminedIndexesProcessThreads extends
     private final double pfPercent;
     private final double rawClusterPercent;
     private final double pfClusterPercent;
-
-    /**
-     * Get CSV header.
-     * @return a string with the CSV header
-     */
-    public static String headerCSV() {
-
-      return "Index\tRaw cluster count\tPF cluster count\tPF %\tRaw cluster %\tPF cluster count %\tComment\n";
-    }
 
     /**
      * Get the entry in CSV format.
@@ -180,6 +273,15 @@ public class UndeterminedIndexesProcessThreads extends
     public int compareTo(final SampleResultEntry that) {
 
       return -((Integer) this.pfClusterCount).compareTo(that.pfClusterCount);
+    }
+
+    @Override
+    public boolean isCommentFieldEmpty() {
+      return this.comment == null || this.comment.trim().length() == 0;
+    }
+
+    public String getComment() {
+      return this.comment;
     }
 
     //
@@ -206,6 +308,95 @@ public class UndeterminedIndexesProcessThreads extends
       this.pfPercent = 100.0 * pfClusterCount / rawClusterCount;
       this.rawClusterPercent = 100.0 * rawClusterCount / demuxRawClusterCount;
       this.pfClusterPercent = 100.0 * pfClusterCount / demuxPFClusterCount;
+    }
+  }
+
+  /**
+   * This class store a result entry for a sample.
+   */
+  private static abstract class ResultEntry {
+
+    protected static List<String> HEADER_TYPE;
+
+    protected static List<String> HEADER_NAMES;
+
+    abstract String toCSV();
+
+    abstract public boolean isCommentFieldEmpty();
+
+    abstract public String getComment();
+
+    /**
+     * Get CSV header.
+     * @return a string with the CSV header
+     */
+    public static String headerCSV() {
+      return Joiner.on("\t").join(HEADER_NAMES) + "\n";
+    }
+
+    /**
+     * Add tag XML header in document.
+     * @param document document XML
+     * @param parent parent element in document XML
+     */
+    public static void headerXML(final Document doc, final Element parent) {
+
+      final Element columns = doc.createElement("Columns");
+      // columns.setAttribute("classValue", "headerColumns");
+      parent.appendChild(columns);
+
+      for (String text : TAB_SPLITTER.split(headerCSV())) {
+
+        final Element elem = doc.createElement("Column");
+        elem.setTextContent(text);
+        columns.appendChild(elem);
+      }
+    }
+
+    /**
+     * Add tag XML header in document.
+     * @param document document XML
+     * @param parent parent element in document XML
+     * @param attributeValue value for desc attribute
+     */
+    public void toXML(final Document doc, final Element parent,
+        final String attributeValue) {
+
+      final Element elemRoot = doc.createElement("Entry");
+      parent.appendChild(elemRoot);
+
+      int n = 0;
+      for (String text : TAB_SPLITTER.split(toCSV())) {
+
+        final Element elem = doc.createElement("Data");
+        elem.setAttribute("name",
+            HEADER_NAMES.get(n).toLowerCase().replaceAll(" ", "_"));
+        elem.setAttribute("type", HEADER_TYPE.get(n));
+        elem.setAttribute("score", "-1");
+
+        elem.setTextContent(text);
+        elemRoot.appendChild(elem);
+
+      }
+
+      // Add empty element for comment field
+      if (isCommentFieldEmpty()) {
+        final Element elem = doc.createElement("Data");
+        elem.setAttribute("name",
+            HEADER_NAMES.get(n).toLowerCase().replaceAll(" ", "_"));
+        elem.setAttribute("type", HEADER_TYPE.get(n));
+        elem.setAttribute("score", "-1");
+
+        elem.setTextContent("");
+        elemRoot.appendChild(elem);
+
+        // Add class attribute at default value
+        elemRoot.setAttribute("classValue", attributeValue);
+      } else {
+        // Add class attribute at sample name
+        elemRoot.setAttribute("classValue", getComment());
+      }
+
     }
 
   }
@@ -445,7 +636,6 @@ public class UndeterminedIndexesProcessThreads extends
                 ? ""
                 : "Demultiplexing with one mismatche is not possible due to indexes conflicts");
 
-    final Joiner joiner = Joiner.on(", ");
     for (Multiset.Entry<String> e : this.rawUndeterminedIndices.entrySet()) {
 
       final String index = e.getElement();
@@ -454,8 +644,7 @@ public class UndeterminedIndexesProcessThreads extends
 
       List<String> samplesCollection = getSampleForNewIndex(index);
       final String samples =
-          samplesCollection.size() > 0 ? "Recovery possible for sample(s) "
-              + joiner.join(samplesCollection) : "";
+          samplesCollection.size() > 0 ? JOINER.join(samplesCollection) : "";
 
       entries.add(new LaneResultEntry(index, rawClusterCount, pfClusterCount,
           totalRawClusterCount, totalPFClusterCount, samples));
@@ -465,6 +654,7 @@ public class UndeterminedIndexesProcessThreads extends
     Collections.sort(entries);
 
     writeCSV(entries, totalEntry);
+    writeHTML(entries, totalEntry);
   }
 
   /**
@@ -527,6 +717,26 @@ public class UndeterminedIndexesProcessThreads extends
   }
 
   /**
+   * Write the lane result file in CSV format.
+   * @param entries entries to write
+   * @param totalEntry total entries summary
+   * @throws IOException if an error occurs while writing the file
+   */
+  private void writeHTML(final List<LaneResultEntry> entries,
+      final LaneResultEntry totalEntry) throws IOException {
+
+    final File reportHtml = createLaneResultFile(".html");
+
+    try {
+      toXML("lane" + lane + "_undetermined", null, entries, totalEntry,
+          reportHtml, false);
+
+    } catch (ParserConfigurationException | TransformerException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
    * Create the report for a sample.
    * @param sampleName the sample name
    * @throws IOException if an error occurs while creating the report
@@ -544,7 +754,7 @@ public class UndeterminedIndexesProcessThreads extends
     final SampleResultEntry demuxEntry =
         new SampleResultEntry(this.sampleIndexes.get(sampleName),
             sampleRawClusterCount, samplePFClusterCount, sampleRawClusterCount,
-            samplePFClusterCount, "Samplesheet index for " + sampleName);
+            samplePFClusterCount, "Demultiplexing result " + sampleName);
 
     int newIndexesRawClusterCount = 0;
     int newIndexesPFClusterCount = 0;
@@ -559,7 +769,8 @@ public class UndeterminedIndexesProcessThreads extends
             this.pfUndeterminedIndices.count(newIndex);
         final String comment =
             this.newIndexes.get(newIndex).size() > 1
-                ? "Conflict if run demultiplexing with mismatches" : "";
+                ? "Conflict if run demultiplexing with mismatches : "
+                    + JOINER.join(this.newIndexes.get(newIndex)) : "";
 
         // Add the entry
         entries.add(new SampleResultEntry(newIndex, newIndexRawClusterCount,
@@ -578,8 +789,9 @@ public class UndeterminedIndexesProcessThreads extends
 
     // Sort lists
     Collections.sort(entries);
-    
+
     writeCSV(sampleName, demuxEntry, entries, totalEntry);
+    writeHTML(sampleName, demuxEntry, entries, totalEntry);
   }
 
   /**
@@ -605,7 +817,7 @@ public class UndeterminedIndexesProcessThreads extends
   }
 
   /**
-   * Write the sample result file in CSV format.
+   * Write the sample result file in csv format.
    * @param demuxEntry original demux result
    * @param entries entries to write
    * @param totalEntry total entries summary
@@ -634,6 +846,156 @@ public class UndeterminedIndexesProcessThreads extends
       br.write(e.toCSV());
 
     br.close();
+  }
+
+  /**
+   * Write the sample result file in HTML format.
+   * @param sampleName sample name
+   * @param demuxEntry original demux result
+   * @param entries entries to write
+   * @param totalEntry total entries summary
+   * @throws IOException if an error occurs while writing the file
+   */
+  private void writeHTML(final String sampleName,
+      final SampleResultEntry demuxEntry,
+      final List<SampleResultEntry> entries, final SampleResultEntry totalEntry)
+      throws IOException {
+
+    final File reportHtml = createSampleResultFile(sampleName, ".html");
+
+    try {
+      toXML(sampleName, demuxEntry, entries, totalEntry, reportHtml, true);
+
+    } catch (ParserConfigurationException | TransformerException e) {
+      e.printStackTrace();
+    }
+
+  }
+
+  /**
+   * Write the sample result file in HTML format.
+   * @param sampleName sample name
+   * @param demuxEntry original demux result
+   * @param entries entries to write
+   * @param totalEntry total entries summary
+   * @param reportHtml report output file in HTML
+   * @param isSampleData true if it is a demultiplexed sample   
+   * @throws IOException if an error occurs while writing the file
+   * @throws ParserConfigurationException if an error occurs while parsing the file
+   * @throws TransformerException if an error occurs while parsing xsl file.
+   */
+  private void toXML(final String sampleName, final ResultEntry demuxEntry,
+      final List<? extends ResultEntry> entries, final ResultEntry totalEntry,
+      final File reportHtml, final boolean isSampleData) throws IOException,
+      ParserConfigurationException, TransformerException {
+
+    Document doc = null;
+
+    DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+    DocumentBuilder docBuilder = null;
+    docBuilder = dbfac.newDocumentBuilder();
+    doc = docBuilder.newDocument();
+
+    // Create the root element and add it to the document
+    Element root = doc.createElement("RecoveryClusterReport");
+    root.setAttribute("formatversion", "1.0");
+    doc.appendChild(root);
+
+    XMLUtils.addTagValue(doc, root, "Step",
+        "Recovery cluster from undetermined fastq file");
+
+    // Common XML tag
+    Globals.buildXMLCommonTagHeader(doc, root, this.data);
+
+    XMLUtils.addTagValue(doc, root, "sampleName", sampleName);
+
+    // Case Undetermined indices samples, no project name
+    if (isSampleData)
+      XMLUtils.addTagValue(doc, root, "projectName",
+          getProjectSample(sampleName));
+
+    XMLUtils.addTagValue(doc, root, "description",
+        getSampleDescription(sampleName));
+
+    XMLUtils.addTagValue(doc, root, "condition",
+        "Compile results on recovery reads in undetermined fastq with "
+            + this.maxMismatches + " mismatches.");
+
+    if (!isSampleData) {
+
+      LaneResultEntry.samplesNameXML(doc, root, this.data, this.lane);
+    }
+
+    // Table - column
+    ResultEntry.headerXML(doc, root);
+
+    final Element results = doc.createElement("Results");
+    results.setAttribute("id", "data");
+    root.appendChild(results);
+
+    // Only exists for sample report
+    if (demuxEntry != null) {
+      // Demultiplexing result
+      demuxEntry.toXML(doc, results, "demultiplexing");
+    }
+
+    // Total entry
+    totalEntry.toXML(doc, results, "total");
+
+    for (ResultEntry e : entries) {
+      e.toXML(doc, results, "Entry");
+    }
+
+    // TODO debug
+    // Print document XML
+    // try {
+    // TransformerFactory transfac = TransformerFactory.newInstance();
+    // Transformer trans;
+    // trans = transfac.newTransformer();
+    // StringWriter swxml = new StringWriter();
+    // StreamResult resultxml = new StreamResult(swxml);
+    // DOMSource sourcexml = new DOMSource(doc);
+    // trans.transform(sourcexml, resultxml);
+    //
+    // Files.write(swxml.toString(), new File(reportHtml.getAbsolutePath()
+    // .replace(".html", ".xml")), Charsets.UTF_8);
+    // } catch (Exception e1) {
+    // e1.printStackTrace();
+    // }
+
+    // Set up a transformer
+    TransformerFactory transfac = TransformerFactory.newInstance();
+    Transformer trans = transfac.newTransformer();
+    // trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+    trans.setOutputProperty(OutputKeys.INDENT, "yes");
+    trans.setOutputProperty(OutputKeys.METHOD, "xml");
+
+    // Create string from xml tree
+    StringWriter sw = new StringWriter();
+    StreamResult result = new StreamResult(sw);
+
+    DOMSource source = new DOMSource(doc);
+    trans.transform(source, result);
+
+    InputStream is =
+        this.getClass().getResourceAsStream(Globals.EMBEDDED_UNDETERMINED_XSL);
+
+    // Create the transformer
+    final Transformer transformer =
+        TransformerFactory.newInstance().newTransformer(
+            new javax.xml.transform.stream.StreamSource(is));
+
+    // Create the String writer
+    final StringWriter writer = new StringWriter();
+
+    // Transform the document
+    transformer.transform(new DOMSource(doc), new StreamResult(writer));
+
+    // Close input stream
+    is.close();
+
+    // Create HTML file
+    Files.write(writer.toString(), reportHtml, Charsets.UTF_8);
   }
 
   //
@@ -787,13 +1149,13 @@ public class UndeterminedIndexesProcessThreads extends
 
     try {
 
-      // this.seqFile =
-      // SequenceFactory.getSequenceFile(new File(
-      // "/tmp/lane1_undetermined_R1.fastq"));
-      // TODO
       this.seqFile =
-          SequenceFactory.getSequenceFile(fastqSample.getFastqFiles().toArray(
-              new File[fastqSample.getFastqFiles().size()]));
+          SequenceFactory.getSequenceFile(new File(
+              "/tmp/lane1_undetermined_R1.fastq"));
+      // TODO
+      // this.seqFile =
+      // SequenceFactory.getSequenceFile(fastqSample.getFastqFiles().toArray(
+      // new File[fastqSample.getFastqFiles().size()]));
 
     } catch (IOException io) {
       throw new AozanException(io);
