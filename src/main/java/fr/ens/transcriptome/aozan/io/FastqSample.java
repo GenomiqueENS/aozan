@@ -350,7 +350,7 @@ public class FastqSample {
 
     this.read = read;
     this.lane = lane;
-    this.sampleName = "";
+    this.sampleName = "lane" + lane;
     this.projectName = "";
     this.descriptionSample = "";
     this.index = "";
