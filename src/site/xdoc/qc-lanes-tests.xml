@@ -68,6 +68,8 @@
          <tr><td>qc.test.pfclusters.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of pfclusters</td></tr>
          <tr><td>qc.test.pfclusterspercent.enable</td><td>boolean</td><td>False</td><td>Enable pfclusterspercent test</td></tr>
          <tr><td>qc.test.pfclusterspercent.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of pfclusterspercent</td></tr>
+         <tr><td>qc.test.rawclusterphix.enable</td><td>boolean</td><td>False</td><td>Enable raw cluster Phix count test</td></tr>
+         <tr><td>qc.test.rawclusterphix.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of raw cluster Phix count</td></tr>
          <tr><td>qc.test.clusterdensity.enable</td><td>boolean</td><td>False</td><td>Enable clusterdensity test</td></tr>
          <tr><td>qc.test.clusterdensity.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of clusterdensity</td></tr>
          <tr><td>qc.test.percentalign.enable</td><td>boolean</td><td>False</td><td>Enable percentalign test</td></tr>
@@ -87,6 +89,9 @@
          <tr><td>qc.test.phasingprephasing.enable</td><td>boolean</td><td>False</td><td>Enable phasingprephasing test</td></tr>
          <tr><td>qc.test.phasingprephasing.phasing.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of phasing</td></tr>
          <tr><td>qc.test.phasingprephasing.prephasing.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of prephasing</td></tr>
+         
+         
+         qc.test.rawclusterphix.enable=True
        </table>
 
        <p>An example of table built with lanes quality tests.</p>

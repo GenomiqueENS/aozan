@@ -15,6 +15,7 @@ fr.ens.transcriptome.aozan.tests.lane.PercentAlignLaneTest
 fr.ens.transcriptome.aozan.tests.lane.PercentCycle20IntensityLaneTest
 fr.ens.transcriptome.aozan.tests.lane.PhasingPrePhasingLaneTest
 fr.ens.transcriptome.aozan.tests.lane.RawClustersLaneTest
+fr.ens.transcriptome.aozan.tests.lane.RawClusterPhixLaneTest
 fr.ens.transcriptome.aozan.tests.sample.BadTilesFastQCSampleTest
 fr.ens.transcriptome.aozan.tests.sample.BasicStatsFastQCSampleTest
 fr.ens.transcriptome.aozan.tests.sample.DuplicationLevelFastQCSampleTest
