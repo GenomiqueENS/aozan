@@ -23,17 +23,10 @@
 
 package fr.ens.transcriptome.aozan.fastqscreen;
 
-import static fr.ens.transcriptome.aozan.Globals.DATE_FORMAT;
-
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -41,12 +34,6 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -57,6 +44,7 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.io.FastqSample;
+import fr.ens.transcriptome.aozan.util.XMLUtilsWriter;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**
@@ -136,90 +124,58 @@ public class FastqScreenResult {
     return s.toString();
   }
 
-  public String reportToHtml(final FastqSample fastqSample, final RunData data,
-      final String genomeSample, final File fastqscreenXSLFile)
-      throws AozanException {
+  /**
+   * Create report html file
+   * @param fastqSample fastqSample instance
+   * @param data object rundata on the run
+   * @param genomeSample genome reference corresponding to sample
+   * @param fastqscreenXSLFile xsl file, can be null to use default file
+   * @throws AozanException if an error occurs during creation document xml or
+   *           transforming document xml in html file
+   * @throws IOException if an error occurs during paring the xsl file
+   */
+  public void reportToHtml(final FastqSample fastqSample, final RunData data,
+      final String genomeSample, final File reportHtml,
+      final File fastqscreenXSLFile) throws AozanException, IOException {
 
     if (!isComputedPercent)
       throw new AozanException(
           "Error writing a html report fastqScreen : no values available.");
 
+    if (reportHtml == null)
+      throw new AozanException(
+          "Error writing a html report fastqScreen : no values available.");
+
     // Call stylesheet file for report
     InputStream is = null;
-    try {
-      if (fastqscreenXSLFile == null)
-        is =
-            this.getClass().getResourceAsStream(
-                Globals.EMBEDDED_FASTQSCREEN_XSL);
-      else
-        is = new FileInputStream(fastqscreenXSLFile);
+    if (fastqscreenXSLFile == null)
+      is =
+          this.getClass().getResourceAsStream(Globals.EMBEDDED_FASTQSCREEN_XSL);
+    else
+      is = new FileInputStream(fastqscreenXSLFile);
 
-      return toXML(fastqSample, data, genomeSample, is);
+    // Create document XML
+    final Document doc = createDocumentXML(fastqSample, data, genomeSample);
 
-    } catch (FileNotFoundException e) {
-      throw new AozanException(e);
-    }
-  }
-
-  private String toXML(final FastqSample fastqSample, final RunData data,
-      final String genomeSample, final InputStream isXSLFile)
-      throws AozanException {
-
-    if (!isComputedPercent)
-      return null;
-
-    try {
-      // set up a transformer
-      TransformerFactory transfac = TransformerFactory.newInstance();
-      Transformer trans = transfac.newTransformer();
-      // trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-      trans.setOutputProperty(OutputKeys.INDENT, "yes");
-      trans.setOutputProperty(OutputKeys.METHOD, "xml");
-
-      // create string from xml tree
-      StringWriter sw = new StringWriter();
-      StreamResult result = new StreamResult(sw);
-
-      Document doc = createDocumentXML(fastqSample, data, genomeSample);
-      DOMSource source = new DOMSource(doc);
-      trans.transform(source, result);
-      // Create the transformer
-      final Transformer transformer =
-          TransformerFactory.newInstance().newTransformer(
-              new javax.xml.transform.stream.StreamSource(isXSLFile));
-
-      // Create the String writer
-      final StringWriter writer = new StringWriter();
-
-      // Transform the document
-      transformer.transform(new DOMSource(doc), new StreamResult(writer));
-
-      // Print document XML
-      // StringWriter swxml = new StringWriter();
-      // StreamResult resultxml = new StreamResult(swxml);
-      // DOMSource sourcexml = new DOMSource(doc);
-      // trans.transform(sourcexml, resultxml);
-      // System.out.println(swxml.toString());
-
-      // Close input stream
-      isXSLFile.close();
-
-      // Return the result of the transformation
-      return writer.toString();
-
-    } catch (TransformerException e) {
-      throw new AozanException(e);
-    } catch (IOException e) {
-      throw new AozanException(e);
-    }
+    // Create html report from xml with xsl file
+    XMLUtilsWriter.createHTMLFileFromXSL(doc, is, reportHtml);
 
   }
 
+  /**
+   * Create document xml
+   * @param fastqSample fastq sample instance
+   * @param data object rundata on the run
+   * @param genomeSample genome reference for the sample
+   * @return document xml completed
+   * @throws AozanException if an error occurs during building document xml
+   */
   private Document createDocumentXML(final FastqSample fastqSample,
       final RunData data, final String genomeSample) throws AozanException {
-    DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 
+    DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
     DocumentBuilder docBuilder = null;
+
     Document doc = null;
 
     try {
@@ -240,35 +196,10 @@ public class FastqScreenResult {
     root.setAttribute("formatversion", "1.0");
     doc.appendChild(root);
 
-    // Header
-    XMLUtils.addTagValue(doc, root, "AozanStep", "Detection contamination");
-    XMLUtils.addTagValue(doc, root, "GeneratorName", Globals.APP_NAME);
-    XMLUtils.addTagValue(doc, root, "GeneratorVersion",
-        Globals.APP_VERSION_STRING);
-    XMLUtils.addTagValue(doc, root, "GeneratorWebsite", Globals.WEBSITE_URL);
-    XMLUtils.addTagValue(doc, root, "GeneratorRevision",
-        Globals.APP_BUILD_COMMIT);
+    // Common tag header in document xml
+    XMLUtilsWriter.buildXMLCommonTagHeader(doc, root, data);
 
-    XMLUtils.addTagValue(doc, root, "RunId", data.get("run.info.run.id"));
-
-    // Convert string to date
-    try {
-      SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
-      Date runDate = sdf.parse(data.get("run.info.date"));
-      XMLUtils.addTagValue(doc, root, "RunDate", DATE_FORMAT.format(runDate));
-    } catch (ParseException e1) {
-      XMLUtils.addTagValue(doc, root, "RunDate", data.get("run.info.date"));
-    }
-
-    XMLUtils.addTagValue(doc, root, "FlowcellId",
-        data.get("run.info.flow.cell.id"));
-    XMLUtils.addTagValue(doc, root, "InstrumentSN",
-        data.get("run.info.instrument"));
-    XMLUtils.addTagValue(doc, root, "InstrumentRunNumber",
-        data.get("run.info.run.number"));
-    XMLUtils.addTagValue(doc, root, "ReportDate",
-        DATE_FORMAT.format(new Date()));
-
+    // Specific data on sample
     XMLUtils
         .addTagValue(doc, root, "projectName", fastqSample.getProjectName());
     XMLUtils.addTagValue(doc, root, "genomeSample", (genomeSample == null

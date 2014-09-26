@@ -156,26 +156,26 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   private void writeHtml(final String fileName) throws AozanException,
       IOException {
 
-    File file = new File(fileName + ".html");
+    final File outputReportR1 = new File(fileName + ".html");
 
-    BufferedWriter br = Files.newWriter(file, Charsets.UTF_8);
-    br.append(this.resultsFastqscreen.reportToHtml(getFastqSample(), this.data,
-        this.genomeSample, this.fastqscreenXSLFile));
+    // BufferedWriter br = Files.newWriter(file, Charsets.UTF_8);
+    this.resultsFastqscreen.reportToHtml(getFastqSample(), this.data,
+        this.genomeSample, outputReportR1, this.fastqscreenXSLFile);
 
-    br.close();
+    // br.close();
 
     // Run paired-end : copy file for read R2
     if (this.isRunPE) {
-      File fileR2 =
+      File outputReportR2 =
           new File(this.reportDir.getAbsolutePath()
               + "/" + getFastqSample().getPrefixRead2() + "-fastqscreen.html");
 
-      if (fileR2.exists())
-        if (!fileR2.delete())
+      if (outputReportR2.exists())
+        if (!outputReportR2.delete())
           LOGGER.warning("Fastqscreen : fail delete report "
-              + fileR2.getAbsolutePath());
+              + outputReportR2.getAbsolutePath());
 
-      FileUtils.copyFile(file, fileR2);
+      FileUtils.copyFile(outputReportR1, outputReportR2);
 
     }
   }
