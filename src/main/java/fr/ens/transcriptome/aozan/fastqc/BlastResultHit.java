@@ -100,7 +100,7 @@ class BlastResultHit {
   public ContaminantHit toContaminantHit() {
 
     StringBuilder name = new StringBuilder();
-    name.append("Search with Blastall+, <a href="
+    name.append("Search with Blastn, <a href="
         + LINK_NCBI_BLASTN + this.sequence + "\""
         + " target=\"_blank\">more detail</a>");
     name.append(" First hit on "

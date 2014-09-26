@@ -23,7 +23,6 @@
 
 package fr.ens.transcriptome.aozan.fastqc;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static fr.ens.transcriptome.aozan.util.XMLUtilsParser.extractFirstValueToInt;
 import static fr.ens.transcriptome.aozan.util.XMLUtilsParser.extractFirstValueToString;
 import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingFile;
@@ -36,6 +35,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -97,7 +97,7 @@ public class OverrepresentedSequencesBlast {
   private boolean firstCall = true;
   private boolean stepEnabled = false;
 
-  private List<String> blastCommonCommandLine;
+  private CommandLine blastCommonCommandLine;
   private String blastVersionExpected;
 
   //
@@ -105,7 +105,7 @@ public class OverrepresentedSequencesBlast {
   //
 
   /**
-   * Configure and check that blastall can be launched
+   * Configure and check that Blastn can be launched
    * @param properties object with the collector configuration
    */
   public void configure(final Properties properties) {
@@ -165,21 +165,20 @@ public class OverrepresentedSequencesBlast {
                   .getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_ARGUMENTS_KEY);
 
           this.blastCommonCommandLine =
-              createCommonBlastCommandLine(blastPath, blastDBPath,
-                  checkArgBlast(blastArguments));
+              createBlastCommandLine(blastPath, blastDBPath, blastArguments);
 
           // Add in map all sequences to do not analysis, return a resultBlast
           // with no hit
           loadSequencesToIgnore();
-          
+
           LOGGER.info("FastQC-step blast : step is enable, command line = "
-              + Joiner.on(' ').join(this.blastCommonCommandLine));
+              + this.blastCommonCommandLine);
 
         } catch (IOException e) {
           LOGGER.warning(e.getMessage()
               + "\n\t" + StringUtils.join(e.getStackTrace(), "\n\t"));
           this.stepEnabled = false;
-          
+
         } catch (AozanException e) {
           LOGGER.warning(e.getMessage()
               + "\n\t" + StringUtils.join(e.getStackTrace(), "\n\t"));
@@ -192,8 +191,8 @@ public class OverrepresentedSequencesBlast {
   }
 
   /**
-   * Test if blastall can be launched
-   * @return true if blastall can be launched else false
+   * Test if Blastn can be launched
+   * @return true if Blastn can be launched else false
    */
   public boolean isStepBlastEnabled() {
 
@@ -241,91 +240,21 @@ public class OverrepresentedSequencesBlast {
   // Methods to build command line
   //
 
-  /**
-   * Build the command line, part common to all sequences
-   * @param blastPath path to blastall
-   * @param blastDBPath path to blastn database
-   * @param argBlast argument for blastn added in configuration aozan, optional
-   * @throws IOException
-   */
-  private static List<String> createCommonBlastCommandLine(
-      final String blastPath, final String blastDBPath,
-      final List<String> argBlast) throws IOException {
+  private CommandLine createBlastCommandLine(final String blastPath,
+      final String blastDBPath, final String blastArguments)
+      throws IOException, AozanException {
 
-    checkExistingFile(new File(blastPath), "FastQC-step blast : path to blast ");
-    // Check nt.nal file exists
-    checkExistingFile(new File(blastDBPath + ".nal"),
-        " FastQC-step blast : path to database blast");
+    if (blastPath.endsWith("blastall"))
+      return new BlastallCommandLine(blastPath, blastDBPath, blastArguments);
 
-    final List<String> result = Lists.newArrayList();
+    if (blastPath.endsWith("blastn"))
+      return new NbciBlastnCommandLine(blastPath, blastDBPath, blastArguments);
 
-    result.add(blastPath);
-    result.add("-p");
-    result.add("blastn");
-    result.add("-d");
-    result.add(blastDBPath);
-    result.add("-m");
-    result.add("7");
-
-    // Add arguments from configuration aozan
-    if (argBlast != null && argBlast.size() > 0)
-      result.addAll(argBlast);
-
-    return result;
+    throw new AozanException(
+        "Fail to build command line, only blastn (from ncbi-blast+) or blastall application are supported.");
   }
 
-  /**
-   * Check argument for blastn from configuration aozan. This parameters can't
-   * been modified : -d, -m, -a. The parameters are returned in a list.
-   * @param argBlast parameters for blastn
-   * @return parameters for blastn in a list
-   * @throws AozanException occurs if the parameters syntax not conforms.
-   */
-  public static List<String> checkArgBlast(final String argBlast)
-      throws AozanException {
-
-    // Check coherence with default parameter defined in Aozan
-    List<String> paramEvalue = Lists.newArrayList();
-    paramEvalue.add("-e");
-    paramEvalue.add("0.0001");
-
-    if (argBlast == null || argBlast.length() == 0)
-      return paramEvalue;
-
-    StringTokenizer tokens = new StringTokenizer(argBlast.trim(), " .,");
-    List<String> args = Lists.newArrayList();
-
-    // Set of pair tokens : first must begin with '-'
-    while (tokens.hasMoreTokens()) {
-      String param = tokens.nextToken();
-      String val = tokens.nextToken();
-
-      if (!param.startsWith("-"))
-        throw new AozanException("FastQC-step blast : parameters not conforme "
-            + argBlast);
-
-      // Parameters can not redefined
-      if (param.equals("-d")
-          || param.equals("-p") || param.equals("-m") || param.equals("-a"))
-        continue;
-
-      if (param.equals("-e")) {
-        // Replace initial value
-        paramEvalue.clear();
-        paramEvalue.add("-e");
-        paramEvalue.add(val);
-        continue;
-      }
-
-      args.add(param);
-      args.add(val);
-    }
-
-    args.addAll(paramEvalue);
-
-    return args;
-  }
-
+  //
   //
   // Methods to analysis sequences
   //
@@ -390,15 +319,11 @@ public class OverrepresentedSequencesBlast {
     checkExistingFile(resultXMLFile,
         "FastQC-step blast : path to output file for the sequence " + sequence);
 
-    // Clone command line
-    final List<String> finalCommand = newArrayList(this.blastCommonCommandLine);
-
-    // Add output file result
-    finalCommand.add("-o");
-    finalCommand.add(resultXMLFile.getAbsolutePath());
+    // Set output file for this sequence
+    this.blastCommonCommandLine.setOutputFile(resultXMLFile);
 
     // Launch blast
-    launchBlastSearch(finalCommand, sequence);
+    launchBlastSearch(this.blastCommonCommandLine.getComandLine(), sequence);
 
     // Wait writing xml file
     try {
@@ -449,7 +374,7 @@ public class OverrepresentedSequencesBlast {
       if (exitValue > 0)
         LOGGER
             .warning("FastQC-step blast : fail of process to launch blastn with sequence "
-                + sequence + ", exist value is : " + exitValue);
+                + sequence + ", exit value is : " + exitValue);
 
     } catch (IOException e) {
       // e.printStackTrace();
@@ -525,7 +450,7 @@ public class OverrepresentedSequencesBlast {
         LOGGER.warning("FastQC - step blast : version xml not expected "
             + version + " instead of " + this.blastVersionExpected);
       else
-        LOGGER.info("FastQC-step blast : blastall version " + version);
+        LOGGER.info("FastQC-step blastn : blast version " + version);
 
       StringBuilder parameters = new StringBuilder();
 
@@ -544,8 +469,7 @@ public class OverrepresentedSequencesBlast {
       parameters.append(", Parameters_filter=");
       parameters.append(extractFirstValueToString(doc, "Parameters_filter"));
 
-      LOGGER.info("FastQC-step blast : blastall parameters "
-          + parameters.toString());
+      LOGGER.info("FastQC-step blast parameters : " + parameters.toString());
 
       firstCall = false;
     }
@@ -601,6 +525,274 @@ public class OverrepresentedSequencesBlast {
    * Private constructor.
    */
   private OverrepresentedSequencesBlast() {
+  }
+
+  //
+  // Internal classes
+  //
+
+  /**
+   * This abstract class store a command line to run blastn
+   */
+  private static abstract class CommandLine {
+
+    /** Result file must be XML */
+    private static String EVALUE_ARGUMENT = "0.0001";
+
+    private final String blastPath;
+    private final String blastDBPath;
+    private final List<String> argBlast;
+    private File outputFile = null;
+
+    //
+    // Abstract methods
+    //
+
+    abstract String getProgramNameArgumentName();
+
+    abstract String getDatabaseArgumentName();
+
+    abstract String getAlignementViewOptionsArgumentName();
+
+    abstract String getAlignementViewOptionsArgumentValue();
+
+    abstract String getEvalueArgumentName();
+
+    abstract String getNumberThreadsArgumentName();
+
+    abstract String getOutputFileArgumentName();
+
+    File getOutputFile() {
+      return this.outputFile;
+    }
+
+    void setOutputFile(final File resultXMLFile) {
+      this.outputFile = resultXMLFile;
+    }
+
+    /**
+     * Build the command line, part common to all sequences
+     * @param blastPath path to application blast
+     * @param blastDBPath path to blastn database
+     * @param argBlast argument for blastn added in configuration Aozan,
+     *          optional
+     */
+    List<String> getComandLine() {
+
+      final List<String> result = Lists.newArrayList();
+
+      result.add(blastPath);
+
+      result.add(getProgramNameArgumentName());
+      result.add("blastn");
+
+      result.add(getDatabaseArgumentName());
+      result.add(blastDBPath);
+
+      result.add(getAlignementViewOptionsArgumentName());
+      result.add(getAlignementViewOptionsArgumentValue());
+
+      if (this.outputFile != null) {
+        result.add(getOutputFileArgumentName());
+        result.add(getOutputFile().getAbsolutePath());
+      }
+
+      // Add arguments from configuration Aozan
+      if (argBlast != null && argBlast.size() > 0)
+        result.addAll(argBlast);
+
+      return Collections.unmodifiableList(result);
+
+    }
+
+    /**
+     * Check argument for blastn from configuration aozan. This parameters can't
+     * been modified : -d, -m, -a. The parameters are returned in a list.
+     * @param argBlast parameters for blastn
+     * @return parameters for blastn in a list
+     * @throws AozanException occurs if the parameters syntax is invalid.
+     */
+    private List<String> checkBlastArguments(String blastArguments)
+        throws AozanException {
+
+      // Check coherence with default parameter defined in Aozan
+      List<String> paramEvalue = Lists.newArrayList();
+      paramEvalue.add(getEvalueArgumentName());
+      paramEvalue.add(EVALUE_ARGUMENT);
+
+      if (blastArguments == null || blastArguments.length() == 0)
+        return paramEvalue;
+
+      StringTokenizer tokens =
+          new StringTokenizer(blastArguments.trim(), " .,");
+      List<String> args = Lists.newArrayList();
+
+      // Set of pair tokens : first must begin with '-'
+      while (tokens.hasMoreTokens()) {
+        String param = tokens.nextToken();
+        String val = tokens.nextToken();
+
+        if (!param.startsWith("-"))
+          throw new AozanException(
+              "FastQC-step blast : parameters not conforme " + argBlast);
+
+        // Parameters can not redefined
+        if (param.equals(getProgramNameArgumentName())
+            || param.equals(getDatabaseArgumentName())
+            || param.equals(getNumberThreadsArgumentName())
+            || param.equals(getAlignementViewOptionsArgumentName()))
+          continue;
+
+        if (param.equals(getEvalueArgumentName())) {
+          // Replace initial value
+          paramEvalue.clear();
+          paramEvalue.add(getEvalueArgumentName());
+          paramEvalue.add(val);
+          continue;
+        }
+
+        args.add(param);
+        args.add(val);
+      }
+
+      args.addAll(paramEvalue);
+
+      return Collections.unmodifiableList(args);
+    }
+
+    @Override
+    public String toString() {
+      return Joiner.on(' ').join(getComandLine());
+    }
+
+    //
+    // Constructor
+    //
+    /**
+     * Constructor
+     * @param blastPath path to application blast
+     * @param blastDBPath path to blastn database
+     * @param argBlast argument for blastn added in configuration Aozan,
+     *          optional
+     * @throws IOException an error occurs if application or database doesn't
+     *           exist
+     * @throws AozanException occurs if the parameters syntax is invalid.
+     */
+    CommandLine(final String blastPath, final String blastDBPath,
+        final String blastArguments) throws IOException, AozanException {
+
+      this.blastPath = blastPath;
+      this.blastDBPath = blastDBPath;
+
+      checkExistingFile(new File(blastPath),
+          "FastQC-step blast : path to blast ");
+      // Check nt.nal file exists
+      checkExistingFile(new File(blastDBPath + ".nal"),
+          " FastQC-step blast : path to database blast");
+
+      this.argBlast = checkBlastArguments(blastArguments);
+    }
+  }
+
+  /**
+   * This class store a command line to run blastn from ncbi-blast+ package
+   */
+  private static final class NbciBlastnCommandLine extends CommandLine {
+
+    @Override
+    String getProgramNameArgumentName() {
+      return "-task";
+    }
+
+    @Override
+    String getDatabaseArgumentName() {
+      return "-db";
+    }
+
+    @Override
+    String getAlignementViewOptionsArgumentName() {
+      return "-outfmt";
+    }
+
+    @Override
+    String getAlignementViewOptionsArgumentValue() {
+      // Output xml format
+      return "5";
+    }
+
+    @Override
+    String getEvalueArgumentName() {
+      return "-evalue";
+    }
+
+    @Override
+    String getNumberThreadsArgumentName() {
+      return "-num_threads";
+    }
+
+    @Override
+    String getOutputFileArgumentName() {
+      return "-out";
+    }
+
+    /**
+     * Constructor
+     */
+    NbciBlastnCommandLine(String blastPath, String blastDBPath,
+        String blastArguments) throws IOException, AozanException {
+      super(blastPath, blastDBPath, blastArguments);
+    }
+
+  }
+
+  /**
+   * This class store a command line to run blastn from blastall package
+   */
+  private static final class BlastallCommandLine extends CommandLine {
+
+    @Override
+    String getProgramNameArgumentName() {
+      return "-p";
+    }
+
+    @Override
+    String getDatabaseArgumentName() {
+      return "-d";
+    }
+
+    @Override
+    String getAlignementViewOptionsArgumentName() {
+      return "-m";
+    }
+
+    @Override
+    String getAlignementViewOptionsArgumentValue() {
+      // Output xml format
+      return "7";
+    }
+
+    @Override
+    String getEvalueArgumentName() {
+      return "-e";
+    }
+
+    @Override
+    String getNumberThreadsArgumentName() {
+      return "-a";
+    }
+
+    @Override
+    String getOutputFileArgumentName() {
+      return "-o";
+    }
+
+    /**
+     * Constructor
+     */
+    BlastallCommandLine(String blastPath, String blastDBPath,
+        String blastArguments) throws IOException, AozanException {
+      super(blastPath, blastDBPath, blastArguments);
+    }
   }
 
 }
