@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -37,13 +36,9 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import com.google.common.base.Charsets;
 
 import fr.ens.transcriptome.eoulsan.util.Version;
-import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**
  * This class contains Globals constants.
@@ -259,40 +254,6 @@ public class Globals {
       manifestAttributes = manifest.getMainAttributes();
 
     } catch (IOException ignored) {
-    }
-  }
-
-  public static void buildXMLCommonTagHeader(final Document doc,
-      final Element parent, final RunData data) {
-
-    XMLUtils.addTagValue(doc, parent, "GeneratorName", Globals.APP_NAME);
-    XMLUtils.addTagValue(doc, parent, "GeneratorVersion",
-        Globals.APP_VERSION_STRING);
-    XMLUtils.addTagValue(doc, parent, "GeneratorWebsite", Globals.WEBSITE_URL);
-    XMLUtils.addTagValue(doc, parent, "GeneratorRevision",
-        Globals.APP_BUILD_COMMIT);
-
-    if (data != null) {
-      XMLUtils.addTagValue(doc, parent, "RunId", data.get("run.info.run.id"));
-
-      // Convert string to date
-      try {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
-        Date runDate = sdf.parse(data.get("run.info.date"));
-        XMLUtils.addTagValue(doc, parent, "RunDate",
-            DATE_FORMAT.format(runDate));
-      } catch (ParseException e1) {
-        XMLUtils.addTagValue(doc, parent, "RunDate", data.get("run.info.date"));
-      }
-
-      XMLUtils.addTagValue(doc, parent, "FlowcellId",
-          data.get("run.info.flow.cell.id"));
-      XMLUtils.addTagValue(doc, parent, "InstrumentSN",
-          data.get("run.info.instrument"));
-      XMLUtils.addTagValue(doc, parent, "InstrumentRunNumber",
-          data.get("run.info.run.number"));
-      XMLUtils.addTagValue(doc, parent, "ReportDate",
-          DATE_FORMAT.format(new Date()));
     }
   }
 
