@@ -50,6 +50,7 @@ import fr.ens.transcriptome.eoulsan.data.DataFile;
 import fr.ens.transcriptome.eoulsan.data.storages.GenomeDescStorage;
 import fr.ens.transcriptome.eoulsan.data.storages.SimpleGenomeDescStorage;
 import fr.ens.transcriptome.eoulsan.steps.generators.GenomeMapperIndexer;
+import fr.ens.transcriptome.eoulsan.util.LocalReporter;
 import fr.ens.transcriptome.eoulsan.util.PseudoMapReduce;
 import fr.ens.transcriptome.eoulsan.util.Reporter;
 import fr.ens.transcriptome.eoulsan.util.StringUtils;
@@ -390,7 +391,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     // Retrieve instance of mapper or null
     SequenceReadsMapper map =
-        SequenceReadsMapperService.getInstance().getMapper(mapperName);
+        SequenceReadsMapperService.getInstance().newService(mapperName);
 
     if (map == null)
       throw new AozanException("FASTQSCREEN : mapper name "
@@ -426,7 +427,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     // Define temporary directory
     this.setMapReduceTemporaryDirectory(new File(this.tmpDir));
 
-    this.reporter = new Reporter();
+    this.reporter = new LocalReporter();
 
     Settings settings = EoulsanRuntime.getSettings();
     DataFile genomeDescStoragePath =
