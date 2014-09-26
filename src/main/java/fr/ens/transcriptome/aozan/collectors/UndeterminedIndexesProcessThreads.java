@@ -23,15 +23,14 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -43,12 +42,6 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.testng.internal.annotations.Sets;
 import org.w3c.dom.Document;
@@ -77,6 +70,7 @@ import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.io.FastqSample;
+import fr.ens.transcriptome.aozan.util.XMLUtilsWriter;
 import fr.ens.transcriptome.eoulsan.EoulsanException;
 import fr.ens.transcriptome.eoulsan.bio.IlluminaReadId;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
@@ -105,6 +99,7 @@ public class UndeterminedIndexesProcessThreads extends
   private final int read;
   private final SequenceFile seqFile;
   private final File reportDir;
+  private final File xslFile;
 
   private final Map<String, String> sampleIndexes;
   private final Map<String, String> reverseSampleIndexes;
@@ -178,9 +173,8 @@ public class UndeterminedIndexesProcessThreads extends
       final Set<String> samplesName = Sets.newHashSet();
 
       // Extract all samples names per lane
-      final String samplesNameInLane =
-          data.get("design.lane" + lane + ".samples.names");
-      samplesName.addAll(COMMA_SPLITTER.splitToList(samplesNameInLane));
+      samplesName.addAll(COMMA_SPLITTER.splitToList(data
+          .getSamplesNameInLane(lane)));
 
       // Write all samples name with correct syntax
       final String txt = "'" + Joiner.on("','").join(samplesName) + "'";
@@ -376,7 +370,8 @@ public class UndeterminedIndexesProcessThreads extends
 
         elem.setTextContent(text);
         elemRoot.appendChild(elem);
-
+        
+        n++;
       }
 
       // Add empty element for comment field
@@ -533,7 +528,7 @@ public class UndeterminedIndexesProcessThreads extends
       }
 
       // Compute results for each sample
-      for (String sampleName : getSampleNames()) {
+      for (String sampleName : this.data.getSamplesNameListInLane(this.lane)) {
         recoverableRawClusterCount +=
             computeRecoverableSampleClusterCount(sampleName,
                 this.rawUndeterminedIndices, ".recoverable.raw.cluster.count");
@@ -601,15 +596,16 @@ public class UndeterminedIndexesProcessThreads extends
     createReportForLane();
 
     // Create the report for each samples
-    for (String sampleName : getSampleNames())
+    for (String sampleName : this.data.getSamplesNameListInLane(this.lane))
       createReportForSample(sampleName);
   }
 
   /**
    * Create the report for the lane.
    * @throws IOException if an error occurs while creating the report
+   * @throws AozanException if an error occurs while building xml file
    */
-  private void createReportForLane() throws IOException {
+  private void createReportForLane() throws IOException, AozanException {
 
     // Test if demultiplexing with mismatches is possible
     boolean oneMismatcheDemuxPossible = true;
@@ -721,28 +717,26 @@ public class UndeterminedIndexesProcessThreads extends
    * @param entries entries to write
    * @param totalEntry total entries summary
    * @throws IOException if an error occurs while writing the file
+   * @throws AozanException if an error occurs while building xml file
    */
   private void writeHTML(final List<LaneResultEntry> entries,
-      final LaneResultEntry totalEntry) throws IOException {
+      final LaneResultEntry totalEntry) throws IOException, AozanException {
 
     final File reportHtml = createLaneResultFile(".html");
 
-    try {
-      toXML("lane" + lane + "_undetermined", null, entries, totalEntry,
-          reportHtml, false);
+    toXML("lane" + lane + "_undetermined", null, entries, totalEntry,
+        reportHtml, false);
 
-    } catch (ParserConfigurationException | TransformerException e) {
-      e.printStackTrace();
-    }
   }
 
   /**
    * Create the report for a sample.
    * @param sampleName the sample name
    * @throws IOException if an error occurs while creating the report
+   * @throws AozanException if an
    */
   private void createReportForSample(final String sampleName)
-      throws IOException {
+      throws IOException, AozanException {
 
     // Create sorted set
     final List<SampleResultEntry> entries = Lists.newArrayList();
@@ -855,20 +849,17 @@ public class UndeterminedIndexesProcessThreads extends
    * @param entries entries to write
    * @param totalEntry total entries summary
    * @throws IOException if an error occurs while writing the file
+   * @throws AozanException if on useful file is not define or if an error
+   *           occurs during transforming document.
    */
   private void writeHTML(final String sampleName,
       final SampleResultEntry demuxEntry,
       final List<SampleResultEntry> entries, final SampleResultEntry totalEntry)
-      throws IOException {
+      throws IOException, AozanException {
 
     final File reportHtml = createSampleResultFile(sampleName, ".html");
 
-    try {
-      toXML(sampleName, demuxEntry, entries, totalEntry, reportHtml, true);
-
-    } catch (ParserConfigurationException | TransformerException e) {
-      e.printStackTrace();
-    }
+    toXML(sampleName, demuxEntry, entries, totalEntry, reportHtml, true);
 
   }
 
@@ -879,22 +870,27 @@ public class UndeterminedIndexesProcessThreads extends
    * @param entries entries to write
    * @param totalEntry total entries summary
    * @param reportHtml report output file in HTML
-   * @param isSampleData true if it is a demultiplexed sample   
+   * @param isSampleData true if it is a demultiplexed sample
    * @throws IOException if an error occurs while writing the file
-   * @throws ParserConfigurationException if an error occurs while parsing the file
-   * @throws TransformerException if an error occurs while parsing xsl file.
+   * @throws AozanException if an usefull file are not define or if an error
+   *           occurs during building document xml
    */
   private void toXML(final String sampleName, final ResultEntry demuxEntry,
       final List<? extends ResultEntry> entries, final ResultEntry totalEntry,
       final File reportHtml, final boolean isSampleData) throws IOException,
-      ParserConfigurationException, TransformerException {
+      AozanException {
 
     Document doc = null;
 
-    DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-    DocumentBuilder docBuilder = null;
-    docBuilder = dbfac.newDocumentBuilder();
-    doc = docBuilder.newDocument();
+    try {
+      DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+      DocumentBuilder docBuilder = null;
+      docBuilder = dbfac.newDocumentBuilder();
+      doc = docBuilder.newDocument();
+
+    } catch (ParserConfigurationException e) {
+      throw new AozanException(e);
+    }
 
     // Create the root element and add it to the document
     Element root = doc.createElement("RecoveryClusterReport");
@@ -905,7 +901,7 @@ public class UndeterminedIndexesProcessThreads extends
         "Recovery cluster from undetermined fastq file");
 
     // Common XML tag
-    Globals.buildXMLCommonTagHeader(doc, root, this.data);
+    XMLUtilsWriter.buildXMLCommonTagHeader(doc, root, this.data);
 
     XMLUtils.addTagValue(doc, root, "sampleName", sampleName);
 
@@ -915,14 +911,14 @@ public class UndeterminedIndexesProcessThreads extends
           getProjectSample(sampleName));
 
     XMLUtils.addTagValue(doc, root, "description",
-        getSampleDescription(sampleName));
+        this.data.getSampleDescription(this.lane, sampleName));
 
     XMLUtils.addTagValue(doc, root, "condition",
         "Compile results on recovery reads in undetermined fastq with "
             + this.maxMismatches + " mismatches.");
 
     if (!isSampleData) {
-
+      // Add sample name in this lane
       LaneResultEntry.samplesNameXML(doc, root, this.data, this.lane);
     }
 
@@ -947,55 +943,19 @@ public class UndeterminedIndexesProcessThreads extends
     }
 
     // TODO debug
-    // Print document XML
-    // try {
-    // TransformerFactory transfac = TransformerFactory.newInstance();
-    // Transformer trans;
-    // trans = transfac.newTransformer();
-    // StringWriter swxml = new StringWriter();
-    // StreamResult resultxml = new StreamResult(swxml);
-    // DOMSource sourcexml = new DOMSource(doc);
-    // trans.transform(sourcexml, resultxml);
-    //
-    // Files.write(swxml.toString(), new File(reportHtml.getAbsolutePath()
-    // .replace(".html", ".xml")), Charsets.UTF_8);
-    // } catch (Exception e1) {
-    // e1.printStackTrace();
-    // }
+    XMLUtilsWriter.createXMLFile(doc, reportHtml);
 
-    // Set up a transformer
-    TransformerFactory transfac = TransformerFactory.newInstance();
-    Transformer trans = transfac.newTransformer();
-    // trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-    trans.setOutputProperty(OutputKeys.INDENT, "yes");
-    trans.setOutputProperty(OutputKeys.METHOD, "xml");
+    // Set xsl file to write report HTML file
+    InputStream is = null;
+    if (this.xslFile == null)
+      is =
+          this.getClass()
+              .getResourceAsStream(Globals.EMBEDDED_UNDETERMINED_XSL);
+    else
+      is = new FileInputStream(this.xslFile);
 
-    // Create string from xml tree
-    StringWriter sw = new StringWriter();
-    StreamResult result = new StreamResult(sw);
-
-    DOMSource source = new DOMSource(doc);
-    trans.transform(source, result);
-
-    InputStream is =
-        this.getClass().getResourceAsStream(Globals.EMBEDDED_UNDETERMINED_XSL);
-
-    // Create the transformer
-    final Transformer transformer =
-        TransformerFactory.newInstance().newTransformer(
-            new javax.xml.transform.stream.StreamSource(is));
-
-    // Create the String writer
-    final StringWriter writer = new StringWriter();
-
-    // Transform the document
-    transformer.transform(new DOMSource(doc), new StreamResult(writer));
-
-    // Close input stream
-    is.close();
-
-    // Create HTML file
-    Files.write(writer.toString(), reportHtml, Charsets.UTF_8);
+    // Write report HTML
+    XMLUtilsWriter.createHTMLFileFromXSL(doc, is, reportHtml);
   }
 
   //
@@ -1051,7 +1011,7 @@ public class UndeterminedIndexesProcessThreads extends
 
     final Map<String, String> result = Maps.newHashMap();
 
-    for (String sampleName : getSampleNames()) {
+    for (String sampleName : this.data.getSamplesNameListInLane(this.lane)) {
 
       // Get the sample index
       String index =
@@ -1064,35 +1024,13 @@ public class UndeterminedIndexesProcessThreads extends
   }
 
   /**
-   * Get the sample names.
-   * @return a list with the sample names
-   */
-  private List<String> getSampleNames() {
-
-    return Lists.newArrayList(Splitter.on(',').split(
-        this.data.get("design.lane" + this.lane + ".samples.names")));
-  }
-
-  /**
    * Get the project related to a sample of the lane.
    * @param sampleName the sample name
    * @return the project related to the sample
    */
   private String getProjectSample(final String sampleName) {
 
-    return this.data.get("design.lane"
-        + this.lane + "." + sampleName + ".sample.project");
-  }
-
-  /**
-   * Get the description of a sample.
-   * @param sampleName the sample name
-   * @return the description of the sample
-   */
-  private String getSampleDescription(final String sampleName) {
-
-    return this.data.get("design.lane"
-        + this.lane + "." + sampleName + ".description");
+    return this.data.getProjectSample(this.lane, sampleName);
   }
 
   /**
@@ -1102,9 +1040,7 @@ public class UndeterminedIndexesProcessThreads extends
    */
   private int getSampleRawClusterCount(final String sampleName) {
 
-    return this.data.getInt("demux.lane"
-        + this.lane + ".sample." + sampleName + ".read" + this.read
-        + ".raw.cluster.count");
+    return this.data.getSampleRawClusterCount(this.lane, this.read, sampleName);
   }
 
   /**
@@ -1114,9 +1050,7 @@ public class UndeterminedIndexesProcessThreads extends
    */
   private int getSamplePFClusterCount(final String sampleName) {
 
-    return this.data.getInt("demux.lane"
-        + this.lane + ".sample." + sampleName + ".read" + this.read
-        + ".pf.cluster.count");
+    return this.data.getSamplePFClusterCount(this.lane, this.read, sampleName);
   }
 
   //
@@ -1125,24 +1059,26 @@ public class UndeterminedIndexesProcessThreads extends
 
   /**
    * Constructor.
+   * @param data run data instance
    * @param fastqSample sample to process
+   * @param reportDir output report directory
+   * @param undeterminedIndexedXSLFile xsl file use to create report html
    * @throws AozanException if sample cannot be processed
    */
   public UndeterminedIndexesProcessThreads(final RunData data,
-      final FastqSample fastqSample, int maxMismatches, final File reportDir)
-      throws AozanException {
+      final FastqSample fastqSample, final File reportDir,
+      final File undeterminedIndexedXSLFile) throws AozanException {
 
     super(fastqSample);
 
     checkNotNull(data, "data argument cannot be null");
-    checkArgument(maxMismatches > 0, "maxMismatches argument must be > 0");
     checkNotNull(reportDir, "reportDir argument cannot be null");
 
     this.data = data;
     this.lane = fastqSample.getLane();
     this.read = fastqSample.getRead();
-    this.maxMismatches = maxMismatches;
     this.reportDir = reportDir;
+    this.xslFile = undeterminedIndexedXSLFile;
 
     this.sampleIndexes = getSampleIndexes();
     this.reverseSampleIndexes = reverse(this.sampleIndexes);
@@ -1165,5 +1101,4 @@ public class UndeterminedIndexesProcessThreads extends
     }
 
   }
-
 }

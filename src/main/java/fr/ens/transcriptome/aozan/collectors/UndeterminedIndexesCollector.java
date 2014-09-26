@@ -47,7 +47,7 @@ public class UndeterminedIndexesCollector extends AbstractFastqCollector {
   public static final String COLLECTOR_NAME = "undeterminedindexes";
 
   private int numberThreads = Runtime.getRuntime().availableProcessors();
-  private int maxMismatches = 1;
+  private File undeterminedIndexedXSLFile;
 
   @Override
   public String getName() {
@@ -101,6 +101,18 @@ public class UndeterminedIndexesCollector extends AbstractFastqCollector {
       } catch (NumberFormatException ignored) {
       }
     }
+
+    // Set external xsl file to write report html instead of default version
+    try {
+      String filename =
+          properties
+              .getProperty(Settings.QC_CONF_UNDETERMINED_INDEXED_XSL_FILE_KEY);
+      if (new File(filename).exists())
+        this.undeterminedIndexedXSLFile = new File(filename);
+    } catch (Exception e) {
+      // Call default xsl file
+      this.undeterminedIndexedXSLFile = null;
+    }
   }
 
   @Override
@@ -118,8 +130,8 @@ public class UndeterminedIndexesCollector extends AbstractFastqCollector {
       return null;
     }
 
-    return new UndeterminedIndexesProcessThreads(data, fastqSample,
-        this.maxMismatches, reportDir);
+    return new UndeterminedIndexesProcessThreads(data, fastqSample, reportDir,
+        this.undeterminedIndexedXSLFile);
   }
 
 }

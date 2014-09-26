@@ -93,7 +93,7 @@ public final class Settings {
   /** Casava design generator command */
   public static final String CASAVA_DESIGN_GENERATOR_COMMAND_KEY =
       "casava.design.generator.command";
-  
+
   /** Demultiplex space factor */
   public static final String DEMUX_SPACE_FACTOR_KEY = "demux.space.factor";
   /** Demultiplex step */
@@ -227,6 +227,10 @@ public final class Settings {
       "qc.conf.read.xml.collector.used";
   /** Collector threads */
   public static final String QC_CONF_THREADS_KEY = "qc.conf.threads";
+
+  /** Collector undetermined indexed xsl file */
+  public static final String QC_CONF_UNDETERMINED_INDEXED_XSL_FILE_KEY =
+      "qc.conf.undetermined.indexed.xsl.file";
 
   /** Configuration test */
   /** Test bad tiles enable */
