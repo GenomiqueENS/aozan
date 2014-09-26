@@ -65,7 +65,8 @@
       background-clip: padding-box;
     }
     
-    td.repeat {
+<!--     table.sampleData td:last-child tr:last-child { -->
+	td.repeat{
       background: WhiteSmoke ;
       color: Gray;
       font-style: italic;
@@ -180,6 +181,41 @@
   		width: 150px;
   	}
   </style>
+  <script language="javascript">
+			<xsl:comment><![CDATA[
+		
+		function filterRow(project) {
+			
+			init_all('none');
+
+			var tab = document.getElementsByClassName(project);
+				
+			for (var i=0; i < tab.length; i++){
+				tab[i].style.display ="table-row";
+			}
+			window.location = '#project';
+		}
+		
+		function init_all(display_val){
+			
+			var tab = document.getElementsByClassName('sampleData');
+			
+			for (var n=0; n < tab.length; n++){ 
+				var rows = tab[n].getElementsByTagName('tr');
+		
+				for (var i=0; i < rows.length; i++){
+					rows[i].style.display = display_val;
+				}
+			}
+			
+			var header = document.getElementsByClassName('headerColumns');
+			for (var i=0; i < header.length; i++){
+				header[i].style.display = "table-row";
+			}
+		}
+		
+		]]></xsl:comment>
+		</script>
 </head>
 <body>
 
@@ -236,7 +272,7 @@
   <xsl:if test="/QCReport[ReadsReport]">
   <a name="lane"></a>
   <h2>Lanes Quality report</h2>
-
+<div>
   <xsl:for-each select="/QCReport/ReadsReport/Reads/Read">
     <h3>Read <xsl:value-of select="@number"/> (<xsl:value-of select="@cycles"/> cycles<xsl:if test="@indexed='true'">, index</xsl:if>)</h3>
     <table>
@@ -263,16 +299,39 @@
 
    </table>
   </xsl:for-each>
+</div>
   </xsl:if>
-
+  <a name="project"></a>
+  <xsl:if test="/QCReport[ProjectsReport]">
+	  <div>
+	  <h4>Filter by projects</h4>
+	  <table id="filter">
+	    <tr>
+		  <td>Projects</td>
+	      <td><a href="javascript:void(0);" onclick="window.location.reload(true);">ALL</a></td>
+									
+	      <xsl:for-each select="/QCReport/ProjectsReport/ProjectName">
+		    <td>
+			  <xsl:element name="a">
+			  <xsl:attribute name="href">javascript:void(0);</xsl:attribute>
+			  <xsl:attribute name="onclick">javascript:filterRow([<xsl:value-of select="@cmdJS"></xsl:value-of>]);</xsl:attribute>
+				<xsl:value-of select="." /></xsl:element>
+			</td>
+	      </xsl:for-each>
+	    </tr>
+	  </table>
+	<!--   end filter by project -->
+	  </div>
+  </xsl:if>
+  
   <a name="sample"></a>
   <xsl:if test="/QCReport[SamplesReport]">
   <h2>Samples Quality report</h2>
 
   <xsl:for-each select="/QCReport/SamplesReport/Reads/Read">
     <h3>Read <xsl:value-of select="@number"/></h3>
-    <table>
-    <tr>
+    <table class="sampleData">
+    <tr class="headerColumns">
       <th>Lane</th>
       <th>Sample name</th>
       <th>Description</th>
@@ -284,7 +343,7 @@
       <th>Sample name</th>
     </tr>
     <xsl:for-each select="Sample">
-      <tr>
+      <tr class="{@project}">
        <td><xsl:value-of select="@lane"/></td>
        <td><xsl:value-of select="@name"/></td>
        <td><xsl:value-of select="@desc"/></td>
@@ -307,7 +366,7 @@
     </xsl:for-each>
 
 	<!-- Repeat header columns at last row -->
-	<tr >
+	<tr>
       <td class="repeat">Lane</td>
       <td class="repeat">Sample name</td>
       <td class="repeat">Description</td>

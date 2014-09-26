@@ -15,7 +15,7 @@
 			<head>
 				<title>
 					<xsl:value-of select="/RecoveryClusterReport/sampleName" />
-					Recovery cluster
+					Recovery clusters
 				</title>
 				<!-- <link rel="stylesheet" href="report.css"></link> -->
 				<style TYPE="text/css">
@@ -81,12 +81,11 @@
 					font-style : bold;
 					}
 					td:first-child{
-					text-align:
-					left;
+					text-align:center;
 					font-style : bold;
 					background-color:#D7A1A3;
 					font-family:Courier New;
-					font-size:100%;
+					font-size:120%;
 					}
 					td:last-child{
 					width: 200px;
@@ -113,8 +112,18 @@
 					display:inline-block;
 					float:left;
 					clear:left;
+					font-size: 50%;
 					}
 
+					#header_right {
+				        display:inline-block;
+				        float:right;
+				        clear:right;
+				        font-size: 55%;
+				        margin-right:2em;
+				        text-align: right;
+				        vertical-align:middle;
+				    }
 					div.report {
 					display:block;
 					position:absolute;
@@ -192,12 +201,17 @@
 						<img
 							src="http://www.transcriptome.ens.fr/aozan/images/logo_aozan_qc.png"
 							alt="Aozan" />
-						Recovery cluster for project
+						Clusters recoverable in <xsl:value-of select="/RecoveryClusterReport/sampleName" />
+						<br/> 
 						<xsl:if test="/RecoveryClusterReport/projectName">
-							<xsl:value-of select="/RecoveryClusterReport/projectName" />
+							- project <xsl:value-of select="/RecoveryClusterReport/projectName" />
 						</xsl:if>
-						Sample
-						<xsl:value-of select="/RecoveryClusterReport/sampleName" />
+					</div>
+					
+					<div id="header_right">
+						<a href="javascript:void(0);" onclick="window.scrollTo(0,0);">
+							Top of page
+						</a>
 					</div>
 				</div>
 
@@ -261,7 +275,7 @@
 					<div id="filterProject">
 						<table border="0">
 							<tr>
-								<td>Filter table</td>
+								<td>Filter by sample</td>
 								<td>
 									<a href="javascript:void(0);" onclick="window.location.reload(true);">ALL</a>
 								</td>
@@ -330,11 +344,6 @@
 						(version
 						<xsl:value-of select="/RecoveryClusterReport/GeneratorVersion" />
 						)
-					</span>
-					<span id="topPage">
-						<a href="javascript:void(0);" onclick="window.scrollTo(0,0);">
-							Top of page
-						</a>
 					</span>
 				</div>
 			</body>
