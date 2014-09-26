@@ -23,28 +23,16 @@
 
 package fr.ens.transcriptome.aozan;
 
-import static fr.ens.transcriptome.aozan.Globals.DATE_FORMAT;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -56,7 +44,7 @@ import fr.ens.transcriptome.aozan.tests.TestResult;
 import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
 import fr.ens.transcriptome.aozan.tests.lane.LaneTest;
 import fr.ens.transcriptome.aozan.tests.sample.SampleTest;
-import fr.ens.transcriptome.eoulsan.util.XMLUtils;
+import fr.ens.transcriptome.aozan.util.XMLUtilsWriter;
 
 /**
  * This class generate the QC Report.
@@ -64,6 +52,9 @@ import fr.ens.transcriptome.eoulsan.util.XMLUtils;
  * @author Laurent Jourdren
  */
 public class QCReport {
+  /** Splitter */
+  private static final Splitter COMMA_SPLITTER = Splitter.on(",").trimResults()
+      .omitEmptyStrings();
 
   private final RunData data;
 
@@ -179,6 +170,33 @@ public class QCReport {
         }
       }
     }
+  }
+
+  /**
+   * Generate the QC report for projects data.
+   * @param parentElement parent Element
+   */
+  private void doProjectsTests(final Element parentElement) {
+
+    final Document doc = this.doc;
+
+    // Add undetermined sample
+    final String list = this.data.getProjectsName() + "," + "Undetermined";
+    // Add projects name
+    final List<String> projectsName = COMMA_SPLITTER.splitToList(list);
+
+    final Element projects = doc.createElement("ProjectsReport");
+    parentElement.appendChild(projects);
+
+    for (String projectName : projectsName) {
+
+      final Element project = doc.createElement("ProjectName");
+      project.setAttribute("classValue", "projectName");
+      project.setAttribute("cmdJS", "'" + projectName + "'");
+      project.setTextContent(projectName);
+      projects.appendChild(project);
+    }
+
   }
 
   /**
@@ -310,34 +328,8 @@ public class QCReport {
       root.setAttribute("formatversion", "1.0");
       doc.appendChild(root);
 
-      XMLUtils.addTagValue(doc, root, "GeneratorName", Globals.APP_NAME);
-      XMLUtils.addTagValue(doc, root, "GeneratorVersion",
-          Globals.APP_VERSION_STRING);
-      XMLUtils.addTagValue(doc, root, "GeneratorWebsite", Globals.WEBSITE_URL);
-      XMLUtils.addTagValue(doc, root, "GeneratorRevision",
-          Globals.APP_BUILD_COMMIT);
-
-      XMLUtils
-          .addTagValue(doc, root, "RunId", this.data.get("run.info.run.id"));
-
-      // Convert string to date
-      try {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
-        Date runDate = sdf.parse(this.data.get("run.info.date"));
-        XMLUtils.addTagValue(doc, root, "RunDate", DATE_FORMAT.format(runDate));
-      } catch (ParseException e1) {
-        XMLUtils.addTagValue(doc, root, "RunDate",
-            this.data.get("run.info.date"));
-      }
-
-      XMLUtils.addTagValue(doc, root, "FlowcellId",
-          this.data.get("run.info.flow.cell.id"));
-      XMLUtils.addTagValue(doc, root, "InstrumentSN",
-          this.data.get("run.info.instrument"));
-      XMLUtils.addTagValue(doc, root, "InstrumentRunNumber",
-          this.data.get("run.info.run.number"));
-      XMLUtils.addTagValue(doc, root, "ReportDate",
-          DATE_FORMAT.format(new Date()));
+      // Common tag header in document xml
+      XMLUtilsWriter.buildXMLCommonTagHeader(doc, root, data);
 
       if (!this.globalTests.isEmpty())
         doGlobalTests(root);
@@ -345,9 +337,10 @@ public class QCReport {
       if (!this.laneTests.isEmpty())
         doLanesTests(root);
 
-      if (!this.sampleTests.isEmpty())
+      if (!this.sampleTests.isEmpty()) {
+        doProjectsTests(root);
         doSamplesTests(root);
-
+      }
     } catch (ParserConfigurationException e) {
       throw new AozanException(e);
     }
@@ -358,29 +351,12 @@ public class QCReport {
    * @return a String with the report in XML
    * @throws AozanException if an error occurs while creating the report
    */
-  public String toXML() throws AozanException {
+  public String toXML() throws AozanException, IOException {
 
     doTests();
 
-    try {
-      // set up a transformer
-      TransformerFactory transfac = TransformerFactory.newInstance();
-      Transformer trans = transfac.newTransformer();
-      // trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-      trans.setOutputProperty(OutputKeys.INDENT, "yes");
-      trans.setOutputProperty(OutputKeys.METHOD, "xml");
+    return XMLUtilsWriter.createXMLFile(doc);
 
-      // create string from xml tree
-      StringWriter sw = new StringWriter();
-      StreamResult result = new StreamResult(sw);
-      DOMSource source = new DOMSource(doc);
-      trans.transform(source, result);
-
-      return sw.toString();
-
-    } catch (TransformerException e) {
-      throw new AozanException(e);
-    }
   }
 
   /**
@@ -414,31 +390,7 @@ public class QCReport {
 
     doTests();
 
-    try {
-
-      // Create the transformer
-      final Transformer transformer =
-          TransformerFactory.newInstance().newTransformer(
-              new javax.xml.transform.stream.StreamSource(is));
-
-      // Create the String writer
-      final StringWriter writer = new StringWriter();
-
-      // Transform the document
-      transformer.transform(new DOMSource(this.doc), new StreamResult(writer));
-
-      // Close input stream
-      is.close();
-
-      // Return the result of the transformation
-      return writer.toString();
-
-    } catch (TransformerException e) {
-      throw new AozanException(e);
-    } catch (IOException e) {
-      throw new AozanException(e);
-    }
-
+    return XMLUtilsWriter.createHTMLFileFromXSL(doc, is);
   }
 
   //
