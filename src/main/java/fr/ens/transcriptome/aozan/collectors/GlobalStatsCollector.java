@@ -36,7 +36,6 @@ public class GlobalStatsCollector implements Collector {
   @Override
   public void configure(final Properties properties) {
 
-    System.out.println("coucou from configure() " + getName());
   }
 
   @Override
@@ -93,7 +92,6 @@ public class GlobalStatsCollector implements Collector {
   }
 
   public GlobalStatsCollector() {
-    System.out.println("coucou from constructor " + getName());
   }
 
 }
