@@ -25,12 +25,16 @@ package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.QC;
@@ -81,6 +85,7 @@ public class DesignCollector implements Collector {
 
     try {
       final Map<Integer, List<String>> samples = Maps.newHashMap();
+      final Set<String> projectsName = Sets.newTreeSet();
 
       // Read Casava design
       final CasavaDesign design =
@@ -108,6 +113,9 @@ public class DesignCollector implements Collector {
         } else
           samplesInLane = samples.get(s.getLane());
         samplesInLane.add(s.getSampleId());
+
+        // List projects in run
+        projectsName.add(s.getSampleProject());
       }
 
       // List samples by lane
@@ -119,6 +127,9 @@ public class DesignCollector implements Collector {
         final double percent = 1.0 / (double) e.getValue().size();
         data.put("design.lane" + e.getKey() + ".percent.homogeneity", percent);
       }
+
+      // Add all projects name in data
+      data.put("design.all.projects.names", Joiner.on(",").join(projectsName));
 
     } catch (IOException e) {
       throw new AozanException(e);
