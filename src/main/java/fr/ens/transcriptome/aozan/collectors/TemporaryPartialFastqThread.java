@@ -256,7 +256,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
         int comptReadsPF = 1;
 
         if (!fastqFile.exists()) {
-          throw new AozanException("Fastq file "
+          throw new AozanException("FastQ file "
               + fastqFile.getName() + " doesn't exist");
         }
 
@@ -336,7 +336,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
       for (File fastqFile : getFastqSample().getFastqFiles()) {
 
         if (!fastqFile.exists()) {
-          throw new IOException("Fastq file "
+          throw new IOException("FastQ file "
               + fastqFile.getName() + " doesn't exist");
         }
 
@@ -357,7 +357,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
 
   @Override
   protected void createReportFile() throws AozanException, IOException {
-
+    // No report
   }
 
   //
@@ -366,7 +366,12 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
 
   /**
    * Thread constructor.
-   * @param FastqSample
+   * @param fastqSample fastq sample instance
+   * @param rawClusterCount raw cluster count for the sample
+   * @param pfClusterCount passing filter cluster count for the sample
+   * @param numberReadsToCopy number reads in partial fastq to create
+   * @param maxReadsToParse maximum number reads to parse for create partial
+   *          fastq
    * @throws AozanException if an error occurs while creating sequence file for
    *           FastQC
    */

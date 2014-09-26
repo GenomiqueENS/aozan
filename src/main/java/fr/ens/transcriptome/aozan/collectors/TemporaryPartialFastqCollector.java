@@ -146,10 +146,13 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
       final FastqSample fastqSample, final File reportDir, final boolean runPE)
       throws AozanException {
 
-    if (fastqSample == null
-        || fastqSample.getFastqFiles() == null
-        || fastqSample.getFastqFiles().isEmpty()) {
+    if (fastqSample == null)
       return null;
+
+    if (fastqSample.getFastqFiles() == null
+        || fastqSample.getFastqFiles().isEmpty()) {
+      throw new AozanException("Fail create partial FastQ for sample "
+          + fastqSample.getSampleName() + " no FastQ file exist");
     }
 
     final boolean controlLane =
@@ -173,7 +176,7 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
 
     // Retrieve number of passing filter Illumina reads for this fastq
     // files
-    String prefix =
+    final String prefix =
         "demux.lane"
             + fastqSample.getLane() + ".sample." + fastqSample.getSampleName()
             + ".read" + fastqSample.getRead();
@@ -181,7 +184,9 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
     // Check value exist in rundata, if not then fastq is empty
     if (data.get(prefix + ".pf.cluster.count") == null
         || data.get(prefix + ".raw.cluster.count") == null)
-      return null;
+      // No demultiplexing data exist
+      throw new AozanException("Fail create partial FastQ for sample "
+          + fastqSample.getSampleName() + " no demultiplexing data found.");
 
     int pfClusterCount = data.getInt(prefix + ".pf.cluster.count");
     int rawClusterCount = data.getInt(prefix + ".raw.cluster.count");
