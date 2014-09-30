@@ -84,8 +84,8 @@ public class StatisticsUtils {
 
     buildDescriptiveStatisticsWithZero();
 
-    return (dsWithoutZero.getN() == 0 ? 0.0 : new Median().evaluate(dsWithoutZero
-        .getValues()));
+    return (dsWithoutZero.getN() == 0 ? 0.0 : new Median()
+        .evaluate(dsWithoutZero.getValues()));
 
   }
 
@@ -99,12 +99,74 @@ public class StatisticsUtils {
   }
 
   /**
+   * Compute the sum of values
+   * @return sum of values.
+   */
+  public double getSum() {
+    return this.ds.getSum();
+  }
+
+  /**
    * Compute the standard deviation for values
    * @return standard deviation or NaN if no values have been added, or 0.0 for
    *         a single value set.
    */
   public Double getStandardDeviation() {
     return getStandardDeviation(false);
+  }
+
+  /**
+   * Compute the mean for values
+   * @return mean or NaN if no values have been added, or 0.0 for a single value
+   *         set.
+   */
+  public int getMeanToInteger() {
+
+    return new Double(getMean()).intValue();
+  }
+
+  /**
+   * Compute the mean for values which are different of 0
+   * @return mean or NaN if no values have been added, or 0.0 for a single value
+   *         set.
+   */
+  public int getMeanWithoutZeroToInteger() {
+    return new Double(getMeanWithoutZero()).intValue();
+  }
+
+  /**
+   * Compute the median for values which are different of 0
+   * @return median or NaN if no values have been added, or 0.0 for a single
+   *         value set.
+   */
+  public int getMedianWithoutZeroToInteger() {
+    return new Double(getMedianWithoutZero()).intValue();
+  }
+
+  /**
+   * Compute the median for values
+   * @return median or NaN if no values have been added, or 0.0 for a single
+   *         value set.
+   */
+  public int getMedianeToInteger() {
+    return new Double(getMediane()).intValue();
+  }
+
+  /**
+   * Compute the sum of values
+   * @return sum of values.
+   */
+  public int getSumToInteger() {
+    return new Double(getSum()).intValue();
+  }
+
+  /**
+   * Compute the standard deviation for values
+   * @return standard deviation or NaN if no values have been added, or 0.0 for
+   *         a single value set.
+   */
+  public int getStandardDeviationToInteger() {
+    return new Double(getStandardDeviation()).intValue();
   }
 
   /**
@@ -262,4 +324,5 @@ public class StatisticsUtils {
   public StatisticsUtils() {
     this.ds = new DescriptiveStatistics();
   }
+
 }
