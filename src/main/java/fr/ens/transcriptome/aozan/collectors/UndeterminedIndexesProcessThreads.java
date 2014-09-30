@@ -676,8 +676,8 @@ public class UndeterminedIndexesProcessThreads extends
   private File createLaneResultFile(final String extension) {
 
     final File reportFile =
-        new File(this.reportDir, "lane"
-            + this.lane + "_Undetermined" + "-potentialindices" + extension);
+        new File(this.reportDir, getFastqSample().getKeyFastqSample()
+            + "-potentialindices" + extension);
 
     // Create parent directory if necessary
     final File parentDir = reportFile.getParentFile();
@@ -943,7 +943,7 @@ public class UndeterminedIndexesProcessThreads extends
     }
 
     // TODO debug
-    XMLUtilsWriter.createXMLFile(doc, reportHtml);
+    // XMLUtilsWriter.createXMLFile(doc, reportHtml);
 
     // Set xsl file to write report HTML file
     InputStream is = null;
@@ -1086,12 +1086,8 @@ public class UndeterminedIndexesProcessThreads extends
     try {
 
       this.seqFile =
-          SequenceFactory.getSequenceFile(new File(
-              "/tmp/lane1_undetermined_R1.fastq"));
-      // TODO
-      // this.seqFile =
-      // SequenceFactory.getSequenceFile(fastqSample.getFastqFiles().toArray(
-      // new File[fastqSample.getFastqFiles().size()]));
+          SequenceFactory.getSequenceFile(fastqSample.getFastqFiles().toArray(
+              new File[fastqSample.getFastqFiles().size()]));
 
     } catch (IOException io) {
       throw new AozanException(io);
