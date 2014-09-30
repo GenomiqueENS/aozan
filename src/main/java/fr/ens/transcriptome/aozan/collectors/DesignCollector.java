@@ -129,7 +129,7 @@ public class DesignCollector implements Collector {
       }
 
       // Add all projects name in data
-      data.put("design.all.projects.names", Joiner.on(",").join(projectsName));
+      data.put("design.projects.names", Joiner.on(",").join(projectsName));
 
     } catch (IOException e) {
       throw new AozanException(e);

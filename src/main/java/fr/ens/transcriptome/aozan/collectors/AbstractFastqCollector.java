@@ -88,7 +88,8 @@ abstract public class AbstractFastqCollector implements Collector {
    * Collect data for a fastqSample
    * @param data result data object
    * @param fastqSample sample object
-   * @param runPE true if it is a run PE else false
+   * @param isRunPE true if it is a run PE else false
+   * @return process thread instance
    * @throws AozanException if an error occurs while execution
    */
   protected abstract AbstractFastqProcessThread collectSample(
