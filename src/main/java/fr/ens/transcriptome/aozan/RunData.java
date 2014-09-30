@@ -30,9 +30,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 
@@ -44,7 +46,102 @@ import com.google.common.io.Files;
  */
 public class RunData {
 
+  /** Splitter */
+  private static final Splitter COMMA_SPLITTER = Splitter.on(",").trimResults()
+      .omitEmptyStrings();
+
   private final Map<String, String> map = Maps.newLinkedHashMap();
+
+  //
+  // Methods to extract data
+  //
+  public String getProjectsName() {
+    return this.get("design.projects.names");
+  }
+
+  public String getSamplesNameInLane(final int lane) {
+    return this.get("design.lane" + lane + ".samples.names");
+  }
+
+  public int getReadCount() {
+    return this.getInt("run.info.read.count");
+  }
+
+  public int getLaneCount() {
+    return this.getInt("run.info.flow.cell.lane.count");
+  }
+
+  public boolean isReadIndexed(final int read) {
+    return this.getBoolean("run.info.read" + read + ".indexed");
+  }
+
+  /**
+   * Get the tiles count.
+   * @return tiles count
+   */
+  public int getTilesCount() {
+    return this.getInt("read1.lane1.tile.count");
+  }
+
+  /**
+   * Get the sample names.
+   * @return a list with the sample names
+   */
+  public List<String> getSamplesNameListInLane(final int lane) {
+    return COMMA_SPLITTER.splitToList(this.get("design.lane"
+        + lane + ".samples.names"));
+  }
+
+  public String getIndexSample(final int lane, final String sampleName) {
+    return this.get("design.lane" + lane + "." + sampleName + ".index");
+  }
+
+  /**
+   * Get the project related to a sample of the lane.
+   * @param lane the lane number
+   * @param sampleName the sample name
+   * @return the project related to the sample
+   */
+  public String getProjectSample(final int lane, final String sampleName) {
+    return this
+        .get("design.lane" + lane + "." + sampleName + ".sample.project");
+  }
+
+  /**
+   * Get the description of a sample.
+   * @param sampleName the sample name
+   * @return the description of the sample
+   */
+  public String getSampleDescription(final int lane, final String sampleName) {
+    return this.get("design.lane" + lane + "." + sampleName + ".description");
+  }
+
+  /**
+   * Get the raw cluster count for a sample.
+   * @param sampleName sample name
+   * @return the raw cluster count of the sample
+   */
+  public int getSampleRawClusterCount(final int lane, final int read,
+      final String sampleName) {
+
+    return this.getInt("demux.lane"
+        + lane + ".sample." + sampleName + ".read" + read
+        + ".raw.cluster.count");
+  }
+
+  /**
+   * Get the passing filter cluster count for a sample.
+   * @param sampleName sample name
+   * @return the passing filter cluster count of the sample
+   */
+  public int getSamplePFClusterCount(final int lane, final int read,
+      final String sampleName) {
+
+    return this
+        .getInt("demux.lane"
+            + lane + ".sample." + sampleName + ".read" + read
+            + ".pf.cluster.count");
+  }
 
   //
   // Getters
