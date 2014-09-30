@@ -39,16 +39,12 @@ import com.google.common.base.Stopwatch;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
-import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
-import fr.ens.transcriptome.eoulsan.Settings;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.BowtieReadsMapper;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.SequenceReadsMapper;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.SequenceReadsMapperService;
 import fr.ens.transcriptome.eoulsan.data.DataFile;
-import fr.ens.transcriptome.eoulsan.data.storages.GenomeDescStorage;
-import fr.ens.transcriptome.eoulsan.data.storages.SimpleGenomeDescStorage;
 import fr.ens.transcriptome.eoulsan.steps.generators.GenomeMapperIndexer;
 import fr.ens.transcriptome.eoulsan.util.LocalReporter;
 import fr.ens.transcriptome.eoulsan.util.PseudoMapReduce;
@@ -70,7 +66,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
   private int mapperThreads = Runtime.getRuntime().availableProcessors();
   private final SequenceReadsMapper mapper;
-  private GenomeDescStorage storage;
   private GenomeDescription desc = null;
   private FastqScreenResult fastqScreenResult;
   private final String tmpDir;
@@ -87,15 +82,15 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * Mapper Receive value in SAM format, only the read mapped are added in
    * output with reference genome.
    * @param fastqRead fastq file
-   * @param listGenomes list of reference genome
-   * @param genomeSample genome reference corresponding to sample
+   * @param genomesForMapping list of reference genome
+   * @param genomeSample genome reference corresponding to sample, can be null
    * @param numberThreads number threads used for mapping
    * @throws AozanException if an error occurs while mapping
    */
-  public void doMap(final File fastqRead, final List<String> listGenomes,
+  public void doMap(final File fastqRead, final List<String> genomesForMapping,
       final String genomeSample, final int numberThreads) throws AozanException {
 
-    this.doMap(fastqRead, null, listGenomes, genomeSample, numberThreads);
+    this.doMap(fastqRead, null, genomesForMapping, genomeSample, numberThreads);
   }
 
   /**
@@ -103,19 +98,19 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * output with reference genome
    * @param fastqRead1 fastq file
    * @param fastqRead2 fastq file in mode paired
-   * @param listGenomes list of genome reference
-   * @param genomeSample genome reference corresponding to sample
+   * @param genomesForMapping list of genome reference
+   * @param genomeSample genome reference corresponding to sample, can be null
    * @param numberThreads number threads used for mapping
    * @throws AozanException if an error occurs while mapping
    */
   public void doMap(final File fastqRead1, final File fastqRead2,
-      final List<String> listGenomes, final String genomeSample,
+      final List<String> genomesForMapping, final String genomeSample,
       final int numberThreads) throws AozanException {
 
     if (numberThreads > 0)
       mapperThreads = numberThreads;
 
-    for (String genome : listGenomes) {
+    for (String genome : genomesForMapping) {
       // Timer : for step mapping on genome
       final Stopwatch timer = Stopwatch.createStarted();
 
@@ -180,9 +175,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
       } catch (IOException e) {
         throw new AozanException(e);
-
-      } catch (BadBioEntryException bee) {
-        throw new AozanException(bee);
       }
     }
   }
@@ -192,11 +184,12 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @param bowtie mapper
    * @param genomeDataFile fasta file of genome
    * @return File file of genome index
-   * @throws BadBioEntryException if an error occurs while creating index genome
    * @throws IOException if an error occurs while using file index genome
+   * @throws AozanException if an error occurs during call
+   *           FastqScreenGenomeMapper instance.
    */
   private File createIndex(final SequenceReadsMapper bowtie,
-      final DataFile genomeDataFile) throws BadBioEntryException, IOException {
+      final DataFile genomeDataFile) throws IOException, AozanException {
 
     // Timer :
     final Stopwatch timer = Stopwatch.createStarted();
@@ -207,7 +200,13 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
             + genomeDataFile.getName() + ".zip");
 
     // Create genome description
-    this.desc = createGenomeDescription(genomeDataFile);
+    try {
+      this.desc =
+          FastqScreenGenomeMapper.getInstance().createGenomeDescription(
+              genomeDataFile);
+    } catch (BadBioEntryException e) {
+      throw new AozanException(e);
+    }
 
     if (desc == null)
       return null;
@@ -222,39 +221,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     timer.stop();
 
     return result.toFile();
-  }
-
-  /**
-   * Create a GenomeDescription object from a Fasta file
-   * @param genomeFile file used for create index
-   * @return genomeDescription description of the genome
-   * @throws BadBioEntryException if an error occurs while creating index genome
-   * @throws IOException if an error occurs while using file index genome
-   */
-  private GenomeDescription createGenomeDescription(final DataFile genomeFile)
-      throws BadBioEntryException, IOException {
-
-    if (!genomeFile.exists())
-      LOGGER.warning("Fastqscreen "
-          + genomeFile.getBasename()
-          + " not exists, Index mapper can't be created.");
-    GenomeDescription desc = null;
-
-    if (storage != null) {
-      desc = storage.get(genomeFile);
-    }
-
-    if (desc == null) {
-      // Compute the genome description
-      desc =
-          GenomeDescription.createGenomeDescFromFasta(genomeFile.open(),
-              genomeFile.getName());
-
-      if (storage != null)
-        storage.put(genomeFile, desc);
-    }
-
-    return desc;
   }
 
   /**
@@ -428,12 +394,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     this.setMapReduceTemporaryDirectory(new File(this.tmpDir));
 
     this.reporter = new LocalReporter();
-
-    Settings settings = EoulsanRuntime.getSettings();
-    DataFile genomeDescStoragePath =
-        new DataFile(settings.getGenomeDescStoragePath());
-
-    this.storage = SimpleGenomeDescStorage.getInstance(genomeDescStoragePath);
     this.fastqScreenResult = new FastqScreenResult();
 
     LOGGER.info("FASTQSCREEN : init  mapper "

@@ -24,26 +24,17 @@
 package fr.ens.transcriptome.aozan.tests.sample;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
-import fr.ens.transcriptome.aozan.fastqscreen.AliasGenomeFile;
+import fr.ens.transcriptome.aozan.fastqscreen.FastqScreenGenomeMapper;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
-import fr.ens.transcriptome.eoulsan.illumina.CasavaDesign;
-import fr.ens.transcriptome.eoulsan.illumina.CasavaSample;
-import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignCSVReader;
 
 /**
  * The class add in the qc report html values from FastqScreen for each sample
@@ -58,8 +49,6 @@ import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignCSVReader;
  * @author Sandrine Perrin
  */
 public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
-
-  private static final Pattern pattern = Pattern.compile(".,;:/-_'");
 
   private final String genomeReference;
   private final boolean isGenomeContamination;
@@ -76,6 +65,11 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
         isGenomeContamination
             ? ".mapped.percent" : ".one.hit.one.library.percent";
 
+    // Check indetermined indexed sample
+    if (sampleName == null) {
+      return "fastqscreen.lane"
+          + lane + ".read" + readSample + "." + genomeReference + value;
+    }
     return "fastqscreen.lane"
         + lane + ".sample." + sampleName + ".read" + readSample + "."
         + sampleName + "." + genomeReference + value;
@@ -107,9 +101,13 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     String genomeSample = data.get(keyGenomeSample);
 
     // Set reference genome corresponding of genome sample if it exists
-    String genomeSampleReference =
-        AliasGenomeFile.getInstance().getGenomeReferenceCorresponding(
-            genomeSample);
+    String genomeSampleReference = null;
+    try {
+      genomeSampleReference =
+          FastqScreenGenomeMapper.getInstance()
+              .getGenomeReferenceCorresponding(genomeSample);
+    } catch (AozanException e) {
+    }
 
     // If genome sample are used like reference genome in FastqScreen, the score
     // are inverse. The value must be near 100% if it had no contamination.
@@ -123,29 +121,15 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   public List<AozanTest> configure(final Map<String, String> properties)
       throws AozanException {
 
-    if (properties == null)
-      throw new NullPointerException("The properties object is null");
+    if (properties == null || properties.isEmpty())
+      throw new NullPointerException("The properties object is null or empty");
 
-    // Set reference genomes defined in configuration aozan file
-    String genomesPerDefault =
-        properties.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
+    // Initialization fastqScreenGenomeMapper object
+    final FastqScreenGenomeMapper fqsm =
+        FastqScreenGenomeMapper.getInstance(properties);
 
-    if (genomesPerDefault == null || genomesPerDefault.length() == 0)
-      throw new AozanException(
-          "AozanTest FastqScreen : none default genome reference for tests define");
-
-    final Splitter s = Splitter.on(',').trimResults().omitEmptyStrings();
-    Set<String> genomes = Sets.newLinkedHashSet(s.split(genomesPerDefault));
-
-    // Set list of genome from samples to use in fastqscreen
-    Set<String> genomesSamples =
-        setGenomesNameReferenceSample(
-            properties.get(QC.CASAVA_DESIGN_PATH),
-            properties
-                .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
-
-    // Set a global list of the run
-    genomes.addAll(genomesSamples);
+    //
+    final Set<String> genomes = fqsm.getGenomesToMapping();
 
     List<AozanTest> list = new ArrayList<AozanTest>();
 
@@ -154,7 +138,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
       // Create an new AozanTest for each reference genome
       final FastqScreenSimpleSampleTest testGenome =
           new FastqScreenSimpleSampleTest(genome,
-              genomesPerDefault.contains(genome));
+              fqsm.isGenomeContamination(genome));
 
       testGenome.internalConfigure(properties);
 
@@ -182,47 +166,6 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     super.configure(properties);
   }
 
-  /**
-   * Set reference genomes for the samples of a run. Retrieve list of genomes
-   * sample from casava design file and filtered them compared to alias genome
-   * file.
-   * @param casavaDesignPath absolute path of the casava design file
-   * @param genomeAliasFile absolute path of the alias genomes file
-   * @return list genomes references used in FastqScreenCollector
-   */
-  private Set<String> setGenomesNameReferenceSample(
-      final String casavaDesignPath, final String genomeAliasFile) {
-
-    Set<String> genomesFromCasavaDesign = Sets.newHashSet();
-
-    CasavaDesignCSVReader casavaReader;
-    CasavaDesign casavaDesign;
-    try {
-      // Reading casava design file in format csv
-      casavaReader = new CasavaDesignCSVReader(casavaDesignPath);
-      casavaDesign = casavaReader.read();
-
-    } catch (Exception e) {
-      // Return empty list
-      return Collections.emptySet();
-    }
-
-    // Retrieve all genome sample included in casava design file
-    for (CasavaSample casavaSample : casavaDesign) {
-      String genomeSample =
-          casavaSample.getSampleRef().replaceAll("\"", "").toLowerCase();
-
-      // Replace all symbols not letters or numbers by space
-      pattern.matcher(genomeSample).replaceAll(" ");
-
-      genomesFromCasavaDesign.add(genomeSample.trim());
-    }
-
-    // Retrieve list of corresponding reference genome from casava design file
-    return AliasGenomeFile.getInstance().convertListToGenomeReferenceName(
-        genomeAliasFile, genomesFromCasavaDesign);
-  }
-
   //
   // Constructor
   //
@@ -238,8 +181,8 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
    * Public constructor, specific for a reference genome
    * @param genome name of reference genome
    */
-  public FastqScreenSimpleSampleTest(String genome,
-      boolean isGenomeContamination) {
+  public FastqScreenSimpleSampleTest(final String genome,
+      final boolean isGenomeContamination) {
     super("fsqmapped", "", "fastqscreen "
         + (isGenomeContamination ? "" : "single ") + "mapped on " + genome, "%");
     this.genomeReference = genome;

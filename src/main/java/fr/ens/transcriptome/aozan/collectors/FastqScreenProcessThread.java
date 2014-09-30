@@ -28,10 +28,12 @@ import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+
+import org.testng.collections.Lists;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Stopwatch;
@@ -208,9 +210,8 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
               .getProjectName(), getFastqSample().getSampleName()));
 
     // Create rundata for the sample
-    getResults().put(
-        resultsFastqscreen.createRundata("fastqscreen"
-            + getFastqSample().getPrefixRundata()));
+    final String prefixR1 = "fastqscreen" + getFastqSample().getPrefixRundata();
+    getResults().put(resultsFastqscreen.createRundata(prefixR1));
 
     // run paired : same values for fastqSample R2
     if (this.isRunPE) {
@@ -235,6 +236,26 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   //
 
   /**
+   * Public constructor for a thread object collector for FastqScreen for
+   * Indetermined indexed sample.
+   * @param fastqSampleR1 fastqSample corresponding to the read 1
+   * @param fastqscreen instance of fastqscreen
+   * @param data object rundata on the run
+   * @param genomes list of references genomes for FastqScreen
+   * @param reportDir path for the directory who save the FastqScreen report
+   * @throws AozanException if an error occurs during create thread, if no fastq
+   *           file was found
+   */
+  public FastqScreenProcessThread(final FastqSample fastqSample,
+      final FastqScreen fastqscreen, final RunData data,
+      final Set<String> genomesToMapping, final File reportDir,
+      final File fastqscreenXSLFile) throws AozanException {
+
+    this(fastqSample, null, fastqscreen, data, genomesToMapping, null,
+        reportDir, false, false, fastqscreenXSLFile);
+  }
+
+  /**
    * Public constructor for a thread object collector for FastqScreen in
    * pair-end mode
    * @param fastqSampleR1 fastqSample corresponding to the read 1
@@ -250,16 +271,15 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @throws AozanException if an error occurs during create thread, if no fastq
    *           file was found
    */
-
   public FastqScreenProcessThread(final FastqSample fastqSampleR1,
       final FastqSample fastqSampleR2, final FastqScreen fastqscreen,
-      final RunData data, final List<String> genomes,
+      final RunData data, final Set<String> genomesToMapping,
       final String genomeSample, final File reportDir,
       final boolean isPairedMode, final boolean isRunPE,
       final File fastqscreenXSLFile) throws AozanException {
 
-    this(fastqSampleR1, fastqscreen, data, genomes, genomeSample, reportDir,
-        isPairedMode, isRunPE, fastqscreenXSLFile);
+    this(fastqSampleR1, fastqscreen, data, genomesToMapping, genomeSample,
+        reportDir, isPairedMode, isRunPE, fastqscreenXSLFile);
     this.fastqSampleR2 = fastqSampleR2;
   }
 
@@ -269,7 +289,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @param fastqSample fastqSample corresponding to the read 1
    * @param fastqscreen instance of fastqscreen
    * @param data object rundata on the run
-   * @param genomes list of references genomes for FastqScreen
+   * @param genomesToMapping list of references genomes for FastqScreen
    * @param genomeSample genome reference corresponding to sample
    * @param reportDir path for the directory who save the FastqScreen report
    * @param isPairedMode true if a pair-end run and option paired mode equals
@@ -280,7 +300,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    */
   public FastqScreenProcessThread(final FastqSample fastqSample,
       final FastqScreen fastqscreen, final RunData data,
-      final List<String> genomes, final String genomeSample,
+      final Set<String> genomesToMapping, final String genomeSample,
       final File reportDir, final boolean isPairedMode, final boolean isRunPE,
       final File fastqscreenXSLFile) throws AozanException {
 
@@ -301,12 +321,8 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     }
 
     // Copy list genome for fastqscreen
-    this.genomes = new ArrayList<String>();
-    this.genomes.addAll(genomes);
-
-    // Add genomeSample in list of genome to fastqscreen
-    if (this.genomeSample != null && !this.genomes.contains(this.genomeSample))
-      this.genomes.add(this.genomeSample);
+    this.genomes = Lists.newArrayList(genomesToMapping);
 
   }
+
 }

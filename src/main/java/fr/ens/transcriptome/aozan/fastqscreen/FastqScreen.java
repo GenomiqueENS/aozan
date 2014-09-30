@@ -81,32 +81,32 @@ public class FastqScreen {
    * @param fastqSample instance to describe fastq sample
    * @param genomes list or reference genome, used by mapper
    * @param genomeSample genome reference corresponding to sample
-   * @param pairedMode true if a pair-end run and option paired mode equals true
-   *          else false
+   * @param isPairedMode true if a pair-end run and option paired mode equals
+   *          true else false
    * @throws AozanException
    */
   public FastqScreenResult execute(final File fastqRead1,
       final File fastqRead2, final FastqSample fastqSample,
       final List<String> genomes, final String genomeSample,
-      final boolean pairedMode) throws AozanException {
+      final boolean isPairedMode) throws AozanException {
 
     // Timer
     final Stopwatch timer = Stopwatch.createStarted();
 
     FastqScreenPseudoMapReduce pmr =
-        new FastqScreenPseudoMapReduce(tmpDir, pairedMode, mapperName,
+        new FastqScreenPseudoMapReduce(tmpDir, isPairedMode, mapperName,
             mapperArgument);
 
     try {
 
-      if (pairedMode)
+      if (isPairedMode)
         pmr.doMap(fastqRead1, fastqRead2, genomes, genomeSample, confThreads);
       else
         pmr.doMap(fastqRead1, genomes, genomeSample, confThreads);
 
       LOGGER.fine("FASTQSCREEN : step map for "
           + fastqSample.getKeyFastqSample() + " in mode "
-          + (pairedMode ? "paired" : "single") + " on genome(s) " + genomes
+          + (isPairedMode ? "paired" : "single") + " on genome(s) " + genomes
           + " in " + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
       timer.reset();
@@ -116,7 +116,7 @@ public class FastqScreen {
 
       LOGGER.fine("FASTQSCREEN : step reduce for "
           + fastqSample.getKeyFastqSample() + " in mode "
-          + (pairedMode ? "paired" : "single") + " in "
+          + (isPairedMode ? "paired" : "single") + " in "
           + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
       // Remove temporary output file use in map-reduce step

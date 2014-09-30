@@ -24,18 +24,18 @@
 package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
-import com.google.common.base.Splitter;
+import com.google.common.collect.Sets;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
-import fr.ens.transcriptome.aozan.fastqscreen.AliasGenomeFile;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreen;
+import fr.ens.transcriptome.aozan.fastqscreen.FastqScreenGenomeMapper;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
 /**
@@ -56,9 +56,6 @@ public class FastqScreenCollector extends AbstractFastqCollector {
   private boolean skipControlLane;
   private boolean ignorePairedMode;
   private File fastqscreenXSLFile = null;
-
-  // List of genome for fastqscreen specific of a sample
-  private final List<String> genomesConfiguration = new ArrayList<String>();
 
   @Override
   public String getName() {
@@ -89,14 +86,6 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     super.configure(properties);
 
     this.fastqscreen = new FastqScreen(properties);
-
-    final Splitter s = Splitter.on(',').trimResults().omitEmptyStrings();
-
-    // Set list of reference genome for fastqscreen
-    for (String g : s.split(properties
-        .getProperty(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY))) {
-      genomesConfiguration.add(g);
-    }
 
     try {
       this.ignorePairedMode =
@@ -131,7 +120,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
   }
 
   @Override
-  public AbstractFastqProcessThread collectSample(RunData data,
+  public AbstractFastqProcessThread collectSample(final RunData data,
       final FastqSample fastqSample, final File reportDir, final boolean isRunPE)
       throws AozanException {
 
@@ -146,21 +135,6 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     if (fastqSample.getRead() == 2)
       return null;
 
-    // Retrieve genome sample
-    final String genomeSample =
-        data.get("design.lane"
-            + fastqSample.getLane() + "." + fastqSample.getSampleName()
-            + ".sample.ref");
-
-    String genomeReferenceSample = null;
-    
-    // No genome reference defined for undetermined fastq
-    if (!fastqSample.isIndeterminedIndices()) {
-      genomeReferenceSample =
-          AliasGenomeFile.getInstance().getGenomeReferenceCorresponding(
-              genomeSample);
-    }
-
     final boolean controlLane =
         data.getBoolean("design.lane"
             + fastqSample.getLane() + "." + fastqSample.getSampleName()
@@ -170,20 +144,61 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     if (controlLane && skipControlLane)
       return null;
 
+    if (fastqSample.isIndeterminedIndices())
+      return createInterminedIndicesSampleProcess(data, fastqSample, reportDir);
+
+    return createStandardSampleProcess(data, fastqSample, reportDir, isRunPE);
+
+  }
+
+  /**
+   * Collect data for a fastqSample for standard sample.
+   * @param data result data object
+   * @param fastqSample sample object
+   * @param reportDir
+   * @param isRunPE true if it is a run PE else false
+   * @return process thread instance
+   * @throws AozanException if an error occurs while execution
+   */
+  private AbstractFastqProcessThread createStandardSampleProcess(
+      final RunData data, final FastqSample fastqSample, final File reportDir,
+      final boolean isRunPE) throws AozanException {
+
+    final Set<String> genomesContaminants =
+        FastqScreenGenomeMapper.getInstance().getGenomesContaminants();
+
+    final Set<String> genomesForMapping = Sets.newHashSet(genomesContaminants);
+
+    // Set mode for FastqScreen
     final boolean isPairedMode = isRunPE && !ignorePairedMode;
 
-    if (isRunPE && isPairedMode) {
+    // Retrieve genome sample from run data
+    final String genomeSample =
+        data.get("design.lane"
+            + fastqSample.getLane() + "." + fastqSample.getSampleName()
+            + ".sample.ref");
 
-      // in mode paired FastqScreen should be launched with R1 and R2
-      // together.
+    // Get corresponding valid genome name for mapping
+    final String genomeReferenceSample =
+        FastqScreenGenomeMapper.getInstance().getGenomeReferenceCorresponding(
+            genomeSample);
+
+    // Genome can be use for mapping
+    if (genomeReferenceSample != null)
+      genomesForMapping.add(genomeReferenceSample);
+
+    // In mode paired FastqScreen should be launched with R1 and R2
+    // together.
+    if (isPairedMode) {
       // Search fasqtSample which corresponding to fastqSample R1
       String prefixRead2 = fastqSample.getPrefixRead2();
 
+      // Search FastSample instance corresponding to read2 for the sample
       for (FastqSample fastqSampleR2 : getFastqSamples()) {
         if (fastqSampleR2.getKeyFastqSample().equals(prefixRead2)) {
 
           return new FastqScreenProcessThread(fastqSample, fastqSampleR2,
-              fastqscreen, data, genomesConfiguration, genomeReferenceSample,
+              fastqscreen, data, genomesForMapping, genomeReferenceSample,
               reportDir, isPairedMode, isRunPE, this.fastqscreenXSLFile);
         }
       }
@@ -191,8 +206,27 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
     // Call with a mode single-end for mapping
     return new FastqScreenProcessThread(fastqSample, fastqscreen, data,
-        genomesConfiguration, genomeReferenceSample, reportDir, isPairedMode,
+        genomesForMapping, genomeReferenceSample, reportDir, isPairedMode,
         isRunPE, this.fastqscreenXSLFile);
+  }
+
+  /**
+   * Collect data for a fastqSample for indetermined indices sample.
+   * @param data result data object
+   * @param fastqSample sample object
+   * @return process thread instance
+   * @throws AozanException if an error occurs while execution
+   */
+  private AbstractFastqProcessThread createInterminedIndicesSampleProcess(
+      final RunData data, final FastqSample fastqSample, final File reportDir)
+      throws AozanException {
+
+    // Retrieve all genomes used by mapping for Undetermined Indexed sample
+    final Set<String> genomesToSampleTest =
+        FastqScreenGenomeMapper.getInstance().getGenomesToMapping();
+
+    return new FastqScreenProcessThread(fastqSample, fastqscreen, data,
+        genomesToSampleTest, reportDir, this.fastqscreenXSLFile);
   }
 
   //

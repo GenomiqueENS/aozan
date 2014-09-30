@@ -586,7 +586,9 @@ public class FastqScreenResult {
      */
     DataPerGenome(final String genome, final String genomeSample) {
       this.genome = genome;
-      this.isGenomeSample = genome.equals(genomeSample);
+
+      if (genomeSample != null)
+        this.isGenomeSample = genome.equals(genomeSample);
     }
   }
 
