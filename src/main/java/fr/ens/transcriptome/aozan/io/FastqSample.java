@@ -129,6 +129,10 @@ public class FastqSample {
    * @return prefix
    */
   public String getPrefixRundata() {
+
+    if (isIndeterminedIndices())
+      return ".lane" + this.lane + ".read" + this.read;
+
     return ".lane"
         + this.lane + ".sample." + this.sampleName + ".read" + this.read + "."
         + this.sampleName;
