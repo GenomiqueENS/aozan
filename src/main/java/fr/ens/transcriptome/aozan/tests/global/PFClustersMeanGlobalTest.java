@@ -32,11 +32,11 @@ import fr.ens.transcriptome.aozan.collectors.GlobalStatsCollector;
 import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 
 /**
- * This class define a Passing Filter cluster global test.
+ * This class define a raw cluster mean global test.
  * @since 1.3
- * @author Laurent Jourdren
+ * @author Sandrine Perrin
  */
-public class PFClustersGlobalTest extends AbstractSimpleGlobalTest {
+public class PFClustersMeanGlobalTest extends AbstractSimpleGlobalTest {
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -48,7 +48,7 @@ public class PFClustersGlobalTest extends AbstractSimpleGlobalTest {
   @Override
   protected String getKey() {
 
-    return "globalstats.clusters.pf.count";
+    return "globalstats.clusters.pf.mean";
   }
 
   @Override
@@ -72,9 +72,9 @@ public class PFClustersGlobalTest extends AbstractSimpleGlobalTest {
   /**
    * Public constructor.
    */
-  public PFClustersGlobalTest() {
+  public PFClustersMeanGlobalTest() {
 
-    super("globalpfclusterscount", "", "PF Clusters Est.");
+    super("globalpfclustersmean", "", "PF Clusters Mean Est.");
   }
 
 }

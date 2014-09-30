@@ -48,7 +48,7 @@ public class RawClustersGlobalTest extends AbstractSimpleGlobalTest {
   @Override
   protected String getKey() {
 
-    return "globalstats.clusters.raw";
+    return "globalstats.clusters.raw.count";
   }
 
   @Override
@@ -74,7 +74,7 @@ public class RawClustersGlobalTest extends AbstractSimpleGlobalTest {
    */
   public RawClustersGlobalTest() {
 
-    super("globalrawclusters", "", "Raw Clusters Est.");
+    super("globalrawclusterscount", "", "Raw Clusters Est.");
   }
 
 }

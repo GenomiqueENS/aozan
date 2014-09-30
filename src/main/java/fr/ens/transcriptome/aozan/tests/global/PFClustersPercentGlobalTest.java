@@ -29,40 +29,41 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.GlobalStatsCollector;
-import fr.ens.transcriptome.aozan.collectors.ReadCollector;
 
 /**
- * This class define a Passing Filter cluster global test.
+ * This class define a percent passing filter clusters global test.
  * @since 1.3
- * @author Laurent Jourdren
+ * @author Sandrine Perrin
  */
-public class PFClustersGlobalTest extends AbstractSimpleGlobalTest {
+public class PFClustersPercentGlobalTest extends AbstractSimpleGlobalTest {
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(GlobalStatsCollector.COLLECTOR_NAME,
-        ReadCollector.COLLECTOR_NAME);
+    return ImmutableList.of(GlobalStatsCollector.COLLECTOR_NAME);
   }
 
   @Override
   protected String getKey() {
 
-    return "globalstats.clusters.pf.count";
+    return "globalstats.prc.pf.clusters";
+  }
+
+  @Override
+  protected boolean isValuePercent() {
+    return true;
   }
 
   @Override
   protected Class<?> getValueType() {
 
-    return Long.class;
+    return Double.class;
   }
 
   @Override
   protected Number transformValue(final Number value, final RunData data) {
 
-    final int tiles = data.getInt("read1.lane1.tile.count");
-
-    return value.longValue() * tiles;
+    return value.doubleValue();
   }
 
   //
@@ -72,9 +73,9 @@ public class PFClustersGlobalTest extends AbstractSimpleGlobalTest {
   /**
    * Public constructor.
    */
-  public PFClustersGlobalTest() {
+  public PFClustersPercentGlobalTest() {
 
-    super("globalpfclusterscount", "", "PF Clusters Est.");
+    super("globalprcpfclusters", "", "PF Clusters Est.", "%");
   }
 
 }

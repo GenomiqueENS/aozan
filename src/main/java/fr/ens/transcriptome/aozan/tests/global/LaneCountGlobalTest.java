@@ -28,41 +28,37 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.collectors.GlobalStatsCollector;
-import fr.ens.transcriptome.aozan.collectors.ReadCollector;
+import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 
 /**
- * This class define a Passing Filter cluster global test.
+ * This class define a lane count global test.
  * @since 1.3
- * @author Laurent Jourdren
+ * @author Sandrine Perrin
  */
-public class PFClustersGlobalTest extends AbstractSimpleGlobalTest {
+public class LaneCountGlobalTest extends AbstractSimpleGlobalTest {
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(GlobalStatsCollector.COLLECTOR_NAME,
-        ReadCollector.COLLECTOR_NAME);
+    return ImmutableList.of(RunInfoCollector.COLLECTOR_NAME);
   }
 
   @Override
   protected String getKey() {
 
-    return "globalstats.clusters.pf.count";
+    return "run.info.flow.cell.lane.count";
   }
 
   @Override
   protected Class<?> getValueType() {
 
-    return Long.class;
+    return Integer.class;
   }
 
   @Override
   protected Number transformValue(final Number value, final RunData data) {
 
-    final int tiles = data.getInt("read1.lane1.tile.count");
-
-    return value.longValue() * tiles;
+    return value.intValue();
   }
 
   //
@@ -72,9 +68,9 @@ public class PFClustersGlobalTest extends AbstractSimpleGlobalTest {
   /**
    * Public constructor.
    */
-  public PFClustersGlobalTest() {
+  public LaneCountGlobalTest() {
 
-    super("globalpfclusterscount", "", "PF Clusters Est.");
+    super("globallanecount", "", "Lane Count.");
   }
 
 }
