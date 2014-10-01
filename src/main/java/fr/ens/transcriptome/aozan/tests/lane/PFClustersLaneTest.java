@@ -59,8 +59,8 @@ public class PFClustersLaneTest extends AbstractSimpleLaneTest {
   protected Number transformValue(final Number value, final RunData data,
       final int read, final boolean indexedRead, final int lane) {
 
-    final int tiles =
-        data.getInt("read" + read + ".lane" + lane + ".tile.count");
+    final int tiles = data.getTilesCount();
+    // data.getInt("read" + read + ".lane" + lane + ".tile.count");
 
     return value.longValue() * tiles;
   }

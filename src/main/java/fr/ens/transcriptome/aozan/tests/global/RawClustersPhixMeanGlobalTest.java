@@ -60,7 +60,7 @@ public class RawClustersPhixMeanGlobalTest extends AbstractSimpleGlobalTest {
   @Override
   protected Number transformValue(final Number value, final RunData data) {
 
-    final int tiles = data.getInt("read1.lane1.tile.count");
+    final int tiles = data.getTilesCount();
 
     return value.longValue() * tiles;
   }

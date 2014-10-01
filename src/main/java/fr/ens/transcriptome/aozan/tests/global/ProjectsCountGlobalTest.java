@@ -44,10 +44,6 @@ import fr.ens.transcriptome.aozan.util.ScoreInterval;
  */
 public class ProjectsCountGlobalTest extends AbstractGlobalTest {
 
-  /** Splitter */
-  private static final Splitter COMMA_SPLITTER = Splitter.on(",").trimResults()
-      .omitEmptyStrings();
-
   private final ScoreInterval interval = new ScoreInterval();
 
   @Override
@@ -61,8 +57,7 @@ public class ProjectsCountGlobalTest extends AbstractGlobalTest {
 
     try {
 
-      final String projects = data.getProjectsName();
-      final int projectsCount = COMMA_SPLITTER.splitToList(projects).size();
+      final int projectsCount = data.getProjectsNameList().size();
 
       return new TestResult(this.interval.getScore(projectsCount),
           projectsCount, false);
