@@ -10,6 +10,58 @@
 <InstrumentSN>SNL110</InstrumentSN>
 <InstrumentRunNumber>77</InstrumentRunNumber>
 <ReportDate>date generation report</ReportDate>
+
+<GlobalReport>
+<Columns>
+<Column description="" testname="globalrawclusterscount" unit="">Raw Clusters Est.</Column>
+<Column description="" testname="globalpfclusterscount" unit="">PF Clusters Est.</Column>
+<Column description="" testname="globalbasecount" unit="Gb">Base count</Column>
+<Column description="" testname="nonindexedglobalbasecount" unit="Gb">Non indexed base count</Column>
+<Column description="" testname="globalrawclustersmean" unit="">Raw Clusters Mean Est.</Column>
+<Column 
+description="" testname="globalrawclustersmediane" unit="">Raw Clusters Mediane Est.</Column>
+<Column description="" testname="globalrawclusterssd" unit="">Raw Clusters SD Est.</Column>
+<Column description="" testname="globalpercentalignal" unit="%">PhiX Align Est.</Column>
+<Column description="" testname="globalpfclustersmean" unit="">PF Clusters Mean Est.</Column>
+<Column description="" testname="globalpfclustersmediane" unit="">PF Clusters Mediane Est.</Column>
+<Column description="" testname="globalpfclusterssd" unit="">PF Clusters SD Est.</Column>
+<Column description="" testname="globalrawclustersphix" unit="">PhiX Raw Clusters Est.</Column>
+<Column description="" testname="globalrawclustersphixmean" unit="">PhiX Raw Clusters Mean Est.</Column>
+<Column description="" testname="globalrawclustersphixmediane" unit="">PhiX Raw Clusters Mediane Est.</Column>
+<Column description="" testname="globalrawclustersphixsd" unit="">PhiX Raw Clusters SD Est.</Column>
+<Column description="" testname="globalprcpfclusters" unit="%">PF Clusters Est.</Column>
+<Column description="" testname="globalcyclescount" unit="">Cycles Count.</Column>
+<Column description="" testname="globallanescount" unit="">Lane Count.</Column>
+<Column description="" testname="globalprcundeterminedcluster" unit="%">Undetermined Cluster Est.</Column>
+<Column description="" testname="globalsamplescount" unit="">Samples Count.</Column>
+<Column description="" testname="globalprojectscount" unit="">Projects Count.</Column>
+</Columns>
+
+<Run>
+<Test name="globalrawclusterscount" score="-1" type="int">257810560</Test>
+<Test name="globalpfclusterscount" score="-1" type="int">242902080</Test>
+<Test name="globalbasecount" score="-1" type="float">53.88240704</Test>
+<Test name="nonindexedglobalbasecount" score="-1" type="float">52.07773312</Test>
+<Test name="globalrawclustersmean" score="-1" type="int">128905280</Test>
+<Test name="globalrawclustersmediane" score="-1" type="int">128905280</Test>
+<Test name="globalrawclusterssd" score="-1" type="int">598528</Test>
+<Test name="globalpercentalignal" score="-1" type="percent">0.25689635056065974</Test>
+<Test name="globalpfclustersmean" score="-1" type="int">121451008</Test>
+<Test name="globalpfclustersmediane" score="-1" type="int">121451008</Test>
+<Test name="globalpfclusterssd" score="-1" type="int">436800</Test>
+<Test name="globalrawclustersphix" score="-1" type="int">66230592</Test>
+<Test name="globalrawclustersphixmean" score="-1" type="int">33115264</Test>
+<Test name="globalrawclustersphixmediane" score="-1" type="int">33115264</Test>
+<Test name="globalrawclustersphixsd" score="-1" type="int">202624</Test>
+<Test name="globalprcpfclusters" score="-1" type="percent">0.9421727333434285</Test>
+<Test name="globalcyclescount" score="-1" type="int">209</Test>
+<Test name="globallanescount" score="-1" type="int">2</Test>
+<Test name="globalprcundeterminedcluster" score="-1" type="percent">0.30194490093811516</Test>
+<Test name="globalsamplescount" score="-1" type="int">6</Test>
+<Test name="globalprojectscount" score="-1" type="int">1</Test>
+</Run>
+</GlobalReport>
+
 <ReadsReport>
 <Columns>
 <Column description="" testname="rawclusters" unit="">Raw Clusters Est.</Column>
@@ -88,6 +140,12 @@
 </Read>
 </Reads>
 </ReadsReport>
+
+<ProjectsReport>
+<ProjectName classValue="projectName" cmdJS="'project_name'">project_name</ProjectName>
+<ProjectName classValue="projectName" cmdJS="'Undetermined'">Undetermined</ProjectName>
+</ProjectsReport>
+
 <SamplesReport>
 <Columns>
 <Column description="" testname="rawclusterssamples" unit="">Raw clusters</Column>

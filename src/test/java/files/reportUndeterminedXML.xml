@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<RecoveryClusterReport formatversion="1.0">
+<Step>Recovery cluster from undetermined fastq file</Step>
+<GeneratorName>Aozan</GeneratorName>
+<GeneratorVersion>UNKNOWN_VERSION</GeneratorVersion>
+<GeneratorWebsite>http://transcriptome.ens.fr/aozan</GeneratorWebsite>
+<GeneratorRevision>UNKNOWN_COMMIT</GeneratorRevision>
+<RunId>140818_SNL110_0129_Ah9bvmadxx</RunId>
+<RunDate>Mon 18 Aug 2014</RunDate>
+<FlowcellId>h9bvmadxx</FlowcellId>
+<InstrumentSN>SNL110</InstrumentSN>
+<InstrumentRunNumber>129</InstrumentRunNumber>
+<ReportDate>Tue 30 Sep 2014</ReportDate>
+<sampleName>lane1_undetermined</sampleName>
+<condition>Compile results on recovery reads in undetermined fastq with 1 mismatches.</condition>
+
+<Samples classValue="samples" cmdJS="'2014_086','2014_084','2014_085'">
+<Sample classValue="sample" cmdJS="'2014_086'">2014_086</Sample>
+<Sample classValue="sample" cmdJS="'2014_084'">2014_084</Sample>
+<Sample classValue="sample" cmdJS="'2014_085'">2014_085</Sample>
+</Samples>
+
+<Columns>
+<Column>Index</Column>
+<Column>Raw cluster count</Column>
+<Column>PF cluster count</Column>
+<Column>PF %</Column>
+<Column>Raw cluster in undetermined %</Column>
+<Column>PF cluster count in undetermined %</Column>
+<Column>Recovery possible for sample(s)</Column>
+</Columns>
+
+<Results id="data">
+<Entry classValue="total">
+<Data name="index" score="-1" type="string">Total</Data>
+<Data name="raw_cluster_count" score="-1" type="int">1000</Data>
+<Data name="pf_cluster_count" score="-1" type="int">907</Data>
+<Data name="pf_%" score="-1" type="string">90.70%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">100.00%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">100.00%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string"/>
+</Entry>
+<Entry classValue="2014_084">
+<Data name="index" score="-1" type="string">TCACCA</Data>
+<Data name="raw_cluster_count" score="-1" type="int">25</Data>
+<Data name="pf_cluster_count" score="-1" type="int">21</Data>
+<Data name="pf_%" score="-1" type="string">84.00%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">2.50%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">2.32%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string">2014_084</Data>
+</Entry>
+<Entry classValue="Entry">
+<Data name="index" score="-1" type="string">CACAAC</Data>
+<Data name="raw_cluster_count" score="-1" type="int">19</Data>
+<Data name="pf_cluster_count" score="-1" type="int">15</Data>
+<Data name="pf_%" score="-1" type="string">78.95%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">1.90%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">1.65%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string"/>
+</Entry>
+
+<Entry classValue="2014_085">
+<Data name="index" score="-1" type="string">ACAGTC</Data>
+<Data name="raw_cluster_count" score="-1" type="int">13</Data>
+<Data name="pf_cluster_count" score="-1" type="int">12</Data>
+<Data name="pf_%" score="-1" type="string">92.31%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">1.30%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">1.32%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string">2014_085</Data>
+</Entry>
+
+<Entry classValue="2014_086">
+<Data name="index" score="-1" type="string">CAGAAC</Data>
+<Data name="raw_cluster_count" score="-1" type="int">11</Data>
+<Data name="pf_cluster_count" score="-1" type="int">11</Data>
+<Data name="pf_%" score="-1" type="string">100.00%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">1.10%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">1.21%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string">2014_086</Data>
+</Entry>
+
+<Entry classValue="Entry">
+<Data name="index" score="-1" type="string">ACACCA</Data>
+<Data name="raw_cluster_count" score="-1" type="int">17</Data>
+<Data name="pf_cluster_count" score="-1" type="int">11</Data>
+<Data name="pf_%" score="-1" type="string">64.71%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">1.70%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">1.21%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string"/>
+</Entry>
+<Entry classValue="Entry"><Data name="index" score="-1" type="string">CAACCA</Data>
+<Data name="raw_cluster_count" score="-1" type="int">9</Data>
+<Data name="pf_cluster_count" score="-1" type="int">9</Data>
+<Data name="pf_%" score="-1" type="string">100.00%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.90%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.99%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string"/>
+</Entry>
+<Entry classValue="2014_084">
+<Data name="index" score="-1" type="string">TAACCA</Data>
+<Data name="raw_cluster_count" score="-1" type="int">8</Data>
+<Data name="pf_cluster_count" score="-1" type="int">8</Data>
+<Data name="pf_%" score="-1" type="string">100.00%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.80%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.88%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string">2014_084</Data>
+</Entry>
+<Entry classValue="2014_086">
+<Data name="index" score="-1" type="string">CAGACC</Data>
+<Data name="raw_cluster_count" score="-1" type="int">8</Data>
+<Data name="pf_cluster_count" score="-1" type="int">8</Data>
+<Data name="pf_%" score="-1" type="string">100.00%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.80%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.88%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string">2014_086</Data>
+</Entry>
+<Entry classValue="2014_085">
+<Data name="index" score="-1" type="string">ACAGAG</Data>
+<Data name="raw_cluster_count" score="-1" type="int">7</Data>
+<Data name="pf_cluster_count" score="-1" type="int">7</Data>
+<Data name="pf_%" score="-1" type="string">100.00%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.70%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.77%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string">2014_085</Data>
+</Entry>
+<Entry classValue="2014_086">
+<Data name="index" score="-1" type="string">CATATC</Data>
+<Data name="raw_cluster_count" score="-1" type="int">7</Data>
+<Data name="pf_cluster_count" score="-1" type="int">7</Data>
+<Data name="pf_%" score="-1" type="string">100.00%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.70%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.77%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string">2014_086</Data>
+</Entry>
+<Entry classValue="Entry">
+<Data name="index" score="-1" type="string">ACACCG</Data>
+<Data name="raw_cluster_count" score="-1" type="int">7</Data>
+<Data name="pf_cluster_count" score="-1" type="int">7</Data>
+<Data name="pf_%" score="-1" type="string">100.00%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.70%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.77%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string"/>
+</Entry>
+<Entry classValue="Entry">
+<Data name="index" score="-1" type="string">GGCAAA</Data>
+<Data name="raw_cluster_count" score="-1" type="int">7</Data>
+<Data name="pf_cluster_count" score="-1" type="int">7</Data>
+<Data name="pf_%" score="-1" type="string">100.00%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.70%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.77%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string"/>
+</Entry>
+<Entry classValue="Entry">
+<Data name="index" score="-1" type="string">CAGCCC</Data>
+<Data name="raw_cluster_count" score="-1" type="int">7</Data>
+<Data name="pf_cluster_count" score="-1" type="int">6</Data>
+<Data name="pf_%" score="-1" type="string">85.71%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.70%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.66%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string"/>
+</Entry>
+<Entry classValue="Entry">
+<Data name="index" score="-1" type="string">GATAAC</Data>
+<Data name="raw_cluster_count" score="-1" type="int">6</Data>
+<Data name="pf_cluster_count" score="-1" type="int">6</Data>
+<Data name="pf_%" score="-1" type="string">100.00%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.60%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.66%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string"/>
+</Entry>
+<Entry classValue="Entry">
+<Data name="index" score="-1" type="string">GATAAA</Data>
+<Data name="raw_cluster_count" score="-1" type="int">6</Data>
+<Data name="pf_cluster_count" score="-1" type="int">6</Data>
+<Data name="pf_%" score="-1" type="string">100.00%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.60%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.66%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string"/>
+</Entry>
+<Entry classValue="2014_084">
+<Data name="index" score="-1" type="string">TGACCC</Data>
+<Data name="raw_cluster_count" score="-1" type="int">7</Data>
+<Data name="pf_cluster_count" score="-1" type="int">6</Data>
+<Data name="pf_%" score="-1" type="string">85.71%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.70%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.66%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string">2014_084</Data>
+</Entry>
+<Entry classValue="2014_084"><Data name="index" score="-1" type="string">AGACCA</Data>
+<Data name="raw_cluster_count" score="-1" type="int">5</Data>
+<Data name="pf_cluster_count" score="-1" type="int">5</Data>
+<Data name="pf_%" score="-1" type="string">100.00%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.50%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.55%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string">2014_084</Data>
+</Entry>
+<Entry classValue="Entry">
+<Data name="index" score="-1" type="string">ACCGAG</Data>
+<Data name="raw_cluster_count" score="-1" type="int">5</Data>
+<Data name="pf_cluster_count" score="-1" type="int">5</Data>
+<Data name="pf_%" score="-1" type="string">100.00%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.50%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.55%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string"/>
+</Entry>
+<Entry classValue="2014_085">
+<Data name="index" score="-1" type="string">ACAGGG</Data>
+<Data name="raw_cluster_count" score="-1" type="int">6</Data>
+<Data name="pf_cluster_count" score="-1" type="int">5</Data>
+<Data name="pf_%" score="-1" type="string">83.33%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.60%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.55%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string">2014_085</Data>
+</Entry>
+<Entry classValue="Entry">
+<Data name="index" score="-1" type="string">ACAATC</Data>
+<Data name="raw_cluster_count" score="-1" type="int">5</Data>
+<Data name="pf_cluster_count" score="-1" type="int">5</Data>
+<Data name="pf_%" score="-1" type="string">100.00%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.50%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.55%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string"/>
+</Entry>
+<Entry classValue="Entry">
+<Data name="index" score="-1" type="string">AAACCA</Data>
+<Data name="raw_cluster_count" score="-1" type="int">6</Data>
+<Data name="pf_cluster_count" score="-1" type="int">5</Data>
+<Data name="pf_%" score="-1" type="string">83.33%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.60%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.55%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string"/>
+</Entry>
+<Entry classValue="Entry">
+<Data name="index" score="-1" type="string">ACACAA</Data>
+<Data name="raw_cluster_count" score="-1" type="int">5</Data>
+<Data name="pf_cluster_count" score="-1" type="int">5</Data>
+<Data name="pf_%" score="-1" type="string">100.00%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.50%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.55%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string"/>
+</Entry>
+<Entry classValue="Entry">
+<Data name="index" score="-1" type="string">CAACCC</Data>
+<Data name="raw_cluster_count" score="-1" type="int">8</Data>
+<Data name="pf_cluster_count" score="-1" type="int">5</Data>
+<Data name="pf_%" score="-1" type="string">62.50%</Data>
+<Data name="raw_cluster_in_undetermined_%" score="-1" type="string">0.80%</Data>
+<Data name="pf_cluster_count_in_undetermined_%" score="-1" type="string">0.55%</Data>
+<Data name="recovery_possible_for_sample(s)" score="-1" type="string"/></Entry>
+
+</Results></RecoveryClusterReport>

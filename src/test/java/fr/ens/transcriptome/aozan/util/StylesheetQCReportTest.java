@@ -52,6 +52,14 @@ public class StylesheetQCReportTest extends TestCase {
             "reportFastqscreenXML.xml"));
   }
 
+  public void testTransformReportUndetermined() throws Exception {
+    assertTrue(
+        "Invalide syntax XSL "
+            + Globals.EMBEDDED_UNDETERMINED_XSL
+            + " for report undetermined for lane ",
+        isStylesheetValide(Globals.EMBEDDED_QC_XSL, "reportUndeterminedXML.xml"));
+  }
+
   private boolean isStylesheetValide(final String stylesheetFile,
       final String reportFile) {
     try {
