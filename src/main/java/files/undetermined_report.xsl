@@ -20,144 +20,221 @@
 				<!-- <link rel="stylesheet" href="report.css"></link> -->
 				<style TYPE="text/css">
 
-					img {
-					width: 150px;
-					}
-					body{
-					font-family: sans-serif;
-					font-size: 80%;
-					margin:0;
-					}
-					h1{
-					color: #234CA5;
-					font-style : italic;
-					font-size : 20px;
-					}
-					h2{}
-					h3{
-					color:black;
-					font-style : italic;
-					}
+img {
+	width: 150px;
+}
+body{
+	font-family: sans-serif;
+	font-size: 80%;
+	margin:0;
+}
+h1{
+	color: #234CA5;
+	font-style : italic;
+	font-size : 20px;
+}
+h2{}
+h3{
+	color:black;
+	font-style : italic;
+}
 
-					table {
-					border: medium solid #000000;
-					font-size: 95%;
-					border-collapse:collapse;
-					}
+table {
+	border: medium solid #000000;
+	font-size: 95%;
+	border-collapse:collapse;
+}
 
-					td {
-					text-align: right;
-					width: 100px;
-					border: 1px solid black;
+td {
+	text-align: right;
+	width: 100px;
+	border: 1px solid black;
+	
+	padding-left:3px;
+	padding-right:3px;
+	padding-top:1px;
+	padding-bottom:1px;
+	position : static;
+	background-clip: padding-box;
+}
+th {
+	background-color:#E7EAF1;
+	color:black;
+	border: thin solid black;
+	border-bottom-width: 2px;
+	width: 50px;
+	font-size: 100%;
+}
 
-					padding-left:3px;
-					padding-right:3px;
-					padding-top:1px;
-					padding-bottom:1px;
-					position : static;
-					background-clip: padding-box;
-					}
-					th {
-					background-color:#E7EAF1;
-					color:black;
-					border: thin solid black;
-					border-bottom-width: 2px;
-					width: 50px;
-					font-size: 100%;
-					}
+tr:hover {
+	z-index:2;
+	box-shadow:0 0
+	12px rgba(0, 0, 0, 1);
+	background:#F6F6B4;
+}
+tr.total{
+	background:#82D482;
+	font-style : bold;
+}
+tr.demultiplexing{
+	background:#FFFFA3;
+	font-style : bold;
+}
+td:first-child{
+	text-align:center;
+	font-style : bold;
+	background-color:#D7A1A3;
+	font-family:Courier New;
+	font-size:120%;
+}
+td:last-child{
+	width: 200px;
+	text-align: left;
+	font-style : italic;
+}
 
-					tr:hover {
-					z-index:2;
-					box-shadow:0 0
-					12px rgba(0, 0, 0, 1);
-					background:#F6F6B4;
-					}
-					tr.total{
-					background:#82D482;
-					font-style : bold;
-					}
-					tr.demultiplexing{
-					background:#FFFFA3;
-					font-style : bold;
-					}
-					td:first-child{
-					text-align:center;
-					font-style : bold;
-					background-color:#D7A1A3;
-					font-family:Courier New;
-					font-size:120%;
-					}
-					td:last-child{
-					width: 200px;
-					text-align: left;
-					font-style : italic;
-					}
+div.header {
+	background-color: #C1C4CA;
+	border:0;
+	margin:0;
+	padding: 0.5em;
+	font-size: 175%;
+	font-weight: bold;
+	width:100%;
+	height: 2em;
+	position:
+	fixed;
+	vertical-align: middle;
+	z-index:2;
+}
 
-					div.header {
-					background-color: #C1C4CA;
-					border:0;
-					margin:0;
-					padding: 0.5em;
-					font-size: 175%;
-					font-weight: bold;
-					width:100%;
-					height: 2em;
-					position:
-					fixed;
-					vertical-align: middle;
-					z-index:2;
-					}
+#header_title {
+	display:inline-block;
+	float:left;
+	clear:left;
+	font-size: 85%;
+}
 
-					#header_title {
-					display:inline-block;
-					float:left;
-					clear:left;
-					font-size: 50%;
-					}
+#header_right {
+     display:inline-block;
+     float:right;
+     clear:right;
+     font-size: 55%;
+     margin-right:2em;
+     text-align: right;
+     vertical-align:middle;
+   }
+div.report {
+	display:block;
+	position:absolute;
+	width:100%;
+	top:6em;
+	bottom:5px;
+	left:0;
+	right:0;
+	padding:0 0 0 1em;
+	background-color: white;
+}
 
-					#header_right {
-				        display:inline-block;
-				        float:right;
-				        clear:right;
-				        font-size: 55%;
-				        margin-right:2em;
-				        text-align: right;
-				        vertical-align:middle;
-				    }
-					div.report {
-					display:block;
-					position:absolute;
-					width:100%;
-					top:6em;
-					bottom:5px;
-					left:0;
-					right:0;
-					padding:0 0 0 1em;
-					background-color: white;
-					}
+div.footer {
+	background-color: #C1C4CA;
+	border:0;
+	margin:0;
+	padding:0.5em;
+	height: 1.3em;
+	overflow:hidden;
+	font-size: 100%;
+	font-weight: bold;
+	position:fixed;
+	bottom:0;
+	width:100%;
+	z-index:2;
+}
+#topPage{
+	text-align: left;
+}
+					
+a.linkFilterActivate:link, a.linkFilterUnactivate:link{
+	color:#ffffff;
+}  
+ 	.linkFilterActivate {
+	-webkit-border-top-left-radius:24px;
+	-moz-border-radius-topleft:24px;
+	border-top-left-radius:24px;
+	-webkit-border-top-right-radius:24px;
+	-moz-border-radius-topright:24px;
+	border-top-right-radius:24px;
+	-webkit-border-bottom-right-radius:24px;
+	-moz-border-radius-bottomright:24px;
+	border-bottom-right-radius:24px;
+	-webkit-border-bottom-left-radius:24px;
+	-moz-border-radius-bottomleft:24px;
+	border-bottom-left-radius:24px;
 
-					div.footer {
-					background-color: #C1C4CA;
-					border:0;
-					margin:0;
-					padding:0.5em;
-					height: 1.3em;
-					overflow:hidden;
-					font-size: 100%;
-					font-weight: bold;
-					position:fixed;
-					bottom:0;
-					width:100%;
-					z-index:2;
-					}
-					#topPage{
-					text-align: left;
-					}
+	background-color:#9A1319;
+	text-indent:0px;
+	border:2px solid #000000;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	font-style:normal;
+	line-height:29px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px 1px 0px #810e05;
+	padding-left:5px;
+	padding-right:5px;
+}
+
+.linkFilterUnactivate {
+	-webkit-border-top-left-radius:24px;
+	-moz-border-radius-topleft:24px;
+	border-top-left-radius:24px;
+	-webkit-border-top-right-radius:24px;
+	-moz-border-radius-topright:24px;
+	border-top-right-radius:24px;
+	-webkit-border-bottom-right-radius:24px;
+	-moz-border-radius-bottomright:24px;
+	border-bottom-right-radius:24px;
+	-webkit-border-bottom-left-radius:24px;
+	-moz-border-radius-bottomleft:24px;
+	border-bottom-left-radius:24px;
+
+	background-color:#A7A9AF;
+	text-indent:0px;
+	border:2px solid #000000;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	font-style:normal;
+	line-height:29px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px 1px 0px #4E5C86;
+	padding-left:5px;
+	padding-right:5px;
+}
+.linkFilterUnactivate:hover, .linkFilterActivate:hover {
+	background-color:#487DD6;
+	font-size:150%;
+}
+
+#filterSample td{
+	border:#ffffff;
+	border-style:hidden;
+}
+#filterSample tr:hover{
+}
+					
 				</style>
 				<script language="javascript">
 					<xsl:comment><![CDATA[
 				
-				function filterRow(samples) {
+				function filterRow(samples, elemLink) {
 					//alert('hello '+ samples.length);
 					init_all('none');
 
@@ -168,6 +245,13 @@
 							tab[i].style.display ="table-row";
 						}
 					}
+							
+		        	// Change class link
+			        // Unactivate link
+			        document.getElementsByClassName('linkFilterActivate')[0].setAttribute('class', 'linkFilterUnactivate');
+			        // Activate new element
+			        elemLink.setAttribute('class', 'linkFilterActivate');
+		
 				}
 
 				function init_all(display_val){
@@ -272,19 +356,20 @@
 					</ul>
 
 				<xsl:if test="/RecoveryClusterReport/Samples/Sample">
-					<div id="filterProject">
+					<div id="filterSample">
 						<table border="0">
 							<tr>
 								<td>Filter by sample</td>
 								<td>
-									<a href="javascript:void(0);" onclick="window.location.reload(true);">ALL</a>
+									<a href="javascript:void(0);" class="linkFilterActivate" onclick="window.location.reload(true);">ALL</a>
 								</td>
 								<xsl:for-each select="/RecoveryClusterReport/Samples/Sample">
 									<td>
 										<xsl:element name="a">
 										<xsl:attribute name="href">javascript:void(0);</xsl:attribute>
+										<xsl:attribute name="class">linkFilterUnactivate</xsl:attribute>
 										<xsl:attribute name="onclick">javascript:filterRow([<xsl:value-of
-											select="@cmdJS"></xsl:value-of>]);</xsl:attribute>
+											select="@cmdJS"></xsl:value-of>], this);</xsl:attribute>
 										<xsl:value-of select="." />
 									</xsl:element>
 									</td>
@@ -292,9 +377,10 @@
 								<td>
 									<xsl:element name="a">
 										<xsl:attribute name="href">javascript:void(0);</xsl:attribute>
+										<xsl:attribute name="class">linkFilterUnactivate</xsl:attribute>
 										<xsl:attribute name="onclick">javascript:filterRow([<xsl:value-of
-											select="/RecoveryClusterReport/Samples/@cmdJS"></xsl:value-of>]);</xsl:attribute>
-										All recovery samples
+											select="/RecoveryClusterReport/Samples/@cmdJS"></xsl:value-of>], this);</xsl:attribute>
+										All samples
 									</xsl:element>
 								</td>
 							</tr>

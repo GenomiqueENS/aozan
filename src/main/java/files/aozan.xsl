@@ -12,7 +12,7 @@
 <head>
   <title><xsl:value-of select="/QCReport/RunId"/> run quality report</title>
   <style type="text/css">
-  	
+
     .score-1 {
     }
     .score0 {
@@ -45,18 +45,18 @@
     .score9 {
       background: #55D486;
     }
-    
+
    tr:hover {
       z-index:2;
       box-shadow:0 0 20px rgba(0, 0, 0, 1);
       background:#F6F6B4;
     }
-      
+
     td {
       text-align: center;
       width: 100px;
       border: 1px solid black;
-      
+
       padding-left:3px;
       padding-right:3px;
       padding-top:1px;
@@ -64,7 +64,7 @@
       position : static;
       background-clip: padding-box;
     }
-    
+
 <!--     table.sampleData td:last-child tr:last-child { -->
 	td.repeat{
       background: WhiteSmoke ;
@@ -72,7 +72,7 @@
       font-style: italic;
       font-size: 80%;
     }
-    
+
     th {
         background-color:#E7EAF1;
         color:black;
@@ -86,10 +86,10 @@
         font-size: 95%;
         border-collapse:collapse;
     }
-    
-    
+
+
     body{
-        font-family: sans-serif;   
+        font-family: sans-serif;
         font-size: 80%;
         margin-left:0px;
         margin-right:0px;
@@ -109,12 +109,12 @@
      a:link {
         color:#1B65AF;
         font-weight: bold;
-    } 
+    }
     a:visited {
         color:#1B65AF;
         font-weight: bold;
-    }   
-  	
+    }
+
   div.report {
     display:block;
     position:absolute;
@@ -126,7 +126,7 @@
     padding:0 0 0 1em;
     background-color: white;
   }
-	
+
   div.footer {
     background-color: #C1C4CA;
     border:0;
@@ -141,8 +141,8 @@
     width:100%;
     z-index:2;
   }
-        
-    
+
+
     div.header {
 		background-color: #C1C4CA;
         border:0;
@@ -155,9 +155,9 @@
         position: fixed;
         vertical-align: middle;
         z-index:2;
-        
+
     }
-    
+
     #header_title {
         display:inline-block;
         float:left;
@@ -180,40 +180,124 @@
   	img {
   		width: 150px;
   	}
+
+	a.linkFilterActivate:link, a.linkFilterUnactivate:link{
+		color:#ffffff;
+	}  
+  	.linkFilterActivate {
+		-webkit-border-top-left-radius:24px;
+		-moz-border-radius-topleft:24px;
+		border-top-left-radius:24px;
+		-webkit-border-top-right-radius:24px;
+		-moz-border-radius-topright:24px;
+		border-top-right-radius:24px;
+		-webkit-border-bottom-right-radius:24px;
+		-moz-border-radius-bottomright:24px;
+		border-bottom-right-radius:24px;
+		-webkit-border-bottom-left-radius:24px;
+		-moz-border-radius-bottomleft:24px;
+		border-bottom-left-radius:24px;
+
+		background-color:#9A1319;
+		text-indent:0px;
+		border:2px solid #000000;
+		display:inline-block;
+		color:#ffffff;
+		font-family:Arial;
+		font-size:15px;
+		font-weight:bold;
+		font-style:normal;
+		line-height:29px;
+		text-decoration:none;
+		text-align:center;
+		text-shadow:1px 1px 0px #810e05;
+		padding-left:5px;
+		padding-right:5px;
+	}
+
+	.linkFilterUnactivate {
+		-webkit-border-top-left-radius:24px;
+		-moz-border-radius-topleft:24px;
+		border-top-left-radius:24px;
+		-webkit-border-top-right-radius:24px;
+		-moz-border-radius-topright:24px;
+		border-top-right-radius:24px;
+		-webkit-border-bottom-right-radius:24px;
+		-moz-border-radius-bottomright:24px;
+		border-bottom-right-radius:24px;
+		-webkit-border-bottom-left-radius:24px;
+		-moz-border-radius-bottomleft:24px;
+		border-bottom-left-radius:24px;
+
+		background-color:#A7A9AF;
+		text-indent:0px;
+		border:2px solid #000000;
+		display:inline-block;
+		color:#ffffff;
+		font-family:Arial;
+		font-size:15px;
+		font-weight:bold;
+		font-style:normal;
+		line-height:29px;
+		text-decoration:none;
+		text-align:center;
+		text-shadow:1px 1px 0px #4E5C86;
+		padding-left:5px;
+		padding-right:5px;
+	}
+	.linkFilterUnactivate:hover, .linkFilterActivate:hover {
+		background-color:#487DD6;
+		font-size:150%;
+	}
+
+	#filterProject td{
+		border:#ffffff;
+		border-style:hidden;
+	}
+	#filterProject tr:hover{
+	}
   </style>
   <script language="javascript">
 			<xsl:comment><![CDATA[
-		
-		function filterRow(project) {
-			
+
+		function filterRow(project, elemLink) {
+
 			init_all('none');
 
 			var tab = document.getElementsByClassName(project);
-				
+
 			for (var i=0; i < tab.length; i++){
 				tab[i].style.display ="table-row";
 			}
+
+	        // Change class link
+	       // Unactivate link
+	       document.getElementsByClassName('linkFilterActivate')[0].setAttribute('class', 'linkFilterUnactivate');
+	       // Activate new element
+	       elemLink.setAttribute('class', 'linkFilterActivate');
+
+			// Change position
 			window.location = '#project';
 		}
-		
+
 		function init_all(display_val){
-			
+
 			var tab = document.getElementsByClassName('sampleData');
-			
-			for (var n=0; n < tab.length; n++){ 
+
+			for (var n=0; n < tab.length; n++){
 				var rows = tab[n].getElementsByTagName('tr');
-		
+
 				for (var i=0; i < rows.length; i++){
 					rows[i].style.display = display_val;
 				}
 			}
-			
+
 			var header = document.getElementsByClassName('headerColumns');
 			for (var i=0; i < header.length; i++){
 				header[i].style.display = "table-row";
 			}
 		}
-		
+
 		]]></xsl:comment>
 		</script>
 </head>
@@ -221,15 +305,15 @@
 
 <div class="header">
 	<div id="header_title">
-		<span><img src="http://www.transcriptome.ens.fr/aozan/images/logo_aozan_qc.png" alt="Aozan"/></span>  
-		<span>Quality report on run <xsl:value-of select="/QCReport/RunId"/></span> 
-	</div> 
+		<span><img src="http://www.transcriptome.ens.fr/aozan/images/logo_aozan_qc.png" alt="Aozan"/></span>
+		<span>Quality report on run <xsl:value-of select="/QCReport/RunId"/></span>
+	</div>
 
 	<div id="header_filename">
 		Generated <xsl:value-of select="/QCReport/ReportDate"/><br/>
 		<a href="#global">Global</a> / <a href="#lane">Lanes</a> / <a href="#sample">Samples</a>
 	</div>
-	
+
 </div>
 
 <div class="report">
@@ -239,7 +323,7 @@
     <li><b>Run started: </b> <xsl:value-of select="/QCReport/RunDate"/></li>
     <li><b>Instrument S/N: </b> <xsl:value-of select="/QCReport/InstrumentSN"/></li>
     <li><b>Instrument run number: </b> <xsl:value-of select="/QCReport/InstrumentRunNumber"/></li>
-    <li><b>Generated by: </b> <xsl:value-of select="/QCReport/GeneratorName"/> version <xsl:value-of select="/QCReport/GeneratorVersion"/> 
+    <li><b>Generated by: </b> <xsl:value-of select="/QCReport/GeneratorName"/> version <xsl:value-of select="/QCReport/GeneratorVersion"/>
     	(revision <xsl:value-of select="/QCReport/GeneratorRevision"/>)</li>
     <li><b>Creation date: </b> <xsl:value-of select="/QCReport/ReportDate"/></li>
   </ul>
@@ -305,16 +389,17 @@
   <xsl:if test="/QCReport[ProjectsReport]">
 	  <div>
 	  <h4>Filter by projects</h4>
-	  <table id="filter">
+	  <table id="filterProject">
 	    <tr>
 		  <td>Projects</td>
-	      <td><a href="javascript:void(0);" onclick="window.location.reload(true);">ALL</a></td>
-									
+	      <td><a href="javascript:void(0);" class="linkFilterActivate" onclick="window.location.reload(true);">ALL</a></td>
+
 	      <xsl:for-each select="/QCReport/ProjectsReport/ProjectName">
 		    <td>
 			  <xsl:element name="a">
+			  <xsl:attribute name="class">linkFilterUnactivate</xsl:attribute>
 			  <xsl:attribute name="href">javascript:void(0);</xsl:attribute>
-			  <xsl:attribute name="onclick">javascript:filterRow([<xsl:value-of select="@cmdJS"></xsl:value-of>]);</xsl:attribute>
+			  <xsl:attribute name="onclick">javascript:filterRow([<xsl:value-of select="@cmdJS"></xsl:value-of>], this);</xsl:attribute>
 				<xsl:value-of select="." /></xsl:element>
 			</td>
 	      </xsl:for-each>
@@ -323,7 +408,7 @@
 	<!--   end filter by project -->
 	  </div>
   </xsl:if>
-  
+
   <a name="sample"></a>
   <xsl:if test="/QCReport[SamplesReport]">
   <h2>Samples Quality report</h2>
@@ -358,11 +443,11 @@
            <xsl:if test="@type='url'"><a href="{.}">link</a></xsl:if>
          </td>
        </xsl:for-each>
-       
+
        <!-- Repeat Sample Name in last column -->
         <td class="repeat"><xsl:value-of select="@name"/><br/><xsl:value-of select="@project"/></td>
        </tr>
-     
+
     </xsl:for-each>
 
 	<!-- Repeat header columns at last row -->
@@ -377,21 +462,21 @@
       </xsl:for-each>
       <td class="repeat">Sample_Project name</td>
     </tr>
-    
+
    </table>
   </xsl:for-each>
   </xsl:if>
-  
+
   <p>_</p>
 <!-- End div report -->
 </div>
 
 <div class="footer">
-	Generated by  
+	Generated by
 	<xsl:element name="a">
 		<xsl:attribute name="href"><xsl:value-of select="/QCReport/GeneratorWebsite"/></xsl:attribute>Aozan</xsl:element>
 	(version <xsl:value-of select="/QCReport/GeneratorVersion"/>)
-	
+
 </div>
 </body>
 </html>
