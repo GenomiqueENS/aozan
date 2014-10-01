@@ -35,7 +35,7 @@ import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
  * @since 1.3
  * @author Sandrine Perrin
  */
-public class LaneCountGlobalTest extends AbstractSimpleGlobalTest {
+public class LanesCountGlobalTest extends AbstractSimpleGlobalTest {
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -68,9 +68,9 @@ public class LaneCountGlobalTest extends AbstractSimpleGlobalTest {
   /**
    * Public constructor.
    */
-  public LaneCountGlobalTest() {
+  public LanesCountGlobalTest() {
 
-    super("globallanecount", "", "Lane Count.");
+    super("globallanescount", "", "Lane Count.");
   }
 
 }

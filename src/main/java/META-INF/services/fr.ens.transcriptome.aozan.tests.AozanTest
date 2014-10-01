@@ -1,6 +1,6 @@
 fr.ens.transcriptome.aozan.tests.global.BaseCountGlobalTest
 fr.ens.transcriptome.aozan.tests.global.CyclesCountGlobalTest
-fr.ens.transcriptome.aozan.tests.global.LaneCountGlobalTest
+fr.ens.transcriptome.aozan.tests.global.LanesCountGlobalTest
 fr.ens.transcriptome.aozan.tests.global.NonIndexedBaseCountGlobalTest
 fr.ens.transcriptome.aozan.tests.global.PFClustersGlobalTest
 fr.ens.transcriptome.aozan.tests.global.PFClustersMeanGlobalTest
