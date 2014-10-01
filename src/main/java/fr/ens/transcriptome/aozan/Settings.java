@@ -168,6 +168,22 @@ public final class Settings {
   /** Collector FastQC nogroup */
   public static final String QC_CONF_FASTQC_NOGROUP_KEY =
       "qc.conf.fastqc.nogroup";
+  /** Path to a specific adapter file, replace default file */
+  public static final String QC_CONF_FASTQC_ADAPTER_FILE_KEY =
+      "qc.conf.fastqc.adapter.file";
+  /** Path to a specific limits file, replace default file */
+  public static final String QC_CONF_FASTQC_LIMITS_FILE_KEY =
+      "qc.conf.fastqc.limits.file";
+  /** Use exponential base groups in graph */
+  public static final String QC_CONF_FASTQC_EXPGROUP_KEY =
+      "qc.conf.fastqc.expgroup";
+  /** Format fastq type casava/Illumina  */
+  public static final String QC_CONF_FASTQC_CASAVA_KEY =
+      "qc.conf.fastqc.casava";
+  /** Option for filter fastq file if casava=true for all modules */
+  public static final String QC_CONF_FASTQC_NOFILTER_KEY =
+      "qc.conf.fastqc.nofilter";
+  
   /** Collector cluster density ratio */
   public static final String QC_CONF_CLUSTER_DENSITY_RATIO_KEY =
       "qc.conf.cluster.density.ratio";

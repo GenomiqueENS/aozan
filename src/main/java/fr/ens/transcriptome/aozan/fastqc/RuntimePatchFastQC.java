@@ -23,13 +23,13 @@
 
 package fr.ens.transcriptome.aozan.fastqc;
 
-import fr.ens.transcriptome.aozan.AozanException;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.NotFoundException;
+import fr.ens.transcriptome.aozan.AozanException;
 
 /**
  * This class redefine methods or constructors from FastQC to provide access to
@@ -50,34 +50,41 @@ public class RuntimePatchFastQC {
    *           failed.
    */
   public static void rewriteContaminantFinderMethod(final boolean asBlastToUse)
-      throws NotFoundException, CannotCompileException {
+      throws CannotCompileException {
 
-    // Get the class to modify
-    CtClass cc =
-        ClassPool.getDefault().get(
-            "uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminentFinder");
+    try {
 
-    // Check class not frozen
-    if (!cc.isFrozen()) {
-      // Retrieve the method to modify
-      CtBehavior cb = cc.getDeclaredMethod("findContaminantHit");
+      // Get the class to modify
+      CtClass cc =
+          ClassPool.getDefault().get(
+              "uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminentFinder");
 
-      // Add code at the beginning of the method
-      final String codeToAdd;
+      // Check class not frozen
+      if (cc != null && !cc.isFrozen()) {
+        // Retrieve the method to modify
+        CtBehavior cb = cc.getDeclaredMethod("findContaminantHit");
 
-      if (asBlastToUse) {
-        codeToAdd =
-            "return fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.findContaminantHit(sequence);";
+        // Add code at the beginning of the method
+        final String codeToAdd;
 
-      } else {
-        codeToAdd =
-            "if (contaminants == null) {\n contaminants = "
-                + "fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.makeContaminantList();\n}";
+        if (asBlastToUse) {
+          codeToAdd =
+              "return fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.findContaminantHit(sequence);";
+
+        } else {
+          codeToAdd =
+              "if (contaminants == null) {\n contaminants = "
+                  + "fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.makeContaminantList();\n}";
+        }
+        cb.insertBefore(codeToAdd);
+
+        // Load the class by the ClassLoader
+        cc.toClass();
+
       }
-      cb.insertBefore(codeToAdd);
+    } catch (NotFoundException e) {
+      // Nothing to do
 
-      // Load the class by the ClassLoader
-      cc.toClass();
     }
   }
 
@@ -91,24 +98,67 @@ public class RuntimePatchFastQC {
    *           failed.
    */
   public static void modifyConstructorHtmlReportArchive()
-      throws NotFoundException, CannotCompileException {
+      throws CannotCompileException {
+    try {
+      // Get the class to modify
+      CtClass cc =
+          ClassPool.getDefault().get(
+              "uk.ac.babraham.FastQC.Report.HTMLReportArchive");
 
-    // Get the class to modify
-    CtClass cc =
-        ClassPool.getDefault().get(
-            "uk.ac.babraham.FastQC.Report.HTMLReportArchive");
+      // Check class not frozen
+      if (cc != null && !cc.isFrozen()) {
 
-    // Check class not frozen
-    if (!cc.isFrozen()) {
+        // Retrieve the constructor
+        CtConstructor[] constructors = cc.getConstructors();
 
-      // Retrieve the constructor
-      CtConstructor[] constructors = cc.getConstructors();
+        // Modify constructor, it does nothing
+        constructors[0].setBody(null);
 
-      // Modify constructor, it does nothing
-      constructors[0].setBody(null);
+        // Load the class by the ClassLoader
+        cc.toClass();
+      }
+    } catch (NotFoundException e) {
+      // Nothing to do
 
-      // Load the class by the ClassLoader
-      cc.toClass();
+    }
+  }
+
+  /**
+   * Change superclass of Overrepresented Module from FastQC v0.11.2 to replace
+   * a new class, it add a link html to ncbi website in result table.
+   * @param asBlastToUse true if use blast to search source on overepresented
+   *          sequences
+   * @throws CannotCompileException thrown when bytecode transformation has
+   *           failed.
+   */
+  public static void changeSuperClassOverrepresentedModule(
+      final boolean asBlastToUse) throws CannotCompileException {
+
+    if (!asBlastToUse)
+      return;
+
+    try {
+      // Get the class to modify
+      CtClass cc =
+          ClassPool.getDefault().get(
+              "uk.ac.babraham.FastQC.Modules.OverRepresentedSeqs");
+
+      // Check class not frozen
+      if (cc != null && !cc.isFrozen()) {
+
+        CtClass newSuperClazz =
+            ClassPool.getDefault().get(
+                "fr.ens.transcriptome.aozan.fastqc.AbstractQCModuleAozan");
+        cc.setSuperclass(newSuperClazz);
+
+        // cc.writeFile();
+
+        // Load the class by the ClassLoader
+        cc.toClass();
+      }
+
+    } catch (NotFoundException e) {
+      // Nothing to do
     }
   }
 
@@ -134,10 +184,10 @@ public class RuntimePatchFastQC {
     try {
       rewriteContaminantFinderMethod(asBlastToUse);
 
-      modifyConstructorHtmlReportArchive();
+      changeSuperClassOverrepresentedModule(asBlastToUse);
 
-    } catch (NotFoundException e) {
-      throw new AozanException(e);
+      // Not necessary with FastQC v0.11.2
+      // modifyConstructorHtmlReportArchive();
 
     } catch (CannotCompileException e) {
       throw new AozanException(e);

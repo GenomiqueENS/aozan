@@ -35,18 +35,22 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.table.TableModel;
+import javax.xml.stream.XMLStreamException;
 
+import uk.ac.babraham.FastQC.Modules.AbstractQCModule;
+import uk.ac.babraham.FastQC.Modules.AdapterContent;
 import uk.ac.babraham.FastQC.Modules.BasicStats;
 import uk.ac.babraham.FastQC.Modules.KmerContent;
 import uk.ac.babraham.FastQC.Modules.NContent;
 import uk.ac.babraham.FastQC.Modules.OverRepresentedSeqs;
-import uk.ac.babraham.FastQC.Modules.PerBaseGCContent;
 import uk.ac.babraham.FastQC.Modules.PerBaseQualityScores;
 import uk.ac.babraham.FastQC.Modules.PerBaseSequenceContent;
 import uk.ac.babraham.FastQC.Modules.PerSequenceGCContent;
 import uk.ac.babraham.FastQC.Modules.PerSequenceQualityScores;
+import uk.ac.babraham.FastQC.Modules.PerTileQualityScores;
 import uk.ac.babraham.FastQC.Modules.QCModule;
 import uk.ac.babraham.FastQC.Modules.SequenceLengthDistribution;
+import uk.ac.babraham.FastQC.Report.HTMLReportArchive;
 import uk.ac.babraham.FastQC.Sequence.Sequence;
 import uk.ac.babraham.FastQC.Sequence.SequenceFactory;
 import uk.ac.babraham.FastQC.Sequence.SequenceFile;
@@ -58,7 +62,6 @@ import com.google.common.collect.Lists;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.fastqc.BadTiles;
-import fr.ens.transcriptome.aozan.fastqc.HTMLReportArchiveAozan;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
 /**
@@ -74,7 +77,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
   private final SequenceFile seqFile;
   private final boolean ignoreFilteredSequences;
-  private final List<QCModule> moduleList;
+  private final List<AbstractQCModule> moduleList;
   private final File reportDir;
 
   @Override
@@ -111,7 +114,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
       throws AozanException {
 
     final boolean ignoreFiltered = this.ignoreFilteredSequences;
-    final List<QCModule> modules = this.moduleList;
+    final List<AbstractQCModule> modules = this.moduleList;
 
     try {
 
@@ -227,16 +230,17 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
   protected void createReportFile() throws AozanException, IOException {
 
     // Set the name of the prefix of the report file
-    final String filename =
-        getFastqSample().getKeyFastqSample() + "-fastqc.zip";
+    final String filename = getFastqSample().getKeyFastqSample() + "-fastqc.html";
 
     final File reportFile = new File(reportDir, filename);
 
-    // Force unzip of the report
-    System.setProperty("fastqc.unzip", "true");
+    try {
+      new HTMLReportArchive(seqFile,
+          this.moduleList.toArray(new QCModule[] {}), reportFile);
 
-    new HTMLReportArchiveAozan(seqFile,
-        this.moduleList.toArray(new QCModule[] {}), reportFile);
+    } catch (XMLStreamException e) {
+      throw new AozanException(e);
+    }
 
     LOGGER.fine("FASTQC : "
         + getFastqSample().getKeyFastqSample() + " creation qc report html");
@@ -247,6 +251,16 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
       if (!reportFile.delete())
         LOGGER.warning("FastQC : fail delete report "
             + reportFile.getAbsolutePath());
+    }
+
+    // Remove zip file
+    final File reportZip =
+        new File(reportDir, filename.replaceAll("\\.html$", ".zip"));
+    if (reportZip.exists()) {
+
+      if (!reportZip.delete())
+        LOGGER.warning("FastQC : fail delete report "
+            + reportZip.getAbsolutePath());
     }
   }
 
@@ -269,7 +283,6 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
     this.reportDir = reportDir;
 
     try {
-
       this.seqFile =
           SequenceFactory.getSequenceFile(fastqSample.getFastqFiles().toArray(
               new File[fastqSample.getFastqFiles().size()]));
@@ -286,11 +299,10 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
     this.moduleList =
         Lists.newArrayList(new BasicStats(), new PerBaseQualityScores(),
-            new PerSequenceQualityScores(), new PerBaseSequenceContent(),
-            new PerBaseGCContent(), new PerSequenceGCContent(), new NContent(),
-            new SequenceLengthDistribution(), os.duplicationLevelModule(), os,
+            new PerTileQualityScores(), new PerSequenceQualityScores(),
+            new PerBaseSequenceContent(), new PerSequenceGCContent(),
+            new NContent(), new SequenceLengthDistribution(),
+            os.duplicationLevelModule(), os, new AdapterContent(),
             new KmerContent(), new BadTiles());
-
   }
-
 }

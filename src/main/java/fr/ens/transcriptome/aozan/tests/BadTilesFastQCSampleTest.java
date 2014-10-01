@@ -21,25 +21,25 @@
  *
  */
 
-package fr.ens.transcriptome.aozan.tests.sample;
+package fr.ens.transcriptome.aozan.tests;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import uk.ac.babraham.FastQC.Modules.PerBaseGCContent;
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.tests.AozanTest;
+import fr.ens.transcriptome.aozan.fastqc.BadTiles;
+import fr.ens.transcriptome.aozan.tests.sample.AbstractFastQCSampleTest;
 
 /**
- * This class define a sample test for FastQC per base GC content module.
+ * This class define a sample test for FastQC sequence length distribution
+ * module.
  * @since 0.8
  * @author Laurent Jourdren
  */
-public class PerBaseGCContentFastQCSampleTest extends AbstractFastQCSampleTest {
+public class BadTilesFastQCSampleTest extends AbstractFastQCSampleTest {
 
-  private static final String FASTQC_MODULE_NAME = new PerBaseGCContent()
-      .name();
+  private static final String FASTQC_MODULE_NAME = new BadTiles().name();
 
   @Override
   public List<AozanTest> configure(final Map<String, String> properties)
@@ -56,7 +56,7 @@ public class PerBaseGCContentFastQCSampleTest extends AbstractFastQCSampleTest {
   @Override
   protected int getHTMLAnchorIndex() {
 
-    return 4;
+    return 12;
   }
 
   //
@@ -66,9 +66,9 @@ public class PerBaseGCContentFastQCSampleTest extends AbstractFastQCSampleTest {
   /**
    * Public constructor.
    */
-  public PerBaseGCContentFastQCSampleTest() {
+  public BadTilesFastQCSampleTest() {
 
-    super("perbasegccontent", "per base GC content", "Per base GC content");
+    super("badtiles", "bad tiles", "Bad tiles");
   }
 
 }

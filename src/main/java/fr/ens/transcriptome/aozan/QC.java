@@ -44,6 +44,7 @@ import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.collectors.CollectorRegistry;
 import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
+import fr.ens.transcriptome.aozan.fastqc.RuntimePatchFastQC;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.AozanTestRegistry;
 import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
@@ -512,6 +513,77 @@ public class QC {
   }
 
   /**
+   * Initialize FastQC v0.11.X from configuration Aozan.
+   * @param properties Aozan properties
+   * @throws AozanException if an error occurs when patching FastQC classes.
+   */
+  private void initFastQC(Map<String, String> properties) throws AozanException {
+
+    // Define parameters of FastQC
+    System.setProperty("java.awt.headless", "true");
+    System.setProperty("fastqc.unzip", "true");
+
+    // Set the number of threads of FastQC at one
+    System.setProperty("fastqc.threads", "1");
+
+    // Contaminant file
+    addSystemProperty(properties, Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY,
+        "fastqc.contaminant_file");
+    // Bug in FastQC code, error in typo key property in configuration class
+    addSystemProperty(properties, Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY,
+        "fastqc.contmainant_file");
+
+    // Adapter file
+    addSystemProperty(properties, Settings.QC_CONF_FASTQC_ADAPTER_FILE_KEY,
+        "fastqc.adapter_file");
+
+    // Limits file
+    addSystemProperty(properties, Settings.QC_CONF_FASTQC_LIMITS_FILE_KEY,
+        "fastqc.limits_file");
+
+    // Kmer Size
+    addSystemProperty(properties, Settings.QC_CONF_FASTQC_KMER_SIZE_KEY,
+        "fastqc.kmer_size");
+
+    // Set fastQC nogroup
+    addSystemProperty(properties, Settings.QC_CONF_FASTQC_NOGROUP_KEY,
+        "fastqc.nogroup");
+
+    // Set fastQC expgroup
+    addSystemProperty(properties, Settings.QC_CONF_FASTQC_EXPGROUP_KEY,
+        "fastqc.expgroup");
+
+    // Set fastQC format fastq
+    addSystemProperty(properties, Settings.QC_CONF_FASTQC_CASAVA_KEY,
+        "fastqc.casava");
+
+    // Set fastQC nofilter default false, if casava=true, filter fastq file
+    addSystemProperty(properties, Settings.QC_CONF_FASTQC_NOFILTER_KEY,
+        "fastqc.nofilter");
+
+    // Patch FastQC classes
+    RuntimePatchFastQC.runPatchFastQC(Boolean.valueOf(properties
+        .get(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY)));
+  }
+
+  /**
+   * Add a system properties from Aozan properties.
+   * @param properties Aozan properties
+   * @param keyAozan key in Aozan properties
+   * @param keySystem key in System properties
+   */
+  private static void addSystemProperty(final Map<String, String> properties,
+      final String keyAozan, final String keySystem) {
+
+    final String value = properties.get(keyAozan);
+
+    if (value != null && value.trim().length() > 0) {
+      System.setProperty(keySystem, value);
+    }
+
+  }
+
+  /**
    * Transform a list of collector names in a set collectors objects.
    * @param collectorNames list of collectors names
    * @return a set of collectors objects
@@ -605,6 +677,8 @@ public class QC {
             ? new File(System.getProperty("java.io.tmpdir")) : tmpDir;
 
     initGlobalConf(properties);
+
+    initFastQC(properties);
     init(properties);
   }
 }

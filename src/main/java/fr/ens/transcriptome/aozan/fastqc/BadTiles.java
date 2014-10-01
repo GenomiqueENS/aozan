@@ -40,8 +40,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
-import uk.ac.babraham.FastQC.Modules.QCModule;
+import uk.ac.babraham.FastQC.Modules.AbstractQCModule;
 import uk.ac.babraham.FastQC.Report.HTMLReportArchive;
 import uk.ac.babraham.FastQC.Sequence.Sequence;
 import uk.ac.babraham.FastQC.Sequence.QualityEncoding.PhredEncoding;
@@ -54,7 +56,7 @@ import fr.ens.transcriptome.eoulsan.bio.IlluminaReadId;
  * @since 0.8
  * @author Laurent Jourdren
  */
-public class BadTiles implements QCModule {
+public class BadTiles extends AbstractQCModule {
 
   private static final int LANE_OFFSET = 10000;
   private static final double MIN_MEDIAN_SCORE = 20.0;
@@ -338,45 +340,25 @@ public class BadTiles implements QCModule {
   }
 
   @Override
-  public void makeReport(HTMLReportArchive report) throws IOException {
+  public void makeReport(HTMLReportArchive report) throws IOException,
+      XMLStreamException {
 
     if (!calculated)
       computeResults();
 
     ResultsTable table = new ResultsTable();
 
-    StringBuffer b = report.htmlDocument();
-    StringBuffer d = report.dataDocument();
-
-    b.append("<table>\n");
-    // Do the headers
-    b.append("<tr>\n");
-    d.append("#");
-    for (int c = 0; c < table.getColumnCount(); c++) {
-      b.append("<th>");
-      b.append(table.getColumnName(c));
-      d.append(table.getColumnName(c));
-      b.append("</th>\n");
-      d.append("\t");
-    }
-    b.append("</tr>\n");
-    d.append("\n");
-
-    // Do the rows
-    for (int r = 0; r < table.getRowCount(); r++) {
-      b.append("<tr>\n");
-      for (int c = 0; c < table.getColumnCount(); c++) {
-        b.append("<td>");
-        b.append(table.getValueAt(r, c));
-        d.append(table.getValueAt(r, c));
-        b.append("</td>\n");
-        d.append("\t");
-      }
-      b.append("</tr>\n");
-      d.append("\n");
+    // Check bad tiles found
+    if (this.badTiles.size() == 0) {
+      XMLStreamWriter w = report.xhtmlStream();
+      w.writeStartElement("p");
+      w.writeCharacters("No bad tiles");
+      w.writeEndElement();
     }
 
-    b.append("</table>\n");
+    else {
+      super.writeTable(report, table);
+    }
 
   }
 
@@ -538,6 +520,11 @@ public class BadTiles implements QCModule {
     Collections.sort(this.badTiles);
 
     this.calculated = true;
+  }
+
+  @Override
+  public boolean ignoreInReport() {
+    return false;
   }
 
 }

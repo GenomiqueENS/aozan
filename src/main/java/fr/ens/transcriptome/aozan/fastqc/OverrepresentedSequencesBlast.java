@@ -81,6 +81,8 @@ public class OverrepresentedSequencesBlast {
       "/sequences_nohit_with_blastn.txt";
   private static final String PREFIX_FILENAME_DATABASE = "/nt";
 
+  private static final boolean BLAST_RESULT_HTML_TYPE = true;
+
   // Tag configuration general of blast
   private static final String tag_queryLength = "Iteration_query-len";
   private static final String tag_blastVersion = "BlastOutput_version";
@@ -497,7 +499,8 @@ public class OverrepresentedSequencesBlast {
       return null;
 
     // Parse the first hit to build result
-    return new BlastResultHit(hits.get(0), countHits, queryLength, sequence);
+    return new BlastResultHit(hits.get(0), countHits, queryLength, sequence,
+        BLAST_RESULT_HTML_TYPE);
 
   }
 

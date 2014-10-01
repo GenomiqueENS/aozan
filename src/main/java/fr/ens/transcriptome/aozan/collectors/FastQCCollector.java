@@ -30,7 +30,6 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.fastqc.OverrepresentedSequencesBlast;
-import fr.ens.transcriptome.aozan.fastqc.RuntimePatchFastQC;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
 /**
@@ -48,7 +47,6 @@ public class FastQCCollector extends AbstractFastqCollector {
   private int numberThreads = Runtime.getRuntime().availableProcessors();
 
   private final boolean ignoreFilteredSequences = false;
-  private boolean isStepBlastEnabled = false;
 
   @Override
   public String getName() {
@@ -60,33 +58,6 @@ public class FastQCCollector extends AbstractFastqCollector {
   public void configure(final Properties properties) {
 
     super.configure(properties);
-
-    // Define parameters of FastQC
-    System.setProperty("java.awt.headless", "true");
-    System.setProperty("fastqc.unzip", "true");
-
-    // Check contaminant file specify in configuration Aozan for module
-    // OverRepresented
-    if (properties.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY) != null
-        && properties.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY)
-            .length() > 0) {
-
-      System.setProperty("fastqc.contaminant_file",
-          properties.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY));
-    }
-
-    if (properties.getProperty(Settings.QC_CONF_FASTQC_KMER_SIZE_KEY) != null
-        && properties.getProperty(Settings.QC_CONF_FASTQC_KMER_SIZE_KEY)
-            .length() > 0)
-
-      System.setProperty("fastqc.kmer_size",
-          properties.getProperty(Settings.QC_CONF_FASTQC_KMER_SIZE_KEY));
-
-    if (properties.getProperty(Settings.QC_CONF_FASTQC_NOGROUP_KEY) != null
-        && properties.getProperty(Settings.QC_CONF_FASTQC_NOGROUP_KEY).length() > 0)
-
-      System.setProperty("fastqc.nogroup",
-          properties.getProperty(Settings.QC_CONF_FASTQC_NOGROUP_KEY));
 
     // Set the number of threads
     if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
@@ -104,17 +75,11 @@ public class FastQCCollector extends AbstractFastqCollector {
 
     // Check if step blast needed and configure
     OverrepresentedSequencesBlast.getInstance().configure(properties);
-    this.isStepBlastEnabled =
-        OverrepresentedSequencesBlast.getInstance().isStepBlastEnabled();
 
   }
 
   @Override
   public void collect(final RunData data) throws AozanException {
-
-    // Rewriting code of the method ContaminantFinder for read the contaminant
-    // list in fastqc-0.10.1 jar
-    RuntimePatchFastQC.runPatchFastQC(this.isStepBlastEnabled);
 
     super.collect(data);
   }
