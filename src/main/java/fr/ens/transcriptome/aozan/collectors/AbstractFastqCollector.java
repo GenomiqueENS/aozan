@@ -38,7 +38,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -58,10 +57,6 @@ abstract public class AbstractFastqCollector implements Collector {
 
   /** Logger */
   private static final Logger LOGGER = Common.getLogger();
-
-  public static final String RUN_MODE_KEY = "run.info.run.mode";
-  public static final String READ_COUNT_KEY = "run.info.read.count";
-  public static final String LANE_COUNT_KEY = "run.info.flow.cell.lane.count";
 
   private FastqStorage fastqStorage;
   private String casavaOutputPath;
@@ -211,7 +206,7 @@ abstract public class AbstractFastqCollector implements Collector {
 
     createListFastqSamples(data);
 
-    final boolean isRunPE = data.get(RUN_MODE_KEY).toUpperCase().equals("PE");
+    final boolean isRunPE = data.getRunMode().toUpperCase().equals("PE");
 
     RunData resultPart = null;
     if (this.getThreadsNumber() > 1) {
@@ -325,39 +320,34 @@ abstract public class AbstractFastqCollector implements Collector {
     if (!fastqSamples.isEmpty())
       return;
 
-    final int laneCount = data.getInt(LANE_COUNT_KEY);
-    final int readCount = data.getInt(READ_COUNT_KEY);
+    final int laneCount = data.getLaneCount();
+    final int readCount = data.getReadCount();
 
     int readIndexedCount = 0;
 
     for (int read = 1; read <= readCount; read++) {
 
-      if (data.getBoolean("run.info.read" + read + ".indexed"))
+      if (data.isReadIndexed(read))
         continue;
 
       readIndexedCount++;
 
       for (int lane = 1; lane <= laneCount; lane++) {
 
-        final List<String> sampleNames =
-            Lists.newArrayList(Splitter.on(',').split(
-                data.get("design.lane" + lane + ".samples.names")));
+        final List<String> sampleNames = data.getSamplesNameListInLane(lane);
 
         if (isProcessStandardSamples())
           for (String sampleName : sampleNames) {
 
             // Get the sample index
-            String index =
-                data.get("design.lane" + lane + "." + sampleName + ".index");
+            String index = data.getIndexSample(lane, sampleName);
 
             // Get project name
-            String projectName =
-                data.get("design.lane"
-                    + lane + "." + sampleName + ".sample.project");
+            String projectName = data.getProjectSample(lane, sampleName);
+
             // Get description on sample
             String descriptionSample =
-                data.get("design.lane"
-                    + lane + "." + sampleName + ".description");
+                data.getSampleDescription(lane, sampleName);
 
             fastqSamples.add(new FastqSample(this.casavaOutputPath,
                 readIndexedCount, lane, sampleName, projectName,

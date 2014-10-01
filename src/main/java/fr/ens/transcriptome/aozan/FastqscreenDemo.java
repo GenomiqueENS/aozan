@@ -128,7 +128,7 @@ public class FastqscreenDemo {
         // Validation (mm10) - PE150
         runId = "131015_SNL110_0088_AH13M0ADXX";
       } else {
-        runId = "140811_SNL110_0127_AH9AP9ADXX";
+        runId = "140818_SNL110_0129_Ah9bvmadxx";
       }
 
       // date = new SimpleDateFormat("yyMMdd").format(new Date());

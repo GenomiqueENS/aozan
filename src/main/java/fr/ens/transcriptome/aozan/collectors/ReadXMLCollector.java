@@ -71,7 +71,7 @@ public class ReadXMLCollector implements Collector {
   public void collect(final RunData data) throws AozanException {
 
     // Collect read info
-    final int readCount = data.getInt("run.info.read.count");
+    final int readCount = data.getReadCount();
 
     for (int i = 1; i <= readCount; i++) {
       String readInfoFilePath =

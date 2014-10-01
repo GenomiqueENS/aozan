@@ -370,7 +370,7 @@ public class UndeterminedIndexesProcessThreads extends
 
         elem.setTextContent(text);
         elemRoot.appendChild(elem);
-        
+
         n++;
       }
 
@@ -1014,8 +1014,7 @@ public class UndeterminedIndexesProcessThreads extends
     for (String sampleName : this.data.getSamplesNameListInLane(this.lane)) {
 
       // Get the sample index
-      String index =
-          data.get("design.lane" + this.lane + "." + sampleName + ".index");
+      String index = this.data.getIndexSample(this.lane, sampleName);
 
       result.put(sampleName, index);
     }

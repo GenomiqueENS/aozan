@@ -43,9 +43,9 @@ public class GlobalStatsCollector implements Collector {
   @Override
   public void collect(final RunData data) throws AozanException {
 
-    final int laneCount = data.getInt("run.info.flow.cell.lane.count");
-    final int readCount = data.getInt("run.info.read.count");
-    final int tiles = data.getInt("read1.lane1.tile.count");
+    final int laneCount = data.getLaneCount();
+    final int readCount = data.getReadCount();
+    final int tiles = data.getTilesCount();
 
     final long rawClusterSum;
     final long pfClusterSum;
@@ -62,21 +62,19 @@ public class GlobalStatsCollector implements Collector {
     for (int lane = 1; lane <= laneCount; lane++) {
 
       // Cluster count per tile
-      rawStats.addValues(data.getInt("read1.lane" + lane + ".clusters.raw"));
-      pfStats.addValues(data.getInt("read1.lane" + lane + ".clusters.pf"));
+      final double alignPhixPrc = data.getReadPrcAlign(lane, 1) / 100.0;
 
-      final double alignPhixPrc =
-          data.getDouble("read1.lane" + lane + ".prc.align") / 100.0;
-      final int rawClusterCount =
-          data.getInt("read1.lane" + lane + ".clusters.raw");
+      final long rawClusterCount = data.getReadRawClusterCount(lane, 1);
+
+      rawStats.addValues(rawClusterCount);
+      pfStats.addValues(data.getReadPFClusterCount(lane, 1));
       phixStats
           .addValues(new Double(rawClusterCount * alignPhixPrc).intValue());
 
       for (int read = 1; read <= readCount; read++) {
 
-        final boolean indexedRead =
-            data.getBoolean("run.info.read" + read + ".indexed");
-        final int cycles = data.getInt("run.info.read" + read + ".cycles");
+        final boolean indexedRead = data.isReadIndexed(read);
+        final int cycles = data.getReadCyclesCount(read);
 
         if (lane == 1) {
 

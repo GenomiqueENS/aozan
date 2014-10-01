@@ -115,8 +115,7 @@ public class RunInfoCollector implements Collector {
       // Add new entry in data : run mode
       boolean runPE =
           runInfo.getReads().size() > 1
-              && !data.getBoolean("run.info.read"
-                  + runInfo.getReads().size() + ".indexed");
+              && !data.isReadIndexed(runInfo.getReads().size());
       data.put(prefix + ".run.mode", runPE ? "PE" : "SR");
 
     } catch (IOException e) {

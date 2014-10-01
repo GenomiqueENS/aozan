@@ -95,7 +95,7 @@ public class PhasingCollector implements Collector {
               + "/Phasing");
 
       // Get lane count
-      final int laneCount = data.getInt("run.info.flow.cell.lane.count");
+      final int laneCount = data.getLaneCount();
 
       for (Map.Entry<Integer, Integer> entry : getCyclesPhasing(data)
           .entrySet()) {
@@ -159,12 +159,12 @@ public class PhasingCollector implements Collector {
 
     final Map<Integer, Integer> result = Maps.newLinkedHashMap();
 
-    final int readCount = data.getInt("run.info.read.count");
+    final int readCount = data.getReadCount();
 
     int cyclesCount = 0;
     for (int read = 1; read <= readCount; read++) {
       result.put(read, cyclesCount + 2);
-      cyclesCount += data.getInt("run.info.read" + read + ".cycles");
+      cyclesCount += data.getReadCyclesCount(read);
     }
 
     return result;

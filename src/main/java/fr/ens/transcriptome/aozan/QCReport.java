@@ -117,8 +117,8 @@ public class QCReport {
   private void doLanesTests(final Element parentElement) {
 
     final Document doc = this.doc;
-    final int readCount = this.data.getInt("run.info.read.count");
-    final int laneCount = this.data.getInt("run.info.flow.cell.lane.count");
+    final int readCount = this.data.getReadCount();
+    final int laneCount = this.data.getLaneCount();
 
     final Element root = doc.createElement("ReadsReport");
     parentElement.appendChild(root);
@@ -140,9 +140,8 @@ public class QCReport {
 
     for (int read = 1; read <= readCount; read++) {
 
-      final int cycles = this.data.getInt("run.info.read" + read + ".cycles");
-      final boolean indexedRead =
-          data.getBoolean("run.info.read" + read + ".indexed");
+      final int cycles = this.data.getReadCyclesCount(read);
+      final boolean indexedRead = this.data.isReadIndexed(read);
 
       final Element readElement = doc.createElement("Read");
       readElement.setAttribute("number", Integer.toString(read));
@@ -206,8 +205,8 @@ public class QCReport {
   private void doSamplesTests(final Element parentElement) {
 
     final Document doc = this.doc;
-    final int readCount = this.data.getInt("run.info.read.count");
-    final int laneCount = this.data.getInt("run.info.flow.cell.lane.count");
+    final int readCount = this.data.getReadCount();
+    final int laneCount = this.data.getLaneCount();
 
     final Element root = doc.createElement("SamplesReport");
     parentElement.appendChild(root);
@@ -230,7 +229,7 @@ public class QCReport {
 
     for (int read = 1; read <= readCount; read++) {
 
-      if (this.data.getBoolean("run.info.read" + read + ".indexed"))
+      if (this.data.isReadIndexed(read))
         continue;
 
       readSample++;
@@ -243,29 +242,24 @@ public class QCReport {
       for (int lane = 1; lane <= laneCount; lane++) {
 
         final List<String> sampleNames =
-            Lists.newArrayList(Splitter.on(',').split(
-                data.get("design.lane" + lane + ".samples.names")));
+            this.data.getSamplesNameListInLane(lane);
 
         final String firstIndex =
-            data.get("design.lane" + lane + "." + sampleNames.get(0) + ".index");
+            this.data.getIndexSample(lane, sampleNames.get(0));
         final boolean noIndex =
             sampleNames.size() == 1 && "".equals(firstIndex);
 
         for (String sampleName : sampleNames) {
 
           // Get the sample index
-          final String index =
-              this.data.get("design.lane" + lane + "." + sampleName + ".index");
+          final String index = this.data.getIndexSample(lane, sampleName);
 
           // Get the sample description
-          final String desc =
-              this.data.get("design.lane"
-                  + lane + "." + sampleName + ".description");
+          final String desc = this.data.getSampleDescription(lane, sampleName);
 
           // Get the sample project
           final String projectName =
-              this.data.get("design.lane"
-                  + lane + "." + sampleName + ".sample.project");
+              this.data.getProjectSample(lane, sampleName);
 
           addSample(readElement, read, readSample, lane, sampleName, desc,
               projectName, noIndex ? "NoIndex" : index);
