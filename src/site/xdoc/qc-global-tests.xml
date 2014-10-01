@@ -45,14 +45,67 @@
        <h4>Configuration global quality tests</h4>
        <table>
          <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
-         <tr><td>qc.test.globalrawclusters.enable</td><td>boolean</td><td>False</td><td>Enable global rawcluster test</td></tr>
-         <tr><td>qc.test.globalrawclusters.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global rawcluster</td></tr>
-         <tr><td>qc.test.globalpfclusters.enable</td><td>boolean</td><td>False</td><td>Enable global pfcluster test</td></tr>
-         <tr><td>qc.test.globalpfclusters.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global pfclusters</td></tr>
-         <tr><td>qc.test.globalpfclusterspercent.enable</td><td>boolean</td><td>False</td><td>Enable global pfclusterspercent test</td></tr>
-         <tr><td>qc.test.globalpfclusterspercent.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of global pfclusterspercent</td></tr>
+
          <tr><td>qc.test.globalbasecount.enable</td><td>boolean</td><td>False</td><td>Enable global base count test</td></tr>
          <tr><td>qc.test.nonindexedglobalbasecount.enable</td><td>boolean</td><td>False</td><td>Enable global non indexed global base count test</td></tr>
+         
+         <tr><td>qc.test.globalrawclusterscount.enable</td><td>boolean</td><td>False</td><td>Enable global rawcluster test</td></tr>
+         <tr><td>qc.test.globalrawclusterscount.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global rawcluster</td></tr>
+
+         <tr><td>qc.test.globalrawclustersmean.enable</td><td>boolean</td><td>False</td><td>Enable global rawcluster mean test</td></tr>
+         <tr><td>qc.test.globalrawclustersmean.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global rawclustermean</td></tr>
+
+		<tr><td>qc.test.globalrawclustersmediane.enable</td><td>boolean</td><td>False</td><td>Enable global rawcluster mediane test</td></tr>
+		<tr><td>qc.test.globalrawclustersmediane.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global rawcluster mediane</td></tr>
+		
+		<tr><td>qc.test.globalrawclusterssd.enable</td><td>boolean</td><td>False</td><td>Enable global rawcluster standard deviation test</td></tr>
+		<tr><td>qc.test.globalrawclusterssd.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global rawcluster standard deviation</td></tr>
+		
+        <tr><td>qc.test.globalpfclusterscount.enable</td><td>boolean</td><td>False</td><td>Enable global pfcluster test</td></tr>
+        <tr><td>qc.test.globalpfclusterscount.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global pfclusters</td></tr>
+
+		<tr><td>qc.test.globalpfclustersmean.enable</td><td>boolean</td><td>False</td><td>Enable global pfcluster mean test</td></tr>
+		<tr><td>qc.test.globalpfclustersmean.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global pfcluster mean</td></tr>
+		
+		<tr><td>qc.test.globalpfclustersmediane.enable</td><td>boolean</td><td>False</td><td>Enable global pfcluster mediane test</td></tr>
+		<tr><td>qc.test.globalpfclustersmediane.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global pfcluster mediane</td></tr>
+		
+		<tr><td>qc.test.globalpfclusterssd.enable</td><td>boolean</td><td>False</td><td>Enable global pf cluster standard deviation test</td></tr>
+		<tr><td>qc.test.globalpfclusterssd.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global pfcluster standard deviation</td></tr>
+		
+		<tr><td>qc.test.globalprcpfclusters.enable</td><td>boolean</td><td>False</td><td>Enable global pfclusterspercent test</td></tr>
+        <tr><td>qc.test.globalprcpfclusters.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of global pfclusterspercent</td></tr>
+
+		<tr><td>qc.test.globalpercentalignal.enable</td><td>boolean</td><td>False</td><td>Enable global percent align on PhiX test</td></tr>
+		<tr><td>qc.test.globalpercentalignal.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global percent align on PhiX</td></tr>
+		
+		<tr><td>qc.test.globalrawclustersphix.enable</td><td>boolean</td><td>False</td><td>Enable global rawcluster PhiX test</td></tr>
+		<tr><td>qc.test.globalrawclustersphix.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global rawcluster PhiX</td></tr>
+		
+		<tr><td>qc.test.globalrawclustersphixmean.enable</td><td>boolean</td><td>False</td><td>Enable global rawcluster PhiX mean test</td></tr>
+		<tr><td>qc.test.globalrawclustersphixmean.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global rawcluster PhiX mean</td></tr>
+		
+		<tr><td>qc.test.globalrawclustersphixmediane.enable</td><td>boolean</td><td>False</td><td>Enable global rawcluster PhiX mediane test</td></tr>
+		<tr><td>qc.test.globalrawclustersphixmediane.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global rawcluster PhiX mediane</td></tr>
+		
+		<tr><td>qc.test.globalrawclustersphixsd.enable</td><td>boolean</td><td>False</td><td>Enable global rawcluster PhiX standard deviation test</td></tr>
+		<tr><td>qc.test.globalrawclustersphixsd.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global rawcluster PhiX standard deviation</td></tr>
+		
+		<tr><td>qc.test.globalprcundeterminedcluster.enable</td><td>boolean</td><td>False</td><td>Enable global percent undetermined raw cluster test</td></tr>
+		<tr><td>qc.test.globalprcundeterminedcluster.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global percent undetermined rawcluster</td></tr>
+		
+		<tr><td>qc.test.globalcyclescount.enable</td><td>boolean</td><td>False</td><td>Enable global cycles count test</td></tr>
+		<tr><td>qc.test.globalcyclescount.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global cycles count</td></tr>
+		
+		<tr><td>qc.test.globallanescount.enable</td><td>boolean</td><td>False</td><td>Enable global lane count test</td></tr>
+		<tr><td>qc.test.globallanescount.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global lane count</td></tr>
+		
+		<tr><td>qc.test.globalprojectscount.enable</td><td>boolean</td><td>False</td><td>Enable global projects count test</td></tr>
+		<tr><td>qc.test.globalprojectscount.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global projects count</td></tr>
+		
+		<tr><td>qc.test.globalsamplescount.enable</td><td>boolean</td><td>False</td><td>Enable global samples count test</td></tr>
+		<tr><td>qc.test.globalsamplescount.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global samples count</td></tr>
+		
        </table>
 
        <p>An example of table built with lanes global tests.</p>
