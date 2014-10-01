@@ -26,9 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
@@ -43,7 +41,7 @@ import fr.ens.transcriptome.aozan.util.ScoreInterval;
  * @since 1.3
  * @author Sandrine Perrin
  */
-public class RawClusterPhixLaneTest extends AbstractLaneTest {
+public class RawClustersPhixLaneTest extends AbstractLaneTest {
 
   private final ScoreInterval interval = new ScoreInterval();
 
@@ -60,28 +58,23 @@ public class RawClusterPhixLaneTest extends AbstractLaneTest {
 
     try {
 
-      final double alignPhixPrc =
-          data.getDouble("read" + read + ".lane" + lane + ".prc.align") / 100.0;
+      final double alignPhixPrc = data.getReadPrcAlign(lane, read) / 100.0;
 
       // Tiles count in run
-      final int tiles =
-          data.getInt("read" + read + ".lane" + lane + ".tile.count");
+      final int tiles = data.getTilesCount();
 
-      final int rawClusterCount =
-          data.getInt("read" + read + ".lane" + lane + ".clusters.raw") * tiles;
+      final long rawClusterCount =
+          data.getReadRawClusterCount(lane, read) * tiles;
 
       // Compute raw cluster corresponding to percent Phix
       final int rawClusterPhix =
           new Double(rawClusterCount * alignPhixPrc).intValue();
 
-      final List<String> sampleNames =
-          Lists.newArrayList(Splitter.on(',').split(
-              data.get("design.lane" + lane + ".samples.names")));
+      final List<String> sampleNames = data.getSamplesNameListInLane(lane);
 
       final boolean control =
           sampleNames.size() == 1
-              && data.getBoolean("design.lane"
-                  + lane + "." + sampleNames.get(0) + ".control");
+              && data.isLaneControl(lane, sampleNames.get(0));
 
       // No score for indexed read
       if (indexedRead || !control)
@@ -119,7 +112,7 @@ public class RawClusterPhixLaneTest extends AbstractLaneTest {
   /**
    * Public constructor.
    */
-  public RawClusterPhixLaneTest() {
+  public RawClustersPhixLaneTest() {
 
     super("rawclusterphix", "", "PhiX raw cluster Est.");
   }
