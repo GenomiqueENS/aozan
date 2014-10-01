@@ -74,11 +74,9 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
 
     final int score = errorRaise ? 0 : (warningRaise ? 4 : 9);
 
-    final String projectName =
-        data.get("design.lane" + lane + "." + sampleName + ".sample.project");
+    final String projectName = data.getProjectSample(lane, sampleName);
 
-    final String index =
-        data.get("design.lane" + lane + "." + sampleName + ".index");
+    final String index = data.getIndexSample(lane, sampleName);
 
     final String dirname =
         String.format("%s_%s_L%03d_R%d_001-fastqc", sampleName,

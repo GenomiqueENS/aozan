@@ -57,11 +57,8 @@ public class PFClustersPercentLaneTest extends AbstractLaneTest {
 
     try {
 
-      final long clusterRaw =
-          data.getLong("read" + read + ".lane" + lane + ".clusters.raw");
-
-      final long clusterPF =
-          data.getLong("read" + read + ".lane" + lane + ".clusters.pf");
+      final long clusterRaw = data.getReadRawClusterCount(lane, read);
+      final long clusterPF = data.getReadPFClusterCount(lane, read);
 
       final double percent = (double) clusterPF / (double) clusterRaw;
 

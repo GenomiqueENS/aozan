@@ -57,17 +57,15 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
     try {
 
       final String keyPrefix = "read" + read + ".lane" + lane;
-      final double phasing = data.getDouble(keyPrefix + ".phasing") / 100.0 ;
-      final double prephasing = data.getDouble(keyPrefix + ".prephasing") / 100.0;
+      final double phasing = data.getDouble(keyPrefix + ".phasing") / 100.0;
+      final double prephasing =
+          data.getDouble(keyPrefix + ".prephasing") / 100.0;
 
-      final List<String> sampleNames =
-          Lists.newArrayList(Splitter.on(',').split(
-              data.get("design.lane" + lane + ".samples.names")));
+      final List<String> sampleNames = data.getSamplesNameListInLane(lane);
 
       final boolean control =
           sampleNames.size() == 1
-              && data.getBoolean("design.lane"
-                  + lane + "." + sampleNames.get(0) + ".control");
+              && data.isLaneControl(lane, sampleNames.get(0));
 
       final String message =
           String.format("%,.3f%% / %,.3f%%", phasing * 100.0,

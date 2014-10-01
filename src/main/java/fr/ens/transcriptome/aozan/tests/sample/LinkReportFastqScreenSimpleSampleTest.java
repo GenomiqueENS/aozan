@@ -52,15 +52,15 @@ public class LinkReportFastqScreenSimpleSampleTest extends AbstractSampleTest {
       final String projectName = "Undetermined_indices";
 
       final String filename =
-          String.format("lane%s_Undetermined_L%03d_R%d_001-fastqscreen.html", lane, lane,
-              readSample);
+          String.format("lane%s_Undetermined_L%03d_R%d_001-fastqscreen.html",
+              lane, lane, readSample);
 
       final String url = projectName + "/" + filename;
 
       // Set score test at -1
       return new TestResult(-1, url, "url");
     }
-    
+
     // Check fastqscreen launch for sample
     final String key =
         "fastqscreen.lane"
@@ -71,10 +71,9 @@ public class LinkReportFastqScreenSimpleSampleTest extends AbstractSampleTest {
       return new TestResult("NA");
 
     // Get HTML report URL
-    final String projectName =
-        data.get("design.lane" + lane + "." + sampleName + ".sample.project");
-    final String index =
-        data.get("design.lane" + lane + "." + sampleName + ".index");
+    final String projectName = data.getProjectSample(lane, sampleName);
+    final String index = data.getIndexSample(lane, sampleName);
+
     final String filename =
         String.format("%s_%s_L%03d_R1_001-fastqscreen.html", sampleName,
             "".equals(index) ? "NoIndex" : index, lane);

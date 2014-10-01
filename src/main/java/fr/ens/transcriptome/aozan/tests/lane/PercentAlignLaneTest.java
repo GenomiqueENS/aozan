@@ -61,17 +61,13 @@ public class PercentAlignLaneTest extends AbstractLaneTest {
 
     try {
 
-      final double alignPhix =
-          data.getDouble("read" + read + ".lane" + lane + ".prc.align") / 100.0;
+      final double alignPhix = data.getReadPrcAlign(lane, read) / 100.0;
 
-      final List<String> sampleNames =
-          Lists.newArrayList(Splitter.on(',').split(
-              data.get("design.lane" + lane + ".samples.names")));
+      final List<String> sampleNames = data.getSamplesNameListInLane(lane);
 
       final boolean control =
           sampleNames.size() == 1
-              && data.getBoolean("design.lane"
-                  + lane + "." + sampleNames.get(0) + ".control");
+              && data.isLaneControl(lane, sampleNames.get(0));
 
       // No score for indexed read
       if (indexedRead || !control)

@@ -75,8 +75,7 @@ public class RecoverableClusterLinkReportSampleTest extends AbstractSampleTest {
       return new TestResult("NA");
 
     // Get HTML report URL
-    final String projectName =
-        data.get("design.lane" + lane + "." + sampleName + ".sample.project");
+    final String projectName = data.getProjectSample(lane, sampleName);
 
     final String filename =
         String.format("%s_lane%s-potentialindices.html", sampleName, lane);
