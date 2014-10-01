@@ -66,7 +66,7 @@ th {
 	font-size: 100%;
 }
 
-tr:hover {
+#data tr:hover {
 	z-index:2;
 	box-shadow:0 0
 	12px rgba(0, 0, 0, 1);
@@ -80,14 +80,14 @@ tr.demultiplexing{
 	background:#FFFFA3;
 	font-style : bold;
 }
-td:first-child{
+#data td:first-child{
 	text-align:center;
 	font-style : bold;
 	background-color:#D7A1A3;
 	font-family:Courier New;
 	font-size:120%;
 }
-td:last-child{
+#data td:last-child{
 	width: 200px;
 	text-align: left;
 	font-style : italic;
@@ -286,7 +286,6 @@ a.linkFilterActivate:link, a.linkFilterUnactivate:link{
 							src="http://www.transcriptome.ens.fr/aozan/images/logo_aozan_qc.png"
 							alt="Aozan" />
 						Clusters recoverable in <xsl:value-of select="/RecoveryClusterReport/sampleName" />
-						<br/> 
 						<xsl:if test="/RecoveryClusterReport/projectName">
 							- project <xsl:value-of select="/RecoveryClusterReport/projectName" />
 						</xsl:if>

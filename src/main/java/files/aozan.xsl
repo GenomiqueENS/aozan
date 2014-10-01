@@ -254,8 +254,7 @@
 		border:#ffffff;
 		border-style:hidden;
 	}
-	#filterProject tr:hover{
-	}
+	
   </style>
   <script language="javascript">
 			<xsl:comment><![CDATA[
