@@ -101,6 +101,11 @@
 	         <tr><td>qc.conf.fastqc.kmer.size</td><td>integer</td><td>5</td><td>Specifies the length of Kmer to look for in the Kmer content module.
 	         	Specified Kmer length must be between 2 and 10 (FastQC parameter)</td></tr>
 	         <tr><td>qc.conf.fastqc.nogroup</td><td>boolean</td><td>False</td><td>Disable grouping of bases for reads &gt;50bp. (FastQC parameter)</td></tr>
+	         <tr><td>qc.conf.fastqc.adapter.file</td><td>string</td><td>False</td><td>Path to a specific adapter file, replace default file. (FastQC parameter)</td></tr>
+	         <tr><td>qc.conf.fastqc.limits.file</td><td>string</td><td>False</td><td>Path to a specific limits file, replace default file. (FastQC parameter)</td></tr>
+	         <tr><td>qc.conf.fastqc.expgroup</td><td>boolean</td><td>False</td><td>Use exponential base groups in graph. (FastQC parameter)</td></tr>
+	         <tr><td>qc.conf.fastqc.casava</td><td>boolean</td><td>False</td><td>Format fastq type casava/Illumina. (FastQC parameter)</td></tr>
+	         <tr><td>qc.conf.fastqc.nofilter</td><td>boolean</td><td>False</td><td>Option for filter fastq file if casava=true for all modules. (FastQC parameter)</td></tr>
 	    </table>
          
         <a name="fctests"/>
@@ -111,13 +116,17 @@
 	         <tr><td>qc.test.perbasequalityscores.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perbasequalityscores test</td></tr>
 	         <tr><td>qc.test.persequencequalityscores.enable</td><td>boolean</td><td>False</td><td>Enable FastQC persequencequalityscores test</td></tr>
 	         <tr><td>qc.test.perbasesequencecontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perbasesequencecontent test</td></tr>
-	         <tr><td>qc.test.perbasegccontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perbasegccontent test</td></tr>
+		<!-- remove from FastQC v0.11.2 	  
+       <tr><td>qc.test.perbasegccontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perbasegccontent test</td></tr> 
+       -->
 	         <tr><td>qc.test.perSequencegccontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perSequencegccontent test</td></tr>
 	         <tr><td>qc.test.ncontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC ncontent test</td></tr>
 	         <tr><td>qc.test.sequencelengthdistribution.enable</td><td>boolean</td><td>False</td><td>Enable FastQC sequencelengthdistribution test</td></tr>
 	         <tr><td>qc.test.duplicationlevel.enable</td><td>boolean</td><td>False</td><td>Enable FastQC duplicationlevel test</td></tr>
 	         <tr><td>qc.test.overrepresentedseqs.enable</td><td>boolean</td><td>False</td><td>Enable FastQC overrepresentedseqs test</td></tr>
 	         <tr><td>qc.test.kmercontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC kmercontent test</td></tr>
+	         <tr><td>qc.test.pertilesequencequality.enable</td><td>boolean</td><td>False</td><td>Enable FastQC pertilesequencequality test</td></tr>
+	         <tr><td>qc.test.adaptercontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC adaptercontent test</td></tr>
 		</table>
          
 
@@ -150,11 +159,11 @@
 	         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
 			 <tr><td>qc.conf.fastqscreen.blast.enable</td><td>boolean</td><td>false</td><td>Enable the blast search if not hit found for an overrepresented sequence</td></tr>
 	         <tr><td>qc.conf.fastqscreen.blast.path</td><td>string</td><td>/usr/bin/blastn</td><td>Path to blastn, it can run blastn from ncbi-blast+ or blastall.</td></tr>
-	         <tr><td>qc.conf.fastqscreen.blast.version.expected</td><td>string</td><td>blastn 2.2.26 [Sep-21-2011]</td><td>Blast version: field &lt;BlastOutput_version&gt; in xml file.
+	         <tr><td>qc.conf.fastqscreen.blast.version.expected</td><td>string</td><td>blastn 2.2.28+</td><td>Blast version: field &lt;BlastOutput_version&gt; in xml file.
 	         	In log file, an entry is added if it is different the local version</td></tr>
 	         <tr><td>qc.conf.fastqscreen.blast.db.path</td><td>string</td><td>/home/aozan/ncbi_database_nt/nt</td><td>Path to the database nt (where is located nt.nal file)</td></tr>
-	         <tr><td>qc.conf.fastqscreen.blast.arguments</td><td>string</td><td>Not set</td><td>Blast parameters. DO NOT use the following blast options: -d (blastn), -p (path to database),
-	         	-m (output type, must be in xml) and -a (number processor)</td></tr>
+	         <tr><td>qc.conf.fastqscreen.blast.arguments</td><td>string</td><td>Not set</td><td>Blast parameters. DO NOT use the following blast options: -d (blastn), -db (path to database),
+	         	-outfmt (output type, must be in xml) and -num-threads (number processor)</td></tr>
 		</table>
 		
 		<p>Example of new module &#145;Overrepresented sequences&#146;: </p>
