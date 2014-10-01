@@ -55,22 +55,44 @@ public class RunData {
   //
   // Methods to extract data
   //
+  /**
+   * Get all projects names, separated by comma.
+   * @return all projects names
+   */
   public String getProjectsName() {
     return this.get("design.projects.names");
   }
 
+  /**
+   * Get all samples names related to the lane, separated by comma.
+   * @param lane the lane number
+   * @return all samples related to the lane
+   */
   public String getSamplesNameInLane(final int lane) {
     return this.get("design.lane" + lane + ".samples.names");
   }
 
+  /**
+   * Get the read count in run.
+   * @return read count.
+   */
   public int getReadCount() {
     return this.getInt("run.info.read.count");
   }
 
+  /**
+   * Get the lane count in run.
+   * @return lane count
+   */
   public int getLaneCount() {
     return this.getInt("run.info.flow.cell.lane.count");
   }
 
+  /**
+   * Check if the read is indexed.
+   * @param read the read number
+   * @return true if the read is indexed,otherwise false
+   */
   public boolean isReadIndexed(final int read) {
     return this.getBoolean("run.info.read" + read + ".indexed");
   }
@@ -84,14 +106,29 @@ public class RunData {
   }
 
   /**
-   * Get the sample names.
-   * @return a list with the sample names
+   * Get the sample names related to a lane, in a list.
+   * @param lane the number
+   * @return a list with the sample names related to the lane
    */
   public List<String> getSamplesNameListInLane(final int lane) {
     return COMMA_SPLITTER.splitToList(this.get("design.lane"
         + lane + ".samples.names"));
   }
 
+  /**
+   * Get all projects names, in a list.
+   * @return a list projects names
+   */
+  public List<String> getProjectsNameList() {
+    return COMMA_SPLITTER.splitToList(this.get("design.projects.names"));
+  }
+
+  /**
+   * Get the sequence index related to the lane number and the sample name.
+   * @param lane the lane number
+   * @param sampleName the sample name
+   * @return sequence index related to the lane and sample name
+   */
   public String getIndexSample(final int lane, final String sampleName) {
     return this.get("design.lane" + lane + "." + sampleName + ".index");
   }
@@ -141,6 +178,64 @@ public class RunData {
         .getInt("demux.lane"
             + lane + ".sample." + sampleName + ".read" + read
             + ".pf.cluster.count");
+  }
+
+  /**
+   * Check if the lane related to the sample name is a control lane.
+   * @param lane the lane number
+   * @param sampleName the sample name
+   * @return true if the lane is a control otherwise false
+   */
+  public boolean isLaneControl(final int lane, final String sampleName) {
+    return this
+        .getBoolean("design.lane" + lane + "." + sampleName + ".control");
+  }
+
+  /**
+   * Get the percent align Phix related to the lane and the read.
+   * @param lane the lane number
+   * @param read the read number
+   * @return percent align Phix related to the lane and the read
+   */
+  public double getReadPrcAlign(final int lane, final int read) {
+    return this.getDouble("read" + read + ".lane" + lane + ".prc.align");
+  }
+
+  /**
+   * Get the raw cluster count related to a lane and a read.
+   * @param lane the lane number
+   * @param read the read number
+   * @return the raw cluster count related to a lane and a read
+   */
+  public long getReadRawClusterCount(int lane, int read) {
+    return this.getLong("read" + read + ".lane" + lane + ".clusters.raw");
+  }
+
+  /**
+   * Get the passing filter cluster count related to a lane and a read.
+   * @param lane the lane number
+   * @param read the read number
+   * @return the passing filter cluster count related to a lane and a read
+   */
+  public long getReadPFClusterCount(int lane, int read) {
+    return this.getLong("read" + read + ".lane" + lane + ".clusters.pf");
+  }
+
+  /**
+   * Get the run mode.
+   * @return run mode
+   */
+  public String getRunMode() {
+    return this.get("run.info.run.mode");
+  }
+
+  /**
+   * Get the cycles count in the read.
+   * @param read the read number
+   * @return cycles count in the read
+   */
+  public int getReadCyclesCount(final int read) {
+    return this.getInt("run.info.read" + read + ".cycles");
   }
 
   //
