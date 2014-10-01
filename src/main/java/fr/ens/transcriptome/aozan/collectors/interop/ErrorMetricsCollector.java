@@ -98,12 +98,12 @@ public class ErrorMetricsCollector implements Collector {
    */
   public void collect(final RunData data) throws AozanException {
 
-    lanesCount = data.getInt("run.info.flow.cell.lane.count");
-    readsCount = data.getInt("run.info.read.count");
-    read1CycleCount = data.getInt("run.info.read1.cycles");
+    lanesCount = data.getLaneCount();
+    readsCount = data.getReadCount();
+    read1CycleCount = data.getReadCyclesCount(1);
 
     if (readsCount == 3)
-      read3CycleCount = data.getInt("run.info.read3.cycles");
+      read3CycleCount = data.getReadCyclesCount(3);
 
     try {
       ErrorMetricsReader reader = new ErrorMetricsReader(dirInterOpPath);
@@ -215,7 +215,7 @@ public class ErrorMetricsCollector implements Collector {
     // for Error metrics ignores first cycle
     int cyclesCount = -1;
 
-    cyclesCount += data.getInt("run.info.read" + 1 + ".cycles");
+    cyclesCount += data.getReadCyclesCount(1);
     this.read1LastCycleNumber = cyclesCount;
 
     if (readsCount == 2) {
@@ -224,7 +224,7 @@ public class ErrorMetricsCollector implements Collector {
 
     } else {
       // case PE
-      cyclesCount += data.getInt("run.info.read" + 2 + ".cycles");
+      cyclesCount += data.getReadCyclesCount(2);
       this.read2LastCycleNumber = cyclesCount;
 
     }

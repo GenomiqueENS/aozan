@@ -118,8 +118,8 @@ public class TileMetricsCollector implements Collector {
             * data.getInt("run.info.flow.cell.surface.count")
             * data.getInt("run.info.flow.cell.swath.count");
 
-    int lanesCount = data.getInt("run.info.flow.cell.lane.count");
-    int readsCount = data.getInt("run.info.read.count");
+    int lanesCount = data.getLaneCount();
+    int readsCount = data.getReadCount();
 
     for (int lane = 1; lane <= lanesCount; lane++)
       tileMetrics.put(lane, new TileMetricsPerLane(lane, readsCount,
@@ -196,9 +196,9 @@ public class TileMetricsCollector implements Collector {
         // One value by tile by code
         if (!metricsPerTilePerCode.get(code).containsKey(tileNumber)) {
           metricsPerTilePerCode.get(code).put(tileNumber, value);
-          
+
         } else if (metricsPerTilePerCode.get(code).get(tileNumber) == 0.0) {
-          
+
           // Replace value by numeric in case several value exist per tile
           metricsPerTilePerCode.get(code).put(tileNumber, value);
         }
@@ -371,9 +371,8 @@ public class TileMetricsCollector implements Collector {
         data.put(key + ".prephasing", rm.getPrephasing());
 
         data.put("read" + rm.getNumberRead() + ".density.ratio", densityRatio);
-        String s =
-            data.getBoolean("run.info.read" + rm.getNumberRead() + ".indexed")
-                ? "(Index)" : "";
+        
+        final String s = data.isReadIndexed(rm.getNumberRead()) ? "(Index)" : "";
         data.put("read" + rm.getNumberRead() + ".type", s);
 
       }

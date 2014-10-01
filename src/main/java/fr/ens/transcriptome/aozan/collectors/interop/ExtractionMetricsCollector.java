@@ -120,8 +120,8 @@ public class ExtractionMetricsCollector implements Collector {
    */
   private void initMetricsMap(final RunData data) throws AozanException {
 
-    final int lanesCount = data.getInt("run.info.flow.cell.lane.count");
-    final int readsCount = data.getInt("run.info.read.count");
+    final int lanesCount = data.getLaneCount();
+    final int readsCount = data.getReadCount();
 
     defineReadsStartEndCycleNumber(data);
 
@@ -168,15 +168,14 @@ public class ExtractionMetricsCollector implements Collector {
    */
   private void defineReadsStartEndCycleNumber(final RunData data) {
 
-    final int readCount = data.getInt("run.info.read.count");
+    final int readCount = data.getReadCount();
 
     this.read1FirstCycleNumber = 1;
-    this.read1LastCycleNumber = data.getInt("run.info.read" + 1 + ".cycles");
+    this.read1LastCycleNumber = data.getReadCyclesCount(1);
 
     this.read2FirstCycleNumber = this.read1LastCycleNumber + 1;
     this.read2LastCycleNumber =
-        this.read1LastCycleNumber
-            + data.getInt("run.info.read" + 2 + ".cycles");
+        this.read1LastCycleNumber + data.getReadCyclesCount(2);
 
     if (readCount > 2) {
       this.read3FirstCycleNumber = this.read2LastCycleNumber + 1;
