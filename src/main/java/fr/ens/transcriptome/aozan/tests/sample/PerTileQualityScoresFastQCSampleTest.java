@@ -21,7 +21,7 @@
  *
  */
 
-package fr.ens.transcriptome.aozan.tests;
+package fr.ens.transcriptome.aozan.tests.sample;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.Map;
 
 import uk.ac.babraham.FastQC.Modules.PerTileQualityScores;
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.tests.sample.AbstractFastQCSampleTest;
+import fr.ens.transcriptome.aozan.tests.AozanTest;
 
 /**
  * This class define a sample test for FastQC per tile sequence quality module.
