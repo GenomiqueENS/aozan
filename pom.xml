@@ -500,6 +500,50 @@
           </execution>
         </executions>
       </plugin>
+      
+       <!-- add plugin for test with Jenkins : static analysis code -->
+        <!-- PLUG-IN Checkstyle -->
+        <plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-checkstyle-plugin</artifactId>
+           <version>2.12</version>
+           <configuration>
+              <configLocation>./checkstyle_google.xml</configLocation>
+           </configuration>
+        </plugin>
+
+        <!-- PLUG-IN Findbugs -->
+        <plugin>
+           <groupId>org.codehaus.mojo</groupId>
+           <artifactId>findbugs-maven-plugin</artifactId>
+           <version>2.3.1</version>
+           <configuration>
+              <effort>Max</effort>
+              <xmlOutput>true</xmlOutput>
+           </configuration>
+        </plugin>
+
+        <!-- PLUG-IN PMD/CPD -->
+        <plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-pmd-plugin</artifactId>
+           <version>3.0.1</version>
+           <configuration>
+              <!-- PMD options -->
+              <targetJdk>1.7</targetJdk>
+              <aggregate>true</aggregate>
+              <format>xml</format>
+              <rulesets>
+                      <ruleset>./pmd-rules.xml</ruleset>
+              </rulesets>
+
+              <!-- CPD options -->
+              <minimumTokens>20</minimumTokens>
+              <ignoreIdentifiers>true</ignoreIdentifiers>
+              <configLocation>./checkstyle_google.xml</configLocation>
+           </configuration>
+        </plugin>
+      
     </plugins>
   </build>
 
