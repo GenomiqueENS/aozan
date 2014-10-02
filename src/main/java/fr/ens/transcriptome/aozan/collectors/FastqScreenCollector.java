@@ -145,7 +145,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
       return null;
 
     if (fastqSample.isIndeterminedIndices())
-      return createInterminedIndicesSampleProcess(data, fastqSample, reportDir);
+      return createInterminedIndicesSampleProcess(data, fastqSample, reportDir, isRunPE);
 
     return createStandardSampleProcess(data, fastqSample, reportDir, isRunPE);
 
@@ -214,19 +214,20 @@ public class FastqScreenCollector extends AbstractFastqCollector {
    * Collect data for a fastqSample for indetermined indices sample.
    * @param data result data object
    * @param fastqSample sample object
+   * @param isRunPE true if the run is PE else false
    * @return process thread instance
    * @throws AozanException if an error occurs while execution
    */
   private AbstractFastqProcessThread createInterminedIndicesSampleProcess(
-      final RunData data, final FastqSample fastqSample, final File reportDir)
-      throws AozanException {
+      final RunData data, final FastqSample fastqSample, final File reportDir,
+      final boolean isRunPE) throws AozanException {
 
     // Retrieve all genomes used by mapping for Undetermined Indexed sample
     final Set<String> genomesToSampleTest =
         FastqScreenGenomeMapper.getInstance().getGenomesToMapping();
 
     return new FastqScreenProcessThread(fastqSample, fastqscreen, data,
-        genomesToSampleTest, reportDir, this.fastqscreenXSLFile);
+        genomesToSampleTest, reportDir, isRunPE, this.fastqscreenXSLFile);
   }
 
   //

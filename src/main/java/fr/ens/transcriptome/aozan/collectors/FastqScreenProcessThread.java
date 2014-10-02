@@ -241,18 +241,22 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @param fastqSampleR1 fastqSample corresponding to the read 1
    * @param fastqscreen instance of fastqscreen
    * @param data object rundata on the run
-   * @param genomes list of references genomes for FastqScreen
+   * @param genomes list of references genomes for FastqScreen * @param isRunPE
+   *          true if the run is PE else false
    * @param reportDir path for the directory who save the FastqScreen report
+   * @param isRunPE true if the run is PE else false
+   * @param fastqscreenXSLFile xsl file needed to create report html
    * @throws AozanException if an error occurs during create thread, if no fastq
    *           file was found
    */
   public FastqScreenProcessThread(final FastqSample fastqSample,
       final FastqScreen fastqscreen, final RunData data,
       final Set<String> genomesToMapping, final File reportDir,
-      final File fastqscreenXSLFile) throws AozanException {
+      final boolean isRunPE, final File fastqscreenXSLFile)
+      throws AozanException {
 
     this(fastqSample, null, fastqscreen, data, genomesToMapping, null,
-        reportDir, false, false, fastqscreenXSLFile);
+        reportDir, false, isRunPE, fastqscreenXSLFile);
   }
 
   /**
@@ -268,6 +272,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @param isPairedMode true if a pair-end run and option paired mode equals
    *          true else false
    * @param isRunPE true if the run is PE else false
+   * @param fastqscreenXSLFile xsl file needed to create report html
    * @throws AozanException if an error occurs during create thread, if no fastq
    *           file was found
    */
@@ -295,6 +300,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @param isPairedMode true if a pair-end run and option paired mode equals
    *          true else false
    * @param isRunPE true if the run is PE else false
+   * @param fastqscreenXSLFile xsl file needed to create report html
    * @throws AozanException if an error occurs during create thread, if no fastq
    *           file was found
    */
@@ -320,7 +326,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
       this.fastqscreenXSLFile = fastqscreenXSLFile;
     }
 
-    // Copy list genome for fastqscreen
+    // Copy list genomes names for fastqscreen
     this.genomes = Lists.newArrayList(genomesToMapping);
 
   }
