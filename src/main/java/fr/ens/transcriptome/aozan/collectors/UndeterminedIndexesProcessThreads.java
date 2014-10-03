@@ -35,7 +35,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -62,7 +61,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -170,11 +168,12 @@ public class UndeterminedIndexesProcessThreads extends
     public static void samplesNameXML(final Document doc, final Element parent,
         final RunData data, final int lane) {
 
-      final Set<String> samplesName = Sets.newTreeSet();
+      final List<String> samplesName = Lists.newArrayList();
 
       // Extract all samples names per lane
       samplesName.addAll(COMMA_SPLITTER.splitToList(data
           .getSamplesNameInLane(lane)));
+      Collections.sort(samplesName);
 
       // Write all samples name with correct syntax
       final String txt = "'" + Joiner.on("','").join(samplesName) + "'";
@@ -915,7 +914,7 @@ public class UndeterminedIndexesProcessThreads extends
 
     XMLUtils.addTagValue(doc, root, "condition",
         "Compile results on recovery clusters in undetermined fastq with "
-            + this.maxMismatches + " mismatche(s).");
+            + this.maxMismatches + " mismatch(es).");
 
     if (!isSampleData) {
       // Add sample name in this lane
