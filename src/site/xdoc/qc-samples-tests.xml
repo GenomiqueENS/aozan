@@ -58,6 +58,7 @@
        				<li><a href="#fqstests">Configuration tests</a></li>
        			</ul>
        		</li>
+       		<li><a href="#recoveryclusters">Analysis undetermined clusters from demultiplexing.</a></li>
        </ul>
 
        <a name="data_illumina"/>
@@ -101,11 +102,13 @@
 	         <tr><td>qc.conf.fastqc.kmer.size</td><td>integer</td><td>5</td><td>Specifies the length of Kmer to look for in the Kmer content module.
 	         	Specified Kmer length must be between 2 and 10 (FastQC parameter)</td></tr>
 	         <tr><td>qc.conf.fastqc.nogroup</td><td>boolean</td><td>False</td><td>Disable grouping of bases for reads &gt;50bp. (FastQC parameter)</td></tr>
-	         <tr><td>qc.conf.fastqc.adapter.file</td><td>string</td><td>False</td><td>Path to a specific adapter file, replace default file. (FastQC parameter)</td></tr>
-	         <tr><td>qc.conf.fastqc.limits.file</td><td>string</td><td>False</td><td>Path to a specific limits file, replace default file. (FastQC parameter)</td></tr>
+	         <tr><td>qc.conf.fastqc.adapter.file</td><td>string</td><td>No set</td><td>Path to a specific adapter file, replace default file. (FastQC parameter)</td></tr>
+	         <tr><td>qc.conf.fastqc.limits.file</td><td>string</td><td>No set</td><td>Path to a specific limits file, replace default file. (FastQC parameter)</td></tr>
 	         <tr><td>qc.conf.fastqc.expgroup</td><td>boolean</td><td>False</td><td>Use exponential base groups in graph. (FastQC parameter)</td></tr>
 	         <tr><td>qc.conf.fastqc.casava</td><td>boolean</td><td>False</td><td>Format fastq type casava/Illumina. (FastQC parameter)</td></tr>
 	         <tr><td>qc.conf.fastqc.nofilter</td><td>boolean</td><td>False</td><td>Option for filter fastq file if casava=true for all modules. (FastQC parameter)</td></tr>
+	         <tr><td>qc.conf.fastqc.nofilter</td><td>boolean</td><td>False</td><td>Option for filter fastq file if casava=true for all modules. (FastQC parameter)</td></tr>
+			 <tr><td>qc.conf.fastqc.process.undetermined.samples</td><td>boolean</td><td>True</td><td>Run FastQC on undetermined indices samples, default at false.</td></tr>
 	    </table>
          
         <a name="fctests"/>
@@ -255,6 +258,12 @@ especially the <a href="http://transcriptome.ens.fr/eoulsan/datarepositories.htm
 			<td>Not set</td>
 			<td>Path to a specific stylesheet file to edit the fastqscreen report html, instead of the file per default</td>
 		  </tr>
+		  <tr>
+			<td>qc.conf.fastqscreen.process.undetermined.sample</td>
+			<td>boolean</td>
+			<td>false</td>
+			<td>Run FastqScreen on undetermined indices samples on all genomes available for the run</td>
+		  </tr>
 		</table>
 
 		<a name="fqstests"/>
@@ -337,6 +346,27 @@ especially the <a href="http://transcriptome.ens.fr/eoulsan/datarepositories.htm
 	</p>
     </subsection>
 
+
+	<a name="recoveryclusters"/> 
+	<subsection name="Analysis undetermined clusters from demultiplexing.">
+		<p>
+			The undetermined FastQ file created by casava/bcl2fastq demultiplexing step can be analyse. The test <i>recoverablepfclusterssamples</i> 
+			achieve to parsing this file, identify the mismatch number usd by demultiplexing, if inferior at 2, add one mismatch to listing recoverable cluster 
+			by index and attribute each at one or more sample. The test create two files by lane and by sample, in two format (csv and html). For undetermined lane FastQ file, for each index display demultiplexing data and
+			the potential sample(s). For each sample, a file display recoverable cluster founded.
+		</p>
+		<p>
+			Moreover, it is now available to run FastQC and/or FastqScreen on undetermined FastQ files.
+		</p>
+		<table>
+		 <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+         <tr><td>qc.test.recoverablepfclusterssamples.enable</td><td>boolean</td><td>False</td>
+	       	 <td>Enable recoverablepfclusterssamples test : compute passing filter cluster can be recovery from undetermined fastq file with more one mismatch that use for demultiplexing step (maximum at 2). </td></tr>
+         <tr><td>qc.test.recoverablepfclusterssamples.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of recoverablepfclusterssamples</td></tr>
+         <tr><td>qc.test.linkreportrecoverycluster.enable</td><td>boolean</td><td>False</td><td>Enable linkreportrecoverycluster test: link to report HTML</td></tr>
+		</table>
+    </subsection>
+    
     <a name="syntax_interval"/>
     <subsection name="Syntax of the interval values">
 

@@ -68,7 +68,7 @@
 			
 			<li><a href="demultiplexing.html">Demultiplexing</a>
 				<ul>
-                                  <li>Demultiplexing is performed by CASAVA</li>
+                  <li>Demultiplexing is performed by CASAVA/bcl2fastq</li>
 				  <li>Parallel computation is done with &quot;<tt>make -j</tt>&quot;</li>
 				  <li>CASAVA or bcl2fastq has been modified to provide bzip2 compression functionality (optional)</li>
 				  <li>Creates one fastq file by sample</li>
@@ -79,6 +79,7 @@
 			
 			<li><p><a href="quality-control.html">Quality control and validation</a></p>
 				<ul>
+				    <li><a href="qc-global-tests.html">Globals quality tests</a> on general sequencing data</li>
 					<li><a href="qc-lanes-tests.html">Lanes quality tests</a> on demultiplexing steps data</li>
 					<li><a href="qc-samples-tests.html">Samples quality tests</a> on demultiplexing steps data,
 					<a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC</a> results, and contamination detection results 

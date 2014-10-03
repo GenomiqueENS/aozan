@@ -89,9 +89,6 @@
          <tr><td>qc.test.phasingprephasing.enable</td><td>boolean</td><td>False</td><td>Enable phasingprephasing test</td></tr>
          <tr><td>qc.test.phasingprephasing.phasing.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of phasing</td></tr>
          <tr><td>qc.test.phasingprephasing.prephasing.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of prephasing</td></tr>
-         
-         
-         qc.test.rawclusterphix.enable=True
        </table>
 
        <p>An example of table built with lanes quality tests.</p>
