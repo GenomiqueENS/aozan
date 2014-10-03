@@ -47,8 +47,9 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
   private static final Logger LOGGER = Common.getLogger();
 
   public static final String COLLECTOR_NAME = "uncompressfastq";
+  
   private long uncompressedSizeFiles = 0l;
-
+  private boolean isProcessUndeterminedIndicesSamples = false;
   private int numberThreads = Runtime.getRuntime().availableProcessors();
 
   /**
@@ -60,6 +61,11 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     return COLLECTOR_NAME;
   }
 
+  @Override
+  protected boolean isProcessUndeterminedIndicesSamples() {
+    return this.isProcessUndeterminedIndicesSamples;
+  }
+  
   /**
    * Collectors to execute before fastqscreen Collector
    * @return list of names collector
@@ -91,6 +97,13 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
       } catch (NumberFormatException e) {
       }
     }
+    
+    // Check if process undetermined indices samples specify in Aozan
+    // configuration
+    this.isProcessUndeterminedIndicesSamples =
+        Boolean
+            .parseBoolean(properties
+                .getProperty(Settings.QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY));
 
   }
 
@@ -179,4 +192,6 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
             + ", and we need " + uncompressedSizeNeeded + " Go.");
 
   }
+
+
 }

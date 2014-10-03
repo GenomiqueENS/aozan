@@ -56,6 +56,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
   private boolean skipControlLane;
   private boolean ignorePairedMode;
   private File fastqscreenXSLFile = null;
+  private boolean isProcessUndeterminedIndicesSamples = false;
 
   @Override
   public String getName() {
@@ -117,6 +118,13 @@ public class FastqScreenCollector extends AbstractFastqCollector {
       // Call default xsl file
       this.fastqscreenXSLFile = null;
     }
+
+    // Check if process undetermined indices samples specify in Aozan
+    // configuration
+    this.isProcessUndeterminedIndicesSamples =
+        Boolean
+            .parseBoolean(properties
+                .getProperty(Settings.QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY));
   }
 
   @Override
@@ -145,7 +153,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
       return null;
 
     if (fastqSample.isIndeterminedIndices())
-      return createInterminedIndicesSampleProcess(data, fastqSample, reportDir, isRunPE);
+      return createInterminedIndicesSampleProcess(data, fastqSample, reportDir,
+          isRunPE);
 
     return createStandardSampleProcess(data, fastqSample, reportDir, isRunPE);
 
@@ -241,6 +250,11 @@ public class FastqScreenCollector extends AbstractFastqCollector {
   @Override
   protected int getThreadsNumber() {
     return 1;
+  }
+
+  @Override
+  protected boolean isProcessUndeterminedIndicesSamples() {
+    return this.isProcessUndeterminedIndicesSamples;
   }
 
 }

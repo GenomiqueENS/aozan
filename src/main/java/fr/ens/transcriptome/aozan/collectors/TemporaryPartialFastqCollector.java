@@ -47,6 +47,7 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
   /** Parameters configuration */
   private boolean skipControlLane;
   private boolean ignorePairedMode;
+  private boolean isProcessUndeterminedIndicesSamples = false;
 
   // count reads pf necessary for create a temporary partial fastq
   private int countReadsPFtoCopy;
@@ -139,6 +140,13 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
     } else {
       this.maxReadsPFtoParse = countReads;
     }
+
+    // Check if process undetermined indices samples specify in Aozan
+    // configuration
+    this.isProcessUndeterminedIndicesSamples =
+        Boolean
+            .parseBoolean(properties
+                .getProperty(Settings.QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY));
   }
 
   @Override
@@ -208,6 +216,12 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
   @Override
   protected int getThreadsNumber() {
     return numberThreads;
+  }
+
+  @Override
+  protected boolean isProcessUndeterminedIndicesSamples() {
+    
+    return this.isProcessUndeterminedIndicesSamples;
   }
 
 }

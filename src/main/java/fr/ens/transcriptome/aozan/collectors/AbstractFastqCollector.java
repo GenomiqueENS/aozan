@@ -98,19 +98,16 @@ abstract public class AbstractFastqCollector implements Collector {
   protected abstract int getThreadsNumber();
 
   /**
+   * Test if undetermined indices samples must be processed.
+   * @return true if undetermined indices samples must be processed
+   */
+  protected abstract boolean isProcessUndeterminedIndicesSamples();
+
+  /**
    * Test if standard samples must be processed.
    * @return true if standard samples must be processed
    */
   protected boolean isProcessStandardSamples() {
-
-    return true;
-  }
-
-  /**
-   * Test if undetermined indices samples must be processed.
-   * @return true if undetermined indices samples must be processed
-   */
-  protected boolean isProcessUndeterminedIndicesSamples() {
 
     return true;
   }

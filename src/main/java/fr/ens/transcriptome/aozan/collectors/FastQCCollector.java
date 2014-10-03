@@ -45,7 +45,7 @@ public class FastQCCollector extends AbstractFastqCollector {
   /** Retrieve parameters of FastQC qc.conf.+ key_fastqc */
 
   private int numberThreads = Runtime.getRuntime().availableProcessors();
-
+  private boolean isProcessUndeterminedIndicesSamples = false;
   private final boolean ignoreFilteredSequences = false;
 
   @Override
@@ -72,6 +72,13 @@ public class FastQCCollector extends AbstractFastqCollector {
       } catch (NumberFormatException ignored) {
       }
     }
+
+    // Check if process undetermined indices samples specify in Aozan
+    // configuration
+    this.isProcessUndeterminedIndicesSamples =
+        Boolean
+            .parseBoolean(properties
+                .getProperty(Settings.QC_CONF_FASTQC_PROCESS_UNDETERMINED_SAMPLES_KEY));
 
     // Check if step blast needed and configure
     OverrepresentedSequencesBlast.getInstance().configure(properties);
@@ -107,4 +114,8 @@ public class FastQCCollector extends AbstractFastqCollector {
     return numberThreads;
   }
 
+  @Override
+  protected boolean isProcessUndeterminedIndicesSamples() {
+    return this.isProcessUndeterminedIndicesSamples;
+  }
 }
