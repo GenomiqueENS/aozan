@@ -76,7 +76,7 @@ tr.total{
 	background:#82D482;
 	font-style : bold;
 }
-tr.demultiplexing{
+tr.conflict{
 	background:#FFFFA3;
 	font-style : bold;
 }
@@ -157,18 +157,10 @@ div.footer {
 a.linkFilterActivate:link, a.linkFilterUnactivate:link{
 	color:#ffffff;
 }  
- 	.linkFilterActivate {
-	-webkit-border-top-left-radius:24px;
-	-moz-border-radius-topleft:24px;
+.linkFilterActivate {
 	border-top-left-radius:24px;
-	-webkit-border-top-right-radius:24px;
-	-moz-border-radius-topright:24px;
 	border-top-right-radius:24px;
-	-webkit-border-bottom-right-radius:24px;
-	-moz-border-radius-bottomright:24px;
 	border-bottom-right-radius:24px;
-	-webkit-border-bottom-left-radius:24px;
-	-moz-border-radius-bottomleft:24px;
 	border-bottom-left-radius:24px;
 
 	background-color:#9A1319;
@@ -189,17 +181,9 @@ a.linkFilterActivate:link, a.linkFilterUnactivate:link{
 }
 
 .linkFilterUnactivate {
-	-webkit-border-top-left-radius:24px;
-	-moz-border-radius-topleft:24px;
 	border-top-left-radius:24px;
-	-webkit-border-top-right-radius:24px;
-	-moz-border-radius-topright:24px;
 	border-top-right-radius:24px;
-	-webkit-border-bottom-right-radius:24px;
-	-moz-border-radius-bottomright:24px;
 	border-bottom-right-radius:24px;
-	-webkit-border-bottom-left-radius:24px;
-	-moz-border-radius-bottomleft:24px;
 	border-bottom-left-radius:24px;
 
 	background-color:#A7A9AF;
@@ -287,7 +271,7 @@ a.linkFilterActivate:link, a.linkFilterUnactivate:link{
 							alt="Aozan" />
 						Clusters recoverable in <xsl:value-of select="/RecoveryClusterReport/sampleName" />
 						<xsl:if test="/RecoveryClusterReport/projectName">
-							- project <xsl:value-of select="/RecoveryClusterReport/projectName" />
+							for project <xsl:value-of select="/RecoveryClusterReport/projectName" />
 						</xsl:if>
 					</div>
 					
