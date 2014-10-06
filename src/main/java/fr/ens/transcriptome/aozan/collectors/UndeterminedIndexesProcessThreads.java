@@ -78,6 +78,7 @@ import fr.ens.transcriptome.eoulsan.util.XMLUtils;
  * indices that can be recovered.
  * @since 1.3
  * @author Laurent Jourdren
+ * @author Sandrine Perrin
  */
 public class UndeterminedIndexesProcessThreads extends
     AbstractFastqProcessThread {
@@ -161,19 +162,43 @@ public class UndeterminedIndexesProcessThreads extends
     }
 
     @Override
-    public String getComment() {
+    public String getAttributeClass() {
+      // Entry corresponding total line
+      if (this.index.toLowerCase(Globals.DEFAULT_LOCALE).equals("total")) {
+        return TOTAL_TAG;
+      }
+
+      // Check several samples names
+      if (this.comment.contains(","))
+        return CONFLICT_TAG;
+
       return this.comment;
     }
 
+    /**
+     * Add elements samples name in xml document to filter result table.
+     * @param doc the doc xml
+     * @param parent the parent element
+     * @param data the data run object
+     * @param lane the lane number
+     * @param asConflictDemultiplexing as conflict demultiplexing
+     */
     public static void samplesNameXML(final Document doc, final Element parent,
-        final RunData data, final int lane) {
+        final RunData data, final int lane,
+        final boolean asConflictDemultiplexing) {
 
       final List<String> samplesName = Lists.newArrayList();
 
       // Extract all samples names per lane
       samplesName.addAll(COMMA_SPLITTER.splitToList(data
           .getSamplesNameInLane(lane)));
+
       Collections.sort(samplesName);
+
+      // Add link on filter for conflict at the end of list
+      if (asConflictDemultiplexing) {
+        samplesName.add(samplesName.size(), CONFLICT_TAG);
+      }
 
       // Write all samples name with correct syntax
       final String txt = "'" + Joiner.on("','").join(samplesName) + "'";
@@ -273,8 +298,13 @@ public class UndeterminedIndexesProcessThreads extends
       return this.comment == null || this.comment.trim().length() == 0;
     }
 
-    public String getComment() {
-      return this.comment;
+    @Override
+    public String getAttributeClass() {
+      // Data entry
+      if (this.comment.toLowerCase(Globals.DEFAULT_LOCALE).startsWith(
+          "conflict"))
+        return CONFLICT_TAG;
+      return "";
     }
 
     //
@@ -313,11 +343,14 @@ public class UndeterminedIndexesProcessThreads extends
 
     protected static List<String> HEADER_NAMES;
 
+    protected static String CONFLICT_TAG = "conflict";
+    protected static String TOTAL_TAG = "total";
+
     abstract String toCSV();
 
     abstract public boolean isCommentFieldEmpty();
 
-    abstract public String getComment();
+    abstract public String getAttributeClass();
 
     /**
      * Get CSV header.
@@ -350,10 +383,10 @@ public class UndeterminedIndexesProcessThreads extends
      * Add tag XML header in document.
      * @param document document XML
      * @param parent parent element in document XML
-     * @param attributeValue value for desc attribute
+     * @param defaultAttributeValue value for desc attribute
      */
     public void toXML(final Document doc, final Element parent,
-        final String attributeValue) {
+        final String defaultAttributeValue) {
 
       final Element elemRoot = doc.createElement("Entry");
       parent.appendChild(elemRoot);
@@ -385,10 +418,10 @@ public class UndeterminedIndexesProcessThreads extends
         elemRoot.appendChild(elem);
 
         // Add class attribute at default value
-        elemRoot.setAttribute("classValue", attributeValue);
+        elemRoot.setAttribute("classValue", defaultAttributeValue);
       } else {
         // Add class attribute at sample name
-        elemRoot.setAttribute("classValue", getComment());
+        elemRoot.setAttribute("classValue", getAttributeClass());
       }
 
     }
@@ -649,7 +682,7 @@ public class UndeterminedIndexesProcessThreads extends
     Collections.sort(entries);
 
     writeCSV(entries, totalEntry);
-    writeHTML(entries, totalEntry);
+    writeHTML(entries, totalEntry, !oneMismatcheDemuxPossible);
   }
 
   /**
@@ -715,16 +748,19 @@ public class UndeterminedIndexesProcessThreads extends
    * Write the lane result file in CSV format.
    * @param entries entries to write
    * @param totalEntry total entries summary
+   * @param asConflictDemultiplexing true if conflict occurs during recovering
+   *          cluster
    * @throws IOException if an error occurs while writing the file
    * @throws AozanException if an error occurs while building xml file
    */
   private void writeHTML(final List<LaneResultEntry> entries,
-      final LaneResultEntry totalEntry) throws IOException, AozanException {
+      final LaneResultEntry totalEntry, final boolean asConflictDemultiplexing)
+      throws IOException, AozanException {
 
     final File reportHtml = createLaneResultFile(".html");
 
     toXML("lane" + lane + "_undetermined", null, entries, totalEntry,
-        reportHtml, false);
+        reportHtml, false, asConflictDemultiplexing);
 
   }
 
@@ -762,7 +798,8 @@ public class UndeterminedIndexesProcessThreads extends
             this.pfUndeterminedIndices.count(newIndex);
         final String comment =
             this.newIndexes.get(newIndex).size() > 1
-                ? "Conflict if run demultiplexing with mismatches : "
+                ? "Conflict if run demultiplexing with "
+                    + this.maxMismatches + " mismatch(es) : "
                     + JOINER.join(this.newIndexes.get(newIndex)) : "";
 
         // Add the entry
@@ -858,7 +895,7 @@ public class UndeterminedIndexesProcessThreads extends
 
     final File reportHtml = createSampleResultFile(sampleName, ".html");
 
-    toXML(sampleName, demuxEntry, entries, totalEntry, reportHtml, true);
+    toXML(sampleName, demuxEntry, entries, totalEntry, reportHtml, true, false);
 
   }
 
@@ -870,13 +907,16 @@ public class UndeterminedIndexesProcessThreads extends
    * @param totalEntry total entries summary
    * @param reportHtml report output file in HTML
    * @param isSampleData true if it is a demultiplexed sample
+   * @param asConflictDemultiplexing true if conflict occurs during recovering
+   *          cluster
    * @throws IOException if an error occurs while writing the file
    * @throws AozanException if an usefull file are not define or if an error
    *           occurs during building document xml
    */
   private void toXML(final String sampleName, final ResultEntry demuxEntry,
       final List<? extends ResultEntry> entries, final ResultEntry totalEntry,
-      final File reportHtml, final boolean isSampleData) throws IOException,
+      final File reportHtml, final boolean isSampleData,
+      final boolean asConflictDemultiplexing) throws IOException,
       AozanException {
 
     Document doc = null;
@@ -918,7 +958,8 @@ public class UndeterminedIndexesProcessThreads extends
 
     if (!isSampleData) {
       // Add sample name in this lane
-      LaneResultEntry.samplesNameXML(doc, root, this.data, this.lane);
+      LaneResultEntry.samplesNameXML(doc, root, this.data, this.lane,
+          asConflictDemultiplexing);
     }
 
     // Table - column
@@ -938,7 +979,7 @@ public class UndeterminedIndexesProcessThreads extends
     totalEntry.toXML(doc, results, "total");
 
     for (ResultEntry e : entries) {
-      e.toXML(doc, results, "Entry");
+      e.toXML(doc, results, "entry");
     }
 
     // TODO debug
