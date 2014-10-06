@@ -130,11 +130,12 @@ def qc(run_id, conf):
     # Create temporary temporary directory
     qc_output_dir = qc_output_dir + tmp_extension
 
-    # Initialize the QC object
-    qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id)
-
-    # Compute the report
     try:
+
+        # Initialize the QC object
+        qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id)
+
+        # Compute the report
         report = qc.computeReport()
     except AozanException, exp:
         error("error while computing qc report for run " + run_id + ".", exception_msg(exp, conf), conf)
