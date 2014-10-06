@@ -7,7 +7,7 @@ Created on 25 oct. 2011
 '''
 
 import hiseq_run, sync_run
-import smtplib, os.path, time
+import smtplib, os.path, time, sys
 import mimetypes
 from email.utils import formatdate 
 
@@ -693,17 +693,36 @@ def load_conf(conf, conf_file_path):
 
     f = open(conf_file_path, 'r')
 
+    # At the beginning configuration file parameter include for reading another configuration Aozan file
+    # There value are replace by the current file
+    first=True
+    
     for l in f:
         s = l[:-1].strip()
         if len(s) == 0 or l[0] == '#' :
             continue
-        fields = s.split('=')
-        if len(fields) == 2:
-            conf[fields[0].strip()] = fields[1].strip()
 
-            # Check if needed to converting key for design fields
-            if fields[0].strip() in converting_table_key:
-                conf[converting_table_key[fields[0].strip()]] = fields[1].strip()
+        if first and s.startswith('include'):
+            # Initialize configuration by another file
+            other_configuration_path = s.split('=')[1].strip()
+            
+            if os.path.exists(other_configuration_path) and os.path.isfile(other_configuration_path):
+                load_conf(conf, other_configuration_path)  
+            else:
+                sys.exit(1)
+            
+            first=False
+            
+            
+        else:
+            fields = s.split('=')
+            
+            if len(fields) == 2:
+                conf[fields[0].strip()] = fields[1].strip()
+    
+                # Check if needed to converting key for design fields
+                if fields[0].strip() in converting_table_key:
+                    conf[converting_table_key[fields[0].strip()]] = fields[1].strip()
     f.close()
     return conf
 
