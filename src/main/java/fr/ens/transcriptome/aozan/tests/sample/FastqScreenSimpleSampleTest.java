@@ -68,7 +68,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     // Check indetermined indexed sample
     if (sampleName == null) {
       return "fastqscreen.lane"
-          + lane + ".read" + readSample + "." + genomeReference + value;
+          + lane + ".undetermined.read" + readSample + "." + genomeReference + value;
     }
     return "fastqscreen.lane"
         + lane + ".sample." + sampleName + ".read" + readSample + "."
