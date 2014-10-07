@@ -312,18 +312,29 @@ public class FastqScreenGenomeMapper {
    * reference genome from a file, the path is in aozan configuration
    * @param map to correspondence between common genome name and valid call name
    *          for mapping
+   * @throws AozanException if alias genomes file doesn't exist.
    */
-  private Map<String, String> loadAliasGenomesFile() {
-    final File aliasGenomesFile =
-        new File(
-            this.properties
-                .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
+  private Map<String, String> loadAliasGenomesFile() throws AozanException {
+
+    // Extract property on alias genomes path
+    final String val =
+        this.properties.get(
+            Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY)
+            .trim();
+    if (val == null || val.length() == 0) {
+      LOGGER.fine("FastqScreen no alias genome file parameter define.");
+      return Collections.emptyMap();
+    }
+
+    final File aliasGenomesFile = new File(val);
 
     final Map<String, String> genomes = Maps.newHashMap();
 
-    // No found alias genomes file
-    if (!aliasGenomesFile.exists())
-      return Collections.emptyMap();
+    // Not found alias genomes file
+    if (!aliasGenomesFile.exists()) {
+      throw new AozanException("FastqScreen alias genome file doesn't exists "
+          + aliasGenomesFile.getAbsolutePath());
+    }
 
     try {
       // Read alias genomes files
@@ -462,10 +473,10 @@ public class FastqScreenGenomeMapper {
     // Load alias genomes file
     this.genomesNamesConvertor = loadAliasGenomesFile();
 
-    // Load genomes references sample from design file
+    // Collect genomes references list sample from design file
     this.genomesReferencesSample = initGenomesReferencesSample();
 
-    // Load genomes contaminant
+    // Collect genomes contaminant list
     this.genomesContaminants = initGenomesContaminant();
 
     // Collect genomes useful to contaminant detection
