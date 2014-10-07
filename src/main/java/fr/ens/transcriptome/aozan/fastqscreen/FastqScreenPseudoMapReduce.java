@@ -41,6 +41,7 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
+import fr.ens.transcriptome.eoulsan.bio.readsmappers.Bowtie2ReadsMapper;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.BowtieReadsMapper;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.SequenceReadsMapper;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.SequenceReadsMapperService;
@@ -299,13 +300,14 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
   /**
    * Compile data of fastqscreen in percentage
-   * @return FastqScreenResult result of FastqScreen
+   * @return FastqScreenResult result of FastqScreen or null if an error occurs
+   *         during mapped: they are more readsmapped than reads processed
    */
   public FastqScreenResult getFastqScreenResult() throws AozanException {
 
     if (readsmapped > readsprocessed) {
-      LOGGER.warning("FASTQSCREEN : nb read mapped "
-          + readsmapped + " must been superior to nb read processed "
+      LOGGER.warning("FASTQSCREEN :  mapped reads count "
+          + readsmapped + " must been inferior to processed reads count"
           + readsprocessed);
       return null;
     }
@@ -321,15 +323,36 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * Return mapper arguments either the defaults or those specified in the
    * configuration
    * @return mapper arguments
+   * @throws AozanException for mapper different bowtie or bowtie2, no
+   *           parameters are define
    */
-  private String getMapperArguments() {
+  private String getMapperArguments() throws AozanException {
 
     if (this.newArgumentsMapper == null
         || this.newArgumentsMapper.length() == 0)
 
-      return " -l 20 -k 2 --chunkmbs 512"
-          + (this.pairedMode ? " --maxins 1000" : "");
+      if (mapper.getMapperName()
+          .equals(new BowtieReadsMapper().getMapperName())) {
 
+        // Parameter for Bowtie
+        return " -l 20 -k 2 --chunkmbs 512"
+            + (this.pairedMode ? " --maxins 1000" : "");
+
+      } else if (mapper.getMapperName().equals(
+          new Bowtie2ReadsMapper().getMapperName())) {
+
+        // Parameter for Bowtie2
+        return " -k 2 --very-fast-local --no-discordant --no-mixed"
+            + (this.pairedMode ? " --maxins 1000" : "");
+      } else {
+        // No parameter define for mapper
+        throw new AozanException(
+            "FastqScreen fail: no argument defined to the mapper "
+                + mapper.getMapperName()
+                + ". Only bowtie or bowtie2 are default parameters.");
+      }
+
+    // Return parameters setting in configuration Aozan file
     return this.newArgumentsMapper;
 
   }
@@ -346,11 +369,10 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       final String mapperArguments) throws AozanException {
 
     // Use default mapper if mapper name or arguments is null
-    if (mapperName == null
-        || mapperName.length() == 0 || mapperArguments == null
-        || mapperArguments.length() == 0) {
+    if (mapperName == null || mapperName.length() == 0) {
 
-      this.newArgumentsMapper = null;
+      if (mapperArguments != null && mapperArguments.length() > 0)
+        this.newArgumentsMapper = mapperArguments;
 
       return new BowtieReadsMapper();
     }
