@@ -150,118 +150,112 @@
 
 		<release version="1.0" description="Aozan version 1.0" date="2013-04-26">
 			<action dev="perrin" type="add">
-				Quality control contains a optional module for assessing sample
-				contamination,
-				based on FastQ Screen model.
+				The quality control step now contains a optional module for assessing sample
+				contamination using a re-implementation of FastQ Screen.
 			</action>
 			<action dev="perrin" type="add">
-				Quality control contains points of restoration if a hardware problem occurs
+				Add quality control restoration points to avoid relaunch all the analysis if a fatal error occurs
 				before the end.
 			</action>
 			<action dev="perrin" type="add">
-				Estimate the space needed for the current run and check free space in
-				directory for next step. If not send a warning mail.
+				Now estimate the space needed for the current run and check if enough free space in
+				directory for next step is available.
 			</action>
 			<action dev="perrin" type="add">
-				A logger commun for java and python code.
+				Add a common logger for java and python code.
 			</action>
 		</release>
 		<release version="1.1" description="Aozan version 1.1" date="2013-09-02">
 			<action dev="perrin" type="add">
-				Module of contamination detection uses partial fastq files for decrease
-				the runtime without lost of information.
+				Add a new module for contamination detection that use partial FASTQ files to reduce
+				computation time without lost of information.
 			</action>
 			<action dev="perrin" type="add">
-				Collector for reading TileOutMetrics.bin InterOp binary files for collect
-				data on the run.
+				Add a collector for reading TileOutMetrics.bin InterOp binary files.
 			</action>
 			<action dev="perrin" type="add">
-				Collector for reading ErrorOutMetrics.bin InterOp binary files for collect
-				data on the run.
+				Add a collector for reading ErrorOutMetrics.bin InterOp binary files.
 			</action>
 			<action dev="perrin" type="add">
-				Collector for reading ExtractionOutMetrics.bin InterOp binary files for
-				collect data on the run.
+				Add a collector for reading ExtractionOutMetrics.bin InterOp binary files.
 			</action>
 			<action dev="perrin" type="update">
-				Report of detection contamination : available in two formats in html and
-				csv.
-			</action>
-			<action dev="perrin" type="fix">
-				Contamination detection for pair-end run. Two modes : single (mapping used R1
-				fastq) or paired (mapping used two fastq R1 and R2).
+				The contamination detection report is now available in two formats: HTML and
+				CSV.
 			</action>
 			<action dev="perrin" type="add">
-				Mode debug, in configuration Aozan file.
+				Add contamination detection for paired-end runs. Two modes are available,
+				one by mapping only the first read and the other one by mapping both reads.
+			</action>
+			<action dev="perrin" type="add">
+				Add a debug mode in configuration Aozan file.
 			</action>
 		</release>
 		<release version="1.1.1" description="Aozan version 1.1.1"
 			date="2013-09-20">
 			<action dev="perrin" type="update">
-				Use FastQC version 0.10.1.
+				Aozan now use FastQC 0.10.1.
 			</action>
 			<action dev="perrin" type="fix">
-				Replace NA in qc report in Undetermined line by value.
+				Now show values for Undetermined instead of NA.
 			</action>
 		</release>
 		<release version="1.1.2" description="Aozan version 1.1.2"
 			date="2013-09-24">
 			<action dev="perrin" type="fix">
-				Fix bugs : files xsl (missing closing tags).
+				Fix missing closing tags in XSL files.
 			</action>
 		</release>
 		<release version="1.1.3" description="Aozan version 1.1.3"
 			date="2013-10-14">
 			<action dev="perrin" type="fix">
-				Fix bug : change directory to save index mapper (selected by parameter
-				tmp.path instead of /tmp).
+				The change directory to save mapper index can now be set instead of always use /tmp.
 			</action>
 		</release>
 		<release version="1.2" description="Aozan version 1.2" date="2013-12-09">
 			<action dev="perrin" type="add">
-				An optional module blast associated with module of FastQC
-				'Overrepresented Sequences' :
-				for unidentified sequences, a blastn has been launched, the first hit
-				is added in report FastQC.
+				Add an optional blast search in the 'Overrepresented Sequences' FastQC module.
+				For unidentified sequences, a blastn is launched and the first hit
+				is added in the FastQC report.
 			</action>
 			<action dev="perrin" type="add">
-				In Aozan configuration, possibility to specify several parameter of
-				FastQC : file with list of contaminants, kmers size, group.
+				In Aozan configuration several FastQC parameters can now be set:
+				a file with list of contaminants, the kmers size and if each cycles values
+				must be displayed.
 			</action>
 			<action dev="perrin" type="update">
-				In CASAVA/bcl2fastq sample sheet validator, add a tag to check genome
+				In the CASAVA/bcl2fastq samplesheet validator, add a tab to check genome
 				sample.
 			</action>
-			<action dev="perrin" type="add">
-				Add a new mode for continuous synchronize hiseq data on storage. If
-				Aozan is a cron job, at each launch it synchronizes data.
+			<action dev="jourdren" type="add">
+				Add an HiSeq data continuous synchronization mode.
 			</action>
 			<action dev="perrin" type="add">
-				File to formatter text code in eclipse or other IDE, download on
-				code.google.com aozan site.
+				Formatter file rules for eclipse or other IDE can be download on
+				code.google.com Aozan site.
 			</action>
 		</release>
 
 		<release version="1.2.1" description="Aozan version 1.2.1"
 			date="2014-01-17">
 			<action dev="perrin" type="add">
-				Homogeization key from parameters configuration. To retrieve value, now using the
-				new class Settings.
+				Homogeization of the configuration settings names. Now use the new Settings class
+				to retrieve a configuration value.
 			</action>
 			<action dev="perrin" type="update">
-				Update the test on demultiplexing
-				data 'percentinlanesample', add a score depends count samples in
+				In the test on demultiplexing
+				data 'percentinlanesample', add a score that depends of the sample count in the
 				lane.
 			</action>
 			<action dev="perrin" type="update">
-				Changes Guava library version from 14.0.1 to 15.1.
+				Update Guava library version dependency from 14.0.1 to 15.1.
 			</action>
 		</release>
-		
+
 		<release version="1.2.2" description="Aozan version 1.2.2"
 			date="2014-01-28">
 			<action dev="perrin" type="fix">
-				Mapping for detection contamination was launched in mono-thread mode.
+				The mapping for contamination detection was launched in mono-thread mode.
 			</action>
 		</release>
 
@@ -269,81 +263,81 @@
 		<release version="1.2.3" description="Aozan version 1.2.3"
 			date="2014-03-11">
 			<action dev="perrin" type="fix">
-				The alias genomes names file used during the detection contamination by FastQScreen is updated and not more writed a new file. 
+				The alias genome names file used by FastQScreen is updated and no more rewritten.
 			</action>
 			<action dev="perrin" type="add">
-				Checking principals parameters from configuration before starting Aozan.
+				Now check main parameters from configuration before starting Aozan.
 			</action>
 			<action dev="perrin" type="fix">
-				Launching steps when synchronization step is skipped without entry in infini loop.
-				The usefull directory and archives for next steps are been created. 
+				Launching steps when synchronization step is skipped without entry in infinite loop.
+				The useful directory and archives for next steps are been created.
 			</action>
 			<action dev="perrin" type="fix">
-				Generation qc report: now it can created with only one &apos;qc.test&apos; enable, call the usefull collectors automatically.
+				The QC report is now generated only if one &apos;qc.test&apos; is enabled. Useful collectors are automatically called.
 			</action>
 			<action dev="jourdren" type="fix">
-				The &apos;From&apos; field header of mails sent by Aozan was not set.
+				The &apos;From&apos; field header in emails sent by Aozan was not set.
 			</action>
-			
+
 		</release>
-		
+
 		<release version="1.2.4" description="Aozan version 1.2.4"
 			date="2014-03-14">
 			<action dev="jourdren" type="fix">
-				Check principals path from configuration, remove to lower. 
+				When check main paths in configuration, the paths are no more converted to lower case.
 			</action>
 			<action dev="jourdren" type="update">
-				Adding key to set compression format for bcl2fastq/casava (.bz2, .gz, none, bzip2, gz, gzip).
+				Add setting for bcl2fastq/casava compression format (.bz2, .gz, none, bzip2, gz, gzip).
 			</action>
 			<action dev="perrin" type="fix">
-				Field in configuration: blast database path, remove the prefix filename in path.
+			    Remove blast database prefix configuration setting.
 			</action>
 		</release>
 
 		<release version="1.2.5" description="Aozan version 1.2.5"
 			date="2014-04-04">
 			<action dev="perrin" type="fix">
-				Check aozan configuration file at the beginning, if failed, now it sends a mail.		
+				Now check aozan configuration file at the beginning. Sends an email if fails.
 			</action>
 		</release>
 
 		<release version="1.2.6" description="Aozan version 1.2.6"
 			date="2014-05-06">
 			<action dev="perrin" type="fix">
-				Check fastq not empty before create partial fastq used by FastqScreen for detection contamination.		
+				Now check if FASTQ files are not empty before creating partial FASTQ files used by FastqScreen for contamination detection.
 			</action>
 		</release>
 		<release version="1.2.7" description="Aozan version 1.2.7"
 			date="2014-09-01">
 			<action dev="perrin" type="update">
-				Now, Aozan run with JRE 1.7 and use new package of samtools v1.92.  
+				Aozan now requires Java 7 and use samtools/picard 1.92 as dependency.
 			</action>
 			<action dev="perrin" type="fix">
-				Change format data of sending message.   
+				Update email sending code. Now the email date is already set.
 			</action>
 			<action dev="perrin" type="update">
-				Compute phasing and prephasing values with RTA v1.18, ignore null tiles metric Interop file.
+				Compute phasing and prephasing values with RTA v1.18. Ignore null tiles metric values in Interop file.
 			</action>
 			<action dev="perrin" type="add">
-				Add page in web site to explain who create a plugin for Aozan.
+				Add a new web page to explain how to create a plugin for Aozan.
 			</action>
 		</release>
 		<release version="1.2.8" description="Aozan version 1.2.8"
 			date="2014-09-11">
 			<action dev="perrin" type="fix">
-				Compute phasing and prephasing values from Tiles metric Interop file: multiple by 100 to save in run data file, like before v1.2.7.
+				Fix compute phasing and prephasing values from tiles metric Interop file. Multiply by 100 values to get the same values as before v1.2.7.
 			</action>
 			<action dev="perrin" type="fix">
-				Order indentation in html report, display error for lines > 1000 characters with some server mail.
+				Fix indentation in html report. Fix display error for lines > 1000 characters when processed by some mail server.
 			</action>
 		</release>
-		
+
 		<release version="1.x" description="Aozan version 1.x"
 			date="TBD">
 			<action dev="jourdren" type="add">
 				Add global tests to the QC step. This new type of test comes with some global tests.
 			</action>
 		</release>
-				
+
 	</body>
 </document>
