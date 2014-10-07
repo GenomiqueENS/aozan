@@ -79,7 +79,7 @@ public class FastqscreenDemo {
   public static final String GENOMES_PATH = RESOURCE_ROOT + "/genomes";
 
   public static final String AOZAN_CONF =
-      "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_plugins.conf";
+      "/home/sperrin/Documents/FastqScreenTest/runtest/aozan_validation-1.3.conf";
 
   public static Map<String, FastqSample> prefixList;
   private static final boolean paired = false;
@@ -128,7 +128,7 @@ public class FastqscreenDemo {
         // Validation (mm10) - PE150
         runId = "131015_SNL110_0088_AH13M0ADXX";
       } else {
-        runId = "140818_SNL110_0129_Ah9bvmadxx";
+        runId = "140811_SNL110_0127_AH9AP9ADXX"; // "140818_SNL110_0129_Ah9bvmadxx";
       }
 
       // date = new SimpleDateFormat("yyMMdd").format(new Date());
@@ -342,7 +342,9 @@ public class FastqscreenDemo {
     conf.put(Settings.QC_CONF_CLUSTER_DENSITY_RATIO_KEY, "0.3472222");
     conf.put(
         Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY,
-        "/home/sperrin/Documents/FastqScreenTest/resources/alias_name_genome_fastqscreen.txt");
+        "/home/sperrin/Documents/FastqScreenTest/resources/alias_name_genome_fastqscreen.txt    ");
+
+    conf.put("qc.conf.fastqscreen.mapper", "bowtie2");
 
     System.out
         .println("genomes : "

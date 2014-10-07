@@ -46,12 +46,12 @@
       background: #55D486;
     }
 
-   tr:hover {
+   .sampleData tr:hover, .data tr:hover {
       z-index:2;
       box-shadow:0 0 20px rgba(0, 0, 0, 1);
       background:#F6F6B4;
     }
-
+    
     td {
       text-align: center;
       width: 100px;
@@ -66,7 +66,7 @@
     }
 
 <!--     table.sampleData td:last-child tr:last-child { -->
-	td.repeat{
+	.sampleData td:last-child, .sampleData tr:last-child{
       background: WhiteSmoke ;
       color: Gray;
       font-style: italic;
@@ -181,73 +181,56 @@
   		width: 150px;
   	}
 
-	a.linkFilterActivate:link, a.linkFilterUnactivate:link{
+	a.linkFilterActivate:link{
 		color:#ffffff;
-	}  
+	}
+	 a.linkFilterInactivate:link{
+	 	color:#000000;
+	 }
   	.linkFilterActivate {
-		-webkit-border-top-left-radius:24px;
-		-moz-border-radius-topleft:24px;
 		border-top-left-radius:24px;
-		-webkit-border-top-right-radius:24px;
-		-moz-border-radius-topright:24px;
 		border-top-right-radius:24px;
-		-webkit-border-bottom-right-radius:24px;
-		-moz-border-radius-bottomright:24px;
 		border-bottom-right-radius:24px;
-		-webkit-border-bottom-left-radius:24px;
-		-moz-border-radius-bottomleft:24px;
 		border-bottom-left-radius:24px;
 
+		background-color:#002447;
+		text-indent:0px;
+		border:3px solid #000000;
+		display:inline-block;
+		font-family:Arial;
+		font-size:15px;
+		font-weight:bold;
+		font-style:normal;
+		line-height:29px;
+		text-decoration:none;
+		text-align:center;
+		padding-left:5px;
+		padding-right:5px;
+	}
+
+	.linkFilterInactivate {
+		border-top-left-radius:24px;
+		border-top-right-radius:24px;
+		border-bottom-right-radius:24px;
+		border-bottom-left-radius:24px;
+
+		background-color:#ffffff;
+		text-indent:0px;
+		border:3px solid #000000;
+		display:inline-block;
+		font-family:Arial;
+		font-size:15px;
+		font-weight:bold;
+		font-style:normal;
+		line-height:29px;
+		text-decoration:none;
+		text-align:center;
+		padding-left:5px;
+		padding-right:5px;
+	}
+	.linkFilterInactivate:hover, .linkFilterActivate:hover {
 		background-color:#9A1319;
-		text-indent:0px;
-		border:2px solid #000000;
-		display:inline-block;
-		color:#ffffff;
-		font-family:Arial;
-		font-size:15px;
-		font-weight:bold;
-		font-style:normal;
-		line-height:29px;
-		text-decoration:none;
-		text-align:center;
-		text-shadow:1px 1px 0px #810e05;
-		padding-left:5px;
-		padding-right:5px;
-	}
-
-	.linkFilterUnactivate {
-		-webkit-border-top-left-radius:24px;
-		-moz-border-radius-topleft:24px;
-		border-top-left-radius:24px;
-		-webkit-border-top-right-radius:24px;
-		-moz-border-radius-topright:24px;
-		border-top-right-radius:24px;
-		-webkit-border-bottom-right-radius:24px;
-		-moz-border-radius-bottomright:24px;
-		border-bottom-right-radius:24px;
-		-webkit-border-bottom-left-radius:24px;
-		-moz-border-radius-bottomleft:24px;
-		border-bottom-left-radius:24px;
-
-		background-color:#A7A9AF;
-		text-indent:0px;
-		border:2px solid #000000;
-		display:inline-block;
-		color:#ffffff;
-		font-family:Arial;
-		font-size:15px;
-		font-weight:bold;
-		font-style:normal;
-		line-height:29px;
-		text-decoration:none;
-		text-align:center;
-		text-shadow:1px 1px 0px #4E5C86;
-		padding-left:5px;
-		padding-right:5px;
-	}
-	.linkFilterUnactivate:hover, .linkFilterActivate:hover {
-		background-color:#487DD6;
-		font-size:150%;
+		color:#000000;
 	}
 
 	#filterProject td{
@@ -270,8 +253,8 @@
 			}
 
 	        // Change class link
-	       // Unactivate link
-	       document.getElementsByClassName('linkFilterActivate')[0].setAttribute('class', 'linkFilterUnactivate');
+	       // Inactivate link
+	       document.getElementsByClassName('linkFilterActivate')[0].setAttribute('class', 'linkFilterInactivate');
 	       // Activate new element
 	       elemLink.setAttribute('class', 'linkFilterActivate');
 
@@ -330,9 +313,7 @@
   <xsl:if test="/QCReport[GlobalReport]">
   <a name="global"/>
   <h2>Global report</h2>
-
-
-  <table>
+  <table class="data">
   <tr>
     <xsl:for-each select="/QCReport/GlobalReport/Columns/Column">
       <th><xsl:value-of select="."/><xsl:if test="@unit!=''"> (<xsl:value-of select="@unit"/>)</xsl:if></th>
@@ -358,7 +339,7 @@
 <div>
   <xsl:for-each select="/QCReport/ReadsReport/Reads/Read">
     <h3>Read <xsl:value-of select="@number"/> (<xsl:value-of select="@cycles"/> cycles<xsl:if test="@indexed='true'">, index</xsl:if>)</h3>
-    <table>
+    <table class="data">
     <tr>
       <th>Lane</th>
       <xsl:for-each select="/QCReport/ReadsReport/Columns/Column">
@@ -390,13 +371,12 @@
 	  <h4>Filter by projects</h4>
 	  <table id="filterProject">
 	    <tr>
-		  <td>Projects</td>
 	      <td><a href="javascript:void(0);" class="linkFilterActivate" onclick="window.location.reload(true);">ALL</a></td>
 
 	      <xsl:for-each select="/QCReport/ProjectsReport/ProjectName">
 		    <td>
 			  <xsl:element name="a">
-			  <xsl:attribute name="class">linkFilterUnactivate</xsl:attribute>
+			  <xsl:attribute name="class">linkFilterInactivate</xsl:attribute>
 			  <xsl:attribute name="href">javascript:void(0);</xsl:attribute>
 			  <xsl:attribute name="onclick">javascript:filterRow([<xsl:value-of select="@cmdJS"></xsl:value-of>], this);</xsl:attribute>
 				<xsl:value-of select="." /></xsl:element>
