@@ -26,16 +26,16 @@
 <document>
 
   <properties>
-    <title>Aozan community</title>
+    <title>Writing an Aozan plug-in</title>
     <author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
     <author email="sperrin@biologie.ens.fr">Sandrine Perrin</author>
   </properties>
-  
-  
+
+
   <body>
 
-   <section name="Writing an Aozan step plug-in">
-	
+   <section name="Writing an Aozan plug-in">
+
     <ul>
       <li><a href="#requirements">Requirements</a></li>
       <li><a href="#createproject">Create the project</a></li>
@@ -45,52 +45,52 @@
       <li><a href="#install">Installing the project</a></li>
     </ul>
 
-	<a name="requirements"/>
+    <a name="requirements"/>
     <subsection name="Requirements">
-   
-	  <p>To develop an Aozan plugin, you need:</p>
-	  <ul>
-	  	<li>A Linux 64 bit (x86-64) distribution (e.g. <a href="http://www.ubuntu.com/">Ubuntu</a>, 
-	  	<a href="http://www.debian.org/">Debian</a>, 
-	  	<a href="http://fedoraproject.org/">Fedora</a>...). 
-	  	You can develop on other system but your system will not run Eoulsan</li>
-	    <li>A <a href="http://www.oracle.com/technetwork/java/index.html">Java 7</a> SDK (Oracle JDK or openJDK are recommended)</li>
-	    <li><a href="http://maven.apache.org/">Maven 2.2.x</a></li>
-	    <li>An IDE like <a href="http://www.eclipse.org/">Eclipse</a> (Optional)</li>
-	    <li>An Internet connection</li>
-	  </ul>
-	  
-	  <p>If you use Ubuntu 14.04 (Trusty Tahr), you can install all the 
-	  requirements with the next command line:</p>
+
+          <p>To develop an Aozan plugin, you need:</p>
+          <ul>
+            <li>A Linux 64 bit (x86-64) distribution (e.g. <a href="http://www.ubuntu.com/">Ubuntu</a>,
+              <a href="http://www.debian.org/">Debian</a>,
+              <a href="http://fedoraproject.org/">Fedora</a>...).
+                You can develop on other operating systems but your system will not run Aozan</li>
+            <li>A <a href="http://www.oracle.com/technetwork/java/index.html">Java 7</a> SDK (Oracle JDK or OpenJDK are recommended)</li>
+            <li><a href="http://maven.apache.org/">Maven 2.2.x</a></li>
+            <li>An IDE like <a href="http://www.eclipse.org/">Eclipse</a> (Optional)</li>
+            <li>An Internet connection</li>
+          </ul>
+
+          <p>If you use Ubuntu 14.04 (Trusty Tahr), you can install all the
+             requirements with the next command line:</p>
 <source>
 $ sudo apt-get install openjdk-7-jdk maven2 eclipse-jdt
 </source>
-   
+
     </subsection>
-    
+
     <a name="createproject"/>
     <subsection name="Creation of the project">
-    
-      <p>Maven simplify the management of project dependencies, that's why in this example we use Maven 
+
+      <p>Maven simplify the management of project dependencies, that's why in this example we use Maven
       to build our project. It is not mandatory to use Maven but it is quite harder without.</p>
-    
+
       <ul>
         <li>First we generate the skeleton of our plugin with Maven. NB: pom.xml should not exist in the current folder.</li>
-    
+
 <source>
 $ mvn archetype:generate \
   -DarchetypeGroupId=org.apache.maven.archetypes \
   -DarchetypeArtifactId=maven-archetype-quickstart \
-  -DgroupId=fr.ens.transcriptome  \
+  -DgroupId=com.example  \
   -DartifactId=myaozanplugin \
   -Dversion=0.1-alpha-1 \
   -Durl=http://transcriptome.ens.fr/aozanplugin \
   -DinteractiveMode=false
 </source>
 
-        <li>You will obtain the following files. 
-        Samples <b>App.java</b> and <b>AppTest.java</b> 
-        files will not be used in your plug-in. You can remove them but 
+        <li>You will obtain the following files.
+        Samples <b>App.java</b> and <b>AppTest.java</b>
+        files will not be used in your plug-in. You can remove them but
         keep the <code>com.example</code> package folders.</li>
  <source>
 myaozanplugin
@@ -107,9 +107,9 @@ myaozanplugin
                 `-- example
                     `-- AppTest.java
  </source>
-    
-        <li>Next edit the <b>pom.xml</b> at the root of the project to add the Aozan 
-        dependency and the ENS repository where Aozan dependency is available:</li> 
+
+        <li>Next edit the <b>pom.xml</b> at the root of the project to add the Aozan
+        dependency and the ENS repository where Aozan dependency is available:</li>
 <source>
   &lt;repositories&gt;
     &lt;repository&gt;
@@ -121,7 +121,7 @@ myaozanplugin
       &lt;url&gt;http://transcriptome.ens.fr/maven2&lt;/url&gt;
     &lt;/repository&gt;
   &lt;/repositories&gt;
-        
+
   &lt;dependencies&gt;
     &lt;dependency&gt;
       &lt;groupId>fr.ens.transcriptome&lt;/groupId&gt;
@@ -135,20 +135,20 @@ myaozanplugin
       &lt;version>3.8.1&lt;/version&gt;
       &lt;scope>test&lt;/scope&gt;
     &lt;/dependency&gt;
-    
+
     &lt;!-- Add specific library needed for plugin --&gt;
     &lt;dependency&gt;
-  	  &lt;!-- jsoup HTML parser library @ http://jsoup.org/ --&gt;
-  	  &lt;groupId&gt;org.jsoup&lt;/groupId&gt;
-  	  &lt;artifactId&gt;jsoup&lt;/artifactId&gt;
-  	  &lt;version&gt;1.7.3&lt;/version&gt;
-	&lt;/dependency&gt;
+      &lt;!-- jsoup HTML parser library @ http://jsoup.org/ --&gt;
+      &lt;groupId&gt;org.jsoup&lt;/groupId&gt;
+      &lt;artifactId&gt;jsoup&lt;/artifactId&gt;
+      &lt;version&gt;1.7.3&lt;/version&gt;
+    &lt;/dependency&gt;
   &lt;/dependencies&gt;
 </source>
 
-        <li>In the <b>pom.xml</b> add also a build section to set the compilation 
+        <li>In the <b>pom.xml</b> add also a build section to set the compilation
         mode to java 1.7 and set the path of the java resources.
-        The <b>src/main/java/files</b> folder is where the developer put resource files 
+        The <b>src/main/java/files</b> folder is where the developer put resource files
         and the <b>src/main/java/META-INF</b> directory is for the metadata of your plug-in.</li>
 <source>
   &lt;build&gt;
@@ -176,23 +176,26 @@ myaozanplugin
 
         <li>Now you can generate an eclipse project with :</li>
 <source>
-$ mvn eclipse:eclipse  -DdownloadSources=true -DdownloadJavadocs=true
+$ mvn eclipse:eclipse -DdownloadSources=true -DdownloadJavadocs=true
 </source>
-		<li>A warning message may appear if some source or javadoc dependencies cannot be found.</li>
-		<li>To import the project in Eclipse, go to <b>File</b> &gt; <b>Import...</b> &gt; 
-		<b>General</b> &gt; <b>Existing projects into Workspace</b> 
-		and select the root directory of the myaozanplugin project. By clicking on the finish button, 
-		myaozanplugin will be imported into Eclipse workspace. </li>
+        <li>A warning message may appear if some source or javadoc dependencies cannot be found.</li>
+        <li>To import the project in Eclipse, go to <b>File</b> &gt; <b>Import...</b> &gt;
+          <b>General</b> &gt; <b>Existing projects into Workspace</b>
+          and select the root directory of the myaozanplugin project. By clicking on the finish button,
+          myaozanplugin will be imported into Eclipse workspace. </li>
       </ul>
-    
+
     </subsection>
-    
+
     <a name="coding"/>
     <subsection name="Coding the plug-in">
-    
+
+      <p>As an example, we show bellow a plug-in example that extract the focus score value for each base (A, T, G, C) from the HTML first base report file
+      and check if collected values are in a interval defined by the user in the Aozan configuration file.</p>
+
       <ul>
-      	<li>In the package <code>fr.ens.transcriptome</code> create a class name <code>FocusScoreCollector</code> 
-      	that extends <code>Collector</code>.</li>
+        <li>In the package <code>com.example.myaozanplugin</code> create a class name <code>FocusScoreCollector</code>
+          that extends <code>Collector</code>. This class allow to collect the focus score data from the first base report.</li>
 <source>
 /*
  *                  Aozan development code
@@ -216,7 +219,7 @@ $ mvn eclipse:eclipse  -DdownloadSources=true -DdownloadJavadocs=true
  *      http://www.transcriptome.ens.fr/aozan
  *
  */
-package fr.ens.transcriptome.aozan.collectors;
+package com.example.myaozanplugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -344,7 +347,6 @@ public class FocusScoreCollector implements Collector {
 
     // Save in run data
     writeRundata(data, scoresPerLane, scoresPerBase);
-
   }
 
   /**
@@ -424,126 +426,126 @@ public class FocusScoreCollector implements Collector {
 }
 </source>
 
-      	<li>The second class create in the package <code>fr.ens.transcriptome</code> with a class name <code>FocusScoreLaneTest</code> 
-      	that extends <code>AbstractSimpleLaneTest</code>. The class define a test to configure in Aozan configuration file. 
-      	A new column appears in table lane quality control report. 
-      	</li>
+      <li>The second class to create in the package <code>com.example.myaozanplugin</code>
+        is a class that extends <code>AbstractSimpleLaneTest</code>:
+        <code>FocusScoreLaneTest</code>. This class define a test class that will
+        check if focus values are in the interval defined by the user in the Aozan configuration file.
+        The <a href="#install">last section</a> of page show how to enable this test.
+      </li>
 <source>
-	/*
-	 *                  Aozan development code
-	 *
-	 * This code may be freely distributed and modified under the
-	 * terms of the GNU General Public License version 3 or later
-	 * and CeCILL. This should be distributed with the code. If you
-	 * do not have a copy, see:
-	 *
-	 *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
-	 *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
-	 *
-	 * Copyright for this code is held jointly by the Genomic platform
-	 * of the Institut de Biologie de l'École Normale Supérieure and
-	 * the individual authors. These should be listed in @author doc
-	 * comments.
-	 *
-	 * For more information on the Aozan project and its aims,
-	 * or to join the Aozan Google group, visit the home page at:
-	 *
-	 *      http://www.transcriptome.ens.fr/aozan
-	 *
-	 */
-	package fr.ens.transcriptome.aozan.tests;
-	
-	import java.util.List;
-	
-	import com.google.common.collect.ImmutableList;
-	
-	import fr.ens.transcriptome.aozan.collectors.FocusScoreCollector;
-	import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
-	
-	public class FocusScoreLaneTest extends AbstractSimpleLaneTest {
-	
-	  // private final ScoreInterval interval = new ScoreInterval();
-	
-	  @Override
-	  protected String getKey(int read, boolean indexedRead, int lane) {
-	
-	    return FocusScoreCollector.PREFIX_DATA + ".lane" + lane;
-	  }
-	
-	  @Override
-	  protected Class&lt;?> getValueType() {
-	
-	    return Double.class;
-	  }
-	
-	  @Override
-	  public List&lt;String> getCollectorsNamesRequiered() {
-	    return ImmutableList.of(RunInfoCollector.COLLECTOR_NAME,
-	        FocusScoreCollector.COLLECTOR_NAME);
-	  }
-	
-	  //
-	  // Public constructor
-	  //
-	  public FocusScoreLaneTest() {
-	    super("focusscore", "from first base report",
-	        "Focus Score (first estimation)");
-	  }
-	}
+/*
+ *                  Aozan development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU General Public License version 3 or later
+ * and CeCILL. This should be distributed with the code. If you
+ * do not have a copy, see:
+ *
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+ *
+ * Copyright for this code is held jointly by the Genomic platform
+ * of the Institut de Biologie de l'École Normale Supérieure and
+ * the individual authors. These should be listed in @author doc
+ * comments.
+ *
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page at:
+ *
+ *      http://www.transcriptome.ens.fr/aozan
+ *
+ */
+package com.example.myaozanplugin;
+
+import java.util.List;
+
+import com.google.common.collect.ImmutableList;
+
+import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
+
+public class FocusScoreLaneTest extends AbstractSimpleLaneTest {
+
+  @Override
+  protected String getKey(int read, boolean indexedRead, int lane) {
+
+    return FocusScoreCollector.PREFIX_DATA + ".lane" + lane;
+  }
+
+  @Override
+  protected Class&lt;?> getValueType() {
+
+    return Double.class;
+  }
+
+  @Override
+  public List&lt;String> getCollectorsNamesRequiered() {
+    return ImmutableList.of(RunInfoCollector.COLLECTOR_NAME,
+        FocusScoreCollector.COLLECTOR_NAME);
+  }
+
+  /**
+  /* Public constructor.
+   **/
+  public FocusScoreLaneTest() {
+    super("focusscore", "from first base report",
+        "Focus Score (first estimation)");
+  }
+}
 </source>
-	    
+
      </ul>
    </subsection>
-   
+
    <a name="register"/>
    <subsection name="Register the plugin">
-   
-   <p>Like many java components (JDBC, JCE, JNDI...), Aozan use the Service provider Interface (spi) 
-   system for its plugin system. To get a functional spi plugin, you need a class that implements an 
-   interface (here <code>FocusScoreCollector</code> implements the <code>Collector</code> interface and 
-   <code>FocusScoreLaneTest</code> extends <code>AbstractSimpleLaneTest</code>) and a declaration of your implementation 
-   of the interface in the metadata. To register your collector and laneTest in the metadata:</p>
-   
+
+   <p>Like many java components (JDBC, JCE, JNDI...), Aozan use the Service provider Interface (spi)
+   system for its plugin system. To get a functional spi plugin, you need a class that implements an
+   interface (here <code>FocusScoreCollector</code> implements the <code>Collector</code> interface and
+   <code>FocusScoreLaneTest</code> implements the <code>AozanTest</code> interface) and a declaration of your implementation
+   of the interface in the metadata. To register your collector and your test in the metadata use the following command lines:</p>
+
 <source>
 $ mkdir -p src/main/java/fr/ens/transcriptome/aozan/collectors fr/ens/transcriptome/aozan/tests META-INF/services
 $ echo fr.ens.transcriptome.aozan.collectors.FocusScoreCollector > src/main/java/META-INF/services/fr.ens.transcriptome.aozan.collectors.Collector
 $ echo fr.ens.transcriptome.aozan.tests.FocusScoreLaneTest > src/main/java/META-INF/services/fr.ens.transcriptome.aozan.tests.AozanTest
 </source>
-	
-	<p>If you have more than one step to register, add the other full class names of your steps in the next 
-	lines of the file.</p>
-    
+
+      <p>If you have more than one step to register, add the other full class names of your plugins in the next
+        lines of the files.</p>
+
     </subsection>
-    
+
     <a name="compile"/>
     <subsection name="Compile the plugin">
-    
+
     <p>The compilation is quite simple, at the root of your project launch:</p>
 <source>
 $ mvn clean install
 </source>
     </subsection>
-    <p>This command line will clean the <b>target</b> directory before lauching the compilation. You will obtain a 
+    <p>This command line will clean the <b>target</b> directory before lauching the compilation. You will obtain a
     <b>myaozanplugin-0.1-alpha-1.jar</b> jar archive that contains your plugin in the <b>target</b> directory.</p>
-    
+
     <a name="install"/>
     <subsection name="Install the plugin">
-    
-    <p>To install an Aozan plugin, you just have to copy the generated jar file from the <b>target</b> directory of your project 
-    to the <b>lib</b> directory of your Aozan installation, and the other specific library needed by plugin (jsoup-1.7.3.jar). 
-    Your plugin is now ready to use like usually.</p> 
-    
-    <p>You must update Aozan configuration file and add parameters for the collector. In this file, you add this two lines for example, 
-    the laneTest is called also the collector will be executed.</p> 
-      <p>qc.test.focusscore.enable=True<br/>
-	     qc.test.focusscore.interval=[75.0, 100.0]</p>
-	
-	<div border="1">Example of personal quality control report html.
-	  <p><img src="images/qc_report_aozan-plugin.png" alt="control quality report after plugin execution" border="1"/></p> 
-    </div>
-    
+
+    <p>To install an Aozan plugin, you just have to copy the generated jar file from the <b>target</b> directory of your project
+    to the <b>lib</b> directory of your Aozan installation with the other specific libraries needed by plugin (jsoup-1.7.3.jar
+    for this example). Your plug-in is now ready to use like the other built-in collectors and tests of Aozan.</p>
+
+    <p>To enable your plug-in, you must update the Aozan configuration file and set parameters for the required test. For this example, must
+    you add the following one line to enable the focusscore test and another line to set the expected interval:</p>
+<source>qc.test.focusscore.enable=True
+qc.test.focusscore.interval=[75.0, 100.0]
+</source>
+
+    <p>After running Aozan with this example plug-in, we've got the following quality control report: </p>
+
+    <div align="center"><img src="images/qc_report_aozan-plugin.png" alt="control quality report after plugin execution" border="1"/></div>
+
     </subsection>
   </section>
-   
+
   </body>
 </document>
