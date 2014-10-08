@@ -344,7 +344,7 @@ public class FastqscreenDemo {
         Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY,
         "/home/sperrin/Documents/FastqScreenTest/resources/alias_name_genome_fastqscreen.txt    ");
 
-    conf.put("qc.conf.fastqscreen.mapper", "bowtie2");
+    conf.put("qc.conf.fastqscreen.mapper", "bowtie");
 
     System.out
         .println("genomes : "
