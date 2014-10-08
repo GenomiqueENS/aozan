@@ -31,6 +31,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import fr.ens.transcriptome.aozan.Globals;
+
 /**
  * This class defines useful method to handle files.
  * @since 1.2
@@ -39,8 +41,8 @@ import com.google.common.collect.Lists;
 public class FileUtils {
 
   /**
-   * Convert a file in string list 
-   * @param is input stream 
+   * Convert a file in string list
+   * @param is input stream
    * @return list of string from file
    * @throws IOException
    */
@@ -52,7 +54,9 @@ public class FileUtils {
 
     final List<String> result = Lists.newArrayList();
 
-    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+    BufferedReader reader =
+        new BufferedReader(new InputStreamReader(is,
+            Globals.DEFAULT_FILE_ENCODING));
 
     String line = null;
 
