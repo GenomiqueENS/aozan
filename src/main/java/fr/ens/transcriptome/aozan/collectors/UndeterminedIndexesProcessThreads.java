@@ -144,7 +144,7 @@ public class UndeterminedIndexesProcessThreads extends
      */
     public String toCSV() {
 
-      return String.format("%s\t%d\t%d\t%.02f%%\t%.02f%%\t%.02f%%\t%s\n",
+      return String.format("%s\t%d\t%d\t%.02f%%\t%.02f%%\t%.02f%%\t%s%n",
           this.index, this.rawClusterCount, this.pfClusterCount,
           this.pfPercent, this.inRawUndeterminedIndicePercent,
           this.inPFUndeterminedIndicePercent, this.comment);
@@ -153,7 +153,60 @@ public class UndeterminedIndexesProcessThreads extends
     @Override
     public int compareTo(final LaneResultEntry that) {
 
-      return -((Integer) this.pfClusterCount).compareTo(that.pfClusterCount);
+      return ((Integer) that.pfClusterCount).compareTo(this.pfClusterCount);
+    }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((comment == null) ? 0 : comment.hashCode());
+      long temp;
+      temp = Double.doubleToLongBits(inPFUndeterminedIndicePercent);
+      result = prime * result + (int) (temp ^ (temp >>> 32));
+      temp = Double.doubleToLongBits(inRawUndeterminedIndicePercent);
+      result = prime * result + (int) (temp ^ (temp >>> 32));
+      result = prime * result + ((index == null) ? 0 : index.hashCode());
+      result = prime * result + pfClusterCount;
+      temp = Double.doubleToLongBits(pfPercent);
+      result = prime * result + (int) (temp ^ (temp >>> 32));
+      result = prime * result + rawClusterCount;
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      LaneResultEntry other = (LaneResultEntry) obj;
+      if (comment == null) {
+        if (other.comment != null)
+          return false;
+      } else if (!comment.equals(other.comment))
+        return false;
+      if (Double.doubleToLongBits(inPFUndeterminedIndicePercent) != Double
+          .doubleToLongBits(other.inPFUndeterminedIndicePercent))
+        return false;
+      if (Double.doubleToLongBits(inRawUndeterminedIndicePercent) != Double
+          .doubleToLongBits(other.inRawUndeterminedIndicePercent))
+        return false;
+      if (index == null) {
+        if (other.index != null)
+          return false;
+      } else if (!index.equals(other.index))
+        return false;
+      if (pfClusterCount != other.pfClusterCount)
+        return false;
+      if (Double.doubleToLongBits(pfPercent) != Double
+          .doubleToLongBits(other.pfPercent))
+        return false;
+      if (rawClusterCount != other.rawClusterCount)
+        return false;
+      return true;
     }
 
     @Override
@@ -281,16 +334,69 @@ public class UndeterminedIndexesProcessThreads extends
      */
     public String toCSV() {
 
-      return String.format("%s\t%d\t%d\t%.02f%%\t%.02f%%\t%.02f%%\t%s\n",
+      return String.format("%s\t%d\t%d\t%.02f%%\t%.02f%%\t%.02f%%\t%s%n",
           this.index, this.rawClusterCount, this.pfClusterCount,
           this.pfPercent, this.rawClusterPercent, this.pfClusterPercent,
           this.comment);
     }
 
     @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((comment == null) ? 0 : comment.hashCode());
+      result = prime * result + ((index == null) ? 0 : index.hashCode());
+      result = prime * result + pfClusterCount;
+      long temp;
+      temp = Double.doubleToLongBits(pfClusterPercent);
+      result = prime * result + (int) (temp ^ (temp >>> 32));
+      temp = Double.doubleToLongBits(pfPercent);
+      result = prime * result + (int) (temp ^ (temp >>> 32));
+      result = prime * result + rawClusterCount;
+      temp = Double.doubleToLongBits(rawClusterPercent);
+      result = prime * result + (int) (temp ^ (temp >>> 32));
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      SampleResultEntry other = (SampleResultEntry) obj;
+      if (comment == null) {
+        if (other.comment != null)
+          return false;
+      } else if (!comment.equals(other.comment))
+        return false;
+      if (index == null) {
+        if (other.index != null)
+          return false;
+      } else if (!index.equals(other.index))
+        return false;
+      if (pfClusterCount != other.pfClusterCount)
+        return false;
+      if (Double.doubleToLongBits(pfClusterPercent) != Double
+          .doubleToLongBits(other.pfClusterPercent))
+        return false;
+      if (Double.doubleToLongBits(pfPercent) != Double
+          .doubleToLongBits(other.pfPercent))
+        return false;
+      if (rawClusterCount != other.rawClusterCount)
+        return false;
+      if (Double.doubleToLongBits(rawClusterPercent) != Double
+          .doubleToLongBits(other.rawClusterPercent))
+        return false;
+      return true;
+    }
+
+    @Override
     public int compareTo(final SampleResultEntry that) {
 
-      return -((Integer) this.pfClusterCount).compareTo(that.pfClusterCount);
+      return ((Integer) that.pfClusterCount).compareTo(this.pfClusterCount);
     }
 
     @Override
@@ -704,8 +810,9 @@ public class UndeterminedIndexesProcessThreads extends
    * Create the lane result file.
    * @param extension extension of the file
    * @return a File object
+   * @throws IOException if it fails to create directory of report
    */
-  private File createLaneResultFile(final String extension) {
+  private File createLaneResultFile(final String extension) throws IOException {
 
     final File reportFile =
         new File(this.reportDir, getFastqSample().getKeyFastqSample()
@@ -714,7 +821,9 @@ public class UndeterminedIndexesProcessThreads extends
     // Create parent directory if necessary
     final File parentDir = reportFile.getParentFile();
     if (!parentDir.exists())
-      parentDir.mkdirs();
+      if (!parentDir.mkdirs())
+        throw new IOException(
+            "Undetermined: Fail to create parent directory of recovery cluster report.");
 
     return reportFile;
   }
@@ -829,9 +938,10 @@ public class UndeterminedIndexesProcessThreads extends
    * @param sampleName the sample name
    * @param extension extension of the file
    * @return a File object
+   * @throws IOException if it fails to create directory of report
    */
   private File createSampleResultFile(final String sampleName,
-      final String extension) {
+      final String extension) throws IOException {
 
     final File reportFile =
         new File(this.reportDir.getAbsolutePath()
@@ -841,7 +951,9 @@ public class UndeterminedIndexesProcessThreads extends
     // Create parent directory if necessary
     final File parentDir = reportFile.getParentFile();
     if (!parentDir.exists())
-      parentDir.mkdirs();
+      if (!parentDir.mkdirs())
+        throw new IOException(
+            "Undetermined: Fail to create parent directory of recovery cluster report.");
 
     return reportFile;
   }
