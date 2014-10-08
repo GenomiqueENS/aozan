@@ -86,7 +86,7 @@
 
 		<menu name="Development">
 		    <item name="How to contribute" href="/contribute.html"/>
-  		    <item name="Writing a Collector plugin" href="/writingstepplugin.html" />
+  		    <item name="Writing a plugin" href="/writingstepplugin.html" />
 			<item name="Downloading sources" href="/download-src.html" />
 			<item name="Compiling" href="/compiling.html"/>
 			<!-- item name="Developer Wiki" href="http://code.google.com/p/aozan/wiki/MainPage" /-->

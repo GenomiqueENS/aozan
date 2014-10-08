@@ -217,7 +217,7 @@ especially the <a href="http://transcriptome.ens.fr/eoulsan/datarepositories.htm
 			<td>qc.conf.fastqscreen.mapper</td>
 			<td>string</td>
 			<td>bowtie</td>
-			<td>In a next version, it will be  possible to choice between bowtie and bowtie2</td>
+			<td>In a next version, it will be  possible to choice between bowtie and bowtie2. Per default, call bowtie.</td>
 		  </tr>
 		  <tr>
 			<td>qc.conf.fastqscreen.mapper.argument</td>

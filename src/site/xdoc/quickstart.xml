@@ -51,7 +51,7 @@
                     <ul>
 	                      <li><a href="#casava">Installing Casava</a></li>
 	                      <li><a href="#bcl2fastq">Installing bcl2fastq</a></li>
-	                      <li><a href="#blastall">Installing blastall (optional)</a></li>
+	                      <li><a href="#blastall">Installing ncbi-blast+ (optional)</a></li>
                     </ul>
 	            <li>
 					<a href="#installation">Installation</a>
@@ -208,11 +208,11 @@ COMPRESSIONSUFFIX:=.gz
 
  </subsection>
 
- <a name="blastall"/>
- <subsection name="Installing blastall, optional for quality control">
+ <a name="ncbi-blast+"/>
+ <subsection name="Installing ncbi-blast+, optional for quality control">
 
- <p>To installing blastall on your system (here Ubuntu), use the following command line: </p>
-	<source>$ sudo apt-get install blast2</source>
+ <p>To installing ncbi-blast+ (or blastall) on your system (Ubuntu or centos), use the following command line: </p>
+	<source>$ sudo apt-get install ncbi-blast+</source>
   <p>Now download the requiered &quot;nt&quot; database from NCBI : </p>
 	<source>
 $ ftp ftp.ncbi.nlm.nih.gov
@@ -225,6 +225,7 @@ $ mget nt*
 	</source>
 	  <p>Unzip all files, the first nt.00.tar.gz contains the file nt.nal.</p>
 	  <p>Use the perl script to update the database, you can consult <a href="http://www.ncbi.nlm.nih.gov/books/NBK1762/" target="_blank">the NCBI documentation.</a></p>
+	  <p>Like Aozan version 1.2, it is always possible to use blastall.</p>
 	 </subsection>
    </section>
 
@@ -403,6 +404,8 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
 
      <table>
 	   <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+	   <tr><td>include</td><td>string</td><td>No set</td><td><b>Must be the first line in configuration file.</b>
+	   		Set the other configuration file path to load at first, their value are replaced by the current file. Now Aozan can be use in multiserver context.</td></tr>
 	   <tr><td>aozan.enable</td><td>boolean</td><td>False</td><td>Enable Aozan</td></tr>
 	   <tr><td>aozan.log.level</td><td>string</td><td>INFO</td><td>Log level (ALL, FINEST, FINER, FINE, CONFIG, INFO, WARNING, SEVERE, OFF)</td></tr>
 	   <tr><td>aozan.debug</td><td>boolean</td><td>False</td><td>mode debug</td></tr>

@@ -83,21 +83,64 @@
 		</section>
 
 		<section name="News on Aozan">
+		
+		
+			<subsection name="Add globals tests in control quality report">
+				<p>
+					Enhancement of the control quality report, with a new table on globals test: listing data on all lanes in run
+					<a href="qc-global-tests.html">more details here.</a>
+				</p>
+			
+			</subsection>
+			
+			<subsection name="Analysis undetermined fastq">
+				<p>
+					<a href="qc-samples-tests.html#recoveryclusters">Add modules to recovery clusters, details here.</a>
+					The undetermined fastq from demultiplexing step are parsing to collect all indices. For each, it proposes the sample(s) 
+					corresponding with one mismatch more that used for demultiplexing. The conflict is easy to identify.
+					Two reports type in csv and html formats are generate : 
+					<p>a recovery clusters for each indexed lanes : 
+						listing all indices collected and the potential samples present in lanes, with data on parsing filter.
+						<img src="" alt="the lane report html for recovering clusters" border="1"/>
+					</p>
+					<p>a recovery clusters for each indexed samples : 
+						listing all indices identify to the sample from the lane, with data on parsing filter.
+						<img src="" alt="the sample report html for recovering clusters" border="1"/>
+					</p>   
+				</p>
+				
+				<p>Two parameters have been added in the configuration Aozan file to run FastQC and contamination detection on undetermined fastq. 
+				For contamination detection, the genomes databank used includes all genomes contaminants from configuration file and all genomes 
+				from samplesheet file, when they are available for mapping.
+				This data can help to understand origin of problems occuring during sequencing.
+				</p>
+			</subsection>
 
+			<subsection name="Using Aozan in multiserver context">
+				<p>
+					Now Aozan can use several configuration files with the keyword "include" at first line in configuration to set a other configuration 
+					file path, it will loaded first.
+				</p>
+			</subsection>
 			<subsection name="FastQC and enhancement">
-				<p>The control quality steps contains an additional FastQC module named &quot;<b>Bad tiles</b>&quot; that search tiles with BMS (Bottom Middle Swath) issues with Illumina flowcell v3.</p>
+				<p>The control quality steps contains an additional FastQC module named &quot;<b>Bad tiles</b>&quot; that search tiles with BMS 
+				   (Bottom Middle Swath) issues with Illumina flowcell v3.</p>
 
-		        <p>Optionally, Aozan adds a sub-step in FastQC to enhance the Overrepresented sequences module. For sequences with &quot;no hit&quot;, a blastn can be launch to estimate the source.
-		        Blastn results with 100% identity and 0% gap will be included in report.</p>
+		        <p>Optionally, Aozan adds a sub-step in FastQC to enhance the Overrepresented sequences module. For sequences with &quot;no hit&quot;, 
+		           a blastn can be launch to estimate the source.
+		           Blastn results with 100% identity and 0% gap will be included in report.</p>
 		    	<div align="center">
-		    		<a href="qc-samples-tests.html#badtiles"><img src="images/qc_fastqc_bad_tiles_height.png" alt="module bad tiles" style="vertical-align:middle"/></a>
-		        	<a href="qc-samples-tests.html#overrepresented"><img src="images/qc_fastqc_overrepresented_blast_h350px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></a>
+		    		<a href="qc-samples-tests.html#badtiles">
+		    			<img src="images/qc_fastqc_bad_tiles_height.png" alt="module bad tiles" style="vertical-align:middle"/></a>
+		        	<a href="qc-samples-tests.html#overrepresented">
+		        	 	<img src="images/qc_fastqc_overrepresented_blast_h350px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></a>
 		    	</div> 
 			</subsection>
 
 			<subsection name="Contamination detection with FastQ-Screen">
-				<p>Aozan now include a fast Java FastQ Screen implementation. This module maps reads samples on a list of reference genomes for assessing sample contamination and the ratio of the expected genome in the sample.
-                                It creates a report file with values for each genome.</p>
+				<p>Aozan now include a fast Java FastQ Screen implementation. This module maps reads samples on a list of reference genomes 
+					for assessing sample contamination and the ratio of the expected genome in the sample.
+                    It creates a report file with values for each genome.</p>
 		    	<div align="center">
 		        	<a href="qc-samples-tests.html#contamination"><img src="images/qc_report_html_fastqscreen_400px.png" alt="example on report fastqscreen"/></a>
 		    	</div>
