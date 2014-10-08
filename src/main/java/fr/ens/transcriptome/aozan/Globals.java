@@ -140,10 +140,6 @@ public class Globals {
 
   public static final Charset DEFAULT_FILE_ENCODING = Charsets.UTF_8;
 
-  /** Default locale date format in the application. */
-  public static final DateFormat DATE_FORMAT = new SimpleDateFormat(
-      "EEE dd MMM yyyy", DEFAULT_LOCALE);
-
   /** Format of the log. */
   public static final Formatter LOG_FORMATTER = new Formatter() {
 

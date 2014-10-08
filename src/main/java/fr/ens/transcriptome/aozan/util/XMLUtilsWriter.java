@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -67,6 +68,10 @@ public final class XMLUtilsWriter {
   public static void buildXMLCommonTagHeader(final Document doc,
       final Element parent, final RunData data) throws AozanException {
 
+    /** Default locale date format in the application. */
+    final DateFormat date_formatter =
+        new SimpleDateFormat("EEE dd MMM yyyy", Globals.DEFAULT_LOCALE);
+
     if (doc == null)
       throw new AozanException(
           "Fail add common tag header in document XML, document doesn't exist.");
@@ -90,7 +95,7 @@ public final class XMLUtilsWriter {
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
         Date runDate = sdf.parse(data.get("run.info.date"));
         XMLUtils.addTagValue(doc, parent, "RunDate",
-            Globals.DATE_FORMAT.format(runDate));
+            date_formatter.format(runDate));
       } catch (ParseException e1) {
         XMLUtils.addTagValue(doc, parent, "RunDate", data.get("run.info.date"));
       }
@@ -102,7 +107,7 @@ public final class XMLUtilsWriter {
       XMLUtils.addTagValue(doc, parent, "InstrumentRunNumber",
           data.get("run.info.run.number"));
       XMLUtils.addTagValue(doc, parent, "ReportDate",
-          Globals.DATE_FORMAT.format(new Date()));
+          date_formatter.format(new Date()));
     }
   }
 
