@@ -102,7 +102,7 @@ public class StatisticsUtils {
    * Compute the sum of values
    * @return sum of values.
    */
-  public double getSum() {
+  public Double getSum() {
     return this.ds.getSum();
   }
 
@@ -122,7 +122,7 @@ public class StatisticsUtils {
    */
   public int getMeanToInteger() {
 
-    return new Double(getMean()).intValue();
+    return getMean().intValue();
   }
 
   /**
@@ -131,7 +131,7 @@ public class StatisticsUtils {
    *         set.
    */
   public int getMeanWithoutZeroToInteger() {
-    return new Double(getMeanWithoutZero()).intValue();
+    return getMeanWithoutZero().intValue();
   }
 
   /**
@@ -140,7 +140,7 @@ public class StatisticsUtils {
    *         value set.
    */
   public int getMedianWithoutZeroToInteger() {
-    return new Double(getMedianWithoutZero()).intValue();
+    return getMedianWithoutZero().intValue();
   }
 
   /**
@@ -149,7 +149,7 @@ public class StatisticsUtils {
    *         value set.
    */
   public int getMedianeToInteger() {
-    return new Double(getMediane()).intValue();
+    return getMediane().intValue();
   }
 
   /**
@@ -157,7 +157,7 @@ public class StatisticsUtils {
    * @return sum of values.
    */
   public int getSumToInteger() {
-    return new Double(getSum()).intValue();
+    return getSum().intValue();
   }
 
   /**
@@ -166,7 +166,7 @@ public class StatisticsUtils {
    *         a single value set.
    */
   public int getStandardDeviationToInteger() {
-    return new Double(getStandardDeviation()).intValue();
+    return getStandardDeviation().intValue();
   }
 
   /**
