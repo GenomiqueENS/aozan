@@ -417,15 +417,16 @@ public class FastqScreenResult {
     private boolean isGenomeSample;
 
     // Specific legend : represent key in rundata
-    private final String unMappedLegend = "unmapped";
-    private final String oneHitOneLibraryLegend = "one.hit.one.library";
-    private final String multipleHitsOneLibraryLegend =
+    private static final String UN_MAPPED_LEGEND = "unmapped";
+    private static final String ONE_HIT_ONE_LIBRARY_LEGEND =
+        "one.hit.one.library";
+    private static final String MULTIPLE_HITS_ONE_LIBRARY_LEGEND =
         "multiple.hits.one.library";
-    private final String oneHitMultipleLibrariesLegend =
+    private static final String ONE_HIT_MULTIPLE_LIBRARIES_LEGEND =
         "one.hit.multiple.libraries";
-    private final String multipleHitsMultipleLibrariesLegend =
+    private static final String MULTIPLE_HITS_MULTIPLE_LIBRARIES_LEGEND =
         "multiple.hits.multiple.libraries";
-    private final String mappedLegend = "mapped";
+    private static final String MAPPED_LEGEND = "mapped";
 
     private double oneHitOneLibraryPercent = 0.0;
     private double multipleHitsOneLibraryPercent = 0.0;
@@ -519,21 +520,22 @@ public class FastqScreenResult {
      */
     public void updateRundata(final RunData data, final String prefix) {
       // add line in RunData
-      data.put(prefix + "." + genome + "." + mappedLegend + ".percent",
+      data.put(prefix + "." + genome + "." + MAPPED_LEGEND + ".percent",
           this.mappedPercent);
-      data.put(prefix + "." + genome + "." + unMappedLegend + ".percent",
+      data.put(prefix + "." + genome + "." + UN_MAPPED_LEGEND + ".percent",
           this.unMappedPercent);
       data.put(prefix
-          + "." + genome + "." + oneHitOneLibraryLegend + ".percent",
+          + "." + genome + "." + ONE_HIT_ONE_LIBRARY_LEGEND + ".percent",
           this.oneHitOneLibraryPercent);
       data.put(prefix
-          + "." + genome + "." + multipleHitsOneLibraryLegend + ".percent",
+          + "." + genome + "." + MULTIPLE_HITS_ONE_LIBRARY_LEGEND + ".percent",
           this.multipleHitsOneLibraryPercent);
+      data.put(
+          prefix
+              + "." + genome + "." + ONE_HIT_MULTIPLE_LIBRARIES_LEGEND
+              + ".percent", this.oneHitMultipleLibrariesPercent);
       data.put(prefix
-          + "." + genome + "." + oneHitMultipleLibrariesLegend + ".percent",
-          this.oneHitMultipleLibrariesPercent);
-      data.put(prefix
-          + "." + genome + "." + multipleHitsMultipleLibrariesLegend
+          + "." + genome + "." + MULTIPLE_HITS_MULTIPLE_LIBRARIES_LEGEND
           + ".percent", this.multipleHitsMultipleLibrariesPercent);
 
     }

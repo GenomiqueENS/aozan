@@ -27,9 +27,7 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
-import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.UndeterminedIndexesCollector;
-import fr.ens.transcriptome.aozan.tests.TestResult;
 
 /**
  * This class define a recoverable passing filter clusters count test for
@@ -43,24 +41,6 @@ public class RecoverablePFClusterSampleTest extends AbstractSimpleSampleTest {
   public List<String> getCollectorsNamesRequiered() {
 
     return ImmutableList.of(UndeterminedIndexesCollector.COLLECTOR_NAME);
-  }
-
-  @Override
-  public TestResult test(final RunData data, final int read, int readSample,
-      final int lane, final String sampleName) {
-
-    final String keyRundata =
-        "undeterminedindices.lane" + lane + ".mismatch.recovery.cluster";
-
-    // Retrieve mismatches number used for recovery cluster
-    if (data.get(keyRundata) != null) {
-
-      final int n = data.getInt(keyRundata);
-      final String columnName =
-          "Recoverable PF clusters with " + n + "mismatches";
-    }
-
-    return super.test(data, read, readSample, lane, sampleName);
   }
 
   @Override

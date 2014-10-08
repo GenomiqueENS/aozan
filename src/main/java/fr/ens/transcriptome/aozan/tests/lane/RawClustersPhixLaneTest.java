@@ -67,8 +67,7 @@ public class RawClustersPhixLaneTest extends AbstractLaneTest {
           data.getReadRawClusterCount(lane, read) * tiles;
 
       // Compute raw cluster corresponding to percent Phix
-      final int rawClusterPhix =
-          new Double(rawClusterCount * alignPhixPrc).intValue();
+      final int rawClusterPhix = (int) (rawClusterCount * alignPhixPrc);
 
       final List<String> sampleNames = data.getSamplesNameListInLane(lane);
 

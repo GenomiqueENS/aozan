@@ -43,10 +43,10 @@ public class FastQCCollector extends AbstractFastqCollector {
   public static final String COLLECTOR_NAME = "fastqc";
 
   /** Retrieve parameters of FastQC qc.conf.+ key_fastqc */
+  private static final boolean INGORE_FILTERED_SEQUENCES = false;
 
   private int numberThreads = Runtime.getRuntime().availableProcessors();
   private boolean isProcessUndeterminedIndicesSamples = false;
-  private final boolean ignoreFilteredSequences = false;
 
   @Override
   public String getName() {
@@ -101,7 +101,7 @@ public class FastQCCollector extends AbstractFastqCollector {
     }
 
     // Create the thread object
-    return new FastQCProcessThread(fastqSample, this.ignoreFilteredSequences,
+    return new FastQCProcessThread(fastqSample, INGORE_FILTERED_SEQUENCES,
         reportDir);
   }
 

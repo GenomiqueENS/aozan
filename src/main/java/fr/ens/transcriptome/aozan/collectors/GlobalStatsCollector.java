@@ -68,8 +68,7 @@ public class GlobalStatsCollector implements Collector {
 
       rawStats.addValues(rawClusterCount);
       pfStats.addValues(data.getReadPFClusterCount(lane, 1));
-      phixStats
-          .addValues(new Double(rawClusterCount * alignPhixPrc).intValue());
+      phixStats.addValues((int) (rawClusterCount * alignPhixPrc));
 
       for (int read = 1; read <= readCount; read++) {
 
