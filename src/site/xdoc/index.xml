@@ -73,7 +73,7 @@
 
 		<section name="Quality control report example">
 			<p><a href="./quality_control_example_report.html" target="_blank">
-				<img src="images/quality_control_example_report_300px.png" alt="Example on control quality run report"/>
+				<img src="images/quality_control_example_report_300px.png" alt="Example on quality control run report"/>
 			</a></p>
 		</section>
 
@@ -84,29 +84,29 @@
 
 		<section name="News on Aozan">
 		
-		
-			<subsection name="Add globals tests in control quality report">
-				<p>
-					Enhancement of the control quality report, with a new table on globals test: listing data on all lanes in run
-					<a href="qc-global-tests.html">more details here.</a>
-				</p>
-			
-			</subsection>
-			
 			<subsection name="Analysis undetermined fastq">
 				<p>
 					<a href="qc-samples-tests.html#recoveryclusters">Add modules to recovery clusters, details here.</a>
-					The undetermined fastq from demultiplexing step are parsing to collect all indices. For each, it proposes the sample(s) 
-					corresponding with one mismatch more that used for demultiplexing. The conflict is easy to identify.
-					Two reports type in csv and html formats are generate : 
-					<p>a recovery clusters for each indexed lanes : 
-						listing all indices collected and the potential samples present in lanes, with data on parsing filter.
-						<img src="" alt="the lane report html for recovering clusters" border="1"/>
 					</p>
-					<p>a recovery clusters for each indexed samples : 
-						listing all indices identify to the sample from the lane, with data on parsing filter.
-						<img src="" alt="the sample report html for recovering clusters" border="1"/>
-					</p>   
+					<p>
+					The undetermined fastq from demultiplexing step are parsing to collect all indices. For each, it proposes the sample(s) 
+					corresponding with one mismatch more that used for demultiplexing.
+					Two reports are generate in csv and html formats : 
+					<ul>
+					<li>a recovery clusters for each indexed lanes : 
+					listing all indices collected and the potential samples present in lanes, with data on parsing filter.</li>
+					<li>a recovery clusters for each indexed samples : 
+						listing all indices identify to the sample from the lane, with data on parsing filter.</li>
+					</ul>
+					<div align="center">
+						<span><a href="qc-samples-tests.html#recoveryclusters">
+							<img src="images/qc_lane_undetermined_report_300px.png" alt="example on lane recovery cluster report" border="1"/></a>
+						</span>
+						<span>
+						<a href="qc-samples-tests.html#recoveryclusters">
+						<img src="images/qc_sample_recovery_cluster_report_300px.png" alt="example on sample recovery cluster report" border="1"/></a>
+						</span>
+					</div>
 				</p>
 				
 				<p>Two parameters have been added in the configuration Aozan file to run FastQC and contamination detection on undetermined fastq. 
@@ -123,7 +123,7 @@
 				</p>
 			</subsection>
 			<subsection name="FastQC and enhancement">
-				<p>The control quality steps contains an additional FastQC module named &quot;<b>Bad tiles</b>&quot; that search tiles with BMS 
+				<p>The quality control  steps contains an additional FastQC module named &quot;<b>Bad tiles</b>&quot; that search tiles with BMS 
 				   (Bottom Middle Swath) issues with Illumina flowcell v3.</p>
 
 		        <p>Optionally, Aozan adds a sub-step in FastQC to enhance the Overrepresented sequences module. For sequences with &quot;no hit&quot;, 
@@ -135,6 +135,20 @@
 		        	<a href="qc-samples-tests.html#overrepresented">
 		        	 	<img src="images/qc_fastqc_overrepresented_blast_h350px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></a>
 		    	</div> 
+			</subsection>
+			
+					
+			<subsection name="Add globals tests in quality control report">
+				<p>
+					Enhancement of the quality control report, with a new table on globals test: listing data on all lanes in run
+					<a href="./qc-global-tests.html">more details here.</a>
+					<p>An example of table built with lanes global tests.</p>
+			       <div align="center">
+			       		<a href="./qc-global-tests.html"><img src="images/qc_global_tests_part1.png" alt="example on report with run data" border="1"/></a>
+			       		<a href="./qc-global-tests.html"><img src="images/qc_global_tests_part2.png" alt="example on report with run data" border="1"/></a>
+			       </div>
+				</p>
+			
 			</subsection>
 
 			<subsection name="Contamination detection with FastQ-Screen">

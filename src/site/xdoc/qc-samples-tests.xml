@@ -353,7 +353,7 @@ especially the <a href="http://transcriptome.ens.fr/eoulsan/datarepositories.htm
 			The undetermined FastQ file created by casava/bcl2fastq demultiplexing step can be analyse. The test <i>recoverablepfclusterssamples</i> 
 			achieve to parsing this file, identify the mismatch number usd by demultiplexing, if inferior at 2, add one mismatch to listing recoverable cluster 
 			by index and attribute each at one or more sample. The test create two files by lane and by sample, in two format (csv and html). For undetermined lane FastQ file, for each index display demultiplexing data and
-			the potential sample(s). For each sample, a file display recoverable cluster founded.
+			the potential sample(s). For each sample, a report displays recoverable cluster founded.
 		</p>
 		<p>
 			Moreover, it is now available to run FastQC and/or FastqScreen on undetermined FastQ files.
@@ -365,6 +365,21 @@ especially the <a href="http://transcriptome.ens.fr/eoulsan/datarepositories.htm
          <tr><td>qc.test.recoverablepfclusterssamples.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of recoverablepfclusterssamples</td></tr>
          <tr><td>qc.test.linkreportrecoverycluster.enable</td><td>boolean</td><td>False</td><td>Enable linkreportrecoverycluster test: link to report HTML</td></tr>
 		</table>
+		<p>Two reports type in csv and html formats are generate : 
+			<p>a recovery clusters for each indexed lanes : 
+							listing all indices collected and the potential samples present in lanes, with data on parsing filter.
+			<div align="center">
+	       		<img src="images/qc_lane_undetermined_report.png" alt="example on lane recovery cluster report" border="1"/>
+	       </div>
+	       </p>
+				       
+	       <p>a recovery clusters for each indexed samples : 
+			listing all indices identify to the sample from the lane, with data on parsing filter.
+			<div align="center">
+	       		<img src="images/qc_sample_recovery_cluster_report.png" alt="example on sample recovery cluster report" border="1"/>
+	       </div>
+	       </p>
+       </p>
     </subsection>
     
     <a name="syntax_interval"/>

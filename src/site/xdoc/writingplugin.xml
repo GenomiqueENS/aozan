@@ -542,7 +542,7 @@ qc.test.focusscore.interval=[75.0, 100.0]
 
     <p>After running Aozan with this example plug-in, we've got the following quality control report: </p>
 
-    <div align="center"><img src="images/qc_report_aozan-plugin.png" alt="control quality report after plugin execution" border="1"/></div>
+    <div align="center"><img src="images/qc_report_aozan-plugin.png" alt="quality control report after plugin execution" border="1"/></div>
 
     </subsection>
   </section>
