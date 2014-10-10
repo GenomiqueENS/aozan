@@ -126,7 +126,7 @@
       <li><b>]2,10[</b> From 2 (excluded) to 10 (excluded)</li>
       <li><b>(2,10[</b> From 2 (excluded) to 10 (excluded)</li>
       <li><b>[2,10]</b> From 2 (included) to 10 (included)</li>
-      <li><b>[2,]</b> From 2 (included) to + infinite</li>
+      <li><b>[2, ]</b> From 2 (included) to + infinite</li>
     </ul>
 
     </section>
