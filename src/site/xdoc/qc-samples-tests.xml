@@ -78,9 +78,12 @@
          <tr><td>qc.test.percentq30.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of percentq30</td></tr>
          <tr><td>qc.test.meanqualityscorepf.enable</td><td>boolean</td><td>False</td><td>Enable meanqualityscorepf test</td></tr>
          <tr><td>qc.test.meanqualityscorepf.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of meanqualityscorepf</td></tr>
+         <tr><td>qc.test.recoverablerawclusterssamples.enable</td><td>boolean</td><td>False</td>
+         	<td>Enable recoverablerawclusterssamples test : compute raw cluster can be recovery from undetermined fastq file with more one mismatch that use for demultiplexing step (maximum at 2). </td></tr>
+         <tr><td>qc.test.recoverablerawclusterssamples.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of recoverablerawclusterssamples</td></tr>
          <tr><td>qc.test.recoverablepfclusterssamples.enable</td><td>boolean</td><td>False</td>
          	<td>Enable recoverablepfclusterssamples test : compute passing filter cluster can be recovery from undetermined fastq file with more one mismatch that use for demultiplexing step (maximum at 2). </td></tr>
-         <tr><td>qc.test.recoverablepfclusterssamples.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of recoverablepfclusterssamples</td></tr>
+         <tr><td>qc.test.recoverablepfclusterssamples.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of recoverablepfclusterssamples</td></tr>
          <tr><td>qc.test.linkreportrecoverycluster.enable</td><td>boolean</td><td>False</td><td>Enable linkreportrecoverycluster test: link to report HTML</td></tr>
        </table>
        <p>The explanation to construct intervals is <a href="#syntax_interval">here.</a></p>
@@ -393,7 +396,7 @@ especially the <a href="http://transcriptome.ens.fr/eoulsan/datarepositories.htm
       <li><b>]2,10[</b> From 2 (excluded) to 10 (excluded)</li>
       <li><b>(2,10[</b> From 2 (excluded) to 10 (excluded)</li>
       <li><b>[2,10]</b> From 2 (included) to 10 (included)</li>
-      <li><b>[2,]</b> From 2 (included) to + infinite</li>
+      <li><b>[2, ]</b> From 2 (included) to + infinite</li>
     </ul>
     </subsection>
     </section>
