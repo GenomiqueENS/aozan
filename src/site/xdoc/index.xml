@@ -85,7 +85,7 @@
 		<section name="What's new in Aozan?">
 
 			<subsection name="FastQC version 0.11.2">
-				<p>Aozan now use the lastest FastQC version (0.11.2) that includes two new modules: 
+				<p>Aozan now use the lastest FastQC version (0.11.2) that includes two new modules:
 				<ul>
 					<li>&quot;<b>Per tile sequence quality</b>&quot;;</li>
 					<li>&quot;<b>Adapter content</b>&quot;.</li>
@@ -96,9 +96,9 @@
 						<a href="qc-samples-tests.html#fastqc">
 							<img src="images/qc_factq_tile_sequence_quality.png" alt="FastQC: new per tile sequence quality module" border="1"/></a>
 				</div>
-				<p>Of course, this new FastQC version bundled in Aozan still contains previous Aozan enhancements to FastQC (the &quot;<b>Bad tiles</b>&quot; module 
+				<p>Of course, this new FastQC version bundled in Aozan still contains previous Aozan enhancements to FastQC (the &quot;<b>Bad tiles</b>&quot; module
 				and the optional blast in the &quot;<b>Overrepresented sequences</b>&quot; module).</p>
-									
+
 			</subsection>
 
 			<subsection name="New globals tests in quality control report">
@@ -111,11 +111,11 @@
 			       		<a href="./qc-global-tests.html"><img src="images/qc_global_tests_part2.png" alt="example on report with run data" border="1"/></a>
 			       </div>
 				</p>
-			
+
 			</subsection>
 
 			<subsection name="Analysis of the indices of reads in the undetermined FASTQ files">
-				<p>Aozan now provide QC module that analyzes indices of reads in the undetermined FASTQ files. For each indices,
+				<p>Aozan now provide a QC module that analyzes indices of reads in the undetermined FASTQ files. For each indices,
 					this module suggest the sample(s) and the number of reads that can be recovered using a demultiplexing step with
 					one more mismatch that the number of mismatches has been used. See for more information about this feature the
 					<a href="qc-samples-tests.html#recoveryclusters">sample	tests section of the documentation</a>.</p>
@@ -135,7 +135,7 @@
 
 			<subsection name="Using Aozan in multi-servers context">
 				<p>The Aozan configuration file has been improved with a new "<code>include</code>" directive. With this enhancement, it will be easier to
-				   use Aozan in multi-servers context using the same core configuration file by all Aozan instances.</p>
+				   use Aozan in a multi-servers context using the same core configuration file by all Aozan instances.</p>
 			</subsection>
 
 			<subsection name="Enhancements to FastQC">
@@ -152,7 +152,7 @@
 		        	 	<img src="images/qc_fastqc_overrepresented_blast_h350px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></a>
 		        </div>
 			</subsection>
-			
+
 			<subsection name="Contamination detection with FastQ-Screen">
                 <p>Aozan now include a fast Java FastQ Screen implementation. This module maps reads samples on a list of reference genomes
 					for assessing sample contamination and the ratio of the expected genome in the sample.
