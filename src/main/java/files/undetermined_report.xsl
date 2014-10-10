@@ -208,6 +208,10 @@
 					a.linkFilterInactivate:link{
 						color:#000000;
 					}
+					.linkFilterInactivate:hover, .linkFilterActivate:hover {
+						background-color:#9A1319;
+						color:#000000;
+					}
 
 					#filterSample td{
 					border:#ffffff;

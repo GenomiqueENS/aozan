@@ -349,6 +349,7 @@ especially the <a href="http://transcriptome.ens.fr/eoulsan/datarepositories.htm
 
 	<a name="recoveryclusters"/>
 	<subsection name="Analysis undetermined clusters from demultiplexing.">
+
 		<p>The undetermined FASTQ files created by the demultiplexing step can be analysed using 3 modules:</p>
 		<ul>
 		  <li>The recoverable sample clusters module can suggest for each indices, the sample(s) and the
@@ -360,6 +361,7 @@ especially the <a href="http://transcriptome.ens.fr/eoulsan/datarepositories.htm
 		  <li>The FastQC module. Use the "<code>qc.conf.fastqc.process.undetermined.samples</code>" property to enable this module.</li>
 		  <li>The FastqScreen module. Use the "<code>qc.conf.fastqscreen.process.undetermined.samples</code>" property to enable this module.</li>
 		</ul>
+
 		<table>
 		 <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
          <tr><td>qc.test.recoverablepfclusterssamples.enable</td><td>boolean</td><td>False</td>
@@ -367,6 +369,24 @@ especially the <a href="http://transcriptome.ens.fr/eoulsan/datarepositories.htm
          <tr><td>qc.test.recoverablepfclusterssamples.interval</td><td>interval</td><td>False</td><td>Interval for valid values for the recoverablepfclusterssamples test</td></tr>
          <tr><td>qc.test.linkreportrecoverycluster.enable</td><td>boolean</td><td>False</td><td>Link to the HTML recoverable clusters report</td></tr>
 		</table>
+		
+		<p>The two reports are generated in CSV and HTML formats:
+		  <ul>
+			<li>Example of a recoverable clusters lanes report:</li>
+			<br/>
+			<div align="center">
+	       		<img src="images/qc_lane_undetermined_report.png" alt="example on lane recovery cluster report" border="1"/>
+	       </div>
+
+		   <br/>
+	       <li>Example of a recoverable clusters sample report:</li>
+	       <br/>
+			<div align="center">
+	       		<img src="images/qc_sample_recovery_cluster_report.png" alt="example on sample recovery cluster report" border="1"/>
+	       </div>
+
+	      </ul>
+       </p>
     </subsection>
 
     <a name="syntax_interval"/>

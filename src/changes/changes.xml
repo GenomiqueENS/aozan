@@ -332,10 +332,36 @@
 			</action>
 		</release>
 
-		<release version="1.x" description="Aozan version 1.x"
+		<release version="1.3" description="Aozan version 1.3"
 			date="TBD">
 			<action dev="jourdren" type="add">
 				Add global tests to the QC step. This new type of test comes with some global tests.
+			</action>
+			<action dev="jourdren" type="add">
+				Add tests to the QC step for analysis undetermined FastQ file, parsing files to recovery clusters by sample from indices sequences with mismatches.
+				Create two reports : per indexed lanes and per indexed samples, in csv and html format.
+			</action>
+			<action dev="sperrin" type="add">
+				Add two parameters in configuration to run FastQC and detection contaminants on undetermined FastQC files.
+			</action>
+			<action dev="sperrin" type="add">
+				Now Aozan can read several configuration file to use in multiserver context.
+			</action>
+			<action dev="sperrin" type="update">
+				Now Aozan use blastn from ncbi-blast+ extra blastall.
+			</action>
+			<action dev="sperrin" type="update">
+				Now Aozan use FastQC v0.11.2, enhanced like previous version (bad tiles modules, blastn in Overrepresented sequences modules).
+			</action>
+			<action dev="sperrin" type="update">
+				Now Aozan use bwotie2 mapper for FastqScreen step, default is always bowtie.
+			</action>
+			<action dev="sperrin" type="update">
+				Update control quality report with a table for global tests if necessary.
+				Add links to filter sample test table by project name.
+			</action>
+			<action dev="sperrin" type="add">
+				Aozan is now dependancy on Eoulsan-2.0-alpha1 version, related add new dependancy to amazonaws library.
 			</action>
 		</release>
 

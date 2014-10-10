@@ -44,6 +44,7 @@ import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.NotFoundException;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
@@ -128,7 +129,7 @@ public class FastqscreenDemo {
         // Validation (mm10) - PE150
         runId = "131015_SNL110_0088_AH13M0ADXX";
       } else {
-        runId = "140811_SNL110_0127_AH9AP9ADXX"; // "140818_SNL110_0129_Ah9bvmadxx";
+        runId = "140818_SNL110_0129_Ah9bvmadxx"; // "140811_SNL110_0127_AH9AP9ADXX";
       }
 
       // date = new SimpleDateFormat("yyMMdd").format(new Date());
@@ -155,11 +156,14 @@ public class FastqscreenDemo {
           + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
     } catch (AozanException ae) {
-      if (ae.getWrappedException() == null)
+      if (ae.getWrappedException() == null) {
         ae.printStackTrace();
-      else
+        LOGGER.severe(Joiner.on("\n\t").join(ae.getStackTrace()));
+      } else {
         ae.getWrappedException().printStackTrace();
-
+        LOGGER.severe(Joiner.on("\n\t").join(
+            ae.getWrappedException().getStackTrace()));
+      }
     } catch (Exception e) {
       LOGGER.severe(e.getMessage());
       e.printStackTrace();
@@ -344,7 +348,7 @@ public class FastqscreenDemo {
         Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY,
         "/home/sperrin/Documents/FastqScreenTest/resources/alias_name_genome_fastqscreen.txt    ");
 
-    conf.put("qc.conf.fastqscreen.mapper", "bowtie2");
+    conf.put("qc.conf.fastqscreen.mapper", "bowtie");
 
     System.out
         .println("genomes : "

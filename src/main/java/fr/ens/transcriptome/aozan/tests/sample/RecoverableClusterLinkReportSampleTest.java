@@ -59,8 +59,8 @@ public class RecoverableClusterLinkReportSampleTest extends AbstractSampleTest {
       final String url =
           String
               .format(
-                  "Undetermined_indices/lane%s_Undetermined_L%03d_R%d_001-potentialindices.html",
-                  lane, lane, readSample);
+                  "Undetermined_indices/lane%s_Undetermined_L%03d_R1_001-potentialindices.html",
+                  lane, lane);
 
       return new TestResult(-1, url, "url");
 

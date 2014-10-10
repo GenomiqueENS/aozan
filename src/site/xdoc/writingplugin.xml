@@ -81,7 +81,7 @@ $ sudo apt-get install openjdk-7-jdk maven2 eclipse-jdt
 $ mvn archetype:generate \
   -DarchetypeGroupId=org.apache.maven.archetypes \
   -DarchetypeArtifactId=maven-archetype-quickstart \
-  -DgroupId=com.example  \
+  -DgroupId=fr.ens.transcriptome  \
   -DartifactId=myaozanplugin \
   -Dversion=0.1-alpha-1 \
   -Durl=http://transcriptome.ens.fr/aozanplugin \
@@ -219,7 +219,7 @@ $ mvn eclipse:eclipse -DdownloadSources=true -DdownloadJavadocs=true
  *      http://www.transcriptome.ens.fr/aozan
  *
  */
-package com.example.myaozanplugin;
+package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
 import java.io.IOException;
@@ -455,15 +455,19 @@ public class FocusScoreCollector implements Collector {
  *      http://www.transcriptome.ens.fr/aozan
  *
  */
-package com.example.myaozanplugin;
+package fr.ens.transcriptome.aozan.tests.lane;
 
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
+import fr.ens.transcriptome.aozan.collectors.FocusScoreCollector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
+import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
 public class FocusScoreLaneTest extends AbstractSimpleLaneTest {
+
+  private final ScoreInterval interval = new ScoreInterval();
 
   @Override
   protected String getKey(int read, boolean indexedRead, int lane) {
@@ -508,8 +512,18 @@ public class FocusScoreLaneTest extends AbstractSimpleLaneTest {
 <source>
 $ mkdir -p src/main/java/fr/ens/transcriptome/aozan/collectors fr/ens/transcriptome/aozan/tests META-INF/services
 $ echo fr.ens.transcriptome.aozan.collectors.FocusScoreCollector > src/main/java/META-INF/services/fr.ens.transcriptome.aozan.collectors.Collector
-$ echo fr.ens.transcriptome.aozan.tests.FocusScoreLaneTest > src/main/java/META-INF/services/fr.ens.transcriptome.aozan.tests.AozanTest
+$ echo fr.ens.transcriptome.aozan.tests.lane.FocusScoreLaneTest > src/main/java/META-INF/services/fr.ens.transcriptome.aozan.tests.AozanTest
 </source>
+
+	<p>Create the jar file.
+<source>
+$ cp /path/to/library/jsoup-1.7.3.jar .
+
+$ javac -cp /path/to/Aozan/lib/aozan-1.3.jar:/path/to/library/com/google/guava/guava/15.0/guava-15.0.jar:/path/to/library/jsoup-1.7.3.jar -sourcepath . fr/ens/transcriptome/aozan/collectors/FocusScoreCollector.java fr/ens/transcriptome/aozan/tests/lane/FocusScoreLaneTest.java
+$ jar cf my-aozan-plugin.jar *
+$ export AOZAN_PLUGINS=`pwd`
+</source>
+	</p>
 
       <p>If you have more than one step to register, add the other full class names of your plugins in the next
         lines of the files.</p>
@@ -542,7 +556,7 @@ qc.test.focusscore.interval=[75.0, 100.0]
 
     <p>After running Aozan with this example plug-in, we've got the following quality control report: </p>
 
-    <div align="center"><img src="images/qc_report_aozan-plugin.png" alt="control quality report after plugin execution" border="1"/></div>
+    <div align="center"><img src="images/qc_report_aozan-plugin.png" alt="quality control report after plugin execution" border="1"/></div>
 
     </subsection>
   </section>
