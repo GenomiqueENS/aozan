@@ -338,30 +338,34 @@
 				Add global tests to the QC step. This new type of test comes with some global tests.
 			</action>
 			<action dev="jourdren" type="add">
-				Add tests to the QC step for analysis undetermined FastQ file, parsing files to recovery clusters by sample from indices sequences with mismatches.
-				Create two reports : per indexed lanes and per indexed samples, in csv and html format.
+			    Aozan now provide a QC module that analyzes indices of reads in the undetermined FASTQ files.
+			    For each indices, this module suggest the sample(s) and the number of reads that can be recovered using a demultiplexing
+			    step with one more mismatch that the number of mismatches has been used.
+				This module create two reports: one per indexed lanes and one per indexed samples, both in CVS and HTML format.
 			</action>
 			<action dev="sperrin" type="add">
-				Add two parameters in configuration to run FastQC and detection contaminants on undetermined FastQC files.
+				Add two parameters in the Aozan configuration to run FastQC and contaminants detection on undetermined FASTQ files.
 			</action>
 			<action dev="sperrin" type="add">
-				Now Aozan can read several configuration file to use in multiserver context.
+				Add a new "include" directive in Aozan configuration file. With this enhancement it will be easier to use
+				Aozan in a multi-servers context using the same core configuration file by all Aozan instances.
 			</action>
 			<action dev="sperrin" type="update">
-				Now Aozan use blastn from ncbi-blast+ extra blastall.
+				Aozan now use blastn from ncbi-blast+ in addition of blastall.
 			</action>
 			<action dev="sperrin" type="update">
-				Now Aozan use FastQC v0.11.2, enhanced like previous version (bad tiles modules, blastn in Overrepresented sequences modules).
+				Aozan use now FastQC 0.11.2 which has been enhanced like previous Aozan version (bad tiles modules, blastn in Overrepresented sequences modules).
 			</action>
 			<action dev="sperrin" type="update">
-				Now Aozan use bwotie2 mapper for FastqScreen step, default is always bowtie.
+				Aozan can now use the bowtie 2 mapper in FastqScreen step. The default mapper used in Aozan still bowtie 1.
 			</action>
 			<action dev="sperrin" type="update">
-				Update control quality report with a table for global tests if necessary.
-				Add links to filter sample test table by project name.
+				Update the control quality report with a table for global tests.
+				Add button to filter by project name displayed samples in the QC report.
 			</action>
 			<action dev="sperrin" type="add">
-				Aozan is now dependancy on Eoulsan-2.0-alpha1 version, related add new dependancy to amazonaws library.
+				Aozan now use Eoulsan 2.0-alpha1 as dependency. A bug in this new Eoulsan version forces us to add amazonaws library as Aozan dependancy.
+				This amazonaws dependency will be remove once Aozan will use a fixed version of Eoulsan.
 			</action>
 		</release>
 

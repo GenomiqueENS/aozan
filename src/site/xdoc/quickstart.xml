@@ -404,8 +404,8 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
 
      <table>
 	   <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-	   <tr><td>include</td><td>string</td><td>No set</td><td><b>Must be the first line in configuration file.</b>
-	   		Set the other configuration file path to load at first, their value are replaced by the current file. Now Aozan can be use in multiserver context.</td></tr>
+	   <tr><td>include</td><td>string</td><td>No set</td><td>Load the configuration entries from another configuration file path. The values
+	   loaded from this new configuration file override existing values.</td></tr>
 	   <tr><td>aozan.enable</td><td>boolean</td><td>False</td><td>Enable Aozan</td></tr>
 	   <tr><td>aozan.log.level</td><td>string</td><td>INFO</td><td>Log level (ALL, FINEST, FINER, FINE, CONFIG, INFO, WARNING, SEVERE, OFF)</td></tr>
 	   <tr><td>aozan.debug</td><td>boolean</td><td>False</td><td>mode debug</td></tr>
