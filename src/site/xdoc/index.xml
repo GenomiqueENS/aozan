@@ -83,7 +83,27 @@
 		</section>
 
 		<section name="News on Aozan">
-		
+			
+			<subsection name="FastQC version 0.11.2">
+				<p>Now Aozan use FastQC version 0.11.2. It includes two new modules : 
+					<ul>
+					<li>&quot;<b>Per tile sequence quality</b>&quot;;</li>
+					<li>&quot;<b>Adapter content</b>&quot;.</li>
+				</ul>
+				</p>
+				<p><a href="qc-samples-tests.html#fastqc">More detail</a>
+				<div align="center">
+						<a href="qc-samples-tests.html#fastqc">
+							<img src="images/qc_factq_tile_sequence_quality.png" alt="FastQC: new per tile sequence quality module" border="1"/></a>
+				</div>
+				<p>
+				Like previous version, the same enhancement are included in this version : &quot;<b>Bad tiles</b>&quot; 
+				and &quot;<b>Overrepresented sequences</b>&quot; with optional Blastn on &quot;no hit&quot; sequences. 
+				</p>
+				<p>All parameters on FastQC can be settings in Aozan configuration.</p>
+				</p>					
+			</subsection>
+			
 			<subsection name="Analysis undetermined fastq">
 				<p>
 					<a href="qc-samples-tests.html#recoveryclusters">Add modules to recovery clusters, details here.</a>
@@ -99,13 +119,8 @@
 						listing all indices identify to the sample from the lane, with data on parsing filter.</li>
 					</ul>
 					<div align="center">
-						<span><a href="qc-samples-tests.html#recoveryclusters">
-							<img src="images/qc_lane_undetermined_report_300px.png" alt="example on lane recovery cluster report" border="1"/></a>
-						</span>
-						<span>
 						<a href="qc-samples-tests.html#recoveryclusters">
-						<img src="images/qc_sample_recovery_cluster_report_300px.png" alt="example on sample recovery cluster report" border="1"/></a>
-						</span>
+							<img src="images/qc_report_html_recovery_cluster.png" alt="examples on recovery cluster report" border="1"/></a>
 					</div>
 				</p>
 				
@@ -122,6 +137,21 @@
 					file path, it will loaded first.
 				</p>
 			</subsection>
+
+			<subsection name="New globals tests in quality control report">
+				<p>
+					Enhancement of the quality control report, with a new table on globals test: listing data on all lanes in run
+					<a href="./qc-global-tests.html">more details here.</a>
+					<p>An example of table built with lanes global tests.</p>
+			       <div align="center">
+			       		<a href="./qc-global-tests.html"><img src="images/qc_global_tests_part1.png" alt="example on report with run data" border="1"/></a>
+			       		<a href="./qc-global-tests.html"><img src="images/qc_global_tests_part2.png" alt="example on report with run data" border="1"/></a>
+			       </div>
+				</p>
+			
+			</subsection>
+
+
 			<subsection name="FastQC and enhancement">
 				<p>The quality control  steps contains an additional FastQC module named &quot;<b>Bad tiles</b>&quot; that search tiles with BMS 
 				   (Bottom Middle Swath) issues with Illumina flowcell v3.</p>
@@ -137,20 +167,6 @@
 		    	</div> 
 			</subsection>
 			
-					
-			<subsection name="Add globals tests in quality control report">
-				<p>
-					Enhancement of the quality control report, with a new table on globals test: listing data on all lanes in run
-					<a href="./qc-global-tests.html">more details here.</a>
-					<p>An example of table built with lanes global tests.</p>
-			       <div align="center">
-			       		<a href="./qc-global-tests.html"><img src="images/qc_global_tests_part1.png" alt="example on report with run data" border="1"/></a>
-			       		<a href="./qc-global-tests.html"><img src="images/qc_global_tests_part2.png" alt="example on report with run data" border="1"/></a>
-			       </div>
-				</p>
-			
-			</subsection>
-
 			<subsection name="Contamination detection with FastQ-Screen">
 				<p>Aozan now include a fast Java FastQ Screen implementation. This module maps reads samples on a list of reference genomes 
 					for assessing sample contamination and the ratio of the expected genome in the sample.
