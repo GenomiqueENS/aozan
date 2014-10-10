@@ -693,27 +693,30 @@ def load_conf(conf, conf_file_path):
 
     f = open(conf_file_path, 'r')
 
-    # At the beginning configuration file parameter include for reading another configuration Aozan file
-    # There value are replace by the current file
-    first=True
-    
     for l in f:
         s = l[:-1].strip()
         if len(s) == 0 or l[0] == '#' :
             continue
 
-        if first and s.startswith('include'):
-            # Initialize configuration by another file
+        # Search other configuration file  
+        if s.startswith('include'):
+            # Path to the other configuration file
             other_configuration_path = s.split('=')[1].strip()
             
-            if os.path.exists(other_configuration_path) and os.path.isfile(other_configuration_path):
-                load_conf(conf, other_configuration_path)  
-            else:
+            if len(other_configuration_path) == 0:
+                continue
+            
+            # Check file exists
+            if not(os.path.exists(other_configuration_path) or os.path.isfile(other_configuration_path)):
                 sys.exit(1)
             
-            first=False
+            # Check different path 
+            if other_configuration_path == conf_file_path:
+                continue
             
-            
+            # Load other configuration file, 
+            load_conf(conf, other_configuration_path)  
+
         else:
             fields = s.split('=')
             
