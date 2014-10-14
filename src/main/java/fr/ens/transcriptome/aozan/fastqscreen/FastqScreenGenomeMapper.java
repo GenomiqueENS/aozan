@@ -120,12 +120,13 @@ public class FastqScreenGenomeMapper {
       if (gdesc != null) {
         // Genome description exist for the genome
         genomes.add(genome);
+        this.genomesReferencesSampleRenamed.put(genome, genome);
 
       } else {
         // Parse alias file to find a valid genome name
         final String aliasGenomeName = this.genomesNamesConvertor.get(genome);
 
-        if (aliasGenomeName == null) {
+        if (aliasGenomeName == null || aliasGenomeName.trim().length() == 0) {
           // No genome name found, add entry in alias genomes file
           newGenomes.add(genome);
 
@@ -354,7 +355,9 @@ public class FastqScreenGenomeMapper {
 
         // Retrieve genomes identified in Casava design file
         // Certain have not genome name reference
-        genomes.put(key, value);
+        if (value == null || value.trim().length() == 0) {
+          genomes.put(key, value);
+        }
       }
       br.close();
 
@@ -466,10 +469,6 @@ public class FastqScreenGenomeMapper {
         new DataFile(settings.getGenomeDescStoragePath());
     this.storage = SimpleGenomeDescStorage.getInstance(genomeDescStoragePath);
 
-    // Correspondance between initial genome name and valid genome name for
-    // mapping
-    this.genomesReferencesSampleRenamed = Maps.newHashMap();
-
     // Load alias genomes file
     this.genomesNamesConvertor = loadAliasGenomesFile();
 
@@ -478,6 +477,10 @@ public class FastqScreenGenomeMapper {
 
     // Collect genomes contaminant list
     this.genomesContaminants = initGenomesContaminant();
+
+    // Correspondance between initial genome name and valid genome name for
+    // mapping
+    this.genomesReferencesSampleRenamed = Maps.newHashMap();
 
     // Collect genomes useful to contaminant detection
     this.genomesToMapping = collectGenomesForMapping();
