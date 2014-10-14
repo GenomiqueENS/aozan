@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -110,6 +111,10 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     if (numberThreads > 0)
       mapperThreads = numberThreads;
+
+    LOGGER.info("FASTQSCREEN mapping sample "
+        + fastqRead1.getName() + " on genomes "
+        + Joiner.on(",").join(genomesForMapping));
 
     for (String genome : genomesForMapping) {
       // Timer : for step mapping on genome
