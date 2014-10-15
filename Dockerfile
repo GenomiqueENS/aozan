@@ -19,7 +19,7 @@ RUN yum install -y java-1.7.0-openjdk.x86_64
 RUN mkdir /aozan_data
 
 # Install Aozan public version
-RUN cd /tmp && wget www.transcriptome.ens.fr/aozan/aozan-1.2.7.tar.gz
+RUN cd /tmp && wget www.transcriptome.ens.fr/aozan/aozan-1.3.tar.gz
 RUN cd /usr/local && tar xvzf /tmp/aozan-*.tar.gz && rm /tmp/aozan-*.tar.gz
 
 RUN ln -s /usr/local/aozan*/aozan.sh /usr/local/bin
