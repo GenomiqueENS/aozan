@@ -119,7 +119,7 @@
   <div class="header">
   	<div id="header_title">
 		<img src="http://www.transcriptome.ens.fr/aozan/images/logo_aozan_qc.png" alt="Aozan"/>  
-		&#xA0;&#xA0;Detection contamination report
+		Detection contamination report
 	</div>   
   </div>	
   
@@ -181,9 +181,9 @@
      <li><xsl:value-of select="/ReportFastqScreen/Report/ReadsMappedExceptGenomeSample/@name"/> : 
      	<xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsMappedExceptGenomeSample,'#0.00','aozan')"/> %</li>
    
-     <li><xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsMapped,'# ##0','thousand')"/>&#160;  
+     <li><xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsMapped,'# ##0','thousand')"/>  
        <xsl:value-of select="/ReportFastqScreen/Report/ReadsMapped/@name"/>  / 
-       <xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsProcessed,'# ##0','thousand')"/>&#160;
+       <xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsProcessed,'# ##0','thousand')"/> 
        <xsl:value-of select="/ReportFastqScreen/Report/ReadsProcessed/@name"/>  </li>
    </ul>
    </p>
