@@ -27,9 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;

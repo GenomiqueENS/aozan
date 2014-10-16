@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -67,7 +68,7 @@ public class FastqScreenGenomeMapper {
   /** Logger */
   private static final Logger LOGGER = Common.getLogger();
 
-  /** Spliter */
+  /** Splitter */
   private static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults()
       .omitEmptyStrings();
 
@@ -355,7 +356,7 @@ public class FastqScreenGenomeMapper {
 
         // Retrieve genomes identified in Casava design file
         // Certain have not genome name reference
-        if (value == null || value.trim().length() == 0) {
+        if (!(value == null || value.trim().length() == 0)) {
           genomes.put(key, value);
         }
       }
@@ -471,7 +472,7 @@ public class FastqScreenGenomeMapper {
 
     // Load alias genomes file
     this.genomesNamesConvertor = loadAliasGenomesFile();
-
+    // System.out.println(Joiner.on("\n").withKeyValueSeparator("\t").join(this.genomesNamesConvertor));
     // Collect genomes references list sample from design file
     this.genomesReferencesSample = initGenomesReferencesSample();
 
@@ -485,6 +486,8 @@ public class FastqScreenGenomeMapper {
     // Collect genomes useful to contaminant detection
     this.genomesToMapping = collectGenomesForMapping();
 
+    System.out.println(Joiner.on("\n").withKeyValueSeparator("\t")
+        .join(this.genomesReferencesSampleRenamed));
   }
 
 }

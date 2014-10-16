@@ -14,7 +14,5 @@
 .idea/
 aozan.iml
 
-/src/main/java/fr/ens/transcriptome/aozan/ReplaceDemo.java
-/src/main/java/fr/ens/transcriptome/aozan/collectors/interop/TestCollectorReadBinary.java
+src/main/java/fr/ens/transcriptome/aozan/AozanDemo.java
 
-./myaozanplugin
