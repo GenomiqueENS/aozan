@@ -63,21 +63,28 @@ public class UndeterminedClustersPercentGlobalTest extends AbstractGlobalTest {
       final int laneCount = data.getLaneCount();
       final int tiles = data.getTilesCount();
 
-      final long rawClusterCount =
-          data.getLong("globalstats.clusters.raw.count") * tiles;
-
+      long rawClusterLaneIndexedSum = 0;
       long undeterminedClusterSum = 0;
 
       for (int lane = 1; lane <= laneCount; lane++) {
-        // Sum raw cluster undetermined
-        undeterminedClusterSum +=
-            data.getLong("demux.lane"
-                + lane + ".sample.lane" + lane + ".read1.raw.cluster.count");
+
+        // Check Undetermined fastq exist for this lane
+        String asBarcodeUndetermined =
+            data.get("demux.lane" + lane + ".sample.lane" + lane + ".barcode");
+        if (asBarcodeUndetermined != null) {
+
+          // Sum raw cluster undetermined
+          undeterminedClusterSum +=
+              data.getLong("demux.lane"
+                  + lane + ".sample.lane" + lane + ".read1.raw.cluster.count");
+          
+          rawClusterLaneIndexedSum = data.getReadRawClusterCount(lane, 1) * tiles; 
+        }
       }
 
-      // Percent undetermined in run
+      // Percent undetermined in run only for the indexed lane
       final double undeterminedPrc =
-          ((double) undeterminedClusterSum / rawClusterCount);
+          ((double) undeterminedClusterSum / rawClusterLaneIndexedSum);
 
       return new TestResult(this.interval.getScore(undeterminedPrc),
           undeterminedPrc, true);
