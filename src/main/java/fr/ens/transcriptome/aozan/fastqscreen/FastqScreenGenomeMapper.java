@@ -472,7 +472,7 @@ public class FastqScreenGenomeMapper {
 
     // Load alias genomes file
     this.genomesNamesConvertor = loadAliasGenomesFile();
-    // System.out.println(Joiner.on("\n").withKeyValueSeparator("\t").join(this.genomesNamesConvertor));
+
     // Collect genomes references list sample from design file
     this.genomesReferencesSample = initGenomesReferencesSample();
 
@@ -486,8 +486,6 @@ public class FastqScreenGenomeMapper {
     // Collect genomes useful to contaminant detection
     this.genomesToMapping = collectGenomesForMapping();
 
-    System.out.println(Joiner.on("\n").withKeyValueSeparator("\t")
-        .join(this.genomesReferencesSampleRenamed));
   }
 
 }
