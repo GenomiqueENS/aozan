@@ -220,7 +220,7 @@
 
 
 				</style>
-				<script language="javascript">
+				<script type="text/javascript">
 					<xsl:comment><![CDATA[
 				
 				function filterRow(samples, elemLink) {

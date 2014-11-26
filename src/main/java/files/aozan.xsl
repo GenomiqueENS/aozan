@@ -206,6 +206,7 @@
 		text-align:center;
 		padding-left:5px;
 		padding-right:5px;
+		white-space:nowrap;
 	}
 
 	.linkFilterInactivate {
@@ -227,7 +228,9 @@
 		text-align:center;
 		padding-left:5px;
 		padding-right:5px;
+		white-space:nowrap;
 	}
+
 	.linkFilterInactivate:hover, .linkFilterActivate:hover {
 		background-color:#9A1319;
 		color:#000000;
@@ -239,19 +242,24 @@
 	}
 	
   </style>
-  <script language="javascript">
+  <script type="text/javascript">
 			<xsl:comment><![CDATA[
 
-		function filterRow(project, elemLink) {
+		// Retrieve list lane number related to projet
+		function filterRow(lanes_related_project, elemLink) {
 
 			init_all('none');
-
-			var tab = document.getElementsByClassName(project);
-
-			for (var i=0; i < tab.length; i++){
-				tab[i].style.display ="table-row";
+			
+			//Split 
+			var lanes = lanes_related_project[0].split(',');
+			for (var n=0; n < lanes.length; n++){			
+				var tab = document.getElementsByClassName(lanes[n]);
+					
+				for (var i=0; i < tab.length; i++){
+					tab[i].style.display ="table-row";
+				}
 			}
-
+				
 	        // Change class link
 	       // Inactivate link
 	       document.getElementsByClassName('linkFilterActivate')[0].setAttribute('class', 'linkFilterInactivate');
@@ -365,10 +373,15 @@
   </xsl:for-each>
 </div>
   </xsl:if>
+
+  <a name="sample"></a>
+  <xsl:if test="/QCReport[SamplesReport]">
+  <h2>Samples Quality report</h2>
+
   <a name="project"></a>
   <xsl:if test="/QCReport[ProjectsReport]">
 	  <div>
-	  <h4>Filter by projects</h4>
+	  <h4>Filter samples by projects</h4>
 	  <table id="filterProject">
 	    <tr>
 	      <td><a href="javascript:void(0);" class="linkFilterActivate" onclick="window.location.reload(true);">ALL</a></td>
@@ -388,10 +401,6 @@
 	  </div>
   </xsl:if>
 
-  <a name="sample"></a>
-  <xsl:if test="/QCReport[SamplesReport]">
-  <h2>Samples Quality report</h2>
-
   <xsl:for-each select="/QCReport/SamplesReport/Reads/Read">
     <h3>Read <xsl:value-of select="@number"/></h3>
     <table class="sampleData">
@@ -407,7 +416,7 @@
       <th>Sample name</th>
     </tr>
     <xsl:for-each select="Sample">
-      <tr class="{@project}">
+      <tr class="{@lane}">
        <td><xsl:value-of select="@lane"/></td>
        <td><xsl:value-of select="@name"/></td>
        <td><xsl:value-of select="@desc"/></td>
