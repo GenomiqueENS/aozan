@@ -106,8 +106,8 @@ public class RecoverableClusterLinkReportSampleTest extends AbstractSampleTest {
    */
   public RecoverableClusterLinkReportSampleTest() {
 
-    super("linkreportrecoverycluster", "link report recovery cluster",
-        "link report recovery cluster");
+    super("linkreportrecoverycluster", "link report recovery clusters",
+        "Recovery clusters report");
   }
 
 }
