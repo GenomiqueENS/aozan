@@ -29,6 +29,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -37,8 +38,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import fr.ens.transcriptome.aozan.tests.TestResult;
 import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
@@ -184,6 +189,10 @@ public class QCReport {
     // Add projects name
     final List<String> projectsName = COMMA_SPLITTER.splitToList(list);
 
+    // Build map associate lanes number with project
+    final ListMultimap<String, Integer> lanesNumberRelatedProjectName =
+        extractLaneNumberRelatedProjectName();
+
     final Element projects = doc.createElement("ProjectsReport");
     parentElement.appendChild(projects);
 
@@ -191,11 +200,52 @@ public class QCReport {
 
       final Element project = doc.createElement("ProjectName");
       project.setAttribute("classValue", "projectName");
-      project.setAttribute("cmdJS", "'" + projectName + "'");
+      
+      // Extract lanes number related project name
+      final Set<Integer> lanesRelatedProject =
+          Sets.newTreeSet(lanesNumberRelatedProjectName.get(projectName));
+
+      // Build command javascript for filter line samples report by project
+      project.setAttribute("cmdJS",
+          "'" + Joiner.on(",").join(lanesRelatedProject) + "'");
+      
       project.setTextContent(projectName);
       projects.appendChild(project);
     }
+  }
 
+  /**
+   * Collect lanes number for each project name to run.
+   * @return map associate project name related lane number
+   */
+  private ListMultimap<String, Integer> extractLaneNumberRelatedProjectName() {
+
+    final ListMultimap<String, Integer> projectsNameWithLaneNumber =
+        ArrayListMultimap.create();
+
+    final int laneCount = this.data.getLaneCount();
+
+    // Parse lane run
+    for (int lane = 1; lane <= laneCount; lane++) {
+
+      // Extract samples name in lane
+      final List<String> samplesNameInLane =
+          COMMA_SPLITTER.splitToList(this.data.getSamplesNameInLane(lane));
+
+      for (String sampleName : samplesNameInLane) {
+        // Extract project name corresponding to sample name
+        final String key =
+            "design.lane" + lane + "." + sampleName + ".sample.project";
+
+        final String projectName = this.data.get(key);
+        if (projectName != null) {
+          // Add project name and lane number in map
+          projectsNameWithLaneNumber.put(projectName, lane);
+        }
+      }
+    }
+
+    return projectsNameWithLaneNumber;
   }
 
   /**
