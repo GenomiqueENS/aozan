@@ -246,29 +246,39 @@
 			<xsl:comment><![CDATA[
 
 		// Retrieve list lane number related to projet
-		function filterRow(lanes_related_project, elemLink) {
+		function filterRow(lanes_related_project, project_name, elemLink) {
 
-			init_all('none');
-			
-			//Split 
+            init_all('none');
+
+			//Split
 			var lanes = lanes_related_project[0].split(',');
-			for (var n=0; n < lanes.length; n++){			
-				var tab = document.getElementsByClassName(lanes[n]);
-					
-				for (var i=0; i < tab.length; i++){
-					tab[i].style.display ="table-row";
+
+			for (var n=0; n < lanes.length; n++){
+				var node = document.getElementsByClassName(lanes[n]);
+
+				if (project_name == "Undetermined"){
+					var lastLane = node.length - 1;
+					node[lastLane].style.display ="table-row";
+				} else {
+					for (var i=0; i < node.length; i++){
+						node[i].style.display ="table-row";
+					}
 				}
 			}
-				
-	        // Change class link
-	       // Inactivate link
-	       document.getElementsByClassName('linkFilterActivate')[0].setAttribute('class', 'linkFilterInactivate');
-	       // Activate new element
-	       elemLink.setAttribute('class', 'linkFilterActivate');
+			update_link_css(elemLink)
+		}
+					   
+		function update_link_css(elemLink){
+			// Change class link
+		       // Inactivate link
+		       document.getElementsByClassName('linkFilterActivate')[0].setAttribute('class', 'linkFilterInactivate');
+		       // Activate new element
+		       elemLink.setAttribute('class', 'linkFilterActivate');
 
 			// Change position
 			window.location = '#project';
 		}
+			
 
 		function init_all(display_val){
 
@@ -391,7 +401,7 @@
 			  <xsl:element name="a">
 			  <xsl:attribute name="class">linkFilterInactivate</xsl:attribute>
 			  <xsl:attribute name="href">javascript:void(0);</xsl:attribute>
-			  <xsl:attribute name="onclick">javascript:filterRow([<xsl:value-of select="@cmdJS"></xsl:value-of>], this);</xsl:attribute>
+			  <xsl:attribute name="onclick">javascript:filterRow([<xsl:value-of select="@cmdJS"></xsl:value-of>], '<xsl:value-of select="." />', this);</xsl:attribute>
 				<xsl:value-of select="." /></xsl:element>
 			</td>
 	      </xsl:for-each>

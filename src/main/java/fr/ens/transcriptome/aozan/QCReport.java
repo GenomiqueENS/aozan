@@ -185,7 +185,7 @@ public class QCReport {
     final Document doc = this.doc;
 
     // Add undetermined sample
-    final String list = this.data.getProjectsName() + "," + "Undetermined";
+    final String list = this.data.getProjectsName();
     // Add projects name
     final List<String> projectsName = COMMA_SPLITTER.splitToList(list);
 
@@ -200,7 +200,7 @@ public class QCReport {
 
       final Element project = doc.createElement("ProjectName");
       project.setAttribute("classValue", "projectName");
-      
+
       // Extract lanes number related project name
       final Set<Integer> lanesRelatedProject =
           Sets.newTreeSet(lanesNumberRelatedProjectName.get(projectName));
@@ -208,10 +208,23 @@ public class QCReport {
       // Build command javascript for filter line samples report by project
       project.setAttribute("cmdJS",
           "'" + Joiner.on(",").join(lanesRelatedProject) + "'");
-      
+
       project.setTextContent(projectName);
       projects.appendChild(project);
     }
+
+    // Add Element for undetermined line
+    final Element undeterminedLines = doc.createElement("ProjectName");
+    undeterminedLines.setAttribute("classValue", "projectName");
+
+    // Build list lane number
+    final List<Integer> s = Lists.newArrayList();
+    for (int i = 1; i <= this.data.getLaneCount(); i++)
+      s.add(i);
+    undeterminedLines.setAttribute("cmdJS", "'" + Joiner.on(",").join(s) + "'");
+
+    undeterminedLines.setTextContent("Undetermined");
+    projects.appendChild(undeterminedLines);
   }
 
   /**
