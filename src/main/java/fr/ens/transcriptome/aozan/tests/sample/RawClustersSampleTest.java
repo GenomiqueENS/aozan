@@ -70,7 +70,7 @@ public class RawClustersSampleTest extends AbstractSimpleSampleTest {
    * Public constructor.
    */
   public RawClustersSampleTest() {
-    super("rawclusterssamples", "", "Raw clusters");
+    super("rawclusterssamples", "", "Raw_clusters");
   }
 
 }
