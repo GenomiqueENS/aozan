@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<!DOCTYPE html>
 <xsl:stylesheet version="1.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-	<xsl:output method="xml" version="1.0" encoding="UTF-8"
-		indent="yes" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN"
-		doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" />
+<xsl:output method="html" version="1.0" encoding="UTF-8" indent="yes" omit-xml-declaration="no" 
+doctype-system="about:legacy-compat"/>
+
 
 	<xsl:template match="/">
 		<xsl:decimal-format name="aozan" decimal-separator="."
@@ -324,7 +324,7 @@
 							<b>Creation date: </b>
 							<xsl:value-of select="/RecoveryClusterReport/ReportDate" />
 						</li>
-						<br />
+					</ul><ul>
 						<xsl:if test="/RecoveryClusterReport/projectName">
 							<li>
 								<b>Project : </b>

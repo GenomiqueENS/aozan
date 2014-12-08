@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-
-<xsl:output method="xml" version="1.0" encoding="UTF-8" indent="yes"
-	doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN"
-	doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" />
+<xsl:output method="html" version="1.0" encoding="UTF-8" indent="yes" omit-xml-declaration="no" 
+doctype-system="about:legacy-compat"/>
 
 <xsl:decimal-format name="aozan" decimal-separator="." grouping-separator=" "/>
 <xsl:template match="/">
@@ -329,7 +328,7 @@
   </ul>
 
   <xsl:if test="/QCReport[GlobalReport]">
-  <a name="global"/>
+  <a id="global"/>
   <h2>Global report</h2>
   <table class="data">
   <tr>
@@ -352,7 +351,7 @@
   </xsl:if>
 
   <xsl:if test="/QCReport[ReadsReport]">
-  <a name="lane"></a>
+  <a id="lane"></a>
   <h2>Lanes Quality report</h2>
 <div>
   <xsl:for-each select="/QCReport/ReadsReport/Reads/Read">
@@ -384,11 +383,11 @@
 </div>
   </xsl:if>
 
-  <a name="sample"></a>
+  <a id="sample"></a>
   <xsl:if test="/QCReport[SamplesReport]">
   <h2>Samples Quality report</h2>
 
-  <a name="project"></a>
+  <a id="project"></a>
   <xsl:if test="/QCReport[ProjectsReport]">
 	  <div>
 	  <h4>Filter samples by projects</h4>

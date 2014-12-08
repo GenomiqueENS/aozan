@@ -238,7 +238,7 @@ public final class XMLUtilsWriter {
       trans = transfac.newTransformer();
       // trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
       trans.setOutputProperty(OutputKeys.INDENT, "yes");
-      trans.setOutputProperty(OutputKeys.METHOD, "xml");
+      trans.setOutputProperty(OutputKeys.METHOD, "html");
 
       // Create string from xml tree
       StringWriter sw = new StringWriter();
