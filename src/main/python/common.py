@@ -427,10 +427,14 @@ def error(short_message, message, last_error_file_path, conf):
 
     if os.path.exists(last_error_file_path):
         f = open(last_error_file_path, 'r')
-        last_error = f.readline()
+        
+        # Extract content file and convert list in string
+        last_error = ''.join(f.readlines())
         f.close()
 
+        # Comparison text error
         if not new_error == last_error:
+            # Send mail if new error
             send_msg(short_message, message, True, conf)
     else:
         send_msg(short_message, message, True, conf)
