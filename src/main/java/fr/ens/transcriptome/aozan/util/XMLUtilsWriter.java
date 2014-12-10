@@ -72,13 +72,15 @@ public final class XMLUtilsWriter {
     final DateFormat date_formatter =
         new SimpleDateFormat("EEE dd MMM yyyy", Globals.DEFAULT_LOCALE);
 
-    if (doc == null)
+    if (doc == null) {
       throw new AozanException(
           "Fail add common tag header in document XML, document doesn't exist.");
+    }
 
-    if (parent == null)
+    if (parent == null) {
       throw new AozanException(
           "Fail add common tag header in document XML, parent element of new tag doesn't exist.");
+    }
 
     XMLUtils.addTagValue(doc, parent, "GeneratorName", Globals.APP_NAME);
     XMLUtils.addTagValue(doc, parent, "GeneratorVersion",
@@ -92,11 +94,11 @@ public final class XMLUtilsWriter {
 
       // Convert string to date
       try {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
-        Date runDate = sdf.parse(data.get("run.info.date"));
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
+        final Date runDate = sdf.parse(data.get("run.info.date"));
         XMLUtils.addTagValue(doc, parent, "RunDate",
             date_formatter.format(runDate));
-      } catch (ParseException e1) {
+      } catch (final ParseException e1) {
         XMLUtils.addTagValue(doc, parent, "RunDate", data.get("run.info.date"));
       }
 
@@ -114,7 +116,7 @@ public final class XMLUtilsWriter {
   /**
    * Create a xml file from document xml.
    * @param doc document xml
-   * @param ouput xml file
+   * @param output the output
    * @throws IOException if an error occurs while writing the file
    * @throws AozanException if document or output file doesn't exist or if an
    *           error occurs during transforming document.
@@ -135,12 +137,13 @@ public final class XMLUtilsWriter {
     final String text = createXMLFile(doc);
 
     // Create XML file
-    if (output.getAbsolutePath().endsWith(".html"))
+    if (output.getAbsolutePath().endsWith(".html")) {
       Files.write(text,
           new File(output.getAbsolutePath().replace(".html", ".xml")),
           Charsets.UTF_8);
-    else
+    } else {
       Files.write(text, output, Charsets.UTF_8);
+    }
   }
 
   /**
@@ -160,17 +163,17 @@ public final class XMLUtilsWriter {
 
     try {
       // Print document XML
-      TransformerFactory transfac = TransformerFactory.newInstance();
+      final TransformerFactory transfac = TransformerFactory.newInstance();
       Transformer trans;
       trans = transfac.newTransformer();
-      StringWriter swxml = new StringWriter();
-      StreamResult resultxml = new StreamResult(swxml);
-      DOMSource sourcexml = new DOMSource(doc);
+      final StringWriter swxml = new StringWriter();
+      final StreamResult resultxml = new StreamResult(swxml);
+      final DOMSource sourcexml = new DOMSource(doc);
       trans.transform(sourcexml, resultxml);
 
       return swxml.toString();
 
-    } catch (TransformerException e) {
+    } catch (final TransformerException e) {
       throw new AozanException(e);
     }
   }
@@ -233,7 +236,7 @@ public final class XMLUtilsWriter {
 
     try {
       // Set up a transformer
-      TransformerFactory transfac = TransformerFactory.newInstance();
+      final TransformerFactory transfac = TransformerFactory.newInstance();
       Transformer trans;
       trans = transfac.newTransformer();
       // trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
@@ -241,10 +244,10 @@ public final class XMLUtilsWriter {
       trans.setOutputProperty(OutputKeys.METHOD, "html");
 
       // Create string from xml tree
-      StringWriter sw = new StringWriter();
-      StreamResult result = new StreamResult(sw);
+      final StringWriter sw = new StringWriter();
+      final StreamResult result = new StreamResult(sw);
 
-      DOMSource source = new DOMSource(doc);
+      final DOMSource source = new DOMSource(doc);
       trans.transform(source, result);
 
       // Create the transformer
@@ -263,9 +266,9 @@ public final class XMLUtilsWriter {
 
       return writer.toString();
 
-    } catch (TransformerException e) {
+    } catch (final TransformerException e) {
       throw new AozanException(e);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new AozanException(e);
     }
   }

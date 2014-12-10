@@ -46,8 +46,9 @@ public abstract class AbstractSimpleGlobalTest extends AbstractGlobalTest {
   public List<AozanTest> configure(final Map<String, String> properties)
       throws AozanException {
 
-    if (properties == null)
+    if (properties == null) {
       throw new NullPointerException("The properties object is null");
+    }
 
     this.interval.configureDoubleInterval(properties);
 
@@ -60,9 +61,6 @@ public abstract class AbstractSimpleGlobalTest extends AbstractGlobalTest {
 
   /**
    * Get the the key in the RunData object for the value to test
-   * @param read index of the read
-   * @param indexedRead true if the read is indexed
-   * @param lane index of the lane
    * @return a String with the required key
    */
   protected abstract String getKey();
@@ -96,12 +94,13 @@ public abstract class AbstractSimpleGlobalTest extends AbstractGlobalTest {
   @Override
   public TestResult test(final RunData data) {
 
-    final String key = getKey();
+    final String key = this.getKey();
 
-    if (key == null)
+    if (key == null) {
       return null;
+    }
 
-    final Class<?> clazz = getValueType();
+    final Class<?> clazz = this.getValueType();
     final String msg;
     final Number value;
 
@@ -131,20 +130,22 @@ public abstract class AbstractSimpleGlobalTest extends AbstractGlobalTest {
       }
 
       // Is result a string ?
-      if (value == null)
+      if (value == null) {
         return new TestResult(msg);
+      }
 
       // Transform the value id needed
-      final Number transformedValue = transformValue(value, data);
+      final Number transformedValue = this.transformValue(value, data);
 
       // Do the test ?
-      if (interval == null)
-        return new TestResult(transformedValue, isValuePercent());
+      if (this.interval == null) {
+        return new TestResult(transformedValue, this.isValuePercent());
+      }
 
       return new TestResult(this.interval.getScore(transformedValue),
-          transformedValue, isValuePercent());
+          transformedValue, this.isValuePercent());
 
-    } catch (NumberFormatException e) {
+    } catch (final NumberFormatException e) {
 
       return new TestResult("NA");
     }
