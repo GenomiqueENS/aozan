@@ -91,6 +91,7 @@
 			<item name="Compiling" href="/compiling.html"/>
 			<!-- item name="Developer Wiki" href="http://code.google.com/p/aozan/wiki/MainPage" /-->
             <item name="Aozan on Google code" href="http://code.google.com/p/aozan" />
+			<item name="Javadoc" href="/apidocs/index.html" />            
 		</menu>
 
 		<!--menu ref="reports"/-->
