@@ -180,9 +180,9 @@ doctype-system="about:legacy-compat"/>
      <li><xsl:value-of select="/ReportFastqScreen/Report/ReadsMappedExceptGenomeSample/@name"/> : 
      	<xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsMappedExceptGenomeSample,'#0.00','aozan')"/> %</li>
    
-     <li><xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsMapped,'# ##0','thousand')"/>  
+     <li><xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsMapped,'# ##0','thousand')"/>&#160;   
        <xsl:value-of select="/ReportFastqScreen/Report/ReadsMapped/@name"/>  / 
-       <xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsProcessed,'# ##0','thousand')"/> 
+       <xsl:value-of select="format-number(/ReportFastqScreen/Report/ReadsProcessed,'# ##0','thousand')"/>&#160;
        <xsl:value-of select="/ReportFastqScreen/Report/ReadsProcessed/@name"/>  </li>
    </ul>
 
