@@ -37,9 +37,9 @@
 	<body>
         <link rel="alternate" type="application/rss+xml" title="Aozan updates" href="aozan.rss" />
 
-		<section name="Welcome to Aozan">
-			<div style="float: right; margin: 0 10px 20px 20px; padding: 5px; border: 1px solid #999; background-color: #eee;">
-				<h5 style="margin: 0; font-size: smaller; border-bottom: 1px solid #aaaaaa">
+		<section name="">
+			<div style="float: right; margin: 0 10px 20px 20px; padding: 5px; background-color: #eee;">
+				<h5 style="margin: 0; border-bottom: 1px solid #aaaaaa">
 					Get Aozan @@@VERSION@@@
 				</h5>
 				<p style="font-size: smaller">
@@ -58,7 +58,9 @@
 					</li>
 				</ul>
 			</div>
-
+		</section>
+		
+		<section name="Welcome to Aozan">
 			<p>Aozan has been developped in order to automatically handle raw data transfert, demultiplexing and
                         quality control once an HiSeq run has been finished. This software is involved in the primary data analysis
                         and produce from an HiSeq sequencer output, compressed FASTQ files and a quality report in order to evaluate
@@ -148,10 +150,13 @@
 		           a blastn can be launch to estimate the source.
 		           Blastn results with 100% identity and 0% gap will be included in report.</p>
 		    	<div align="center">
-		    		<a href="qc-samples-tests.html#badtiles">
-		    			<img src="images/qc_fastqc_bad_tiles_height.png" alt="module bad tiles" style="vertical-align:middle"/></a>
-		        	<a href="qc-samples-tests.html#overrepresented">
-		        	 	<img src="images/qc_fastqc_overrepresented_blast_h350px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></a>
+	    		  <table><tr style="text-align:center; background-color: #FFFFFF"><td>
+		    			<a href="qc-samples-tests.html#badtiles">
+		    				<img src="images/qc_fastqc_bad_tiles_height.png" alt="module bad tiles" style="vertical-align:middle"/></a>
+		    		</td><td>
+		        		<a href="qc-samples-tests.html#overrepresented">
+		        	 		<img src="images/qc_fastqc_overrepresented_blast_h350px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></a>
+		        	</td></tr></table>
 		        </div>
 			</subsection>
 
