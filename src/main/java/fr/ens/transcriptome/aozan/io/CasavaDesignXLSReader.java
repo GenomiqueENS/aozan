@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,7 +44,6 @@ import com.google.common.math.DoubleMath;
 
 import fr.ens.transcriptome.eoulsan.illumina.CasavaDesign;
 import fr.ens.transcriptome.eoulsan.illumina.io.AbstractCasavaDesignTextReader;
-import fr.ens.transcriptome.eoulsan.util.Utils;
 
 /**
  * This class reads a Casava design file in xls format.
@@ -54,6 +54,7 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
 
   private final InputStream is;
 
+  @Override
   public CasavaDesign read() throws IOException {
 
     // create a POIFSFileSystem object to read the data
@@ -68,7 +69,7 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
     // When we have a sheet object in hand we can iterator on
     // each sheet's rows and on each row's cells.
     final Iterator<Row> rows = sheet.rowIterator();
-    final List<String> fields = Utils.newArrayList();
+    final List<String> fields = new ArrayList<>();
 
     while (rows.hasNext()) {
       final HSSFRow row = (HSSFRow) rows.next();
