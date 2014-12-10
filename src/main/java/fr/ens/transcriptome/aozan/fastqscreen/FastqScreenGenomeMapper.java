@@ -36,6 +36,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.FileWriteMode;
@@ -49,6 +50,7 @@ import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
 import fr.ens.transcriptome.eoulsan.data.DataFile;
+import fr.ens.transcriptome.eoulsan.data.protocols.DataProtocolService;
 import fr.ens.transcriptome.eoulsan.data.storages.GenomeDescStorage;
 import fr.ens.transcriptome.eoulsan.data.storages.SimpleGenomeDescStorage;
 import fr.ens.transcriptome.eoulsan.illumina.CasavaDesign;
@@ -472,6 +474,13 @@ public class FastqScreenGenomeMapper {
     settings.setGenomeStoragePath(this.properties
         .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY));
 
+    // Set data protocol from Eoulsan not load for Aozan because it needs to add
+    // dependencies
+    DataProtocolService.getInstance().addClassesToNotLoad(
+        Lists.newArrayList(
+            "fr.ens.transcriptome.eoulsan.data.protocols.S3DataProtocol",
+            "fr.ens.transcriptome.eoulsan.data.protocols.S3NDataProtocol"));
+
     final DataFile genomeDescStoragePath =
         new DataFile(settings.getGenomeDescStoragePath());
     this.storage = SimpleGenomeDescStorage.getInstance(genomeDescStoragePath);
@@ -493,5 +502,4 @@ public class FastqScreenGenomeMapper {
     this.genomesToMapping = this.collectGenomesForMapping();
 
   }
-
 }
