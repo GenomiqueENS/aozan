@@ -98,6 +98,16 @@ public class RunData {
   }
 
   /**
+   * Checks if is lane indexed.
+   * @param lane the lane
+   * @return true, if is lane indexed
+   */
+  public boolean isLaneIndexed(final int lane) {
+    return this.getBoolean("demux.lane"
+        + lane + ".sample.lane" + lane + ".barcode=Undetermined");
+  }
+
+  /**
    * Get the tiles count.
    * @return tiles count
    */
@@ -207,7 +217,7 @@ public class RunData {
    * @param read the read number
    * @return the raw cluster count related to a lane and a read
    */
-  public long getReadRawClusterCount(int lane, int read) {
+  public long getReadRawClusterCount(final int lane, final int read) {
     return this.getLong("read" + read + ".lane" + lane + ".clusters.raw");
   }
 
@@ -217,7 +227,7 @@ public class RunData {
    * @param read the read number
    * @return the passing filter cluster count related to a lane and a read
    */
-  public long getReadPFClusterCount(int lane, int read) {
+  public long getReadPFClusterCount(final int lane, final int read) {
     return this.getLong("read" + read + ".lane" + lane + ".clusters.pf");
   }
 
@@ -249,8 +259,9 @@ public class RunData {
    */
   public String get(final String key) {
 
-    if (key == null)
+    if (key == null) {
       return null;
+    }
 
     return this.map.get(key.toLowerCase().trim());
   }
@@ -316,8 +327,9 @@ public class RunData {
    */
   public void put(final String key, final String value) {
 
-    if (key == null)
+    if (key == null) {
       return;
+    }
 
     this.map.put(key.toLowerCase().trim(), value == null ? "" : value.trim());
   }
@@ -379,10 +391,11 @@ public class RunData {
    */
   public void put(final String key, final String... strings) {
 
-    if (strings == null)
+    if (strings == null) {
       put(key, (String) null);
-    else
+    } else {
       put(key, Joiner.on(',').join(strings));
+    }
   }
 
   /**
@@ -392,10 +405,11 @@ public class RunData {
    */
   public void put(final String key, final Collection<String> strings) {
 
-    if (strings == null)
+    if (strings == null) {
       put(key, (String) null);
-    else
+    } else {
       put(key, Joiner.on(',').join(strings));
+    }
   }
 
   /**
@@ -404,11 +418,13 @@ public class RunData {
    */
   public void put(final RunData data) {
 
-    if (data == null)
+    if (data == null) {
       return;
+    }
 
-    for (final Map.Entry<String, String> e : data.map.entrySet())
+    for (final Map.Entry<String, String> e : data.map.entrySet()) {
       this.map.put(e.getKey(), e.getValue());
+    }
   }
 
   //
@@ -428,7 +444,7 @@ public class RunData {
   public String toString() {
 
     final StringBuilder sb = new StringBuilder();
-    for (Map.Entry<String, String> e : this.map.entrySet()) {
+    for (final Map.Entry<String, String> e : this.map.entrySet()) {
       sb.append(e.getKey());
       sb.append('=');
       sb.append(e.getValue());
@@ -452,11 +468,13 @@ public class RunData {
    */
   public void createRunDataFile(final File fileName) throws IOException {
 
-    if (fileName == null)
+    if (fileName == null) {
       throw new NullPointerException();
+    }
 
-    if (fileName.isDirectory())
+    if (fileName.isDirectory()) {
       throw new IOException();
+    }
 
     BufferedWriter bw;
 
@@ -482,8 +500,9 @@ public class RunData {
    */
   public void addDataFileInRundata(final File file) throws IOException {
 
-    if (file == null)
+    if (file == null) {
       throw new NullPointerException("The file parameter is null");
+    }
 
     checkExistingFile(file, " rundata file ");
 
@@ -495,8 +514,9 @@ public class RunData {
     while ((line = br.readLine()) != null) {
 
       final int pos = line.indexOf('=');
-      if (pos == -1)
+      if (pos == -1) {
         continue;
+      }
 
       final String key = line.substring(0, pos);
       final String value = line.substring(pos + 1);
@@ -511,8 +531,9 @@ public class RunData {
    */
   public void print() {
 
-    for (Map.Entry<String, String> e : this.map.entrySet())
+    for (final Map.Entry<String, String> e : this.map.entrySet()) {
       System.out.println(e.getKey() + "=" + e.getValue());
+    }
   }
 
   //
@@ -532,8 +553,9 @@ public class RunData {
    */
   public RunData(final File file) throws IOException {
 
-    if (file == null)
+    if (file == null) {
       throw new NullPointerException("The file parameter is null");
+    }
 
     final BufferedReader br =
         Files.newReader(file, Globals.DEFAULT_FILE_ENCODING);
@@ -543,8 +565,9 @@ public class RunData {
     while ((line = br.readLine()) != null) {
 
       final int pos = line.indexOf('=');
-      if (pos == -1)
+      if (pos == -1) {
         continue;
+      }
 
       final String key = line.substring(0, pos);
       final String value = line.substring(pos + 1);

@@ -91,7 +91,7 @@ public class QCReport {
     final Element columns = doc.createElement("Columns");
     root.appendChild(columns);
 
-    for (GlobalTest test : this.globalTests) {
+    for (final GlobalTest test : this.globalTests) {
       final Element columnElement = doc.createElement("Column");
       columnElement.setAttribute("testname", test.getName());
       columnElement.setAttribute("description", test.getDescription());
@@ -103,7 +103,7 @@ public class QCReport {
     final Element runElement = doc.createElement("Run");
     root.appendChild(runElement);
 
-    for (GlobalTest test : this.globalTests) {
+    for (final GlobalTest test : this.globalTests) {
       final TestResult result = test.test(this.data);
 
       final Element testElement = doc.createElement("Test");
@@ -131,7 +131,7 @@ public class QCReport {
     final Element columns = doc.createElement("Columns");
     root.appendChild(columns);
 
-    for (LaneTest test : this.laneTests) {
+    for (final LaneTest test : this.laneTests) {
       final Element columnElement = doc.createElement("Column");
       columnElement.setAttribute("testname", test.getName());
       columnElement.setAttribute("description", test.getDescription());
@@ -160,8 +160,9 @@ public class QCReport {
         laneElement.setAttribute("number", Integer.toString(lane));
         readElement.appendChild(laneElement);
 
-        for (LaneTest test : laneTests) {
-          final TestResult result = test.test(data, read, indexedRead, lane);
+        for (final LaneTest test : this.laneTests) {
+          final TestResult result =
+              test.test(this.data, read, indexedRead, lane);
 
           final Element testElement = doc.createElement("Test");
           testElement.setAttribute("name", test.getName());
@@ -196,7 +197,7 @@ public class QCReport {
     final Element projects = doc.createElement("ProjectsReport");
     parentElement.appendChild(projects);
 
-    for (String projectName : projectsName) {
+    for (final String projectName : projectsName) {
 
       final Element project = doc.createElement("ProjectName");
       project.setAttribute("classValue", "projectName");
@@ -219,8 +220,14 @@ public class QCReport {
 
     // Build list lane number
     final List<Integer> s = Lists.newArrayList();
-    for (int i = 1; i <= this.data.getLaneCount(); i++)
-      s.add(i);
+    for (int lane = 1; lane <= this.data.getLaneCount(); lane++) {
+
+      // Check lane is indexed
+      if (this.data.isLaneIndexed(lane)) {
+        s.add(lane);
+      }
+    }
+
     undeterminedLines.setAttribute("cmdJS", "'" + Joiner.on(",").join(s) + "'");
 
     undeterminedLines.setTextContent("Undetermined");
@@ -245,7 +252,7 @@ public class QCReport {
       final List<String> samplesNameInLane =
           COMMA_SPLITTER.splitToList(this.data.getSamplesNameInLane(lane));
 
-      for (String sampleName : samplesNameInLane) {
+      for (final String sampleName : samplesNameInLane) {
         // Extract project name corresponding to sample name
         final String key =
             "design.lane" + lane + "." + sampleName + ".sample.project";
@@ -277,8 +284,8 @@ public class QCReport {
     final Element columns = doc.createElement("Columns");
     root.appendChild(columns);
 
-    for (SampleTest test : this.sampleTests) {
-      Element columnElement = doc.createElement("Column");
+    for (final SampleTest test : this.sampleTests) {
+      final Element columnElement = doc.createElement("Column");
       columnElement.setAttribute("testname", test.getName());
       columnElement.setAttribute("description", test.getDescription());
       columnElement.setAttribute("unit", test.getUnit());
@@ -292,8 +299,9 @@ public class QCReport {
 
     for (int read = 1; read <= readCount; read++) {
 
-      if (this.data.isReadIndexed(read))
+      if (this.data.isReadIndexed(read)) {
         continue;
+      }
 
       readSample++;
 
@@ -312,7 +320,7 @@ public class QCReport {
         final boolean noIndex =
             sampleNames.size() == 1 && "".equals(firstIndex);
 
-        for (String sampleName : sampleNames) {
+        for (final String sampleName : sampleNames) {
 
           // Get the sample index
           final String index = this.data.getIndexSample(lane, sampleName);
@@ -329,9 +337,10 @@ public class QCReport {
         }
 
         // Undetermined indexes
-        if (!noIndex)
+        if (!noIndex) {
           addSample(readElement, read, readSample, lane, null, null, null,
               "Undetermined");
+        }
       }
     }
   }
@@ -340,7 +349,7 @@ public class QCReport {
       final int readSample, final int lane, final String sampleName,
       final String desc, final String projectName, final String index) {
 
-    final Element sampleElement = doc.createElement("Sample");
+    final Element sampleElement = this.doc.createElement("Sample");
     sampleElement.setAttribute("name", sampleName == null
         ? "Undetermined" : sampleName);
     sampleElement.setAttribute("desc", desc == null ? "No description" : desc);
@@ -351,12 +360,12 @@ public class QCReport {
 
     readElement.appendChild(sampleElement);
 
-    for (SampleTest test : this.sampleTests) {
+    for (final SampleTest test : this.sampleTests) {
 
       final TestResult result =
           test.test(this.data, read, readSample, lane, sampleName);
 
-      final Element testElement = doc.createElement("Test");
+      final Element testElement = this.doc.createElement("Test");
       testElement.setAttribute("name", test.getName());
       testElement.setAttribute("score", Integer.toString(result.getScore()));
       testElement.setAttribute("type", result.getType());
@@ -371,34 +380,37 @@ public class QCReport {
    */
   private void doTests() throws AozanException {
 
-    if (this.doc != null)
+    if (this.doc != null) {
       return;
+    }
 
     try {
 
-      DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-      DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+      final DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+      final DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
       final Document doc = this.doc = docBuilder.newDocument();
 
       // Create the root element and add it to the document
-      Element root = doc.createElement("QCReport");
+      final Element root = doc.createElement("QCReport");
       root.setAttribute("formatversion", "1.0");
       doc.appendChild(root);
 
       // Common tag header in document xml
-      XMLUtilsWriter.buildXMLCommonTagHeader(doc, root, data);
+      XMLUtilsWriter.buildXMLCommonTagHeader(doc, root, this.data);
 
-      if (!this.globalTests.isEmpty())
+      if (!this.globalTests.isEmpty()) {
         doGlobalTests(root);
+      }
 
-      if (!this.laneTests.isEmpty())
+      if (!this.laneTests.isEmpty()) {
         doLanesTests(root);
+      }
 
       if (!this.sampleTests.isEmpty()) {
         doProjectsTests(root);
         doSamplesTests(root);
       }
-    } catch (ParserConfigurationException e) {
+    } catch (final ParserConfigurationException e) {
       throw new AozanException(e);
     }
   }
@@ -412,7 +424,7 @@ public class QCReport {
 
     doTests();
 
-    return XMLUtilsWriter.createXMLFile(doc);
+    return XMLUtilsWriter.createXMLFile(this.doc);
 
   }
 
@@ -427,7 +439,7 @@ public class QCReport {
 
     try {
       return export(new FileInputStream(XSLFile));
-    } catch (FileNotFoundException e) {
+    } catch (final FileNotFoundException e) {
       throw new AozanException(e);
     }
   }
@@ -441,13 +453,14 @@ public class QCReport {
    */
   public String export(final InputStream is) throws AozanException {
 
-    if (is == null)
+    if (is == null) {
       throw new NullPointerException(
           "The input stream for the XSL stylesheet is null.");
+    }
 
     doTests();
 
-    return XMLUtilsWriter.createHTMLFileFromXSL(doc, is);
+    return XMLUtilsWriter.createHTMLFileFromXSL(this.doc, is);
   }
 
   //
@@ -461,19 +474,22 @@ public class QCReport {
    * @param laneTests list of the read tests
    * @param sampleTests list of the sample tests
    */
-  public QCReport(RunData data, List<GlobalTest> globalTests,
-      List<LaneTest> laneTests, List<SampleTest> sampleTests) {
+  public QCReport(final RunData data, final List<GlobalTest> globalTests,
+      final List<LaneTest> laneTests, final List<SampleTest> sampleTests) {
 
     this.data = data;
 
-    if (globalTests != null)
+    if (globalTests != null) {
       this.globalTests.addAll(globalTests);
+    }
 
-    if (laneTests != null)
+    if (laneTests != null) {
       this.laneTests.addAll(laneTests);
+    }
 
-    if (sampleTests != null)
+    if (sampleTests != null) {
       this.sampleTests.addAll(sampleTests);
+    }
   }
 
 }
