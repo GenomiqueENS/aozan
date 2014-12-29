@@ -69,7 +69,7 @@ public class UndeterminedClustersPercentGlobalTest extends AbstractGlobalTest {
       for (int lane = 1; lane <= laneCount; lane++) {
 
         // Check Undetermined fastq exist for this lane
-        String asBarcodeUndetermined =
+        final String asBarcodeUndetermined =
             data.get("demux.lane" + lane + ".sample.lane" + lane + ".barcode");
         if (asBarcodeUndetermined != null) {
 
@@ -78,7 +78,7 @@ public class UndeterminedClustersPercentGlobalTest extends AbstractGlobalTest {
               data.getLong("demux.lane"
                   + lane + ".sample.lane" + lane + ".read1.raw.cluster.count");
           
-          rawClusterLaneIndexedSum = data.getReadRawClusterCount(lane, 1) * tiles; 
+          rawClusterLaneIndexedSum += data.getReadRawClusterCount(lane, 1) * tiles; 
         }
       }
 
@@ -89,7 +89,7 @@ public class UndeterminedClustersPercentGlobalTest extends AbstractGlobalTest {
       return new TestResult(this.interval.getScore(undeterminedPrc),
           undeterminedPrc, true);
 
-    } catch (NumberFormatException e) {
+    } catch (final NumberFormatException e) {
 
       return new TestResult("NA");
     }
@@ -103,8 +103,9 @@ public class UndeterminedClustersPercentGlobalTest extends AbstractGlobalTest {
   public List<AozanTest> configure(final Map<String, String> properties)
       throws AozanException {
 
-    if (properties == null)
+    if (properties == null) {
       throw new NullPointerException("The properties object is null");
+    }
 
     this.interval.configureDoubleInterval(properties);
 
