@@ -55,13 +55,13 @@ abstract class AbstractFastqProcessThread implements Runnable {
    * @throws AozanException
    * @throws IOException
    */
-  abstract protected void createReportFile() throws AozanException, IOException;
+  protected abstract  void createReportFile() throws AozanException, IOException;
 
   /**
    * Execute the treatment on a sample and supplying the rundata.
    * @throws AozanException
    */
-  abstract protected void processResults() throws AozanException;
+  protected abstract void processResults() throws AozanException;
 
   //
   // Getters
