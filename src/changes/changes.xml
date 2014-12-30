@@ -379,6 +379,12 @@
 				with Eoulsan version 2.0-alpha1  
 			</action>
 		</release>
-
+		
+		<release version="1.3.2" description="Aozan 1.3.2 release" date="2014-12-30">
+			<action dev="sperrin" type="fix">
+				Global test UndeterminedClustersPercentGlobalTest, fix compute percent.
+			</action>
+		</release>
+		
 	</body>
 </document>
