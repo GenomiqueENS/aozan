@@ -72,7 +72,7 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
  */
 class FastQCProcessThread extends AbstractFastqProcessThread {
 
-  /** Logger */
+  /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
   private final SequenceFile seqFile;
@@ -91,7 +91,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
       processSequences(this.seqFile);
       setSuccess(true);
 
-    } catch (AozanException e) {
+    } catch (final AozanException e) {
       setException(e);
 
     } finally {
@@ -106,7 +106,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
   }
 
   /**
-   * Read FASTQ file and process the data by FastQC modules
+   * Read FASTQ file and process the data by FastQC modules.
    * @param seqFile input file
    * @throws AozanException if an error occurs while processing file
    */
@@ -124,8 +124,9 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
         for (final QCModule module : modules) {
 
-          if (ignoreFiltered && module.ignoreFilteredSequences())
+          if (ignoreFiltered && module.ignoreFilteredSequences()) {
             continue;
+          }
 
           module.processSequence(seq);
         }
@@ -137,7 +138,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
       // Keep module data is now unnecessary
       this.moduleList.clear();
 
-    } catch (SequenceFormatException e) {
+    } catch (final SequenceFormatException e) {
       throw new AozanException(e);
     }
 
@@ -162,19 +163,20 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
       final String value = (String) tm.getValueAt(3, 1);
 
-      if (value == null)
+      if (value == null) {
         throw new AozanException(
             "The results panel of Basic Stats FastQC module has changed."
                 + " Update Aozan code to handle this.");
+      }
 
       return Integer.parseInt(value);
 
-    } catch (ClassCastException e) {
+    } catch (final ClassCastException e) {
 
       throw new AozanException(
           "The results panel of Basic Stats FastQC module has changed."
               + " Update Aozan code to handle this.");
-    } catch (NumberFormatException e) {
+    } catch (final NumberFormatException e) {
       throw new AozanException(
           "The results panel of Basic Stats FastQC module has changed."
               + " Update Aozan code to handle this.");
@@ -186,6 +188,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
    * Process results after the end of the thread.
    * @throws AozanException if an error occurs while generate FastQC reports
    */
+  @Override
   protected void processResults() throws AozanException {
 
     // Set the prefix for the run data entries
@@ -203,8 +206,9 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
         nClusters = getClusterNumberFromBasicStatsModule((BasicStats) module);
 
         // If no read read don't go further
-        if (nClusters == 0)
+        if (nClusters == 0) {
           break;
+        }
       }
 
       getResults().put(keyPrefix + ".error", module.raisesError());
@@ -213,12 +217,13 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
     }
 
     // Create report
-    if (nClusters > 0)
+    if (nClusters > 0) {
       try {
         createReportFile();
-      } catch (IOException e) {
+      } catch (final IOException e) {
         throw new AozanException(e);
       }
+    }
 
   }
 
@@ -227,18 +232,20 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
    * @throws AozanException if an error occurs while processing data
    * @throws IOException if an error occurs while processing data
    */
+  @Override
   protected void createReportFile() throws AozanException, IOException {
 
     // Set the name of the prefix of the report file
-    final String filename = getFastqSample().getKeyFastqSample() + "-fastqc.html";
+    final String filename =
+        getFastqSample().getKeyFastqSample() + "-fastqc.html";
 
-    final File reportFile = new File(reportDir, filename);
+    final File reportFile = new File(this.reportDir, filename);
 
     try {
-      new HTMLReportArchive(seqFile,
+      new HTMLReportArchive(this.seqFile,
           this.moduleList.toArray(new QCModule[] {}), reportFile);
 
-    } catch (XMLStreamException e) {
+    } catch (final XMLStreamException e) {
       throw new AozanException(e);
     }
 
@@ -248,19 +255,21 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
     // Keep only the uncompressed data
     if (reportFile.exists()) {
 
-      if (!reportFile.delete())
+      if (!reportFile.delete()) {
         LOGGER.warning("FastQC : fail delete report "
             + reportFile.getAbsolutePath());
+      }
     }
 
     // Remove zip file
     final File reportZip =
-        new File(reportDir, filename.replaceAll("\\.html$", ".zip"));
+        new File(this.reportDir, filename.replaceAll("\\.html$", ".zip"));
     if (reportZip.exists()) {
 
-      if (!reportZip.delete())
+      if (!reportZip.delete()) {
         LOGGER.warning("FastQC : fail delete report "
             + reportZip.getAbsolutePath());
+      }
     }
   }
 
@@ -287,10 +296,10 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
           SequenceFactory.getSequenceFile(fastqSample.getFastqFiles().toArray(
               new File[fastqSample.getFastqFiles().size()]));
 
-    } catch (IOException io) {
+    } catch (final IOException io) {
       throw new AozanException(io);
 
-    } catch (SequenceFormatException e) {
+    } catch (final SequenceFormatException e) {
       throw new AozanException(e);
     }
 

@@ -29,6 +29,7 @@ import static fr.ens.transcriptome.eoulsan.util.XMLUtils.getTagValue;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -43,7 +44,6 @@ import org.xml.sax.SAXException;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.QC;
@@ -73,8 +73,9 @@ public class FlowcellDemuxSummaryCollector implements Collector {
 
     public void add(final TileStats t) {
 
-      if (t == null)
+      if (t == null) {
         return;
+      }
 
       this.yield += t.yield;
       this.yieldQ30 += t.yieldQ30;
@@ -87,17 +88,23 @@ public class FlowcellDemuxSummaryCollector implements Collector {
     @Override
     public String toString() {
 
-      return Objects.toStringHelper(this).add("yield", yield)
-          .add("yieldQ30", yieldQ30).add("clusterCount", clusterCount)
-          .add("clusterCount0MismatchBarcode", clusterCount0MismatchBarcode)
-          .add("clusterCount1MismatchBarcode", clusterCount1MismatchBarcode)
-          .add("qualityScoreSum", qualityScoreSum).toString();
+      return Objects
+          .toStringHelper(this)
+          .add("yield", this.yield)
+          .add("yieldQ30", this.yieldQ30)
+          .add("clusterCount", this.clusterCount)
+          .add("clusterCount0MismatchBarcode",
+              this.clusterCount0MismatchBarcode)
+          .add("clusterCount1MismatchBarcode",
+              this.clusterCount1MismatchBarcode)
+          .add("qualityScoreSum", this.qualityScoreSum).toString();
     }
 
     public void putData(final RunData runData, final String prefix) {
 
-      if (runData == null || prefix == null)
+      if (runData == null || prefix == null) {
         return;
+      }
 
       runData.put(prefix + ".yield", this.yield);
       runData.put(prefix + ".yield.q30", this.yieldQ30);
@@ -144,8 +151,9 @@ public class FlowcellDemuxSummaryCollector implements Collector {
   @Override
   public void configure(final Properties properties) {
 
-    if (properties == null)
+    if (properties == null) {
       return;
+    }
 
     this.casavaOutputPath = properties.getProperty(QC.CASAVA_OUTPUT_DIR);
   }
@@ -153,8 +161,9 @@ public class FlowcellDemuxSummaryCollector implements Collector {
   @Override
   public void collect(final RunData data) throws AozanException {
 
-    if (data == null)
+    if (data == null) {
       return;
+    }
 
     try {
 
@@ -175,14 +184,14 @@ public class FlowcellDemuxSummaryCollector implements Collector {
       parse(doc, data);
 
       is.close();
-    } catch (IOException e) {
+    } catch (final IOException e) {
 
       throw new AozanException(e);
 
-    } catch (SAXException e) {
+    } catch (final SAXException e) {
 
       throw new AozanException(e);
-    } catch (ParserConfigurationException e) {
+    } catch (final ParserConfigurationException e) {
 
       throw new AozanException(e);
     }
@@ -190,9 +199,11 @@ public class FlowcellDemuxSummaryCollector implements Collector {
 
   private void parse(final Document document, final RunData data) {
 
-    for (Element e1 : XMLUtils.getElementsByTagName(document, "Summary"))
-      for (Element e2 : XMLUtils.getElementsByTagName(e1, "Lane"))
+    for (final Element e1 : XMLUtils.getElementsByTagName(document, "Summary")) {
+      for (final Element e2 : XMLUtils.getElementsByTagName(e1, "Lane")) {
         parseLane(e2, data);
+      }
+    }
 
   }
 
@@ -200,21 +211,24 @@ public class FlowcellDemuxSummaryCollector implements Collector {
 
     final int lane = Integer.parseInt(getAttributeValue(e, "index"));
 
-    final Map<Integer, TileStats> rawLine = Maps.newHashMap();
-    final Map<Integer, TileStats> pfLine = Maps.newHashMap();
+    final Map<Integer, TileStats> rawLine = new HashMap<>();
+    final Map<Integer, TileStats> pfLine = new HashMap<>();
 
     // Parse samples of the line
-    for (Element e1 : XMLUtils.getElementsByTagName(e, "Sample"))
+    for (final Element e1 : XMLUtils.getElementsByTagName(e, "Sample")) {
       parseSample(e1, lane, data, rawLine, pfLine);
+    }
 
     // Put the line stats
-    for (Map.Entry<Integer, TileStats> entry : rawLine.entrySet())
+    for (final Map.Entry<Integer, TileStats> entry : rawLine.entrySet()) {
       entry.getValue().putData(data,
           "demux.lane" + lane + ".all.read" + entry.getKey() + ".raw");
+    }
 
-    for (Map.Entry<Integer, TileStats> entry : pfLine.entrySet())
+    for (final Map.Entry<Integer, TileStats> entry : pfLine.entrySet()) {
       entry.getValue().putData(data,
           "demux.lane" + lane + ".all.read" + entry.getKey() + ".pf");
+    }
   }
 
   private void parseSample(final Element e, final int lane, final RunData data,
@@ -226,8 +240,8 @@ public class FlowcellDemuxSummaryCollector implements Collector {
     for (final Element e1 : XMLUtils.getElementsByTagName(e, "Barcode")) {
       final String barcode = getAttributeValue(e1, "index").trim();
 
-      Map<Integer, TileStats> mapRaw = Maps.newHashMap();
-      Map<Integer, TileStats> mapPF = Maps.newHashMap();
+      final Map<Integer, TileStats> mapRaw = new HashMap<>();
+      final Map<Integer, TileStats> mapPF = new HashMap<>();
 
       for (final Element e2 : XMLUtils.getElementsByTagName(e1, "Tile")) {
         // final int tile = Integer.parseInt(getAttributeValue(e2, "index"));
@@ -269,14 +283,14 @@ public class FlowcellDemuxSummaryCollector implements Collector {
 
       data.put(prefix + ".barcode", barcode);
 
-      for (Map.Entry<Integer, TileStats> entry : mapRaw.entrySet()) {
+      for (final Map.Entry<Integer, TileStats> entry : mapRaw.entrySet()) {
         final int read = entry.getKey();
         final TileStats ts = entry.getValue();
         rawLine.get(read).add(ts);
         ts.putData(data, prefix + ".read" + entry.getKey() + ".raw");
       }
 
-      for (Map.Entry<Integer, TileStats> entry : mapPF.entrySet()) {
+      for (final Map.Entry<Integer, TileStats> entry : mapPF.entrySet()) {
         final int read = entry.getKey();
         final TileStats ts = entry.getValue();
         pfLine.get(read).add(ts);

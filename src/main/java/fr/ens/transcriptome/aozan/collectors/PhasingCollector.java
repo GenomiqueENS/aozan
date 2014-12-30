@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -40,7 +41,6 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.QC;
@@ -74,8 +74,9 @@ public class PhasingCollector implements Collector {
   @Override
   public void configure(final Properties properties) {
 
-    if (properties == null)
+    if (properties == null) {
       return;
+    }
 
     this.casavaOutputPath = properties.getProperty(QC.CASAVA_OUTPUT_DIR);
   }
@@ -83,8 +84,9 @@ public class PhasingCollector implements Collector {
   @Override
   public void collect(final RunData data) throws AozanException {
 
-    if (data == null)
+    if (data == null) {
       return;
+    }
 
     try {
 
@@ -97,7 +99,7 @@ public class PhasingCollector implements Collector {
       // Get lane count
       final int laneCount = data.getLaneCount();
 
-      for (Map.Entry<Integer, Integer> entry : getCyclesPhasing(data)
+      for (final Map.Entry<Integer, Integer> entry : getCyclesPhasing(data)
           .entrySet()) {
 
         final int read = entry.getKey();
@@ -112,14 +114,14 @@ public class PhasingCollector implements Collector {
         }
       }
 
-    } catch (IOException e) {
+    } catch (final IOException e) {
 
       throw new AozanException(e);
 
-    } catch (SAXException e) {
+    } catch (final SAXException e) {
 
       throw new AozanException(e);
-    } catch (ParserConfigurationException e) {
+    } catch (final ParserConfigurationException e) {
 
       throw new AozanException(e);
     }
@@ -137,7 +139,7 @@ public class PhasingCollector implements Collector {
     final Document document = dBuilder.parse(is);
     document.getDocumentElement().normalize();
 
-    for (Element e : XMLUtils.getElementsByTagName(document, "Parameters")) {
+    for (final Element e : XMLUtils.getElementsByTagName(document, "Parameters")) {
 
       final double phasing =
           Double.parseDouble(XMLUtils.getTagValue(e, "Phasing"));
@@ -157,7 +159,7 @@ public class PhasingCollector implements Collector {
     // run.info.read.count=2
     // run.info.read1.cycles=51
 
-    final Map<Integer, Integer> result = Maps.newLinkedHashMap();
+    final Map<Integer, Integer> result = new LinkedHashMap<>();
 
     final int readCount = data.getReadCount();
 

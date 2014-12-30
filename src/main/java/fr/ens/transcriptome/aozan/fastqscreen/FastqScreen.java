@@ -42,13 +42,13 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
 
 /**
- * This class execute fastqscreen pair-end mode or single-end
+ * This class execute fastqscreen pair-end mode or single-end.
  * @since 1.0
  * @author Sandrine Perrin
  */
 public class FastqScreen {
 
-  /** Logger */
+  /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
   private final String tmpDir;
@@ -57,7 +57,7 @@ public class FastqScreen {
   private final String mapperArgument;
 
   /**
-   * Mode pair-end : execute fastqscreen
+   * Mode pair-end : execute fastqscreen.
    * @param fastqRead fastq file input for mapper
    * @param fastqSample instance to describe fastq sample
    * @param genomes list or reference genome, used by mapper
@@ -75,7 +75,7 @@ public class FastqScreen {
   }
 
   /**
-   * Mode single-end : execute fastqscreen
+   * Mode single-end : execute fastqscreen.
    * @param fastqRead1 fastq read1 file input for mapper
    * @param fastqRead2 fastq read2 file input for mapper
    * @param fastqSample instance to describe fastq sample
@@ -93,16 +93,18 @@ public class FastqScreen {
     // Timer
     final Stopwatch timer = Stopwatch.createStarted();
 
-    FastqScreenPseudoMapReduce pmr =
-        new FastqScreenPseudoMapReduce(tmpDir, isPairedMode, mapperName,
-            mapperArgument);
+    final FastqScreenPseudoMapReduce pmr =
+        new FastqScreenPseudoMapReduce(this.tmpDir, isPairedMode,
+            this.mapperName, this.mapperArgument);
 
     try {
 
-      if (isPairedMode)
-        pmr.doMap(fastqRead1, fastqRead2, genomes, genomeSample, confThreads);
-      else
-        pmr.doMap(fastqRead1, genomes, genomeSample, confThreads);
+      if (isPairedMode) {
+        pmr.doMap(fastqRead1, fastqRead2, genomes, genomeSample,
+            this.confThreads);
+      } else {
+        pmr.doMap(fastqRead1, genomes, genomeSample, this.confThreads);
+      }
 
       LOGGER.fine("FASTQSCREEN : step map for "
           + fastqSample.getKeyFastqSample() + " in mode "
@@ -112,7 +114,7 @@ public class FastqScreen {
       timer.reset();
       timer.start();
 
-      pmr.doReduce(new File(tmpDir + "/outputDoReduce.txt"));
+      pmr.doReduce(new File(this.tmpDir + "/outputDoReduce.txt"));
 
       LOGGER.fine("FASTQSCREEN : step reduce for "
           + fastqSample.getKeyFastqSample() + " in mode "
@@ -120,12 +122,13 @@ public class FastqScreen {
           + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
       // Remove temporary output file use in map-reduce step
-      File f = new File(tmpDir + "/outputDoReduce.txt");
-      if (!f.delete())
+      final File f = new File(this.tmpDir + "/outputDoReduce.txt");
+      if (!f.delete()) {
         LOGGER.warning("Fastqscreen : fail to delete file "
             + f.getAbsolutePath());
+      }
 
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new AozanException(e);
 
     } finally {
@@ -150,10 +153,10 @@ public class FastqScreen {
 
     if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
       try {
-        confThreads =
+        this.confThreads =
             Integer.parseInt(properties
                 .getProperty(Settings.QC_CONF_THREADS_KEY));
-      } catch (Exception e) {
+      } catch (final Exception e) {
       }
     }
 
@@ -164,7 +167,7 @@ public class FastqScreen {
         properties
             .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPER_ARGUMENT_KEY);
 
-    fr.ens.transcriptome.eoulsan.Settings settings =
+    final fr.ens.transcriptome.eoulsan.Settings settings =
         EoulsanRuntime.getSettings();
 
     settings

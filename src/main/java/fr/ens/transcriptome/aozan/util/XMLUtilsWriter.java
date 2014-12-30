@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -42,7 +43,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -69,7 +69,7 @@ public final class XMLUtilsWriter {
       final Element parent, final RunData data) throws AozanException {
 
     /** Default locale date format in the application. */
-    final DateFormat date_formatter =
+    final DateFormat dateFormatter =
         new SimpleDateFormat("EEE dd MMM yyyy", Globals.DEFAULT_LOCALE);
 
     if (doc == null) {
@@ -97,7 +97,7 @@ public final class XMLUtilsWriter {
         final SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
         final Date runDate = sdf.parse(data.get("run.info.date"));
         XMLUtils.addTagValue(doc, parent, "RunDate",
-            date_formatter.format(runDate));
+            dateFormatter.format(runDate));
       } catch (final ParseException e1) {
         XMLUtils.addTagValue(doc, parent, "RunDate", data.get("run.info.date"));
       }
@@ -109,7 +109,7 @@ public final class XMLUtilsWriter {
       XMLUtils.addTagValue(doc, parent, "InstrumentRunNumber",
           data.get("run.info.run.number"));
       XMLUtils.addTagValue(doc, parent, "ReportDate",
-          date_formatter.format(new Date()));
+          dateFormatter.format(new Date()));
     }
   }
 
@@ -140,9 +140,9 @@ public final class XMLUtilsWriter {
     if (output.getAbsolutePath().endsWith(".html")) {
       Files.write(text,
           new File(output.getAbsolutePath().replace(".html", ".xml")),
-          Charsets.UTF_8);
+          StandardCharsets.UTF_8);
     } else {
-      Files.write(text, output, Charsets.UTF_8);
+      Files.write(text, output, StandardCharsets.UTF_8);
     }
   }
 
@@ -210,7 +210,7 @@ public final class XMLUtilsWriter {
     final String text = createHTMLFileFromXSL(doc, isXslFile);
 
     // Create html file
-    Files.write(text, reportHtml, Charsets.UTF_8);
+    Files.write(text, reportHtml, StandardCharsets.UTF_8);
   }
 
   /**

@@ -48,13 +48,13 @@ public interface AozanTest {
   public String getDescription();
 
   /**
-   * Get the column name of the test in the QC result file
+   * Get the column name of the test in the QC result file.
    * @return the coloumn name of the test
    */
   public String getColumnName();
 
   /**
-   * Get the unit of the result of the test
+   * Get the unit of the result of the test.
    * @return the unit of the result of the test
    */
   public String getUnit();

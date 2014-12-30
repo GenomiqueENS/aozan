@@ -24,9 +24,11 @@
 package fr.ens.transcriptome.aozan.collectors.interop;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -34,13 +36,12 @@ import java.util.Properties;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.collectors.Collector;
+import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.util.StatisticsUtils;
 
 /**
@@ -67,9 +68,10 @@ public class ErrorMetricsCollector implements Collector {
 
   private int read3CycleCount;
 
-  private final Map<Integer, ErrorRatesPerLane> errorRatesMetrics = Maps
-      .newHashMap();
+  private final Map<Integer, ErrorRatesPerLane> errorRatesMetrics =
+      new HashMap<>();
 
+  @Override
   public String getName() {
     return NAME_COLLECTOR;
   }
@@ -78,17 +80,19 @@ public class ErrorMetricsCollector implements Collector {
    * Get the name of the collectors required to run this collector.
    * @return a list of String with the name of the required collectors
    */
+  @Override
   public List<String> getCollectorsNamesRequiered() {
     return Collections.unmodifiableList(Lists
         .newArrayList(RunInfoCollector.COLLECTOR_NAME));
   }
 
   /**
-   * Configure the collector with the path of the run data
+   * Configure the collector with the path of the run data.
    * @param properties object with the collector configuration
    */
-  public void configure(Properties properties) {
-    String RTAOutputDirPath = properties.getProperty(QC.RTA_OUTPUT_DIR);
+  @Override
+  public void configure(final Properties properties) {
+    final String RTAOutputDirPath = properties.getProperty(QC.RTA_OUTPUT_DIR);
     this.dirInterOpPath = RTAOutputDirPath + "/InterOp/";
   }
 
@@ -96,37 +100,40 @@ public class ErrorMetricsCollector implements Collector {
    * Collect data.
    * @param data result data object
    */
+  @Override
   public void collect(final RunData data) throws AozanException {
 
-    lanesCount = data.getLaneCount();
-    readsCount = data.getReadCount();
-    read1CycleCount = data.getReadCyclesCount(1);
+    this.lanesCount = data.getLaneCount();
+    this.readsCount = data.getReadCount();
+    this.read1CycleCount = data.getReadCyclesCount(1);
 
-    if (readsCount == 3)
-      read3CycleCount = data.getReadCyclesCount(3);
+    if (this.readsCount == 3) {
+      this.read3CycleCount = data.getReadCyclesCount(3);
+    }
 
     try {
-      ErrorMetricsReader reader = new ErrorMetricsReader(dirInterOpPath);
+      final ErrorMetricsReader reader =
+          new ErrorMetricsReader(this.dirInterOpPath);
       initMetricsMap(data);
 
       int keyMap;
 
       // Distribution of metrics between lane and code
-      for (IlluminaErrorMetrics iem : reader.getSetIlluminaMetrics()) {
+      for (final IlluminaErrorMetrics iem : reader.getSetIlluminaMetrics()) {
         keyMap =
             getKeyMap(iem.getLaneNumber(), getReadNumber(iem.getCycleNumber()));
-        errorRatesMetrics.get(keyMap).addMetric(iem);
+        this.errorRatesMetrics.get(keyMap).addMetric(iem);
       }
 
-    } catch (FileNotFoundException e) {
+    } catch (final FileNotFoundException e) {
 
       // Case : ErrorMetricsOut.bin doesn't exist, all values are 0.0
-      collectionEmpty(1, lanesCount);
+      collectionEmpty(1, this.lanesCount);
 
     }
 
     // Build runData
-    for (Map.Entry<Integer, ErrorRatesPerLane> entry : errorRatesMetrics
+    for (final Map.Entry<Integer, ErrorRatesPerLane> entry : this.errorRatesMetrics
         .entrySet()) {
 
       entry.getValue().computeData();
@@ -136,7 +143,7 @@ public class ErrorMetricsCollector implements Collector {
   }
 
   /**
-   * Set unique id for each pair lane-read in a run
+   * Set unique id for each pair lane-read in a run.
    * @param lane lane number
    * @param read read number
    * @return integer identifier unique
@@ -153,14 +160,14 @@ public class ErrorMetricsCollector implements Collector {
 
     defineReadLastCycleNumber(data);
 
-    for (int lane = 1; lane <= lanesCount; lane++) {
-      for (int read = 1; read <= readsCount; read++) {
+    for (int lane = 1; lane <= this.lanesCount; lane++) {
+      for (int read = 1; read <= this.readsCount; read++) {
 
         // lane skiping with phix
         if (data.getBoolean("run.info.align.to.phix.lane" + lane)) {
-          errorRatesMetrics.put(getKeyMap(lane, read), new ErrorRatesPerLane(
-              lane, read, read1CycleCount, read2LastCycleNumber,
-              read3CycleCount));
+          this.errorRatesMetrics.put(getKeyMap(lane, read),
+              new ErrorRatesPerLane(lane, read, this.read1CycleCount,
+                  this.read2LastCycleNumber, this.read3CycleCount));
 
         } else {
           // None phix in this lane, all values error are 0
@@ -172,16 +179,18 @@ public class ErrorMetricsCollector implements Collector {
   }
 
   /**
-   * Define the readNumber corresponding to the cycle
+   * Define the readNumber corresponding to the cycle.
    * @param cycle number cycle in the run
    * @return readNumber
    */
   private int getReadNumber(final int cycle) {
-    if (read1LastCycleNumber >= cycle)
+    if (this.read1LastCycleNumber >= cycle) {
       return 1;
+    }
 
-    if (read2LastCycleNumber >= cycle)
+    if (this.read2LastCycleNumber >= cycle) {
       return 2;
+    }
 
     return 3;
   }
@@ -195,11 +204,12 @@ public class ErrorMetricsCollector implements Collector {
   private void collectionEmpty(final int firstLane, final int lastLane) {
 
     for (int lane = firstLane; lane <= lastLane; lane++) {
-      for (int read = 1; read <= readsCount; read++) {
+      for (int read = 1; read <= this.readsCount; read++) {
 
-        int keyMap = lane * 100 + read;
-        errorRatesMetrics.put(keyMap, new ErrorRatesPerLane(lane, read, true,
-            read1CycleCount, read2LastCycleNumber, read3CycleCount));
+        final int keyMap = lane * 100 + read;
+        this.errorRatesMetrics.put(keyMap, new ErrorRatesPerLane(lane, read,
+            true, this.read1CycleCount, this.read2LastCycleNumber,
+            this.read3CycleCount));
       }
     }
 
@@ -218,7 +228,7 @@ public class ErrorMetricsCollector implements Collector {
     cyclesCount += data.getReadCyclesCount(1);
     this.read1LastCycleNumber = cyclesCount;
 
-    if (readsCount == 2) {
+    if (this.readsCount == 2) {
       // Case SR
       this.read2LastCycleNumber = cyclesCount;
 
@@ -232,8 +242,9 @@ public class ErrorMetricsCollector implements Collector {
   }
 
   /**
-   * Remove temporary files
+   * Remove temporary files.
    */
+  @Override
   public void clear() {
   }
 
@@ -252,9 +263,9 @@ public class ErrorMetricsCollector implements Collector {
     private final int laneNumber;
     private final int readNumber;
 
-    private int threshold_35_cycle = -1;
-    private int threshold_75_cycle = -1;
-    private int threshold_100_cycle = -1;
+    private int threshold35thCycle = -1;
+    private int threshold75thCycle = -1;
+    private int threshold100thCycle = -1;
 
     // average errorRate
     private double errorRate = 0.0;
@@ -295,21 +306,21 @@ public class ErrorMetricsCollector implements Collector {
      */
     public void addMetric(final IlluminaErrorMetrics iem) {
 
-      allErrorRates.put(iem.getTileNumber(), iem.getErrorRate());
-      int cycle = iem.getCycleNumber();
+      this.allErrorRates.put(iem.getTileNumber(), iem.getErrorRate());
+      final int cycle = iem.getCycleNumber();
 
-      if (cycle <= threshold_35_cycle) {
-        error35.put(iem.getTileNumber(), iem.getErrorRate());
+      if (cycle <= this.threshold35thCycle) {
+        this.error35.put(iem.getTileNumber(), iem.getErrorRate());
       }
 
       // Threshold = 0 in run SR
-      if (cycle <= threshold_75_cycle) {
-        error75.put(iem.getTileNumber(), iem.getErrorRate());
+      if (cycle <= this.threshold75thCycle) {
+        this.error75.put(iem.getTileNumber(), iem.getErrorRate());
       }
 
       // Threshold = 0 in run SR
-      if (cycle <= threshold_100_cycle) {
-        error100.put(iem.getTileNumber(), iem.getErrorRate());
+      if (cycle <= this.threshold100thCycle) {
+        this.error100.put(iem.getTileNumber(), iem.getErrorRate());
       }
     }
 
@@ -321,9 +332,9 @@ public class ErrorMetricsCollector implements Collector {
 
       List<Number> errorRatePerTile;
 
-      if (allErrorRates.size() > 0) {
-        errorRatePerTile = computeErrorRatePerTile(allErrorRates);
-        StatisticsUtils stat = new StatisticsUtils(errorRatePerTile);
+      if (this.allErrorRates.size() > 0) {
+        errorRatePerTile = computeErrorRatePerTile(this.allErrorRates);
+        final StatisticsUtils stat = new StatisticsUtils(errorRatePerTile);
 
         this.errorRate = stat.getMean();
         this.errorRateSD = stat.getStandardDeviation();
@@ -331,9 +342,9 @@ public class ErrorMetricsCollector implements Collector {
       }
 
       // Check if number cycle > 35, else values are 0.0
-      if (error35.size() > 0) {
-        errorRatePerTile = computeErrorRatePerTile(error35);
-        StatisticsUtils stat = new StatisticsUtils(errorRatePerTile);
+      if (this.error35.size() > 0) {
+        errorRatePerTile = computeErrorRatePerTile(this.error35);
+        final StatisticsUtils stat = new StatisticsUtils(errorRatePerTile);
 
         this.errorRateCycle35 = stat.getMean();
         this.errorRateCycle35SD = stat.getStandardDeviation();
@@ -341,9 +352,9 @@ public class ErrorMetricsCollector implements Collector {
       }
 
       // Check if number cycle > 75, else values are 0.0
-      if (error75.size() > 0) {
-        errorRatePerTile = computeErrorRatePerTile(error75);
-        StatisticsUtils stat = new StatisticsUtils(errorRatePerTile);
+      if (this.error75.size() > 0) {
+        errorRatePerTile = computeErrorRatePerTile(this.error75);
+        final StatisticsUtils stat = new StatisticsUtils(errorRatePerTile);
 
         this.errorRateCycle75 = stat.getMean();
         this.errorRateCycle75SD = stat.getStandardDeviation();
@@ -351,16 +362,16 @@ public class ErrorMetricsCollector implements Collector {
       }
 
       // Check if number cycle > 100, else values are 0.0
-      if (error100.size() > 0) {
-        errorRatePerTile = computeErrorRatePerTile(error100);
-        StatisticsUtils stat = new StatisticsUtils(errorRatePerTile);
+      if (this.error100.size() > 0) {
+        errorRatePerTile = computeErrorRatePerTile(this.error100);
+        final StatisticsUtils stat = new StatisticsUtils(errorRatePerTile);
 
         this.errorRateCycle100 = stat.getMean();
         this.errorRateCycle100SD = stat.getStandardDeviation();
 
       }
 
-      dataToCompute = false;
+      this.dataToCompute = false;
     }
 
     /**
@@ -372,19 +383,19 @@ public class ErrorMetricsCollector implements Collector {
         final ListMultimap<Integer, Number> values) {
 
       // Define map : tile and list of rate error, one per cycle to use
-      Map<Integer, Collection<Number>> errorValuePerTile = values.asMap();
+      final Map<Integer, Collection<Number>> errorValuePerTile = values.asMap();
 
       // Save rate error per tile
-      List<Number> errorRatePerTile = Lists.newArrayList();
+      final List<Number> errorRatePerTile = new ArrayList<>();
 
-      for (Map.Entry<Integer, Collection<Number>> entry : errorValuePerTile
+      for (final Map.Entry<Integer, Collection<Number>> entry : errorValuePerTile
           .entrySet()) {
 
-        Collection<Number> value = entry.getValue();
-        List<Number> list =
+        final Collection<Number> value = entry.getValue();
+        final List<Number> list =
             Arrays.asList(value.toArray(new Number[value.size()]));
 
-        StatisticsUtils stat = new StatisticsUtils(list);
+        final StatisticsUtils stat = new StatisticsUtils(list);
         errorRatePerTile.add(stat.getMean());
 
       }
@@ -393,28 +404,29 @@ public class ErrorMetricsCollector implements Collector {
     }
 
     /**
-     * Save data from error metrics for a run in a RunData
+     * Save data from error metrics for a run in a RunData.
      * @return rundata data from tile metrics for a run
      */
     public RunData getRunData() {
 
-      if (dataToCompute)
+      if (this.dataToCompute) {
         computeData();
+      }
 
-      RunData data = new RunData();
+      final RunData data = new RunData();
 
-      String key = "read" + readNumber + ".lane" + laneNumber;
+      final String key = "read" + this.readNumber + ".lane" + this.laneNumber;
 
-      data.put(key + ".err.rate.100", errorRateCycle100);
-      data.put(key + ".err.rate.100.sd", errorRateCycle100SD);
-      data.put(key + ".err.rate.35", errorRateCycle35);
-      data.put(key + ".err.rate.35.sd", errorRateCycle35SD);
-      data.put(key + ".err.rate.75", errorRateCycle75);
-      data.put(key + ".err.rate.75.sd", errorRateCycle75SD);
-      data.put(key + ".err.rate.phix", errorRate);
-      data.put(key + ".err.rate.phix.sd", errorRateSD);
-      data.put(key + ".called.cycles.max", calledCyclesMax);
-      data.put(key + ".called.cycles.min", calledCyclesMin);
+      data.put(key + ".err.rate.100", this.errorRateCycle100);
+      data.put(key + ".err.rate.100.sd", this.errorRateCycle100SD);
+      data.put(key + ".err.rate.35", this.errorRateCycle35);
+      data.put(key + ".err.rate.35.sd", this.errorRateCycle35SD);
+      data.put(key + ".err.rate.75", this.errorRateCycle75);
+      data.put(key + ".err.rate.75.sd", this.errorRateCycle75SD);
+      data.put(key + ".err.rate.phix", this.errorRate);
+      data.put(key + ".err.rate.phix.sd", this.errorRateSD);
+      data.put(key + ".called.cycles.max", this.calledCyclesMax);
+      data.put(key + ".called.cycles.min", this.calledCyclesMin);
 
       return data;
     }
@@ -424,10 +436,11 @@ public class ErrorMetricsCollector implements Collector {
       return String
           .format(
               "\t%d\t%d\trate %.2f\trate sd %.3f\t35 %.2f\t35 sd %.3f\t75 %.2f\t75 sd %.3f\t100 %.2f\t100 sd %.3f\tmin %d\tmax %d",
-              laneNumber, readNumber, errorRate, errorRateSD, errorRateCycle35,
-              errorRateCycle35SD, errorRateCycle75, errorRateCycle75SD,
-              errorRateCycle100, errorRateCycle100SD, calledCyclesMin,
-              calledCyclesMax);
+              this.laneNumber, this.readNumber, this.errorRate,
+              this.errorRateSD, this.errorRateCycle35, this.errorRateCycle35SD,
+              this.errorRateCycle75, this.errorRateCycle75SD,
+              this.errorRateCycle100, this.errorRateCycle100SD,
+              this.calledCyclesMin, this.calledCyclesMax);
 
     }
 
@@ -436,7 +449,7 @@ public class ErrorMetricsCollector implements Collector {
     //
 
     /**
-     * Constructor
+     * Constructor.
      * @param lane lane number
      * @param read read number
      * @param asEmpty if true, all values are default values (0.0),
@@ -452,36 +465,39 @@ public class ErrorMetricsCollector implements Collector {
         int firstCycleNumber = -1;
         int readCycleCount = -1;
 
-        switch (readNumber) {
+        switch (this.readNumber) {
         case 1:
           firstCycleNumber = 0;
           readCycleCount = read1CycleCount;
-          calledCyclesMin = firstCycleNumber + readCycleCount - 1;
-          calledCyclesMax = firstCycleNumber + readCycleCount - 1;
+          this.calledCyclesMin = firstCycleNumber + readCycleCount - 1;
+          this.calledCyclesMax = firstCycleNumber + readCycleCount - 1;
           break;
 
         case 3:
           firstCycleNumber = read2LastCycleNumber + 1;
           readCycleCount = read3CycleCount;
-          calledCyclesMin = firstCycleNumber + readCycleCount - 1;
-          calledCyclesMax = firstCycleNumber + readCycleCount - 1;
+          this.calledCyclesMin = firstCycleNumber + readCycleCount - 1;
+          this.calledCyclesMax = firstCycleNumber + readCycleCount - 1;
           break;
         default:
-          calledCyclesMax = 0;
-          calledCyclesMin = 0;
+          this.calledCyclesMax = 0;
+          this.calledCyclesMin = 0;
         }
 
         // check threshold computed > at the cycle count
         // no error rate for read2 (index), cycle absent from
         // ErrorMetricsOut.bin
-        if (35 <= readCycleCount && readNumber != 2)
-          threshold_35_cycle = firstCycleNumber + 35;
+        if (35 <= readCycleCount && this.readNumber != 2) {
+          this.threshold35thCycle = firstCycleNumber + 35;
+        }
 
-        if (75 <= readCycleCount && readNumber != 2)
-          threshold_75_cycle = firstCycleNumber + 75;
+        if (75 <= readCycleCount && this.readNumber != 2) {
+          this.threshold75thCycle = firstCycleNumber + 75;
+        }
 
-        if (100 <= readCycleCount && readNumber != 2)
-          threshold_100_cycle = firstCycleNumber + 100;
+        if (100 <= readCycleCount && this.readNumber != 2) {
+          this.threshold100thCycle = firstCycleNumber + 100;
+        }
 
       }
 

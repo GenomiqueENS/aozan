@@ -59,14 +59,14 @@ public class IlluminaTileMetrics {
   private final int laneNumber; // uint16
   private final int tileNumber; // uint16
 
-  /** Get the number lane */
+  /** Get the number lane. */
   public int getLaneNumber() {
-    return laneNumber;
+    return this.laneNumber;
   }
 
-  /** Get the number tile */
+  /** Get the number tile. */
   public int getTileNumber() {
-    return tileNumber;
+    return this.tileNumber;
   }
 
   /**
@@ -74,7 +74,7 @@ public class IlluminaTileMetrics {
    * @return metric code
    */
   public int getMetricCode() {
-    return metricCode;
+    return this.metricCode;
   }
 
   /**
@@ -82,13 +82,13 @@ public class IlluminaTileMetrics {
    * @return value for the metric code
    */
   public float getMetricValue() {
-    return metricValue;
+    return this.metricValue;
   }
 
   @Override
   public String toString() {
-    return String.format("lane %s tile %s code %s value %.04f", laneNumber,
-        tileNumber, metricCode, metricValue);
+    return String.format("lane %s tile %s code %s value %.04f", this.laneNumber,
+        this.tileNumber, this.metricCode, this.metricValue);
 
   }
 
@@ -101,10 +101,10 @@ public class IlluminaTileMetrics {
    * @param bb ByteBuffer who read one record
    */
   IlluminaTileMetrics(final ByteBuffer bb) {
-    laneNumber = uShortToInt(bb.getShort());
-    tileNumber = uShortToInt(bb.getShort());
-    metricCode = uShortToInt(bb.getShort());
-    metricValue = bb.getFloat();
+    this.laneNumber = uShortToInt(bb.getShort());
+    this.tileNumber = uShortToInt(bb.getShort());
+    this.metricCode = uShortToInt(bb.getShort());
+    this.metricValue = bb.getFloat();
 
   }
 

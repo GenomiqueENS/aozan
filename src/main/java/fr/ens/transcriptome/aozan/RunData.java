@@ -30,12 +30,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 
 /**
@@ -46,11 +46,11 @@ import com.google.common.io.Files;
  */
 public class RunData {
 
-  /** Splitter */
+  /** Splitter. */
   private static final Splitter COMMA_SPLITTER = Splitter.on(",").trimResults()
       .omitEmptyStrings();
 
-  private final Map<String, String> map = Maps.newLinkedHashMap();
+  private final Map<String, String> map = new LinkedHashMap<>();
 
   //
   // Methods to extract data
@@ -455,7 +455,7 @@ public class RunData {
   }
 
   /**
-   * Create the data file
+   * Create the data file.
    * @param fileName path destination
    */
   public void createRunDataFile(final String fileName) throws IOException {
@@ -463,7 +463,7 @@ public class RunData {
   }
 
   /**
-   * Create the data file
+   * Create the data file.
    * @param fileName file destination
    */
   public void createRunDataFile(final File fileName) throws IOException {
@@ -485,7 +485,7 @@ public class RunData {
   }
 
   /**
-   * Add the data file in the rundata
+   * Add the data file in the rundata.
    * @param fileName file source
    * @throws IOException if an error occurs while reading the data file
    */
@@ -494,7 +494,7 @@ public class RunData {
   }
 
   /**
-   * Add the data file in the rundata
+   * Add the data file in the rundata.
    * @param file file source
    * @throws IOException if an error occurs while reading the data file
    */

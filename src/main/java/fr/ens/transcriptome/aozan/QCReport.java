@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -42,7 +43,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import fr.ens.transcriptome.aozan.tests.TestResult;
@@ -63,9 +63,9 @@ public class QCReport {
 
   private final RunData data;
 
-  private final List<GlobalTest> globalTests = Lists.newArrayList();
-  private final List<LaneTest> laneTests = Lists.newArrayList();
-  private final List<SampleTest> sampleTests = Lists.newArrayList();
+  private final List<GlobalTest> globalTests = new ArrayList<>();
+  private final List<LaneTest> laneTests = new ArrayList<>();
+  private final List<SampleTest> sampleTests = new ArrayList<>();
   private Document doc;
 
   /**
@@ -219,7 +219,7 @@ public class QCReport {
     undeterminedLines.setAttribute("classValue", "projectName");
 
     // Build list lane number
-    final List<Integer> s = Lists.newArrayList();
+    final List<Integer> s = new ArrayList<>();
     for (int lane = 1; lane <= this.data.getLaneCount(); lane++) {
 
       // Check lane is indexed

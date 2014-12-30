@@ -33,7 +33,7 @@ import fr.ens.transcriptome.aozan.fastqc.OverrepresentedSequencesBlast;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
 /**
- * This class define a FastQC Collector
+ * This class define a FastQC Collector.
  * @since 0.8
  * @author Laurent Jourdren
  */
@@ -42,7 +42,7 @@ public class FastQCCollector extends AbstractFastqCollector {
   /** The collector name. */
   public static final String COLLECTOR_NAME = "fastqc";
 
-  /** Retrieve parameters of FastQC qc.conf.+ key_fastqc */
+  /** Retrieve parameters of FastQC qc.conf.+ key_fastqc. */
   private static final boolean INGORE_FILTERED_SEQUENCES = false;
 
   private int numberThreads = Runtime.getRuntime().availableProcessors();
@@ -63,13 +63,14 @@ public class FastQCCollector extends AbstractFastqCollector {
     if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
 
       try {
-        int confThreads =
+        final int confThreads =
             Integer.parseInt(properties.getProperty(
                 Settings.QC_CONF_THREADS_KEY).trim());
-        if (confThreads > 0)
+        
+        if (confThreads > 0) {
           this.numberThreads = confThreads;
-
-      } catch (NumberFormatException ignored) {
+        }
+      } catch (final NumberFormatException ignored) {
       }
     }
 
@@ -111,7 +112,7 @@ public class FastQCCollector extends AbstractFastqCollector {
 
   @Override
   protected int getThreadsNumber() {
-    return numberThreads;
+    return this.numberThreads;
   }
 
   @Override

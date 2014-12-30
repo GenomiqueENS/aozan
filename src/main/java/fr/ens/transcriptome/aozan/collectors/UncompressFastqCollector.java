@@ -43,17 +43,17 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
  */
 public class UncompressFastqCollector extends AbstractFastqCollector {
 
-  /** Logger */
+  /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
   public static final String COLLECTOR_NAME = "uncompressfastq";
-  
+
   private long uncompressedSizeFiles = 0l;
   private boolean isProcessUndeterminedIndicesSamples = false;
   private int numberThreads = Runtime.getRuntime().availableProcessors();
 
   /**
-   * Get collector name
+   * Get collector name.
    * @return name
    */
   @Override
@@ -65,15 +65,15 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
   protected boolean isProcessUndeterminedIndicesSamples() {
     return this.isProcessUndeterminedIndicesSamples;
   }
-  
+
   /**
-   * Collectors to execute before fastqscreen Collector
+   * Collectors to execute before fastqscreen Collector.
    * @return list of names collector
    */
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    List<String> result = super.getCollectorsNamesRequiered();
+    final List<String> result = super.getCollectorsNamesRequiered();
     result.add(FastQCCollector.COLLECTOR_NAME);
 
     return Collections.unmodifiableList(result);
@@ -88,16 +88,17 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
 
       try {
-        int confThreads =
+        final int confThreads =
             Integer.parseInt(properties.getProperty(
                 Settings.QC_CONF_THREADS_KEY).trim());
-        if (confThreads > 0)
+        if (confThreads > 0) {
           this.numberThreads = confThreads;
+        }
 
-      } catch (NumberFormatException e) {
+      } catch (final NumberFormatException e) {
       }
     }
-    
+
     // Check if process undetermined indices samples specify in Aozan
     // configuration
     this.isProcessUndeterminedIndicesSamples =
@@ -126,15 +127,16 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     }
 
     // Check if the uncompressed fastq file exists
-    if (getFastqStorage().tmpFileExists(fastqSample))
+    if (getFastqStorage().tmpFileExists(fastqSample)) {
       return null;
+    }
 
     // Create the thread object
     return new UncompressFastqThread(fastqSample);
   }
 
   /**
-   * No data file to save in UncompressCollector
+   * No data file to save in UncompressCollector.
    */
   @Override
   protected void saveResultPart(final FastqSample fastqSample,
@@ -144,7 +146,7 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
 
   @Override
   protected int getThreadsNumber() {
-    return numberThreads;
+    return this.numberThreads;
   }
 
   /**
@@ -164,7 +166,7 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     long freeSpace = tmpDir.getFreeSpace();
     freeSpace = freeSpace / (1024 * 1024 * 1024);
 
-    for (FastqSample fastqSample : getFastqSamples()) {
+    for (final FastqSample fastqSample : getFastqSamples()) {
       // Check temporary fastq files exists
       if (!(new File(tmpDir, fastqSample.getNameTemporaryFastqFiles()).exists())) {
         this.uncompressedSizeFiles += fastqSample.getUncompressedSize();
@@ -176,13 +178,14 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     long uncompressedSizeNeeded = (long) (this.uncompressedSizeFiles * 1.05);
     uncompressedSizeNeeded = uncompressedSizeNeeded / (1024 * 1024 * 1024);
 
-    if (uncompressedSizeNeeded > freeSpace)
+    if (uncompressedSizeNeeded > freeSpace) {
       throw new AozanException(
           "Not enough disk space to store uncompressed fastq files for step fastqScreen. We are "
               + freeSpace
               + " Go in directory "
               + tmpDir.getAbsolutePath()
               + ", and we need " + uncompressedSizeNeeded + " Go. Fail Aozan");
+    }
 
     LOGGER
         .fine("Enough disk space to store uncompressed fastq files for step fastqScreen. We are "
@@ -192,6 +195,5 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
             + ", and we need " + uncompressedSizeNeeded + " Go.");
 
   }
-
 
 }

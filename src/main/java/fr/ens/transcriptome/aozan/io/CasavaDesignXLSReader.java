@@ -77,16 +77,18 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
 
       while (cells.hasNext()) {
         final HSSFCell cell = (HSSFCell) cells.next();
-        while (fields.size() != cell.getColumnIndex())
+        while (fields.size() != cell.getColumnIndex()) {
           fields.add("");
+        }
 
         // Convert cell value to String
         fields.add(parseCell(cell));
       }
 
       // Parse the fields
-      if (!isFieldsEmpty(fields))
+      if (!isFieldsEmpty(fields)) {
         parseLine(fields);
+      }
       fields.clear();
 
     }
@@ -103,11 +105,12 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
    */
   private static String parseCell(final HSSFCell cell) {
 
-    if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+    if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
       final double doubleValue = cell.getNumericCellValue();
 
-      if (DoubleMath.isMathematicalInteger(doubleValue))
+      if (DoubleMath.isMathematicalInteger(doubleValue)) {
         return Long.toString((long) doubleValue);
+      }
     }
 
     return cell.toString();
@@ -120,12 +123,15 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
    */
   private static boolean isFieldsEmpty(final List<String> list) {
 
-    if (list == null)
+    if (list == null) {
       return true;
+    }
 
-    for (String e : list)
-      if (e != null && !"".equals(e.trim()))
+    for (final String e : list) {
+      if (e != null && !"".equals(e.trim())) {
         return false;
+      }
+    }
 
     return true;
   }
@@ -135,35 +141,38 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
   //
 
   /**
-   * Public constructor
+   * Public constructor.
    * @param is InputStream to use
    */
   public CasavaDesignXLSReader(final InputStream is) {
 
-    if (is == null)
+    if (is == null) {
       throw new NullPointerException("InputStream is null");
+    }
 
     this.is = is;
   }
 
   /**
-   * Public constructor
+   * Public constructor.
    * @param file File to use
    */
   public CasavaDesignXLSReader(final File file) throws FileNotFoundException {
 
-    if (file == null)
+    if (file == null) {
       throw new NullPointerException("File is null");
+    }
 
-    if (!file.isFile())
+    if (!file.isFile()) {
       throw new FileNotFoundException("File not found: "
           + file.getAbsolutePath());
+    }
 
     this.is = new FileInputStream(file);
   }
 
   /**
-   * Public constructor
+   * Public constructor.
    * @param filename Filename to use
    */
   public CasavaDesignXLSReader(final String filename)

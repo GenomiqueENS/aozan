@@ -23,11 +23,10 @@
 
 package fr.ens.transcriptome.aozan.tests;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.ServiceLoader;
-
-import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
 
@@ -39,7 +38,7 @@ import fr.ens.transcriptome.aozan.AozanRuntimeException;
 public class AozanTestRegistry {
 
   private static AozanTestRegistry instance;
-  private final Map<String, AozanTest> tests = Maps.newHashMap();
+  private final Map<String, AozanTest> tests = new HashMap<>();
 
   /**
    * Get a the test instance.
@@ -48,24 +47,28 @@ public class AozanTestRegistry {
    */
   public AozanTest get(final String testName) {
 
-    if (testName == null)
+    if (testName == null) {
       return null;
+    }
 
     return this.tests.get(testName.trim().toLowerCase());
   }
 
   private void register(final AozanTest test) {
 
-    if (test == null)
+    if (test == null) {
       throw new NullPointerException("The AozanTest to register is null");
+    }
 
-    if (test.getName() == null)
+    if (test.getName() == null) {
       throw new AozanRuntimeException("The name of the AozanTest ("
           + test.getClass().getName() + ") to register is null");
+    }
 
-    if (this.tests.containsKey(test.getName()))
+    if (this.tests.containsKey(test.getName())) {
       throw new AozanRuntimeException("The AozanTest ("
           + test.getName() + ") is already registred");
+    }
 
     this.tests.put(test.getName(), test);
   }
@@ -75,13 +78,14 @@ public class AozanTestRegistry {
   //
 
   /**
-   * Get the singleton instance of AozanTestRegistry
+   * Get the singleton instance of AozanTestRegistry.
    * @return the AozanTestRegistry singleton
    */
   public static AozanTestRegistry getInstance() {
 
-    if (instance == null)
+    if (instance == null) {
       instance = new AozanTestRegistry();
+    }
 
     return instance;
   }

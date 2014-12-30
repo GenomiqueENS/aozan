@@ -60,7 +60,7 @@ public abstract class AbstractSimpleGlobalTest extends AbstractGlobalTest {
   //
 
   /**
-   * Get the the key in the RunData object for the value to test
+   * Get the the key in the RunData object for the value to test.
    * @return a String with the required key
    */
   protected abstract String getKey();

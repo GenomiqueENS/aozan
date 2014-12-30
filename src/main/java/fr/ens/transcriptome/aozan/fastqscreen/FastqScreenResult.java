@@ -79,17 +79,18 @@ public class FastqScreenResult {
 
   /**
    * Print table percent in format use by fastqscreen program with rounding
-   * value
+   * value.
    * @return string with results from fastqscreen
    */
   public String reportToCSV(final FastqSample fastqSample,
       final String genomeSample) throws AozanException {
 
-    if (!isComputedPercent)
+    if (!this.isComputedPercent) {
       throw new AozanException(
           "Error writing a csv report fastqScreen : no values available.");
+    }
 
-    StringBuilder s = new StringBuilder();
+    final StringBuilder s = new StringBuilder();
 
     s.append("FastqScreen : for Projet " + fastqSample.getProjectName());
     s.append(genomeSample == null ? "" : " (genome reference for sample "
@@ -97,27 +98,28 @@ public class FastqScreenResult {
     s.append("\nresult for sample : " + fastqSample.getSampleName());
     s.append("\ndescription of sample : " + fastqSample.getDescriptionSample());
 
-    s.append("\n");
+    s.append('\n');
     s.append("\n" + HEADER_COLUMNS_TEXT + "\n");
 
     // length max genome
-    int nameLength = lengthMaxGenomeName(this.resultsPerGenome.keySet());
+    final int nameLength = lengthMaxGenomeName(this.resultsPerGenome.keySet());
 
-    for (Map.Entry<String, DataPerGenome> e : this.resultsPerGenome.entrySet()) {
+    for (final Map.Entry<String, DataPerGenome> e : this.resultsPerGenome
+        .entrySet()) {
       s.append(e.getValue().getAllPercentValues(nameLength) + "\n");
     }
 
     // add last lines for percentage of reads
-    s.append("\n");
+    s.append('\n');
     s.append("% reads_unmapped_none_genome : "
         + DataPerGenome.roundDouble(this.percentUnmappedNoneGenome));
-    s.append("\n");
+    s.append('\n');
     s.append("% reads_mapped_at_least_one_genome : "
         + DataPerGenome.roundDouble(this.percentMappedAtLeastOneGenome));
-    s.append("\n");
+    s.append('\n');
     s.append("% reads_mapped_except_genome_sample : "
         + DataPerGenome.roundDouble(this.percentMappedExceptGenomeSample));
-    s.append("\n");
+    s.append('\n');
 
     s.append("reads mapped "
         + this.readsMapped + " / reads processed " + this.readsprocessed);
@@ -125,7 +127,7 @@ public class FastqScreenResult {
   }
 
   /**
-   * Create report html file
+   * Create report html file.
    * @param fastqSample fastqSample instance
    * @param data object rundata on the run
    * @param genomeSample genome reference corresponding to sample
@@ -138,21 +140,24 @@ public class FastqScreenResult {
       final String genomeSample, final File reportHtml,
       final File fastqscreenXSLFile) throws AozanException, IOException {
 
-    if (!isComputedPercent)
+    if (!this.isComputedPercent) {
       throw new AozanException(
           "Error writing a html report fastqScreen : no values available.");
+    }
 
-    if (reportHtml == null)
+    if (reportHtml == null) {
       throw new AozanException(
           "Error writing a html report fastqScreen : no values available.");
+    }
 
     // Call stylesheet file for report
     InputStream is = null;
-    if (fastqscreenXSLFile == null)
+    if (fastqscreenXSLFile == null) {
       is =
           this.getClass().getResourceAsStream(Globals.EMBEDDED_FASTQSCREEN_XSL);
-    else
+    } else {
       is = new FileInputStream(fastqscreenXSLFile);
+    }
 
     // Create document XML
     final Document doc = createDocumentXML(fastqSample, data, genomeSample);
@@ -163,7 +168,7 @@ public class FastqScreenResult {
   }
 
   /**
-   * Create document xml
+   * Create document xml.
    * @param fastqSample fastq sample instance
    * @param data object rundata on the run
    * @param genomeSample genome reference for the sample
@@ -173,7 +178,7 @@ public class FastqScreenResult {
   private Document createDocumentXML(final FastqSample fastqSample,
       final RunData data, final String genomeSample) throws AozanException {
 
-    DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+    final DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
     DocumentBuilder docBuilder = null;
 
     Document doc = null;
@@ -182,17 +187,18 @@ public class FastqScreenResult {
       docBuilder = dbfac.newDocumentBuilder();
       doc = docBuilder.newDocument();
 
-      if (doc == null)
+      if (doc == null) {
         throw new AozanException(
             "Fastsqscreen : creating xml file, DocumentBuilder return null");
+      }
 
-    } catch (ParserConfigurationException e) {
+    } catch (final ParserConfigurationException e) {
       throw new AozanException(e);
     }
 
     // Create the root element and add it to the document
 
-    Element root = doc.createElement("ReportFastqScreen");
+    final Element root = doc.createElement("ReportFastqScreen");
     root.setAttribute("formatversion", "1.0");
     doc.appendChild(root);
 
@@ -217,7 +223,7 @@ public class FastqScreenResult {
 
     final String headerColumns = HEADER_COLUMNS_TEXT.replace('_', ' ');
 
-    for (String header : Splitter.on('\t').split(headerColumns)) {
+    for (final String header : Splitter.on('\t').split(headerColumns)) {
 
       final Element columnElement = doc.createElement("Column");
       columnElement.setAttribute("name", header.trim());
@@ -230,15 +236,16 @@ public class FastqScreenResult {
     final Element genomes = doc.createElement("Genomes");
     report.appendChild(genomes);
 
-    for (Map.Entry<String, DataPerGenome> e : this.resultsPerGenome.entrySet()) {
-      String val = e.getValue().getAllPercentValues();
+    for (final Map.Entry<String, DataPerGenome> e : this.resultsPerGenome
+        .entrySet()) {
+      final String val = e.getValue().getAllPercentValues();
 
       final Element genome = doc.createElement("Genome");
       genomes.appendChild(genome);
 
       boolean first = true;
 
-      for (String value : Splitter.on('\t').split(val)) {
+      for (final String value : Splitter.on('\t').split(val)) {
         if (first) {
           // Genome name (first column)
           genome.setAttribute("name", value.trim());
@@ -293,16 +300,18 @@ public class FastqScreenResult {
    */
   public void addGenome(final String genome, final String genomeSample) {
 
-    if (genome == null)
+    if (genome == null) {
       return;
+    }
 
-    if (!this.resultsPerGenome.containsKey(genome))
+    if (!this.resultsPerGenome.containsKey(genome)) {
       this.resultsPerGenome
           .put(genome, new DataPerGenome(genome, genomeSample));
+    }
   }
 
   /**
-   * Count for each read number of hit per reference genome
+   * Count for each read number of hit per reference genome.
    * @param genome genome name
    * @param oneHit true if read mapped one time on genome else false
    * @param oneGenome true if read mapped on several genome else false
@@ -321,16 +330,18 @@ public class FastqScreenResult {
   public void countPercentValue(final int readsMapped, final int readsprocessed)
       throws AozanException {
 
-    if (this.resultsPerGenome.isEmpty())
+    if (this.resultsPerGenome.isEmpty()) {
       throw new AozanException(
           "During fastqScreen execusion : no genome receive");
+    }
     this.readsMapped = readsMapped;
     this.readsprocessed = readsprocessed;
 
     double percentMappedOnlyOnGenomeSample = 0.0;
 
     // Convert value in percentage for all results of each genome
-    for (Map.Entry<String, DataPerGenome> e : this.resultsPerGenome.entrySet()) {
+    for (final Map.Entry<String, DataPerGenome> e : this.resultsPerGenome
+        .entrySet()) {
       e.getValue().countPercentValue(readsprocessed);
 
       percentMappedOnlyOnGenomeSample +=
@@ -345,30 +356,33 @@ public class FastqScreenResult {
         Math.round((1.0 - this.percentUnmappedNoneGenome) * 100000.0) / 100000.0;
 
     this.percentMappedExceptGenomeSample =
-        Math.round((percentMappedAtLeastOneGenome - percentMappedOnlyOnGenomeSample) * 100000.0) / 100000.0;
+        Math.round((this.percentMappedAtLeastOneGenome - percentMappedOnlyOnGenomeSample) * 100000.0) / 100000.0;
 
-    isComputedPercent = true;
+    this.isComputedPercent = true;
   }
 
   /**
-   * Update rundata with results from fastqscreen
+   * Update rundata with results from fastqscreen.
    * @param prefix name of sample
    * @throws AozanException if no value.
    */
   public RunData createRundata(final String prefix) throws AozanException {
 
-    if (this.resultsPerGenome.isEmpty())
+    if (this.resultsPerGenome.isEmpty()) {
       throw new AozanException(
           "During fastqScreen execution : no genome receive");
+    }
 
-    if (!isComputedPercent)
+    if (!this.isComputedPercent) {
       throw new AozanException(
           "During fastqScreen execution : no value ​for genome");
+    }
 
-    RunData data = new RunData();
+    final RunData data = new RunData();
 
     // Add in data all results for each genome
-    for (Map.Entry<String, DataPerGenome> e : this.resultsPerGenome.entrySet()) {
+    for (final Map.Entry<String, DataPerGenome> e : this.resultsPerGenome
+        .entrySet()) {
       e.getValue().updateRundata(data, prefix);
     }
 
@@ -396,8 +410,9 @@ public class FastqScreenResult {
 
   private int lengthMaxGenomeName(final Set<String> genomesName) {
     int length = 0;
-    for (String s : genomesName)
+    for (final String s : genomesName) {
       length = s.length() > length ? s.length() : length;
+    }
 
     return length;
 
@@ -413,7 +428,7 @@ public class FastqScreenResult {
    */
   private static class DataPerGenome {
 
-    private String genome;
+    private final String genome;
     private boolean isGenomeSample;
 
     // Specific legend : represent key in rundata
@@ -448,16 +463,16 @@ public class FastqScreenResult {
     void countHitPerGenome(final boolean oneHit, final boolean oneGenome) {
 
       if (oneHit && oneGenome) {
-        oneHitOneLibraryCount++;
+        this.oneHitOneLibraryCount++;
 
       } else if (!oneHit && oneGenome) {
-        multipleHitsOneLibraryCount++;
+        this.multipleHitsOneLibraryCount++;
 
       } else if (oneHit && !oneGenome) {
-        oneHitMultipleLibrariesCount++;
+        this.oneHitMultipleLibrariesCount++;
 
       } else if (!oneHit && !oneGenome) {
-        multipleHitsMultipleLibrariesCount++;
+        this.multipleHitsMultipleLibrariesCount++;
       }
     }
 
@@ -465,24 +480,24 @@ public class FastqScreenResult {
      * Convert values from fastqscreen in percentage.
      * @param readsprocessed number reads total
      */
-    void countPercentValue(int readscount) {
-      double readsprocessed = readscount * 1.0;
+    void countPercentValue(final int readscount) {
+      final double readsprocessed = readscount * 1.0;
       this.oneHitOneLibraryPercent =
-          (double) this.oneHitOneLibraryCount / readsprocessed;
+          this.oneHitOneLibraryCount / readsprocessed;
       this.multipleHitsOneLibraryPercent =
-          (double) this.multipleHitsOneLibraryCount / readsprocessed;
+          this.multipleHitsOneLibraryCount / readsprocessed;
       this.oneHitMultipleLibrariesPercent =
-          (double) this.oneHitMultipleLibrariesCount / readsprocessed;
+          this.oneHitMultipleLibrariesCount / readsprocessed;
       this.multipleHitsMultipleLibrariesPercent =
-          (double) this.multipleHitsMultipleLibrariesCount / readsprocessed;
+          this.multipleHitsMultipleLibrariesCount / readsprocessed;
 
       this.mappedPercent =
-          (double) (this.oneHitOneLibraryCount
+          (this.oneHitOneLibraryCount
               + this.multipleHitsOneLibraryCount
               + this.oneHitMultipleLibrariesCount + this.multipleHitsMultipleLibrariesCount)
               / readsprocessed;
 
-      this.unMappedPercent = 1.0 - mappedPercent;
+      this.unMappedPercent = 1.0 - this.mappedPercent;
 
     }
 
@@ -491,7 +506,7 @@ public class FastqScreenResult {
      * @return string
      */
     String getAllPercentValues(final int lengthName) {
-      return writeGenomeName(genome, lengthName)
+      return writeGenomeName(this.genome, lengthName)
           + "\t" + roundDouble(this.mappedPercent) + "\t"
           + roundDouble(this.unMappedPercent) + "\t"
           + roundDouble(this.oneHitOneLibraryPercent) + "\t"
@@ -509,68 +524,70 @@ public class FastqScreenResult {
      * @param n double
      * @return double value rounded
      */
-    private static double roundDouble(double n) {
+    private static double roundDouble(final double n) {
       return Math.rint(n * 10000.0) / 100.0;
     }
 
     /**
-     * Update rundata with result from fastqscreen
+     * Update rundata with result from fastqscreen.
      * @param data rundata
      * @param prefix name of sample
      */
     public void updateRundata(final RunData data, final String prefix) {
       // add line in RunData
-      data.put(prefix + "." + genome + "." + MAPPED_LEGEND + ".percent",
+      data.put(prefix + "." + this.genome + "." + MAPPED_LEGEND + ".percent",
           this.mappedPercent);
-      data.put(prefix + "." + genome + "." + UN_MAPPED_LEGEND + ".percent",
+      data.put(
+          prefix + "." + this.genome + "." + UN_MAPPED_LEGEND + ".percent",
           this.unMappedPercent);
       data.put(prefix
-          + "." + genome + "." + ONE_HIT_ONE_LIBRARY_LEGEND + ".percent",
+          + "." + this.genome + "." + ONE_HIT_ONE_LIBRARY_LEGEND + ".percent",
           this.oneHitOneLibraryPercent);
       data.put(prefix
-          + "." + genome + "." + MULTIPLE_HITS_ONE_LIBRARY_LEGEND + ".percent",
-          this.multipleHitsOneLibraryPercent);
-      data.put(
-          prefix
-              + "." + genome + "." + ONE_HIT_MULTIPLE_LIBRARIES_LEGEND
-              + ".percent", this.oneHitMultipleLibrariesPercent);
+          + "." + this.genome + "." + MULTIPLE_HITS_ONE_LIBRARY_LEGEND
+          + ".percent", this.multipleHitsOneLibraryPercent);
       data.put(prefix
-          + "." + genome + "." + MULTIPLE_HITS_MULTIPLE_LIBRARIES_LEGEND
+          + "." + this.genome + "." + ONE_HIT_MULTIPLE_LIBRARIES_LEGEND
+          + ".percent", this.oneHitMultipleLibrariesPercent);
+      data.put(prefix
+          + "." + this.genome + "." + MULTIPLE_HITS_MULTIPLE_LIBRARIES_LEGEND
           + ".percent", this.multipleHitsMultipleLibrariesPercent);
 
     }
 
     /**
      * Retrieve the percent of reads which mapped only on genome sample, zero if
-     * genome is not the genome sample
+     * genome is not the genome sample.
      * @return percent
      */
     double getPercentMappedOnlyOnGenomeSample() {
 
-      if (isGenomeSample) {
+      if (this.isGenomeSample) {
 
-        return oneHitOneLibraryPercent + multipleHitsOneLibraryPercent;
+        return this.oneHitOneLibraryPercent
+            + this.multipleHitsOneLibraryPercent;
       }
       return 0.0;
     }
 
     /**
      * Extends the genome name with "_" to the length max for writing in report.
-     * @param genomeName name of genome
+     * @param genomeName name of genome.
      * @param lengthFinal final length expected
      * @return string of length equal to lengthFinal
      */
     private String writeGenomeName(final String genomeName,
         final int lengthFinal) {
 
-      if (lengthFinal == -1)
+      if (lengthFinal == -1) {
         return genomeName;
+      }
 
-      StringBuilder s = new StringBuilder();
+      final StringBuilder s = new StringBuilder();
       s.append(genomeName);
       int length = genomeName.length();
       while (length < lengthFinal) {
-        s.append("_");
+        s.append('_');
         length++;
       }
 
@@ -582,15 +599,16 @@ public class FastqScreenResult {
     //
 
     /**
-     * Constructor for DataPerGenome
+     * Constructor for DataPerGenome.
      * @param genome genome name
      * @param genomeSample genome reference corresponding to sample
      */
     DataPerGenome(final String genome, final String genomeSample) {
       this.genome = genome;
 
-      if (genomeSample != null)
+      if (genomeSample != null) {
         this.isGenomeSample = genome.equals(genomeSample);
+      }
     }
   }
 

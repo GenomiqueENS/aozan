@@ -87,7 +87,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
   }
 
   /**
-   * Test if the call to run method was a success
+   * Test if the call to run method was a success.
    * @return true if the call to run method was a success
    */
   public boolean isSuccess() {
@@ -96,7 +96,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
   }
 
   /**
-   * Test if the data file is saving
+   * Test if the data file is saving.
    * @return true if the data file is saving else false
    */
   public boolean isDataSaved() {
@@ -105,7 +105,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
   }
 
   /**
-   * Set the data file is saving
+   * Set the data file is saving.
    */
   public void setDataSave() {
 
@@ -113,7 +113,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
   }
 
   /**
-   * Return the fastqSample which represent a sample to treat
+   * Return the fastqSample which represent a sample to treat.
    * @return fastqSample, object which represent a sample to treat
    */
   public FastqSample getFastqSample() {
@@ -134,7 +134,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
   //
 
   /**
-   * Set the exception if occurs
+   * Set the exception if occurs.
    * @param exception the exception
    */
   protected void setException(final AozanException exception) {
@@ -145,7 +145,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
    * Set if the process has been successful.
    * @param success the success result
    */
-  protected void setSuccess(boolean success) {
+  protected void setSuccess(final boolean success) {
     this.success = success;
   }
 
@@ -162,15 +162,17 @@ abstract class AbstractFastqProcessThread implements Runnable {
       throws AozanException {
 
     // Check if fastqSample is null
-    if (fastqSample == null)
+    if (fastqSample == null) {
       throw new AozanException("No fastqSample defined");
+    }
 
     this.fastqSample = fastqSample;
 
     // Check if fastq files exists for this fastqSample
     if (this.fastqSample.getFastqFiles() == null
-        || this.fastqSample.getFastqFiles().isEmpty())
+        || this.fastqSample.getFastqFiles().isEmpty()) {
       throw new AozanException("No fastq file defined");
+    }
 
     this.results = new RunData();
     this.dataSaved = false;

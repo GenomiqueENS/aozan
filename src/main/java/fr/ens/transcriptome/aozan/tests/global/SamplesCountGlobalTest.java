@@ -44,7 +44,7 @@ import fr.ens.transcriptome.aozan.util.ScoreInterval;
  */
 public class SamplesCountGlobalTest extends AbstractGlobalTest {
 
-  /** Splitter */
+  /** Splitter. */
   private static final Splitter COMMA_SPLITTER = Splitter.on(",").trimResults()
       .omitEmptyStrings();
 
@@ -74,7 +74,7 @@ public class SamplesCountGlobalTest extends AbstractGlobalTest {
       return new TestResult(this.interval.getScore(samplesCount), samplesCount,
           false);
 
-    } catch (NumberFormatException e) {
+    } catch (final NumberFormatException e) {
 
       return new TestResult("NA");
     }
@@ -88,8 +88,9 @@ public class SamplesCountGlobalTest extends AbstractGlobalTest {
   public List<AozanTest> configure(final Map<String, String> properties)
       throws AozanException {
 
-    if (properties == null)
+    if (properties == null) {
       throw new NullPointerException("The properties object is null");
+    }
 
     this.interval.configureDoubleInterval(properties);
 

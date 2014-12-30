@@ -24,6 +24,7 @@
 package fr.ens.transcriptome.aozan.collectors.interop;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -31,14 +32,13 @@ import java.util.Properties;
 import java.util.TreeMap;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
-import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.collectors.Collector;
+import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.util.StatisticsUtils;
 
 /**
@@ -54,10 +54,10 @@ public class TileMetricsCollector implements Collector {
 
   private double densityRatio = 0.0;
 
-  private final Map<Integer, TileMetricsPerLane> tileMetrics = Maps
-      .newHashMap();
+  private final Map<Integer, TileMetricsPerLane> tileMetrics = new HashMap<>();
   private String dirInterOpPath;
 
+  @Override
   public String getName() {
     return NAME_COLLECTOR;
   }
@@ -66,20 +66,22 @@ public class TileMetricsCollector implements Collector {
    * Get the name of the collectors required to run this collector.
    * @return a list of String with the name of the required collectors
    */
+  @Override
   public List<String> getCollectorsNamesRequiered() {
     return Collections.unmodifiableList(Lists
         .newArrayList(RunInfoCollector.COLLECTOR_NAME));
   }
 
   /**
-   * Configure the collector with the path of the run data
+   * Configure the collector with the path of the run data.
    * @param properties object with the collector configuration
    */
-  public void configure(Properties properties) {
-    String RTAOutputDirPath = properties.getProperty(QC.RTA_OUTPUT_DIR);
+  @Override
+  public void configure(final Properties properties) {
+    final String RTAOutputDirPath = properties.getProperty(QC.RTA_OUTPUT_DIR);
     this.dirInterOpPath = RTAOutputDirPath + "/InterOp/";
 
-    densityRatio =
+    this.densityRatio =
         Double.parseDouble(properties
             .getProperty(Settings.QC_CONF_CLUSTER_DENSITY_RATIO_KEY));
   }
@@ -88,19 +90,20 @@ public class TileMetricsCollector implements Collector {
    * Collect data from TileMetric interOpFile.
    * @param data result data object
    */
+  @Override
   public void collect(final RunData data) throws AozanException {
 
-    TileMetricsReader reader = new TileMetricsReader(dirInterOpPath);
+    final TileMetricsReader reader = new TileMetricsReader(this.dirInterOpPath);
     initMetricsMap(data);
 
     // Distribution of metrics between lane and code
-    for (IlluminaTileMetrics itm : reader.getSetIlluminaMetrics()) {
+    for (final IlluminaTileMetrics itm : reader.getSetIlluminaMetrics()) {
 
-      tileMetrics.get(itm.getLaneNumber()).addMetric(itm);
+      this.tileMetrics.get(itm.getLaneNumber()).addMetric(itm);
     }
 
     // Build runData
-    for (TileMetricsPerLane value : tileMetrics.values()) {
+    for (final TileMetricsPerLane value : this.tileMetrics.values()) {
 
       value.computeData();
       data.put(value.getRunData());
@@ -113,23 +116,25 @@ public class TileMetricsCollector implements Collector {
    */
   private void initMetricsMap(final RunData data) {
 
-    int tilesCount =
+    final int tilesCount =
         data.getInt("run.info.flow.cell.tile.count")
             * data.getInt("run.info.flow.cell.surface.count")
             * data.getInt("run.info.flow.cell.swath.count");
 
-    int lanesCount = data.getLaneCount();
-    int readsCount = data.getReadCount();
+    final int lanesCount = data.getLaneCount();
+    final int readsCount = data.getReadCount();
 
-    for (int lane = 1; lane <= lanesCount; lane++)
-      tileMetrics.put(lane, new TileMetricsPerLane(lane, readsCount,
+    for (int lane = 1; lane <= lanesCount; lane++) {
+      this.tileMetrics.put(lane, new TileMetricsPerLane(lane, readsCount,
           tilesCount, this.densityRatio));
+    }
 
   }
 
   /**
-   * Remove temporary files
+   * Remove temporary files.
    */
+  @Override
   public void clear() {
   }
 
@@ -145,7 +150,7 @@ public class TileMetricsCollector implements Collector {
    */
   private static final class TileMetricsPerLane {
 
-    /** Set code used for TileMetrics */
+    /** Set code used for TileMetrics. */
     private static final int CLUSTER_DENSITY_CODE = 100;
     private static final int CLUSTER_DENSITY_PF_CODE = 101;
     private static final int NUMBER_CLUSTER_CODE = 102;
@@ -187,26 +192,26 @@ public class TileMetricsCollector implements Collector {
      * @param itm illumina tile metrics
      */
     public void addMetric(final IlluminaTileMetrics itm) {
-      int tileNumber = itm.getTileNumber();
-      int code = itm.getMetricCode();
-      double value = itm.getMetricValue();
+      final int tileNumber = itm.getTileNumber();
+      final int code = itm.getMetricCode();
+      final double value = itm.getMetricValue();
 
-      if (metricsPerTilePerCode.containsKey(code)) {
+      if (this.metricsPerTilePerCode.containsKey(code)) {
 
         // One value by tile by code
-        if (!metricsPerTilePerCode.get(code).containsKey(tileNumber)) {
-          metricsPerTilePerCode.get(code).put(tileNumber, value);
+        if (!this.metricsPerTilePerCode.get(code).containsKey(tileNumber)) {
+          this.metricsPerTilePerCode.get(code).put(tileNumber, value);
 
-        } else if (metricsPerTilePerCode.get(code).get(tileNumber) == 0.0) {
+        } else if (this.metricsPerTilePerCode.get(code).get(tileNumber) == 0.0) {
 
           // Replace value by numeric in case several value exist per tile
-          metricsPerTilePerCode.get(code).put(tileNumber, value);
+          this.metricsPerTilePerCode.get(code).put(tileNumber, value);
         }
 
       } else {
-        Map<Integer, Double> m = new TreeMap<Integer, Double>();
+        final Map<Integer, Double> m = new TreeMap<Integer, Double>();
         m.put(tileNumber, value);
-        metricsPerTilePerCode.put(code, m);
+        this.metricsPerTilePerCode.put(code, m);
       }
     }
 
@@ -221,11 +226,11 @@ public class TileMetricsCollector implements Collector {
       Number sd;
 
       // Compute statistics for each code
-      for (Map.Entry<Integer, Map<Integer, Double>> entry : metricsPerTilePerCode
+      for (final Map.Entry<Integer, Map<Integer, Double>> entry : this.metricsPerTilePerCode
           .entrySet()) {
 
         // list values for the code metric
-        List<Double> listValues =
+        final List<Double> listValues =
             Lists.newArrayList((entry.getValue().values()));
 
         // compute mean and standard deviation
@@ -266,7 +271,7 @@ public class TileMetricsCollector implements Collector {
 
       computePercentClusterPF();
 
-      dataToCompute = false;
+      this.dataToCompute = false;
     }
 
     /**
@@ -274,25 +279,28 @@ public class TileMetricsCollector implements Collector {
      */
     private void computePercentClusterPF() {
 
-      Map<Integer, Double> numberClusterValues = metricsPerTilePerCode.get(102);
-      Map<Integer, Double> numberClusterPFValues =
-          metricsPerTilePerCode.get(103);
+      final Map<Integer, Double> numberClusterValues =
+          this.metricsPerTilePerCode.get(102);
+      final Map<Integer, Double> numberClusterPFValues =
+          this.metricsPerTilePerCode.get(103);
 
-      if (numberClusterPFValues.size() == 0 || numberClusterValues.size() == 0)
+      if (numberClusterPFValues.size() == 0 || numberClusterValues.size() == 0) {
         return;
+      }
 
-      StatisticsUtils stat = new StatisticsUtils();
+      final StatisticsUtils stat = new StatisticsUtils();
 
       // Set the percent cluster PF for each tile
-      for (Map.Entry<Integer, Double> clusters : numberClusterValues.entrySet()) {
+      for (final Map.Entry<Integer, Double> clusters : numberClusterValues
+          .entrySet()) {
 
-        for (Map.Entry<Integer, Double> clustersPF : numberClusterPFValues
+        for (final Map.Entry<Integer, Double> clustersPF : numberClusterPFValues
             .entrySet()) {
 
           // For each tile
           if (clusters.getKey().equals(clustersPF.getKey())) {
 
-            Double prc = clustersPF.getValue() / clusters.getValue();
+            final Double prc = clustersPF.getValue() / clusters.getValue();
 
             stat.addValues(prc);
 
@@ -317,19 +325,20 @@ public class TileMetricsCollector implements Collector {
       int numeroRead = -1;
 
       // code >= 300
-      if (code >= PCR_ALIGNED_PHIX_CODE)
+      if (code >= PCR_ALIGNED_PHIX_CODE) {
         numeroRead = code - PCR_ALIGNED_PHIX_CODE + 1;
-      else {
+      } else {
         // code pair and < 300
-        if (code % 2 == 0)
+        if (code % 2 == 0) {
           numeroRead = (code - PHASING_CODE) / 2 + 1;
-        else
+        } else {
           // code impair and < 300
           numeroRead = (code - PREPHASING_CODE) / 2 + 1;
+        }
       }
 
       // update ReadMetrics for the read number if it exists
-      for (ReadTileMetrics read : listReads) {
+      for (final ReadTileMetrics read : this.listReads) {
         if (read.getNumberRead() == numeroRead) {
           read.addValue(code, stat);
         }
@@ -337,31 +346,33 @@ public class TileMetricsCollector implements Collector {
     }
 
     /**
-     * Save data from tile metrics for a run in a RunData
+     * Save data from tile metrics for a run in a RunData.
      * @return rundata data from tile metrics for a run
      */
     public RunData getRunData() {
 
-      if (dataToCompute)
+      if (this.dataToCompute) {
         computeData();
+      }
 
-      RunData data = new RunData();
+      final RunData data = new RunData();
 
-      for (ReadTileMetrics rm : listReads) {
+      for (final ReadTileMetrics rm : this.listReads) {
 
-        String key = "read" + rm.getNumberRead() + ".lane" + laneNumber;
+        final String key =
+            "read" + rm.getNumberRead() + ".lane" + this.laneNumber;
 
         // Same values for all read in a lane, values for one tile
-        data.put(key + ".clusters.pf", numberClusterPF);
-        data.put(key + ".clusters.pf.sd", numberClusterPFSD);
+        data.put(key + ".clusters.pf", this.numberClusterPF);
+        data.put(key + ".clusters.pf.sd", this.numberClusterPFSD);
 
-        data.put(key + ".clusters.raw", numberCluster);
-        data.put(key + ".clusters.raw.sd", numberClusterSD);
+        data.put(key + ".clusters.raw", this.numberCluster);
+        data.put(key + ".clusters.raw.sd", this.numberClusterSD);
 
-        data.put(key + ".prc.pf.clusters", prcPFClusters);
-        data.put(key + ".prc.pf.clusters.sd", prcPFClustersSD);
+        data.put(key + ".prc.pf.clusters", this.prcPFClusters);
+        data.put(key + ".prc.pf.clusters.sd", this.prcPFClustersSD);
 
-        data.put(key + ".tile.count", countTiles);
+        data.put(key + ".tile.count", this.countTiles);
 
         // Specific value of align on phix for each read
         data.put(key + ".prc.align", rm.getPercentAlignedPhix());
@@ -370,9 +381,11 @@ public class TileMetricsCollector implements Collector {
         data.put(key + ".phasing", rm.getPhasing());
         data.put(key + ".prephasing", rm.getPrephasing());
 
-        data.put("read" + rm.getNumberRead() + ".density.ratio", densityRatio);
-        
-        final String s = data.isReadIndexed(rm.getNumberRead()) ? "(Index)" : "";
+        data.put("read" + rm.getNumberRead() + ".density.ratio",
+            this.densityRatio);
+
+        final String s =
+            data.isReadIndexed(rm.getNumberRead()) ? "(Index)" : "";
         data.put("read" + rm.getNumberRead() + ".type", s);
 
       }
@@ -385,9 +398,10 @@ public class TileMetricsCollector implements Collector {
       return String
           .format(
               "Density %.2f\t -PF %.2f\t nbC %s\t PF %s\t prc %.2f\tsd Density %.3f\t -PF %.3f\t nbC %.3f\t PF %.3f\t prc %.3f",
-              clusterDensity, clusterDensityPF, numberCluster, numberClusterPF,
-              prcPFClusters, clusterDensitySD, clusterDensityPFSD,
-              numberClusterSD, numberClusterPFSD, prcPFClustersSD);
+              this.clusterDensity, this.clusterDensityPF, this.numberCluster,
+              this.numberClusterPF, this.prcPFClusters, this.clusterDensitySD,
+              this.clusterDensityPFSD, this.numberClusterSD,
+              this.numberClusterPFSD, this.prcPFClustersSD);
     }
 
     //
@@ -401,11 +415,12 @@ public class TileMetricsCollector implements Collector {
       this.countTiles = countTiles;
       this.densityRatio = densityRatio;
 
-      this.metricsPerTilePerCode = Maps.newHashMap();
+      this.metricsPerTilePerCode = new HashMap<>();
       this.listReads = new LinkedList<ReadTileMetrics>();
 
-      for (int read = 1; read <= countReads; read++)
-        listReads.add(new ReadTileMetrics(read));
+      for (int read = 1; read <= countReads; read++) {
+        this.listReads.add(new ReadTileMetrics(read));
+      }
 
     }
 
@@ -414,7 +429,7 @@ public class TileMetricsCollector implements Collector {
     //
 
     /**
-     * This class contains all tile metrics specific on a read
+     * This class contains all tile metrics specific on a read.
      * @author Sandrine Perrin
      * @since 1.1
      */
@@ -458,7 +473,7 @@ public class TileMetricsCollector implements Collector {
        * @return number read
        */
       public int getNumberRead() {
-        return readNumber;
+        return this.readNumber;
       }
 
       /**
@@ -466,7 +481,7 @@ public class TileMetricsCollector implements Collector {
        * @return percent of phasing
        */
       public double getPhasing() {
-        return phasing;
+        return this.phasing;
       }
 
       /**
@@ -474,7 +489,7 @@ public class TileMetricsCollector implements Collector {
        * @return percent of prephasing
        */
       public double getPrephasing() {
-        return prephasing;
+        return this.prephasing;
       }
 
       /**
@@ -483,7 +498,7 @@ public class TileMetricsCollector implements Collector {
        * @return percent of cluster aligned on Phix
        */
       public double getPercentAlignedPhix() {
-        return percentAlignedPhix;
+        return this.percentAlignedPhix;
       }
 
       /**
@@ -492,7 +507,7 @@ public class TileMetricsCollector implements Collector {
        * @return percent of cluster aligned on Phix
        */
       public double getPercentAlignedPhixSD() {
-        return percentAlignedPhixSD;
+        return this.percentAlignedPhixSD;
       }
     }
   }

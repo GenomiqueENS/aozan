@@ -30,6 +30,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -37,7 +39,6 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
@@ -66,14 +67,14 @@ import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignCSVReader;
  */
 public class FastqScreenGenomeMapper {
 
-  /** Logger */
+  /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
-  /** Splitter */
+  /** Splitter. */
   private static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults()
       .omitEmptyStrings();
 
-  /** Pattern */
+  /** Pattern. */
   private static final Pattern PATTERN = Pattern.compile(".,;:/-_'");
 
   private static FastqScreenGenomeMapper singleton;
@@ -104,8 +105,8 @@ public class FastqScreenGenomeMapper {
   private Set<String> collectGenomesForMapping() throws AozanException {
 
     // Identify genomes can be use for mapping
-    final Set<String> genomes = Sets.newHashSet();
-    final Set<String> newGenomes = Sets.newHashSet();
+    final Set<String> genomes = new HashSet<>();
+    final Set<String> newGenomes = new HashSet<>();
 
     for (final String genome : this.genomesReferencesSample) {
       final DataFile genomeFile = new DataFile("genome://" + genome);
@@ -128,7 +129,7 @@ public class FastqScreenGenomeMapper {
         // Parse alias file to find a valid genome name
         final String aliasGenomeName = this.genomesNamesConvertor.get(genome);
 
-        if (aliasGenomeName == null || aliasGenomeName.trim().length() == 0) {
+        if (aliasGenomeName == null || aliasGenomeName.isEmpty()) {
           // No genome name found, add entry in alias genomes file
           newGenomes.add(genome);
 
@@ -152,14 +153,12 @@ public class FastqScreenGenomeMapper {
   }
 
   /**
-   * Create a GenomeDescription object from a Fasta file
+   * Create a GenomeDescription object from a Fasta file.
    * @param genomeFile file used for create index
    * @return genomeDescription description of the genome
-   * @throws AozanException if an error occurs while create genome description
-   *           file
-   * @throws IOException if an error occurs during acces genome file
    * @throws BadBioEntryException if an error occurs during create genome
    *           description object
+   * @throws IOException if an error occurs during access genome file
    */
   public GenomeDescription createGenomeDescription(final DataFile genomeFile)
       throws BadBioEntryException, IOException {
@@ -192,7 +191,7 @@ public class FastqScreenGenomeMapper {
 
   /**
    * Add the genome of the sample in the file which does correspondence with
-   * reference genome
+   * reference genome.
    * @param genomesToAdd genomes must be added in alias genomes file
    */
   private void updateAliasGenomeFile(final Set<String> genomesToAdd) {
@@ -238,7 +237,7 @@ public class FastqScreenGenomeMapper {
     final File designFile =
         new File(this.properties.get(QC.CASAVA_DESIGN_PATH));
 
-    final Set<String> genomesFromDesign = Sets.newHashSet();
+    final Set<String> genomesFromDesign = new HashSet<>();
 
     if (designFile.exists() && designFile.isFile()) {
 
@@ -284,9 +283,9 @@ public class FastqScreenGenomeMapper {
     final String val =
         this.properties.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
 
-    final Set<String> genomes = Sets.newHashSet();
+    final Set<String> genomes = new HashSet<>();
 
-    if (val == null || val.trim().length() == 0) {
+    if (val == null || val.isEmpty()) {
       throw new AozanException("FastqScreen : none genomes contaminant define.");
     }
 
@@ -318,7 +317,7 @@ public class FastqScreenGenomeMapper {
 
   /**
    * Create a map which does correspondence between genome of sample and
-   * reference genome from a file, the path is in aozan configuration
+   * reference genome from a file, the path is in aozan configuration.
    * @param map to correspondence between common genome name and valid call name
    *          for mapping
    * @throws AozanException if alias genomes file doesn't exist.
@@ -337,7 +336,7 @@ public class FastqScreenGenomeMapper {
 
     final File aliasGenomesFile = new File(val);
 
-    final Map<String, String> genomes = Maps.newHashMap();
+    final Map<String, String> genomes = new HashMap<>();
 
     // Not found alias genomes file
     if (!aliasGenomesFile.exists()) {
@@ -364,7 +363,7 @@ public class FastqScreenGenomeMapper {
 
         // Retrieve genomes identified in Casava design file
         // Certain have not genome name reference
-        if (!(value == null || value.trim().length() == 0)) {
+        if (!(value == null || value.isEmpty())) {
           genomes.put(key, value);
         }
       }
@@ -439,7 +438,7 @@ public class FastqScreenGenomeMapper {
 
   /**
    * Create a instance of FastqScreenGenomeMapper or if it exists return
-   * instance
+   * instance.
    * @return instance of FastqScreenGenomeMapper
    * @throws AozanException if the instance doesn't exist
    */
@@ -457,7 +456,7 @@ public class FastqScreenGenomeMapper {
   //
 
   /**
-   * Private constructor of FastqScreenGenomeMapper
+   * Private constructor of FastqScreenGenomeMapper.
    * @throws AozanException if the initialization of instance fail.
    */
   private FastqScreenGenomeMapper(final Map<String, String> props)
@@ -496,7 +495,7 @@ public class FastqScreenGenomeMapper {
 
     // Correspondance between initial genome name and valid genome name for
     // mapping
-    this.genomesReferencesSampleRenamed = Maps.newHashMap();
+    this.genomesReferencesSampleRenamed = new HashMap<>();
 
     // Collect genomes useful to contaminant detection
     this.genomesToMapping = this.collectGenomesForMapping();

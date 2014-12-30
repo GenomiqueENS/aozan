@@ -26,6 +26,7 @@ package fr.ens.transcriptome.aozan;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,8 +36,6 @@ import java.util.jar.Manifest;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-
-import com.google.common.base.Charsets;
 
 import fr.ens.transcriptome.eoulsan.util.Version;
 
@@ -138,7 +137,7 @@ public class Globals {
   /** Default locale of the application. */
   public static final Locale DEFAULT_LOCALE = Locale.US;
 
-  public static final Charset DEFAULT_FILE_ENCODING = Charsets.UTF_8;
+  public static final Charset DEFAULT_FILE_ENCODING = StandardCharsets.UTF_8;
 
   /** Format of the log. */
   public static final Formatter LOG_FORMATTER = new Formatter() {
@@ -146,8 +145,9 @@ public class Globals {
     private final DateFormat df = new SimpleDateFormat("yyyy.MM.dd kk:mm:ss",
         DEFAULT_LOCALE);
 
+    @Override
     public String format(final LogRecord record) {
-      return df.format(new Date(record.getMillis()))
+      return this.df.format(new Date(record.getMillis()))
           + "\t" + record.getLevel() + "\t" + record.getMessage() + "\n";
     }
   };
@@ -236,20 +236,21 @@ public class Globals {
 
     try {
 
-      Class<?> clazz = Globals.class;
-      String className = clazz.getSimpleName() + ".class";
-      String classPath = clazz.getResource(className).toString();
+      final Class<?> clazz = Globals.class;
+      final String className = clazz.getSimpleName() + ".class";
+      final String classPath = clazz.getResource(className).toString();
       if (!classPath.startsWith("jar")) {
         // Class not from JAR
         return;
       }
-      String manifestPath =
-          classPath.substring(0, classPath.lastIndexOf("!") + 1)
+      final String manifestPath =
+          classPath.substring(0, classPath.lastIndexOf('!') + 1)
               + MANIFEST_FILE;
-      Manifest manifest = new Manifest(new URL(manifestPath).openStream());
+      final Manifest manifest =
+          new Manifest(new URL(manifestPath).openStream());
       manifestAttributes = manifest.getMainAttributes();
 
-    } catch (IOException ignored) {
+    } catch (final IOException ignored) {
     }
   }
 

@@ -42,7 +42,7 @@ import fr.ens.transcriptome.aozan.Common;
  */
 public final class FastqStorage {
 
-  /** Logger */
+  /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
   private static FastqStorage singleton;
@@ -75,10 +75,10 @@ public final class FastqStorage {
 
       }
 
-    } catch (IOException io) {
+    } catch (final IOException io) {
       throw new AozanException(io);
 
-    } catch (SequenceFormatException e) {
+    } catch (final SequenceFormatException e) {
       throw new AozanException(e);
     }
 
@@ -87,28 +87,30 @@ public final class FastqStorage {
 
   /**
    * Check if a temporary file corresponding with fastq files has already
-   * created
+   * created.
    * @param fastqSample fastq instance which describe an sample
    * @return true if map of files contains a entry with the same key or false
    */
   public boolean tmpFileExists(final FastqSample fastqSample) {
 
-    if (fastqSample.getFastqFiles().isEmpty())
+    if (fastqSample.getFastqFiles().isEmpty()) {
       return false;
+    }
 
     return getTemporaryFile(fastqSample).exists();
 
   }
 
   /**
-   * Delete all temporaries files (fastq tmp files and map files)
+   * Delete all temporaries files (fastq tmp files and map files).
    * @throws IOException
    */
   public void clear() {
     LOGGER.info("Delete temporaries fastq and map files");
 
-    File[] files = tmpPath.listFiles(new FileFilter() {
+    final File[] files = this.tmpPath.listFiles(new FileFilter() {
 
+      @Override
       public boolean accept(final File pathname) {
         return (pathname.getName().startsWith("aozan_fastq_") && (pathname
             .getName().endsWith(".fastq") || pathname.getName().endsWith(
@@ -119,11 +121,13 @@ public final class FastqStorage {
     });
 
     // Delete temporary files
-    for (File f : files) {
-      if (f.exists())
-        if (!f.delete())
+    for (final File f : files) {
+      if (f.exists()) {
+        if (!f.delete()) {
           LOGGER.warning("Can not delete the temporary file : "
               + f.getAbsolutePath());
+        }
+      }
     }
   }
 
@@ -155,7 +159,7 @@ public final class FastqStorage {
   //
 
   /**
-   * Create a instance of fastqStorage or if it exists return instance
+   * Create a instance of fastqStorage or if it exists return instance.
    * @return instance of fastqStorage
    */
   public static FastqStorage getInstance() {
@@ -167,7 +171,7 @@ public final class FastqStorage {
   }
 
   /**
-   * Get absolute path of the temporary directory
+   * Get absolute path of the temporary directory.
    * @return path of the temporary directory
    */
   public File getTmpDir() {
@@ -179,7 +183,7 @@ public final class FastqStorage {
   //
 
   /**
-   * Private constructor of FastqStorage
+   * Private constructor of FastqStorage.
    */
   private FastqStorage() {
   }

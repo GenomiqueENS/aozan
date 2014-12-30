@@ -40,16 +40,16 @@ import uk.ac.babraham.FastQC.Report.HTMLReportArchive;
 public abstract class AbstractQCModuleAozan extends AbstractQCModule {
 
   @Override
-  protected void writeTable(HTMLReportArchive report, TableModel table)
+  protected void writeTable(final HTMLReportArchive report, final TableModel table)
       throws IOException, XMLStreamException {
     writeXhtmlTable(report, table);
     writeTextTable(report, table);
   }
 
   @Override
-  protected void writeXhtmlTable(HTMLReportArchive report, TableModel table)
+  protected void writeXhtmlTable(final HTMLReportArchive report, final TableModel table)
       throws IOException, XMLStreamException {
-    XMLStreamWriter w = report.xhtmlStream();
+    final XMLStreamWriter w = report.xhtmlStream();
     w.writeStartElement("table");
     w.writeStartElement("thead");
     w.writeStartElement("tr");
@@ -81,33 +81,35 @@ public abstract class AbstractQCModuleAozan extends AbstractQCModule {
   }
 
   @Override
-  protected void writeTextTable(HTMLReportArchive report, TableModel table)
+  protected void writeTextTable(final HTMLReportArchive report, final TableModel table)
       throws IOException {
-    StringBuffer d = report.dataDocument();
-    d.append("#");
+    final StringBuffer d = report.dataDocument();
+    d.append('#');
 
     for (int c = 0; c < table.getColumnCount(); c++) {
-      if (c != 0)
-        d.append("\t");
+      if (c != 0) {
+        d.append('\t');
+      }
       d.append(table.getColumnName(c));
     }
 
-    d.append("\n");
+    d.append('\n');
 
     // Do the rows
     for (int r = 0; r < table.getRowCount(); r++) {
       for (int c = 0; c < table.getColumnCount(); c++) {
-        if (c != 0)
-          d.append("\t");
+        if (c != 0) {
+          d.append('\t');
+        }
         // Remove tag html
         d.append(trimTagHtml(String.valueOf(table.getValueAt(r, c))));
       }
-      d.append("\n");
+      d.append('\n');
     }
   }
 
   /**
-   * Remove link tag html in text
+   * Remove link tag html in text.
    * @param text text to modify
    * @return text with tag html
    */
@@ -121,7 +123,7 @@ public abstract class AbstractQCModuleAozan extends AbstractQCModule {
     // Check link html
     if (startPos > 0 && endPos > startPos) {
       // Remove link tag
-      String s =
+      final String s =
           text.substring(0, startPos - 2) +". "+ text.substring(endPos + 4);
 
       // Remove new line tag
@@ -136,26 +138,27 @@ public abstract class AbstractQCModuleAozan extends AbstractQCModule {
       throws XMLStreamException {
 
     // Check link html
-    int startPos = text.indexOf("<a href");
-    int endPos = text.indexOf("</a>");
+    final int startPos = text.indexOf("<a href");
+    final int endPos = text.indexOf("</a>");
 
     // Create link element
     if (startPos > 0 && endPos > startPos) {
 
       String s = text.substring(0, startPos - 1);
-      if (s != null && s.length() > 0)
+      if (s != null && s.length() > 0) {
         w.writeCharacters(s.trim());
+      }
 
       // Create link
       w.writeStartElement("a");
       // Add url
-      int hrefEndPos = text.indexOf("target");
+      final int hrefEndPos = text.indexOf("target");
       s = text.substring(startPos + 9, hrefEndPos - 2);
       w.writeAttribute("href", s.trim());
       w.writeAttribute("target", "_blank");
 
       // Add text link
-      int tagAEndPos = text.indexOf(">");
+      final int tagAEndPos = text.indexOf('>');
       s = text.substring(tagAEndPos + 1, endPos);
       w.writeCharacters(s.trim());
 
@@ -165,12 +168,13 @@ public abstract class AbstractQCModuleAozan extends AbstractQCModule {
       // Add last text
       s = text.substring(endPos + 4, text.length());
       // remove tab br
-      String newS = s.replaceAll("<br/>", "");
+      final String newS = s.replaceAll("<br/>", "");
       w.writeCharacters(newS.trim());
 
-    } else
+    } else {
       // Add classic text
       w.writeCharacters(text);
+    }
 
   }
 }

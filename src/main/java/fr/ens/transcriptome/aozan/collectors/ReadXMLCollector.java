@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -43,7 +44,6 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.QC;
@@ -57,7 +57,7 @@ import fr.ens.transcriptome.eoulsan.util.XMLUtils;
  */
 public class ReadXMLCollector implements Collector {
 
-  /** Sub-collector for readCollector */
+  /** Sub-collector for readCollector. */
   private static final String NAME_COLLECTOR = "ReadXMLCollector";
 
   private String RTAOutputDirPath;
@@ -74,22 +74,23 @@ public class ReadXMLCollector implements Collector {
     final int readCount = data.getReadCount();
 
     for (int i = 1; i <= readCount; i++) {
-      String readInfoFilePath =
-          RTAOutputDirPath + "/Data/reports/Summary/read" + i + ".xml";
+      final String readInfoFilePath =
+          this.RTAOutputDirPath + "/Data/reports/Summary/read" + i + ".xml";
       collectXMLFile(data, readInfoFilePath);
     }
   }
 
   /**
-   * Collect data for a read?.xml file
+   * Collect data for a read?.xml file.
    * @param data RunData object
    * @param readInfoFilePath the read?.xml file path
    */
   private void collectXMLFile(final RunData data, final String readInfoFilePath)
       throws AozanException {
 
-    if (data == null)
+    if (data == null) {
       return;
+    }
 
     try {
 
@@ -106,14 +107,14 @@ public class ReadXMLCollector implements Collector {
       parse(doc, data);
 
       is.close();
-    } catch (IOException e) {
+    } catch (final IOException e) {
 
       throw new AozanException(e);
 
-    } catch (SAXException e) {
+    } catch (final SAXException e) {
 
       throw new AozanException(e);
-    } catch (ParserConfigurationException e) {
+    } catch (final ParserConfigurationException e) {
 
       throw new AozanException(e);
     }
@@ -126,22 +127,23 @@ public class ReadXMLCollector implements Collector {
    */
   private void parse(final Document document, final RunData data) {
 
-    for (Element e : XMLUtils.getElementsByTagName(document, "Summary")) {
+    for (final Element e : XMLUtils.getElementsByTagName(document, "Summary")) {
 
       int readNumber = -1;
       double densityRatio = -1.0;
       String readType = "";
 
       // Parse Summary tag attributes
-      for (String attributeName : getAttributeNames(e)) {
+      for (final String attributeName : getAttributeNames(e)) {
 
-        if ("Read".equals(attributeName))
+        if ("Read".equals(attributeName)) {
           readNumber = Integer.parseInt(getAttributeValue(e, attributeName));
-        else if ("ReadType".equals(attributeName))
+        } else if ("ReadType".equals(attributeName)) {
           readType = getAttributeValue(e, attributeName);
-        else if ("densityRatio".equals(attributeName))
+        } else if ("densityRatio".equals(attributeName)) {
           densityRatio =
               Double.parseDouble(getAttributeValue(e, attributeName));
+        }
       }
 
       final String prefix = "read" + readNumber;
@@ -149,24 +151,26 @@ public class ReadXMLCollector implements Collector {
       data.put(prefix + ".type", readType);
 
       // Parse Lane tag
-      for (Element laneElement : XMLUtils.getElementsByTagName(e, "Lane")) {
+      for (final Element laneElement : XMLUtils.getElementsByTagName(e, "Lane")) {
 
         int lane = -1;
-        Map<String, String> map = Maps.newLinkedHashMap();
+        final Map<String, String> map = new LinkedHashMap<>();
 
-        for (String key : XMLUtils.getAttributeNames(laneElement)) {
+        for (final String key : XMLUtils.getAttributeNames(laneElement)) {
 
           final String value = laneElement.getAttribute(key);
 
-          if ("key".equals(key))
+          if ("key".equals(key)) {
             lane = Integer.parseInt(value);
-          else
+          } else {
             map.put(convertKey(key), value);
+          }
         }
 
-        for (Map.Entry<String, String> entry : map.entrySet())
+        for (final Map.Entry<String, String> entry : map.entrySet()) {
           data.put(prefix + ".lane" + lane + "." + entry.getKey(),
               entry.getValue());
+        }
       }
     }
   }
@@ -178,15 +182,18 @@ public class ReadXMLCollector implements Collector {
    */
   private String convertKey(final String key) {
 
-    if (key == null)
+    if (key == null) {
       return null;
+    }
 
-    if (key.length() == 1)
+    if (key.length() == 1) {
       return key.toLowerCase();
+    }
 
     String k = key;
-    if (k.endsWith("SD"))
+    if (k.endsWith("SD")) {
       k = k.substring(0, k.length() - 2) + ".sd";
+    }
 
     k = k.replace("PhiX", ".phix");
 
@@ -209,8 +216,9 @@ public class ReadXMLCollector implements Collector {
         continue;
       }
 
-      if (digit && lastDigit)
+      if (digit && lastDigit) {
         continue;
+      }
 
       if (lastUp > 0 && !up) {
 
@@ -250,9 +258,10 @@ public class ReadXMLCollector implements Collector {
   }
 
   @Override
-  public void configure(Properties properties) {
-    if (properties == null)
+  public void configure(final Properties properties) {
+    if (properties == null) {
       return;
+    }
 
     this.RTAOutputDirPath = properties.getProperty(QC.RTA_OUTPUT_DIR);
   }

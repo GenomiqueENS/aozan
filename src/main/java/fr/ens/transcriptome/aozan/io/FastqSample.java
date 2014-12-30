@@ -40,7 +40,7 @@ import fr.ens.transcriptome.eoulsan.io.CompressionType;
  */
 public class FastqSample {
 
-  /** Logger */
+  /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
   public static final String FASTQ_EXTENSION = ".fastq";
@@ -58,7 +58,7 @@ public class FastqSample {
   private final String nameTemporaryFastqFiles;
 
   private final List<File> fastqFiles;
-  private CompressionType compressionType;
+  private final CompressionType compressionType;
 
   /**
    * Create a key unique for each fastq sample.
@@ -67,31 +67,33 @@ public class FastqSample {
   private String createKeyFastqSample() {
 
     // Case exists only during step test
-    if (fastqFiles.isEmpty())
-      return lane + " " + sampleName;
+    if (this.fastqFiles.isEmpty()) {
+      return this.lane + " " + this.sampleName;
+    }
 
-    String firstFastqFileName = this.fastqFiles.get(0).getName();
+    final String firstFastqFileName = this.fastqFiles.get(0).getName();
 
     return firstFastqFileName.substring(0, firstFastqFileName.length()
-        - FASTQ_EXTENSION.length() - compressionType.getExtension().length());
+        - FASTQ_EXTENSION.length()
+        - this.compressionType.getExtension().length());
 
   }
 
   /**
-   * Create name for temporary fastq file uncompressed
+   * Create name for temporary fastq file uncompressed.
    * @return name fastq file
    */
   private String createNameTemporaryFastqFile() {
-    return "aozan_fastq_" + keyFastqSample + FASTQ_EXTENSION;
+    return "aozan_fastq_" + this.keyFastqSample + FASTQ_EXTENSION;
   }
 
   /**
-   * Get ratio compression for fastq files according to type compression
+   * Get ratio compression for fastq files according to type compression.
    * @return ratio compression or 1 if not compress
    */
   private double ratioCommpression() {
 
-    switch (compressionType) {
+    switch (this.compressionType) {
 
     case GZIP:
       return 7.0;
@@ -111,13 +113,14 @@ public class FastqSample {
 
   /**
    * Receive the type of compression use for fastq files, only one possible per
-   * sample
+   * sample.
    */
   private static CompressionType getCompressionExtension(
       final List<File> fastqFiles) {
 
-    if (fastqFiles.get(0).getName().endsWith(FASTQ_EXTENSION))
+    if (fastqFiles.get(0).getName().endsWith(FASTQ_EXTENSION)) {
       return CompressionType.NONE;
+    }
 
     return CompressionType.getCompressionTypeByFilename(fastqFiles.get(0)
         .getName());
@@ -125,13 +128,14 @@ public class FastqSample {
   }
 
   /**
-   * Create the prefix used for add data in a RunData for each FastqSample
+   * Create the prefix used for add data in a RunData for each FastqSample.
    * @return prefix
    */
   public String getPrefixRundata() {
 
-    if (isIndeterminedIndices())
+    if (isIndeterminedIndices()) {
       return ".lane" + this.lane + ".undetermined.read" + this.read;
+    }
 
     return ".lane"
         + this.lane + ".sample." + this.sampleName + ".read" + this.read + "."
@@ -144,7 +148,7 @@ public class FastqSample {
    */
   public boolean isUncompressedNeeded() {
 
-    return !compressionType.equals(CompressionType.NONE);
+    return !this.compressionType.equals(CompressionType.NONE);
   }
 
   /**
@@ -157,7 +161,7 @@ public class FastqSample {
     // according to type of compressionExtension
     long sizeFastqFiles = 0;
 
-    for (File f : fastqFiles) {
+    for (final File f : this.fastqFiles) {
       sizeFastqFiles += f.length();
     }
 
@@ -165,35 +169,38 @@ public class FastqSample {
   }
 
   /**
-   * Set the directory to the fastq files for this fastqSample
+   * Set the directory to the fastq files for this fastqSample.
    * @return directory of fastq files for a fastqSample
    */
   private File casavaOutputDir() {
 
-    if (this.undeterminedIndices)
+    if (this.undeterminedIndices) {
       return new File(this.runFastqPath
-          + "/Undetermined_indices/Sample_lane" + lane);
+          + "/Undetermined_indices/Sample_lane" + this.lane);
+    }
 
     return new File(this.runFastqPath
-        + "/Project_" + projectName + "/Sample_" + sampleName);
+        + "/Project_" + this.projectName + "/Sample_" + this.sampleName);
   }
 
   /**
-   * Set the prefix of the fastq file of read1 for this fastqSample
+   * Set the prefix of the fastq file of read1 for this fastqSample.
    * @return prefix fastq files for this fastqSample
    */
-  private String prefixFileName(int read) {
+  private String prefixFileName(final int read) {
 
-    if (this.undeterminedIndices)
-      return String.format("lane%d_Undetermined_L%03d_R%d_", lane, lane, read);
+    if (this.undeterminedIndices) {
+      return String.format("lane%d_Undetermined_L%03d_R%d_", this.lane,
+          this.lane, read);
+    }
 
-    return String.format("%s_%s_L%03d_R%d_", sampleName, "".equals(index)
-        ? "NoIndex" : index, lane, read);
+    return String.format("%s_%s_L%03d_R%d_", this.sampleName,
+        "".equals(this.index) ? "NoIndex" : this.index, this.lane, read);
   }
 
   /**
    * Keep files that satisfy the specified filter in this directory and
-   * beginning with this prefix
+   * beginning with this prefix.
    * @return an array of abstract pathnames
    */
   private List<File> createListFastqFiles(final int read) {
@@ -215,7 +222,7 @@ public class FastqSample {
   //
 
   /**
-   * Get the number of read from the sample in run
+   * Get the number of read from the sample in run.
    * @return number read
    */
   public int getRead() {
@@ -223,7 +230,7 @@ public class FastqSample {
   }
 
   /**
-   * Get the number of lane from the sample in run
+   * Get the number of lane from the sample in run.
    * @return number lane
    */
   public int getLane() {
@@ -231,7 +238,7 @@ public class FastqSample {
   }
 
   /**
-   * Get the project name from the sample in run
+   * Get the project name from the sample in run.
    * @return project name
    */
   public String getProjectName() {
@@ -239,7 +246,7 @@ public class FastqSample {
   }
 
   /**
-   * Get the sample name in run
+   * Get the sample name in run.
    * @return sample name
    */
   public String getSampleName() {
@@ -247,7 +254,7 @@ public class FastqSample {
   }
 
   /**
-   * Get the description of the sample in run
+   * Get the description of the sample in run.
    * @return description of the sample
    */
   public String getDescriptionSample() {
@@ -263,7 +270,7 @@ public class FastqSample {
   }
 
   /**
-   * Get list of fastq files for this sample
+   * Get list of fastq files for this sample.
    * @return list fastq files
    */
   public List<File> getFastqFiles() {
@@ -272,15 +279,15 @@ public class FastqSample {
 
   /**
    * Get the prefix corresponding on read 2 for this sample, this value exists
-   * only in mode paired
+   * only in mode paired.
    * @return prefix for read 2
    */
   public String getPrefixRead2() {
-    return keyFastqSample.replaceFirst("R1", "R2");
+    return this.keyFastqSample.replaceFirst("R1", "R2");
   }
 
   /**
-   * Get the name for temporary fastq files uncompressed
+   * Get the name for temporary fastq files uncompressed.
    * @return temporary fastq file name
    */
   public String getNameTemporaryFastqFiles() {
@@ -288,7 +295,7 @@ public class FastqSample {
   }
 
   /**
-   * Get the unique key for sample
+   * Get the unique key for sample.
    * @return unique key for sample
    */
   public String getKeyFastqSample() {
@@ -296,7 +303,7 @@ public class FastqSample {
   }
 
   /**
-   * Get the compression type for fastq files
+   * Get the compression type for fastq files.
    * @return compression type for fastq files
    */
   public CompressionType getCompressionType() {
@@ -308,7 +315,7 @@ public class FastqSample {
   //
 
   /**
-   * Public constructor corresponding of a technical replica sample
+   * Public constructor corresponding of a technical replica sample.
    * @param casavaOutputPath path to fastq files
    * @param read read number
    * @param lane lane number
@@ -344,7 +351,7 @@ public class FastqSample {
   }
 
   /**
-   * Public constructor corresponding of a undetermined index sample
+   * Public constructor corresponding of a undetermined index sample.
    * @param casavaOutputPath path to fastq files
    * @param read read number
    * @param lane lane number

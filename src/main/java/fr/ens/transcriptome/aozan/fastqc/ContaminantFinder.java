@@ -28,16 +28,17 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
+import uk.ac.babraham.FastQC.Sequence.Contaminant.Contaminant;
+import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.eoulsan.util.StringUtils;
-import uk.ac.babraham.FastQC.Sequence.Contaminant.Contaminant;
-import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
 
 /**
  * Source FastQC version 0.10.0, not modify. The class version 0.10.1 doesn't
@@ -48,12 +49,12 @@ import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
  */
 public class ContaminantFinder {
 
-  /** LOGGER */
+  /** LOGGER. */
   private static final Logger LOGGER = Common.getLogger();
 
   private static Contaminant[] contaminants;
 
-  public static ContaminantHit findContaminantHit(String sequence) {
+  public static ContaminantHit findContaminantHit(final String sequence) {
 
     // Modify call Aozan method
     if (contaminants == null) {
@@ -62,14 +63,16 @@ public class ContaminantFinder {
 
     ContaminantHit bestHit = null;
 
-    for (int c = 0; c < contaminants.length; c++) {
-      ContaminantHit thisHit = contaminants[c].findMatch(sequence);
+    for (final Contaminant contaminant : contaminants) {
+      final ContaminantHit thisHit = contaminant.findMatch(sequence);
 
-      if (thisHit == null)
+      if (thisHit == null) {
         continue; // No hit
+      }
 
-      if (bestHit == null || thisHit.length() > bestHit.length())
+      if (bestHit == null || thisHit.length() > bestHit.length()) {
         bestHit = thisHit;
+      }
 
     }
 
@@ -80,14 +83,15 @@ public class ContaminantFinder {
         final ContaminantHit contaminantBlast =
             OverrepresentedSequencesBlast.getInstance().blastSequence(sequence);
 
-        if (contaminantBlast != null)
+        if (contaminantBlast != null) {
           bestHit = contaminantBlast;
+        }
 
-      } catch (IOException e) {
+      } catch (final IOException e) {
 
         LOGGER.warning("Error during find contaminant with blast : "
             + StringUtils.join(e.getStackTrace(), "\n\t"));
-      } catch (AozanException e) {
+      } catch (final AozanException e) {
 
         LOGGER.warning("Error during find contaminant with blast : "
             + StringUtils.join(e.getStackTrace(), "\n\t"));
@@ -98,7 +102,7 @@ public class ContaminantFinder {
   }
 
   public static Contaminant[] makeContaminantList() {
-    Vector<Contaminant> c = new Vector<Contaminant>();
+    final List<Contaminant> c = new ArrayList<>();
 
     try {
 
@@ -122,31 +126,33 @@ public class ContaminantFinder {
 
       }
 
-      BufferedReader br =
+      final BufferedReader br =
           new BufferedReader(new InputStreamReader(is,
               Globals.DEFAULT_FILE_ENCODING));
 
       String line;
       while ((line = br.readLine()) != null) {
 
-        if (line.startsWith("#"))
+        if (line.startsWith("#")) {
           continue; // Skip comments
-        if (line.trim().length() == 0)
+        }
+        if (line.isEmpty()) {
           continue; // Skip blank lines
+        }
 
-        String[] sections = line.split("\\t+");
+        final String[] sections = line.split("\\t+");
         if (sections.length != 2) {
           System.err
               .println("Expected 2 sections for contaminant line but got "
                   + sections.length + " from " + line);
           continue;
         }
-        Contaminant con = new Contaminant(sections[0], sections[1]);
+        final Contaminant con = new Contaminant(sections[0], sections[1]);
         c.add(con);
       }
 
       br.close();
-    } catch (IOException e) {
+    } catch (final IOException e) {
       e.printStackTrace();
     }
 

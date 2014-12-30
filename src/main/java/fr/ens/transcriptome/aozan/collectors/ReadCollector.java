@@ -23,11 +23,11 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
@@ -46,7 +46,7 @@ public class ReadCollector implements Collector {
   /** The collector name. */
   public static final String COLLECTOR_NAME = "read";
 
-  private final List<Collector> subCollectionList = Lists.newArrayList();
+  private final List<Collector> subCollectionList = new ArrayList<>();
 
   @Override
   public String getName() {
@@ -63,11 +63,12 @@ public class ReadCollector implements Collector {
   @Override
   public void configure(final Properties properties) {
 
-    if (properties == null)
+    if (properties == null) {
       return;
+    }
 
     // Use ReadXMLCollector, if specified in aozan.conf
-    String readXMLCollectorUsed =
+    final String readXMLCollectorUsed =
         properties.getProperty(Settings.QC_CONF_READ_XML_COLLECTOR_USED_KEY)
             .trim().toLowerCase();
 
@@ -75,34 +76,37 @@ public class ReadCollector implements Collector {
     if (readXMLCollectorUsed.equals("true")) {
 
       // file read.xml exists
-      subCollectionList.add(new ReadXMLCollector());
+      this.subCollectionList.add(new ReadXMLCollector());
 
     } else {
       // Reading interOpFile, per default
-      subCollectionList.add(new TileMetricsCollector());
-      subCollectionList.add(new ExtractionMetricsCollector());
-      subCollectionList.add(new ErrorMetricsCollector());
+      this.subCollectionList.add(new TileMetricsCollector());
+      this.subCollectionList.add(new ExtractionMetricsCollector());
+      this.subCollectionList.add(new ErrorMetricsCollector());
     }
 
     // Configure sub-collector
-    for (Collector collector : subCollectionList)
+    for (final Collector collector : this.subCollectionList) {
       collector.configure(properties);
+    }
   }
 
   @Override
   public void collect(final RunData data) throws AozanException {
 
     // Collect sub-collector
-    for (Collector collector : subCollectionList)
+    for (final Collector collector : this.subCollectionList) {
       collector.collect(data);
+    }
 
   }
 
   @Override
   public void clear() {
 
-    for (Collector collector : subCollectionList)
+    for (final Collector collector : this.subCollectionList) {
       collector.clear();
+    }
   }
 
 }

@@ -43,8 +43,8 @@ import fr.ens.transcriptome.aozan.tests.TestResult;
  */
 public class PercentInLaneSampleTest extends AbstractSampleTest {
 
-  private final static String MARGE_PERCENT_IN_LANE_KEY = "distance";
-  private double DISTANCE = 0.0;
+  private static final String MARGE_PERCENT_IN_LANE_KEY = "distance";
+  private double distance = 0.0;
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -59,16 +59,17 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
 
     final String rawSampleKey;
 
-    if (sampleName == null)
+    if (sampleName == null) {
       rawSampleKey =
           "demux.lane"
               + lane + ".sample.lane" + lane + ".read" + readSample
               + ".raw.cluster.count";
-    else
+    } else {
       rawSampleKey =
           "demux.lane"
               + lane + ".sample." + sampleName + ".read" + readSample
               + ".raw.cluster.count";
+    }
 
     final String rawAll =
         "demux.lane" + lane + ".all.read" + readSample + ".raw.cluster.count";
@@ -83,23 +84,24 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
       // Configure score
       final double homogeneityInLane =
           data.getDouble("design.lane" + lane + ".percent.homogeneity");
-      if (this.DISTANCE >= homogeneityInLane) {
-        this.DISTANCE = 0.0;
+      if (this.distance >= homogeneityInLane) {
+        this.distance = 0.0;
       }
 
-      final double min = homogeneityInLane - DISTANCE;
-      final double max = homogeneityInLane + DISTANCE;
+      final double min = homogeneityInLane - this.distance;
+      final double max = homogeneityInLane + this.distance;
 
       // If distance not set, score = -1
       final int score =
-          (DISTANCE == 0.0 ? -1 : (percent > max || percent < min) ? 4 : 9);
+          (this.distance == 0.0 ? -1 : (percent > max || percent < min) ? 4 : 9);
 
-      if (sampleName == null)
+      if (sampleName == null) {
         return new TestResult(percent, true);
+      }
 
       return new TestResult(score, percent, true);
 
-    } catch (NumberFormatException e) {
+    } catch (final NumberFormatException e) {
 
       return new TestResult("NA");
     }
@@ -113,16 +115,17 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
   public List<AozanTest> configure(final Map<String, String> properties)
       throws AozanException {
 
-    if (properties == null)
+    if (properties == null) {
       throw new NullPointerException("The properties object is null");
+    }
 
     final String d = properties.get(MARGE_PERCENT_IN_LANE_KEY);
     if (d != null) {
-      this.DISTANCE =
+      this.distance =
           Double.parseDouble(properties.get(MARGE_PERCENT_IN_LANE_KEY));
 
-      if (this.DISTANCE >= 1.0) {
-        this.DISTANCE = 0.0;
+      if (this.distance >= 1.0) {
+        this.distance = 0.0;
       }
     }
 

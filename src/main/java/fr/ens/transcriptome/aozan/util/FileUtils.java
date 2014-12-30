@@ -27,9 +27,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
-
-import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.Globals;
 
@@ -41,7 +40,7 @@ import fr.ens.transcriptome.aozan.Globals;
 public class FileUtils {
 
   /**
-   * Convert a file in string list
+   * Convert a file in string list.
    * @param is input stream
    * @return list of string from file
    * @throws IOException
@@ -49,12 +48,13 @@ public class FileUtils {
   public static List<String> readFileByLines(final InputStream is)
       throws IOException {
 
-    if (is == null)
+    if (is == null) {
       return null;
+    }
 
-    final List<String> result = Lists.newArrayList();
+    final List<String> result = new ArrayList<>();
 
-    BufferedReader reader =
+    final BufferedReader reader =
         new BufferedReader(new InputStreamReader(is,
             Globals.DEFAULT_FILE_ENCODING));
 

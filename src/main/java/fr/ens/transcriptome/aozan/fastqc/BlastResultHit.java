@@ -64,26 +64,27 @@ class BlastResultHit {
   private boolean isNull = true;
 
   /**
-   * Generate hit data
+   * Generate hit data.
    * @param firstHit first hit retrieved by blast
    * @param countHits number hits retrieved by blast
    * @param queryLength number base in sequence query
    */
-  private void addHitData(Element firstHit, final int countHits,
+  private void addHitData(final Element firstHit, final int countHits,
       final int queryLength) {
 
     // No hit found for this sequence
-    if (extractFirstValueToInt(firstHit, "Hit_num") == 0)
+    if (extractFirstValueToInt(firstHit, "Hit_num") == 0) {
       return;
+    }
 
     this.queryLength = queryLength;
     this.countHits = countHits;
 
     this.result = extractFirstValueToString(firstHit, tag_hitDef);
     this.hspEValue = extractFirstValueToString(firstHit, tag_hspEValue);
-    int hspIdentity = extractFirstValueToInt(firstHit, tag_hspIdentity);
-    int hspAlignLen = extractFirstValueToInt(firstHit, tag_hspAlignLen);
-    int countGap = queryLength - hspAlignLen;
+    final int hspIdentity = extractFirstValueToInt(firstHit, tag_hspIdentity);
+    final int hspAlignLen = extractFirstValueToInt(firstHit, tag_hspAlignLen);
+    final int countGap = queryLength - hspAlignLen;
 
     this.prcIdentity = (int) ((double) hspIdentity / this.queryLength * 100);
 
@@ -125,19 +126,20 @@ class BlastResultHit {
    */
   private String contaminantHitToTextType() {
 
-    StringBuilder name = new StringBuilder();
+    final StringBuilder name = new StringBuilder(100);
     name.append("Search with Blastall+");
     name.append(" First hit on "
-        + (countHits > 100 ? "+100" : countHits) + " : ");
+        + (this.countHits > 100 ? "+100" : this.countHits) + " : ");
     name.append(this.result);
     name.append(" Evalue=" + this.hspEValue + ", ");
-    name.append(" Ident=" + prcIdentity + "%,");
+    name.append(" Ident=" + this.prcIdentity + "%,");
     name.append(" QueryCovergap=" + this.queryCover + "%");
 
     // Return only the best hit
     if (this.prcIdentity < MIN_IDENTITY_EXPECTED
-        || this.queryCover > MAX_QUERYCOVERT_EXPECTED)
+        || this.queryCover > MAX_QUERYCOVERT_EXPECTED) {
       return "No hit";
+    }
 
     return name.toString();
 
@@ -150,23 +152,24 @@ class BlastResultHit {
    */
   private String contaminantHitToHtmlType() {
 
-    StringBuilder name = new StringBuilder();
+    final StringBuilder name = new StringBuilder(200);
     name.append("Search with Blastn, <a href="
         + LINK_NCBI_BLASTN + this.sequence + "\""
         + " target=\"_blank\">more detail</a>");
     name.append(" First hit on "
-        + (countHits > 100 ? "+100" : countHits) + " : ");
+        + (this.countHits > 100 ? "+100" : this.countHits) + " : ");
     name.append(" <br/>");
     name.append(this.result);
     name.append(" <br/>");
     name.append(" Evalue=" + this.hspEValue + ", ");
-    name.append(" Ident=" + prcIdentity + "%,");
+    name.append(" Ident=" + this.prcIdentity + "%,");
     name.append(" QueryCovergap=" + this.queryCover + "%");
 
     // Return only the best hit
     if (this.prcIdentity < MIN_IDENTITY_EXPECTED
-        || this.queryCover > MAX_QUERYCOVERT_EXPECTED)
+        || this.queryCover > MAX_QUERYCOVERT_EXPECTED) {
       return "No hit";
+    }
 
     return name.toString();
   }

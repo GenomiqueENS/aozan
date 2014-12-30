@@ -41,11 +41,10 @@ import fr.ens.transcriptome.aozan.AozanException;
 public class RuntimePatchFastQC {
 
   /**
-   * Add code at the beginning on the method
+   * Add code at the beginning on the method.
    * ContaminentFinder.findContaminantHit to call the version Aozan of this
    * method which had access to the contaminant list in fastqc jar.
-   * @throws NotFoundException it occurs when receive signals that something
-   *           could not be found.
+   * @param asBlastToUse the as blast to use
    * @throws CannotCompileException thrown when bytecode transformation has
    *           failed.
    */
@@ -55,14 +54,14 @@ public class RuntimePatchFastQC {
     try {
 
       // Get the class to modify
-      CtClass cc =
+      final CtClass cc =
           ClassPool.getDefault().get(
               "uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminentFinder");
 
       // Check class not frozen
       if (cc != null && !cc.isFrozen()) {
         // Retrieve the method to modify
-        CtBehavior cb = cc.getDeclaredMethod("findContaminantHit");
+        final CtBehavior cb = cc.getDeclaredMethod("findContaminantHit");
 
         // Add code at the beginning of the method
         final String codeToAdd;
@@ -82,7 +81,7 @@ public class RuntimePatchFastQC {
         cc.toClass();
 
       }
-    } catch (NotFoundException e) {
+    } catch (final NotFoundException e) {
       // Nothing to do
 
     }
@@ -92,8 +91,6 @@ public class RuntimePatchFastQC {
    * Remove code from Report.HTMLReportArchive in constructor. Can also redefine
    * code in a heritage class HTMLReportArchiveAozan which had access the files
    * included in fastqc jar.
-   * @throws NotFoundException it occurs when receive signals that something
-   *           could not be found.
    * @throws CannotCompileException thrown when bytecode transformation has
    *           failed.
    */
@@ -101,7 +98,7 @@ public class RuntimePatchFastQC {
       throws CannotCompileException {
     try {
       // Get the class to modify
-      CtClass cc =
+      final CtClass cc =
           ClassPool.getDefault().get(
               "uk.ac.babraham.FastQC.Report.HTMLReportArchive");
 
@@ -109,7 +106,7 @@ public class RuntimePatchFastQC {
       if (cc != null && !cc.isFrozen()) {
 
         // Retrieve the constructor
-        CtConstructor[] constructors = cc.getConstructors();
+        final CtConstructor[] constructors = cc.getConstructors();
 
         // Modify constructor, it does nothing
         constructors[0].setBody(null);
@@ -117,7 +114,7 @@ public class RuntimePatchFastQC {
         // Load the class by the ClassLoader
         cc.toClass();
       }
-    } catch (NotFoundException e) {
+    } catch (final NotFoundException e) {
       // Nothing to do
 
     }
@@ -134,19 +131,20 @@ public class RuntimePatchFastQC {
   public static void changeSuperClassOverrepresentedModule(
       final boolean asBlastToUse) throws CannotCompileException {
 
-    if (!asBlastToUse)
+    if (!asBlastToUse) {
       return;
+    }
 
     try {
       // Get the class to modify
-      CtClass cc =
+      final CtClass cc =
           ClassPool.getDefault().get(
               "uk.ac.babraham.FastQC.Modules.OverRepresentedSeqs");
 
       // Check class not frozen
       if (cc != null && !cc.isFrozen()) {
 
-        CtClass newSuperClazz =
+        final CtClass newSuperClazz =
             ClassPool.getDefault().get(
                 "fr.ens.transcriptome.aozan.fastqc.AbstractQCModuleAozan");
         cc.setSuperclass(newSuperClazz);
@@ -157,23 +155,22 @@ public class RuntimePatchFastQC {
         cc.toClass();
       }
 
-    } catch (NotFoundException e) {
+    } catch (final NotFoundException e) {
       // Nothing to do
     }
   }
 
   /**
-   * Execute method who patch code from FastQC before call in Aozan
+   * Execute method who patch code from FastQC before call in Aozan.
    * @throws AozanException throw an error occurs during modification bytecode
    *           fastqc
    */
-
   public static void runPatchFastQC() throws AozanException {
     runPatchFastQC(false);
   }
 
   /**
-   * Execute method who patch code from FastQC before call in Aozan
+   * Execute method who patch code from FastQC before call in Aozan.
    * @param asBlastToUse if blast will be used else false
    * @throws AozanException throw an error occurs during modification bytecode
    *           fastqc
@@ -189,7 +186,7 @@ public class RuntimePatchFastQC {
       // Not necessary with FastQC v0.11.2
       // modifyConstructorHtmlReportArchive();
 
-    } catch (CannotCompileException e) {
+    } catch (final CannotCompileException e) {
       throw new AozanException(e);
 
     }

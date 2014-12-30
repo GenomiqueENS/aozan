@@ -37,7 +37,7 @@ import fr.ens.transcriptome.aozan.RunData;
 public interface Collector {
 
   /**
-   * Get the name of the collector
+   * Get the name of the collector.
    * @return the name of the collector
    */
   public String getName();
@@ -49,7 +49,7 @@ public interface Collector {
   public List<String> getCollectorsNamesRequiered();
 
   /**
-   * Configure the collector with the path of the run data
+   * Configure the collector with the path of the run data.
    * @param properties object with the collector configuration
    */
   public void configure(Properties properties);
@@ -62,7 +62,7 @@ public interface Collector {
   public void collect(RunData data) throws AozanException;
 
   /**
-   * Remove temporary files
+   * Remove temporary files.
    */
   public void clear();
 

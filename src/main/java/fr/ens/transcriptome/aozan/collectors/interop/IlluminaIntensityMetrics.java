@@ -62,51 +62,51 @@ public class IlluminaIntensityMetrics {
 
   private final int cycleNumber; // uint16
 
-  /** Get the number lane */
+  /** Get the number lane. */
   public int getLaneNumber() {
-    return laneNumber;
+    return this.laneNumber;
   }
 
-  /** Get the number tile */
+  /** Get the number tile. */
   public int getTileNumber() {
-    return tileNumber;
+    return this.tileNumber;
   }
 
   /**
-   * Get the number cycle of this record
+   * Get the number cycle of this record.
    * @return number cycle
    */
   public int getCycleNumber() {
-    return cycleNumber;
+    return this.cycleNumber;
   }
 
   /**
    * Get a float array with the fwhm (full width at half maximum) scores of each
-   * base (A, C, G, T)
+   * base (A, C, G, T).
    * @return float array with the fwhm scores of each channel
    */
   public float[] getFwhm() {
-    return Arrays.copyOf(fwhm, fwhm.length);
+    return Arrays.copyOf(this.fwhm, this.fwhm.length);
   }
 
   /**
-   * Get a integer array with the raw intensities of each base (A, C, G, T)
+   * Get a integer array with the raw intensities of each base (A, C, G, T).
    * @return float array with the raw intensities of each channel
    */
   public int[] getIntensities() {
-    return Arrays.copyOf(intensities, intensities.length);
+    return Arrays.copyOf(this.intensities, this.intensities.length);
   }
 
   /**
-   * Get the average of the four intensities (one per channel) for this record
+   * Get the average of the four intensities (one per channel) for this record.
    * @return average of the four intensities (one per channel)
    */
   public int getAverageIntensities() {
     int sum = 0;
-    for (int intensity : intensities) {
+    for (final int intensity : this.intensities) {
       sum += intensity;
     }
-    return sum / intensities.length;
+    return sum / this.intensities.length;
   }
 
   //
@@ -134,6 +134,7 @@ public class IlluminaIntensityMetrics {
     // Read date/time for CIF creation, not used
     // TODO get date create cif file to finalize
     @SuppressWarnings("unused")
+    final
     ByteBuffer buf = bb.get(new byte[8]);
 
   }

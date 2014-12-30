@@ -25,15 +25,15 @@ package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.QC;
@@ -43,7 +43,7 @@ import fr.ens.transcriptome.eoulsan.illumina.CasavaSample;
 import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignCSVReader;
 
 /**
- * This class define a Casava design Collector
+ * This class define a Casava design Collector.
  * @since 0.8
  * @author Laurent Jourdren
  */
@@ -69,8 +69,9 @@ public class DesignCollector implements Collector {
   @Override
   public void configure(final Properties properties) {
 
-    if (properties == null)
+    if (properties == null) {
       return;
+    }
 
     this.casavaDesignFile =
         new File(properties.getProperty(QC.CASAVA_DESIGN_PATH));
@@ -79,18 +80,19 @@ public class DesignCollector implements Collector {
   @Override
   public void collect(final RunData data) throws AozanException {
 
-    if (data == null)
+    if (data == null) {
       return;
+    }
 
     try {
-      final Map<Integer, List<String>> samples = Maps.newHashMap();
-      final Set<String> projectsName = Sets.newTreeSet();
+      final Map<Integer, List<String>> samples = new HashMap<>();
+      final Set<String> projectsName = new TreeSet<>();
 
       // Read Casava design
       final CasavaDesign design =
-          new CasavaDesignCSVReader(casavaDesignFile).read();
+          new CasavaDesignCSVReader(this.casavaDesignFile).read();
 
-      for (CasavaSample s : design) {
+      for (final CasavaSample s : design) {
 
         final String prefix =
             "design.lane" + s.getLane() + "." + s.getSampleId();
@@ -107,10 +109,11 @@ public class DesignCollector implements Collector {
 
         final List<String> samplesInLane;
         if (!samples.containsKey(s.getLane())) {
-          samplesInLane = Lists.newArrayList();
+          samplesInLane = new ArrayList<>();
           samples.put(s.getLane(), samplesInLane);
-        } else
+        } else {
           samplesInLane = samples.get(s.getLane());
+        }
         samplesInLane.add(s.getSampleId());
 
         // List projects in run
@@ -118,19 +121,19 @@ public class DesignCollector implements Collector {
       }
 
       // List samples by lane
-      for (Map.Entry<Integer, List<String>> e : samples.entrySet()) {
+      for (final Map.Entry<Integer, List<String>> e : samples.entrySet()) {
         data.put("design.lane" + e.getKey() + ".samples.names", e.getValue());
 
         // Check homogeneity between sample in lane
         // add in rundata interval for percent sample for each lane
-        final double percent = 1.0 / (double) e.getValue().size();
+        final double percent = 1.0 / e.getValue().size();
         data.put("design.lane" + e.getKey() + ".percent.homogeneity", percent);
       }
 
       // Add all projects name in data
       data.put("design.projects.names", Joiner.on(",").join(projectsName));
 
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new AozanException(e);
     }
   }

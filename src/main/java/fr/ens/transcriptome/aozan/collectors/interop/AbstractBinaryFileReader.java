@@ -29,9 +29,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.List;
-
-import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
@@ -50,36 +49,45 @@ abstract class AbstractBinaryFileReader<M> {
   private static final int HEADER_SIZE = 2;
 
   /**
+   * Gets the name.
    * @return collector name
    */
-  abstract public String getName();
+  public abstract String getName();
 
   /**
+   * Gets the metrics file.
    * @return metrics filename
    */
-  abstract protected File getMetricsFile();
+  protected abstract File getMetricsFile();
 
   /**
+   * Gets the expected record size.
    * @return expected record size
    */
-  abstract protected int getExpectedRecordSize();
+  protected abstract int getExpectedRecordSize();
 
   /**
+   * Gets the expected version.
    * @return expected version of binary file
    */
-  abstract protected int getExpectedVersion();
+  protected abstract int getExpectedVersion();
 
+  /**
+   * Gets the dir path inter op.
+   * @return the dir path inter op
+   */
   public String getDirPathInterOP() {
     return this.dirInterOpPath;
   }
 
   /**
+   * Gets the sets the illumina metrics.
    * @return set Illumina metrics corresponding to one binary InterOp file
-   * @throws AozanException
+   * @throws AozanException the aozan exception
    */
   public List<M> getSetIlluminaMetrics() throws AozanException {
 
-    List<M> collection = Lists.newArrayList();
+    final List<M> collection = new ArrayList<>();
 
     final ByteBuffer buf;
     final byte[] header = new byte[HEADER_SIZE];
@@ -102,7 +110,7 @@ abstract class AbstractBinaryFileReader<M> {
       channel.close();
       is.close();
 
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new AozanException(e);
     }
 
@@ -131,16 +139,16 @@ abstract class AbstractBinaryFileReader<M> {
 
   /**
    * Build a set of a type of illumina metrics (M) according to the interop file
-   * reading
+   * reading.
    * @param collection list of illumina metrics
    * @param bb ByteBuffer contains the value corresponding to one record
    */
-  abstract protected void addIlluminaMetricsInCollection(
+  protected abstract void addIlluminaMetricsInCollection(
       final List<M> collection, final ByteBuffer bb);
 
   /**
    * Check version file corresponding to the implemented code
-   * @param header header file
+   * @param header header file.
    * @throws AozanException occurs if the checking fails
    */
   private void checkVersionFile(final ByteBuffer header) throws AozanException {
@@ -168,37 +176,39 @@ abstract class AbstractBinaryFileReader<M> {
   //
 
   /**
-   * Constructor
+   * Constructor.
    * @param dirPath path to the interop directory for a run
    * @throws AozanException
    */
   AbstractBinaryFileReader(final String dirPath) throws AozanException {
-    dirInterOpPath = dirPath;
+    this.dirInterOpPath = dirPath;
 
-    if (dirInterOpPath == null)
+    if (this.dirInterOpPath == null) {
       throw new AozanException("None path to InterOp directory provided");
+    }
 
-    if (!new File(dirInterOpPath).exists())
+    if (!new File(this.dirInterOpPath).exists()) {
       throw new AozanException("Path to interOp directory doesn't exists "
-          + dirInterOpPath);
+          + this.dirInterOpPath);
+    }
   }
 
-  /** Convert an unsigned byte to a signed int */
+  /** Convert an unsigned byte to a signed int. */
   public static final int uByteToInt(final byte unsignedByte) {
     return unsignedByte & 0xFF;
   }
 
-  /** Convert an unsigned byte to a signed short */
+  /** Convert an unsigned byte to a signed short. */
   public static final int uByteToShort(final byte unsignedByte) {
-    return (short) unsignedByte & 0xFF;
+    return unsignedByte & 0xFF;
   }
 
-  /** Convert an unsigned short to an int */
+  /** Convert an unsigned short to an int. */
   public static final int uShortToInt(final short unsignedShort) {
     return unsignedShort & 0xFFFF;
   }
 
-  /** Convert an unsigned int to a long */
+  /** Convert an unsigned int to a long. */
   public static final long uIntToLong(final int unsignedInt) {
     return unsignedInt & 0xFFFFFFFFL;
   }

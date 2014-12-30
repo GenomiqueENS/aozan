@@ -46,8 +46,9 @@ public abstract class AbstractSimpleLaneTest extends AbstractLaneTest {
   public List<AozanTest> configure(final Map<String, String> properties)
       throws AozanException {
 
-    if (properties == null)
+    if (properties == null) {
       throw new NullPointerException("The properties object is null");
+    }
 
     this.interval.configureDoubleInterval(properties);
 
@@ -59,7 +60,7 @@ public abstract class AbstractSimpleLaneTest extends AbstractLaneTest {
   //
 
   /**
-   * Get the the key in the RunData object for the value to test
+   * Get the the key in the RunData object for the value to test.
    * @param read index of the read
    * @param indexedRead true if the read is indexed
    * @param lane index of the lane
@@ -104,8 +105,9 @@ public abstract class AbstractSimpleLaneTest extends AbstractLaneTest {
 
     final String key = getKey(read, indexedRead, lane);
 
-    if (key == null)
+    if (key == null) {
       return null;
+    }
 
     final Class<?> clazz = getValueType();
     final String msg;
@@ -137,21 +139,23 @@ public abstract class AbstractSimpleLaneTest extends AbstractLaneTest {
       }
 
       // Is result a string ?
-      if (value == null)
+      if (value == null) {
         return new TestResult(msg);
+      }
 
       // Transform the value id needed
       final Number transformedValue =
           transformValue(value, data, read, indexedRead, lane);
 
       // Do the test ?
-      if (interval == null || (indexedRead && !testIndexedRead()))
+      if (this.interval == null || (indexedRead && !testIndexedRead())) {
         return new TestResult(transformedValue, isValuePercent());
+      }
 
       return new TestResult(this.interval.getScore(transformedValue),
           transformedValue, isValuePercent());
 
-    } catch (NumberFormatException e) {
+    } catch (final NumberFormatException e) {
 
       return new TestResult("NA");
     }

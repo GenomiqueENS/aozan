@@ -23,11 +23,10 @@
 
 package fr.ens.transcriptome.aozan;
 
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
-
 import static fr.ens.transcriptome.eoulsan.LocalEoulsanRuntime.initEoulsanRuntimeForExternalApp;
 
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -47,7 +46,7 @@ public class Common {
   }
 
   /**
-   * Return the pid of the instance of jvm
+   * Return the pid of the instance of jvm.
    * @return pid of the instance of jvm, or null
    */
   public static final int getCurrentPid() {
@@ -105,7 +104,7 @@ public class Common {
 
     try {
       initEoulsanRuntimeForExternalApp();
-    } catch (EoulsanException ee) {
+    } catch (final EoulsanException ee) {
       throw new AozanException(ee);
     }
 

@@ -26,6 +26,7 @@ package fr.ens.transcriptome.aozan;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -33,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.collectors.Collector;
 
@@ -44,13 +44,13 @@ import fr.ens.transcriptome.aozan.collectors.Collector;
  */
 public class RunDataGenerator {
 
-  /** Logger */
+  /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
   /** Collect done property key. */
   private static final String COLLECT_DONE = "collect.done";
 
-  private final List<Collector> collectors = Lists.newArrayList();
+  private final List<Collector> collectors = new ArrayList<>();
   private final Properties properties = new Properties();
 
   /**
@@ -59,11 +59,13 @@ public class RunDataGenerator {
    */
   public void setGlobalConf(final Map<String, String> conf) {
 
-    if (conf == null)
+    if (conf == null) {
       return;
+    }
 
-    for (Map.Entry<String, String> e : conf.entrySet())
-      properties.setProperty(e.getKey(), e.getValue());
+    for (final Map.Entry<String, String> e : conf.entrySet()) {
+      this.properties.setProperty(e.getKey(), e.getValue());
+    }
   }
 
   //
@@ -71,7 +73,7 @@ public class RunDataGenerator {
   //
 
   /**
-   * Collect data and return a RunData object
+   * Collect data and return a RunData object.
    * @return a RunData object with all data about the run
    * @throws AozanException if an error occurs while collecting data
    */
@@ -79,23 +81,29 @@ public class RunDataGenerator {
 
     final RunData data = new RunData();
 
-    if (this.properties.containsKey(COLLECT_DONE))
+    if (this.properties.containsKey(COLLECT_DONE)) {
       throw new AozanException("Collect has been already done.");
+    }
 
-    if (!this.properties.containsKey(QC.RTA_OUTPUT_DIR))
+    if (!this.properties.containsKey(QC.RTA_OUTPUT_DIR)) {
       throw new AozanException("RTA output directory is not set.");
+    }
 
-    if (!this.properties.containsKey(QC.CASAVA_DESIGN_PATH))
+    if (!this.properties.containsKey(QC.CASAVA_DESIGN_PATH)) {
       throw new AozanException("Casava design file path is not set.");
+    }
 
-    if (!this.properties.containsKey(QC.CASAVA_OUTPUT_DIR))
+    if (!this.properties.containsKey(QC.CASAVA_OUTPUT_DIR)) {
       throw new AozanException("Casava output directory is not set.");
+    }
 
-    if (!this.properties.containsKey(QC.QC_OUTPUT_DIR))
+    if (!this.properties.containsKey(QC.QC_OUTPUT_DIR)) {
       throw new AozanException("QC output directory is not set.");
+    }
 
-    if (!this.properties.containsKey(QC.TMP_DIR))
+    if (!this.properties.containsKey(QC.TMP_DIR)) {
       throw new AozanException("Temporary directory is not set.");
+    }
 
     // Timer
     final Stopwatch timerGlobal = Stopwatch.createStarted();
@@ -105,7 +113,7 @@ public class RunDataGenerator {
     // For all collectors
     for (final Collector collector : this.collectors) {
 
-      Stopwatch timerCollector = Stopwatch.createStarted();
+      final Stopwatch timerCollector = Stopwatch.createStarted();
       LOGGER.info(collector.getName().toUpperCase() + " start");
 
       // Configure

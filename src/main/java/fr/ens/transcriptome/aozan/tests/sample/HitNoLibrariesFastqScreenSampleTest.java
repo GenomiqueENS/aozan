@@ -46,7 +46,7 @@ public class HitNoLibrariesFastqScreenSampleTest extends
   }
 
   @Override
-  protected String getKey(int read, int readSample, int lane, String sampleName) {
+  protected String getKey(final int read, final int readSample, final int lane, final String sampleName) {
 
     return "fastqscreen.lane"
         + lane + ".sample." + sampleName + ".read" + readSample + "."
@@ -75,7 +75,7 @@ public class HitNoLibrariesFastqScreenSampleTest extends
   //
 
   /**
-   * Public constructor
+   * Public constructor.
    */
   public HitNoLibrariesFastqScreenSampleTest() {
     super("hitnolibraries", "", "fastqScreen mapped except genome sample", "%");

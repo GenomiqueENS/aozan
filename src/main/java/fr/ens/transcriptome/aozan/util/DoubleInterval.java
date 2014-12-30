@@ -28,7 +28,7 @@ import com.google.common.base.Objects;
 import fr.ens.transcriptome.aozan.AozanException;
 
 /**
- * This class define a double interval
+ * This class define a double interval.
  * @since 0.8
  * @author Laurent Jourdren
  */
@@ -86,30 +86,36 @@ public class DoubleInterval implements Interval {
   @Override
   public boolean isInInterval(final Number value) {
 
-    if (value == null)
+    if (value == null) {
       return false;
+    }
 
     final double val = value.doubleValue();
 
-    if (Double.isNaN(val))
+    if (Double.isNaN(val)) {
       return false;
+    }
 
     if (this.min != Double.NEGATIVE_INFINITY) {
 
-      if (this.minInclude && val < min)
+      if (this.minInclude && val < this.min) {
         return false;
+      }
 
-      if (!this.minInclude && val <= min)
+      if (!this.minInclude && val <= this.min) {
         return false;
+      }
     }
 
     if (this.max != Double.POSITIVE_INFINITY) {
 
-      if (this.maxInclude && val > max)
+      if (this.maxInclude && val > this.max) {
         return false;
+      }
 
-      if (!this.maxInclude && val >= max)
+      if (!this.maxInclude && val >= this.max) {
         return false;
+      }
     }
 
     return true;
@@ -118,9 +124,9 @@ public class DoubleInterval implements Interval {
   @Override
   public String toString() {
 
-    return Objects.toStringHelper(this).add("min", min)
-        .add("minInclude", minInclude).add("max", max)
-        .add("maxInclude", maxInclude).toString();
+    return Objects.toStringHelper(this).add("min", this.min)
+        .add("minInclude", this.minInclude).add("max", this.max)
+        .add("maxInclude", this.maxInclude).toString();
   }
 
   //
@@ -135,11 +141,13 @@ public class DoubleInterval implements Interval {
   public DoubleInterval(final double min, final boolean minIncluded,
       final double max, final boolean maxIncluded) {
 
-    if (Double.isNaN(min))
+    if (Double.isNaN(min)) {
       throw new IllegalArgumentException("Invalid min argument: " + min);
+    }
 
-    if (Double.isNaN(max))
+    if (Double.isNaN(max)) {
       throw new IllegalArgumentException("Invalid max argument: " + max);
+    }
 
     this.min = Math.min(min, max);
     this.minInclude = minIncluded;
@@ -149,8 +157,9 @@ public class DoubleInterval implements Interval {
 
   public DoubleInterval(final String s) throws AozanException {
 
-    if (s == null)
+    if (s == null) {
       throw new NullPointerException("The interval string is null");
+    }
 
     final String trimmed = s.trim();
 
@@ -186,8 +195,9 @@ public class DoubleInterval implements Interval {
     final String[] values =
         trimmed.substring(1, trimmed.length() - 1).split(",");
 
-    if (values == null || values.length != 2)
+    if (values == null || values.length != 2) {
       throw new AozanException("Invalid interval: " + s);
+    }
 
     // Trim the values
     final String minString = values[0].trim();
@@ -195,17 +205,19 @@ public class DoubleInterval implements Interval {
 
     try {
 
-      if ("".equals(minString))
+      if ("".equals(minString)) {
         this.min = Double.NEGATIVE_INFINITY;
-      else
+      } else {
         this.min = Double.parseDouble(minString);
+      }
 
-      if ("".equals(maxString))
+      if ("".equals(maxString)) {
         this.max = Double.POSITIVE_INFINITY;
-      else
+      } else {
         this.max = Double.parseDouble(maxString);
+      }
 
-    } catch (NumberFormatException e) {
+    } catch (final NumberFormatException e) {
       throw new AozanException("Invalid interval: " + s);
     }
 

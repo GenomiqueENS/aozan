@@ -33,32 +33,29 @@ import com.google.common.collect.Lists;
 
 /**
  * This class contains statistics methods, using the class DescriptiveStatistics
- * from commons.apache.math
+ * from commons.apache.math.
  * @author Sandrine Perrin
  * @since 1.1
  */
-/**
- * @author sperrin
- */
 public class StatisticsUtils {
 
-  /** object maintains a dataset of values of a single variable */
+  /** object maintains a dataset of values of a single variable. */
   private final DescriptiveStatistics ds;
   /** copy dataset without values == 0 */
   private DescriptiveStatistics dsWithoutZero = null;
 
   /**
-   * Compute the mean for values
+   * Compute the mean for values.
    * @return mean or NaN if no values have been added, or 0.0 for a single value
    *         set.
    */
   public Double getMean() {
 
-    return ds.getMean();
+    return this.ds.getMean();
   }
 
   /**
-   * Compute the mean for values which are different of 0
+   * Compute the mean for values which are different of 0.
    * @return mean or NaN if no values have been added, or 0.0 for a single value
    *         set.
    */
@@ -67,16 +64,17 @@ public class StatisticsUtils {
     buildDescriptiveStatisticsWithZero();
 
     // Build dataset of values from dataset initial
-    for (Double d : ds.getValues()) {
-      if (d != 0.0)
-        dsWithoutZero.addValue(d);
+    for (final Double d : this.ds.getValues()) {
+      if (d != 0.0) {
+        this.dsWithoutZero.addValue(d);
+      }
     }
 
-    return dsWithoutZero.getMean();
+    return this.dsWithoutZero.getMean();
   }
 
   /**
-   * Compute the median for values which are different of 0
+   * Compute the median for values which are different of 0.
    * @return median or NaN if no values have been added, or 0.0 for a single
    *         value set.
    */
@@ -84,22 +82,22 @@ public class StatisticsUtils {
 
     buildDescriptiveStatisticsWithZero();
 
-    return (dsWithoutZero.getN() == 0 ? 0.0 : new Median()
-        .evaluate(dsWithoutZero.getValues()));
+    return (this.dsWithoutZero.getN() == 0 ? 0.0 : new Median()
+        .evaluate(this.dsWithoutZero.getValues()));
 
   }
 
   /**
-   * Compute the median for values
+   * Compute the median for values.
    * @return median or NaN if no values have been added, or 0.0 for a single
    *         value set.
    */
   public Double getMediane() {
-    return new Median().evaluate(ds.getValues());
+    return new Median().evaluate(this.ds.getValues());
   }
 
   /**
-   * Compute the sum of values
+   * Compute the sum of values.
    * @return sum of values.
    */
   public Double getSum() {
@@ -107,7 +105,7 @@ public class StatisticsUtils {
   }
 
   /**
-   * Compute the standard deviation for values
+   * Compute the standard deviation for values.
    * @return standard deviation or NaN if no values have been added, or 0.0 for
    *         a single value set.
    */
@@ -116,7 +114,7 @@ public class StatisticsUtils {
   }
 
   /**
-   * Compute the mean for values
+   * Compute the mean for values.
    * @return mean or NaN if no values have been added, or 0.0 for a single value
    *         set.
    */
@@ -135,7 +133,7 @@ public class StatisticsUtils {
   }
 
   /**
-   * Compute the median for values which are different of 0
+   * Compute the median for values which are different of 0.
    * @return median or NaN if no values have been added, or 0.0 for a single
    *         value set.
    */
@@ -144,7 +142,7 @@ public class StatisticsUtils {
   }
 
   /**
-   * Compute the median for values
+   * Compute the median for values.
    * @return median or NaN if no values have been added, or 0.0 for a single
    *         value set.
    */
@@ -153,7 +151,7 @@ public class StatisticsUtils {
   }
 
   /**
-   * Compute the sum of values
+   * Compute the sum of values.
    * @return sum of values.
    */
   public int getSumToInteger() {
@@ -161,7 +159,7 @@ public class StatisticsUtils {
   }
 
   /**
-   * Compute the standard deviation for values
+   * Compute the standard deviation for values.
    * @return standard deviation or NaN if no values have been added, or 0.0 for
    *         a single value set.
    */
@@ -170,7 +168,7 @@ public class StatisticsUtils {
   }
 
   /**
-   * Returns the instance of DescriptiveStatistics
+   * Returns the instance of DescriptiveStatistics.
    * @return instance of DescriptiveStatistics
    */
   public DescriptiveStatistics getDescriptiveStatistics() {
@@ -179,7 +177,7 @@ public class StatisticsUtils {
 
   /**
    * Returns the instance of DescriptiveStatistics which doesn't contain the
-   * value zero
+   * value zero.
    * @return instance of DescriptiveStatistics
    */
   public DescriptiveStatistics getDescriptiveStatisticsWithZero() {
@@ -189,31 +187,31 @@ public class StatisticsUtils {
   }
 
   /**
-   * Print dataset
+   * Print dataset.
    * @return string of dataset
    */
   public String printValuesWithoutZero() {
     buildDescriptiveStatisticsWithZero();
 
-    return printValues(dsWithoutZero);
+    return printValues(this.dsWithoutZero);
   }
 
   /**
-   * Print dataset
+   * Print dataset.
    * @return string of dataset
    */
   public String printValues() {
-    return printValues(ds);
+    return printValues(this.ds);
   }
 
   /**
-   * Print dataset
+   * Print dataset.
    * @return string of dataset
    */
   private String printValues(final DescriptiveStatistics stat) {
-    StringBuilder s = new StringBuilder();
+    final StringBuilder s = new StringBuilder();
 
-    for (double d : stat.getValues()) {
+    for (final double d : stat.getValues()) {
       s.append(d);
       s.append("\n");
     }
@@ -222,24 +220,25 @@ public class StatisticsUtils {
   }
 
   /**
-   * Compute the standard deviation for values
+   * Compute the standard deviation for values.
    * @param isBiasCorrected false per default
    * @return standard deviation NaN if no values have been added, or 0.0 for a
    *         single value set.
    */
   public Double getStandardDeviation(final boolean isBiasCorrected) {
+    final double average = getMean();
+
     double result = Double.NaN;
-    double average = getMean();
     double sum = 0.0;
     Double val = 0.0;
     double count = 0.0;
 
-    if (ds.getN() > 0) {
-      if (ds.getN() > 1) {
+    if (this.ds.getN() > 0) {
+      if (this.ds.getN() > 1) {
 
-        for (int i = 0; i < ds.getN(); i++) {
+        for (int i = 0; i < this.ds.getN(); i++) {
 
-          val = ds.getElement(i);
+          val = this.ds.getElement(i);
 
           val -= average;
           sum += val * val;
@@ -260,28 +259,31 @@ public class StatisticsUtils {
   }
 
   /**
-   * Add values in dataset
+   * Add values in dataset.
    * @param number new values to put in dataset
    */
-  public void addValues(Number number) {
-    Double val = number.doubleValue();
+  public void addValues(final Number number) {
+    final Double val = number.doubleValue();
 
-    if (val != null)
-      if (!val.isInfinite())
+    if (val != null) {
+      if (!val.isInfinite()) {
         this.ds.addValue(val);
+      }
+    }
   }
 
   /**
    * Builds dataset without value zero of each call, if the dataset source has
-   * been modified
+   * been modified.
    */
   private void buildDescriptiveStatisticsWithZero() {
 
     this.dsWithoutZero = new DescriptiveStatistics();
 
-    for (Double d : ds.getValues()) {
-      if (d != 0.0)
-        dsWithoutZero.addValue(d);
+    for (final Double d : this.ds.getValues()) {
+      if (d != 0.0) {
+        this.dsWithoutZero.addValue(d);
+      }
     }
   }
 
@@ -298,12 +300,14 @@ public class StatisticsUtils {
 
     this.ds = new DescriptiveStatistics();
 
-    for (Number n : list) {
-      Double val = n.doubleValue();
+    for (final Number n : list) {
+      final Double val = n.doubleValue();
 
-      if (val != null)
-        if (!val.isInfinite())
+      if (val != null) {
+        if (!val.isInfinite()) {
           this.ds.addValue(val);
+        }
+      }
 
     }
   }

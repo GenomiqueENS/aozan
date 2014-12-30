@@ -23,10 +23,9 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
-
-import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
 
@@ -38,7 +37,7 @@ import fr.ens.transcriptome.aozan.AozanRuntimeException;
 public class CollectorRegistry {
 
   private static CollectorRegistry instance;
-  private final Map<String, Collector> collectors = Maps.newHashMap();
+  private final Map<String, Collector> collectors = new HashMap<>();
 
   /**
    * Get a Collector.
@@ -47,24 +46,28 @@ public class CollectorRegistry {
    */
   public Collector get(final String collectorName) {
 
-    if (collectorName == null)
+    if (collectorName == null) {
       return null;
+    }
 
     return this.collectors.get(collectorName.trim().toLowerCase());
   }
 
   private void register(final Collector test) {
 
-    if (test == null)
+    if (test == null) {
       throw new NullPointerException("The Collector to register is null");
+    }
 
-    if (test.getName() == null)
+    if (test.getName() == null) {
       throw new AozanRuntimeException("The name of the Collector ("
           + test.getClass().getName() + ") to register is null");
+    }
 
-    if (this.collectors.containsKey(test.getName()))
+    if (this.collectors.containsKey(test.getName())) {
       throw new AozanRuntimeException("The Collector ("
           + test.getName() + ") is already registred");
+    }
 
     this.collectors.put(test.getName(), test);
   }
@@ -74,13 +77,14 @@ public class CollectorRegistry {
   //
 
   /**
-   * Get the singleton instance of CollectorRegistry
+   * Get the singleton instance of CollectorRegistry.
    * @return the CollectorRegistry singleton
    */
   public static CollectorRegistry getInstance() {
 
-    if (instance == null)
+    if (instance == null) {
       instance = new CollectorRegistry();
+    }
 
     return instance;
   }
@@ -94,7 +98,7 @@ public class CollectorRegistry {
    */
   private CollectorRegistry() {
 
-    for (Collector collector : ServiceLoader.load(Collector.class)) {
+    for (final Collector collector : ServiceLoader.load(Collector.class)) {
 
       register(collector);
 

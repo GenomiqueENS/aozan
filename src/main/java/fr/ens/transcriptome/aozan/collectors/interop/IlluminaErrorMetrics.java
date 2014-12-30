@@ -50,34 +50,55 @@ import java.nio.ByteBuffer;
  */
 public class IlluminaErrorMetrics {
 
+  /** The lane number. */
   private final int laneNumber; // uint16
+
+  /** The tile number. */
   private final int tileNumber; // uint16
 
+  /** The cycle number. */
   private final int cycleNumber; // uint16
+
+  /** The error rate. */
   private final float errorRate; // float
 
+  /** The number perfect reads. */
   private final int numberPerfectReads; // uint32
+
+  /** The number reads one error. */
   private final int numberReadsOneError; // uint32
+
+  /** The number reads two errors. */
   private final int numberReadsTwoErrors; // uint32
+
+  /** The number reads three errors. */
   private final int numberReadsThreeErrors; // uint32
+
+  /** The number reads four errors. */
   private final int numberReadsFourErrors; // uint32
 
-  /** Get the number lane */
+  /**
+   * Get the number lane.
+   * @return the lane number
+   */
   public int getLaneNumber() {
-    return laneNumber;
-  }
-
-  /** Get the number tile */
-  public int getTileNumber() {
-    return tileNumber;
+    return this.laneNumber;
   }
 
   /**
-   * Get the number cycle of this record
+   * Get the number tile.
+   * @return the tile number
+   */
+  public int getTileNumber() {
+    return this.tileNumber;
+  }
+
+  /**
+   * Get the number cycle of this record.
    * @return number cycle
    */
   public int getCycleNumber() {
-    return cycleNumber;
+    return this.cycleNumber;
   }
 
   /**
@@ -85,7 +106,7 @@ public class IlluminaErrorMetrics {
    * @return rate error
    */
   public double getErrorRate() {
-    return (double) errorRate;
+    return this.errorRate;
   }
 
   /**
@@ -96,28 +117,45 @@ public class IlluminaErrorMetrics {
     return this.numberPerfectReads;
   }
 
+  /**
+   * Gets the number reads one error.
+   * @return the number reads one error
+   */
   public int getNumberReadsOneError() {
     return this.numberReadsOneError;
   }
 
+  /**
+   * Gets the number reads two errors.
+   * @return the number reads two errors
+   */
   public int getNumberReadsTwoErrors() {
     return this.numberReadsTwoErrors;
   }
 
+  /**
+   * Gets the number reads three errors.
+   * @return the number reads three errors
+   */
   public int getNumberReadsThreeErrors() {
     return this.numberReadsThreeErrors;
   }
 
+  /**
+   * Gets the number reads four errors.
+   * @return the number reads four errors
+   */
   public int getNumberReadsFourErrors() {
     return this.numberReadsFourErrors;
   }
 
   @Override
   public String toString() {
-    return String.format("%s\t%s\t%s\t%.2f\t%s\t%s\t%s\t%s\t%s", laneNumber,
-        tileNumber, cycleNumber, errorRate, numberPerfectReads,
-        numberReadsOneError, numberReadsTwoErrors, numberReadsThreeErrors,
-        numberReadsFourErrors);
+    return String.format("%s\t%s\t%s\t%.2f\t%s\t%s\t%s\t%s\t%s",
+        this.laneNumber, this.tileNumber, this.cycleNumber, this.errorRate,
+        this.numberPerfectReads, this.numberReadsOneError,
+        this.numberReadsTwoErrors, this.numberReadsThreeErrors,
+        this.numberReadsFourErrors);
   }
 
   //

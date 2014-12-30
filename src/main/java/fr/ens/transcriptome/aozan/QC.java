@@ -29,15 +29,16 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.collectors.Collector;
@@ -58,7 +59,7 @@ import fr.ens.transcriptome.aozan.tests.sample.SampleTest;
  */
 public class QC {
 
-  /** Logger */
+  /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
   /** RTA output directory property key. */
@@ -84,13 +85,13 @@ public class QC {
   private final String qcDir;
   private final String runId;
 
-  private final List<Collector> collectors = Lists.newArrayList();
-  private final List<GlobalTest> globalTests = Lists.newArrayList();
-  private final List<LaneTest> laneTests = Lists.newArrayList();
-  private final List<SampleTest> sampleTests = Lists.newArrayList();
-  private final Map<String, String> globalConf = Maps.newHashMap();
+  private final List<Collector> collectors = new ArrayList<>();
+  private final List<GlobalTest> globalTests = new ArrayList<>();
+  private final List<LaneTest> laneTests = new ArrayList<>();
+  private final List<SampleTest> sampleTests = new ArrayList<>();
+  private final Map<String, String> globalConf = new HashMap<>();
 
-  private File tmpDir;
+  private final File tmpDir;
 
   /**
    * Process data.
@@ -102,7 +103,7 @@ public class QC {
     final File casavaOutputDir = new File(this.fastqDir);
     final File QCOutputDir = new File(this.qcDir);
 
-    final File dataFile = new File(qcDir + "/data-" + runId + ".txt");
+    final File dataFile = new File(this.qcDir + "/data-" + this.runId + ".txt");
 
     RunData data = null;
     // Check if raw data file exists
@@ -112,11 +113,12 @@ public class QC {
         data = new RunData(dataFile);
         LOGGER.info("Data file for this run already exists.");
 
-      } catch (IOException e) {
+      } catch (final IOException e) {
 
-        if (!dataFile.delete())
+        if (!dataFile.delete()) {
           LOGGER.warning("IOException, fail delete partiel Data file "
               + dataFile.getName());
+        }
         data = null;
 
       }
@@ -124,20 +126,23 @@ public class QC {
 
     // If no data file or it is empty, the collector must be launch
     if (data == null || data.size() == 0) {
-      if (!RTAOutputDir.exists() || !RTAOutputDir.isDirectory())
+      if (!RTAOutputDir.exists() || !RTAOutputDir.isDirectory()) {
         throw new AozanException(
             "The BCL directory does not exist or is not a directory: "
                 + RTAOutputDir);
+      }
 
-      if (!casavaOutputDir.exists() || !casavaOutputDir.isDirectory())
+      if (!casavaOutputDir.exists() || !casavaOutputDir.isDirectory()) {
         throw new AozanException(
             "The Casava output directory does not exist or is not a directory: "
                 + casavaOutputDir);
+      }
 
       if (!QCOutputDir.exists()) {
-        if (!QCOutputDir.mkdirs())
+        if (!QCOutputDir.mkdirs()) {
           throw new AozanException("Cannot create QC directory : "
               + QCOutputDir);
+        }
       } else {
         LOGGER.info("Temporary QC directory already exists");
       }
@@ -152,11 +157,12 @@ public class QC {
       data = rdg.collect();
     }
 
-    if (data.size() == 0)
+    if (data.size() == 0) {
       throw new AozanException("No data collected.");
+    }
 
     // Create the report
-    QCReport qcReport =
+    final QCReport qcReport =
         new QCReport(data, this.globalTests, this.laneTests, this.sampleTests);
 
     // Create the completed raw data file
@@ -193,7 +199,7 @@ public class QC {
       writer.write(report.toXML());
 
       writer.close();
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new AozanException(e);
     }
 
@@ -210,26 +216,29 @@ public class QC {
       final String stylesheetFilename, final String outputFilename)
       throws AozanException {
 
-    if (outputFilename == null)
+    if (outputFilename == null) {
       throw new AozanException("The filename for the qc report is null");
+    }
 
     InputStream is = null;
     try {
 
-      if (stylesheetFilename == null)
+      if (stylesheetFilename == null) {
         is = this.getClass().getResourceAsStream(Globals.EMBEDDED_QC_XSL);
-      else
+      } else {
         is = new FileInputStream(stylesheetFilename);
+      }
 
       writeReport(report, is, new File(outputFilename));
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new AozanException(e);
 
     } finally {
       try {
-        if (is != null)
+        if (is != null) {
           is.close();
-      } catch (IOException ignored) {
+        }
+      } catch (final IOException ignored) {
       }
     }
   }
@@ -251,7 +260,7 @@ public class QC {
       writer.write(report.export(xslIs));
 
       writer.close();
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new AozanException(e);
     }
   }
@@ -265,8 +274,9 @@ public class QC {
   public void writeRawData(final QCReport report, final String outputFilename)
       throws AozanException {
 
-    if (outputFilename == null)
+    if (outputFilename == null) {
       throw new AozanException("The filename for the qc report is null");
+    }
 
     writeRawData(report, new File(outputFilename));
   }
@@ -287,7 +297,7 @@ public class QC {
       writer.write(report.getData().toString());
 
       writer.close();
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new AozanException(e);
     }
   }
@@ -301,7 +311,7 @@ public class QC {
       throws AozanException {
 
     final AozanTestRegistry registry = AozanTestRegistry.getInstance();
-    final Map<String, AozanTest> mapTests = Maps.newHashMap();
+    final Map<String, AozanTest> mapTests = new HashMap<>();
     List<AozanTest> tests;
 
     for (final Map.Entry<String, String> e : properties.entrySet()) {
@@ -327,25 +337,26 @@ public class QC {
 
           // Add the test to runTests, laneTests or sampleTests
           if (test instanceof GlobalTest) {
-            for (AozanTest t : tests) {
+            for (final AozanTest t : tests) {
               this.globalTests.add((GlobalTest) t);
               mapTests.put(key, t);
             }
           } else if (test instanceof LaneTest) {
-            for (AozanTest t : tests) {
+            for (final AozanTest t : tests) {
               this.laneTests.add((LaneTest) t);
               mapTests.put(key, t);
             }
 
           } else if (test instanceof SampleTest) {
-            for (AozanTest t : tests) {
+            for (final AozanTest t : tests) {
               this.sampleTests.add((SampleTest) t);
               mapTests.put(key, t);
             }
           }
 
-        } else
+        } else {
           throw new AozanException("No test found for property: " + key);
+        }
       }
 
     }
@@ -353,12 +364,15 @@ public class QC {
     initCollectors();
 
     // Initialize tests
-    for (GlobalTest test : this.globalTests)
+    for (final GlobalTest test : this.globalTests) {
       test.init();
-    for (LaneTest test : this.laneTests)
+    }
+    for (final LaneTest test : this.laneTests) {
       test.init();
-    for (SampleTest test : this.sampleTests)
+    }
+    for (final SampleTest test : this.sampleTests) {
       test.init();
+    }
   }
 
   /**
@@ -373,7 +387,7 @@ public class QC {
       final Map<String, String> properties, final String prefix)
       throws AozanException {
 
-    final Map<String, String> conf = Maps.newHashMap();
+    final Map<String, String> conf = new HashMap<>();
 
     for (final Map.Entry<String, String> e : properties.entrySet()) {
 
@@ -389,7 +403,7 @@ public class QC {
       }
 
       // add additional configuration in properties for collector
-      conf.putAll(globalConf);
+      conf.putAll(this.globalConf);
     }
 
     return test.configure(conf);
@@ -401,15 +415,18 @@ public class QC {
    */
   private final void initCollectors() throws AozanException {
 
-    final Set<Collector> collectors = Sets.newHashSet();
+    final Set<Collector> collectors = new HashSet<>();
 
-    List<AozanTest> testsList = Lists.newArrayList();
-    for (GlobalTest gt : this.globalTests)
+    final List<AozanTest> testsList = new ArrayList<>();
+    for (final GlobalTest gt : this.globalTests) {
       testsList.add(gt);
-    for (LaneTest lt : this.laneTests)
+    }
+    for (final LaneTest lt : this.laneTests) {
       testsList.add(lt);
-    for (SampleTest st : this.sampleTests)
+    }
+    for (final SampleTest st : this.sampleTests) {
       testsList.add(st);
+    }
 
     // Test if number test enable in configuration empty
     if (testsList.isEmpty()) {
@@ -418,27 +435,31 @@ public class QC {
     }
 
     // Get necessary collector for the qc report for lane test
-    if (!this.laneTests.isEmpty() || !this.globalTests.isEmpty())
+    if (!this.laneTests.isEmpty() || !this.globalTests.isEmpty()) {
       addCollectors(Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME),
           collectors);
+    }
 
     // Get necessary collector for the qc report for sample test
-    if (!this.sampleTests.isEmpty())
+    if (!this.sampleTests.isEmpty()) {
       addCollectors(Lists.newArrayList(DesignCollector.COLLECTOR_NAME),
           collectors);
+    }
 
     // Get the necessary collectors
-    for (final AozanTest test : testsList)
+    for (final AozanTest test : testsList) {
       addCollectors(test.getCollectorsNamesRequiered(), collectors);
+    }
 
-    final Map<Collector, Set<Collector>> dependencies = Maps.newHashMap();
-    final Set<Collector> added = Sets.newHashSet();
+    final Map<Collector, Set<Collector>> dependencies = new HashMap<>();
+    final Set<Collector> added = new HashSet<>();
 
     // Create the dependencies map
-    for (Collector c : collectors) {
+    for (final Collector c : collectors) {
 
-      if (c == null)
+      if (c == null) {
         continue;
+      }
 
       final Set<Collector> deps =
           getCollectors(c.getCollectorsNamesRequiered());
@@ -446,32 +467,37 @@ public class QC {
       if (deps.size() == 0) {
         this.collectors.add(c);
         added.add(c);
-      } else
+      } else {
         dependencies.put(c, deps);
+      }
     }
 
     // Resolve dependencies
     while (this.collectors.size() != collectors.size()) {
 
-      final Set<Collector> toRemove = Sets.newHashSet();
-      for (Map.Entry<Collector, Set<Collector>> e : dependencies.entrySet()) {
+      final Set<Collector> toRemove = new HashSet<>();
+      for (final Map.Entry<Collector, Set<Collector>> e : dependencies
+          .entrySet()) {
         e.getValue().removeAll(added);
-        if (e.getValue().size() == 0)
+        if (e.getValue().size() == 0) {
           toRemove.add(e.getKey());
+        }
       }
 
-      if (toRemove.size() == 0)
+      if (toRemove.size() == 0) {
         throw new AozanException("Unable to resolve collectors dependencies");
+      }
 
-      for (Collector c : toRemove) {
+      for (final Collector c : toRemove) {
         dependencies.remove(c);
         this.collectors.add(c);
         added.add(c);
       }
     }
 
-    if (this.collectors.size() == 0)
+    if (this.collectors.size() == 0) {
       throw new AozanException("No collector found.");
+    }
 
   }
 
@@ -486,29 +512,32 @@ public class QC {
 
     for (final Map.Entry<String, String> e : properties.entrySet()) {
 
-      if (e.getKey().startsWith("qc.conf."))
+      if (e.getKey().startsWith("qc.conf.")) {
         this.globalConf.put(e.getKey(), e.getValue());
+      }
     }
 
-    File[] designFiles = new File(fastqDir).listFiles(new FilenameFilter() {
+    final File[] designFiles =
+        new File(this.fastqDir).listFiles(new FilenameFilter() {
 
-      @Override
-      public boolean accept(File dir, String name) {
+          @Override
+          public boolean accept(final File dir, final String name) {
 
-        return name.endsWith(".csv");
-      }
-    });
+            return name.endsWith(".csv");
+          }
+        });
 
-    if (designFiles == null || designFiles.length == 0)
+    if (designFiles == null || designFiles.length == 0) {
       throw new AozanException("No Casava design file found in ");
+    }
 
     final File casavaDesignFile = designFiles[0];
 
-    this.globalConf.put(RTA_OUTPUT_DIR, bclDir);
+    this.globalConf.put(RTA_OUTPUT_DIR, this.bclDir);
     this.globalConf.put(CASAVA_DESIGN_PATH, casavaDesignFile.getAbsolutePath());
-    this.globalConf.put(CASAVA_OUTPUT_DIR, fastqDir);
-    this.globalConf.put(QC_OUTPUT_DIR, qcDir);
-    this.globalConf.put(TMP_DIR, tmpDir.getAbsolutePath());
+    this.globalConf.put(CASAVA_OUTPUT_DIR, this.fastqDir);
+    this.globalConf.put(QC_OUTPUT_DIR, this.qcDir);
+    this.globalConf.put(TMP_DIR, this.tmpDir.getAbsolutePath());
 
   }
 
@@ -517,7 +546,8 @@ public class QC {
    * @param properties Aozan properties
    * @throws AozanException if an error occurs when patching FastQC classes.
    */
-  private void initFastQC(Map<String, String> properties) throws AozanException {
+  private void initFastQC(final Map<String, String> properties)
+      throws AozanException {
 
     // Define parameters of FastQC
     System.setProperty("java.awt.headless", "true");
@@ -577,7 +607,7 @@ public class QC {
 
     final String value = properties.get(keyAozan);
 
-    if (value != null && value.trim().length() > 0) {
+    if (value != null && !value.isEmpty()) {
       System.setProperty(keySystem, value);
     }
 
@@ -589,23 +619,26 @@ public class QC {
    * @return a set of collectors objects
    * @throws AozanException if an error occurs while creating a collector
    */
-  private Set<Collector> getCollectors(List<String> collectorNames)
+  private Set<Collector> getCollectors(final List<String> collectorNames)
       throws AozanException {
 
-    if (collectorNames == null)
+    if (collectorNames == null) {
       return Collections.emptySet();
+    }
 
     final CollectorRegistry registry = CollectorRegistry.getInstance();
-    final Set<Collector> result = Sets.newHashSet();
+    final Set<Collector> result = new HashSet<>();
 
-    for (String collectorName : collectorNames) {
+    for (final String collectorName : collectorNames) {
 
-      if (collectorName == null)
+      if (collectorName == null) {
         continue;
+      }
       final Collector c = registry.get(collectorName);
 
-      if (c == null)
+      if (c == null) {
         throw new AozanException("Unable to found collector: " + collectorName);
+      }
 
       result.add(c);
     }
@@ -664,8 +697,9 @@ public class QC {
       final String fastqDir, final String qcDir, final File tmpDir,
       final String runId) throws AozanException {
 
-    if (properties == null)
+    if (properties == null) {
       throw new NullPointerException("The properties object is null");
+    }
 
     this.bclDir = bclDir;
     this.fastqDir = fastqDir;

@@ -43,7 +43,7 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
   private final ScoreInterval interval = new ScoreInterval();
 
   /**
-   * Get the the key in the RunData object for the value to test
+   * Get the the key in the RunData object for the value to test.
    * @param read index of the read
    * @param readSample index of read without indexed reads
    * @param lane index of the lane
@@ -65,7 +65,7 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
    * @return the transformed value
    */
   protected Number transformValue(final Number value, final RunData data,
-      final int read, int readSample, final int lane, final String sampleName) {
+      final int read, final int readSample, final int lane, final String sampleName) {
 
     return value;
   }
@@ -81,7 +81,7 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
    * @return the transformed score
    */
   protected int transformScore(final int score, final RunData data,
-      final int read, int readSample, final int lane, final String sampleName) {
+      final int read, final int readSample, final int lane, final String sampleName) {
 
     return score;
   }
@@ -102,18 +102,20 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
   protected abstract Class<?> getValueType();
 
   @Override
-  public TestResult test(final RunData data, final int read, int readSample,
+  public TestResult test(final RunData data, final int read, final int readSample,
       final int lane, final String sampleName) {
 
     final String key = getKey(read, readSample, lane, sampleName);
 
-    if (key == null)
+    if (key == null) {
       return null;
+    }
 
     // Key not present in data, case with fastqscreen, a genome specific from a
     // project
-    if (data.get(key) == null)
+    if (data.get(key) == null) {
       return new TestResult("NA");
+    }
 
     final Class<?> clazz = getValueType();
     final String msg;
@@ -143,24 +145,26 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
       }
 
       // Is result a string ?
-      if (value == null)
+      if (value == null) {
         return new TestResult(msg);
+      }
 
       // Transform the value id needed
       final Number transformedValue =
           transformValue(value, data, read, readSample, lane, sampleName);
 
       // Do the test ?
-      if (interval == null || sampleName == null)
+      if (this.interval == null || sampleName == null) {
         return new TestResult(transformedValue, isValuePercent());
+      }
 
-      int score =
+      final int score =
           transformScore(this.interval.getScore(transformedValue), data, read,
               readSample, lane, sampleName);
 
       return new TestResult(score, transformedValue, isValuePercent());
 
-    } catch (NumberFormatException e) {
+    } catch (final NumberFormatException e) {
 
       return new TestResult("NA");
     }
@@ -174,8 +178,9 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
   public List<AozanTest> configure(final Map<String, String> properties)
       throws AozanException {
 
-    if (properties == null)
+    if (properties == null) {
       throw new NullPointerException("The properties object is null");
+    }
 
     this.interval.configureDoubleInterval(properties);
 

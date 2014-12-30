@@ -52,10 +52,10 @@ import fr.ens.transcriptome.aozan.Globals;
 
 // this class is used with UncompressFastqCollector not used in aozan 1.1
 public class AozanSequenceFile implements SequenceFile {
-  /** Logger */
+  /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
-  /** Timer **/
+  /** Timer. **/
   private Stopwatch timer;
 
   private final File tmpFile;
@@ -82,39 +82,41 @@ public class AozanSequenceFile implements SequenceFile {
       this.fw.write(seq.getID() + "\n");
       this.fw.write(seq.getSequence() + "\n");
 
-      if (seq.getColorspace() == null)
+      if (seq.getColorspace() == null) {
         this.fw.write("+\n");
-      else
+      } else {
         this.fw.write(seq.getColorspace() + "\n");
+      }
 
       this.fw.write(seq.getQualityString() + "\n");
 
       // End of file, close the new file
-      if (!seqFile.hasNext()) {
+      if (!this.seqFile.hasNext()) {
         this.fw.close();
 
-        long sizeFile = tmpFile.length();
+        long sizeFile = this.tmpFile.length();
         sizeFile /= (1024 * 1024 * 1024);
 
         // Rename file for remove '.tmp' final
-        if (!tmpFile.renameTo(FastqStorage.getInstance().getTemporaryFile(
-            fastqSample)))
+        if (!this.tmpFile.renameTo(FastqStorage.getInstance().getTemporaryFile(
+            this.fastqSample))) {
           LOGGER.warning("Aozan sequence : fail to rename file "
-              + tmpFile.getAbsolutePath());
+              + this.tmpFile.getAbsolutePath());
+        }
 
         LOGGER.fine("FASTQC : uncompress for "
-            + fastqSample.getKeyFastqSample() + " "
-            + +fastqSample.getFastqFiles().size()
+            + this.fastqSample.getKeyFastqSample() + " "
+            + +this.fastqSample.getFastqFiles().size()
             + " fastq file(s), type compression "
-            + fastqSample.getCompressionType() + " in "
-            + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS))
+            + this.fastqSample.getCompressionType() + " in "
+            + toTimeHumanReadable(this.timer.elapsed(TimeUnit.MILLISECONDS))
             + "(tmp fastq file size " + sizeFile + "Go / estimated size "
-            + fastqSample.getUncompressedSize() + ")");
-        timer.stop();
+            + this.fastqSample.getUncompressedSize() + ")");
+        this.timer.stop();
 
       }
 
-    } catch (IOException io) {
+    } catch (final IOException io) {
       throw new SequenceFormatException(io.getMessage());
     }
 
@@ -150,6 +152,13 @@ public class AozanSequenceFile implements SequenceFile {
   // Constructor
   //
 
+  /**
+   * Instantiates a new aozan sequence file.
+   * @param files the files
+   * @param tmpFile the tmp file
+   * @param fastqSample the fastq sample
+   * @throws AozanException the aozan exception
+   */
   public AozanSequenceFile(final File[] files, final File tmpFile,
       final FastqSample fastqSample) throws AozanException {
 
@@ -164,10 +173,10 @@ public class AozanSequenceFile implements SequenceFile {
       // Init timer
       this.timer = Stopwatch.createStarted();
 
-    } catch (SequenceFormatException e) {
+    } catch (final SequenceFormatException e) {
       throw new AozanException(e);
 
-    } catch (IOException io) {
+    } catch (final IOException io) {
       throw new AozanException(io);
     }
   }

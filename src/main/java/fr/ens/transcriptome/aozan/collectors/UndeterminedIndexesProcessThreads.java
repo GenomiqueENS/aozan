@@ -31,8 +31,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -50,7 +53,6 @@ import uk.ac.babraham.FastQC.Sequence.SequenceFactory;
 import uk.ac.babraham.FastQC.Sequence.SequenceFile;
 import uk.ac.babraham.FastQC.Sequence.SequenceFormatException;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -58,7 +60,6 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import com.google.common.io.Files;
@@ -83,7 +84,7 @@ import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 public class UndeterminedIndexesProcessThreads extends
     AbstractFastqProcessThread {
 
-  /** Logger */
+  /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
   private static final Splitter TAB_SPLITTER = Splitter.on("\t").trimResults()
@@ -102,8 +103,8 @@ public class UndeterminedIndexesProcessThreads extends
 
   private final Map<String, String> sampleIndexes;
   private final Map<String, String> reverseSampleIndexes;
-  private Multiset<String> rawUndeterminedIndices = HashMultiset.create();
-  private Multiset<String> pfUndeterminedIndices = HashMultiset.create();
+  private final Multiset<String> rawUndeterminedIndices = HashMultiset.create();
+  private final Multiset<String> pfUndeterminedIndices = HashMultiset.create();
   private final Multimap<String, String> newSamplesIndexes = ArrayListMultimap
       .create();
   private final Multimap<String, String> newIndexes = ArrayListMultimap
@@ -119,11 +120,11 @@ public class UndeterminedIndexesProcessThreads extends
       Comparable<LaneResultEntry> {
 
     static {
-      HEADER_TYPE =
+      headerType =
           Lists.newArrayList("string", "int", "int", "string", "string",
               "string", "string");
 
-      HEADER_NAMES =
+      headerNames =
           Lists.newArrayList("Index", "Raw cluster count", "PF cluster count",
               "PF %", "Raw cluster in undetermined %",
               "PF cluster count in undetermined %",
@@ -142,6 +143,7 @@ public class UndeterminedIndexesProcessThreads extends
      * Get the entry in CSV format.
      * @return the entry in CSV format in a string
      */
+    @Override
     public String toCSV() {
 
       return String.format("%s\t%d\t%d\t%.02f%%\t%.02f%%\t%.02f%%\t%s%n",
@@ -160,52 +162,67 @@ public class UndeterminedIndexesProcessThreads extends
     public int hashCode() {
       final int prime = 31;
       int result = 1;
-      result = prime * result + ((comment == null) ? 0 : comment.hashCode());
+      result =
+          prime
+              * result + ((this.comment == null) ? 0 : this.comment.hashCode());
       long temp;
-      temp = Double.doubleToLongBits(inPFUndeterminedIndicePercent);
+      temp = Double.doubleToLongBits(this.inPFUndeterminedIndicePercent);
       result = prime * result + (int) (temp ^ (temp >>> 32));
-      temp = Double.doubleToLongBits(inRawUndeterminedIndicePercent);
+      temp = Double.doubleToLongBits(this.inRawUndeterminedIndicePercent);
       result = prime * result + (int) (temp ^ (temp >>> 32));
-      result = prime * result + ((index == null) ? 0 : index.hashCode());
-      result = prime * result + pfClusterCount;
-      temp = Double.doubleToLongBits(pfPercent);
+      result =
+          prime * result + ((this.index == null) ? 0 : this.index.hashCode());
+      result = prime * result + this.pfClusterCount;
+      temp = Double.doubleToLongBits(this.pfPercent);
       result = prime * result + (int) (temp ^ (temp >>> 32));
-      result = prime * result + rawClusterCount;
+      result = prime * result + this.rawClusterCount;
       return result;
     }
 
     @Override
-    public boolean equals(Object obj) {
-      if (this == obj)
+    public boolean equals(final Object obj) {
+      if (this == obj) {
         return true;
-      if (obj == null)
+      }
+      if (obj == null) {
         return false;
-      if (getClass() != obj.getClass())
+      }
+      if (getClass() != obj.getClass()) {
         return false;
-      LaneResultEntry other = (LaneResultEntry) obj;
-      if (comment == null) {
-        if (other.comment != null)
+      }
+      final LaneResultEntry other = (LaneResultEntry) obj;
+      if (this.comment == null) {
+        if (other.comment != null) {
           return false;
-      } else if (!comment.equals(other.comment))
+        }
+      } else if (!this.comment.equals(other.comment)) {
         return false;
-      if (Double.doubleToLongBits(inPFUndeterminedIndicePercent) != Double
-          .doubleToLongBits(other.inPFUndeterminedIndicePercent))
+      }
+      if (Double.doubleToLongBits(this.inPFUndeterminedIndicePercent) != Double
+          .doubleToLongBits(other.inPFUndeterminedIndicePercent)) {
         return false;
-      if (Double.doubleToLongBits(inRawUndeterminedIndicePercent) != Double
-          .doubleToLongBits(other.inRawUndeterminedIndicePercent))
+      }
+      if (Double.doubleToLongBits(this.inRawUndeterminedIndicePercent) != Double
+          .doubleToLongBits(other.inRawUndeterminedIndicePercent)) {
         return false;
-      if (index == null) {
-        if (other.index != null)
+      }
+      if (this.index == null) {
+        if (other.index != null) {
           return false;
-      } else if (!index.equals(other.index))
+        }
+      } else if (!this.index.equals(other.index)) {
         return false;
-      if (pfClusterCount != other.pfClusterCount)
+      }
+      if (this.pfClusterCount != other.pfClusterCount) {
         return false;
-      if (Double.doubleToLongBits(pfPercent) != Double
-          .doubleToLongBits(other.pfPercent))
+      }
+      if (Double.doubleToLongBits(this.pfPercent) != Double
+          .doubleToLongBits(other.pfPercent)) {
         return false;
-      if (rawClusterCount != other.rawClusterCount)
+      }
+      if (this.rawClusterCount != other.rawClusterCount) {
         return false;
+      }
       return true;
     }
 
@@ -222,8 +239,9 @@ public class UndeterminedIndexesProcessThreads extends
       }
 
       // Check several samples names
-      if (this.comment.contains(","))
+      if (this.comment.contains(",")) {
         return CONFLICT_TAG;
+      }
 
       return this.comment;
     }
@@ -240,7 +258,7 @@ public class UndeterminedIndexesProcessThreads extends
         final RunData data, final int lane,
         final boolean asConflictDemultiplexing) {
 
-      final List<String> samplesName = Lists.newArrayList();
+      final List<String> samplesName = new ArrayList<>();
 
       // Extract all samples names per lane
       samplesName.addAll(COMMA_SPLITTER.splitToList(data
@@ -263,7 +281,7 @@ public class UndeterminedIndexesProcessThreads extends
       parent.appendChild(samples);
 
       // Add tag XML per sample name
-      for (String sampleName : samplesName) {
+      for (final String sampleName : samplesName) {
         final Element sample = doc.createElement("Sample");
         sample.setAttribute("classValue", "sample");
         sample.setAttribute("cmdJS", "'" + sampleName + "'");
@@ -310,11 +328,11 @@ public class UndeterminedIndexesProcessThreads extends
       Comparable<SampleResultEntry> {
 
     static {
-      HEADER_TYPE =
+      headerType =
           Lists.newArrayList("string", "int", "int", "string", "string",
               "string", "string");
 
-      HEADER_NAMES =
+      headerNames =
           Lists.newArrayList("Index", "Raw cluster count", "PF cluster count",
               "PF %", "Raw cluster in sample %",
               "PF cluster count in sample %", "Comment");
@@ -332,6 +350,7 @@ public class UndeterminedIndexesProcessThreads extends
      * Get the entry in CSV format.
      * @return the entry in CSV format in a string
      */
+    @Override
     public String toCSV() {
 
       return String.format("%s\t%d\t%d\t%.02f%%\t%.02f%%\t%.02f%%\t%s%n",
@@ -344,52 +363,67 @@ public class UndeterminedIndexesProcessThreads extends
     public int hashCode() {
       final int prime = 31;
       int result = 1;
-      result = prime * result + ((comment == null) ? 0 : comment.hashCode());
-      result = prime * result + ((index == null) ? 0 : index.hashCode());
-      result = prime * result + pfClusterCount;
+      result =
+          prime
+              * result + ((this.comment == null) ? 0 : this.comment.hashCode());
+      result =
+          prime * result + ((this.index == null) ? 0 : this.index.hashCode());
+      result = prime * result + this.pfClusterCount;
       long temp;
-      temp = Double.doubleToLongBits(pfClusterPercent);
+      temp = Double.doubleToLongBits(this.pfClusterPercent);
       result = prime * result + (int) (temp ^ (temp >>> 32));
-      temp = Double.doubleToLongBits(pfPercent);
+      temp = Double.doubleToLongBits(this.pfPercent);
       result = prime * result + (int) (temp ^ (temp >>> 32));
-      result = prime * result + rawClusterCount;
-      temp = Double.doubleToLongBits(rawClusterPercent);
+      result = prime * result + this.rawClusterCount;
+      temp = Double.doubleToLongBits(this.rawClusterPercent);
       result = prime * result + (int) (temp ^ (temp >>> 32));
       return result;
     }
 
     @Override
-    public boolean equals(Object obj) {
-      if (this == obj)
+    public boolean equals(final Object obj) {
+      if (this == obj) {
         return true;
-      if (obj == null)
+      }
+      if (obj == null) {
         return false;
-      if (getClass() != obj.getClass())
+      }
+      if (getClass() != obj.getClass()) {
         return false;
-      SampleResultEntry other = (SampleResultEntry) obj;
-      if (comment == null) {
-        if (other.comment != null)
+      }
+      final SampleResultEntry other = (SampleResultEntry) obj;
+      if (this.comment == null) {
+        if (other.comment != null) {
           return false;
-      } else if (!comment.equals(other.comment))
+        }
+      } else if (!this.comment.equals(other.comment)) {
         return false;
-      if (index == null) {
-        if (other.index != null)
+      }
+      if (this.index == null) {
+        if (other.index != null) {
           return false;
-      } else if (!index.equals(other.index))
+        }
+      } else if (!this.index.equals(other.index)) {
         return false;
-      if (pfClusterCount != other.pfClusterCount)
+      }
+      if (this.pfClusterCount != other.pfClusterCount) {
         return false;
-      if (Double.doubleToLongBits(pfClusterPercent) != Double
-          .doubleToLongBits(other.pfClusterPercent))
+      }
+      if (Double.doubleToLongBits(this.pfClusterPercent) != Double
+          .doubleToLongBits(other.pfClusterPercent)) {
         return false;
-      if (Double.doubleToLongBits(pfPercent) != Double
-          .doubleToLongBits(other.pfPercent))
+      }
+      if (Double.doubleToLongBits(this.pfPercent) != Double
+          .doubleToLongBits(other.pfPercent)) {
         return false;
-      if (rawClusterCount != other.rawClusterCount)
+      }
+      if (this.rawClusterCount != other.rawClusterCount) {
         return false;
-      if (Double.doubleToLongBits(rawClusterPercent) != Double
-          .doubleToLongBits(other.rawClusterPercent))
+      }
+      if (Double.doubleToLongBits(this.rawClusterPercent) != Double
+          .doubleToLongBits(other.rawClusterPercent)) {
         return false;
+      }
       return true;
     }
 
@@ -408,8 +442,9 @@ public class UndeterminedIndexesProcessThreads extends
     public String getAttributeClass() {
       // Data entry
       if (this.comment.toLowerCase(Globals.DEFAULT_LOCALE).startsWith(
-          "conflict"))
+          "conflict")) {
         return CONFLICT_TAG;
+      }
       return "";
     }
 
@@ -443,27 +478,27 @@ public class UndeterminedIndexesProcessThreads extends
   /**
    * This class store a result entry for a sample.
    */
-  private static abstract class ResultEntry {
+  private abstract static class ResultEntry {
 
-    protected static List<String> HEADER_TYPE;
+    protected static List<String> headerType;
 
-    protected static List<String> HEADER_NAMES;
+    protected static List<String> headerNames;
 
-    protected static String CONFLICT_TAG = "conflict";
-    protected static String TOTAL_TAG = "total";
+    protected static final String CONFLICT_TAG = "conflict";
+    protected static final String TOTAL_TAG = "total";
 
     abstract String toCSV();
 
-    abstract public boolean isCommentFieldEmpty();
+    public abstract boolean isCommentFieldEmpty();
 
-    abstract public String getAttributeClass();
+    public abstract String getAttributeClass();
 
     /**
      * Get CSV header.
      * @return a string with the CSV header
      */
     public static String headerCSV() {
-      return Joiner.on("\t").join(HEADER_NAMES) + "\n";
+      return Joiner.on("\t").join(headerNames) + "\n";
     }
 
     /**
@@ -477,7 +512,7 @@ public class UndeterminedIndexesProcessThreads extends
       // columns.setAttribute("classValue", "headerColumns");
       parent.appendChild(columns);
 
-      for (String text : TAB_SPLITTER.split(headerCSV())) {
+      for (final String text : TAB_SPLITTER.split(headerCSV())) {
 
         final Element elem = doc.createElement("Column");
         elem.setTextContent(text);
@@ -498,12 +533,12 @@ public class UndeterminedIndexesProcessThreads extends
       parent.appendChild(elemRoot);
 
       int n = 0;
-      for (String text : TAB_SPLITTER.split(toCSV())) {
+      for (final String text : TAB_SPLITTER.split(toCSV())) {
 
         final Element elem = doc.createElement("Data");
         elem.setAttribute("name",
-            HEADER_NAMES.get(n).toLowerCase().replaceAll(" ", "_"));
-        elem.setAttribute("type", HEADER_TYPE.get(n));
+            headerNames.get(n).toLowerCase().replaceAll(" ", "_"));
+        elem.setAttribute("type", headerType.get(n));
         elem.setAttribute("score", "-1");
 
         elem.setTextContent(text);
@@ -516,8 +551,8 @@ public class UndeterminedIndexesProcessThreads extends
       if (isCommentFieldEmpty()) {
         final Element elem = doc.createElement("Data");
         elem.setAttribute("name",
-            HEADER_NAMES.get(n).toLowerCase().replaceAll(" ", "_"));
-        elem.setAttribute("type", HEADER_TYPE.get(n));
+            headerNames.get(n).toLowerCase().replaceAll(" ", "_"));
+        elem.setAttribute("type", headerType.get(n));
         elem.setAttribute("score", "-1");
 
         elem.setTextContent("");
@@ -546,7 +581,7 @@ public class UndeterminedIndexesProcessThreads extends
       processSequences(this.seqFile);
       setSuccess(true);
 
-    } catch (AozanException e) {
+    } catch (final AozanException e) {
       setException(e);
 
     } finally {
@@ -560,7 +595,7 @@ public class UndeterminedIndexesProcessThreads extends
   }
 
   /**
-   * Read FASTQ file and process the data by FastQC modules
+   * Read FASTQ file and process the data by FastQC modules.
    * @param seqFile input file
    * @throws AozanException if an error occurs while processing file
    */
@@ -577,19 +612,21 @@ public class UndeterminedIndexesProcessThreads extends
 
         // Parse sequence id
         try {
-          if (irid == null)
+          if (irid == null) {
             irid = new IlluminaReadId(seq.getID().substring(1));
-          else
+          } else {
             irid.parse(seq.getID().substring(1));
-        } catch (EoulsanException e) {
+          }
+        } catch (final EoulsanException e) {
 
           // This is not an Illumina id
           return;
         }
 
         this.rawUndeterminedIndices.add(irid.getSequenceIndex());
-        if (!irid.isFiltered())
+        if (!irid.isFiltered()) {
           this.pfUndeterminedIndices.add(irid.getSequenceIndex());
+        }
       }
 
       // Set max mismatches allowed
@@ -598,7 +635,7 @@ public class UndeterminedIndexesProcessThreads extends
       // Process results
       processResults();
 
-    } catch (SequenceFormatException e) {
+    } catch (final SequenceFormatException e) {
       throw new AozanException(e);
     }
 
@@ -610,21 +647,23 @@ public class UndeterminedIndexesProcessThreads extends
 
     int minMismatchFound = Integer.MAX_VALUE;
 
-    for (Map.Entry<String, String> e : this.sampleIndexes.entrySet()) {
+    for (final Map.Entry<String, String> e : this.sampleIndexes.entrySet()) {
 
-      for (String i : this.rawUndeterminedIndices.elementSet()) {
+      for (final String i : this.rawUndeterminedIndices.elementSet()) {
         final String index = e.getValue();
         final int mismatches = mismatches(index, i);
 
         minMismatchFound = Math.min(minMismatchFound, mismatches);
 
         // Check minimum found
-        if (minMismatchFound == 1)
+        if (minMismatchFound == 1) {
           break;
+        }
       }
 
-      if (minMismatchFound == 1)
+      if (minMismatchFound == 1) {
         break;
+      }
     }
 
     if (minMismatchFound > maxMismatchAllowed) {
@@ -636,7 +675,8 @@ public class UndeterminedIndexesProcessThreads extends
       getResults()
           .put(
               "undeterminedindices.lane"
-                  + this.lane + ".mismatch.recovery.cluster", maxMismatches);
+                  + this.lane + ".mismatch.recovery.cluster",
+              this.maxMismatches);
     }
   }
 
@@ -648,12 +688,12 @@ public class UndeterminedIndexesProcessThreads extends
 
     if (!this.isSkipProcessResult) {
       // For each sample find the indexes sequences that can be recovered
-      for (Map.Entry<String, String> e : this.sampleIndexes.entrySet()) {
+      for (final Map.Entry<String, String> e : this.sampleIndexes.entrySet()) {
 
         final String sampleName = e.getKey();
         final String index = e.getValue();
 
-        for (String i : this.rawUndeterminedIndices.elementSet()) {
+        for (final String i : this.rawUndeterminedIndices.elementSet()) {
 
           final int mismatches = mismatches(index, i);
 
@@ -666,7 +706,8 @@ public class UndeterminedIndexesProcessThreads extends
       }
 
       // Compute results for each sample
-      for (String sampleName : this.data.getSamplesNameListInLane(this.lane)) {
+      for (final String sampleName : this.data
+          .getSamplesNameListInLane(this.lane)) {
         recoverableRawClusterCount +=
             computeRecoverableSampleClusterCount(sampleName,
                 this.rawUndeterminedIndices, ".recoverable.raw.cluster.count");
@@ -689,7 +730,7 @@ public class UndeterminedIndexesProcessThreads extends
     // Create report
     try {
       createReportFile();
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new AozanException(e);
     }
   }
@@ -708,14 +749,15 @@ public class UndeterminedIndexesProcessThreads extends
 
     if (!this.isSkipProcessResult) {
       // Sum the number of cluster that can be recovered
-      if (this.newSamplesIndexes.containsKey(sampleName))
-        for (String newIndex : this.newSamplesIndexes.get(sampleName)) {
+      if (this.newSamplesIndexes.containsKey(sampleName)) {
+        for (final String newIndex : this.newSamplesIndexes.get(sampleName)) {
 
           if (indicesCounts.contains(newIndex)) {
             final int count = indicesCounts.count(newIndex);
             recoverableClusterCount += count;
           }
         }
+      }
     }
 
     // Set the result for the sample
@@ -734,8 +776,10 @@ public class UndeterminedIndexesProcessThreads extends
     createReportForLane();
 
     // Create the report for each samples
-    for (String sampleName : this.data.getSamplesNameListInLane(this.lane))
+    for (final String sampleName : this.data
+        .getSamplesNameListInLane(this.lane)) {
       createReportForSample(sampleName);
+    }
   }
 
   /**
@@ -747,16 +791,18 @@ public class UndeterminedIndexesProcessThreads extends
 
     // Test if demultiplexing with mismatches is possible
     boolean oneMismatcheDemuxPossible = true;
-    for (Map.Entry<String, Collection<String>> e : this.newIndexes.asMap()
-        .entrySet())
-      if (e.getValue().size() > 1)
+    for (final Map.Entry<String, Collection<String>> e : this.newIndexes
+        .asMap().entrySet()) {
+      if (e.getValue().size() > 1) {
         oneMismatcheDemuxPossible = false;
+      }
+    }
 
     final int totalRawClusterCount = this.rawUndeterminedIndices.size();
     final int totalPFClusterCount = this.pfUndeterminedIndices.size();
 
     // Create sorted set
-    final List<LaneResultEntry> entries = Lists.newArrayList();
+    final List<LaneResultEntry> entries = new ArrayList<>();
 
     // Total entry
     final LaneResultEntry totalEntry =
@@ -770,13 +816,14 @@ public class UndeterminedIndexesProcessThreads extends
                 ? ""
                 : "Demultiplexing with one mismatche is not possible due to indexes conflicts");
 
-    for (Multiset.Entry<String> e : this.rawUndeterminedIndices.entrySet()) {
+    for (final Multiset.Entry<String> e : this.rawUndeterminedIndices
+        .entrySet()) {
 
       final String index = e.getElement();
       final int rawClusterCount = e.getCount();
       final int pfClusterCount = this.pfUndeterminedIndices.count(index);
 
-      List<String> samplesCollection = getSampleForNewIndex(index);
+      final List<String> samplesCollection = getSampleForNewIndex(index);
       final String samples =
           samplesCollection.size() > 0 ? JOINER.join(samplesCollection) : "";
 
@@ -799,9 +846,10 @@ public class UndeterminedIndexesProcessThreads extends
   private List<String> getSampleForNewIndex(final String newIndex) {
 
     final Collection<String> indexesCollection = this.newIndexes.get(newIndex);
-    final List<String> samplesCollection = Lists.newArrayList();
-    for (String i : indexesCollection)
+    final List<String> samplesCollection = new ArrayList<>();
+    for (final String i : indexesCollection) {
       samplesCollection.add(this.reverseSampleIndexes.get(i));
+    }
 
     return samplesCollection;
   }
@@ -820,10 +868,12 @@ public class UndeterminedIndexesProcessThreads extends
 
     // Create parent directory if necessary
     final File parentDir = reportFile.getParentFile();
-    if (!parentDir.exists())
-      if (!parentDir.mkdirs())
+    if (!parentDir.exists()) {
+      if (!parentDir.mkdirs()) {
         throw new IOException(
             "Undetermined: Fail to create parent directory of recovery cluster report.");
+      }
+    }
 
     return reportFile;
   }
@@ -837,18 +887,19 @@ public class UndeterminedIndexesProcessThreads extends
   private void writeCSV(final List<LaneResultEntry> entries,
       final LaneResultEntry totalEntry) throws IOException {
 
-    BufferedWriter br =
-        Files.newWriter(createLaneResultFile(".csv"), Charsets.UTF_8);
+    final BufferedWriter br =
+        Files.newWriter(createLaneResultFile(".csv"), StandardCharsets.UTF_8);
 
     // Header
-    br.write(LaneResultEntry.headerCSV());
+    br.write(ResultEntry.headerCSV());
 
     // Total recoverable result
     br.write(totalEntry.toCSV());
 
     // All the other results
-    for (LaneResultEntry e : entries)
+    for (final LaneResultEntry e : entries) {
       br.write(e.toCSV());
+    }
 
     br.close();
   }
@@ -868,7 +919,7 @@ public class UndeterminedIndexesProcessThreads extends
 
     final File reportHtml = createLaneResultFile(".html");
 
-    toXML("lane" + lane + "_undetermined", null, entries, totalEntry,
+    toXML("lane" + this.lane + "_undetermined", null, entries, totalEntry,
         reportHtml, false, asConflictDemultiplexing);
 
   }
@@ -883,7 +934,7 @@ public class UndeterminedIndexesProcessThreads extends
       throws IOException, AozanException {
 
     // Create sorted set
-    final List<SampleResultEntry> entries = Lists.newArrayList();
+    final List<SampleResultEntry> entries = new ArrayList<>();
 
     final int sampleRawClusterCount = getSampleRawClusterCount(sampleName);
     final int samplePFClusterCount = getSamplePFClusterCount(sampleName);
@@ -898,8 +949,8 @@ public class UndeterminedIndexesProcessThreads extends
     int newIndexesPFClusterCount = 0;
 
     // Add the new index found
-    if (this.newSamplesIndexes.containsKey(sampleName))
-      for (String newIndex : this.newSamplesIndexes.get(sampleName)) {
+    if (this.newSamplesIndexes.containsKey(sampleName)) {
+      for (final String newIndex : this.newSamplesIndexes.get(sampleName)) {
 
         final int newIndexRawClusterCount =
             this.rawUndeterminedIndices.count(newIndex);
@@ -919,6 +970,7 @@ public class UndeterminedIndexesProcessThreads extends
         newIndexesRawClusterCount += newIndexRawClusterCount;
         newIndexesPFClusterCount += newIndexPFClusterCount;
       }
+    }
 
     // Total result
     final SampleResultEntry totalEntry =
@@ -946,14 +998,16 @@ public class UndeterminedIndexesProcessThreads extends
     final File reportFile =
         new File(this.reportDir.getAbsolutePath()
             + "/../Project_" + getProjectSample(sampleName) + "/" + sampleName
-            + "_lane" + lane + "-potentialindices" + extension);
+            + "_lane" + this.lane + "-potentialindices" + extension);
 
     // Create parent directory if necessary
     final File parentDir = reportFile.getParentFile();
-    if (!parentDir.exists())
-      if (!parentDir.mkdirs())
+    if (!parentDir.exists()) {
+      if (!parentDir.mkdirs()) {
         throw new IOException(
             "Undetermined: Fail to create parent directory of recovery cluster report.");
+      }
+    }
 
     return reportFile;
   }
@@ -970,12 +1024,12 @@ public class UndeterminedIndexesProcessThreads extends
       final List<SampleResultEntry> entries, final SampleResultEntry totalEntry)
       throws IOException {
 
-    BufferedWriter br =
+    final BufferedWriter br =
         Files.newWriter(createSampleResultFile(sampleName, ".csv"),
-            Charsets.UTF_8);
+            StandardCharsets.UTF_8);
 
     // Header
-    br.write(SampleResultEntry.headerCSV());
+    br.write(ResultEntry.headerCSV());
 
     // Original demux result
     br.write(demuxEntry.toCSV());
@@ -984,8 +1038,9 @@ public class UndeterminedIndexesProcessThreads extends
     br.write(totalEntry.toCSV());
 
     // All the other results
-    for (SampleResultEntry e : entries)
+    for (final SampleResultEntry e : entries) {
       br.write(e.toCSV());
+    }
 
     br.close();
   }
@@ -1034,17 +1089,17 @@ public class UndeterminedIndexesProcessThreads extends
     Document doc = null;
 
     try {
-      DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+      final DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
       DocumentBuilder docBuilder = null;
       docBuilder = dbfac.newDocumentBuilder();
       doc = docBuilder.newDocument();
 
-    } catch (ParserConfigurationException e) {
+    } catch (final ParserConfigurationException e) {
       throw new AozanException(e);
     }
 
     // Create the root element and add it to the document
-    Element root = doc.createElement("RecoveryClusterReport");
+    final Element root = doc.createElement("RecoveryClusterReport");
     root.setAttribute("formatversion", "1.0");
     doc.appendChild(root);
 
@@ -1057,9 +1112,10 @@ public class UndeterminedIndexesProcessThreads extends
     XMLUtils.addTagValue(doc, root, "sampleName", sampleName);
 
     // Case Undetermined indices samples, no project name
-    if (isSampleData)
+    if (isSampleData) {
       XMLUtils.addTagValue(doc, root, "projectName",
           getProjectSample(sampleName));
+    }
 
     XMLUtils.addTagValue(doc, root, "description",
         this.data.getSampleDescription(this.lane, sampleName));
@@ -1090,7 +1146,7 @@ public class UndeterminedIndexesProcessThreads extends
     // Total entry
     totalEntry.toXML(doc, results, "total");
 
-    for (ResultEntry e : entries) {
+    for (final ResultEntry e : entries) {
       e.toXML(doc, results, "entry");
     }
 
@@ -1099,12 +1155,13 @@ public class UndeterminedIndexesProcessThreads extends
 
     // Set xsl file to write report HTML file
     InputStream is = null;
-    if (this.xslFile == null)
+    if (this.xslFile == null) {
       is =
           this.getClass()
               .getResourceAsStream(Globals.EMBEDDED_UNDETERMINED_XSL);
-    else
+    } else {
       is = new FileInputStream(this.xslFile);
+    }
 
     // Write report HTML
     XMLUtilsWriter.createHTMLFileFromXSL(doc, is, reportHtml);
@@ -1120,7 +1177,7 @@ public class UndeterminedIndexesProcessThreads extends
    * @param b the second string
    * @return the number of mismatches
    */
-  private static final int mismatches(final String a, String b) {
+  private static final int mismatches(final String a, final String b) {
 
     Preconditions.checkNotNull(a, "a cannot be null");
     Preconditions.checkNotNull(b, "b cannot be null");
@@ -1130,9 +1187,11 @@ public class UndeterminedIndexesProcessThreads extends
     final int len = a.length();
     int result = 0;
 
-    for (int i = 0; i < len; i++)
-      if (a.charAt(i) != b.charAt(i))
+    for (int i = 0; i < len; i++) {
+      if (a.charAt(i) != b.charAt(i)) {
         result++;
+      }
+    }
 
     return result;
   }
@@ -1142,15 +1201,17 @@ public class UndeterminedIndexesProcessThreads extends
    * @param map the original map
    * @return a new map with the inversed key-values
    */
-  private Map<String, String> reverse(Map<String, String> map) {
+  private Map<String, String> reverse(final Map<String, String> map) {
 
-    if (map == null)
+    if (map == null) {
       return null;
+    }
 
-    final Map<String, String> result = Maps.newHashMap();
+    final Map<String, String> result = new HashMap<>();
 
-    for (Map.Entry<String, String> e : map.entrySet())
+    for (final Map.Entry<String, String> e : map.entrySet()) {
       result.put(e.getValue(), e.getKey());
+    }
 
     return result;
   }
@@ -1161,12 +1222,13 @@ public class UndeterminedIndexesProcessThreads extends
    */
   private Map<String, String> getSampleIndexes() {
 
-    final Map<String, String> result = Maps.newHashMap();
+    final Map<String, String> result = new HashMap<>();
 
-    for (String sampleName : this.data.getSamplesNameListInLane(this.lane)) {
+    for (final String sampleName : this.data
+        .getSamplesNameListInLane(this.lane)) {
 
       // Get the sample index
-      String index = this.data.getIndexSample(this.lane, sampleName);
+      final String index = this.data.getIndexSample(this.lane, sampleName);
 
       result.put(sampleName, index);
     }
@@ -1240,10 +1302,10 @@ public class UndeterminedIndexesProcessThreads extends
           SequenceFactory.getSequenceFile(fastqSample.getFastqFiles().toArray(
               new File[fastqSample.getFastqFiles().size()]));
 
-    } catch (IOException io) {
+    } catch (final IOException io) {
       throw new AozanException(io);
 
-    } catch (SequenceFormatException e) {
+    } catch (final SequenceFormatException e) {
       throw new AozanException(e);
     }
 

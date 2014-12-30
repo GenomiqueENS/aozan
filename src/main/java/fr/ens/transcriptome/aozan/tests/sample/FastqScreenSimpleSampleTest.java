@@ -59,20 +59,21 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   }
 
   @Override
-  public String getKey(int read, int readSample, int lane, String sampleName) {
+  public String getKey(final int read, final int readSample, final int lane,
+      final String sampleName) {
 
-    String value =
-        isGenomeContamination
+    final String value =
+        this.isGenomeContamination
             ? ".mapped.percent" : ".one.hit.one.library.percent";
 
     // Check indetermined indexed sample
     if (sampleName == null) {
       return "fastqscreen.lane"
-          + lane + ".undetermined.read1." + genomeReference + value;
+          + lane + ".undetermined.read1." + this.genomeReference + value;
     }
     return "fastqscreen.lane"
         + lane + ".sample." + sampleName + ".read" + readSample + "."
-        + sampleName + "." + genomeReference + value;
+        + sampleName + "." + this.genomeReference + value;
   }
 
   @Override
@@ -81,7 +82,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   }
 
   /**
-   * Transform the score : if genome of sample is the same as reference genome
+   * Transform the score : if genome of sample is the same as reference genome.
    * then the score is reverse for change the color in QC report
    * @param data run data
    * @param read index of read
@@ -92,13 +93,14 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
    */
   @Override
   protected int transformScore(final int score, final RunData data,
-      final int read, int readSample, final int lane, final String sampleName) {
+      final int read, final int readSample, final int lane,
+      final String sampleName) {
 
-    String keyGenomeSample =
+    final String keyGenomeSample =
         "design.lane" + lane + "." + sampleName + ".sample.ref";
 
     // Set genome sample
-    String genomeSample = data.get(keyGenomeSample);
+    final String genomeSample = data.get(keyGenomeSample);
 
     // Set reference genome corresponding of genome sample if it exists
     String genomeSampleReference = null;
@@ -106,13 +108,14 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
       genomeSampleReference =
           FastqScreenGenomeMapper.getInstance()
               .getGenomeReferenceCorresponding(genomeSample);
-    } catch (AozanException e) {
+    } catch (final AozanException e) {
     }
 
     // If genome sample are used like reference genome in FastqScreen, the score
     // are inverse. The value must be near 100% if it had no contamination.
-    if (this.genomeReference.equals(genomeSampleReference))
+    if (this.genomeReference.equals(genomeSampleReference)) {
       return (9 - score);
+    }
 
     return score;
   }
@@ -121,8 +124,9 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   public List<AozanTest> configure(final Map<String, String> properties)
       throws AozanException {
 
-    if (properties == null || properties.isEmpty())
+    if (properties == null || properties.isEmpty()) {
       throw new NullPointerException("The properties object is null or empty");
+    }
 
     // Initialization fastqScreenGenomeMapper object
     final FastqScreenGenomeMapper fqsm =
@@ -131,9 +135,9 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     //
     final Set<String> genomes = fqsm.getGenomesToMapping();
 
-    List<AozanTest> list = new ArrayList<AozanTest>();
+    final List<AozanTest> list = new ArrayList<AozanTest>();
 
-    for (String genome : genomes) {
+    for (final String genome : genomes) {
 
       // Create an new AozanTest for each reference genome
       final FastqScreenSimpleSampleTest testGenome =
@@ -154,7 +158,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   }
 
   /**
-   * Get name of reference genome
+   * Get name of reference genome.
    * @return name of reference genome
    */
   public String getNameGenome() {
@@ -171,14 +175,14 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   //
 
   /**
-   * Public constructor
+   * Public constructor.
    */
   public FastqScreenSimpleSampleTest() {
     this(null, false);
   }
 
   /**
-   * Public constructor, specific for a reference genome
+   * Public constructor, specific for a reference genome.
    * @param genome name of reference genome
    */
   public FastqScreenSimpleSampleTest(final String genome,

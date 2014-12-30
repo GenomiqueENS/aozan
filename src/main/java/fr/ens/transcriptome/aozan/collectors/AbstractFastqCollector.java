@@ -26,6 +26,7 @@ package fr.ens.transcriptome.aozan.collectors;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -53,9 +54,9 @@ import fr.ens.transcriptome.aozan.io.FastqStorage;
  * @since 1.0
  * @author Sandrine Perrin
  */
-abstract public class AbstractFastqCollector implements Collector {
+public abstract class AbstractFastqCollector implements Collector {
 
-  /** Logger */
+  /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
   private FastqStorage fastqStorage;
@@ -170,7 +171,7 @@ abstract public class AbstractFastqCollector implements Collector {
   }
 
   /**
-   * Configure the collector with the path of the run data
+   * Configure the collector with the path of the run data.
    * @param properties object with the collector configuration
    */
   @Override
@@ -186,8 +187,8 @@ abstract public class AbstractFastqCollector implements Collector {
     if (this.getThreadsNumber() > 1) {
 
       // Create the list for threads
-      this.threads = Lists.newArrayList();
-      this.futureThreads = Lists.newArrayList();
+      this.threads = new ArrayList<>();
+      this.futureThreads = new ArrayList<>();
 
       // Create executor service
       this.executor = Executors.newFixedThreadPool(this.getThreadsNumber());
@@ -195,7 +196,7 @@ abstract public class AbstractFastqCollector implements Collector {
   }
 
   /**
-   * Collect data : browse data for call concrete collector,
+   * Collect data : browse data for call concrete collector.
    * @param data result data object
    * @throws AozanException if an error occurs while collecting data
    */
@@ -343,8 +344,7 @@ abstract public class AbstractFastqCollector implements Collector {
 
         final List<String> sampleNames = data.getSamplesNameListInLane(lane);
 
-        if (this.isProcessStandardSamples())
-         {
+        if (this.isProcessStandardSamples()) {
           for (final String sampleName : sampleNames) {
 
             // Get the sample index
@@ -423,7 +423,7 @@ abstract public class AbstractFastqCollector implements Collector {
   }
 
   /**
-   * Save rundata for a sample in a file in a qc report directory
+   * Save rundata for a sample in a file in a qc report directory.
    * @param fastqSample sample object
    * @param data RunData corresponding to one sample
    */
@@ -450,7 +450,7 @@ abstract public class AbstractFastqCollector implements Collector {
   }
 
   /**
-   * Return run data file corresponding of a sample or a undetermined fastq
+   * Return run data file corresponding of a sample or a undetermined fastq.
    * @param fastqSample
    * @return run data file
    */
@@ -544,7 +544,7 @@ abstract public class AbstractFastqCollector implements Collector {
   }
 
   /**
-   * Clear qc directory after successfully all FastqCollector
+   * Clear qc directory after successfully all FastqCollector.
    */
   @Override
   public void clear() {

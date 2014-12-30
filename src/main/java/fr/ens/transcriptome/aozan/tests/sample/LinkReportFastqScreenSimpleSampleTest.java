@@ -67,8 +67,9 @@ public class LinkReportFastqScreenSimpleSampleTest extends AbstractSampleTest {
             + lane + ".sample." + sampleName + ".read" + readSample + "."
             + sampleName + ".mappedexceptgenomesample";
 
-    if (data.get(key) == null)
+    if (data.get(key) == null) {
       return new TestResult("NA");
+    }
 
     // Get HTML report URL
     final String projectName = data.getProjectSample(lane, sampleName);
@@ -100,7 +101,7 @@ public class LinkReportFastqScreenSimpleSampleTest extends AbstractSampleTest {
   //
 
   /**
-   * Public constructor
+   * Public constructor.
    */
   public LinkReportFastqScreenSimpleSampleTest() {
 

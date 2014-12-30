@@ -28,7 +28,7 @@ import com.google.common.base.Objects;
 import fr.ens.transcriptome.aozan.AozanException;
 
 /**
- * This class define a long interval
+ * This class define a long interval.
  * @since 0.8
  * @author Laurent Jourdren
  */
@@ -86,30 +86,34 @@ public class LongInterval implements Interval {
   @Override
   public boolean isInInterval(final Number value) {
 
-    if (value == null)
+    if (value == null) {
       return false;
+    }
 
     final long val = value.longValue();
 
-    if (this.minInclude && val < min)
+    if (this.minInclude && val < this.min) {
       return false;
+    }
 
-    if (!this.minInclude && val <= min)
+    if (!this.minInclude && val <= this.min) {
       return false;
+    }
 
-    if (this.maxInclude && val > max)
+    if (this.maxInclude && val > this.max) {
       return false;
+    }
 
-    return !(!this.maxInclude && val >= max);
+    return !(!this.maxInclude && val >= this.max);
 
   }
 
   @Override
   public String toString() {
 
-    return Objects.toStringHelper(this).add("min", min)
-        .add("minInclude", minInclude).add("max", max)
-        .add("maxInclude", maxInclude).toString();
+    return Objects.toStringHelper(this).add("min", this.min)
+        .add("minInclude", this.minInclude).add("max", this.max)
+        .add("maxInclude", this.maxInclude).toString();
   }
 
   //
@@ -132,8 +136,9 @@ public class LongInterval implements Interval {
 
   public LongInterval(final String s) throws AozanException {
 
-    if (s == null)
+    if (s == null) {
       throw new NullPointerException("The interval string is null");
+    }
 
     final String trimmed = s.trim();
 
@@ -169,25 +174,28 @@ public class LongInterval implements Interval {
     final String[] values =
         trimmed.substring(1, trimmed.length() - 1).split(",");
 
-    if (values == null || values.length != 2)
+    if (values == null || values.length != 2) {
       throw new AozanException("Invalid interval: " + s);
+    }
 
     final String minString = values[0].trim();
     final String maxString = values[1].trim();
 
     try {
 
-      if ("".equals(minString))
+      if ("".equals(minString)) {
         this.min = Long.MIN_VALUE;
-      else
+      } else {
         this.min = Long.parseLong(minString);
+      }
 
-      if ("".equals(maxString))
+      if ("".equals(maxString)) {
         this.max = Long.MAX_VALUE;
-      else
+      } else {
         this.max = Long.parseLong(maxString);
+      }
 
-    } catch (NumberFormatException e) {
+    } catch (final NumberFormatException e) {
       throw new AozanException("Invalid interval: " + s);
     }
 

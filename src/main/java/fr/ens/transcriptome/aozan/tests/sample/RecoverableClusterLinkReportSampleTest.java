@@ -53,8 +53,9 @@ public class RecoverableClusterLinkReportSampleTest extends AbstractSampleTest {
       final String key =
           "undeterminedindices.lane" + lane + ".recoverable.pf.cluster.count";
 
-      if (data.get(key) == null)
+      if (data.get(key) == null) {
         return new TestResult("NA");
+      }
 
       final String url =
           String
@@ -71,8 +72,9 @@ public class RecoverableClusterLinkReportSampleTest extends AbstractSampleTest {
         "undeterminedindices.lane"
             + lane + ".sample." + sampleName + ".recoverable.pf.cluster.count";
 
-    if (data.get(key) == null)
+    if (data.get(key) == null) {
       return new TestResult("NA");
+    }
 
     // Get HTML report URL
     final String projectName = data.getProjectSample(lane, sampleName);
@@ -102,7 +104,7 @@ public class RecoverableClusterLinkReportSampleTest extends AbstractSampleTest {
   //
 
   /**
-   * Public constructor
+   * Public constructor.
    */
   public RecoverableClusterLinkReportSampleTest() {
 

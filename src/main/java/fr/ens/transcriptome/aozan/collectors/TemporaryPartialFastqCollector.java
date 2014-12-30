@@ -44,7 +44,7 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
 
   public static final String COLLECTOR_NAME = "tmppartialfastq";
 
-  /** Parameters configuration */
+  /** Parameters configuration. */
   private boolean skipControlLane;
   private boolean ignorePairedMode;
   private boolean isProcessUndeterminedIndicesSamples = false;
@@ -58,7 +58,7 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
   private int numberThreads = Runtime.getRuntime().availableProcessors();
 
   /**
-   * Get collector name
+   * Get collector name.
    * @return name
    */
   @Override
@@ -67,13 +67,13 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
   }
 
   /**
-   * Collectors to execute before fastqscreen Collector
+   * Collectors to execute before fastqscreen Collector.
    * @return list of names collector
    */
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    List<String> result = super.getCollectorsNamesRequiered();
+    final List<String> result = super.getCollectorsNamesRequiered();
     result.add(FlowcellDemuxSummaryCollector.COLLECTOR_NAME);
 
     return Collections.unmodifiableList(result);
@@ -88,13 +88,14 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
     if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
 
       try {
-        int confThreads =
+        final int confThreads =
             Integer.parseInt(properties.getProperty(
                 Settings.QC_CONF_THREADS_KEY).trim());
-        if (confThreads > 0)
+        if (confThreads > 0) {
           this.numberThreads = confThreads;
+        }
 
-      } catch (NumberFormatException ignored) {
+      } catch (final NumberFormatException ignored) {
       }
     }
 
@@ -103,7 +104,7 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
           Boolean
               .parseBoolean(properties
                   .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY));
-    } catch (Exception e) {
+    } catch (final Exception e) {
       // Default value
       this.skipControlLane = true;
     }
@@ -114,12 +115,12 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
               .parseBoolean(properties
                   .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY));
 
-    } catch (Exception e) {
+    } catch (final Exception e) {
       // Default value
       this.ignorePairedMode = false;
     }
 
-    int readsToCopy =
+    final int readsToCopy =
         Integer.parseInt(properties
             .getProperty(Settings.QC_CONF_FASTQSCREEN_FASTQ_READS_PF_USED_KEY));
     if (readsToCopy == -1) {
@@ -154,8 +155,9 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
       final FastqSample fastqSample, final File reportDir, final boolean runPE)
       throws AozanException {
 
-    if (fastqSample == null)
+    if (fastqSample == null) {
       return null;
+    }
 
     if (fastqSample.getFastqFiles() == null
         || fastqSample.getFastqFiles().isEmpty()) {
@@ -169,18 +171,20 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
             + ".control");
 
     // Skip control lane
-    if (controlLane && skipControlLane) {
+    if (controlLane && this.skipControlLane) {
       return null;
     }
 
     // Ignore fastq from reads R2 in run PE if the mapping mode is not paired
-    final boolean isPairedMode = runPE && !ignorePairedMode;
-    if (!isPairedMode && fastqSample.getRead() == 2)
+    final boolean isPairedMode = runPE && !this.ignorePairedMode;
+    if (!isPairedMode && fastqSample.getRead() == 2) {
       return null;
+    }
 
     // Check if the temporary partial fastq file exists
-    if (getFastqStorage().tmpFileExists(fastqSample))
+    if (getFastqStorage().tmpFileExists(fastqSample)) {
       return null;
+    }
 
     // Retrieve number of passing filter Illumina reads for this fastq
     // files
@@ -191,13 +195,14 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
 
     // Check value exist in rundata, if not then fastq is empty
     if (data.get(prefix + ".pf.cluster.count") == null
-        || data.get(prefix + ".raw.cluster.count") == null)
+        || data.get(prefix + ".raw.cluster.count") == null) {
       // No demultiplexing data exist
       throw new AozanException("Fail create partial FastQ for sample "
           + fastqSample.getSampleName() + " no demultiplexing data found.");
+    }
 
-    int pfClusterCount = data.getInt(prefix + ".pf.cluster.count");
-    int rawClusterCount = data.getInt(prefix + ".raw.cluster.count");
+    final int pfClusterCount = data.getInt(prefix + ".pf.cluster.count");
+    final int rawClusterCount = data.getInt(prefix + ".raw.cluster.count");
 
     // Create the thread object
     return new TemporaryPartialFastqThread(fastqSample, rawClusterCount,
@@ -205,7 +210,7 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
   }
 
   /**
-   * No data file to save in UncompressCollector
+   * No data file to save in UncompressCollector.
    */
   @Override
   protected void saveResultPart(final FastqSample fastqSample,
@@ -215,12 +220,12 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
 
   @Override
   protected int getThreadsNumber() {
-    return numberThreads;
+    return this.numberThreads;
   }
 
   @Override
   protected boolean isProcessUndeterminedIndicesSamples() {
-    
+
     return this.isProcessUndeterminedIndicesSamples;
   }
 

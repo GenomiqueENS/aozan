@@ -31,7 +31,7 @@ package fr.ens.transcriptome.aozan.util;
 public interface Interval {
 
   /**
-   * Test if a number is in an interval
+   * Test if a number is in an interval.
    * @param value value to test
    * @return true if the number is in the interval
    */

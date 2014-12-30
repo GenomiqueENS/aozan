@@ -46,7 +46,7 @@ public class ErrorMetricsReader extends
   private static final int EXPECTED_VERSION = 3;
 
   /**
-   * Get the file name treated
+   * Get the file name treated.
    * @return file name
    */
   @Override
@@ -81,7 +81,7 @@ public class ErrorMetricsReader extends
   //
 
   /**
-   * Constructor
+   * Constructor.
    * @throws AozanException it occurs if size record or version aren't the same
    *           that expected.
    */
@@ -90,8 +90,9 @@ public class ErrorMetricsReader extends
       AozanException {
     super(dirPath);
 
-    if (!new File(getDirPathInterOP() + ERROR_METRICS_FILE).exists())
+    if (!new File(getDirPathInterOP() + ERROR_METRICS_FILE).exists()) {
       throw new FileNotFoundException();
+    }
   }
 
 }
