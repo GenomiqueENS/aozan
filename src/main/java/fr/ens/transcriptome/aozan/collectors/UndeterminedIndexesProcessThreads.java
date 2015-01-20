@@ -1177,7 +1177,7 @@ public class UndeterminedIndexesProcessThreads extends
    * @param b the second string
    * @return the number of mismatches
    */
-  private static final int mismatches(final String a, final String b) {
+  public static final int mismatches(final String a, final String b) {
 
     Preconditions.checkNotNull(a, "a cannot be null");
     Preconditions.checkNotNull(b, "b cannot be null");
