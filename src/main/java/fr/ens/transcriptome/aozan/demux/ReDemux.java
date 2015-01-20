@@ -357,7 +357,7 @@ public class ReDemux {
         // Define the output file
         final File file =
             new File(subdir, sampleName
-                + "_" + sampleIndex + "_L00" + lane + lane + "_R" + read
+                + "_" + sampleIndex + "_L00" + lane + "_R" + read
                 + "_redemux.fastq" + compression.getExtension());
 
         final OutputStream out =
