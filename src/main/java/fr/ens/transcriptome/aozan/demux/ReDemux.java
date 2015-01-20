@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.amazonaws.services.cloudfront.model.InvalidArgumentException;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
@@ -113,7 +112,7 @@ public class ReDemux {
           break;
 
         default:
-          throw new InvalidArgumentException(
+          throw new IllegalArgumentException(
               "Invalid character found for index, 'A', 'T', 'G', 'C', 'N' and '.' are only allowed: "
                   + index);
         }
