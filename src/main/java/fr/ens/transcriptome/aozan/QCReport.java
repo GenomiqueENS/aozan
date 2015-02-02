@@ -214,9 +214,9 @@ public class QCReport {
       projects.appendChild(project);
     }
 
-    // Add Element for undetermined line
-    final Element undeterminedLines = doc.createElement("ProjectName");
-    undeterminedLines.setAttribute("classValue", "projectName");
+    // Add Element for undetermined lane
+    final Element undeterminedLanes = doc.createElement("ProjectName");
+    undeterminedLanes.setAttribute("classValue", "projectName");
 
     // Build list lane number
     final List<Integer> s = new ArrayList<>();
@@ -228,10 +228,10 @@ public class QCReport {
       }
     }
 
-    undeterminedLines.setAttribute("cmdJS", "'" + Joiner.on(",").join(s) + "'");
+    undeterminedLanes.setAttribute("cmdJS", "'" + Joiner.on(",").join(s) + "'");
 
-    undeterminedLines.setTextContent("Undetermined");
-    projects.appendChild(undeterminedLines);
+    undeterminedLanes.setTextContent("Undetermined");
+    projects.appendChild(undeterminedLanes);
   }
 
   /**
