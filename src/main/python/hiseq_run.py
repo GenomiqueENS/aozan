@@ -85,6 +85,9 @@ def check_end_run(run_id, conf):
 		if not os.path.exists(hiseq_data_path + '/' + run_id + '/Basecalling_Netcopy_complete_Read' + str(i + 1) + '.txt'):
 			return False
 
+	if not os.path.exists(hiseq_data_path + '/' + run_id + '/RTAComplete.txt'):
+		return False
+
 	return True
 
 def check_end_run_since(run_id, secs, conf):
