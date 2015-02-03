@@ -27,6 +27,9 @@ from fr.ens.transcriptome.aozan.Settings import AOZAN_ENABLE_KEY
 from fr.ens.transcriptome.aozan.Settings import SYNC_CONTINUOUS_SYNC_KEY
 from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import LOCK_FILE_KEY
+from fr.ens.transcriptome.aozan.Settings import BCL_DATA_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import FASTQ_DATA_PATH_KEY
+from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
 
 def create_lock_file(lock_file_path):
     """Create the lock file.
@@ -94,6 +97,118 @@ something_to_do = False
 is_error_message = True
 is_not_error_message = False
 
+
+def lock_step(lock_file_path):
+    """Lock a step.
+
+    Arguments:
+        lock_file_path: lock_file path
+    """
+    # Return False if the run is currently processed
+    if os.path.isfile(lock_file_path):
+        return False
+
+    # Create the lock file
+    open(lock_file_path, 'w').close()
+
+    return True
+
+
+def unlock_step(lock_file_path):
+    """Unlock a step.
+
+    Arguments:
+        lock_file_path: lock_file path
+    """
+
+    # Remove lock file if exists
+    if os.path.isfile(lock_file_path):
+        os.remove(lock_file_path)
+
+    return True
+
+
+def lock_sync_step(conf, run_id):
+    """Lock the sync step step.
+
+    Arguments:
+        conf: configuration object
+        run_id: run_id
+    """
+
+    return lock_step(conf[BCL_DATA_PATH_KEY] + '/' + run_id + '.lock')
+
+def lock_demux_step(conf, run_id):
+    """Lock the demux step step.
+
+    Arguments:
+        conf: configuration object
+        run_id: run_id
+    """
+
+    return lock_step(conf[FASTQ_DATA_PATH_KEY] + '/' + run_id + '.lock')
+
+def lock_qc_step(conf, run_id):
+    """Lock the qc step step.
+
+    Arguments:
+        conf: configuration object
+        run_id: run_id
+    """
+
+    return lock_step(conf[REPORTS_DATA_PATH_KEY] + '/' + run_id + '/qc_' + run_id + '.lock')
+
+def lock_partial_sync_step(conf, run_id):
+    """Lock the partial sync step.
+
+    Arguments:
+        conf: configuration object
+        run_id: run_id
+    """
+
+    return lock_sync_step(conf, run_id)
+
+def unlock_sync_step(conf, run_id):
+    """Unlock the sync step.
+
+    Arguments:
+        conf: configuration object
+        run_id: run_id
+    """
+
+    return unlock_step(conf[BCL_DATA_PATH_KEY] + '/' + run_id + '.lock')
+
+def unlock_demux_step(conf, run_id):
+    """Unlock the demux step.
+
+    Arguments:
+        conf: configuration object
+        run_id: run_id
+    """
+
+    return unlock_step(conf[FASTQ_DATA_PATH_KEY] + '/' + run_id + '.lock')
+
+def unlock_qc_step(conf, run_id):
+    """Unlock the qc step.
+
+    Arguments:
+        conf: configuration object
+        run_id: run_id
+    """
+
+    return unlock_step(conf[REPORTS_DATA_PATH_KEY] + '/' + run_id + '/qc_' + run_id + '.lock')
+
+def unlock_partial_sync_step(conf, run_id):
+    """Unlock the partial sync step.
+
+    Arguments:
+        conf: configuration object
+        run_id: run_id
+    """
+
+    return unlock_sync_step(conf, run_id)
+
+
 def discover_new_run(conf):
     """Discover new runs.
 
@@ -156,13 +271,16 @@ def launch_steps(conf):
     # Get the list of run available on HiSeq output
     if sync_run.is_sync_step_enable(conf):
         for run_id in (hiseq_run_ids_done - sync_run_ids_done - hiseq_run_ids_do_not_process):
-            welcome(conf)
-            common.log('INFO', 'Synchronize ' + run_id, conf)
-            if sync_run.sync(run_id, conf):
-                sync_run.add_run_id_to_processed_run_ids(run_id, conf)
-                sync_run_ids_done.add(run_id)
-            else:
-                return
+            if lock_sync_step(conf, run_id):
+                welcome(conf)
+                common.log('INFO', 'Synchronize ' + run_id, conf)
+                if sync_run.sync(run_id, conf):
+                    sync_run.add_run_id_to_processed_run_ids(run_id, conf)
+                    sync_run_ids_done.add(run_id)
+                    unlock_sync_step(conf, run_id)
+                else:
+                    unlock_sync_step(conf, run_id)
+                    return
 
 
     # Check if new run appears while sync step
@@ -181,13 +299,16 @@ def launch_steps(conf):
     
     if common.is_conf_value_equals_true(DEMUX_STEP_KEY, conf):
         for run_id in (sync_run_ids_done - demux_run_ids_done):
-            welcome(conf)
-            common.log('INFO', 'Demux ' + run_id, conf)
-            if demux_run.demux(run_id, conf):
-                demux_run.add_run_id_to_processed_run_ids(run_id, conf)
-                demux_run_ids_done.add(run_id)
-            else:
-                return
+            if lock_demux_step(conf, run_id):
+                welcome(conf)
+                common.log('INFO', 'Demux ' + run_id, conf)
+                if demux_run.demux(run_id, conf):
+                    demux_run.add_run_id_to_processed_run_ids(run_id, conf)
+                    demux_run_ids_done.add(run_id)
+                    unlock_demux_step(conf, run_id)
+                else:
+                    unlock_demux_step(conf, run_id)
+                    return
 
     # Check if new run appears while demux step
     if common.is_conf_value_equals_true(DEMUX_STEP_KEY, conf) and len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
@@ -202,13 +323,16 @@ def launch_steps(conf):
     
     if common.is_conf_value_equals_true(QC_STEP_KEY, conf):
         for run_id in (demux_run_ids_done - qc_run_ids_done):
-            welcome(conf)
-            common.log('INFO', 'Quality control ' + run_id, conf)
-            if qc_run.qc(run_id, conf):
-                qc_run.add_run_id_to_processed_run_ids(run_id, conf)
-                qc_run_ids_done.add(run_id)
-            else:
-                return
+            if lock_qc_step(conf, run_id):
+                welcome(conf)
+                common.log('INFO', 'Quality control ' + run_id, conf)
+                if qc_run.qc(run_id, conf):
+                    qc_run.add_run_id_to_processed_run_ids(run_id, conf)
+                    qc_run_ids_done.add(run_id)
+                    unlock_qc_step(conf, run_id)
+                else:
+                    unlock_qc_step(conf, run_id)
+                    return
 
     # Check if new run appears while quality control step
     if common.is_conf_value_equals_true(QC_STEP_KEY, conf) and len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
@@ -223,10 +347,13 @@ def launch_steps(conf):
 
     if common.is_conf_value_equals_true(SYNC_CONTINUOUS_SYNC_KEY, conf):
         for run_id in (working_run_ids - sync_run_ids_done - hiseq_run_ids_do_not_process):
-            welcome(conf)
-            common.log('INFO', 'Partial synchronization of ' + run_id, conf)
-            if not sync_run.partial_sync(run_id, False, conf):
-                return
+            if lock_partial_sync_step(conf, run_id):
+                welcome(conf)
+                common.log('INFO', 'Partial synchronization of ' + run_id, conf)
+                if not sync_run.partial_sync(run_id, False, conf):
+                    unlock_partial_sync_step(lock_file_path, run_id)
+                    return
+                unlock_partial_sync_step(conf, run_id)
 
 
 def aozan_main():
