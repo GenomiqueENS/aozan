@@ -103,8 +103,11 @@ public class RunData {
    * @return true, if is lane indexed
    */
   public boolean isLaneIndexed(final int lane) {
-    return this.getBoolean("demux.lane"
-        + lane + ".sample.lane" + lane + ".barcode=Undetermined");
+    final String res =
+        this.get("demux.lane" + lane + ".sample.lane" + lane + ".barcode");
+
+    return (res == null ? false : res.trim()
+        .toLowerCase(Globals.DEFAULT_LOCALE).equals("undetermined"));
   }
 
   /**
