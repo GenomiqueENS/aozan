@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -555,31 +556,52 @@ public abstract class AbstractFastqCollector implements Collector {
     // Delete all data files fastqSample per fastqSample
     for (final FastqSample fs : this.fastqSamples) {
 
-      if (!fs.getFastqFiles().isEmpty()) {
-        final File projectDir =
-            new File(this.qcReportOutputPath
-                + "/Project_" + fs.getProjectName());
+      if (fs.getFastqFiles().isEmpty()) {
+        // Nothing to do
+        continue;
+      }
 
-        final File[] dataFiles = projectDir.listFiles(new FileFilter() {
+      // Collect all data file
+      List<File> dataFiles = collectTemporaryDatafile(fs);
 
-          @Override
-          public boolean accept(final File pathname) {
-            return pathname.getName().endsWith(".data");
-          }
-        });
-
-        // delete datafile
-        if (dataFiles != null) {
-          for (final File f : dataFiles) {
-            if (f.exists()) {
-              if (!f.delete()) {
-                LOGGER.warning("Can not delete data file : "
-                    + f.getAbsolutePath());
-              }
-            }
-          }
+      // Delete temporary data file
+      for (final File f : dataFiles) {
+        if (!(f.exists() && f.delete())) {
+          LOGGER.warning("Can not delete data file : " + f.getAbsolutePath());
         }
       }
     }
+  }
+
+  /**
+   * Collect temporary datafile.
+   * @param fs the FastqSample instance.
+   * @return the list of data file, if not found return an empty list.
+   */
+  private List<File> collectTemporaryDatafile(final FastqSample fs) {
+
+    // Build subdirectory name
+    final String subdir =
+        (fs.isIndeterminedIndices() ? "/Undetermined_indices" : "/Project_"
+            + fs.getProjectName());
+
+    // Build subdirectory path
+    final File projectDir = new File(this.qcReportOutputPath, subdir);
+
+    // Collect all data file
+    final File[] dataFiles = projectDir.listFiles(new FileFilter() {
+
+      @Override
+      public boolean accept(final File pathname) {
+        return pathname.getName().endsWith(".data");
+      }
+    });
+
+    if (dataFiles == null || dataFiles.length == 0) {
+      // Not found
+      return Collections.emptyList();
+    }
+
+    return Collections.unmodifiableList(Arrays.asList(dataFiles));
   }
 }
