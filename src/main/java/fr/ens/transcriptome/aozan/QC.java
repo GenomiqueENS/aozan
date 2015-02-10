@@ -528,7 +528,7 @@ public class QC {
         });
 
     if (designFiles == null || designFiles.length == 0) {
-      throw new AozanException("No Casava design file found in ");
+      throw new AozanException("No Casava design file found in "+ this.fastqDir);
     }
 
     final File casavaDesignFile = designFiles[0];
