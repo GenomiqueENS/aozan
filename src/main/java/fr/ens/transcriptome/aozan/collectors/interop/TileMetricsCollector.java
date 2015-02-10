@@ -408,7 +408,7 @@ public class TileMetricsCollector implements Collector {
     // Constructor
     //
 
-    TileMetricsPerLane(final int laneNumber, final int countReads,
+    TileMetricsPerLane(final int laneNumber, final int readsCount,
         final int countTiles, final double densityRatio) {
 
       this.laneNumber = laneNumber;
@@ -418,7 +418,7 @@ public class TileMetricsCollector implements Collector {
       this.metricsPerTilePerCode = new HashMap<>();
       this.listReads = new LinkedList<ReadTileMetrics>();
 
-      for (int read = 1; read <= countReads; read++) {
+      for (int read = 1; read <= readsCount; read++) {
         this.listReads.add(new ReadTileMetrics(read));
       }
 

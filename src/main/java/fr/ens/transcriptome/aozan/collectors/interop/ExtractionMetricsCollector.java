@@ -182,14 +182,15 @@ public class ExtractionMetricsCollector implements Collector {
     this.read1FirstCycleNumber = 1;
     this.read1LastCycleNumber = data.getReadCyclesCount(1);
 
-    this.read2FirstCycleNumber = this.read1LastCycleNumber + 1;
-    this.read2LastCycleNumber =
-        this.read1LastCycleNumber + data.getReadCyclesCount(2);
+    if (readCount > 1) {
+      this.read2FirstCycleNumber = this.read1LastCycleNumber + 1;
+      this.read2LastCycleNumber =
+          this.read1LastCycleNumber + data.getReadCyclesCount(2);
 
-    if (readCount > 2) {
-      this.read3FirstCycleNumber = this.read2LastCycleNumber + 1;
+      if (readCount > 2) {
+        this.read3FirstCycleNumber = this.read2LastCycleNumber + 1;
+      }
     }
-
   }
 
   /**

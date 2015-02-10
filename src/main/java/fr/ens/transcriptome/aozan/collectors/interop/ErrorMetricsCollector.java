@@ -226,19 +226,22 @@ public class ErrorMetricsCollector implements Collector {
     int cyclesCount = -1;
 
     cyclesCount += data.getReadCyclesCount(1);
+
+    // Case SR
     this.read1LastCycleNumber = cyclesCount;
 
-    if (this.readsCount == 2) {
-      // Case SR
-      this.read2LastCycleNumber = cyclesCount;
+    if (this.readsCount > 1) {
+      if (this.readsCount == 2) {
+        // Case index
+        this.read2LastCycleNumber = cyclesCount;
 
-    } else {
-      // case PE
-      cyclesCount += data.getReadCyclesCount(2);
-      this.read2LastCycleNumber = cyclesCount;
+      } else {
+        // case PE
+        cyclesCount += data.getReadCyclesCount(2);
+        this.read2LastCycleNumber = cyclesCount;
+      }
 
     }
-
   }
 
   /**
