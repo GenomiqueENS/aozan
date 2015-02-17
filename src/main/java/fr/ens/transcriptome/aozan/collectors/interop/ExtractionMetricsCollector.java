@@ -23,20 +23,16 @@
 
 package fr.ens.transcriptome.aozan.collectors.interop;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.TreeMap;
 
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.collectors.Collector;
-import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
+import fr.ens.transcriptome.aozan.collectors.interop.ReadsData.ReadData;
 import fr.ens.transcriptome.aozan.util.StatisticsUtils;
 
 /**
@@ -45,47 +41,18 @@ import fr.ens.transcriptome.aozan.util.StatisticsUtils;
  * @author Sandrine Perrin
  * @since 1.1
  */
-public class ExtractionMetricsCollector implements Collector {
+public class ExtractionMetricsCollector extends AbstractMetricsCollector {
 
   /** The sub-collector name from ReadCollector. */
   public static final String NAME_COLLECTOR = "ExtractionMetricsCollector";
 
-  private String dirInterOpPath;
+  /** The intensity metrics. */
   private final Map<Integer, ExtractionMetricsPerLane> intensityMetrics =
       new HashMap<>();
-
-  // number cycle corresponding to the start of a read
-  private int read1FirstCycleNumber;
-  private int read1LastCycleNumber;
-
-  private int read2FirstCycleNumber;
-  private int read2LastCycleNumber;
-
-  private int read3FirstCycleNumber;
 
   @Override
   public String getName() {
     return NAME_COLLECTOR;
-  }
-
-  /**
-   * Get the name of the collectors required to run this collector.
-   * @return a list of String with the name of the required collectors
-   */
-  @Override
-  public List<String> getCollectorsNamesRequiered() {
-    return Collections.unmodifiableList(Lists
-        .newArrayList(RunInfoCollector.COLLECTOR_NAME));
-  }
-
-  /**
-   * Configure the collector with the path of the run data.
-   * @param properties object with the collector configuration
-   */
-  @Override
-  public void configure(final Properties properties) {
-    final String RTAOutputDirPath = properties.getProperty(QC.RTA_OUTPUT_DIR);
-    this.dirInterOpPath = RTAOutputDirPath + "/InterOp/";
   }
 
   /**
@@ -95,18 +62,21 @@ public class ExtractionMetricsCollector implements Collector {
   @Override
   public void collect(final RunData data) throws AozanException {
 
+    super.collect(data);
+
     int keyMap;
 
     final ExtractionMetricsReader reader =
-        new ExtractionMetricsReader(this.dirInterOpPath);
-    initMetricsMap(data);
+        new ExtractionMetricsReader(getInterOpDirPath());
+    initMetricsMap();
 
     // Distribution of metrics between lane and code
     for (final IlluminaIntensityMetrics iim : reader.getSetIlluminaMetrics()) {
 
       // key : number read, value(pair:first number cycle, last number cycle)
       keyMap =
-          getKeyMap(iim.getLaneNumber(), getReadNumber(iim.getCycleNumber()));
+          getKeyMap(iim.getLaneNumber(),
+              getReadFromCycleNumber(iim.getCycleNumber()));
 
       this.intensityMetrics.get(keyMap).addMetric(iim);
     }
@@ -123,42 +93,18 @@ public class ExtractionMetricsCollector implements Collector {
   /**
    * Initialize TileMetrics map.
    */
-  private void initMetricsMap(final RunData data) throws AozanException {
+  private void initMetricsMap() {
 
-    final int lanesCount = data.getLaneCount();
-    final int readsCount = data.getReadCount();
+    for (int lane = 1; lane <= getLanesCount(); lane++) {
+      for (int read = 1; read <= getReadsCount(); read++) {
 
-    defineReadsStartEndCycleNumber(data);
-
-    for (int lane = 1; lane <= lanesCount; lane++) {
-      for (int read = 1; read <= readsCount; read++) {
+        // Extract readData from setting from run
+        final ReadData readData = getReadData(read);
 
         this.intensityMetrics.put(getKeyMap(lane, read),
-            new ExtractionMetricsPerLane(lane, read,
-                this.read1FirstCycleNumber, this.read2FirstCycleNumber,
-                this.read3FirstCycleNumber));
+            new ExtractionMetricsPerLane(lane, read, readData));
       }
     }
-
-  }
-
-  /**
-   * Define the readNumber corresponding to the cycle.
-   * @param cycle number cycle in the run
-   * @return readNumber
-   */
-  private int getReadNumber(final int cycle) {
-
-    if (cycle <= this.read1LastCycleNumber) {
-      return 1;
-    }
-
-    if (cycle <= this.read2LastCycleNumber) {
-      return 2;
-    }
-
-    return 3;
-
   }
 
   /**
@@ -169,35 +115,6 @@ public class ExtractionMetricsCollector implements Collector {
    */
   private int getKeyMap(final int lane, final int read) {
     return lane * 100 + read;
-  }
-
-  /**
-   * Build a map : number read with number cycle corresponding to end of read.
-   * @param data on run
-   */
-  private void defineReadsStartEndCycleNumber(final RunData data) {
-
-    final int readCount = data.getReadCount();
-
-    this.read1FirstCycleNumber = 1;
-    this.read1LastCycleNumber = data.getReadCyclesCount(1);
-
-    if (readCount > 1) {
-      this.read2FirstCycleNumber = this.read1LastCycleNumber + 1;
-      this.read2LastCycleNumber =
-          this.read1LastCycleNumber + data.getReadCyclesCount(2);
-
-      if (readCount > 2) {
-        this.read3FirstCycleNumber = this.read2LastCycleNumber + 1;
-      }
-    }
-  }
-
-  /**
-   * Remove temporary files
-   */
-  @Override
-  public void clear() {
   }
 
   //
@@ -211,6 +128,8 @@ public class ExtractionMetricsCollector implements Collector {
    * @since 1.1
    */
   private static final class ExtractionMetricsPerLane {
+
+    private static final int STEP = 19;
 
     private final int laneNumber;
     private final int readNumber;
@@ -345,32 +264,15 @@ public class ExtractionMetricsCollector implements Collector {
      * @param read read number
      */
     ExtractionMetricsPerLane(final int lane, final int read,
-        final int read1FirstCycleNumber, final int read2FirstCycleNumber,
-        final int read3FirstCycleNumber) throws AozanException {
+        final ReadData readData) {
 
       this.laneNumber = lane;
       this.readNumber = read;
 
-      switch (this.readNumber) {
-      case 1:
-        this.firstCycleNumber = read1FirstCycleNumber;
-        this.twentiethCycleNumber = read1FirstCycleNumber + 19;
-        break;
+      this.firstCycleNumber = readData.getFirstCycleNumber();
 
-      case 2:
-        this.firstCycleNumber = read2FirstCycleNumber;
-        this.twentiethCycleNumber = read2FirstCycleNumber + 19;
-        break;
-
-      case 3:
-        this.firstCycleNumber = read3FirstCycleNumber;
-        this.twentiethCycleNumber = read3FirstCycleNumber + 19;
-        break;
-
-      default:
-        throw new AozanException(
-            "In ExtractionMetricsCollector can't define the number of first and twentieth cycle for the reads of the run");
-      }
+      this.twentiethCycleNumber =
+          (readData.getNumberCycles() >= 20 ? this.firstCycleNumber + STEP : -1);
 
       this.intensityCycle1ValuesPerTile = new TreeMap<>();
       this.intensityCycle20ValuesPerTile = new TreeMap<>();

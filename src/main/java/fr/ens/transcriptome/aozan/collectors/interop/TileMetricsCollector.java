@@ -23,7 +23,6 @@
 
 package fr.ens.transcriptome.aozan.collectors.interop;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,11 +33,8 @@ import java.util.TreeMap;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
-import fr.ens.transcriptome.aozan.collectors.Collector;
-import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.util.StatisticsUtils;
 
 /**
@@ -47,7 +43,7 @@ import fr.ens.transcriptome.aozan.util.StatisticsUtils;
  * @author Sandrine Perrin
  * @since 1.1
  */
-public class TileMetricsCollector implements Collector {
+public class TileMetricsCollector extends AbstractMetricsCollector {
 
   /** The sub-collector name from ReadCollector. */
   public static final String NAME_COLLECTOR = "TileMetricsCollector";
@@ -55,21 +51,10 @@ public class TileMetricsCollector implements Collector {
   private double densityRatio = 0.0;
 
   private final Map<Integer, TileMetricsPerLane> tileMetrics = new HashMap<>();
-  private String dirInterOpPath;
 
   @Override
   public String getName() {
     return NAME_COLLECTOR;
-  }
-
-  /**
-   * Get the name of the collectors required to run this collector.
-   * @return a list of String with the name of the required collectors
-   */
-  @Override
-  public List<String> getCollectorsNamesRequiered() {
-    return Collections.unmodifiableList(Lists
-        .newArrayList(RunInfoCollector.COLLECTOR_NAME));
   }
 
   /**
@@ -78,8 +63,8 @@ public class TileMetricsCollector implements Collector {
    */
   @Override
   public void configure(final Properties properties) {
-    final String RTAOutputDirPath = properties.getProperty(QC.RTA_OUTPUT_DIR);
-    this.dirInterOpPath = RTAOutputDirPath + "/InterOp/";
+
+    super.configure(properties);
 
     this.densityRatio =
         Double.parseDouble(properties
@@ -93,7 +78,9 @@ public class TileMetricsCollector implements Collector {
   @Override
   public void collect(final RunData data) throws AozanException {
 
-    final TileMetricsReader reader = new TileMetricsReader(this.dirInterOpPath);
+    super.collect(data);
+
+    final TileMetricsReader reader = new TileMetricsReader(getInterOpDirPath());
     initMetricsMap(data);
 
     // Distribution of metrics between lane and code
@@ -131,15 +118,8 @@ public class TileMetricsCollector implements Collector {
 
   }
 
-  /**
-   * Remove temporary files.
-   */
-  @Override
-  public void clear() {
-  }
-
   //
-  // Inner class
+  // Internal class
   //
 
   /**

@@ -27,21 +27,16 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.collectors.Collector;
-import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
+import fr.ens.transcriptome.aozan.collectors.interop.ReadsData.ReadData;
 import fr.ens.transcriptome.aozan.util.StatisticsUtils;
 
 /**
@@ -51,22 +46,10 @@ import fr.ens.transcriptome.aozan.util.StatisticsUtils;
  * @author Sandrine Perrin
  * @since 1.1
  */
-public class ErrorMetricsCollector implements Collector {
+public class ErrorMetricsCollector extends AbstractMetricsCollector {
 
   /** The sub-collector name from ReadCollector. */
   public static final String NAME_COLLECTOR = "ErrorMetricsCollector";
-
-  private String dirInterOpPath;
-
-  private int lanesCount;
-  private int readsCount;
-
-  private int read1CycleCount;
-  private int read1LastCycleNumber = -1;
-
-  private int read2LastCycleNumber = -1;
-
-  private int read3CycleCount;
 
   private final Map<Integer, ErrorRatesPerLane> errorRatesMetrics =
       new HashMap<>();
@@ -77,43 +60,17 @@ public class ErrorMetricsCollector implements Collector {
   }
 
   /**
-   * Get the name of the collectors required to run this collector.
-   * @return a list of String with the name of the required collectors
-   */
-  @Override
-  public List<String> getCollectorsNamesRequiered() {
-    return Collections.unmodifiableList(Lists
-        .newArrayList(RunInfoCollector.COLLECTOR_NAME));
-  }
-
-  /**
-   * Configure the collector with the path of the run data.
-   * @param properties object with the collector configuration
-   */
-  @Override
-  public void configure(final Properties properties) {
-    final String RTAOutputDirPath = properties.getProperty(QC.RTA_OUTPUT_DIR);
-    this.dirInterOpPath = RTAOutputDirPath + "/InterOp/";
-  }
-
-  /**
    * Collect data.
    * @param data result data object
    */
   @Override
   public void collect(final RunData data) throws AozanException {
 
-    this.lanesCount = data.getLaneCount();
-    this.readsCount = data.getReadCount();
-    this.read1CycleCount = data.getReadCyclesCount(1);
-
-    if (this.readsCount == 3) {
-      this.read3CycleCount = data.getReadCyclesCount(3);
-    }
+    super.collect(data);
 
     try {
       final ErrorMetricsReader reader =
-          new ErrorMetricsReader(this.dirInterOpPath);
+          new ErrorMetricsReader(getInterOpDirPath());
       initMetricsMap(data);
 
       int keyMap;
@@ -121,14 +78,16 @@ public class ErrorMetricsCollector implements Collector {
       // Distribution of metrics between lane and code
       for (final IlluminaErrorMetrics iem : reader.getSetIlluminaMetrics()) {
         keyMap =
-            getKeyMap(iem.getLaneNumber(), getReadNumber(iem.getCycleNumber()));
+            getKeyMap(iem.getLaneNumber(),
+                getReadFromCycleNumber(iem.getCycleNumber()));
+
         this.errorRatesMetrics.get(keyMap).addMetric(iem);
       }
 
     } catch (final FileNotFoundException e) {
 
       // Case : ErrorMetricsOut.bin doesn't exist, all values are 0.0
-      collectionEmpty(1, this.lanesCount);
+      collectionEmpty(1, getLanesCount());
 
     }
 
@@ -158,16 +117,17 @@ public class ErrorMetricsCollector implements Collector {
    */
   private void initMetricsMap(final RunData data) {
 
-    defineReadLastCycleNumber(data);
-
-    for (int lane = 1; lane <= this.lanesCount; lane++) {
-      for (int read = 1; read <= this.readsCount; read++) {
+    for (int lane = 1; lane <= getLanesCount(); lane++) {
+      for (int read = 1; read <= getReadsCount(); read++) {
 
         // lane skiping with phix
         if (data.getBoolean("run.info.align.to.phix.lane" + lane)) {
+
+          // Extract readData from setting from run
+          final ReadData readData = getReadData(read);
+
           this.errorRatesMetrics.put(getKeyMap(lane, read),
-              new ErrorRatesPerLane(lane, read, this.read1CycleCount,
-                  this.read2LastCycleNumber, this.read3CycleCount));
+              new ErrorRatesPerLane(lane, read, readData));
 
         } else {
           // None phix in this lane, all values error are 0
@@ -175,24 +135,6 @@ public class ErrorMetricsCollector implements Collector {
         }
       }
     }
-
-  }
-
-  /**
-   * Define the readNumber corresponding to the cycle.
-   * @param cycle number cycle in the run
-   * @return readNumber
-   */
-  private int getReadNumber(final int cycle) {
-    if (this.read1LastCycleNumber >= cycle) {
-      return 1;
-    }
-
-    if (this.read2LastCycleNumber >= cycle) {
-      return 2;
-    }
-
-    return 3;
   }
 
   /**
@@ -204,51 +146,16 @@ public class ErrorMetricsCollector implements Collector {
   private void collectionEmpty(final int firstLane, final int lastLane) {
 
     for (int lane = firstLane; lane <= lastLane; lane++) {
-      for (int read = 1; read <= this.readsCount; read++) {
+      for (int read = 1; read <= getReadsCount(); read++) {
+
+        // Extract readData from setting from run
+        final ReadData readData = getReadData(read);
 
         final int keyMap = lane * 100 + read;
         this.errorRatesMetrics.put(keyMap, new ErrorRatesPerLane(lane, read,
-            true, this.read1CycleCount, this.read2LastCycleNumber,
-            this.read3CycleCount));
+            true, readData));
       }
     }
-
-  }
-
-  /**
-   * In SR : count cycles final = 50 only for read1 In PE : count cycles final =
-   * 208, ie read1:100 (instead of 101), read2:107, read3:208.
-   * @param data result data object
-   */
-  private void defineReadLastCycleNumber(final RunData data) {
-
-    // for Error metrics ignores first cycle
-    int cyclesCount = -1;
-
-    cyclesCount += data.getReadCyclesCount(1);
-
-    // Case SR
-    this.read1LastCycleNumber = cyclesCount;
-
-    if (this.readsCount > 1) {
-      if (this.readsCount == 2) {
-        // Case index
-        this.read2LastCycleNumber = cyclesCount;
-
-      } else {
-        // case PE
-        cyclesCount += data.getReadCyclesCount(2);
-        this.read2LastCycleNumber = cyclesCount;
-      }
-
-    }
-  }
-
-  /**
-   * Remove temporary files.
-   */
-  @Override
-  public void clear() {
   }
 
   //
@@ -265,6 +172,7 @@ public class ErrorMetricsCollector implements Collector {
 
     private final int laneNumber;
     private final int readNumber;
+    private final ReadData readData;
 
     private int threshold35thCycle = -1;
     private int threshold75thCycle = -1;
@@ -458,60 +366,45 @@ public class ErrorMetricsCollector implements Collector {
      * @param asEmpty if true, all values are default values (0.0),
      *          corresponding to a control lane or without skipping Phix
      */
-    ErrorRatesPerLane(final int lane, final int read, final boolean asEmpty,
-        final int read1CycleCount, final int read2LastCycleNumber,
-        final int read3CycleCount) {
+    public ErrorRatesPerLane(final int lane, final int read, boolean asEmpty,
+        final ReadData readData) {
       this.laneNumber = lane;
       this.readNumber = read;
+      this.readData = readData;
 
       if (!asEmpty) {
-        int firstCycleNumber = -1;
-        int readCycleCount = -1;
 
-        switch (this.readNumber) {
-        case 1:
-          firstCycleNumber = 0;
-          readCycleCount = read1CycleCount;
-          this.calledCyclesMin = firstCycleNumber + readCycleCount - 1;
-          this.calledCyclesMax = firstCycleNumber + readCycleCount - 1;
-          break;
+        this.calledCyclesMin = readData.getFirstCycleNumber();
+        this.calledCyclesMax = readData.getLastCycleNumber();
 
-        case 3:
-          firstCycleNumber = read2LastCycleNumber + 1;
-          readCycleCount = read3CycleCount;
-          this.calledCyclesMin = firstCycleNumber + readCycleCount - 1;
-          this.calledCyclesMax = firstCycleNumber + readCycleCount - 1;
-          break;
-        default:
-          this.calledCyclesMax = 0;
-          this.calledCyclesMin = 0;
+        // Compute error rate on indexed read
+        if (this.readData.isIndexedRead()) {
+
+          final int readCycleCount = this.readData.getNumberCycles();
+          final int firstCycle = this.readData.getFirstCycleNumber();
+
+          // check threshold computed > at the cycle count
+          if (35 <= readCycleCount) {
+            this.threshold35thCycle = firstCycle + 35;
+          }
+
+          if (75 <= readCycleCount) {
+            this.threshold75thCycle = firstCycle + 75;
+          }
+
+          if (100 <= readCycleCount) {
+            this.threshold100thCycle = firstCycle + 100;
+          }
         }
-
-        // check threshold computed > at the cycle count
-        // no error rate for read2 (index), cycle absent from
-        // ErrorMetricsOut.bin
-        if (35 <= readCycleCount && this.readNumber != 2) {
-          this.threshold35thCycle = firstCycleNumber + 35;
-        }
-
-        if (75 <= readCycleCount && this.readNumber != 2) {
-          this.threshold75thCycle = firstCycleNumber + 75;
-        }
-
-        if (100 <= readCycleCount && this.readNumber != 2) {
-          this.threshold100thCycle = firstCycleNumber + 100;
-        }
-
       }
+    }
+
+    public ErrorRatesPerLane(final int lane, final int read,
+        final ReadData readData) {
+      this(lane, read, false, readData);
 
     }
 
-    ErrorRatesPerLane(final int lane, final int read,
-        final int read1CycleCount, final int read2LastCycleNumber,
-        final int read3CycleCount) {
-      this(lane, read, false, read1CycleCount, read2LastCycleNumber,
-          read3CycleCount);
-    }
   }
 
 }
