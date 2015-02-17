@@ -172,7 +172,6 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
 
     private final int laneNumber;
     private final int readNumber;
-    private final ReadData readData;
 
     private int threshold35thCycle = -1;
     private int threshold75thCycle = -1;
@@ -370,32 +369,37 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
         final ReadData readData) {
       this.laneNumber = lane;
       this.readNumber = read;
-      this.readData = readData;
 
       if (!asEmpty) {
 
-        this.calledCyclesMin = readData.getFirstCycleNumber();
-        this.calledCyclesMax = readData.getLastCycleNumber();
+        // Compute error rate on not indexed read
+        if (!readData.isIndexedRead()) {
 
-        // Compute error rate on indexed read
-        if (this.readData.isIndexedRead()) {
+          final int readCycleCount = readData.getNumberCycles();
+          final int initCycle = readData.getFirstCycleNumber() - 1;
 
-          final int readCycleCount = this.readData.getNumberCycles();
-          final int firstCycle = this.readData.getFirstCycleNumber();
+          this.calledCyclesMin = readCycleCount + initCycle - 1;
+          this.calledCyclesMax = readCycleCount + initCycle - 1;
 
           // check threshold computed > at the cycle count
           if (35 <= readCycleCount) {
-            this.threshold35thCycle = firstCycle + 35;
+            this.threshold35thCycle = initCycle + 35;
           }
 
           if (75 <= readCycleCount) {
-            this.threshold75thCycle = firstCycle + 75;
+            this.threshold75thCycle = initCycle + 75;
           }
 
           if (100 <= readCycleCount) {
-            this.threshold100thCycle = firstCycle + 100;
+            this.threshold100thCycle = initCycle + 100;
           }
         }
+
+        // TODO
+        System.out.println("lane "
+            + lane + " read " + read + "\nseul35 " + this.threshold35thCycle
+            + "\tseul75 " + this.threshold75thCycle + "\tseul100 "
+            + this.threshold100thCycle);
       }
     }
 
