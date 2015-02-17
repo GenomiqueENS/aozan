@@ -23,18 +23,13 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
-import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
-
-import com.google.common.base.Stopwatch;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
@@ -53,38 +48,33 @@ class UncompressFastqThread extends AbstractFastqProcessThread {
   /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
-  /** Timer. **/
-  private final Stopwatch timer = Stopwatch.createUnstarted();
-
   private long sizeFile = 0L;
 
   @Override
-  public void run() {
-    this.timer.start();
+  protected void notifyStartLogger() {
 
-    try {
-      processResults();
-      setSuccess(true);
+    // Nothing to log
+  }
 
-    } catch (final AozanException e) {
-      setException(e);
+  @Override
+  protected void process() throws AozanException {
 
-    } finally {
+    processResults();
+  }
 
-      final long uncompressSizeFile =
-          getFastqSample().getUncompressedSize() / (1024 * 1024 * 1024);
+  @Override
+  protected void notifyEndLogger(final String duration) {
 
-      LOGGER.fine("UNCOMPRESS fastq : for "
-          + getFastqSample().getKeyFastqSample() + " "
-          + getFastqSample().getFastqFiles().size()
-          + " fastq file(s) in value compression "
-          + getFastqSample().getCompressionType() + " in "
-          + toTimeHumanReadable(this.timer.elapsed(TimeUnit.MILLISECONDS))
-          + " : temporary fastq file size " + this.sizeFile + " Go (size estimated "
-          + uncompressSizeFile + " Go)");
-      this.timer.stop();
-    }
+    final long uncompressSizeFile =
+        getFastqSample().getUncompressedSize() / (1024 * 1024 * 1024);
 
+    LOGGER.fine("UNCOMPRESS fastq : for "
+        + getFastqSample().getKeyFastqSample() + " "
+        + getFastqSample().getFastqFiles().size()
+        + " fastq file(s) in value compression "
+        + getFastqSample().getCompressionType() + " in " + duration
+        + " : temporary fastq file size " + this.sizeFile
+        + " Go (size estimated " + uncompressSizeFile + " Go)");
   }
 
   /**

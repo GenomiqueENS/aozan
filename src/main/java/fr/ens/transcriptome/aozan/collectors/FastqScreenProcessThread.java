@@ -23,18 +23,14 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
-import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
@@ -70,34 +66,27 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   private File fastqscreenXSLFile = null;
 
   @Override
-  public void run() {
-
-    // Timer
-    final Stopwatch timer = Stopwatch.createStarted();
-
+  protected void notifyStartLogger() {
     LOGGER.fine("FASTQSCREEN : start for "
         + getFastqSample().getKeyFastqSample());
+  }
 
-    try {
-      processResults();
-      setSuccess(true);
-    } catch (final AozanException e) {
-      setException(e);
-    } finally {
+  @Override
+  protected void process() throws AozanException {
 
-      timer.stop();
+    processResults();
+  }
 
-      LOGGER.fine("FASTQSCREEN : end for "
-          + getFastqSample().getKeyFastqSample()
-          + " in mode "
-          + (this.isPairedMode ? "paired" : "single")
-          + (isSuccess()
-              ? " on genome(s) "
-                  + this.genomes + " in "
-                  + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS))
-              : " with fail."));
+  @Override
+  protected void notifyEndLogger(final String duration) {
 
-    }
+    LOGGER.fine("FASTQSCREEN : end for "
+        + getFastqSample().getKeyFastqSample()
+        + " in mode "
+        + (this.isPairedMode ? "paired" : "single")
+        + (isSuccess()
+            ? " on genome(s) " + this.genomes + " in " + duration
+            : " with fail."));
 
   }
 

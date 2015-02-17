@@ -23,7 +23,12 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
+import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
+
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import com.google.common.base.Stopwatch;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
@@ -46,16 +51,49 @@ abstract class AbstractFastqProcessThread implements Runnable {
   private boolean success;
   private boolean dataSaved;
 
+  @Override
+  public void run() {
+
+    // Timer
+    final Stopwatch timer = Stopwatch.createStarted();
+
+    notifyStartLogger();
+
+    try {
+      // Launch process treatment related to each collector
+      process();
+
+      setSuccess(true);
+
+    } catch (final AozanException e) {
+      setException(e);
+    } finally {
+
+      final String duration =
+          toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS));
+      timer.stop();
+
+      notifyEndLogger(duration);
+    }
+
+  }
+
   //
   // Abstract methods
   //
+
+  protected abstract void notifyEndLogger(final String duration);
+
+  protected abstract void notifyStartLogger();
+
+  protected abstract void process() throws AozanException;
 
   /**
    * Create a report file for the sample treated.
    * @throws AozanException
    * @throws IOException
    */
-  protected abstract  void createReportFile() throws AozanException, IOException;
+  protected abstract void createReportFile() throws AozanException, IOException;
 
   /**
    * Execute the treatment on a sample and supplying the rundata.

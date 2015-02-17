@@ -23,12 +23,9 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
-import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import javax.swing.JScrollPane;
@@ -56,7 +53,6 @@ import uk.ac.babraham.FastQC.Sequence.SequenceFactory;
 import uk.ac.babraham.FastQC.Sequence.SequenceFile;
 import uk.ac.babraham.FastQC.Sequence.SequenceFormatException;
 
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -81,28 +77,21 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
   private final File reportDir;
 
   @Override
-  public void run() {
-
-    // Timer
-    final Stopwatch timer = Stopwatch.createStarted();
-
+  protected void notifyStartLogger() {
     LOGGER.fine("FASTQC: start for " + getFastqSample().getKeyFastqSample());
-    try {
-      processSequences(this.seqFile);
-      setSuccess(true);
+  }
 
-    } catch (final AozanException e) {
-      setException(e);
+  @Override
+  protected void process() throws AozanException {
 
-    } finally {
+    processSequences(this.seqFile);
+  }
 
-      timer.stop();
+  @Override
+  protected void notifyEndLogger(final String duration) {
 
-      LOGGER.fine("FASTQC: end for "
-          + getFastqSample().getKeyFastqSample() + " in "
-          + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
-    }
-
+    LOGGER.fine("FASTQC: end for "
+        + getFastqSample().getKeyFastqSample() + " in " + duration);
   }
 
   /**
@@ -110,7 +99,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
    * @param seqFile input file
    * @throws AozanException if an error occurs while processing file
    */
-  private void processSequences(final SequenceFile seqFile)
+  protected void processSequences(final SequenceFile seqFile)
       throws AozanException {
 
     final boolean ignoreFiltered = this.ignoreFilteredSequences;
@@ -314,4 +303,5 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
             os.duplicationLevelModule(), os, new AdapterContent(),
             new KmerContent(), new BadTiles());
   }
+
 }

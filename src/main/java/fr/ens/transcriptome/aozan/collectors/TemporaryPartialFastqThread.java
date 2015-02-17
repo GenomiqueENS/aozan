@@ -24,8 +24,6 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
-import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -33,7 +31,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import com.google.common.base.Stopwatch;
@@ -63,9 +60,6 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
   /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
-  /** Timer. **/
-  private final Stopwatch timer = Stopwatch.createUnstarted();
-
   // count reads pf necessary for create a temporary partial fastq
   private final int countReadsPFtoCopy;
 
@@ -76,28 +70,29 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
   private boolean uncompressFastqFile = false;
 
   @Override
-  public void run() {
-    this.timer.start();
+  protected void notifyStartLogger() {
+    // Nothing to log
+  }
 
-    try {
-      processResults();
-      setSuccess(true);
+  @Override
+  protected void process() throws AozanException {
 
-    } catch (final AozanException e) {
-      setException(e);
+    processResults();
+  }
 
-    } finally {
-      final String txt =
-          this.uncompressFastqFile
-              ? " by uncompressed fastq file " : " by created partial file ("
-                  + this.countReadsPFtoCopy + " selecting in "
-                  + this.pfClusterCountParsed;
+  @Override
+  protected void notifyEndLogger(final String duration) {
 
-      LOGGER.fine("Temporary Partial fastq created in "
-          + toTimeHumanReadable(this.timer.elapsed(TimeUnit.MILLISECONDS)) + " for "
-          + getFastqSample().getKeyFastqSample() + txt + ")");
-      this.timer.stop();
-    }
+    final String txt =
+        this.uncompressFastqFile
+            ? " by uncompressed fastq file " : " by created partial file ("
+                + this.countReadsPFtoCopy + " selecting in "
+                + this.pfClusterCountParsed;
+
+    LOGGER
+        .fine("Temporary Partial fastq created in "
+            + duration + " for " + getFastqSample().getKeyFastqSample() + txt
+            + ")");
 
   }
 

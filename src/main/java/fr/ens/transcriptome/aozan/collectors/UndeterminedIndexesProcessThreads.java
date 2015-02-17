@@ -24,7 +24,6 @@
 package fr.ens.transcriptome.aozan.collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -38,7 +37,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -56,7 +54,6 @@ import uk.ac.babraham.FastQC.Sequence.SequenceFormatException;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
@@ -570,28 +567,23 @@ public class UndeterminedIndexesProcessThreads extends
   }
 
   @Override
-  public void run() {
-
-    // Timer
-    final Stopwatch timer = Stopwatch.createStarted();
-
+  protected void notifyStartLogger() {
     LOGGER.fine("Undetermined indexes: start for "
         + getFastqSample().getKeyFastqSample());
-    try {
-      processSequences(this.seqFile);
-      setSuccess(true);
+  }
 
-    } catch (final AozanException e) {
-      setException(e);
+  @Override
+  protected void process() throws AozanException {
 
-    } finally {
+    processSequences(this.seqFile);
+  }
 
-      timer.stop();
+  @Override
+  protected void notifyEndLogger(final String duration) {
 
-      LOGGER.fine("Undetermined indexes: end for "
-          + getFastqSample().getKeyFastqSample() + " in "
-          + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
-    }
+    LOGGER.fine("Undetermined indexes: end for "
+        + getFastqSample().getKeyFastqSample() + " in " + duration);
+
   }
 
   /**
