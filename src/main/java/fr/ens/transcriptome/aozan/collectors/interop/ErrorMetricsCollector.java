@@ -394,12 +394,6 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
             this.threshold100thCycle = initCycle + 100;
           }
         }
-
-        // TODO
-        System.out.println("lane "
-            + lane + " read " + read + "\nseul35 " + this.threshold35thCycle
-            + "\tseul75 " + this.threshold75thCycle + "\tseul100 "
-            + this.threshold100thCycle);
       }
     }
 
