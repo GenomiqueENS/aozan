@@ -100,11 +100,19 @@ public class RunInfoCollector implements Collector {
       data.put(prefix + ".date", runInfo.getDate());
 
       data.put(prefix + ".read.count", runInfo.getReads().size());
+
+      int readIndexedCount = 0;
+
       for (RunInfo.Read read : runInfo.getReads()) {
         data.put(prefix + ".read" + read.getNumber() + ".cycles",
             read.getNumberCycles());
+
         data.put(prefix + ".read" + read.getNumber() + ".indexed",
             read.isIndexedRead());
+
+        if (! read.isIndexedRead()) {
+          readIndexedCount++;
+        }
       }
 
       final Set<Integer> lanesToAlign =
@@ -113,10 +121,8 @@ public class RunInfoCollector implements Collector {
         data.put(prefix + ".align.to.phix.lane" + i, lanesToAlign.contains(i));
 
       // Add new entry in data : run mode
-      boolean runPE =
-          runInfo.getReads().size() > 1
-              && !data.isReadIndexed(runInfo.getReads().size());
-      data.put(prefix + ".run.mode", runPE ? "PE" : "SR");
+      data.put(prefix + ".run.mode", (readIndexedCount == 1
+          ? "SR" : (readIndexedCount == 2 ? "PE" : "other")));
 
     } catch (IOException e) {
       throw new AozanException(e);
