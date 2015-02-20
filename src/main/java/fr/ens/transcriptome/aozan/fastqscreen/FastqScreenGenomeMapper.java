@@ -166,7 +166,7 @@ public class FastqScreenGenomeMapper {
     if (!genomeFile.exists()) {
       LOGGER.warning("Fastqscreen "
           + genomeFile.getBasename()
-          + " not exists, Index mapper can't be created.");
+          + " not exists.");
     }
 
     GenomeDescription desc = null;
