@@ -29,8 +29,10 @@ import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -146,7 +148,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         // remove default argument
         this.mapper.setMapperArguments("");
 
-        this.mapper.init(archiveIndexFile, indexDir, this.reporter, COUNTER_GROUP);
+        this.mapper.init(archiveIndexFile, indexDir, this.reporter,
+            COUNTER_GROUP);
 
         // define new argument
         this.mapper.setMapperArguments(getMapperArguments());
@@ -154,7 +157,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
         if (this.pairedMode) {
           // mode pair-end
-          final InputStream outputSAM = this.mapper.mapPE(fastqRead1, fastqRead2, this.desc);
+          final InputStream outputSAM =
+              this.mapper.mapPE(fastqRead1, fastqRead2, this.desc);
           parser.parseLine(outputSAM);
 
           parser.closeMapOutputFile();
@@ -167,7 +171,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
                 "Fastqscreen : genome description is null for bowtie");
           }
 
-          final InputStream outputSAM = this.mapper.mapSE(fastqRead1, this.desc);
+          final InputStream outputSAM =
+              this.mapper.mapSE(fastqRead1, this.desc);
           parser.parseLine(outputSAM);
 
           parser.closeMapOutputFile();
@@ -220,7 +225,11 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       return null;
     }
 
-    final GenomeMapperIndexer indexer = new GenomeMapperIndexer(bowtie);
+    final Map<String, String> additionnalArgument = Collections.emptyMap();
+
+    final GenomeMapperIndexer indexer =
+        new GenomeMapperIndexer(bowtie, "", additionnalArgument);
+    
     indexer.createIndex(genomeDataFile, this.desc, result);
 
     LOGGER.info("FASTQSCREEN : create/retrieve index for "
@@ -296,7 +305,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         oneGenome = false;
       }
 
-      this.fastqScreenResult.countHitPerGenome(currentGenome, oneHit, oneGenome);
+      this.fastqScreenResult
+          .countHitPerGenome(currentGenome, oneHit, oneGenome);
     }
   }
 
@@ -327,7 +337,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     LOGGER.fine("FASTQSCREEN : result of mappings : nb read mapped "
         + this.readsmapped + " / nb read " + this.readsprocessed);
 
-    this.fastqScreenResult.countPercentValue(this.readsmapped, this.readsprocessed);
+    this.fastqScreenResult.countPercentValue(this.readsmapped,
+        this.readsprocessed);
 
     return this.fastqScreenResult;
   }
@@ -343,8 +354,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     if (this.newArgumentsMapper == null
         || this.newArgumentsMapper.length() == 0) {
-      if (this.mapper.getMapperName()
-          .equals(new BowtieReadsMapper().getMapperName())) {
+      if (this.mapper.getMapperName().equals(
+          new BowtieReadsMapper().getMapperName())) {
 
         // Parameter for Bowtie
         return " -l 20 -k 2 --chunkmbs 512"
