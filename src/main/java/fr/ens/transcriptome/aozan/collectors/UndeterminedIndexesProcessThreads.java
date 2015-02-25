@@ -997,7 +997,10 @@ public class UndeterminedIndexesProcessThreads extends
     if (!parentDir.exists()) {
       if (!parentDir.mkdirs()) {
         throw new IOException(
-            "Undetermined: Fail to create parent directory of recovery cluster report.");
+            "Undetermined: Fail to create parent directory of recovery cluster report parent directory :"
+                + parentDir.getAbsolutePath()
+                + " for new file :"
+                + reportFile.getAbsolutePath());
       }
     }
 
