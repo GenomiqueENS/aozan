@@ -680,7 +680,7 @@ def extract_steps_to_launch(conf):
                 Settings.DEMUX_STEP_KEY, Settings.QC_STEP_KEY]:
         
         if is_conf_value_equals_true(key, conf):    
-            log("CONF", "{} step setting".format(key), conf)
+            log("CONF", key + " step setting", conf)
             steps.append(key)
     
     # Return list steps setting
