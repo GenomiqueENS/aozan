@@ -15,7 +15,7 @@ make_paths() {
 }
 
 # Read link to get aozan.sh path
-REAL_PATH=`readlink $0`
+REAL_PATH=`readlink -f $0`
 
 # Get the path to this script
 BASEDIR=`dirname $REAL_PATH`
