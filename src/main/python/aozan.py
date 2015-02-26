@@ -281,6 +281,8 @@ def launch_steps(conf):
                 else:
                     unlock_sync_step(conf, run_id)
                     return
+            else:
+                common.log('INFO', 'Synchronize ' + run_id + ' is locked.', conf)
 
 
     # Check if new run appears while sync step
@@ -309,6 +311,9 @@ def launch_steps(conf):
                 else:
                     unlock_demux_step(conf, run_id)
                     return
+            else:
+                common.log('INFO', 'Demux ' + run_id + ' is locked.', conf)
+
 
     # Check if new run appears while demux step
     if common.is_conf_value_equals_true(DEMUX_STEP_KEY, conf) and len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
@@ -333,6 +338,9 @@ def launch_steps(conf):
                 else:
                     unlock_qc_step(conf, run_id)
                     return
+            else:
+                common.log('INFO', 'Quality control ' + run_id + ' is locked.', conf)
+
 
     # Check if new run appears while quality control step
     if common.is_conf_value_equals_true(QC_STEP_KEY, conf) and len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
@@ -351,9 +359,12 @@ def launch_steps(conf):
                 welcome(conf)
                 common.log('INFO', 'Partial synchronization of ' + run_id, conf)
                 if not sync_run.partial_sync(run_id, False, conf):
-                    unlock_partial_sync_step(lock_file_path, run_id)
+                    unlock_partial_sync_step(conf, run_id)
                     return
                 unlock_partial_sync_step(conf, run_id)
+            else:
+                common.log('INFO', 'Partial synchronization of ' + run_id + ' is locked.', conf)
+
 
 
 def aozan_main():
@@ -394,10 +405,12 @@ def aozan_main():
 
     # Init logger
     Common.initLogger(conf[AOZAN_LOG_PATH_KEY], conf[AOZAN_LOG_LEVEL_KEY])
-
+    
+    # Check main path file in configuration
     if not common.check_configuration(conf, args[0]):
         common.log('SEVERE', 'Aozan can not be executed, configuration invalid or useful directories inaccessible. ', conf)
         sys.exit(1)
+
         
     # Check critical free space available
     hiseq_run.send_mail_if_critical_free_space_available(conf)
