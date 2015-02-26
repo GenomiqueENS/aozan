@@ -522,21 +522,33 @@ def add_run_id_to_processed_run_ids(run_id, done_file_path, conf):
     f.write(run_id + '\n')
 
     f.close()
+    
+def get_report_run_data_path(run_id, conf):
+    """ Build report run data path from run id
 
-def create_html_index_file(conf, output_file_path, run_id, sections):
+    Arguments:
+        conf: configuration dictionary
+        run_id: The run id
+    Return:
+        path to report_run_data
+    """
+    
+    return conf[REPORTS_DATA_PATH_KEY] + '/' + run_id
+    
+def create_html_index_file(conf, run_id, sections):
     """Create an index.html file that contains links to all the generated reports.
 
     Arguments:
         conf: configuration dictionary
         output_file_path: path of the index.html file to create
         run_id: The run id
-        sections: The list of section to write
+        sections: The list of section to write, use step key from configuration
     """
 
     """ Since version RTA after 1.17, Illumina stop the generation of the Status and reports files"""
 
-    path_report = conf[REPORTS_DATA_PATH_KEY] + '/' + run_id
-
+    report_path = get_report_run_data_path(run_id, conf)
+    output_file_path = report_path + "/index.html"
     # Retrieve BufferedReader on index html template
     template_path = conf[INDEX_HTML_TEMPLATE_KEY]
     if template_path != None and template_path != '' and os.path.exists(template_path):
@@ -550,16 +562,17 @@ def create_html_index_file(conf, output_file_path, run_id, sections):
         jar_is = Globals.getResourceAsStream(Globals.INDEX_HTML_TEMPLATE_FILENAME)
         lines = FileUtils.readFileByLines(jar_is)
 
-    if 'sync' in sections and os.path.exists(path_report + '/report_' + run_id):
+    # NOT necessary to test step sync if Settings.SYNC_STEP_KEY in sections and os.path.exists(report_path + '/report_' + run_id):
+    if os.path.exists(report_path + '/report_' + run_id):
         sections.append('optional')
 
     write_lines = True
     result = ''
-
+  
     for line in lines:
         if line.startswith('<!--START_SECTION'):
             section_name = line.split(' ')[1]
-            if section_name in sections:
+            if section_name in sections and (is_conf_value_equals_true(section_name, conf) or section_name == 'optional'):
                 write_lines = True
             else:
                 write_lines = False
@@ -588,45 +601,62 @@ def check_configuration(conf, configuration_file_path):
     Returns:
         True if the configuration is valid
     """
+    
+    steps_to_launch = extract_steps_to_launch(conf)
 
     msg = ''
 
-    # Check if hiseq_data_path exists
-    for hiseq_output_path in hiseq_run.get_hiseq_data_paths(conf):
-        if not os.path.exists(hiseq_output_path):
-            msg += '\n\t* HiSeq directory does not exists: ' + hiseq_output_path
-
-    # Check if bcl_data_path exists
-    if is_conf_value_equals_true(SYNC_STEP_KEY, conf):
-        if not is_dir_exists(BCL_DATA_PATH_KEY, conf):
-            msg += '\n\t* Basecalling directory does not exists: ' + conf[BCL_DATA_PATH_KEY]
-    #
+    # # Path common on all steps
+    
+    # Check log path
     if not is_file_exists(AOZAN_LOG_PATH_KEY, conf):
         msg += '\n\t* Aozan log file path does not exists : ' + conf[AOZAN_LOG_PATH_KEY]
-
-    # Check if casava designs path exists
-    if not is_dir_exists(CASAVA_SAMPLESHEETS_PATH_KEY, conf):
-        msg += '\n\t* Casava sample sheets directory does not exists: ' + conf[CASAVA_SAMPLESHEETS_PATH_KEY]
-
-    # Check if root input fastq data directory exists
-    if not is_dir_exists(FASTQ_DATA_PATH_KEY, conf):
-        msg += '\n\t* Fastq data directory does not exists: ' + conf[FASTQ_DATA_PATH_KEY]
-
-    # Check if casava designs path exists
-    if not is_dir_exists(CASAVA_PATH_KEY, conf):
-        msg += '\n\t* Casava/bcl2fastq path directory does not exists: ' + conf[CASAVA_PATH_KEY]
 
     # Check if temporary directory exists
     if not is_dir_exists(TMP_PATH_KEY, conf):
         msg += '\n\t* Temporary directory does not exists: ' + conf[TMP_PATH_KEY]
+        
+    if not is_dir_exists(REPORTS_DATA_PATH_KEY, conf):
+        msg += '\n\t* Report run data directory does not exists: ' + conf[REPORTS_DATA_PATH_KEY]
+        
+    # # Step First_base_report and HiSeq
+    if Settings.HISEQ_STEP_KEY in steps_to_launch:
+        # Check if hiseq_data_path exists
+        for hiseq_output_path in hiseq_run.get_hiseq_data_paths(conf):
+            if not os.path.exists(hiseq_output_path):
+                msg += '\n\t* HiSeq directory does not exists: ' + hiseq_output_path
 
-    # Check path to blast if step enable
-    if is_conf_value_equals_true(QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY, conf) and not is_file_exists(QC_CONF_FASTQSCREEN_BLAST_PATH_KEY, conf):
-        msg += '\n\t* Blast enabled but blast file path does not exists: ' + conf[QC_CONF_FASTQSCREEN_BLAST_PATH_KEY]
+    # # For step SYNC
+    if Settings.SYNC_STEP_KEY in steps_to_launch:
+        # Check if bcl_data_path exists
+        if not is_dir_exists(BCL_DATA_PATH_KEY, conf):
+            msg += '\n\t* Basecalling directory does not exists: ' + conf[BCL_DATA_PATH_KEY]
 
-    # Check compression type: three values None, gzip (default) bzip2
-    if not is_fastq_compression_format_valid(conf):
-        msg += '\n\t* Invalid FASTQ compression format: ' + conf[CASAVA_COMPRESSION_KEY]
+    # # For step DEMUX
+    if Settings.DEMUX_STEP_KEY in steps_to_launch:
+        # Check if casava designs path exists
+        if not is_dir_exists(CASAVA_SAMPLESHEETS_PATH_KEY, conf):
+            msg += '\n\t* Casava sample sheets directory does not exists: ' + conf[CASAVA_SAMPLESHEETS_PATH_KEY]
+    
+        # Check if root input fastq data directory exists
+        if not is_dir_exists(FASTQ_DATA_PATH_KEY, conf):
+            msg += '\n\t* Fastq data directory does not exists: ' + conf[FASTQ_DATA_PATH_KEY]
+    
+        # Check if casava designs path exists
+        if not is_dir_exists(CASAVA_PATH_KEY, conf):
+            msg += '\n\t* Casava/bcl2fastq path directory does not exists: ' + conf[CASAVA_PATH_KEY]
+
+        # Check compression type: three values None, gzip (default) bzip2
+        if not is_fastq_compression_format_valid(conf):
+            msg += '\n\t* Invalid FASTQ compression format: ' + conf[CASAVA_COMPRESSION_KEY]
+
+
+    # # For step QC
+    if Settings.QC_STEP_KEY in steps_to_launch:
+        # Check path to blast if step enable
+        if is_conf_value_equals_true(QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY, conf) and not is_file_exists(QC_CONF_FASTQSCREEN_BLAST_PATH_KEY, conf):
+            msg += '\n\t* Blast enabled but blast file path does not exists: ' + conf[QC_CONF_FASTQSCREEN_BLAST_PATH_KEY]
+
 
     if len(msg) > 0:
         msg = 'Error(s) found in Aozan configuration file (' + os.path.abspath(configuration_file_path) + '):' + msg
@@ -634,6 +664,27 @@ def check_configuration(conf, configuration_file_path):
         return False
 
     return True
+
+def extract_steps_to_launch(conf):
+    """ List steps to launch 
+    
+    Arguments:
+        conf: configuration dictionary
+
+    Returns:
+        list steps name
+    """
+    
+    steps = []
+    for key in [Settings.FIRST_BASE_REPORT_STEP_KEY, Settings.HISEQ_STEP_KEY, Settings.SYNC_STEP_KEY,
+                Settings.DEMUX_STEP_KEY, Settings.QC_STEP_KEY]:
+        
+        if is_conf_value_equals_true(key, conf):    
+            log("CONFIG", "Step " + key + " is  setting", conf)
+            steps.append(key)
+    
+    # Return list steps setting
+    return steps
 
 def is_fastq_compression_format_valid(conf):
     """ Check compression format fastq for bcl2fastq

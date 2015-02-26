@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os, stat, time
+import os, time
 import common, hiseq_run
 
 from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
@@ -31,8 +31,8 @@ def is_sync_step_enable(conf):
             # Check bcl not same hiseq output path
             for path in hiseq_run.get_hiseq_data_paths(conf):
                 if path == bcl_path:
-                    error('error configuration.' , 
-                          'Basecalling path and hiseq output data path are the same: ' + bcl_path ,conf) 
+                    error('error configuration.' ,
+                          'Basecalling path and hiseq output data path are the same: ' + bcl_path , conf) 
                     return False
                 
             return True
@@ -145,7 +145,7 @@ def partial_sync(run_id, last_sync, conf):
         for exclude_file in exclude_files:
             cmd += " -not -name '" + exclude_file + "' "
         cmd += ' > ' + rsync_manifest_path
-        common.log("SEVERE", "exec: " + cmd, conf)
+        common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
             error("error while executing rsync for run " + run_id, 'Error while executing find.\nCommand line:\n' + cmd, conf)
             return False
@@ -153,7 +153,7 @@ def partial_sync(run_id, last_sync, conf):
 
     # Copy data from hiseq path to bcl path
     cmd = 'rsync  -a ' + rsync_params + ' ' + input_path + '/ ' + output_path
-    common.log("SEVERE", "exec: " + cmd, conf)
+    common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while executing rsync for run " + run_id, 'Error while executing rsync.\nCommand line:\n' + cmd, conf)
         return False
@@ -177,33 +177,11 @@ def sync(run_id, conf):
 
     bcl_data_path = conf[BCL_DATA_PATH_KEY]
     reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
-    tmp_base_path = conf[TMP_PATH_KEY]
-
     output_path = bcl_data_path + '/' + run_id
-    reports_data_path = reports_data_base_path + '/' + run_id
-    report_prefix = 'report_'
-    hiseq_log_prefix = 'hiseq_log_'
-    report_archive_file = report_prefix + run_id + '.tar.bz2'
-    hiseq_log_archive_file = hiseq_log_prefix + run_id + '.tar.bz2'
 
     # Check if reports_data_path exists
     if not os.path.exists(reports_data_base_path):
         error("Report directory does not exists", "Report directory does not exists: " + reports_data_base_path, conf)
-        return False
-
-    # Check if reports archive exists
-    if os.path.exists(reports_data_path + '/' + report_archive_file):
-        error('Report archive already exists for run ' + run_id, 'Report archive already exists for run ' + run_id + ' : ' + report_archive_file, conf)
-        return False
-
-    # Check if hiseq log archive exists
-    if os.path.exists(reports_data_path + '/' + hiseq_log_archive_file):
-        error('Hiseq log archive already exists for run ' + run_id, 'Hiseq log archive already exists for run ' + run_id + ' : ' + hiseq_log_archive_file, conf)
-        return False
-
-    # Check if temporary directory exists
-    if not os.path.exists(tmp_base_path):
-        error("Temporary directory does not exists", "Temporary directory does not exists: " + tmp_base_path, conf)
         return False
 
     # Check if enough space to store reports
@@ -220,76 +198,7 @@ def sync(run_id, conf):
     if os.path.exists(output_path + '.tmp'):
         os.rename(output_path + '.tmp', output_path)
 
-    # Create if not exists archive directory for the run
-    if not os.path.exists(reports_data_path):
-        os.mkdir(reports_data_path)
-
-    # Save quality control data
-    tmp_path = tmp_base_path + '/' + run_id
-    if os.path.exists(tmp_path):
-        cmd = 'rm -rf ' + tmp_path
-        common.log("SEVERE", "exec: " + cmd, conf)
-        if os.system(cmd) != 0:
-            error("error while removing existing temporary directory", 'Error while removing existing temporary directory.\nCommand line:\n' + cmd, conf)
-            return False
-    os.mkdir(tmp_path)
-    
-    # Define set file to copy in report archive, check if exists (depend on parameters Illumina)
-    path_source = bcl_data_path + '/' + run_id
-    files = ['InterOp' , 'RunInfo.xml' , 'runParameters.xml']
-    files_to_copy = common.list_files_existing(path_source, files)
-    
-    if (files_to_copy == None):
-        common.log("WARNING", "Archive " + hiseq_log_archive_file + " not create: none file exists " + files + ' in ' + path_source, conf)
-    else:
-        cmd = 'cd ' + path_source + ' && ' + \
-            'cp -rp ' + files_to_copy + tmp_path + ' && ' + \
-            'cd ' + tmp_base_path + ' && ' + \
-            'mv ' + run_id + ' ' + hiseq_log_prefix + run_id + ' && ' + \
-            'tar cjf ' + reports_data_path + '/' + hiseq_log_archive_file + ' ' + hiseq_log_prefix + run_id + ' && ' + \
-            'rm -rf ' + tmp_path + ' && rm -rf ' + hiseq_log_prefix + run_id
-        common.log("SEVERE", "exec: " + cmd, conf)
-        if os.system(cmd) != 0:
-            error("error while saving Illumina quality control for run " + run_id, 'Error saving Illumina quality control.\nCommand line:\n' + cmd, conf)
-            return False
-
-    # Save html reports
-    if os.path.exists(tmp_path):
-        cmd = 'rm -rf ' + tmp_path
-        common.log("SEVERE", "exec: " + cmd, conf)
-        if os.system(cmd) != 0:
-            error("error while removing existing temporary directory", 'Error while removing existing temporary directory.\nCommand line:\n' + cmd, conf)
-            return False
-    os.mkdir(tmp_path)
-    
-    # Define set file to copy in report archive, check if exists (depend on parameters Illumina)
-    path_source = output_path + '/Data'
-    files = ['Status_Files', 'reports', 'Status.htm', '../First_Base_Report.htm' ]
-    files_to_copy = common.list_files_existing(path_source, files)
-    if (files_to_copy == None):
-        common.log("WARNING", "Archive " + report_archive_file + " not create: none file exists " + files + ' in ' + path_source, conf)
-    else: 
-        cmd = 'cd ' + path_source + ' && ' + \
-            'cp -rp ' + files_to_copy + tmp_path + ' && ' + \
-            'cd ' + tmp_base_path + ' && ' + \
-            'mv ' + run_id + ' ' + report_prefix + run_id + ' && ' + \
-            'tar cjf ' + reports_data_path + '/' + report_archive_file + ' ' + report_prefix + run_id + ' && ' + \
-            'mv ' + report_prefix + run_id + ' ' + reports_data_path
-            # 'cd ' + base_dir_path + ' && ' + \
-            # 'cp -p ../First_Base_Report.htm ' + reports_data_path + '/' + run_id + '/ && ' + \
-        common.log("SEVERE", "exec: " + cmd, conf)
-        if os.system(cmd) != 0:
-            error("error while saving Illumina html reports for run " + run_id, 'Error saving Illumina html reports.\nCommand line:\n' + cmd, conf)
-            return False
-
-    # Create index.hml file
-    common.create_html_index_file(conf, reports_data_path + '/index.html', run_id, ['sync'])
-
-    # Set read only archives files
-    os.chmod(reports_data_path + '/' + report_archive_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
-    os.chmod(reports_data_path + '/' + hiseq_log_archive_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
-
-
+    # Check used and free space
     df_in_bytes = common.df(bcl_data_path)
     du_in_bytes = common.du(output_path)
     df = df_in_bytes / (1024 * 1024 * 1024)

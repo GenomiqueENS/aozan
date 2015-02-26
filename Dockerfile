@@ -19,15 +19,12 @@ RUN yum install -y java-1.7.0-openjdk.x86_64
 RUN mkdir /aozan_data
 
 # Install Aozan public version
-ADD https://github.com/GenomicParisCentre/aozan/archive/v1.3.2/aozan-1.3.2.tar.gz /tmp/ 
+ADD https://github.com/GenomicParisCentre/aozan/releases/download/v1.3.2/aozan-1.3.2.tar.gz /tmp/
 
 RUN cd /usr/local && tar xvzf /tmp/aozan-*.tar.gz && rm /tmp/aozan-*.tar.gz
 
 RUN ln -s /usr/local/aozan*/aozan.sh /usr/local/bin
 
-
-# Patch bug in aozan.sh
-RUN sed -i 's/BASEDIR=`dirname $0`/ARG0=`readlink $0` ; BASEDIR=`dirname $ARG0`/' /usr/local/aozan-*/aozan.sh && chmod +x /usr/local/aozan-*/aozan.sh
 
 # Patch bcl2fast configuration file for use bz2 compression type
 # Comment 2 lines
