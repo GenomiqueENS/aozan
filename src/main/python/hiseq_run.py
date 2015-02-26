@@ -293,7 +293,7 @@ def create_run_summary_reports(run_id, conf):
 		conf: configuration dictionary
     """
 	
-	hiseq_data_path = conf[HISEQ_DATA_PATH_KEY]
+	hiseq_data_path = find_hiseq_run_path(run_id, conf)
 	tmp_base_path = conf[TMP_PATH_KEY]
 	reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
 
@@ -397,3 +397,5 @@ def create_run_summary_reports(run_id, conf):
 	# Set read only archives files
 	os.chmod(reports_data_path + '/' + report_archive_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
 	os.chmod(reports_data_path + '/' + hiseq_log_archive_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+	
+	return True
