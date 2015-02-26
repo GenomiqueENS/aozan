@@ -243,12 +243,13 @@ def discover_new_run(conf):
         for run_id in (hiseq_run.get_available_run_ids(conf) - hiseq_run_ids_done):
             welcome(conf)
             common.log('INFO', 'Discover ' + run_id, conf)
+            
             if hiseq_run.create_run_summary_reports(run_id, conf):
                 hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
                 hiseq_run.add_run_id_to_processed_run_ids(run_id, conf)
                 hiseq_run_ids_done.add(run_id)
             else:
-                return
+                raise Exception('Create run summary report for new discovery run ' + run_id)
 
     return hiseq_run_ids_done
 
@@ -408,7 +409,9 @@ def aozan_main():
 
     # Init logger
     Common.initLogger(conf[AOZAN_LOG_PATH_KEY], conf[AOZAN_LOG_LEVEL_KEY])
-    
+
+    welcome(conf)
+        
     # Check main path file in configuration
     if not common.check_configuration(conf, args[0]):
         common.log('SEVERE', 'Aozan can not be executed, configuration invalid or useful directories inaccessible. ', conf)
