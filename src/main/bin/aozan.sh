@@ -14,8 +14,11 @@ make_paths() {
     echo $RESULT
 }
 
+# Read link to get aozan.sh path
+REAL_PATH=`readlink $0`
+
 # Get the path to this script
-BASEDIR=`dirname $0`
+BASEDIR=`dirname $REAL_PATH`
 
 # Set the Eoulsan libraries path
 LIBDIR=$BASEDIR/lib
