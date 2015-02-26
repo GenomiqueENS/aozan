@@ -243,9 +243,12 @@ def discover_new_run(conf):
         for run_id in (hiseq_run.get_available_run_ids(conf) - hiseq_run_ids_done):
             welcome(conf)
             common.log('INFO', 'Discover ' + run_id, conf)
-            hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
-            hiseq_run.add_run_id_to_processed_run_ids(run_id, conf)
-            hiseq_run_ids_done.add(run_id)
+            if hiseq_run.create_run_summary_reports(run_id, conf):
+                hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
+                hiseq_run.add_run_id_to_processed_run_ids(run_id, conf)
+                hiseq_run_ids_done.add(run_id)
+            else:
+                return
 
     return hiseq_run_ids_done
 

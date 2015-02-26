@@ -12,6 +12,7 @@ from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import HISEQ_STEP_KEY
 from fr.ens.transcriptome.aozan.Settings import TMP_PATH_KEY
 import cmd
+from pickle import FALSE
 
 
 def load_processed_run_ids(conf):
@@ -39,10 +40,8 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         run id: The run id
         conf: configuration dictionary
     """
-	create_run_summary_reports(run_id, conf)
-	
-	common.add_run_id_to_processed_run_ids(run_id, conf[AOZAN_VAR_PATH_KEY] + '/hiseq.done', conf)
 
+	common.add_run_id_to_processed_run_ids(run_id, conf[AOZAN_VAR_PATH_KEY] + '/hiseq.done', conf)
 
 def get_reads_number(run_id, conf):
 	"""Get the number of read of a run.
