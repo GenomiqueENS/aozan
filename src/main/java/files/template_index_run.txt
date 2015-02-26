@@ -98,7 +98,7 @@ Run ${RUN_ID} reports</div>
 
 
 <div class="report">
-<!--START_SECTION sync -->
+<!--START_SECTION hiseq.step -->
 <div id="section_sync">
 <h3>HiSeq reports</h3>
 <ul>
@@ -112,7 +112,7 @@ Run ${RUN_ID} reports</div>
 </div>
 <!--END_SECTION-->
 
-<!--START_SECTION demux -->
+<!--START_SECTION demux.step -->
 <div id="section_demux">
 <h3>Demultiplexing reports</h3/>
 <ul>
@@ -124,7 +124,7 @@ Run ${RUN_ID} reports</div>
 </div>
 <!--END_SECTION-->
 
-<!--START_SECTION qc -->
+<!--START_SECTION qc.step -->
 <div id="section_qc">
 <h3>Quality control reports</h3>
 <ul>
