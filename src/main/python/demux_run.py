@@ -37,6 +37,7 @@ from fr.ens.transcriptome.aozan.Settings import CASAVA_WITH_FAILED_READS_KEY
 from fr.ens.transcriptome.aozan.Settings import INDEX_SEQUENCES_KEY
 from fr.ens.transcriptome.aozan.Settings import FASTQ_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_DESIGN_GENERATOR_COMMAND_KEY
+from fr.ens.transcriptome.aozan import Settings
 
 def load_processed_run_ids(conf):
     """Load the list of the processed run ids.
@@ -124,7 +125,7 @@ def demux(run_id, conf):
     common.log('INFO', 'Demux step: start', conf)
 
     reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
-    reports_data_path = reports_data_base_path + '/' + run_id
+    reports_data_path = common.get_report_run_data_path(run_id, conf)
 
     input_run_data_path = common.get_input_run_data_path(run_id, conf)
     
@@ -249,7 +250,7 @@ def demux(run_id, conf):
             return False
 
         cmd = 'cp ' + input_design_csv_path + ' ' + design_csv_path
-        common.log("SEVERE", "exec: " + cmd, conf)
+        common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
             error("error while copying Casava CSV sample sheet file to temporary directory for run " + run_id,
                   'Error while copying Casava CSV sample sheet file to temporary directory.\nCommand line:\n' + cmd, conf)
@@ -257,13 +258,13 @@ def demux(run_id, conf):
 
     elif common.is_conf_value_defined(CASAVA_SAMPLESHEET_FORMAT_KEY, 'command', conf):
 
-        if not common.is_conf_key_exists(CASAVA_DESIGN_GENERATOR_COMMAND_KEY,conf):
+        if not common.is_conf_key_exists(CASAVA_DESIGN_GENERATOR_COMMAND_KEY, conf):
             error("error while creating Casava CSV sample sheet file for run " + run_id,
                   'Error while creating Casava CSV sample sheet file, the command is empty.', conf)
             return False
 
         cmd = conf[CASAVA_DESIGN_GENERATOR_COMMAND_KEY] + ' ' + run_id + ' ' + design_csv_path
-        common.log("SEVERE", "exec: " + cmd, conf)
+        common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
             error("error while creating Casava CSV sample sheet file for run " + run_id,
                   'Error while creating Casava CSV sample sheet file.\nCommand line:\n' + cmd, conf)
@@ -333,7 +334,7 @@ def demux(run_id, conf):
     # Retrieve output in file
     cmd = cmd + ' > /tmp/bcl2fastq_output_' + run_id + '.out 2> /tmp/bcl2fastq_output_' + run_id + '.err'
     
-    common.log("SEVERE", "exec: " + cmd, conf)
+    common.log("INFO", "exec: " + cmd, conf)
     exit_code = os.system(cmd)
     if exit_code != 0:
         error("error while creating Casava makefile for run " + run_id, 'Error while creating Casava makefile (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
@@ -341,7 +342,7 @@ def demux(run_id, conf):
     
     # Configuration bcl2fastq success, move command output file in fastq_output_dir
     cmd = 'mv /tmp/bcl2fastq_output_' + run_id + '.*  ' + fastq_output_dir
-    common.log("SEVERE", "exec: " + cmd, conf)
+    common.log("INFO", "exec: " + cmd, conf)
     exit_code = os.system(cmd)
     if exit_code != 0:
         error("error while moving command output files for run " + run_id, 'Error while moving command output files (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
@@ -353,7 +354,7 @@ def demux(run_id, conf):
 
     # Launch casava
     cmd = 'cd ' + fastq_output_dir + ' && make -j ' + str(cpu_count) + ' > ' + fastq_output_dir + '/make.out' + ' 2> ' + fastq_output_dir + '/make.err'
-    common.log("SEVERE", "exec: " + cmd, conf)
+    common.log("INFO", "exec: " + cmd, conf)
     exit_code = os.system(cmd)
     if exit_code != 0:
         error("error while running Casava for run " + run_id, 'Error while running Casava (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
@@ -361,7 +362,7 @@ def demux(run_id, conf):
 
     # Copy design to output directory
     cmd = "cp -p " + design_csv_path + ' ' + fastq_output_dir
-    common.log("SEVERE", "exec: " + cmd, conf)
+    common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while copying sample sheet file to the fastq directory for run " + run_id, 'Error while copying sample sheet file to fastq directory.\nCommand line:\n' + cmd, conf)
         return False
@@ -372,7 +373,7 @@ def demux(run_id, conf):
         'tar cjf ' + reports_data_path + '/' + basecall_stats_file + ' ' + basecall_stats_prefix + run_id + ' && ' + \
         'cp -rp ' + basecall_stats_prefix + run_id + ' ' + reports_data_path + ' && ' + \
         'mv ' + basecall_stats_prefix + run_id + ' Basecall_Stats_' + flow_cell_id_in_conf_xml
-    common.log("SEVERE", "exec: " + cmd, conf)
+    common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while saving the basecall stats file for " + run_id, 'Error while saving the basecall stats files.\nCommand line:\n' + cmd, conf)
         return False
@@ -382,7 +383,7 @@ def demux(run_id, conf):
 
     # The output directory must be read only
     cmd = 'chmod -R ugo-w ' + fastq_output_dir + '/Project_*'
-    common.log("SEVERE", "exec: " + cmd, conf)
+    common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while setting read only the output fastq directory for run " + run_id, 'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
         return False
@@ -400,7 +401,7 @@ def demux(run_id, conf):
         ' && zip -q ' + conf[CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + conf[CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip ' + \
         os.path.basename(design_csv_path)
 
-    common.log("SEVERE", "exec: " + cmd, conf)
+    common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while archiving the sample sheet file for " + run_id, 'Error while archiving the sample sheet file for.\nCommand line:\n' + cmd, conf)
         return False
@@ -411,7 +412,7 @@ def demux(run_id, conf):
         os.remove(conf[TMP_PATH_KEY] + '/' + os.path.basename(input_design_xls_path))
 
     # Create index.hml file
-    common.create_html_index_file(conf, reports_data_path + '/index.html', run_id, ['sync', 'demux'])
+    common.create_html_index_file(conf, run_id, [Settings.HISEQ_STEP_KEY, Settings.DEMUX_STEP_KEY])
 
     df_in_bytes = common.df(fastq_output_dir)
     du_in_bytes = common.du(fastq_output_dir)
