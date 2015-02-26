@@ -616,7 +616,7 @@ def check_configuration(conf, configuration_file_path):
     if not is_dir_exists(TMP_PATH_KEY, conf):
         msg += '\n\t* Temporary directory does not exists: ' + conf[TMP_PATH_KEY]
         
-    if not is_file_exists(REPORTS_DATA_PATH_KEY, conf):
+    if not is_dir_exists(REPORTS_DATA_PATH_KEY, conf):
         msg += '\n\t* Report run data directory does not exists: ' + conf[REPORTS_DATA_PATH_KEY]
         
     # # Step First_base_report and HiSeq
@@ -680,7 +680,7 @@ def extract_steps_to_launch(conf):
                 Settings.DEMUX_STEP_KEY, Settings.QC_STEP_KEY]:
         
         if is_conf_value_equals_true(key, conf):    
-            log("CONFIG", key + " step setting", conf)
+            log("CONFIG", "Step " + key + " is  setting", conf)
             steps.append(key)
     
     # Return list steps setting
