@@ -104,14 +104,23 @@ def lock_step(lock_file_path):
     Arguments:
         lock_file_path: lock_file path
     """
+    # Check if parent directory of the lock file exists
+    if os.path.isdir(os.path.dirname(lock_file_path)):
+        common.log('SEVERE', 'Parent directory of lock file does not exists. The lock file has not been created: ' + lock_file_path)
+        return True
+
     # Return False if the run is currently processed
     if os.path.isfile(lock_file_path):
         return False
 
     # Create the lock file
-    open(lock_file_path, 'w').close()
+    try:
+        open(lock_file_path, 'w').close()
+    except:
+        common.log('SEVERE', 'The lock file cannot not been created (' + sys.exc_info()[0] + '): ' + lock_file_path)
+        return True
 
-    return True
+    return True 
 
 
 def unlock_step(lock_file_path):
@@ -382,10 +391,15 @@ def aozan_main():
     parser = OptionParser(usage='usage: ' + Globals.APP_NAME_LOWER_CASE + '.sh [options] conf_file')
     parser.add_option('-q', '--quiet', action='store_true', dest='quiet',
                 default=False, help='quiet')
+    parser.add_option('-v', '--version', action='Aozan version', dest='version', help='Aozan version')
 
     # Parse command line arguments
     (options, args) = parser.parse_args()
-
+    
+    # Print Aozan current version
+    if options.version:
+        print Globals.APP_VERSION_STRING + " " + Globals.APP_BUILD_COMMIT
+        
     # If no argument print usage
     if len(args) < 1:
         parser.print_help()
