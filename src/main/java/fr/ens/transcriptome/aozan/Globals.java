@@ -130,6 +130,8 @@ public class Globals {
   public static final String EMBEDDED_FASTQSCREEN_XSL = "/fastqscreen.xsl";
   public static final String EMBEDDED_UNDETERMINED_XSL =
       "/undetermined_report.xsl";
+  public static final String EMBEDDED_FASTQSCREEN_PROJECT_XSL =
+      "/fastqscreen_project.xsl";
 
   public static final String INDEX_HTML_TEMPLATE_FILENAME =
       "/template_index_run.txt";
