@@ -46,9 +46,6 @@ public abstract class AbstractSimpleProjectTest extends AbstractProjectTest {
   public List<AozanTest> configure(final Map<String, String> properties)
       throws AozanException {
 
-    // TODO
-    System.out.println("in configure project test");
-
     if (properties == null) {
       throw new NullPointerException("The properties object is null");
     }

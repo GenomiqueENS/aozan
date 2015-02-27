@@ -18,8 +18,6 @@ public class LanesRunProjectTest extends AbstractSimpleProjectTest {
 
   @Override
   protected String getKey(final String projectName) {
-    // TODO
-    System.out.println("in test project " + projectName);
 
     return COLLECTOR_PREFIX + projectName + ".lanes";
   }
