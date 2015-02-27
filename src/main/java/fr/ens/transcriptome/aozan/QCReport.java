@@ -48,6 +48,7 @@ import com.google.common.collect.Sets;
 import fr.ens.transcriptome.aozan.tests.TestResult;
 import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
 import fr.ens.transcriptome.aozan.tests.lane.LaneTest;
+import fr.ens.transcriptome.aozan.tests.project.ProjectTest;
 import fr.ens.transcriptome.aozan.tests.sample.SampleTest;
 import fr.ens.transcriptome.aozan.util.XMLUtilsWriter;
 
@@ -65,6 +66,7 @@ public class QCReport {
 
   private final List<GlobalTest> globalTests = new ArrayList<>();
   private final List<LaneTest> laneTests = new ArrayList<>();
+  private final List<ProjectTest> projectTests = new ArrayList<>();
   private final List<SampleTest> sampleTests = new ArrayList<>();
   private Document doc;
 
@@ -177,11 +179,53 @@ public class QCReport {
     }
   }
 
+  private void doProjectsTests(final Element parentElement) {
+
+    final Document doc = this.doc;
+    final List<String> projects = this.data.getProjectsNameList();
+
+    final Element root = doc.createElement("ProjectsReport");
+    parentElement.appendChild(root);
+
+    final Element columns = doc.createElement("Columns");
+    root.appendChild(columns);
+
+    for (final ProjectTest test : this.projectTests) {
+      final Element columnElement = doc.createElement("Column");
+      columnElement.setAttribute("testname", test.getName());
+      columnElement.setAttribute("description", test.getDescription());
+      columnElement.setAttribute("unit", test.getUnit());
+      columnElement.setTextContent(test.getColumnName());
+      columns.appendChild(columnElement);
+    }
+
+    final Element projectsElement = doc.createElement("Projects");
+    root.appendChild(projectsElement);
+
+    for (String project : projects) {
+      final Element projectElement = doc.createElement("Project");
+      projectElement.setAttribute("name", project);
+      projectsElement.appendChild(projectElement);
+
+      for (final ProjectTest test : this.projectTests) {
+        final TestResult result = test.test(this.data, project);
+
+        final Element testElement = doc.createElement("Test");
+        testElement.setAttribute("name", test.getName());
+        testElement.setAttribute("score", Integer.toString(result.getScore()));
+        testElement.setAttribute("type", result.getType());
+        testElement.setTextContent(result.getMessage());
+        projectElement.appendChild(testElement);
+
+      }
+    }
+  }
+
   /**
    * Generate the QC report for projects data.
    * @param parentElement parent Element
    */
-  private void doProjectsTests(final Element parentElement) {
+  private void doProjectsNavigation(final Element parentElement) {
 
     final Document doc = this.doc;
 
@@ -406,8 +450,12 @@ public class QCReport {
         doLanesTests(root);
       }
 
-      if (!this.sampleTests.isEmpty()) {
+      if (!this.projectTests.isEmpty()) {
         doProjectsTests(root);
+      }
+
+      if (!this.sampleTests.isEmpty()) {
+        doProjectsNavigation(root);
         doSamplesTests(root);
       }
     } catch (final ParserConfigurationException e) {
@@ -472,10 +520,12 @@ public class QCReport {
    * @param data Run data
    * @param globalTests list of the global tests
    * @param laneTests list of the read tests
+   * @param projectTests
    * @param sampleTests list of the sample tests
    */
   public QCReport(final RunData data, final List<GlobalTest> globalTests,
-      final List<LaneTest> laneTests, final List<SampleTest> sampleTests) {
+      final List<LaneTest> laneTests, List<ProjectTest> projectTests,
+      final List<SampleTest> sampleTests) {
 
     this.data = data;
 
@@ -485,6 +535,10 @@ public class QCReport {
 
     if (laneTests != null) {
       this.laneTests.addAll(laneTests);
+    }
+
+    if (projectTests != null) {
+      this.projectTests.addAll(projectTests);
     }
 
     if (sampleTests != null) {
