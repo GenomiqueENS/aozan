@@ -216,7 +216,7 @@ def qc(run_id, conf):
 
     # Create index.hml file
     sessions = [Settings.HISEQ_STEP_KEY , Settings.DEMUX_STEP_KEY , Settings.QC_STEP_KEY]
-    common.create_html_index_file(conf, reports_data_path + '/index.html', run_id, sessions)
+    common.create_html_index_file(conf, run_id, sessions)
 
     df_in_bytes = common.df(qc_output_dir)
     du_in_bytes = common.du(qc_output_dir)
