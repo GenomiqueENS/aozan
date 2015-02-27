@@ -395,7 +395,7 @@ doctype-system="about:legacy-compat"/>
   </tr>
   <xsl:for-each select="/QCReport/ProjectsReport/Projects/Project">
   <tr>
-  	<td><xsl:value-of select="@name"/></td>
+  	<td class="{@name}"><xsl:value-of select="@name"/></td>
     <xsl:for-each select="Test">
       <td class="score{@score}">
         <xsl:if test="@type='int'"><xsl:value-of select="format-number(.,'### ### ### ### ###','aozan')"/></xsl:if>
