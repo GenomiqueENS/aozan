@@ -78,6 +78,8 @@ def qc(run_id, conf):
     """
 
     start_time = time.time()
+    
+    common.log('INFO', 'QC step: start', conf)
 
     input_run_data_path = common.get_input_run_data_path(run_id, conf)
     
