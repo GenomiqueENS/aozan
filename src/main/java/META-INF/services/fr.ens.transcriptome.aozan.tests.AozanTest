@@ -32,6 +32,14 @@ fr.ens.transcriptome.aozan.tests.lane.PercentCycle20IntensityLaneTest
 fr.ens.transcriptome.aozan.tests.lane.PhasingPrePhasingLaneTest
 fr.ens.transcriptome.aozan.tests.lane.RawClustersLaneTest
 fr.ens.transcriptome.aozan.tests.lane.RawClustersPhixLaneTest
+fr.ens.transcriptome.aozan.tests.project.SampleCountProjectTest
+fr.ens.transcriptome.aozan.tests.project.LanesRunProjectTest
+fr.ens.transcriptome.aozan.tests.project.GenomesProjectTest
+fr.ens.transcriptome.aozan.tests.project.IsIndexedProjectTest
+fr.ens.transcriptome.aozan.tests.project.RawClusterMeanProjectTest
+fr.ens.transcriptome.aozan.tests.project.PFClusterMeanProjectTest
+fr.ens.transcriptome.aozan.tests.project.PFRecoveryClusterMeanProjectTest
+fr.ens.transcriptome.aozan.tests.project.LinkReportFastqScreenProjectTest
 fr.ens.transcriptome.aozan.tests.sample.AdapterContentFastQCSampleTest
 fr.ens.transcriptome.aozan.tests.sample.BadTilesFastQCSampleTest
 fr.ens.transcriptome.aozan.tests.sample.BasicStatsFastQCSampleTest
