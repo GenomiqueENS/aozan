@@ -310,7 +310,7 @@ doctype-system="about:legacy-compat"/>
 
 	<div id="header_filename">
 		Generated <xsl:value-of select="/QCReport/ReportDate"/><br/>
-		<a href="#global">Global</a> / <a href="#lane">Lanes</a> / <a href="#sample">Samples</a>
+		<a href="#global">Global</a> / <a href="#lane">Lanes</a> / <a href="#project">Projects</a> / <a href="#sample">Samples</a>
 	</div>
 
 </div>
@@ -382,6 +382,34 @@ doctype-system="about:legacy-compat"/>
   </xsl:for-each>
 </div>
   </xsl:if>
+  
+  <xsl:if test="/QCReport[ProjectsReport]">
+  <a id="project"></a>
+  <h2>Projects statistics report</h2>
+   <table class="data">
+  <tr>
+  	<th>Project</th>
+    <xsl:for-each select="/QCReport/ProjectsReport/Columns/Column">
+      <th><xsl:value-of select="."/><xsl:if test="@unit!=''"> (<xsl:value-of select="@unit"/>)</xsl:if></th>
+    </xsl:for-each>
+  </tr>
+  <xsl:for-each select="/QCReport/ProjectsReport/Projects/Project">
+  <tr>
+  	<td><xsl:value-of select="@name"/></td>
+    <xsl:for-each select="Test">
+      <td class="score{@score}">
+        <xsl:if test="@type='int'"><xsl:value-of select="format-number(.,'### ### ### ### ###','aozan')"/></xsl:if>
+        <xsl:if test="@type='float'"><xsl:value-of select="format-number(.,'### ### ### ##0.00','aozan')"/></xsl:if>
+        <xsl:if test="@type='percent'"><xsl:value-of select="format-number(.,'#0.00%','aozan')"/></xsl:if>
+        <xsl:if test="@type='string'"><xsl:value-of select="."/></xsl:if>
+        <xsl:if test="@type='url'"><a href="{.}">link</a></xsl:if>
+      </td>
+    </xsl:for-each>
+  </tr>
+    </xsl:for-each>
+  
+  </table>
+	</xsl:if>
 
   <a id="sample"></a>
   <xsl:if test="/QCReport[SamplesReport]">
