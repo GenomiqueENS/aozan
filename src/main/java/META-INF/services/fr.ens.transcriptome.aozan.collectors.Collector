@@ -8,3 +8,4 @@ fr.ens.transcriptome.aozan.collectors.FastqScreenCollector
 fr.ens.transcriptome.aozan.collectors.TemporaryPartialFastqCollector
 fr.ens.transcriptome.aozan.collectors.UndeterminedIndexesCollector
 fr.ens.transcriptome.aozan.collectors.GlobalStatsCollector
+fr.ens.transcriptome.aozan.collectors.ProjectStatsCollector

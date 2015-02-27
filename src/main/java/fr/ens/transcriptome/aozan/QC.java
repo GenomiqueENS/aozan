@@ -50,6 +50,7 @@ import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.AozanTestRegistry;
 import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
 import fr.ens.transcriptome.aozan.tests.lane.LaneTest;
+import fr.ens.transcriptome.aozan.tests.project.ProjectTest;
 import fr.ens.transcriptome.aozan.tests.sample.SampleTest;
 
 /**
@@ -88,6 +89,7 @@ public class QC {
   private final List<Collector> collectors = new ArrayList<>();
   private final List<GlobalTest> globalTests = new ArrayList<>();
   private final List<LaneTest> laneTests = new ArrayList<>();
+  private final List<ProjectTest> projectTests = new ArrayList<>();
   private final List<SampleTest> sampleTests = new ArrayList<>();
   private final Map<String, String> globalConf = new HashMap<>();
 
@@ -163,7 +165,8 @@ public class QC {
 
     // Create the report
     final QCReport qcReport =
-        new QCReport(data, this.globalTests, this.laneTests, this.sampleTests);
+        new QCReport(data, this.globalTests, this.laneTests, this.projectTests,
+            this.sampleTests);
 
     // Create the completed raw data file
     writeRawData(qcReport, dataFile);
@@ -352,6 +355,12 @@ public class QC {
               this.sampleTests.add((SampleTest) t);
               mapTests.put(key, t);
             }
+
+          } else if (test instanceof ProjectTest) {
+            for (final AozanTest t : tests) {
+              this.projectTests.add((ProjectTest) t);
+              mapTests.put(key, t);
+            }
           }
 
         } else {
@@ -371,6 +380,9 @@ public class QC {
       test.init();
     }
     for (final SampleTest test : this.sampleTests) {
+      test.init();
+    }
+    for (final ProjectTest test : this.projectTests) {
       test.init();
     }
   }
@@ -425,6 +437,9 @@ public class QC {
       testsList.add(lt);
     }
     for (final SampleTest st : this.sampleTests) {
+      testsList.add(st);
+    }
+    for (final ProjectTest st : this.projectTests) {
       testsList.add(st);
     }
 
@@ -528,7 +543,8 @@ public class QC {
         });
 
     if (designFiles == null || designFiles.length == 0) {
-      throw new AozanException("No Casava design file found in "+ this.fastqDir);
+      throw new AozanException("No Casava design file found in "
+          + this.fastqDir);
     }
 
     final File casavaDesignFile = designFiles[0];

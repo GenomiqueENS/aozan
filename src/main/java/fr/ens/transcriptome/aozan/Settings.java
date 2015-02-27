@@ -238,6 +238,9 @@ public final class Settings {
   /** Collector fastqscreen xsl file. */
   public static final String QC_CONF_FASTQSCREEN_XSL_FILE_KEY =
       "qc.conf.fastqscreen.xsl.file";
+  /** Collector project, fastqscreen xsl file */
+  public static final String QC_CONF_FASTQSCREEN_PROJECT_XSL_FILE_KEY =
+      "qc.conf.fastqscreen.project.xsl.file";
   /** Collector read xml collector used. */
   public static final String QC_CONF_READ_XML_COLLECTOR_USED_KEY =
       "qc.conf.read.xml.collector.used";
@@ -247,11 +250,17 @@ public final class Settings {
   /** Collector undetermined indexed xsl file. */
   public static final String QC_CONF_UNDETERMINED_INDEXED_XSL_FILE_KEY =
       "qc.conf.undetermined.indexed.xsl.file";
-  
-  /** Collector FastQC, process on undetermined indices samples, default at false. */
+
+  /**
+   * Collector FastQC, process on undetermined indices samples, default at
+   * false.
+   */
   public static final String QC_CONF_FASTQC_PROCESS_UNDETERMINED_SAMPLES_KEY =
       "qc.conf.fastqc.process.undetermined.samples";
-  /** Collector FastqScreen, process on undetermined indices samples, default at false. */
+  /**
+   * Collector FastqScreen, process on undetermined indices samples, default at
+   * false.
+   */
   public static final String QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY =
       "qc.conf.fastqscreen.process.undetermined.samples";
 }
