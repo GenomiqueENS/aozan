@@ -167,6 +167,16 @@ public class RunData {
   }
 
   /**
+   * Gets the sample genome.
+   * @param lane the lane
+   * @param sampleName the sample name
+   * @return the sample genome
+   */
+  public String getSampleGenome(final int lane, final String sampleName) {
+    return this.get("design.lane" + lane + "." + sampleName + ".sample.ref");
+  }
+
+  /**
    * Get the raw cluster count for a sample.
    * @param sampleName sample name
    * @return the raw cluster count of the sample
@@ -191,6 +201,40 @@ public class RunData {
         .getInt("demux.lane"
             + lane + ".sample." + sampleName + ".read" + read
             + ".pf.cluster.count");
+  }
+
+  /**
+   * Get the raw cluster recovery count for a sample.
+   * @param lane the lane
+   * @param sampleName sample name
+   * @return the raw cluster recovery count of the sample
+   */
+  public int getSampleRawClusterRecoveryCount(final int lane,
+      final String sampleName) {
+
+    if (sampleName == null)
+      return this.getInt("undeterminedindices.lane"
+          + lane + ".recoverable.raw.cluster.count");
+
+    return this.getInt("undeterminedindices.lane"
+        + lane + ".sample." + sampleName + ".recoverable.raw.cluster.count");
+  }
+
+  /**
+   * Get the passing filter cluster recovery count for a sample.
+   * @param lane the lane
+   * @param sampleName sample name
+   * @return the passing filter cluster recovery count of the sample
+   */
+  public int getSamplePFClusterRecoveryCount(final int lane,
+      final String sampleName) {
+
+    if (sampleName == null)
+      return this.getInt("undeterminedindices.lane"
+          + lane + ".recoverable.pf.cluster.count");
+
+    return this.getInt("undeterminedindices.lane"
+        + lane + ".sample." + sampleName + ".recoverable.pf.cluster.count");
   }
 
   /**
