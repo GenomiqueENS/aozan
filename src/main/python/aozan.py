@@ -98,15 +98,17 @@ is_error_message = True
 is_not_error_message = False
 
 
-def lock_step(lock_file_path):
+def lock_step(lock_file_path, conf):
     """Lock a step.
 
     Arguments:
         lock_file_path: lock_file path
+        conf: configuration object
     """
+    
     # Check if parent directory of the lock file exists
     if os.path.isdir(os.path.dirname(lock_file_path)):
-        common.log('SEVERE', 'Parent directory of lock file does not exists. The lock file has not been created: ' + lock_file_path)
+        common.log('SEVERE', 'Parent directory of lock file does not exists. The lock file has not been created: ' + lock_file_path, conf)
         return True
 
     # Return False if the run is currently processed
@@ -117,7 +119,7 @@ def lock_step(lock_file_path):
     try:
         open(lock_file_path, 'w').close()
     except:
-        common.log('SEVERE', 'The lock file cannot not been created (' + sys.exc_info()[0] + '): ' + lock_file_path)
+        common.log('SEVERE', 'The lock file cannot not been created (' + sys.exc_info()[0] + '): ' + lock_file_path, conf)
         return True
 
     return True 
@@ -145,7 +147,7 @@ def lock_sync_step(conf, run_id):
         run_id: run_id
     """
 
-    return lock_step(conf[BCL_DATA_PATH_KEY] + '/' + run_id + '.lock')
+    return lock_step(conf[BCL_DATA_PATH_KEY] + '/' + run_id + '.lock', conf)
 
 def lock_demux_step(conf, run_id):
     """Lock the demux step step.
@@ -155,7 +157,7 @@ def lock_demux_step(conf, run_id):
         run_id: run_id
     """
 
-    return lock_step(conf[FASTQ_DATA_PATH_KEY] + '/' + run_id + '.lock')
+    return lock_step(conf[FASTQ_DATA_PATH_KEY] + '/' + run_id + '.lock', conf)
 
 def lock_qc_step(conf, run_id):
     """Lock the qc step step.
@@ -165,7 +167,7 @@ def lock_qc_step(conf, run_id):
         run_id: run_id
     """
 
-    return lock_step(conf[REPORTS_DATA_PATH_KEY] + '/' + run_id + '/qc_' + run_id + '.lock')
+    return lock_step(conf[REPORTS_DATA_PATH_KEY] + '/qc_' + run_id + '.lock', conf)
 
 def lock_partial_sync_step(conf, run_id):
     """Lock the partial sync step.
@@ -391,14 +393,15 @@ def aozan_main():
     parser = OptionParser(usage='usage: ' + Globals.APP_NAME_LOWER_CASE + '.sh [options] conf_file')
     parser.add_option('-q', '--quiet', action='store_true', dest='quiet',
                 default=False, help='quiet')
-    parser.add_option('-v', '--version', action='Aozan version', dest='version', help='Aozan version')
+    parser.add_option('-v', '--version', action='store_true', dest='version', help='Aozan version')
 
     # Parse command line arguments
     (options, args) = parser.parse_args()
     
     # Print Aozan current version
     if options.version:
-        print Globals.APP_VERSION_STRING + " " + Globals.APP_BUILD_COMMIT
+        print Globals.WELCOME_MSG
+        sys.exit(0)
         
     # If no argument print usage
     if len(args) < 1:
