@@ -30,6 +30,7 @@ import java.lang.management.ManagementFactory;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import fr.ens.transcriptome.eoulsan.EoulsanException;
@@ -120,6 +121,15 @@ public class Common {
     eoulsanLogger.removeHandler(eoulsanLogger.getParent().getHandlers()[0]);
 
     eoulsanLogger.addHandler(fh);
+  }
+
+  /**
+   * Cancel logger.
+   */
+  public static void cancelLogger() {
+
+    LogManager.getLogManager().reset();
+
   }
 
 }
