@@ -113,8 +113,7 @@ public class ProjectStatsCollector implements Collector {
     for (ProjectStat p : projects) {
       final FastqScreenProjectReport fpr = new FastqScreenProjectReport(p);
 
-      final File f = p.createReportHtmlFile();
-      fpr.createReport(p.createReportHtmlFile());
+      fpr.createReport(p.getReportHtmlFile());
 
     }
 
@@ -211,7 +210,7 @@ public class ProjectStatsCollector implements Collector {
       return this.genomes;
     }
 
-    public File createReportHtmlFile() {
+    public File getReportHtmlFile() {
 
       return new File(reportDir + "/Project_" + this.projectName,
           this.projectName + "-fastqscreen.html");
@@ -264,6 +263,9 @@ public class ProjectStatsCollector implements Collector {
             }
           }));
 
+      // Sort by filename
+      Collections.sort(reports);
+
       return Collections.unmodifiableList(reports);
     }
 
@@ -279,7 +281,7 @@ public class ProjectStatsCollector implements Collector {
             + " incompatible with fastqscreen report found "
             + this.fastqscreenReportSamples.size());
 
-      return this.fastqscreenReportSamples;
+      return Collections.unmodifiableList(this.fastqscreenReportSamples);
     }
 
     @Override
