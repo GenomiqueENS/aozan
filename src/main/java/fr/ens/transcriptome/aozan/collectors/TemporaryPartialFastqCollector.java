@@ -28,8 +28,10 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.io.FastqSample;
@@ -41,6 +43,9 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
  * @author Sandrine Perrin
  */
 public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
+
+  /** Logger. */
+  private static final Logger LOGGER = Common.getLogger();
 
   public static final String COLLECTOR_NAME = "tmppartialfastq";
 
@@ -196,9 +201,13 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
     // Check value exist in rundata, if not then fastq is empty
     if (data.get(prefix + ".pf.cluster.count") == null
         || data.get(prefix + ".raw.cluster.count") == null) {
+
       // No demultiplexing data exist
-      throw new AozanException("Fail create partial FastQ for sample "
+      LOGGER.warning("Can not create partial FastQ for sample "
           + fastqSample.getSampleName() + " no demultiplexing data found.");
+
+      // Return no thread
+      return null;
     }
 
     final int pfClusterCount = data.getInt(prefix + ".pf.cluster.count");
