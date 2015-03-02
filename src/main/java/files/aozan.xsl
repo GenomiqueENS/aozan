@@ -242,37 +242,62 @@ doctype-system="about:legacy-compat"/>
 	
   </style>
   <script type="text/javascript">
-			<xsl:comment><![CDATA[
+	<xsl:comment><![CDATA[
 
-		// Retrieve list lane number related to projet
-		function filterRow(lanes_related_project, project_name, elemLink) {
+			
+        // Retrieve list lane number related to projet
+        function filterRow(lanes_related_project, project_name, elemLink) {
 
             init_all('none');
 
-			//Split
-			var lanes = lanes_related_project[0].split(',');
+            //Split
+            var lanes = lanes_related_project[0].split(',');
 
-			for (var n=0; n < lanes.length; n++){
-				var node = document.getElementsByClassName(lanes[n]);
+            alert('project name ' + project_name);
 
-				if (project_name == "Undetermined"){
-					var lastLane = node.length - 1;
-					node[lastLane].style.display ="table-row";
-				} else {
-					for (var i=0; i < node.length; i++){
-						node[i].style.display ="table-row";
-					}
-				}
-			}
-			update_link_css(elemLink)
-		}
+            if (project_name == "Undetermined"){
+                alert('cas Undetermined')
+                var table_read = document.getElementsByClassName('sampleData');
+
+                // Parsing read
+                for (var read = 0; read < table_read.length ; read++){
+                    // Parsing lanes set in parameters
+                    for (var j=0; j < lanes.length; j++){
+
+                        // Get rows number
+                        var node_lane = table_read[read].getElementsByClassName(lanes[j]);
+                        var last_row = node_lane.length -1 ;
+                        // Display last rows from selected lane
+                        node_lane[last_row].style.display ="table-row";
+                    }
+                }
+            } else {
+              // Filter sample table data
+              for (var n=0; n < lanes.length; n++){
+                  var node = document.getElementsByClassName(lanes[n]);
+                  for (var i=0; i < node.length; i++){
+                      node[i].style.display ="table-row";
+
+                  }
+              }
+
+              // Filter project table data
+              var projects = document.getElementsByClassName('projectData')[0];
+              var project_row = projects.getElementsByClassName(project_name);
+
+              // One row by project
+              project_row[0].style.display ="table-row";
+            }
+
+            update_link_css(elemLink)
+        }
 					   
 		function update_link_css(elemLink){
 			// Change class link
-		       // Inactivate link
-		       document.getElementsByClassName('linkFilterActivate')[0].setAttribute('class', 'linkFilterInactivate');
-		       // Activate new element
-		       elemLink.setAttribute('class', 'linkFilterActivate');
+	       // Inactivate link
+	       document.getElementsByClassName('linkFilterActivate')[0].setAttribute('class', 'linkFilterInactivate');
+	       // Activate new element
+	       elemLink.setAttribute('class', 'linkFilterActivate');
 
 			// Change position
 			window.location = '#project';
@@ -280,8 +305,17 @@ doctype-system="about:legacy-compat"/>
 			
 
 		function init_all(display_val){
-
-			var tab = document.getElementsByClassName('sampleData');
+			init_table(display_val,'sampleData')
+			init_table(display_val,'projectData')
+					
+			var header = document.getElementsByClassName('headerColumns');
+			for (var i=0; i < header.length; i++){
+				header[i].style.display = "table-row";
+			}
+		}
+					
+		function init_table(display_val, class_name){
+			var tab = document.getElementsByClassName(class_name);
 
 			for (var n=0; n < tab.length; n++){
 				var rows = tab[n].getElementsByTagName('tr');
@@ -290,13 +324,7 @@ doctype-system="about:legacy-compat"/>
 					rows[i].style.display = display_val;
 				}
 			}
-
-			var header = document.getElementsByClassName('headerColumns');
-			for (var i=0; i < header.length; i++){
-				header[i].style.display = "table-row";
-			}
-		}
-
+		}					
 		]]></xsl:comment>
 		</script>
 </head>
@@ -386,16 +414,16 @@ doctype-system="about:legacy-compat"/>
   <xsl:if test="/QCReport[ProjectsReport]">
   <a id="project"></a>
   <h2>Projects statistics report</h2>
-   <table class="data">
-  <tr>
-  	<th>Project</th>
+   <table class="projectData">
+  <tr class="headerColumns">
+	<th>Project</th>
     <xsl:for-each select="/QCReport/ProjectsReport/Columns/Column">
       <th><xsl:value-of select="."/><xsl:if test="@unit!=''"> (<xsl:value-of select="@unit"/>)</xsl:if></th>
     </xsl:for-each>
   </tr>
   <xsl:for-each select="/QCReport/ProjectsReport/Projects/Project">
-  <tr>
-  	<td class="{@name}"><xsl:value-of select="@name"/></td>
+  <tr class="{@name}">
+  	<td><xsl:value-of select="@name"/></td>
     <xsl:for-each select="Test">
       <td class="score{@score}">
         <xsl:if test="@type='int'"><xsl:value-of select="format-number(.,'### ### ### ### ###','aozan')"/></xsl:if>
