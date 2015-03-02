@@ -150,6 +150,10 @@ public class FastqScreenResult {
           "Error writing a html report fastqScreen : no values available.");
     }
 
+    // Create filename report xml, change extension from report html
+    final File reportXML =
+        new File(reportHtml.getAbsolutePath().replaceAll(".html$", ".xml"));
+
     // Call stylesheet file for report
     InputStream is = null;
     if (fastqscreenXSLFile == null) {
@@ -161,6 +165,9 @@ public class FastqScreenResult {
 
     // Create document XML
     final Document doc = createDocumentXML(fastqSample, data, genomeSample);
+
+    // Create xml report
+    XMLUtilsWriter.createXMLFile(doc, reportXML);
 
     // Create html report from xml with xsl file
     XMLUtilsWriter.createHTMLFileFromXSL(doc, is, reportHtml);
