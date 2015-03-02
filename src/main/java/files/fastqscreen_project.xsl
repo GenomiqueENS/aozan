@@ -120,23 +120,32 @@ doctype-system="about:legacy-compat"/>
       text-align:left;
       vertical-align:middle;
       width:auto;
-      padding-bottom:5em;
+      padding-bottom:3em;
+      padding-right:3em;
   	}
 
   	#report_right{
       display:inline-block;
-      float:right;
-      clear:right;
+      float:inherit;
+      clear:inherit;
       text-align:left;
       vertical-align:middle;
       width:auto;
-      padding-bottom:5em;
-      margin-bottom:5em;
-      border-bottom:3em;
+      padding-bottom:3em;
     }
+
 
     td, th{
 	width:90px;
+    }
+   	
+    #goToSample td{
+    border:#ffffff;
+    border-style:hidden;
+    }
+
+    #goToSample{
+	padding-bottom:3em;    
     }
   </style>
 </head>
@@ -145,15 +154,13 @@ doctype-system="about:legacy-compat"/>
   <div class="header">
   	<div id="header_title">
 		<img src="http://www.transcriptome.ens.fr/aozan/images/logo_aozan_qc.png" alt="Aozan"/>  
-		Detection contamination report
+		Detection contamination report for project <b><xsl:value-of select="/ReportFastqScreen/projectName"/></b>
 	</div>   
   </div>
-
+<a name="top"></a>
  
   <div class="report">
  
-  <h3>Detection contamination report</h3>
-
   <ul>
     <li><b>Run Id: </b> <xsl:value-of select="/ReportFastqScreen/RunId"/></li>
     <li><b>Flow cell: </b> <xsl:value-of select="/ReportFastqScreen/FlowcellId"/></li>
@@ -166,10 +173,17 @@ doctype-system="about:legacy-compat"/>
   </ul>
 
 
-  
+	<table id="goToSample">
+	<tr>
+  		<xsl:for-each select="/ReportFastqScreen/project/sample">
+		<td><a href="#{sampleName}"><xsl:value-of select="sampleName"/></a></td>
+  		</xsl:for-each>
+  </tr>
+  </table>
   
     <xsl:for-each select="/ReportFastqScreen/project/sample">
-    <div id="report_right">
+   		<a id="{sampleName}"></a>
+    	<div id="report_right">
  
  <table border="1">
     <tr>
@@ -190,6 +204,7 @@ doctype-system="about:legacy-compat"/>
     <!-- end report right -->    
     </div>
 
+   <a href="#top">TOP</a>
   <div id="report_left">
   <ul>
     <li><b>Sample: </b> <xsl:value-of select="sampleName"/></li>
