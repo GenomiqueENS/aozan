@@ -60,7 +60,7 @@ def lock_file_exists(lock_file_path):
     return False
 
 def delete_lock_file(lock_file_path):
-    """Create the lock file.
+    """Delete the lock file.
 
     Arguments:
         lock_file_path path of the lock file
@@ -457,6 +457,9 @@ def aozan_main():
 
             if something_to_do:
                 common.log('INFO', 'End of Aozan', conf)
+                    
+                # Cancel logger, in case not be cancel properly 
+                Common.cancelLogger()
         except:
                 # Get exception info
                 exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
@@ -468,6 +471,9 @@ def aozan_main():
 
                 # Send a mail with the exception
                 common.send_msg("[Aozan] Exception: " + exception_msg, traceback_msg, is_not_error_message, conf)
+                
+                # Cancel logger, in case not be cancel properly 
+                Common.cancelLogger()
     else:
         if not options.quiet:
             print "A lock file exists."
