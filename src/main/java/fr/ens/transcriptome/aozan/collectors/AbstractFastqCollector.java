@@ -348,6 +348,11 @@ public abstract class AbstractFastqCollector implements Collector {
         if (this.isProcessStandardSamples()) {
           for (final String sampleName : sampleNames) {
 
+            // Skip invalid sample for quality control, like FASTQ file empty
+            if (!isValidFastQSampleForQC(data, lane, sampleName, read)) {
+              continue;
+            }
+
             // Get the sample index
             final String index = data.getIndexSample(lane, sampleName);
 
@@ -386,6 +391,35 @@ public abstract class AbstractFastqCollector implements Collector {
       }
 
     } // Read
+  }
+
+  /**
+   * Checks if is valid fast q sample for qc.
+   * @param data result data object.
+   * @param lane the lane number.
+   * @param sampleName the sample name.
+   * @param read the read number.
+   * @return true, if sample is valid otherwise false, like FASTQ file empty.
+   */
+  private boolean isValidFastQSampleForQC(final RunData data, final int lane,
+      final String sampleName, final int read) {
+
+    final String prefix =
+        "demux.lane" + lane + ".sample." + sampleName + ".read" + read;
+
+    // Check value exist in rundata, if not then fastq is empty
+    final boolean invalid =
+        (data.get(prefix + ".pf.cluster.count") == null || data.get(prefix
+            + ".raw.cluster.count") == null);
+
+    if (invalid)
+      LOGGER.warning("Sample "
+          + sampleName
+          + " no demultiplexing data found, no quality control data.");
+
+    // Return true if sample valid
+    return !invalid;
+
   }
 
   /**
@@ -483,6 +517,8 @@ public abstract class AbstractFastqCollector implements Collector {
       final List<Future<? extends AbstractFastqProcessThread>> threads,
       final ExecutorService executor) throws AozanException {
 
+    final boolean interruptThreadIfRunning = true;
+
     int samplesNotProcessed = 0;
 
     // Wait until all samples are processed
@@ -524,16 +560,24 @@ public abstract class AbstractFastqCollector implements Collector {
               }
 
             }
-
           } catch (final InterruptedException e) {
             // LOGGER.warning("InterruptedException: " + e.getMessage());
           } catch (final ExecutionException e) {
+
+            if (fst.cancel(interruptThreadIfRunning)) {
+              LOGGER
+                  .severe("Throw exception by thread execution, task could not be cancelled.");
+            } else {
+              LOGGER
+                  .severe("Throw exception by thread execution, task is cancelled.");
+            }
+
+            // Throw exception
             throw new AozanException(e);
           }
 
         } else {
           samplesNotProcessed++;
-
         }
 
       }
