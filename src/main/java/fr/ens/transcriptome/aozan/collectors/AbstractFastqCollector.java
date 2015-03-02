@@ -52,29 +52,45 @@ import fr.ens.transcriptome.aozan.io.FastqStorage;
 /**
  * The abstract class define commons methods for the Collectors which treats
  * fastq files.
- * @since 1.0
  * @author Sandrine Perrin
+ * @since 1.0
  */
 public abstract class AbstractFastqCollector implements Collector {
 
   /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
+  /** The fastq storage. */
   private FastqStorage fastqStorage;
+
+  /** The casava output path. */
   private String casavaOutputPath;
+
+  /** The qc report output path. */
   private String qcReportOutputPath;
+
+  /** The tmp dir. */
   private File tmpDir;
 
   // Set samples to treat
+  /** The fastq samples. */
   private final Set<FastqSample> fastqSamples =
       new LinkedHashSet<FastqSample>();
 
   // mode threaded
+  /** The Constant CHECKING_DELAY_MS. */
   private static final int CHECKING_DELAY_MS = 5000;
+
+  /** The Constant WAIT_SHUTDOWN_MINUTES. */
   private static final int WAIT_SHUTDOWN_MINUTES = 60;
 
+  /** The threads. */
   private List<AbstractFastqProcessThread> threads;
+
+  /** The future threads. */
   private List<Future<? extends AbstractFastqProcessThread>> futureThreads;
+
+  /** The executor. */
   private ExecutorService executor;
 
   //
@@ -486,7 +502,7 @@ public abstract class AbstractFastqCollector implements Collector {
 
   /**
    * Return run data file corresponding of a sample or a undetermined fastq.
-   * @param fastqSample
+   * @param fastqSample the fastq sample
    * @return run data file
    */
   private File createTemporaryDataFile(final FastqSample fastqSample) {
@@ -605,24 +621,56 @@ public abstract class AbstractFastqCollector implements Collector {
         continue;
       }
 
-      // Collect all data file
-      List<File> dataFiles = collectTemporaryDatafile(fs);
+      deleteTemporaryDatafile(fs);
 
-      // Delete temporary data file
-      for (final File f : dataFiles) {
-        if (!(f.exists() && f.delete())) {
-          LOGGER.warning("Can not delete data file : " + f.getAbsolutePath());
-        }
-      }
+      deleteFastqScreenSampleReportXML(fs);
     }
   }
 
   /**
-   * Collect temporary datafile.
+   * Delete the fastq screen sample report xml.
+   * @param fastqSample the fastq sample
+   */
+  private void deleteFastqScreenSampleReportXML(final FastqSample fs) {
+    // Collect all data file
+    final List<File> files = collectFileFromSuffix(fs, "-fastqscreen.xml");
+
+    // Delete temporary data file
+    for (final File f : files) {
+      if (!(f.exists() && f.delete())) {
+        LOGGER.warning("Can not delete fastqscreen sample report XML file : "
+            + f.getAbsolutePath());
+      }
+    }
+
+  }
+
+  /**
+   * Delete the temporary data file.
+   * @param fastqSample the fastq sample
+   */
+  private void deleteTemporaryDatafile(final FastqSample fs) {
+
+    // Collect all data file
+    final List<File> files = collectFileFromSuffix(fs, ".data");
+
+    // Delete temporary data file
+    for (final File f : files) {
+      if (!(f.exists() && f.delete())) {
+        LOGGER.warning("Can not delete data file : " + f.getAbsolutePath());
+      }
+    }
+
+  }
+
+  /**
+   * Collect specific file in quality control directory from suffix.
    * @param fs the FastqSample instance.
+   * @param suffix the suffix of temporary file.
    * @return the list of data file, if not found return an empty list.
    */
-  private List<File> collectTemporaryDatafile(final FastqSample fs) {
+  private List<File> collectFileFromSuffix(final FastqSample fs,
+      final String suffix) {
 
     // Build subdirectory name
     final String subdir =
@@ -637,7 +685,7 @@ public abstract class AbstractFastqCollector implements Collector {
 
       @Override
       public boolean accept(final File pathname) {
-        return pathname.getName().endsWith(".data");
+        return pathname.getName().endsWith(suffix);
       }
     });
 
