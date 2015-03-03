@@ -167,6 +167,14 @@ public class StatisticsUtils {
     return getStandardDeviation().intValue();
   }
 
+  public Double getMin() {
+    return this.ds.getMin();
+  }
+
+  public Double getMax() {
+    return this.ds.getMax();
+  }
+
   /**
    * Returns the instance of DescriptiveStatistics.
    * @return instance of DescriptiveStatistics
