@@ -47,13 +47,13 @@ public class PFClusterMaxProjectTest extends AbstractSimpleProjectTest {
   protected String getKey(final String projectName) {
 
     return ProjectStatsCollector.COLLECTOR_PREFIX
-        + projectName + ".pf.cluster.maw";
+        + projectName + ".pf.cluster.max";
   }
 
   @Override
   protected Class<?> getValueType() {
 
-    return String.class;
+    return Integer.class;
   }
 
   //

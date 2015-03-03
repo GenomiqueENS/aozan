@@ -53,7 +53,7 @@ public class PFClusterSumProjectTest extends AbstractSimpleProjectTest {
   @Override
   protected Class<?> getValueType() {
 
-    return String.class;
+    return Integer.class;
   }
 
   //
