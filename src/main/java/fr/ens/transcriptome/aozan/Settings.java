@@ -241,6 +241,10 @@ public final class Settings {
   /** Collector project, fastqscreen xsl file */
   public static final String QC_CONF_FASTQSCREEN_PROJECT_XSL_FILE_KEY =
       "qc.conf.fastqscreen.project.xsl.file";
+  /** Collector project, fastqscreen xsl file */
+  public static final String QC_CONF_FASTQSCREEN_PERCENT_CONTAMINATION_THRESHOLD_KEY =
+      "qc.conf.fastqscreen.percent.contamination.threshold";
+  
   /** Collector read xml collector used. */
   public static final String QC_CONF_READ_XML_COLLECTOR_USED_KEY =
       "qc.conf.read.xml.collector.used";
