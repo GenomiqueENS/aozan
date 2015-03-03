@@ -238,6 +238,20 @@ public class RunData {
   }
 
   /**
+   * Get the percent mapped read on dataset contaminants. 
+   * @param lane the lane
+   * @param sampleName sample name
+   * @param read the read number
+   * @return the percent mapped read on dataset contaminants.
+   */
+  public double getPercentMappedReadOnContaminationSample(final int lane, final String sampleName,
+      final int read) {
+    return this.getDouble("fastqscreen.lane"
+        + lane + ".sample." + sampleName + ".read" + read + "."
+        + sampleName + ".mappedexceptgenomesample");
+  }
+
+  /**
    * Check if the lane related to the sample name is a control lane.
    * @param lane the lane number
    * @param sampleName the sample name
