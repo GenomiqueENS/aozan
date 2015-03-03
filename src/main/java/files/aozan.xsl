@@ -253,10 +253,7 @@ doctype-system="about:legacy-compat"/>
             //Split
             var lanes = lanes_related_project[0].split(',');
 
-            alert('project name ' + project_name);
-
             if (project_name == "Undetermined"){
-                alert('cas Undetermined')
                 var table_read = document.getElementsByClassName('sampleData');
 
                 // Parsing read
@@ -414,6 +411,30 @@ doctype-system="about:legacy-compat"/>
   <xsl:if test="/QCReport[ProjectsReport]">
   <a id="project"></a>
   <h2>Projects statistics report</h2>
+  
+    <a id="project"></a>
+  <xsl:if test="/QCReport[ProjectsReport]">
+	  <div>
+	  <h4>Filter samples by projects</h4>
+	  <table id="filterProject">
+	    <tr>
+	      <td><a href="javascript:void(0);" class="linkFilterActivate" onclick="window.location.reload(true);">ALL</a></td>
+
+	      <xsl:for-each select="/QCReport/ProjectsReport/ProjectName">
+		    <td>
+			  <xsl:element name="a">
+			  <xsl:attribute name="class">linkFilterInactivate</xsl:attribute>
+			  <xsl:attribute name="href">javascript:void(0);</xsl:attribute>
+			  <xsl:attribute name="onclick">javascript:filterRow([<xsl:value-of select="@cmdJS"></xsl:value-of>], '<xsl:value-of select="." />', this);</xsl:attribute>
+				<xsl:value-of select="." /></xsl:element>
+			</td>
+	      </xsl:for-each>
+	    </tr>
+	  </table>
+	<!--   end filter by project -->
+	  </div>
+  </xsl:if>
+  
    <table class="projectData">
   <tr class="headerColumns">
 	<th>Project</th>
@@ -442,29 +463,6 @@ doctype-system="about:legacy-compat"/>
   <a id="sample"></a>
   <xsl:if test="/QCReport[SamplesReport]">
   <h2>Samples Quality report</h2>
-
-  <a id="project"></a>
-  <xsl:if test="/QCReport[ProjectsReport]">
-	  <div>
-	  <h4>Filter samples by projects</h4>
-	  <table id="filterProject">
-	    <tr>
-	      <td><a href="javascript:void(0);" class="linkFilterActivate" onclick="window.location.reload(true);">ALL</a></td>
-
-	      <xsl:for-each select="/QCReport/ProjectsReport/ProjectName">
-		    <td>
-			  <xsl:element name="a">
-			  <xsl:attribute name="class">linkFilterInactivate</xsl:attribute>
-			  <xsl:attribute name="href">javascript:void(0);</xsl:attribute>
-			  <xsl:attribute name="onclick">javascript:filterRow([<xsl:value-of select="@cmdJS"></xsl:value-of>], '<xsl:value-of select="." />', this);</xsl:attribute>
-				<xsl:value-of select="." /></xsl:element>
-			</td>
-	      </xsl:for-each>
-	    </tr>
-	  </table>
-	<!--   end filter by project -->
-	  </div>
-  </xsl:if>
 
   <xsl:for-each select="/QCReport/SamplesReport/Reads/Read">
     <h3>Read <xsl:value-of select="@number"/></h3>
