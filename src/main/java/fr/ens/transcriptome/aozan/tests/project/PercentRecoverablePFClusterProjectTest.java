@@ -109,7 +109,7 @@ public class PercentRecoverablePFClusterProjectTest extends AbstractProjectTest 
    * Public constructor.
    */
   public PercentRecoverablePFClusterProjectTest() {
-    super("recoverablerpfclusterpercent", "", "Recoverable PF cluster ", "%");
+    super("recoverablepfclusterpercent", "", "Recoverable PF cluster ", "%");
   }
 
 }
