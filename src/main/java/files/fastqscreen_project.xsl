@@ -95,7 +95,7 @@ doctype-system="about:legacy-compat"/>
 	    display:block;
 	    position:absolute;
 	    width:100%;
-	    top:6em;
+	    top:5.2em;
 	    bottom:5px;
 	    left:0;
 	    right:0;
@@ -136,9 +136,8 @@ doctype-system="about:legacy-compat"/>
       text-align:left;
       vertical-align:middle;
       width:auto;
-	  width:50%;
+	  width:60%;
       padding-bottom:3em;
-      padding-right:3em;
   	}
 
   	.report_right{
@@ -191,6 +190,21 @@ doctype-system="about:legacy-compat"/>
     z-index:2;	
    	}
   </style>
+  
+    <script type="text/javascript">
+	<xsl:comment><![CDATA[	
+		
+        function goto(){
+            // Decallage de 2 pour corriger l'affichage
+            var index = document.forms.sampleName.nom.options.selectedIndex - 2;
+            var anchor = document.forms.sampleName.nom.options[index].text;
+
+            window.location.href = "#"+anchor;
+        }
+		
+	]]></xsl:comment>
+	</script>
+	
 </head>
 
 <body>
@@ -218,21 +232,30 @@ doctype-system="about:legacy-compat"/>
     <li><b>Genome : </b> <xsl:value-of select="/ReportFastqScreen/genomeSample"/></li>
   </ul>
 
-
-	<table id="goToSample">
+  	<form name="sampleName">
+		<label>Display a sample : </label>
+		<select name="nom" size="1" onchange="goto()">
+  			<xsl:for-each select="/ReportFastqScreen/project/sample">
+				<option><xsl:value-of select="sampleName"/></option>
+			</xsl:for-each>
+		</select>
+  	</form>
+  	
+	<!-- table id="goToSample">
 	<tr class="linkRow">
   		<xsl:for-each select="/ReportFastqScreen/project/sample">
 		<td><a class="linkSample" href="#{sampleName}"><xsl:value-of select="sampleName"/></a></td>
   		</xsl:for-each>
-  </tr>
-  </table>
+  	</tr>
+  </table -->
   <!-- end run report -->
   </div>
 
   <div class="projectReport">  
   
     <xsl:for-each select="/ReportFastqScreen/project/sample">
-    	<div class="report_right">
+    <div class="report_left">
+    <h3>Sample: <xsl:value-of select="sampleName"/></h3>
    		<a id="{sampleName}"></a>
  
  <table border="1" class="sampleDataTab">
@@ -242,6 +265,7 @@ doctype-system="about:legacy-compat"/>
       </xsl:for-each>
     </tr>
    
+    
    <xsl:for-each select="Report/Genomes/Genome">
    
     <xsl:choose>
@@ -265,14 +289,13 @@ doctype-system="about:legacy-compat"/>
    
    </xsl:for-each>
    </table>
-    <!-- end report right -->    
+    <!-- end report left -->    
     </div>
 
    <!-- a href="#top">TOP</a -->
-  <div class="report_left">
+  <div class="report_right">
   <ul>
-    <li><b>Sample: </b> <xsl:value-of select="sampleName"/></li>
-    <li><b>Description: </b> <xsl:value-of select="/ReportFastqScreen/genomeName"/></li>
+    <li><b>Description: </b> <xsl:value-of select="/ReportFastqScreen/description"/></li>
   </ul>   
    <p>
    <ul>

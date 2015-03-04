@@ -408,18 +408,13 @@ doctype-system="about:legacy-compat"/>
 </div>
   </xsl:if>
   
-  <xsl:if test="/QCReport[ProjectsReport]">
   <a id="project"></a>
-  <h2>Projects statistics report</h2>
-  
-    <a id="project"></a>
   <xsl:if test="/QCReport[ProjectsReport]">
 	  <div>
 	  <h4>Filter samples by projects</h4>
 	  <table id="filterProject">
 	    <tr>
 	      <td><a href="javascript:void(0);" class="linkFilterActivate" onclick="window.location.reload(true);">ALL</a></td>
-
 	      <xsl:for-each select="/QCReport/ProjectsReport/ProjectName">
 		    <td>
 			  <xsl:element name="a">
@@ -433,8 +428,9 @@ doctype-system="about:legacy-compat"/>
 	  </table>
 	<!--   end filter by project -->
 	  </div>
-  </xsl:if>
   
+  <h2>Projects statistics report</h2>
+	<div>
    <table class="projectData">
   <tr class="headerColumns">
 	<th>Project</th>
@@ -456,14 +452,14 @@ doctype-system="about:legacy-compat"/>
     </xsl:for-each>
   </tr>
     </xsl:for-each>
-  
   </table>
+	</div>
 	</xsl:if>
 
   <a id="sample"></a>
   <xsl:if test="/QCReport[SamplesReport]">
   <h2>Samples Quality report</h2>
-
+	<div>
   <xsl:for-each select="/QCReport/SamplesReport/Reads/Read">
     <h3>Read <xsl:value-of select="@number"/></h3>
     <table class="sampleData">
@@ -516,8 +512,8 @@ doctype-system="about:legacy-compat"/>
 
    </table>
   </xsl:for-each>
+	</div>
   </xsl:if>
-
   <p>_</p>
 <!-- End div report -->
 </div>
