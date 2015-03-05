@@ -19,7 +19,7 @@ RUN yum install -y java-1.7.0-openjdk.x86_64
 RUN mkdir /aozan_data
 
 # Install Aozan public version
-ADD https://github.com/GenomicParisCentre/aozan/releases/download/v1.3.2/aozan-1.3.2.tar.gz /tmp/
+ADD https://github.com/GenomicParisCentre/aozan/releases/download/v1.4/aozan-1.4.tar.gz /tmp/
 
 RUN cd /usr/local && tar xvzf /tmp/aozan-*.tar.gz && rm /tmp/aozan-*.tar.gz
 
@@ -63,5 +63,5 @@ RUN mkdir -p /aozan_data/ressources/genomes_descs
 RUN mkdir -p /aozan_data/ressources/mappers_indexes
 
 
-## Command to launch docker Aozan-1.3
+## Command to launch docker Aozan-1.4
 # docker run -i -t --rm -v /path/to/real/dir/var_aozan:/aozan_data/var_aozan -v /path/to/real/dir/conf:/aozan_data/conf -v /path/to/real/dir/hiseq:/aozan_data/hiseq -v /path/to/real/dir/bcl:/aozan_data/bcl -v /path/to/real/dir/fastq:/aozan_data/fastq -v /path/to/real/dir/runs:/aozan_data/runs -v /path/to/real/dir/casava_designs:/aozan_data/casava_samplesheet -v /path/to/real/dir/aozan_tmp:/aozan_data/aozan_tmp -v /path/to/real/dir/ressources:/aozan_data/ressources -v /path/to/real/dir/ncbi_nt:/aozan_data/ncbi_nt -v /path/to/real/dir/ressources/genomes:/aozan_data/ressources/genomes -v /path/to/real/dir/ressources/genomes_descs:/aozan_data/ressources/genomes_descs -v /path/to/real/dir/ressources/mappers_indexes:/aozan_data/ressources/mappers_indexes genomicpariscentre/aozan:1.3 bash

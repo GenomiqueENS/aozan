@@ -385,6 +385,27 @@
 				Global test UndeterminedClustersPercentGlobalTest, fix compute percent.
 			</action>
 		</release>
-		
+
+        <release version="1.4" description="Aozan 1.4 release"  date="2015-03-05">
+            <action dev="jourdren" type="add">
+                Add lock file for each run at each step in context with several instance of Aozan running.
+            </action>
+            <action dev="sperrin" type="add">
+                Add detection contamination project report in HTML, compile data from samples.
+            </action>
+            <action dev="sperrin" type="fix">
+                Fix read collector on InterOp, now it can treat run with multindexes or run without index.
+            </action>
+            <action dev="sperrin" type="update">
+                Archive on run, now is create after the detection run step instead of synchronization step.
+            </action>
+            <action dev="sperrin" type="add">
+                 Aozan now use Eoulsan 2.0-alpha5 as dependency.
+            </action>
+            <action dev="sperrin" type="add">
+                 Add project tests to the QC step. This new type of test comes with some project tests.
+            </action>
+        </release>
+				
 	</body>
 </document>
