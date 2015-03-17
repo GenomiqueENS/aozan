@@ -39,6 +39,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
@@ -200,6 +201,8 @@ public class ProjectStatsCollector implements Collector {
     final List<ProjectStat> projectsSorted =
         new ArrayList<ProjectStatsCollector.ProjectStat>(projects.values());
 
+    Collections.sort(projectsSorted);
+
     return Collections.unmodifiableList(projectsSorted);
   }
 
@@ -236,7 +239,7 @@ public class ProjectStatsCollector implements Collector {
    * @author Sandrine Perrin
    * @since 1.4
    */
-  public final class ProjectStat {
+  public final class ProjectStat implements Comparable<ProjectStat> {
 
     /** Default genome value */
     private static final String DEFAULT_GENOME = "No genome.";
@@ -292,6 +295,14 @@ public class ProjectStatsCollector implements Collector {
 
     /** Data compile in run data */
     private boolean asCompiledData = false;
+
+    @Override
+    public int compareTo(final ProjectStat that) {
+
+      // Compare on project name
+      return that.projectName.toLowerCase(Globals.DEFAULT_LOCALE).compareTo(
+          this.projectName.toLowerCase(Globals.DEFAULT_LOCALE));
+    }
 
     /**
      * Creates the run data project.
