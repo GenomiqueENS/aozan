@@ -26,6 +26,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -38,6 +40,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -143,7 +146,15 @@ public class FastqScreenProjectReport {
 
       // Add sample data in project document
       extractSampleData(doc, sample, srcDoc);
+
     }
+
+    // Create project element with all genomes names
+    final String textContent = compileGenomesInProject(doc);
+
+    final Element e = doc.createElement("genomesProject");
+    e.setTextContent(textContent);
+    root.appendChild(e);
 
     // Return document on project
     return doc;
@@ -203,7 +214,6 @@ public class FastqScreenProjectReport {
     runDataTag.add("InstrumentRunNumber");
     runDataTag.add("ReportDate");
     runDataTag.add("projectName");
-    runDataTag.add("genomeSample");
 
     // Extract
     extractDataFromDOMtoDOM(destDocument, root, srcDocument, runDataTag);
@@ -222,18 +232,22 @@ public class FastqScreenProjectReport {
     // Tags name to extract
     final List<String> sampleDataTag = Lists.newArrayList();
     sampleDataTag.add("sampleName");
+    sampleDataTag.add("genomeSample");
     sampleDataTag.add("descriptionSample");
+    sampleDataTag.add("lane");
     sampleDataTag.add("Report");
 
     // Extract
     extractDataFromDOMtoDOM(destDocument, sample, srcDocument, sampleDataTag);
+
   }
 
   /**
    * Extract sample data from DOM on sample to add in DOM on project.
    * @param destDocument the destination document, project
-   * @param sample the sample element
+   * @param destElement the dest element
    * @param srcDocument the source document, sample
+   * @param tagNames the tag names
    */
   private void extractDataFromDOMtoDOM(final Document destDocument,
       final Element destElement, final Document srcDocument,
@@ -253,8 +267,47 @@ public class FastqScreenProjectReport {
 
         Node newElem = destDocument.importNode(elem, true);
         destElement.appendChild(newElem);
+
       }
     }
+  }
+
+  /**
+   * Compile genomes in project.
+   * @param the document from xml file.
+   * @return all genomes or if none found no genome
+   */
+  private String compileGenomesInProject(final Document doc) {
+    // Save all genomes in project
+    final List<String> genomes = new ArrayList<>();
+    final String tagName = "genomeSample";
+
+    String textTag = "No genome";
+
+    final NodeList childs = doc.getElementsByTagName(tagName);
+
+    if (childs != null && childs.getLength() > 0) {
+
+      for (int i = 0; i < childs.getLength(); i++) {
+        final String genome = childs.item(i).getTextContent();
+
+        if (!genome.isEmpty() && !genomes.contains(genome)) {
+          // Add new founded genome name
+          genomes.add(genome);
+        }
+      }
+    }
+
+    // Compile genomes name
+    if (!genomes.isEmpty()) {
+      // Sort list
+      Collections.sort(genomes);
+
+      // Set new tag text content
+      textTag = Joiner.on(", ").join(genomes);
+    }
+
+    return textTag;
   }
 
   //
@@ -270,6 +323,7 @@ public class FastqScreenProjectReport {
 
     this.projectStat = project;
     this.fastqscreenXSLFile = xslFile;
+
   }
 
 }
