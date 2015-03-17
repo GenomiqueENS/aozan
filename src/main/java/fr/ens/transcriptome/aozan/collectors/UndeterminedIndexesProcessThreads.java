@@ -863,7 +863,9 @@ public class UndeterminedIndexesProcessThreads extends
     if (!parentDir.exists()) {
       if (!parentDir.mkdirs()) {
         throw new IOException(
-            "Undetermined: Fail to create parent directory of recovery cluster report.");
+            "Undetermined: Fail to create parent directory of recovery cluster lane's report ."
+                + parentDir.getAbsolutePath() + " for new file :"
+                + reportFile.getAbsolutePath());
       }
     }
 
@@ -997,7 +999,7 @@ public class UndeterminedIndexesProcessThreads extends
     if (!parentDir.exists()) {
       if (!parentDir.mkdirs()) {
         throw new IOException(
-            "Undetermined: Fail to create parent directory of recovery cluster report parent directory :"
+            "Undetermined: Fail to create parent directory of recovery cluster sample's report parent directory :"
                 + parentDir.getAbsolutePath()
                 + " for new file :"
                 + reportFile.getAbsolutePath());
