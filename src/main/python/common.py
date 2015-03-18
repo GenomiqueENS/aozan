@@ -562,9 +562,13 @@ def create_html_index_file(conf, run_id, sections):
         jar_is = Globals.getResourceAsStream(Globals.INDEX_HTML_TEMPLATE_FILENAME)
         lines = FileUtils.readFileByLines(jar_is)
 
+    #TODO check all path in session write in link tag and add final file if exist
     # NOT necessary to test step sync if Settings.SYNC_STEP_KEY in sections and os.path.exists(report_path + '/report_' + run_id):
     if os.path.exists(report_path + '/report_' + run_id):
-        sections.append('optional')
+        sections.append('optional2')
+        
+        if os.path.exists(report_path + '/report_' + run_id + '/Status.htm'):
+            sections.append('optional1')
 
     write_lines = True
     result = ''
@@ -572,7 +576,7 @@ def create_html_index_file(conf, run_id, sections):
     for line in lines:
         if line.startswith('<!--START_SECTION'):
             section_name = line.split(' ')[1]
-            if section_name in sections and (is_conf_value_equals_true(section_name, conf) or section_name == 'optional'):
+            if section_name in sections and (is_conf_value_equals_true(section_name, conf) or section_name.startswith('optional')):
                 write_lines = True
             else:
                 write_lines = False
