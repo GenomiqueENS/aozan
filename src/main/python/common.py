@@ -166,7 +166,7 @@ def is_conf_value_defined(settings_key, expected_value, conf):
     return value == expected_value
 
 
-def list_files_existing(path, files_array):
+def list_existing_files(path, files_array):
     """Return string with existing files from array  
     
     Arguments:

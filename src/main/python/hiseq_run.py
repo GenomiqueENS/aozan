@@ -341,7 +341,7 @@ def create_run_summary_reports(run_id, conf):
 
 	# Define set file to copy in report archive, check if exists (depend on parameters Illumina)
 	files = ['InterOp' , 'RunInfo.xml' , 'runParameters.xml']
-	files_to_copy = common.list_files_existing(source_path, files)
+	files_to_copy = common.list_existing_files(source_path, files)
 	
 	if (files_to_copy == None):
 		common.log("WARNING", "Archive " + hiseq_log_archive_file + " not create: none file exists " + files + ' in ' + source_path, conf)
@@ -372,7 +372,7 @@ def create_run_summary_reports(run_id, conf):
 	# Define set file to copy in report archive, check if exists (depend on parameters Illumina)
 	path_source_data = source_path + '/Data'
 	files = ['Status_Files', 'reports', 'Status.htm', '../First_Base_Report.htm' ]
-	files_to_copy = common.list_files_existing(path_source_data, files)
+	files_to_copy = common.list_existing_files(path_source_data, files)
 	if (files_to_copy == None):
 		common.log("WARNING", "Archive " + report_archive_file + " not create: none file exists " + files + ' in ' + source_path, conf)
 	else: 
