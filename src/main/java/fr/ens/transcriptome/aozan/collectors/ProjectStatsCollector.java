@@ -36,6 +36,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -65,6 +66,10 @@ public class ProjectStatsCollector implements Collector {
   /** Default contaminantion percent threshold. */
   private static final double DEFAULT_CONTAMINATION_PERCENT_THRESHOLD = 0.10;
 
+  /** Splitter. */
+  private static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults()
+      .omitEmptyStrings();
+
   /** Report directory. */
   private String reportDir;
 
@@ -74,6 +79,9 @@ public class ProjectStatsCollector implements Collector {
   /** Contamination threshold. */
   private double contaminationThreshold;
 
+  private boolean undeterminedIndexesCollectorSelected = false;
+  private boolean fastqScreenCollectorSelected = false;
+
   @Override
   public String getName() {
     return COLLECTOR_NAME;
@@ -82,14 +90,15 @@ public class ProjectStatsCollector implements Collector {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
+    // UndeterminedIndexesCollector and FastqScreenCollector is optional for this collector.
+    // Use their data only if a test use them.
+    
     return Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME,
-        DesignCollector.COLLECTOR_NAME,
-        UndeterminedIndexesCollector.COLLECTOR_NAME,
-        FastqScreenCollector.COLLECTOR_NAME);
+        DesignCollector.COLLECTOR_NAME);
   }
 
   @Override
-  public void configure(Properties properties) {
+  public void configure(final Properties properties) {
 
     // Set control quality directory
     this.reportDir = properties.getProperty(QC.QC_OUTPUT_DIR);
@@ -123,6 +132,18 @@ public class ProjectStatsCollector implements Collector {
         this.contaminationThreshold = DEFAULT_CONTAMINATION_PERCENT_THRESHOLD;
       }
     }
+
+    // Check optional collector selected
+    final List<String> collectorNames =
+        COMMA_SPLITTER.splitToList(properties
+            .getProperty(QC.QC_COLLECTOR_NAMES));
+
+    undeterminedIndexesCollectorSelected =
+        collectorNames.contains(UndeterminedIndexesCollector.COLLECTOR_NAME);
+
+    fastqScreenCollectorSelected =
+        collectorNames.contains(FastqScreenCollector.COLLECTOR_NAME);
+
   }
 
   @Override
@@ -157,6 +178,12 @@ public class ProjectStatsCollector implements Collector {
    */
   private void createProjectsReport(final List<ProjectStat> projects)
       throws AozanException, IOException {
+
+    // Check FastqScreen collected
+    if (!isFastqScreenCollectorSelected()) {
+      // No selected, no data to create project report
+      return;
+    }
 
     for (ProjectStat p : projects) {
       final FastqScreenProjectReport fpr =
@@ -227,6 +254,22 @@ public class ProjectStatsCollector implements Collector {
     }
 
     return Collections.unmodifiableMap(projects);
+  }
+
+  /**
+   * Checks if is undetermined indexes collector selected.
+   * @return true, if is undetermined indexes collector selected
+   */
+  boolean isUndeterminedIndexesCollectorSelected() {
+    return this.undeterminedIndexesCollectorSelected;
+  }
+
+  /**
+   * Checks if is fastqscreen collector selected.
+   * @return true, if is fastqscreen collector selected
+   */
+  boolean isFastqScreenCollectorSelected() {
+    return this.fastqScreenCollectorSelected;
   }
 
   //
@@ -343,20 +386,31 @@ public class ProjectStatsCollector implements Collector {
       data.put(getPrefixRunData() + ".pf.cluster.max", stats.getMax()
           .intValue());
 
-      // Compile data on recoverable cluster
-      data.put(getPrefixRunData() + ".raw.cluster.recovery.sum",
-          rawClusterRecoverySum);
-      data.put(getPrefixRunData() + ".pf.cluster.recovery.sum",
-          pfClusterRecoverySum);
-
-      // Compile data on detection contamination
-      data.put(getPrefixRunData()
-          + ".samples.exceeded.contamination.threshold.count",
-          getSamplesWithContaminationCount());
+      addConditionalRundata(data);
 
       asCompiledData = true;
 
       return data;
+    }
+
+    private void addConditionalRundata(final RunData data) {
+
+      // Check collector is selected
+      if (isUndeterminedIndexesCollectorSelected()) {
+        // Compile data on recoverable cluster
+        data.put(getPrefixRunData() + ".raw.cluster.recovery.sum",
+            rawClusterRecoverySum);
+        data.put(getPrefixRunData() + ".pf.cluster.recovery.sum",
+            pfClusterRecoverySum);
+      }
+
+      // Check collector is selected
+      if (isFastqScreenCollectorSelected()) {
+        // Compile data on detection contamination
+        data.put(getPrefixRunData()
+            + ".samples.exceeded.contamination.threshold.count",
+            getSamplesWithContaminationCount());
+      }
     }
 
     /**
@@ -387,19 +441,38 @@ public class ProjectStatsCollector implements Collector {
       this.pfClusterSamples.add(this.data.getSamplePFClusterCount(lane, READ,
           sample));
 
-      this.mappedContaminationPercentSamples.add(this.data
-          .getPercentMappedReadOnContaminationSample(lane, sample, READ));
-
-      this.rawClusterRecoverySum +=
-          this.data.getSampleRawClusterRecoveryCount(lane, sample);
-
-      this.pfClusterRecoverySum +=
-          this.data.getSamplePFClusterRecoveryCount(lane, sample);
+      computeConditionalRundata(lane, sample);
 
       this.samples.add(sample);
 
       // Extract from samplesheet file
       this.genomes.add(data.getSampleGenome(lane, sample));
+
+    }
+
+    /**
+     * Compute conditional rundata according to collector selected.
+     * UndeterminedIndexesCollector and FastqScreenCollector is optional for
+     * this collector.
+     * @param lane the lane
+     * @param sample the sample
+     */
+    private void computeConditionalRundata(final int lane, final String sample) {
+
+      // Check collector is selected
+      if (isUndeterminedIndexesCollectorSelected()) {
+        this.rawClusterRecoverySum +=
+            this.data.getSampleRawClusterRecoveryCount(lane, sample);
+
+        this.pfClusterRecoverySum +=
+            this.data.getSamplePFClusterRecoveryCount(lane, sample);
+      }
+
+      // Check collector is selected
+      if (isFastqScreenCollectorSelected()) {
+        this.mappedContaminationPercentSamples.add(this.data
+            .getPercentMappedReadOnContaminationSample(lane, sample, READ));
+      }
 
     }
 
