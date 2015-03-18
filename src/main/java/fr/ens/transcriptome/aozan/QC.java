@@ -75,6 +75,9 @@ public class QC {
   /** QC output directory property key. */
   public static final String QC_OUTPUT_DIR = "qc.output.dir";
 
+  /** QC output directory property key. */
+  public static final String QC_COLLECTOR_NAMES = "qc.collector.names";
+
   /** Temporary directory property key. */
   public static final String TMP_DIR = "tmp.dir";
 
