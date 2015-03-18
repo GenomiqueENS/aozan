@@ -98,17 +98,19 @@ is_error_message = True
 is_not_error_message = False
 
 
-def lock_step(lock_file_path, conf):
+def lock_step(lock_file_path, step_name, conf):
     """Lock a step.
 
     Arguments:
         lock_file_path: lock_file path
+        step_name: step name
         conf: configuration object
     """
     
     # Check if parent directory of the lock file exists
-    if os.path.isdir(os.path.dirname(lock_file_path)):
-        common.log('SEVERE', 'Parent directory of lock file does not exists. The lock file has not been created: ' + lock_file_path, conf)
+    if not os.path.isdir(os.path.dirname(lock_file_path)):
+        common.log('SEVERE', 'Parent directory of lock file does not exists. The lock file for ' + step_name + \
+                   ' step has not been created: ' + lock_file_path, conf)
         return True
 
     # Return False if the run is currently processed
@@ -119,7 +121,8 @@ def lock_step(lock_file_path, conf):
     try:
         open(lock_file_path, 'w').close()
     except:
-        common.log('SEVERE', 'The lock file cannot not been created (' + sys.exc_info()[0] + '): ' + lock_file_path, conf)
+        common.log('SEVERE', 'The lock file cannot not been created (' + sys.exc_info()[0] + ') for ' + step_name + \
+                   ': ' + lock_file_path, conf)
         return True
 
     return True 
@@ -147,7 +150,7 @@ def lock_sync_step(conf, run_id):
         run_id: run_id
     """
 
-    return lock_step(conf[BCL_DATA_PATH_KEY] + '/' + run_id + '.lock', conf)
+    return lock_step(conf[BCL_DATA_PATH_KEY] + '/' + run_id + '.lock', 'sync', conf)
 
 def lock_demux_step(conf, run_id):
     """Lock the demux step step.
@@ -157,7 +160,7 @@ def lock_demux_step(conf, run_id):
         run_id: run_id
     """
 
-    return lock_step(conf[FASTQ_DATA_PATH_KEY] + '/' + run_id + '.lock', conf)
+    return lock_step(conf[FASTQ_DATA_PATH_KEY] + '/' + run_id + '.lock', 'demux', conf)
 
 def lock_qc_step(conf, run_id):
     """Lock the qc step step.
@@ -167,7 +170,7 @@ def lock_qc_step(conf, run_id):
         run_id: run_id
     """
 
-    return lock_step(conf[REPORTS_DATA_PATH_KEY] + '/qc_' + run_id + '.lock', conf)
+    return lock_step(conf[REPORTS_DATA_PATH_KEY] + '/qc_' + run_id + '.lock', 'qc', conf)
 
 def lock_partial_sync_step(conf, run_id):
     """Lock the partial sync step.
