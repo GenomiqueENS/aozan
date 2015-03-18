@@ -100,7 +100,7 @@ def check_end_run_since(run_id, secs, conf):
 
 	Arguments:
 		runtId: the run id
-		secs: naximal number of seconds
+		secs: maximal number of seconds
 		conf: configuration dictionary
 	"""
 
