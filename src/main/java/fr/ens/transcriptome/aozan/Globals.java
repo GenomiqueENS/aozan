@@ -134,7 +134,7 @@ public class Globals {
       "/fastqscreen_project.xsl";
 
   public static final String INDEX_HTML_TEMPLATE_FILENAME =
-      "/template_index_run.txt";
+      "/template_index_run.html";
 
   /** Default locale of the application. */
   public static final Locale DEFAULT_LOCALE = Locale.US;
