@@ -27,15 +27,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 
 import fr.ens.transcriptome.aozan.collectors.Collector;
+import fr.ens.transcriptome.aozan.collectors.ProjectStatsCollector;
 
 /**
  * This Class collect Data.
@@ -50,7 +53,7 @@ public class RunDataGenerator {
   /** Collect done property key. */
   private static final String COLLECT_DONE = "collect.done";
 
-  private final List<Collector> collectors = new ArrayList<>();
+  private final List<Collector> collectors;
   private final Properties properties = new Properties();
 
   /**
@@ -141,6 +144,62 @@ public class RunDataGenerator {
     return data;
   }
 
+  /**
+   * Adds the all collectors and change order per default to move
+   * ProjectStatCollector at the end, if is selected.
+   * @param collectorsInitOrder the collectors init order
+   * @return the same list with new order
+   */
+  private List<Collector> addAllCollectors(
+      final List<Collector> collectorsInitOrder) {
+    // Force ProjectCollector, must be the last
+
+    final List<Collector> collectorsNewOrder = new ArrayList<>();
+
+    Collector projectStat = null;
+
+    for (final Collector collector : collectorsInitOrder) {
+
+      // Collector selected
+      if (collector.getName().equals(ProjectStatsCollector.COLLECTOR_NAME)) {
+        projectStat = collector;
+
+      } else {
+        collectorsNewOrder.add(collector);
+      }
+    }
+
+    // Check ProjectCollector founded
+    if (projectStat != null) {
+      collectorsNewOrder.add(projectStat);
+    }
+
+    if (collectorsInitOrder.size() != collectorsNewOrder.size()) {
+      throw new RuntimeException(
+          "Reorder collector list, generate list with different size.");
+    }
+
+    // Return list with new order
+    return Collections.unmodifiableList(collectorsNewOrder);
+  }
+
+  private void addCollectorNameInProperties() {
+    final List<String> collectorNames = new ArrayList<>();
+
+    for (final Collector collector : this.collectors) {
+      collectorNames.add(collector.getName());
+    }
+
+    // Compile collector names
+    final String propertyValue = Joiner.on(",").join(collectorNames);
+
+    LOGGER.config("Collectors requiered for QC " + propertyValue);
+
+    // Update properties
+    this.properties.setProperty(QC.QC_COLLECTOR_NAMES, propertyValue);
+
+  }
+
   //
   // Constructor
   //
@@ -152,7 +211,10 @@ public class RunDataGenerator {
 
     checkNotNull(collectors, "The list of collectors is null");
 
-    this.collectors.addAll(collectors);
+    this.collectors = addAllCollectors(collectors);
+
+    // Add collector name requiered in properties
+    addCollectorNameInProperties();
   }
 
 }
