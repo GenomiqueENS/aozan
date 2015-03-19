@@ -90,9 +90,10 @@ public class ProjectStatsCollector implements Collector {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    // UndeterminedIndexesCollector and FastqScreenCollector is optional for this collector.
+    // UndeterminedIndexesCollector and FastqScreenCollector is optional for
+    // this collector.
     // Use their data only if a test use them.
-    
+
     return Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME,
         DesignCollector.COLLECTOR_NAME);
   }
@@ -568,6 +569,9 @@ public class ProjectStatsCollector implements Collector {
      */
     public List<File> getFastqScreenReport() {
 
+      if (!isFastqScreenCollectorSelected())
+        throw new UnsupportedOperationException();
+
       if (this.fastqscreenReportSamples.size() != this.sampleCount)
         throw new EoulsanRuntimeException("In project "
             + projectName + " samples count " + sampleCount
@@ -620,8 +624,11 @@ public class ProjectStatsCollector implements Collector {
 
       this.projectDir = new File(reportDir + "/Project_" + this.projectName);
 
-      this.fastqscreenReportSamples = extractFastqscreenReport();
-
+      if (isFastqScreenCollectorSelected()) {
+        this.fastqscreenReportSamples = extractFastqscreenReport();
+      } else {
+        this.fastqscreenReportSamples = null;
+      }
     }
 
   }
