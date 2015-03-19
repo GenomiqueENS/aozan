@@ -210,7 +210,7 @@ def unlock_qc_step(conf, run_id):
         run_id: run_id
     """
 
-    return unlock_step(conf[REPORTS_DATA_PATH_KEY] + '/' + run_id + '/qc_' + run_id + '.lock')
+    return unlock_step(conf[REPORTS_DATA_PATH_KEY] + '/qc_' + run_id + '.lock')
 
 def unlock_partial_sync_step(conf, run_id):
     """Unlock the partial sync step.
