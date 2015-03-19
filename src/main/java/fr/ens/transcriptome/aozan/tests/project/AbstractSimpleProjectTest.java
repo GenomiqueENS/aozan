@@ -61,9 +61,7 @@ public abstract class AbstractSimpleProjectTest extends AbstractProjectTest {
 
   /**
    * Get the the key in the RunData object for the value to test.
-   * @param read index of the read
-   * @param indexedRead true if the read is indexed
-   * @param lane index of the lane
+   * @param projectName the project name
    * @return a String with the required key
    */
   protected abstract String getKey(final String projectName);
@@ -72,9 +70,6 @@ public abstract class AbstractSimpleProjectTest extends AbstractProjectTest {
    * Transform the value.
    * @param value value to transform
    * @param data run data
-   * @param read index of read
-   * @param lane lane index
-   * @param indexedRead true if the read is indexed
    * @return the transformed value
    */
   protected Number transformValue(final Number value, final RunData data) {

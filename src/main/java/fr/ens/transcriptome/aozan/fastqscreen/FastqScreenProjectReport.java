@@ -41,7 +41,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
@@ -202,7 +201,7 @@ public class FastqScreenProjectReport {
       final Document srcDocument) {
 
     // Tag name to extract
-    final List<String> runDataTag = Lists.newArrayList();
+    final List<String> runDataTag = new ArrayList<>();
     runDataTag.add("GeneratorName");
     runDataTag.add("GeneratorVersion");
     runDataTag.add("GeneratorWebsite");
@@ -230,7 +229,7 @@ public class FastqScreenProjectReport {
       final Element sample, final Document srcDocument) {
 
     // Tags name to extract
-    final List<String> sampleDataTag = Lists.newArrayList();
+    final List<String> sampleDataTag = new ArrayList<>();
     sampleDataTag.add("sampleName");
     sampleDataTag.add("genomeSample");
     sampleDataTag.add("descriptionSample");
