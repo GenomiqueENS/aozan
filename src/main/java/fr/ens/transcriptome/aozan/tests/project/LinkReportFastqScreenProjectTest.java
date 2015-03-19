@@ -1,3 +1,26 @@
+/*
+ *                  Aozan development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU General Public License version 3 or later 
+ * and CeCILL. This should be distributed with the code. If you 
+ * do not have a copy, see:
+ *
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+ *
+ * Copyright for this code is held jointly by the Genomic platform
+ * of the Institut de Biologie de l'École Normale Supérieure and
+ * the individual authors. These should be listed in @author doc
+ * comments.
+ *
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page at:
+ *
+ *      http://www.transcriptome.ens.fr/aozan
+ *
+ */
+
 package fr.ens.transcriptome.aozan.tests.project;
 
 import java.util.Collections;
@@ -22,30 +45,6 @@ public class LinkReportFastqScreenProjectTest extends AbstractProjectTest {
 
   @Override
   public TestResult test(RunData data, String projectName) {
-
-    // if (sampleName == null) {
-    // // return new TestResult("NA");
-    // final String projectName = "Undetermined_indices";
-    //
-    // final String filename =
-    // String.format("lane%s_Undetermined_L%03d_R%d_001-fastqscreen.html",
-    // lane, lane, readSample);
-    //
-    // final String url = projectName + "/" + filename;
-    //
-    // // Set score test at -1
-    // return new TestResult(-1, url, "url");
-    // }
-    //
-    // // Check fastqscreen launch for sample
-    // final String key =
-    // "fastqscreen.lane"
-    // + lane + ".sample." + sampleName + ".read" + readSample + "."
-    // + sampleName + ".mappedexceptgenomesample";
-    //
-    // if (data.get(key) == null) {
-    // return new TestResult("NA");
-    // }
 
     // Get HTML report URL
     final String filename = String.format("%s-fastqscreen.html", projectName);
