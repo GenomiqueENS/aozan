@@ -57,13 +57,13 @@
 
       <subsection name="Code repository">
         <p>You can also download the Aozan source from our 
-        	<a href="http://code.google.com/p/aozan/source/checkout">code repository</a> 
-        	hosted by <a href="http://code.google.com/hosting">Google code hosting</a>. 
-        	On the <a href="http://code.google.com/p/aozan">main page of Aozan on this forge</a> 
-        	(<a href="http://code.google.com/p/aozan">http://code.google.com/p/aozan</a>) 
-        	you have access to the <a href="http://code.google.com/p/aozan/issues">issue tracker</a>, 
-        	to the <a href="http://code.google.com/p/aozan/source/browse/">source browser</a> of the project and a 
-        	<a href="http://code.google.com/p/aozan/wiki/MainPage">wiki dedicated to developers</a>.</p>
+		<a href="https://github.com/GenomicParisCentre/aozan">code repository</a>
+		hosted by <a href="https://github.com">GitHub</a>.
+		On the <a href="https://github.com/GenomicParisCentre/aozan">main page of Aozan on this forge</a>
+		(<a href="https://github.com/GenomicParisCentre/aozan">https://github.com/GenomicParisCentre/aozan</a>)
+		you have access to the <a href="https://github.com/GenomicParisCentre/aozan/issues">issue tracker</a>,
+		to the <a href="https://github.com/GenomicParisCentre/aozan">source browser</a> of the project and a
+		<a href="https://github.com/GenomicParisCentre/aozan/wiki">wiki dedicated to developers</a>.</p>
       </subsection>
 
       <subsection name="Compilation">
