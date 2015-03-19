@@ -36,8 +36,8 @@
   
     <section name="Known Bugs for Aozan @@@VERSION@@@">
 
-      <p>You can consult the list of Aozan bugs on the <a href="http://code.google.com/p/aozan/issues/list">issue tracker</a>
-      of the Google code hosting page of our project.</p>  
+      <p>You can consult the list of Aozan bugs on the <a href="https://github.com/GenomicParisCentre/aozan/issues">issue tracker</a>
+      of the GitHub repository of our project.</p>
 
       <!--ul> 
         <li>Bug 1.</li>
@@ -50,8 +50,8 @@
 
       <!-- aozan-list?subject=Bug -->
       <p>You can submit a bug by filling an entry on the 
-      <a href="http://code.google.com/p/aozan/issues/list">issue tracker</a> 
-      of the Google code hosting page of our project.</p>
+      <a href="https://github.com/GenomicParisCentre/aozan/issues/new">issue tracker</a>
+      of GitHub repository of our project.</p>
 
     </section>
 

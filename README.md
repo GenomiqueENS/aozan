@@ -5,4 +5,4 @@ Aozan is an automated post sequencing data processing pipeline. It is a tool tha
 
 Aozan is available on the [Ecole Normale Supérieure Genomic platform website](http://transcriptome.ens.fr/aozan).
 
-Currently the Git reference repository is [https://code.google.com/p/aozan/](http://code.google.com/p/aozan/).
+Currently the Git reference repository is [https://github.com/GenomicParisCentre/aozan](https://github.com/GenomicParisCentre/aozan).

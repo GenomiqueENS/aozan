@@ -47,12 +47,12 @@
 
       <ul>
         <li>Testing new versions</li>
-        <li>Submitting bug reports to the <a href="http://code.google.com/p/aozan/issues/list">issue tracker</a></li>
+        <li>Submitting bug reports to the <a href="https://github.com/GenomicParisCentre/aozan/issues">issue tracker</a></li>
         <!-- 
         <li>Programming new <a href="./writingstepplugin.html">Aozan plugins</a> and redistributing them (by yourself or in Aozan source repository)</li>
          -->
         <li>Submitting patches</li>
-        <li>Writing developer documentation on <a href="http://code.google.com/p/aozan/wiki/MainPage">Aozan Wiki</a> if you become Aozan committer</li>
+        <li>Writing developer documentation on <a href="https://github.com/GenomicParisCentre/aozan/wiki">Aozan Wiki</a> if you become Aozan committer</li>
       </ul>
 
       <p>There are several places to look for more information if you want to get involved in the development. The first step is to subscribe to the aozan group. You will soon see something that can be improved or added.</p>
@@ -61,14 +61,14 @@
     
 
     <section name="How do I commit a bug report?">
-      <p>As Aozan code is hosting by Google, you can use the <a href="http://code.google.com/p/aozan/issues/list">issue tracker</a> bind to our project.</p>
+      <p>As Aozan code is hosting by GitHub, you can use the <a href="https://github.com/GenomicParisCentre/aozan/issues">issue tracker</a> bind to our project.</p>
     </section>
 
    <section name="How do I get access to the code repository ?">
-      <p>The Aozan project uses the Git system to develop the core parts of the software. To facilitate contributions to our project, 
-      Aozan code is hosted by Google code hosting. You can freely access to the 
-      <a href="http://code.google.com/p/aozan/">main page of the project</a> and to the
-      <a href="http://code.google.com/p/aozan/source/checkout">git repository.</a></p>
+      <p>The Aozan project uses the Git system to develop the core parts of the software. To facilitate contributions to our project,
+      Aozan code is hosted by GitHub. You can freely access to the
+      <a href="https://github.com/GenomicParisCentre/aozan">main page of the project</a> and to the
+      <a href="https://github.com/GenomicParisCentre/aozan">git repository.</a></p>
     </section>
 
     

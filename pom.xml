@@ -111,8 +111,8 @@
   </scm>
 
   <issueManagement>
-    <system>code.google.com</system>
-    <url>http://code.google.com/p/aozan/issues</url>
+    <system>GitHub Issues</system>
+    <url>https://github.com/GenomicParisCentre/aozan/issues</url>
   </issueManagement>
 
   <repositories>
