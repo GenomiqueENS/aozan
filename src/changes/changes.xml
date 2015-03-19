@@ -375,8 +375,8 @@
 				QC global report, now button project filter by lane.
 			</action>
 			<action dev="sperrin" type="update">
-				Update dependancies in pom.xml : 1) now use Eoulsan-2.0-alpha3, 2) remove dependency to aws-java-sdk only usefully  
-				with Eoulsan version 2.0-alpha1  
+				Update dependancies in pom.xml : 1) now use Eoulsan-2.0-alpha3, 2) remove dependency to aws-java-sdk 
+				only usefully with Eoulsan version 2.0-alpha1  
 			</action>
 		</release>
 		
@@ -404,6 +404,29 @@
             </action>
             <action dev="sperrin" type="add">
                  Add project tests to the QC step. This new type of test comes with some project tests.
+            </action>
+        </release>
+        
+        <release version="1.4.1" description="Aozan 1.4.1 release"  date="2015-03-19">
+            <action dev="jourdren" type="fix">
+                Fix action to create of lock file on each step.
+            </action>
+            <action dev="sperrin" type="update">
+                Example on final quality control report, add table on project.
+            </action>
+            <action dev="sperrin" type="add">
+                Change default logger level, replace INFO by CONF.
+            </action>
+            <action dev="sperrin" type="update">
+                 In detection contamination project report, add lane number with sample name (case technical replicates), 
+            	can be manage project with several genome.
+            </action>
+            <action dev="sperrin" type="fix">
+                Now ProjectStatsCollector don't require UndeterminedIndexesCollector and FastqScreenCollector. 
+            	Only if they are required for QC step, it can use data to compute related statistics.
+            </action>
+            <action dev="jourdren" type="update">
+                The official Aozan Git repository is now GitHub instead of Google code.
             </action>
         </release>
 				
