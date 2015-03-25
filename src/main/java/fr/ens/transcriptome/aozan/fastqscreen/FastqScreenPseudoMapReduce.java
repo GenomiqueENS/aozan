@@ -65,6 +65,10 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
+  // Boolean use to update logger with parameter mapper only at the first
+  // execution
+  private static boolean firstDoMapRunning = true;
+
   private static final String COUNTER_GROUP = "reads_mapping";
   private final Reporter reporter;
 
@@ -119,9 +123,12 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       this.mapperThreads = numberThreads;
     }
 
-    LOGGER.info("FASTQSCREEN mapping sample "
-        + fastqRead1.getName() + " on genomes "
-        + Joiner.on(",").join(genomesForMapping));
+    if (firstDoMapRunning) {
+      // Update logger at the first execution
+      LOGGER.info("FASTQSCREEN mapping sample "
+          + fastqRead1.getName() + " on genomes "
+          + Joiner.on(",").join(genomesForMapping));
+    }
 
     for (final String genome : genomesForMapping) {
       // Timer : for step mapping on genome
@@ -185,6 +192,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
         timer.stop();
 
+        firstDoMapRunning = false;
+
       } catch (final IOException e) {
         throw new AozanException(e);
       }
@@ -231,7 +240,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     indexer.createIndex(genomeDataFile, this.desc, result);
 
-    LOGGER.info("FASTQSCREEN : create/retrieve index for "
+    LOGGER.fine("FASTQSCREEN : create/retrieve index for "
         + genomeDataFile.getName() + " in "
         + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
@@ -422,10 +431,12 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     mapper.setThreadsNumber(this.mapperThreads);
 
-    LOGGER.info("FASTQSCREEN : init  mapper "
-        + mapper.getMapperName() + ", arguments \"" + getMapperArguments()
-        + "\" in mode " + (pairedMode ? "paired" : "single"));
-
+    if (firstDoMapRunning) {
+      // Update logger at the first execution
+      LOGGER.info("FASTQSCREEN : init  mapper "
+          + mapper.getMapperName() + ", arguments \"" + getMapperArguments()
+          + "\" in mode " + (pairedMode ? "paired" : "single"));
+    }
     return mapper;
   }
 
