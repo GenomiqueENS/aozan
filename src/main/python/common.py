@@ -868,3 +868,5 @@ def set_default_conf(conf):
     conf[Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY] = 'true'
     # run paired : no paired mapping
     conf[Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY] = 'true'
+    # Default mapper is bowtie
+    conf[Settings.QC_CONF_FASTQSCREEN_MAPPER_KEY] = 'bowtie'
