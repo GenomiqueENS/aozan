@@ -864,7 +864,8 @@ public class UndeterminedIndexesProcessThreads extends
       if (!parentDir.mkdirs()) {
         throw new IOException(
             "Undetermined: Fail to create parent directory of recovery cluster lane's report ."
-                + parentDir.getAbsolutePath() + " for new file :"
+                + parentDir.getAbsolutePath()
+                + " for new file :"
                 + reportFile.getAbsolutePath());
       }
     }
@@ -990,8 +991,8 @@ public class UndeterminedIndexesProcessThreads extends
       final String extension) throws IOException {
 
     final File reportFile =
-        new File(this.reportDir.getAbsolutePath()
-            + "/../Project_" + getProjectSample(sampleName) + "/" + sampleName
+        new File(this.reportDir.getParentFile().getAbsolutePath()
+            + "/Project_" + getProjectSample(sampleName) + "/" + sampleName
             + "_lane" + this.lane + "-potentialindices" + extension);
 
     // Create parent directory if necessary
