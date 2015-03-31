@@ -225,7 +225,7 @@ public class QCReport {
    * Generate the QC report for projects data.
    * @param parentElement parent Element
    */
-  private void doProjectsNavigation(final Element parentElement) {
+  private void doProjectsFilter(final Element parentElement) {
 
     final Document doc = this.doc;
 
@@ -238,7 +238,7 @@ public class QCReport {
     final ListMultimap<String, Integer> lanesNumberRelatedProjectName =
         extractLaneNumberRelatedProjectName();
 
-    final Element projects = doc.createElement("ProjectsReport");
+    final Element projects = doc.createElement("ProjectsFilter");
     parentElement.appendChild(projects);
 
     for (final String projectName : projectsName) {
@@ -455,7 +455,7 @@ public class QCReport {
       }
 
       if (!this.sampleTests.isEmpty()) {
-        doProjectsNavigation(root);
+        doProjectsFilter(root);
         doSamplesTests(root);
       }
     } catch (final ParserConfigurationException e) {
