@@ -95,7 +95,8 @@ public class ProjectStatsCollector implements Collector {
     // Use their data only if a test use them.
 
     return Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME,
-        DesignCollector.COLLECTOR_NAME);
+        DesignCollector.COLLECTOR_NAME,
+        FlowcellDemuxSummaryCollector.COLLECTOR_NAME);
   }
 
   @Override
