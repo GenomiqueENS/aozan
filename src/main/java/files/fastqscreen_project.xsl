@@ -14,12 +14,11 @@ doctype-system="about:legacy-compat"/>
   <title>fastqscreen <xsl:value-of select="/ReportFastqScreen/sampleName"/></title>
    <style type="text/css">
    
-    #genomeSample{
+    tr.genomeSample{
     	color:#9B1319;
-    	font-style : bold;
     }
     
-    tr.sampleDataTab:hover {
+    .sampleDataTab tr:hover {
       z-index:2;
       box-shadow:0 0 12px rgba(0, 0, 0, 1);
       background:#F6F6B4;
@@ -153,29 +152,7 @@ doctype-system="about:legacy-compat"/>
     }
 
    	
-   	.linkSample {
-    border-top-left-radius:24px;
-    border-top-right-radius:24px;
-    border-bottom-right-radius:24px;
-    border-bottom-left-radius:24px;
-
-    background-color:#ffffff;
-    text-indent:0px;
-    border:3px solid #000000;
-    display:inline-block;
-    font-family:Arial;
-    font-size:12px;
-    font-weight:bold;
-    font-style:normal;
-    line-height:29px;
-    text-decoration:none;
-    text-align:center;
-    padding-left:5px;
-    padding-right:5px;
-	white-space:nowrap;
-    }
-
-    #goToSample td{
+   #goToSample td{
     border:#ffffff;
     border-style:hidden;
     }
@@ -218,7 +195,7 @@ doctype-system="about:legacy-compat"/>
 		Detection contamination report for project <b><xsl:value-of select="/ReportFastqScreen/projectName"/></b>
 	</div>   
   </div>
-<a name="top"></a>
+<a id="top"></a>
  
   <div class="report">
  
@@ -239,7 +216,7 @@ doctype-system="about:legacy-compat"/>
   	<form name="sampleName">
 		<label><b>Display a sample : </b></label>
 		<select name="nom" size="1" onchange="goto()">
-			<option></option>
+			<option>All</option>
   			<xsl:for-each select="/ReportFastqScreen/project/sample">
 				<option><xsl:value-of select="sampleName"/></option>
 			</xsl:for-each>
@@ -256,7 +233,7 @@ doctype-system="about:legacy-compat"/>
 	<a class="anchor" id="{sampleName}"></a>
     <h3>Sample <xsl:value-of select="sampleName"/> on lane <xsl:value-of select="lane"/></h3>
  
- <table border="1" class="sampleDataTab">
+ <table class="sampleDataTab">
     <tr>
       <xsl:for-each select="Report/Columns/Column">
         <th><xsl:value-of select="@name"/></th>
@@ -268,7 +245,7 @@ doctype-system="about:legacy-compat"/>
    
     <xsl:choose>
    	  <xsl:when test="boolean(@name=/ReportFastqScreen/project/sample/genomeSample)">
-		   <tr id="genomeSample">
+		   <tr class="genomeSample">
 		   	  <td><xsl:value-of select="@name"/></td>
 		      <xsl:for-each select="Value">
 		       	 <td><xsl:value-of select="format-number(.,'#0.00','aozan')"/> %</td>
@@ -297,7 +274,7 @@ doctype-system="about:legacy-compat"/>
     <li><b>Description: </b> <xsl:value-of select="descriptionSample"/></li>
   	<li><b>Genome name: </b> <xsl:value-of select="genomeSample"/></li>
   </ul>   
-   <p>
+
    <ul>
      <li><xsl:value-of select="Report/ReadsUnmapped/@name"/> : <xsl:value-of select="format-number(Report/ReadsUnmapped,'#0.00','aozan')"/> %</li>
      <li><xsl:value-of select="Report/ReadsMappedOneGenome/@name"/> : <xsl:value-of select="format-number(Report/ReadsMappedOneGenome,'#0.00','aozan')"/> %</li>
@@ -308,8 +285,6 @@ doctype-system="about:legacy-compat"/>
        <xsl:value-of select="format-number(Report/ReadsProcessed,'# ##0','thousand')"/>&#160;
        <xsl:value-of select="Report/ReadsProcessed/@name"/>  </li>
    </ul>
-   </p>
-
         
     </div><!-- end report right -->
     </xsl:for-each>

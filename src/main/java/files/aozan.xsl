@@ -45,7 +45,7 @@ doctype-system="about:legacy-compat"/>
       background: #55D486;
     }
 
-   .sampleData tr:hover, .data tr:hover {
+   .sampleData tr:hover, .data tr:hover, .projectData tr:hover,{
       z-index:2;
       box-shadow:0 0 20px rgba(0, 0, 0, 1);
       background:#F6F6B4;
