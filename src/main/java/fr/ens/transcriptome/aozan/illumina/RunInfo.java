@@ -46,51 +46,12 @@ import fr.ens.transcriptome.eoulsan.util.FileUtils;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**
- * This class handle RTA run info data.
+ * This class handle RTA run info data. It is updated with new data related to
+ * RTA version 2.X, published in mars 2015.
  * @since 1.1
  * @author Laurent Jourdren
  */
 public class RunInfo {
-
-  /**
-   * Handle information about a read.
-   * @author Laurent Jourdren
-   */
-  public static class Read {
-
-    private int number;
-    private int numberCycles;
-    private boolean indexedRead;
-
-    /**
-     * @return Returns the number
-     */
-    public int getNumber() {
-      return this.number;
-    }
-
-    /**
-     * @return Returns the numberCycles
-     */
-    public int getNumberCycles() {
-      return this.numberCycles;
-    }
-
-    /**
-     * @return Returns the indexedRead
-     */
-    public boolean isIndexedRead() {
-      return this.indexedRead;
-    }
-
-    @Override
-    public String toString() {
-      return this.getClass().getSimpleName()
-          + "{number=" + this.number + ", numberCycles=" + this.numberCycles
-          + ", indexedRead=" + this.indexedRead + "}";
-    }
-
-  }
 
   private String id;
   private int number;
@@ -100,13 +61,242 @@ public class RunInfo {
   private final List<Read> reads = new ArrayList<>();
 
   // FlowcellLayout
-
   private int flowCellLaneCount;
   private int flowCellSurfaceCount;
   private int flowCellSwathCount;
   private int flowCellTileCount;
 
+  // FlowcellLayout specific to RTA version 2.X
+  private int flowCellSectionPerLane = -1;
+  private int flowCellLanePerSection = -1;
+
   private final List<Integer> alignToPhix = new ArrayList<>();
+
+  // Data specific to RTA version 2.X
+  private final List<String> imageChannels = new ArrayList<>();
+
+  //
+  // Parser
+  //
+
+  /**
+   * Parses the run info file
+   * @param file the run info file
+   * @throws ParserConfigurationException the parser configuration exception
+   * @throws SAXException the SAX exception
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public void parse(final File file) throws ParserConfigurationException,
+      SAXException, IOException {
+
+    parse(FileUtils.createInputStream(file));
+  }
+
+  /**
+   * Parses the run info file.
+   * @param is the input stream on run info file
+   * @throws ParserConfigurationException the parser configuration exception
+   * @throws SAXException the SAX exception
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public void parse(final InputStream is) throws ParserConfigurationException,
+      SAXException, IOException {
+
+    final Document doc;
+
+    final DocumentBuilderFactory dbFactory =
+        DocumentBuilderFactory.newInstance();
+    final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+    doc = dBuilder.parse(is);
+    doc.getDocumentElement().normalize();
+
+    parse(doc);
+
+    is.close();
+  }
+
+  /**
+   * Parses the run info file.
+   * @param document the document from run info XML file
+   */
+  private void parse(final Document document) {
+
+    for (Element e : XMLUtils.getElementsByTagName(document, "RunInfo")) {
+
+      for (Element runElement : XMLUtils.getElementsByTagName(e, "Run")) {
+
+        // Parse attribute of the Run tag
+        for (String name : XMLUtils.getAttributeNames(runElement)) {
+
+          final String value = runElement.getAttribute(name);
+
+          switch (name) {
+          case "Id":
+            this.id = value;
+            break;
+          case "Number":
+            this.number = Integer.parseInt(value);
+            break;
+          }
+        }
+
+        this.flowCell = getTagValue(runElement, "Flowcell");
+        this.instrument = getTagValue(runElement, "Instrument");
+        this.date = getTagValue(runElement, "Date");
+
+        // Extract read data
+        extractReadData(runElement);
+
+        // Extract variable from Flowcell element
+        extractFlowcellElement(runElement);
+
+        // After extract lane with PhiX
+        extractAlignToPhiXElement(runElement);
+
+        // Extract images channel data
+        extractImageChannels(runElement);
+      }
+    }
+
+  }
+
+  /**
+   * Extract image channels data.
+   * @param runElement the run element
+   */
+  private void extractImageChannels(final Element runElement) {
+
+    // Check if element name exists
+    if (XMLUtils.getElementsByTagName(runElement, "ImageChannels") == null) {
+
+      return;
+    }
+
+    // Parse element
+    for (Element e2 : getElementsByTagName(runElement, "ImageChannels")) {
+
+      // Extract content on name element
+      for (Element name : getElementsByTagName(e2, "Name")) {
+        this.imageChannels.add(name.getTextContent());
+      }
+    }
+  }
+
+  /**
+   * Extract the read data.
+   * @param runElement the run element
+   */
+  private void extractReadData(final Element runElement) {
+
+    int readCount = 0;
+    // Parse Reads tag
+    for (Element e2 : XMLUtils.getElementsByTagName(runElement, "Reads")) {
+      for (Element e3 : XMLUtils.getElementsByTagName(e2, "Read")) {
+
+        final Read read = new Read();
+        readCount++;
+
+        for (String name : XMLUtils.getAttributeNames(e3)) {
+
+          final String value = e3.getAttribute(name);
+
+          switch (name) {
+          case "Number":
+            read.number = Integer.parseInt(value);
+            break;
+          case "NumCycles":
+            read.numberCycles = Integer.parseInt(value);
+            break;
+          case "IsIndexedRead":
+            read.indexedRead = "Y".equals(value.toUpperCase().trim());
+            break;
+          }
+
+          if (read.getNumber() == 0) {
+            read.number = readCount;
+          }
+        }
+
+        this.reads.add(read);
+      }
+    }
+
+  }
+
+  /**
+   * Parses the flowcell element to set variable used to compute tile number.
+   * @param runElement the element parent.
+   */
+  private void extractFlowcellElement(final Element runElement) {
+
+    // Parse FlowcellLayout tag
+    for (Element e2 : getElementsByTagName(runElement, "FlowcellLayout")) {
+
+      for (String name : getAttributeNames(e2)) {
+
+        final int value = Integer.parseInt(e2.getAttribute(name));
+
+        switch (name) {
+        case "LaneCount":
+          this.flowCellLaneCount = value;
+          break;
+        case "SurfaceCount":
+          this.flowCellSurfaceCount = value;
+          break;
+        case "SwathCount":
+          this.flowCellSwathCount = value;
+          break;
+        case "TileCount":
+          this.flowCellTileCount = value;
+          break;
+
+        // Value specific on RTA version 2.X
+        case "SectionPerLane":
+          this.flowCellSectionPerLane = value;
+          break;
+        case "LanePerSection":
+          this.flowCellLanePerSection = value;
+          break;
+        }
+      }
+    }
+
+  }
+
+  /**
+   * Set the lane with Phix. Per default all for a NextSeq, specified for an
+   * HiSeq.
+   * @param runElement the element parent
+   */
+  private void extractAlignToPhiXElement(final Element runElement) {
+
+    // Check if element name exists
+    if (XMLUtils.isElementExistsByTagName(runElement, "AlignToPhiX")) {
+
+      // Element exist
+      for (Element e2 : getElementsByTagName(runElement, "AlignToPhiX")) {
+        // Parse lane number
+        for (Element e3 : getElementsByTagName(e2, "Lane")) {
+
+          this.alignToPhix.add(Integer.parseInt(e3.getTextContent()));
+        }
+      }
+
+    } else {
+
+      // Not found, aligned to PhiX in all lanes
+      for (int lane = 1; lane <= this.flowCellLaneCount; lane++) {
+
+        this.alignToPhix.add(lane);
+      }
+    }
+  }
+
+  public int getTilesCount() {
+
+    return this.flowCellSurfaceCount
+        * this.flowCellSwathCount * this.flowCellTileCount;
+  }
 
   //
   // Getters
@@ -183,131 +373,31 @@ public class RunInfo {
   }
 
   /**
+   * @return Returns the flowCellSectionPerLane
+   */
+  public int getFlowCellSectionPerLane() {
+    return this.flowCellSectionPerLane;
+  }
+
+  /**
+   * @return Returns the flowCellLanePerSection
+   */
+  public int getFlowCellLanePerSection() {
+    return this.flowCellLanePerSection;
+  }
+
+  /**
    * @return Returns the alignToPhix
    */
   public List<Integer> getAlignToPhix() {
     return Collections.unmodifiableList(this.alignToPhix);
   }
 
-  //
-  // Parser
-  //
-
-  public void parse(final File file) throws ParserConfigurationException,
-      SAXException, IOException {
-
-    parse(FileUtils.createInputStream(file));
-  }
-
-  public void parse(final InputStream is) throws ParserConfigurationException,
-      SAXException, IOException {
-
-    final Document doc;
-
-    final DocumentBuilderFactory dbFactory =
-        DocumentBuilderFactory.newInstance();
-    final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-    doc = dBuilder.parse(is);
-    doc.getDocumentElement().normalize();
-
-    parse(doc);
-
-    is.close();
-  }
-
-  private void parse(final Document document) {
-
-    for (Element e : XMLUtils.getElementsByTagName(document, "RunInfo")) {
-
-      for (Element e1 : XMLUtils.getElementsByTagName(e, "Run")) {
-
-        // Parse attribute of the Run tag
-        for (String name : XMLUtils.getAttributeNames(e1)) {
-
-          final String value = e1.getAttribute(name);
-
-          switch (name) {
-          case "Id":
-            this.id = value;
-            break;
-          case "Number":
-            this.number = Integer.parseInt(value);
-            break;
-          }
-        }
-
-        this.flowCell = getTagValue(e1, "Flowcell");
-        this.instrument = getTagValue(e1, "Instrument");
-        this.date = getTagValue(e1, "Date");
-
-        int readCount = 0;
-        // Parse Reads tag
-        for (Element e2 : XMLUtils.getElementsByTagName(e1, "Reads")) {
-          for (Element e3 : XMLUtils.getElementsByTagName(e2, "Read")) {
-
-            final Read read = new Read();
-            readCount++;
-
-            for (String name : XMLUtils.getAttributeNames(e3)) {
-
-              final String value = e3.getAttribute(name);
-
-              switch (name) {
-              case "Number":
-                read.number = Integer.parseInt(value);
-                break;
-              case "NumCycles":
-                read.numberCycles = Integer.parseInt(value);
-                break;
-              case "IsIndexedRead":
-                read.indexedRead = "Y".equals(value.toUpperCase().trim());
-                break;
-              }
-
-              if (read.getNumber() == 0) {
-                read.number = readCount;
-              }
-            }
-
-            this.reads.add(read);
-          }
-        }
-
-        // Parse FlowcellLayout tag
-        for (Element e2 : getElementsByTagName(e1, "FlowcellLayout")) {
-
-          for (String name : getAttributeNames(e2)) {
-
-            final int value = Integer.parseInt(e2.getAttribute(name));
-
-            switch (name) {
-            case "LaneCount":
-              this.flowCellLaneCount = value;
-              break;
-            case "SurfaceCount":
-              this.flowCellSurfaceCount = value;
-              break;
-            case "SwathCount":
-              this.flowCellSwathCount = value;
-              break;
-            case "TileCount":
-              this.flowCellTileCount = value;
-              break;
-            }
-          }
-
-        }
-
-        for (Element e2 : getElementsByTagName(e1, "AlignToPhiX")) {
-          for (Element e3 : getElementsByTagName(e2, "Lane")) {
-            this.alignToPhix.add(Integer.parseInt(e3.getTextContent()));
-          }
-        }
-
-      }
-
-    }
-
+  /**
+   * @return Returns the image channels
+   */
+  public List<String> getImageChannels() {
+    return Collections.unmodifiableList(this.imageChannels);
   }
 
   //
@@ -325,6 +415,50 @@ public class RunInfo {
         + this.flowCellSurfaceCount + ", flowCellSwathCount="
         + this.flowCellSwathCount + ", flowCellTileCount="
         + this.flowCellTileCount + ", alignToPhix=" + this.alignToPhix + "}";
+
+  }
+
+  //
+  // Internal class
+  //
+
+  /**
+   * Handle information about a read.
+   * @author Laurent Jourdren
+   */
+  public static class Read {
+
+    private int number;
+    private int numberCycles;
+    private boolean indexedRead;
+
+    /**
+     * @return Returns the number
+     */
+    public int getNumber() {
+      return this.number;
+    }
+
+    /**
+     * @return Returns the numberCycles
+     */
+    public int getNumberCycles() {
+      return this.numberCycles;
+    }
+
+    /**
+     * @return Returns the indexedRead
+     */
+    public boolean isIndexedRead() {
+      return this.indexedRead;
+    }
+
+    @Override
+    public String toString() {
+      return this.getClass().getSimpleName()
+          + "{number=" + this.number + ", numberCycles=" + this.numberCycles
+          + ", indexedRead=" + this.indexedRead + "}";
+    }
 
   }
 
