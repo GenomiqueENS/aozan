@@ -10,6 +10,8 @@ import hiseq_run, sync_run
 import smtplib, os.path, time, sys
 import mimetypes
 from email.utils import formatdate 
+from glob import glob
+from xml.etree.ElementTree import ElementTree
 
 from java.io import File
 from java.lang import Runtime
@@ -514,12 +516,13 @@ def add_run_id_to_processed_run_ids(run_id, done_file_path, conf):
         done_file_path: path of the done file
         conf: configuration dictionary
     """
-
-    log('INFO', 'Add ' + run_id + ' to ' + os.path.basename(done_file_path), conf)
+    sequencer_type = get_sequencer_type(run_id, conf)
+    
+    log('INFO', 'Add ' + run_id + ' on sequencer ' + sequencer_type + ' to ' + os.path.basename(done_file_path), conf)
 
     f = open(done_file_path, 'a')
 
-    f.write(run_id + '\n')
+    f.write(run_id + '\t' + sequencer_type + '\n')
 
     f.close()
     
@@ -534,6 +537,36 @@ def get_report_run_data_path(run_id, conf):
     """
     
     return conf[REPORTS_DATA_PATH_KEY] + '/' + run_id
+
+def get_runparameters_path(run_id, conf):
+    """ Get path to run parameters related to the run_id. With HiSeq name is
+           runParameters.xml, with NextSeq name is RunParameters.xml.
+    Arguments:
+        run_id: run id
+        conf: configuration dictionary
+
+    Returns:
+        path to the run parameters file related to the run_id
+    """
+
+    sequencer_dir_path = get_input_run_data_path(run_id, conf)
+    
+    # Find file at the root of directory sequencer data
+    res = glob(sequencer_dir_path + "/*Parameters.xml")
+    
+    if len(res) == 0:
+        # TODO throw exception ?
+        return None
+    
+    # Extract path
+    runParameter_path = res[0]
+    
+        # Check result path
+    if os.path.basename(runParameter_path).lower() == "runparameters.xml":
+        return runParameter_path
+    
+    return None
+
     
 def create_html_index_file(conf, run_id, sections):
     """Create an index.html file that contains links to all the generated reports.
@@ -562,7 +595,7 @@ def create_html_index_file(conf, run_id, sections):
         jar_is = Globals.getResourceAsStream(Globals.INDEX_HTML_TEMPLATE_FILENAME)
         lines = FileUtils.readFileByLines(jar_is)
 
-    #TODO check all path in session write in link tag and add final file if exist
+    # TODO check all path in session write in link tag and add final file if exist
     # NOT necessary to test step sync if Settings.SYNC_STEP_KEY in sections and os.path.exists(report_path + '/report_' + run_id):
     if os.path.exists(report_path + '/report_' + run_id):
         sections.append('optional2')
@@ -727,6 +760,71 @@ def is_fastq_compression_format_valid(conf):
         return True
 
     return False
+
+def get_sequencer_type(run_id, conf):
+    """ Identify sequencer type from runParameter.xml file, from the version of RTA software
+    Arguments:
+        run_id: run id
+        conf: configuration dictionary
+
+    Returns:
+        nextseq if version start by 2.X and hiseq if version start by 1.X, other None
+    """
+        
+    # Find file at the root of directory sequencer data
+    runParameter_file = get_runparameters_path(run_id, conf)
+    
+    if runParameter_file != None:
+        # Extract element 
+        rtaversion_element = extract_elements_by_tagname_from_xml(runParameter_file, "RTAVersion")
+        
+        # Extract version
+        if len(rtaversion_element) == 0:
+            # TODO throw exception
+            return None
+            
+        # Extract major element version
+        rtaversion = rtaversion_element[0].text.strip()
+        
+        if rtaversion.startswith("1."):
+            return "hiseq"
+        
+        if rtaversion.startswith("2."):
+            return "nextseq"
+        
+    # TODO throw exception
+    return None
+
+        
+def extract_elements_by_tagname_from_xml(xmlpath, tagname):
+    """ Extract an element from xml file path by tag name
+    Arguments:
+        xmlpath: path to the xml file
+        tagname: tag name on element extracted
+
+    Returns:
+        list elements founded
+    """
+    
+    # Check file exits and tagname not empty
+    if os.path.exists(xmlpath) and os.path.isfile(xmlpath) and len(tagname) > 0:
+        # Read file
+        tree = ElementTree()
+        tree.parse(xmlpath)
+        
+        # Find tag from name
+        res = tree.findall(tagname)
+        
+        # Check result found
+        if len(res) == 0:
+            # Search in children nodes
+            res = tree.findall('*/'+ tagname)
+            
+        # Return result
+        return res
+    
+    # Default return empty list
+    return []
 
 def load_conf(conf, conf_file_path):
     """Load configuration file"""
