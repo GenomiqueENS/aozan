@@ -238,17 +238,17 @@ public class RunData {
   }
 
   /**
-   * Get the percent mapped read on dataset contaminants. 
+   * Get the percent mapped read on dataset contaminants.
    * @param lane the lane
    * @param sampleName sample name
    * @param read the read number
    * @return the percent mapped read on dataset contaminants.
    */
-  public double getPercentMappedReadOnContaminationSample(final int lane, final String sampleName,
-      final int read) {
+  public double getPercentMappedReadOnContaminationSample(final int lane,
+      final String sampleName, final int read) {
     return this.getDouble("fastqscreen.lane"
-        + lane + ".sample." + sampleName + ".read" + read + "."
-        + sampleName + ".mappedexceptgenomesample");
+        + lane + ".sample." + sampleName + ".read" + read + "." + sampleName
+        + ".mappedexceptgenomesample");
   }
 
   /**
@@ -290,6 +290,15 @@ public class RunData {
    */
   public long getReadPFClusterCount(final int lane, final int read) {
     return this.getLong("read" + read + ".lane" + lane + ".clusters.pf");
+  }
+
+  /**
+   * Gets the run tiles per lane.
+   * @return the run tiles per lane
+   */
+  public int getRunTilesPerLane() {
+    
+    return this.getInt("run.info.tiles.per.lane.count");
   }
 
   /**
