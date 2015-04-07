@@ -33,12 +33,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.eoulsan.illumina.RunInfo;
+import fr.ens.transcriptome.aozan.illumina.RunInfo;
 
 /**
  * This collector collect data from the RunInfo.xml file.
@@ -101,6 +102,16 @@ public class RunInfoCollector implements Collector {
 
       data.put(prefix + ".read.count", runInfo.getReads().size());
 
+      // Specific run data with RTA v2.X
+      data.put(prefix + ".flow.cell.section.per.lane",
+          runInfo.getFlowCellSectionPerLane());
+      data.put(prefix + ".flow.cell.lane.per.section",
+          runInfo.getFlowCellLanePerSection());
+      data.put(prefix + ".image.channels",
+          Joiner.on(",").join(runInfo.getImageChannels()));
+
+      data.put(prefix + ".tiles.per.lane.count", runInfo.getTilesCount());
+
       int readIndexedCount = 0;
 
       for (RunInfo.Read read : runInfo.getReads()) {
@@ -110,7 +121,7 @@ public class RunInfoCollector implements Collector {
         data.put(prefix + ".read" + read.getNumber() + ".indexed",
             read.isIndexedRead());
 
-        if (! read.isIndexedRead()) {
+        if (!read.isIndexedRead()) {
           readIndexedCount++;
         }
       }
