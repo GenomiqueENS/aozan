@@ -42,7 +42,8 @@ import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.illumina.RunInfo;
 
 /**
- * This collector collect data from the RunInfo.xml file.
+ * This collector collect data from the RunInfo.xml file, working with all RTA
+ * versions.
  * @since 0.8
  * @author Laurent Jourdren
  */
@@ -50,6 +51,9 @@ public class RunInfoCollector implements Collector {
 
   /** The collector name. */
   public static final String COLLECTOR_NAME = "runinfo";
+
+  /** Prefix for run data */
+  public static final String PREFIX = "run.info";
 
   private File runInfoFile;
 
@@ -86,39 +90,37 @@ public class RunInfoCollector implements Collector {
       final RunInfo runInfo = new RunInfo();
       runInfo.parse(this.runInfoFile);
 
-      final String prefix = "run.info";
-
-      data.put(prefix + ".run.id", runInfo.getId());
-      data.put(prefix + ".run.number", runInfo.getNumber());
-      data.put(prefix + ".flow.cell.id", runInfo.getFlowCell());
-      data.put(prefix + ".flow.cell.lane.count", runInfo.getFlowCellLaneCount());
-      data.put(prefix + ".flow.cell.surface.count",
+      data.put(PREFIX + ".run.id", runInfo.getId());
+      data.put(PREFIX + ".run.number", runInfo.getNumber());
+      data.put(PREFIX + ".flow.cell.id", runInfo.getFlowCell());
+      data.put(PREFIX + ".flow.cell.lane.count", runInfo.getFlowCellLaneCount());
+      data.put(PREFIX + ".flow.cell.surface.count",
           runInfo.getFlowCellSurfaceCount());
-      data.put(prefix + ".flow.cell.swath.count",
+      data.put(PREFIX + ".flow.cell.swath.count",
           runInfo.getFlowCellSwathCount());
-      data.put(prefix + ".flow.cell.tile.count", runInfo.getFlowCellTileCount());
-      data.put(prefix + ".instrument", runInfo.getInstrument());
-      data.put(prefix + ".date", runInfo.getDate());
+      data.put(PREFIX + ".flow.cell.tile.count", runInfo.getFlowCellTileCount());
+      data.put(PREFIX + ".instrument", runInfo.getInstrument());
+      data.put(PREFIX + ".date", runInfo.getDate());
 
-      data.put(prefix + ".read.count", runInfo.getReads().size());
+      data.put(PREFIX + ".read.count", runInfo.getReads().size());
 
       // Specific run data with RTA v2.X
-      data.put(prefix + ".flow.cell.section.per.lane",
+      data.put(PREFIX + ".flow.cell.section.per.lane",
           runInfo.getFlowCellSectionPerLane());
-      data.put(prefix + ".flow.cell.lane.per.section",
+      data.put(PREFIX + ".flow.cell.lane.per.section",
           runInfo.getFlowCellLanePerSection());
-      data.put(prefix + ".image.channels",
+      data.put(PREFIX + ".image.channels",
           Joiner.on(",").join(runInfo.getImageChannels()));
 
-      data.put(prefix + ".tiles.per.lane.count", runInfo.getTilesCount());
+      data.put(PREFIX + ".tiles.per.lane.count", runInfo.getTilesCount());
 
       int readIndexedCount = 0;
 
       for (RunInfo.Read read : runInfo.getReads()) {
-        data.put(prefix + ".read" + read.getNumber() + ".cycles",
+        data.put(PREFIX + ".read" + read.getNumber() + ".cycles",
             read.getNumberCycles());
 
-        data.put(prefix + ".read" + read.getNumber() + ".indexed",
+        data.put(PREFIX + ".read" + read.getNumber() + ".indexed",
             read.isIndexedRead());
 
         if (!read.isIndexedRead()) {
@@ -129,10 +131,10 @@ public class RunInfoCollector implements Collector {
       final Set<Integer> lanesToAlign =
           Sets.newHashSet(runInfo.getAlignToPhix());
       for (int i = 1; i <= runInfo.getFlowCellLaneCount(); i++)
-        data.put(prefix + ".align.to.phix.lane" + i, lanesToAlign.contains(i));
+        data.put(PREFIX + ".align.to.phix.lane" + i, lanesToAlign.contains(i));
 
       // Add new entry in data : run mode
-      data.put(prefix + ".run.mode", (readIndexedCount == 1
+      data.put(PREFIX + ".run.mode", (readIndexedCount == 1
           ? "SR" : (readIndexedCount == 2 ? "PE" : "other")));
 
     } catch (IOException e) {
