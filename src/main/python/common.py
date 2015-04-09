@@ -15,6 +15,7 @@ from xml.etree.ElementTree import ElementTree
 
 from java.io import File
 from java.lang import Runtime
+from java.util import LinkedHashMap
 from java.util.logging import Level
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -770,21 +771,11 @@ def get_sequencer_type(run_id, conf):
     Returns:
         nextseq if version start by 2.X and hiseq if version start by 1.X, other None
     """
-        
-    # Find file at the root of directory sequencer data
-    runParameter_file = get_runparameters_path(run_id, conf)
+
+    # Extract RTA version 
+    rtaversion = extract_rtaversion(run_id, conf)
     
-    if runParameter_file != None:
-        # Extract element 
-        rtaversion_element = extract_elements_by_tagname_from_xml(runParameter_file, "RTAVersion")
-        
-        # Extract version
-        if len(rtaversion_element) == 0:
-            # TODO throw exception
-            return None
-            
-        # Extract major element version
-        rtaversion = rtaversion_element[0].text.strip()
+    if rtaversion != None:    
         
         if rtaversion.startswith("1."):
             return "hiseq"
@@ -794,6 +785,86 @@ def get_sequencer_type(run_id, conf):
         
     # TODO throw exception
     return None
+
+def is_sequencer_hiseq(run_id, conf):
+    """ Check if sequencer is a HiSeq from the version of RTA software
+    Arguments:
+        run_id: run id
+        conf: configuration dictionary
+
+    Returns:
+        true if sequencer is a HiSeq 
+    """
+    
+    return get_sequencer_type(run_id, conf) == "hiseq"
+    
+    
+def is_sequencer_nextseq(run_id, conf):
+    """ Check if sequencer is a NextSeq from the version of RTA software
+    Arguments:
+        run_id: run id
+        conf: configuration dictionary
+
+    Returns:
+        true if sequencer is a NextSeq 
+    """
+
+    return get_sequencer_type(run_id, conf) == "nextseq"
+
+        
+def extract_rtaversion(run_id, conf):
+    """ Identify sequencer type from runParameter.xml file, from the version of RTA software
+    Arguments:
+        run_id: run id
+        conf: configuration dictionary
+
+    Returns:
+        RTA version of the run or None 
+    """
+    # Find file at the root of directory sequencer data
+    runParameter_file = get_runparameters_path(run_id, conf)
+    
+    if runParameter_file != None:
+        # Extract element
+        rtaversion_element = extract_elements_by_tagname_from_xml(runParameter_file, "RTAVersion")
+
+        # Extract version
+        if len(rtaversion_element) == 0:
+            # TODO throw exception
+            return None
+            
+        # Extract major element version
+        return rtaversion_element[0].text.strip()
+
+    return None
+
+def is_RTA_1_version(run_id, conf):
+    """ Identify sequencer type from runParameter.xml file, from the version of RTA software
+    Arguments:
+        run_id: run id
+        conf: configuration dictionary
+
+    Return:
+        True is RTA version is 1.X 
+    """
+    
+    rta_version = extract_rtaversion(run_id, conf)
+    
+    return rta_version.startswith("1.")
+    
+def is_RTA_2_version(run_id, conf):
+    """ Identify sequencer type from runParameter.xml file, from the version of RTA software
+    Arguments:
+        run_id: run id
+        conf: configuration dictionary
+
+    Return:
+        True is RTA version is 2.X 
+    """
+    
+    rta_version = extract_rtaversion(run_id, conf)
+    
+    return rta_version.startswith("2.")
 
         
 def extract_elements_by_tagname_from_xml(xmlpath, tagname):
@@ -818,13 +889,25 @@ def extract_elements_by_tagname_from_xml(xmlpath, tagname):
         # Check result found
         if len(res) == 0:
             # Search in children nodes
-            res = tree.findall('*/'+ tagname)
+            res = tree.findall('*/' + tagname)
             
         # Return result
         return res
     
     # Default return empty list
     return []
+
+def print_default_configuration():
+    """ Print default parameter in configuration.
+    
+    """
+    conf = LinkedHashMap()
+    
+    # Load default configuration
+    set_default_conf(conf)
+    
+    # Convert in test
+    return ('\n'.join(str(x + '=' + conf[x]) for x in conf))
 
 def load_conf(conf, conf_file_path):
     """Load configuration file"""
