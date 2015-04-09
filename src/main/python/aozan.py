@@ -11,7 +11,8 @@ from optparse import OptionParser
 import common, hiseq_run, sync_run, demux_run, qc_run
 import estimate_space_needed
 from java.util import Locale
-import first_base_report
+# import first_base_report
+import detection_new_run, detection_end_run
 from java.util import LinkedHashMap
 from fr.ens.transcriptome.aozan import Globals
 from fr.ens.transcriptome.aozan import Common
@@ -30,7 +31,6 @@ from fr.ens.transcriptome.aozan.Settings import LOCK_FILE_KEY
 from fr.ens.transcriptome.aozan.Settings import BCL_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import FASTQ_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
-from common import extract_steps_to_launch
 
 def create_lock_file(lock_file_path):
     """Create the lock file.
@@ -95,7 +95,7 @@ def welcome(conf):
         something_to_do = True
         
         # Add list step selected
-        extract_steps_to_launch(True, conf)
+        common.extract_steps_to_launch(True, conf)
 
 something_to_do = False
 is_error_message = True
@@ -227,7 +227,7 @@ def unlock_partial_sync_step(conf, run_id):
     return unlock_sync_step(conf, run_id)
 
 
-def discover_new_run(conf):
+def discover_new_run_TOREMOVE(conf):
     """Discover new runs.
 
     Arguments:
@@ -235,41 +235,41 @@ def discover_new_run(conf):
     """
 
     #
-    # Discover first base report
+    # Discover new run
     #
-
-    first_base_report_sent = first_base_report.load_processed_run_ids(conf)
-
-    if common.is_conf_value_equals_true(FIRST_BASE_REPORT_STEP_KEY, conf):
-        for run_id in (first_base_report.get_available_run_ids(conf) - first_base_report_sent):
-            welcome(conf)
-            common.log('INFO', 'First base report ' + run_id, conf)
-            first_base_report.send_report(run_id, conf)
-            first_base_report.add_run_id_to_processed_run_ids(run_id, conf)
-            first_base_report_sent.add(run_id)
-
-            # Verify space needed during the first base report
-            estimate_space_needed.estimate(run_id, conf)
-
-    #
-    # Discover hiseq run done
-    #
-
-    hiseq_run_ids_done = hiseq_run.load_processed_run_ids(conf)
-
-    if common.is_conf_value_equals_true(HISEQ_STEP_KEY, conf):
-        for run_id in (hiseq_run.get_available_run_ids(conf) - hiseq_run_ids_done):
-            welcome(conf)
-            common.log('INFO', 'Discover ' + run_id, conf)
-            
-            if hiseq_run.create_run_summary_reports(run_id, conf):
-                hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
-                hiseq_run.add_run_id_to_processed_run_ids(run_id, conf)
-                hiseq_run_ids_done.add(run_id)
-            else:
-                raise Exception('Create run summary report for new discovery run ' + run_id)
-
-    return hiseq_run_ids_done
+# 
+#     first_base_report_sent = first_base_report.load_processed_run_ids(conf)
+# 
+#     if common.is_conf_value_equals_true(FIRST_BASE_REPORT_STEP_KEY, conf):
+#         for run_id in (first_base_report.get_available_run_ids(conf) - first_base_report_sent):
+#             welcome(conf)
+#             common.log('INFO', 'First base report ' + run_id, conf)
+#             first_base_report.send_report(run_id, conf)
+#             first_base_report.add_run_id_to_processed_run_ids(run_id, conf)
+#             first_base_report_sent.add(run_id)
+# 
+#             # Verify space needed during the first base report
+#             estimate_space_needed.estimate(run_id, conf)
+# 
+#     #
+#     # Discover hiseq run done
+#     #
+# 
+#     hiseq_run_ids_done = hiseq_run.load_processed_run_ids(conf)
+# 
+#     if common.is_conf_value_equals_true(HISEQ_STEP_KEY, conf):
+#         for run_id in (hiseq_run.get_available_run_ids(conf) - hiseq_run_ids_done):
+#             welcome(conf)
+#             common.log('INFO', 'Discover ' + run_id, conf)
+#             
+#             if hiseq_run.create_run_summary_reports(run_id, conf):
+#                 hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
+#                 hiseq_run.add_run_id_to_processed_run_ids(run_id, conf)
+#                 hiseq_run_ids_done.add(run_id)
+#             else:
+#                 raise Exception('Create run summary report for new discovery run ' + run_id)
+# 
+#     return hiseq_run_ids_done
 
 def launch_steps(conf):
     """Launch steps.
@@ -279,7 +279,7 @@ def launch_steps(conf):
     """
 
     # Discover new runs
-    hiseq_run_ids_done = discover_new_run(conf)
+    hiseq_run_ids_done = detection_new_run.discover_new_run(conf)
 
     # Load run do not process
     hiseq_run_ids_do_not_process = hiseq_run.load_deny_run_ids(conf)
@@ -308,7 +308,7 @@ def launch_steps(conf):
 
 
     # Check if new run appears while sync step
-    if  sync_run.is_sync_step_enable(conf) and len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
+    if  sync_run.is_sync_step_enable(conf) and len(detection_new_run.discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
         launch_steps(conf)
         return
 
@@ -338,7 +338,7 @@ def launch_steps(conf):
 
 
     # Check if new run appears while demux step
-    if common.is_conf_value_equals_true(DEMUX_STEP_KEY, conf) and len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
+    if common.is_conf_value_equals_true(DEMUX_STEP_KEY, conf) and len(detection_new_run.discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
         launch_steps(conf)
         return
 
@@ -365,7 +365,7 @@ def launch_steps(conf):
 
 
     # Check if new run appears while quality control step
-    if common.is_conf_value_equals_true(QC_STEP_KEY, conf) and len(discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
+    if common.is_conf_value_equals_true(QC_STEP_KEY, conf) and len(detection_new_run.discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
         launch_steps(conf)
         return
 
@@ -401,6 +401,7 @@ def aozan_main():
     parser.add_option('-q', '--quiet', action='store_true', dest='quiet',
                 default=False, help='quiet')
     parser.add_option('-v', '--version', action='store_true', dest='version', help='Aozan version')
+    parser.add_option('-c', '--conf', action='store_true', dest='conf', help='Configuration Aozan by default, charge before configuration file.')
 
     # Parse command line arguments
     (options, args) = parser.parse_args()
@@ -408,6 +409,11 @@ def aozan_main():
     # Print Aozan current version
     if options.version:
         print Globals.WELCOME_MSG
+        sys.exit(0)
+    
+    # Print default configuration option
+    if options.conf:
+        print common.print_default_configuration()
         sys.exit(0)
         
     # If no argument print usage
@@ -451,7 +457,7 @@ def aozan_main():
         try:
             # Create lock file
             create_lock_file(lock_file_path)
-
+            
             # Launch steps
             launch_steps(conf)
 
