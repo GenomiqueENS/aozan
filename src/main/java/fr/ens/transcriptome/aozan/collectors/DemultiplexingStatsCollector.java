@@ -148,6 +148,7 @@ public class DemultiplexingStatsCollector implements Collector {
       parseSample(e1, name, data, rawLine, pfLine);
     }
 
+    String lane = "1";
     // Put the line stats
     for (final Map.Entry<Integer, TileStats> entry : rawLine.entrySet()) {
       entry.getValue().putData(data,
@@ -160,8 +161,8 @@ public class DemultiplexingStatsCollector implements Collector {
     }
   }
 
-  private void parseSample(final Element e, final String projectName, final RunData data,
-      final Map<Integer, TileStats> rawLine,
+  private void parseSample(final Element e, final String projectName,
+      final RunData data, final Map<Integer, TileStats> rawLine,
       final Map<Integer, TileStats> pfLine) {
 
     final String sample = getAttributeValue(e, "index").trim();
@@ -208,6 +209,7 @@ public class DemultiplexingStatsCollector implements Collector {
 
       }
 
+      String lane = "1";
       final String prefix = "demux.lane" + lane + ".sample." + sample;
 
       data.put(prefix + ".barcode", barcode);
