@@ -71,6 +71,30 @@ def error(short_message, message, conf):
     common.error('[Aozan] synchronizer: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/sync.lasterr', conf)
 
 
+def get_exclude_files_list(run_id, conf):
+    """ Build list of excluded extension file from sequencer type.
+    
+    Arguments:
+        run_id: the run id
+        conf: configuration dictionary
+    
+    Return:
+        excluded extension files list
+    """
+    
+    # Check if excluded file is required
+    if not common.is_conf_value_equals_true(SYNC_EXCLUDE_CIF_KEY, conf):
+        return []
+    
+    if common.is_sequencer_hiseq(run_id, conf):
+        return ['*.cif', '*_pos.txt', '*.errorMap', '*.FWHMMap']
+    
+    if common.is_sequencer_nextseq(run_id, conf):
+        # TODO to identify "*bcl.bgzf.bci"
+        return []
+        
+    return []
+
 def partial_sync(run_id, last_sync, conf):
     """Partial synchronization of a run.
 
@@ -127,11 +151,14 @@ def partial_sync(run_id, last_sync, conf):
         return False
 
     # exclude CIF files ?
-    if common.is_conf_value_equals_true(SYNC_EXCLUDE_CIF_KEY, conf):
-        exclude_files = ['*.cif', '*_pos.txt', '*.errorMap', '*.FWHMMap']
-    else:
-        exclude_files = []
+#     if common.is_conf_value_equals_true(SYNC_EXCLUDE_CIF_KEY, conf):
+#         exclude_files = ['*.cif', '*_pos.txt', '*.errorMap', '*.FWHMMap']
+#     else:
+#         exclude_files = []
 
+    # Extract exclude file from sequencer type and configuration
+    exclude_files = get_exclude_files_list(run_id, conf) 
+    
     rsync_manifest_path = conf[TMP_PATH_KEY] + '/' + run_id + '.rsync.manifest'
     rsync_params = ''
 
@@ -167,9 +194,9 @@ def partial_sync(run_id, last_sync, conf):
 def sync(run_id, conf):
     """Synchronize a run.
 
-        Arguments:
-                run_id: the run id
-                conf: configuration dictionary
+    Arguments:
+        run_id: the run id
+        conf: configuration dictionary
     """
 
     start_time = time.time()
