@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os, time
-import stat
+import stat, detection_end_run
 from xml.etree.ElementTree import ElementTree
 
 import common
@@ -15,33 +15,16 @@ import cmd
 from pickle import FALSE
 
 
-def load_processed_run_ids(conf):
-	"""Load the list of the processed run ids.
-
-    Arguments:
-        conf: configuration dictionary
-    """
-
-	return common.load_processed_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/hiseq.done')
+DENY_FILE = 'sequencer_run.deny'
 
 def load_deny_run_ids(conf):
-	"""Load the list of the run ids to not process.
+    """Load the list of the run ids to not process.
 
     Arguments:
         conf: configuration dictionary
     """
 
-	return common.load_processed_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/hiseq.deny')
-
-def add_run_id_to_processed_run_ids(run_id, conf):
-	"""Add a processed run id to the list of the run ids.
-
-    Arguments:
-        run id: The run id
-        conf: configuration dictionary
-    """
-
-	common.add_run_id_to_processed_run_ids(run_id, conf[AOZAN_VAR_PATH_KEY] + '/hiseq.done', conf)
+    return common.load_processed_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/hiseq.deny')
 
 def get_reads_number(run_id, conf):
 	"""Get the number of read of a run.
@@ -67,62 +50,6 @@ def get_reads_number(run_id, conf):
 
 	return len(reads)
 
-
-def check_end_run(run_id, conf):
-	"""Check the end of a run data transfert.
-
-	Arguments:
-		runtId: the run id
-		conf: configuration dictionary
-	"""
-
-	hiseq_data_path = find_hiseq_run_path(run_id, conf)
-	if hiseq_data_path == False:
-		return False
-
-	reads_number = get_reads_number(run_id, conf)
-
-	# if reads_number equals -1, runParameters.xml is missing
-	if reads_number == -1:
-		return False
-
-	for i in range(reads_number):
-		if not os.path.exists(hiseq_data_path + '/' + run_id + '/Basecalling_Netcopy_complete_Read' + str(i + 1) + '.txt'):
-			return False
-
-	if not os.path.exists(hiseq_data_path + '/' + run_id + '/RTAComplete.txt'):
-		return False
-
-	return True
-
-def check_end_run_since(run_id, secs, conf):
-	"""Check the end of a run data transfert since a number of seconds.
-
-	Arguments:
-		runtId: the run id
-		secs: maximal number of seconds
-		conf: configuration dictionary
-	"""
-
-	hiseq_data_path = find_hiseq_run_path(run_id, conf)
-	if hiseq_data_path == False:
-		return 0
-
-	reads_number = get_reads_number(run_id, conf)
-	last = 0
-
-	for i in range(reads_number):
-		file_to_test = hiseq_data_path + '/' + run_id + '/Basecalling_Netcopy_complete_Read' + str(i + 1) + '.txt'
-		if not os.path.exists(file_to_test):
-			return 0
-		else:
-			m_time = os.stat(file_to_test).st_mtime
-			if m_time > last:
-				last = m_time
-
-	if (time.time() - last) < secs:
-		return last
-	return 0
 
 
 def check_run_id(run_id, conf):
@@ -171,7 +98,7 @@ def get_available_run_ids(conf):
 
 		files = os.listdir(hiseq_data_path)
 		for f in files:
-			if os.path.isdir(hiseq_data_path + '/' + f) and check_run_id(f, conf) and check_end_run(f, conf):
+			if os.path.isdir(hiseq_data_path + '/' + f) and check_run_id(f, conf) and detection_end_run.check_end_run(f, conf):
 				result.add(f)
 
 	return result
@@ -189,7 +116,7 @@ def get_working_run_ids(conf):
 
 		files = os.listdir(hiseq_data_path)
 		for f in files:
-			if os.path.isdir(hiseq_data_path + '/' + f) and check_run_id(f, conf) and not check_end_run(f, conf):
+			if os.path.isdir(hiseq_data_path + '/' + f) and check_run_id(f, conf) and not detection_end_run.check_end_run(f, conf):
 				result.add(f)
 
 	return result
@@ -244,7 +171,7 @@ def send_mail_if_recent_run(run_id, secs, conf):
 	if run_path == False:
 		return
 
-	last = check_end_run_since(run_id, secs, conf)
+	last = detection_end_run.check_end_run_since(run_id, secs, conf)
 
 	if last > 0:
 		df = common.df(run_path) / (1024 * 1024 * 1024)
