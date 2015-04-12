@@ -48,7 +48,7 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
 
   public static final String COLLECTOR_NAME = "uncompressfastq";
 
-  private long uncompressedSizeFiles = 0l;
+  private long uncompressedSizeFiles = 0L;
   private boolean isProcessUndeterminedIndicesSamples = false;
   private int numberThreads = Runtime.getRuntime().availableProcessors();
 
