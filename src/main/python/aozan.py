@@ -30,6 +30,7 @@ from fr.ens.transcriptome.aozan.Settings import LOCK_FILE_KEY
 from fr.ens.transcriptome.aozan.Settings import BCL_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import FASTQ_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
+from common import extract_steps_to_launch
 
 def create_lock_file(lock_file_path):
     """Create the lock file.
@@ -92,6 +93,9 @@ def welcome(conf):
     if something_to_do == False:
         common.log('INFO', 'Start ' + Globals.WELCOME_MSG, conf)
         something_to_do = True
+        
+        # Add list step selected
+        extract_steps_to_launch(True, conf)
 
 something_to_do = False
 is_error_message = True
@@ -430,8 +434,6 @@ def aozan_main():
     # Init logger
     Common.initLogger(conf[AOZAN_LOG_PATH_KEY], conf[AOZAN_LOG_LEVEL_KEY])
 
-    welcome(conf)
-        
     # Check main path file in configuration
     if not common.check_configuration(conf, args[0]):
         common.log('SEVERE', 'Aozan can not be executed, configuration invalid or useful directories inaccessible. ', conf)

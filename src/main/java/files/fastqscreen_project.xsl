@@ -149,6 +149,7 @@ doctype-system="about:legacy-compat"/>
       width:auto;
    	  width:40%;
       padding-bottom:3em;
+   	  padding-top:4em;	
     }
 
    	
@@ -184,11 +185,14 @@ doctype-system="about:legacy-compat"/>
    	clear:inherit;
     margin:0;
     width:100%;
-    height: 17em;
+    height: 16em;
     background-color: white;
     position: fixed;
     z-index:2;	
    	}
+   	
+   	a.anchor{display: block; position: relative; top: -20em; visibility: hidden;}
+   	
   </style>
   
     <script type="text/javascript">
@@ -196,7 +200,7 @@ doctype-system="about:legacy-compat"/>
 		
         function goto(){
             // Decallage de 2 pour corriger l'affichage
-            var index = document.forms.sampleName.nom.options.selectedIndex - 2;
+            var index = document.forms.sampleName.nom.options.selectedIndex;
             var anchor = document.forms.sampleName.nom.options[index].text;
 
             window.location.href = "#"+anchor;
@@ -233,21 +237,15 @@ doctype-system="about:legacy-compat"/>
   </ul>
 
   	<form name="sampleName">
-		<label>Display a sample : </label>
+		<label><b>Display a sample : </b></label>
 		<select name="nom" size="1" onchange="goto()">
+			<option></option>
   			<xsl:for-each select="/ReportFastqScreen/project/sample">
 				<option><xsl:value-of select="sampleName"/></option>
 			</xsl:for-each>
 		</select>
   	</form>
   	
-	<!-- table id="goToSample">
-	<tr class="linkRow">
-  		<xsl:for-each select="/ReportFastqScreen/project/sample">
-		<td><a class="linkSample" href="#{sampleName}"><xsl:value-of select="sampleName"/></a></td>
-  		</xsl:for-each>
-  	</tr>
-  </table -->
   <!-- end run report -->
   </div>
 
@@ -255,8 +253,8 @@ doctype-system="about:legacy-compat"/>
   
     <xsl:for-each select="/ReportFastqScreen/project/sample">
     <div class="report_left">
-    <h3>Sample: <xsl:value-of select="sampleName"/> on lane <xsl:value-of select="lane"/></h3>
-   		<a id="{sampleName}"></a>
+	<a class="anchor" id="{sampleName}"></a>
+    <h3>Sample <xsl:value-of select="sampleName"/> on lane <xsl:value-of select="lane"/></h3>
  
  <table border="1" class="sampleDataTab">
     <tr>
@@ -269,7 +267,7 @@ doctype-system="about:legacy-compat"/>
    <xsl:for-each select="Report/Genomes/Genome">
    
     <xsl:choose>
-   	  <xsl:when test="boolean(@name=genomeSample)">
+   	  <xsl:when test="boolean(@name=/ReportFastqScreen/project/sample/genomeSample)">
 		   <tr id="genomeSample">
 		   	  <td><xsl:value-of select="@name"/></td>
 		      <xsl:for-each select="Value">
@@ -294,6 +292,7 @@ doctype-system="about:legacy-compat"/>
 
    <!-- a href="#top">TOP</a -->
   <div class="report_right">
+  	
   <ul>
     <li><b>Description: </b> <xsl:value-of select="descriptionSample"/></li>
   	<li><b>Genome name: </b> <xsl:value-of select="genomeSample"/></li>

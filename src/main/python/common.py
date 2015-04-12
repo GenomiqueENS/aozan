@@ -606,7 +606,7 @@ def check_configuration(conf, configuration_file_path):
         True if the configuration is valid
     """
     
-    steps_to_launch = extract_steps_to_launch(conf)
+    steps_to_launch = extract_steps_to_launch(False, conf)
 
     msg = ''
 
@@ -667,15 +667,14 @@ def check_configuration(conf, configuration_file_path):
         error("[Aozan] check configuration: error(s) in configuration file.", msg , get_last_error_file(conf), conf)
         return False
 
-    log('CONFIG', 'Configuration file valid', conf)
-    
     return True
 
-def extract_steps_to_launch(conf):
+def extract_steps_to_launch(update_logger, conf):
     """ List steps to launch 
     
     Arguments:
         conf: configuration dictionary
+        update_logger: boolean to add data in logger
 
     Returns:
         list steps name
@@ -686,8 +685,12 @@ def extract_steps_to_launch(conf):
                 Settings.DEMUX_STEP_KEY, Settings.QC_STEP_KEY]:
         
         if is_conf_value_equals_true(key, conf):    
-            log("CONFIG", "Step " + key + " is setting", conf)
             steps.append(key)
+
+    # Add data in logger
+    if update_logger:
+        txt = ", ".join(steps)
+        log("CONFIG", "Step(s) " + txt + " is setting.", conf)
     
     # Return list steps setting
     return steps
@@ -865,3 +868,5 @@ def set_default_conf(conf):
     conf[Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY] = 'true'
     # run paired : no paired mapping
     conf[Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY] = 'true'
+    # Default mapper is bowtie
+    conf[Settings.QC_CONF_FASTQSCREEN_MAPPER_KEY] = 'bowtie'
