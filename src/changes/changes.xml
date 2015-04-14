@@ -429,6 +429,17 @@
                 The official Aozan Git repository is now GitHub instead of Google code.
             </action>
         </release>
-				
+
+        <release version="1.4.2" description="Aozan 1.4.2 release"  date="2015-04-14">
+            <action dev="jourdren" type="add">
+                New dependency for errorprone static code analysis tool execution each time mvn compile is called.
+            </action>
+            <action dev="sperrin" type="update">
+                Update detection contaminant project report.
+            </action>
+            <action dev="sperrin" type="fix">
+                With PE run, now all statistical data in quality control report are display, no more NA.
+            </action>
+	</release>				
 	</body>
 </document>
