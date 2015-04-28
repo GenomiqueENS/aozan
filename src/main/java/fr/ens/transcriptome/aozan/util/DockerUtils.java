@@ -24,8 +24,10 @@
 package fr.ens.transcriptome.aozan.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static fr.ens.transcriptome.eoulsan.LocalEoulsanRuntime.initEoulsanRuntimeForExternalApp;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -41,6 +43,9 @@ import com.spotify.docker.client.messages.ContainerInfo;
 import com.spotify.docker.client.messages.HostConfig;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.eoulsan.EoulsanException;
+import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
+import fr.ens.transcriptome.eoulsan.util.ProcessUtils;
 
 public class DockerUtils {
 
@@ -48,14 +53,12 @@ public class DockerUtils {
 
   private static final String DEPOT_DEFAULT = "genomicpariscentre";
 
-  private static final String PERMISSION_DEFAULT = "root:root";
-
+  private static final String DEFAULT_VERSION = "latest";
   private static final String WORK_DIRECTORY_DOCKER_DEFAULT = "/root";
 
   private final String imageDockerVersion;
   private final String imageDockerName;
   private final String commandLine;
-  private final String workDirectory;
   private final List<String> mountArgument = new ArrayList<>();
 
   private String permission;
@@ -102,7 +105,7 @@ public class DockerUtils {
 
       // TODO
       if (exitValue == 0)
-        System.out.println("SUCCESS run docker");
+        System.out.println("SUCCESS run docker " + docker.info());
       else
         System.out.println("FAIL run docker " + docker.info());
 
@@ -131,11 +134,15 @@ public class DockerUtils {
   public void addMountDirectory(final String localDirectory,
       final String dockerDirectory) throws AozanException {
 
-    if (localDirectory == null || !new File(localDirectory).exists()) {
-      throw new AozanException(
-          "Error Docker: local directory is null or does not exist. "
-              + localDirectory);
+    if (localDirectory == null) {
+      throw new AozanException("Error Docker: local directory is null. "
+          + localDirectory);
     }
+
+    // if (!new File(localDirectory).exists()) {
+    // throw new AozanException("Error Docker: local directory does not exist. "
+    // + localDirectory + " ? " + new File(localDirectory).exists());
+    // }
 
     if (dockerDirectory == null) {
       throw new AozanException(
@@ -147,7 +154,8 @@ public class DockerUtils {
     if (localDirectory.trim().charAt(0) != SEPARATOR
         || dockerDirectory.trim().charAt(0) != SEPARATOR) {
       throw new AozanException(
-          "Error Docker: directories path must be absolute.");
+          "Error Docker: directories path must be absolute local "
+              + localDirectory + " docker directory " + dockerDirectory);
     }
 
     this.mountArgument.add(localDirectory + ":" + dockerDirectory);
@@ -169,7 +177,7 @@ public class DockerUtils {
    * @throws InterruptedException the interrupted exception
    */
   private DockerClient init(final String imageName) throws DockerException,
-      InterruptedException {
+      InterruptedException, AozanException {
 
     // TODO
     System.out.println(" * Create connection");
@@ -259,6 +267,20 @@ public class DockerUtils {
   // Getters and setters
   //
 
+  private String setDefaultPermission() throws AozanException {
+
+    try {
+      final String user = ProcessUtils.execToString("id -u");
+      final String group = ProcessUtils.execToString("id -g");
+
+      return user.trim() + ":" + group.trim();
+
+    } catch (IOException e) {
+      throw new AozanException(e);
+    }
+
+  }
+
   /**
    * Sets the permission.
    * @param permissions the new permission
@@ -293,6 +315,15 @@ public class DockerUtils {
   }
 
   /**
+   * Gets the image docker name.
+   * @return the image docker name
+   */
+  public String getImageDockerName() {
+    return String.format("%s/%s:%s", this.depotPublicName,
+        this.imageDockerName, this.imageDockerVersion);
+  }
+
+  /**
    * Gets the exception.
    * @return the exception
    */
@@ -306,12 +337,7 @@ public class DockerUtils {
 
   public DockerUtils(final String commandLine, final String softwareName)
       throws AozanException {
-    this(commandLine, softwareName, "", null);
-  }
-
-  public DockerUtils(final String commandLine, final String softwareName,
-      final String workDirectory) throws AozanException {
-    this(commandLine, softwareName, "", workDirectory);
+    this(commandLine, softwareName, DEFAULT_VERSION);
   }
 
   /**
@@ -323,8 +349,7 @@ public class DockerUtils {
    * @throws AozanException
    */
   public DockerUtils(final String commandLine, final String softwareName,
-      final String softwareVersion, final String workDirectory)
-      throws AozanException {
+      final String softwareVersion) throws AozanException {
 
     checkNotNull(commandLine, "commande line");
     checkNotNull(softwareName, "software image Docker");
@@ -333,25 +358,28 @@ public class DockerUtils {
     this.imageDockerName = softwareName;
 
     this.imageDockerVersion = softwareVersion;
-    this.workDirectory = workDirectory;
 
     this.depotPublicName = DEPOT_DEFAULT;
-    this.permission = null;
+    this.permission = setDefaultPermission();
+
+    System.out
+        .println("----------------- setting permissions/user in container config "
+            + this.permission);
+
     this.workDirectoryDocker = WORK_DIRECTORY_DOCKER_DEFAULT;
 
-    addMountDirectory(this.workDirectory, this.workDirectoryDocker);
   }
 
   public static void main(String[] args) {
 
-    try {
-      test();
-
-    } catch (DockerException | InterruptedException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
-    }
-
+    // try {
+    // test();
+    //
+    // } catch (DockerException | InterruptedException e1) {
+    // // TODO Auto-generated catch block
+    // e1.printStackTrace();
+    // }
+    //
     // System.exit(0);
 
     // final String cmd = "touch /root/lolotiti_" + new Random().nextInt();
@@ -365,11 +393,27 @@ public class DockerUtils {
     final String dir = "/tmp/aozan";
 
     try {
-      final DockerUtils dV2 = new DockerUtils(cmd, name, version, dir);
-      dV2.run();
+      // final DockerUtils dV2 = new DockerUtils(cmd, name);
+      // dV2.addMountDirectory(dir, "/root");
+      // dV2.run();
+      //
+      // final DockerUtils dV1 = new DockerUtils(cmd, name, version);
+      // dV1.addMountDirectory(dir, "/root");
+      // dV1.run();
 
-      final DockerUtils dV1 = new DockerUtils(cmd, name, version, dir);
-      dV1.run();
+      final DockerUtils script =
+          new DockerUtils("/tmp/script_bcl2fastq.sh", name, version);
+      // script.addMountDirectory("/import/mimir03/sequencages/nextseq_500/fastq",
+      // "/root/");
+      // script
+      // .addMountDirectory(
+      // "/import/mimir03/sequencages/nextseq_500/bcl/150331_TESTHISR_0151_AH9RLKADXX",
+      // "/mnt/");
+      script.addMountDirectory("/import/mimir03/sequencages/nextseq_500/tmp",
+          "/tmp");
+
+      script.setWorkDirectoryDocker("/root");
+      script.run();
 
     } catch (AozanException e) {
       // TODO Auto-generated catch block
@@ -402,8 +446,8 @@ public class DockerUtils {
     // .cmd("sh", "-c", "touch /root/lolotiti").user("2715:100").build();
 
     final HostConfig hostConfig =
-        HostConfig.builder().binds("/home/sperrin/workspace/eoulsan:/root")
-            .build();
+        HostConfig.builder()
+            .binds("/import/mimir03/sequencages/nextseq_500/tmp:/root").build();
 
     System.out.println(" * Create container");
     final ContainerCreation creation = docker.createContainer(config);
