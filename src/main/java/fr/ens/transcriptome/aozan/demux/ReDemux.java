@@ -37,6 +37,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -45,7 +46,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.eoulsan.EoulsanException;
 import fr.ens.transcriptome.eoulsan.EoulsanRuntimeException;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.eoulsan.bio.ReadSequence;
@@ -267,11 +267,21 @@ public class ReDemux {
               .getName());
 
       // Create the writers
-      final Map<Pattern, FastqWriter> writers =
-          createWriters(read, compression);
+      // final Map<Pattern, FastqWriter> writers =
+      // createWriters(read, compression);
+
+      final Map<String, Entity> writers = createWriters2(read, compression);
+
+      System.out
+          .println("reDemux method, nupmber index retrieve from command line "
+              + this.newIndexes.size() + " with " + writers.size()
+              + " create on fastq.");
 
       // Create an array with the pattern. An array is faster than a collection.
-      final Pattern[] patterns = writers.keySet().toArray(new Pattern[0]);
+      final List<Pattern> patterns = new ArrayList<>();
+      for (Map.Entry<String, Entity> e : writers.entrySet()) {
+        patterns.addAll(e.getValue().getPatterns());
+      }
 
       for (File file : undeterminedFiles) {
 
@@ -285,19 +295,25 @@ public class ReDemux {
 
           for (Pattern p : patterns) {
             if (p.matcher(index).matches()) {
-              writers.get(p).write(rs);
-              // status.add(p);
-              break;
+
+              for (Map.Entry<String, Entity> e : writers.entrySet()) {
+
+                if (e.getValue().getPatterns().contains(p)) {
+                  e.getValue().getFw().write(rs);
+                  // writers.get(p).write(rs);
+                  // status.add(p);
+                  break;
+                }
+              }
             }
           }
         }
-
         reader.throwException();
         reader.close();
 
         // Close writers
-        for (FastqWriter out : writers.values()) {
-          out.close();
+        for (Entity e : writers.values()) {
+          e.getFw().close();
         }
 
       }
@@ -356,8 +372,8 @@ public class ReDemux {
         // Define the output file
         final File file =
             new File(subdir, sampleName
-                + "_" + sampleIndex + "_L00" + lane + "_R" + read
-                + "_redemux.fastq" + compression.getExtension());
+                + "_" + sampleIndex + "_L00" + lane + "_R" + read + "_redemux_"
+                + e.getKey().pattern() + ".fastq" + compression.getExtension());
 
         final OutputStream out =
             compression.createOutputStream(new FileOutputStream(file));
@@ -366,6 +382,87 @@ public class ReDemux {
       }
 
       return result;
+    }
+
+    private Map<String, Entity> createWriters2(final int read,
+        final CompressionType compression) throws FileNotFoundException,
+        IOException {
+
+      final Map<String, Entity> result = new HashMap<>();
+
+      for (Map.Entry<Pattern, CasavaSample> e : this.newIndexes.entrySet()) {
+
+        final String sampleProject = e.getValue().getSampleProject();
+        final String sampleName = e.getValue().getSampleId();
+        final String sampleIndex = e.getValue().getIndex();
+
+        // Define the output directory
+        final File subdir =
+            new File(this.outputDir, "Project_"
+                + sampleProject + File.separator + "Sample_" + sampleName);
+
+        // Create output directory if not exists
+        if (!subdir.isDirectory()) {
+
+          if (!subdir.mkdirs()) {
+            throw new IOException("Cannot create output directory: " + subdir);
+          }
+        }
+
+        // Define the output file
+        final File file =
+            new File(subdir, sampleName
+                + "_" + sampleIndex + "_L00" + lane + "_R" + read
+                + "_redemux_.fastq" + compression.getExtension());
+
+        final OutputStream out =
+            compression.createOutputStream(new FileOutputStream(file));
+
+        if (!result.containsKey(sampleName)) {
+          result
+              .put(sampleName, new Entity(new FastqWriter(out), e.getValue()));
+        }
+
+        result.get(sampleName).addPattern(e.getKey());
+      }
+
+      return result;
+    }
+
+    //
+    // Internal Class
+    //
+    static final class Entity {
+
+      private FastqWriter fw;
+      private List<Pattern> patterns;
+      private CasavaSample cs;
+
+      void addPattern(final Pattern p) {
+
+        if (patterns.contains(p))
+          throw new RuntimeException();
+
+        this.patterns.add(p);
+      }
+
+      public FastqWriter getFw() {
+        return fw;
+      }
+
+      public List<Pattern> getPatterns() {
+        return patterns;
+      }
+
+      public CasavaSample getCs() {
+        return cs;
+      }
+
+      Entity(final FastqWriter fw, final CasavaSample cs) {
+        this.fw = fw;
+        this.patterns = new ArrayList<>();
+        this.cs = cs;
+      }
     }
 
     /**
@@ -569,7 +666,7 @@ public class ReDemux {
   //
 
   public static void main(final String[] args) throws FileNotFoundException,
-      IOException, AozanException, BadBioEntryException, EoulsanException {
+      IOException, AozanException, BadBioEntryException {
 
     final List<String> list = Arrays.asList(args);
 
