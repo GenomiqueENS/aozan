@@ -153,7 +153,7 @@ public class QC {
       }
 
       // Create RunDataGenerator object
-      final RunDataGenerator rdg = new RunDataGenerator(this.collectors);
+      final RunDataGenerator rdg = new RunDataGenerator(this.collectors, this.runId);
 
       // Set the parameters of the generator
       rdg.setGlobalConf(this.globalConf);
