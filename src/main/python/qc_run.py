@@ -7,14 +7,12 @@ import os.path, stat
 import common, time
 from fr.ens.transcriptome.aozan import QC, Settings
 from fr.ens.transcriptome.aozan import AozanException
-from fr.ens.transcriptome.eoulsan.util import StringUtils
 from java.lang import Throwable
 
 from fr.ens.transcriptome.aozan.Settings import FASTQ_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import REPORTS_URL_KEY
 from fr.ens.transcriptome.aozan.Settings import QC_REPORT_SAVE_RAW_DATA_KEY
-from fr.ens.transcriptome.aozan.Settings import AOZAN_DEBUG_KEY
 from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import QC_REPORT_STYLESHEET_KEY
 from fr.ens.transcriptome.aozan.Settings import QC_REPORT_SAVE_REPORT_DATA_KEY
@@ -50,23 +48,6 @@ def error(short_message, message, conf):
     """
 
     common.error('[Aozan] qc: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/qc.lasterr', conf)
-
-def exception_msg(exp, conf):
-    """Create error message when an AozanException is thrown.
-    
-    Arguments:
-        exp: exception
-        conf: configuration dictionary
-    """
-
-    if common.is_conf_value_equals_true(AOZAN_DEBUG_KEY, conf):
-
-        if isinstance(exp, AozanException) and exp.getWrappedException() != None:
-            exp = exp.getWrappedException()
-
-        return str(exp.getClass().getName()) + ": " + str(exp.getMessage()) + '\n' + str(StringUtils.join(exp.getStackTrace(), '\n\t'))
-    else:
-        return str(exp.getMessage())
 
 
 def qc(run_id, conf):
@@ -140,10 +121,10 @@ def qc(run_id, conf):
         # Compute the report
         report = qc.computeReport()
     except AozanException, exp:
-        error("error while computing qc report for run " + run_id + ".", exception_msg(exp, conf), conf)
+        error("error while computing qc report for run " + run_id + ".", common.exception_msg(exp, conf), conf)
         return False
     except Throwable, exp:
-        error("error while computing qc report for run " + run_id + ".", exception_msg(exp, conf), conf)
+        error("error while computing qc report for run " + run_id + ".", common.exception_msg(exp, conf), conf)
         return False
 
     # Remove qc data if not demand
@@ -160,10 +141,10 @@ def qc(run_id, conf):
         try:
             qc.writeXMLReport(report, qc_output_dir + '/' + run_id + '.xml')
         except AozanException, exp:
-            error("error while computing qc report XML for run " + run_id + ".", exception_msg(exp, conf), conf)
+            error("error while computing qc report XML for run " + run_id + ".", common.exception_msg(exp, conf), conf)
             return False
         except Throwable, exp:
-            error("error while computing qc report XML for run " + run_id + ".", exception_msg(exp, conf), conf)
+            error("error while computing qc report XML for run " + run_id + ".", common.exception_msg(exp, conf), conf)
             return False
 
     # Remove tmp extension of temporary qc directory
@@ -178,10 +159,10 @@ def qc(run_id, conf):
         else:
             qc.writeReport(report, conf[QC_REPORT_STYLESHEET_KEY], html_report_file)
     except AozanException, exp:
-        error("error while computing qc report HTML for run " + run_id + ".", exception_msg(exp, conf), conf)
+        error("error while computing qc report HTML for run " + run_id + ".", common.exception_msg(exp, conf), conf)
         return False
     except Throwable, exp:
-        error("error while computing qc report HTML for run " + run_id + ".", exception_msg(exp, conf), conf)
+        error("error while computing qc report HTML for run " + run_id + ".", common.exception_msg(exp, conf), conf)
         return False
 
     # Check if the report has been generated
