@@ -59,6 +59,16 @@ public class AozanException extends Exception {
   }
 
   /**
+   * Create a new AozanException with a message and a cause.
+   * @param message the message
+   * @param cause the cause
+   */
+  public AozanException(String message, Throwable cause) {
+
+    super(message, cause);
+  }
+
+  /**
    * Create a new AozanException with a message.
    * @param message the message
    */
