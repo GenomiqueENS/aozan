@@ -39,7 +39,7 @@ def estimate(run_id, conf):
         cycle_count = cycle_count + read.getNumberCycles()
 
     # retrieve data from runParameters.xml
-    run_param_path = hiseq_run_path + "/runParameters.xml"
+    run_param_path = common.get_runparameters_path(run_id, conf)
 
     #
     # Estimate space needed +10%

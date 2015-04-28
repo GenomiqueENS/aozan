@@ -3,8 +3,8 @@
 import os, time
 import stat, detection_end_run
 from xml.etree.ElementTree import ElementTree
-
 import common
+
 from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import HISEQ_CRITICAL_MIN_SPACE_KEY
 from fr.ens.transcriptome.aozan.Settings import HISEQ_DATA_PATH_KEY
@@ -12,8 +12,8 @@ from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import HISEQ_STEP_KEY
 from fr.ens.transcriptome.aozan.Settings import TMP_PATH_KEY
 import cmd
-from pickle import FALSE
-
+# from pickle import FALSE
+# from macpath import pathsep
 
 DENY_FILE = 'sequencer_run.deny'
 
@@ -26,30 +26,42 @@ def load_deny_run_ids(conf):
 
     return common.load_processed_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/hiseq.deny')
 
-def get_reads_number(run_id, conf):
-	"""Get the number of read of a run.
 
-	Arguments:
-		runtId: the run id
-		conf: configuration dictionary
+def get_runinfos_file(run_id, conf):
+    """Get the RunInfos.xml path.
+
+    Arguments:
+        runtId: the run id
+        conf: configuration dictionary
+    """
+    
+    sequencer_path = find_hiseq_run_path(run_id, conf)
+    
+    if not sequencer_path:
+        return None
+    
+    return sequencer_path + '/' + run_id + '/RunInfo.xml'
+
+def get_reads_number(run_id, conf):
+    """Get the number of read of a run.
+
+	    Arguments:
+		    runtId: the run id
+		    conf: configuration dictionary
 	"""
 
-	hiseq_data_path = find_hiseq_run_path(run_id, conf)
-	if hiseq_data_path == False:
-		return -1
+    file_src = get_runinfos_file(run_id, conf)
+    
+    
+    if not file_src:
+        return -1
+    
+    tree = ElementTree()
+    tree.parse(file_src)
 
-	run_parameters_path = hiseq_data_path + '/' + run_id + "/runParameters.xml"
+    reads = tree.find("Run/Reads")
 
-	if not os.path.exists(run_parameters_path):
-		return -1
-
-	tree = ElementTree()
-	tree.parse(hiseq_data_path + '/' + run_id + "/runParameters.xml")
-
-	reads = tree.find("Setup/Reads")
-
-	return len(reads)
-
+    return len(reads)
 
 
 def check_run_id(run_id, conf):
@@ -212,6 +224,10 @@ def error(short_message, message, conf):
 
 
 def create_run_summary_reports(run_id, conf):
+
+    return True
+    
+def create_run_summary_reports_REAL(run_id, conf):
 	""" Copy main files and directory from hiseq run directory to save in report run data directory.
         Save data in two distinct directory on hiseq and on report, and tar.bz2 version
         
@@ -219,7 +235,7 @@ def create_run_summary_reports(run_id, conf):
 		runId: the run id
 		conf: configuration dictionary
     """
-	
+
 	hiseq_data_path = find_hiseq_run_path(run_id, conf)
 	tmp_base_path = conf[TMP_PATH_KEY]
 	reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]

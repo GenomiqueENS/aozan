@@ -110,9 +110,7 @@ def send_report(run_id, conf):
     # Retrieve features the current run in RunInfos.xml file
     #
 
-    hiseq_run_path = conf[HISEQ_DATA_PATH_KEY] + '/' + run_id
-
-    run_info_path = hiseq_run_path + "/RunInfo.xml"
+    run_info_path = hiseq_run.get_runinfos_file(run_id, conf)
     run_info = RunInfo()
     run_info.parse(File(run_info_path))
 
@@ -170,4 +168,4 @@ def send_report(run_id, conf):
     else:
         # With other no attachment file
         message = 'You will find below features on new run on NextSeq ' + run_id + '.\n\n' + description_run
-        common.send_msg('[Aozan] Detection new run on sequencer NextSeq ' + type_run_estimated + '  ' + run_id , message, conf)
+        common.send_msg('[Aozan] Detection new run on sequencer NextSeq ' + type_run_estimated + '  ' + run_id , message, False, conf)
