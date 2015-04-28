@@ -578,9 +578,6 @@ public class QC {
     // Contaminant file
     addSystemProperty(properties, Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY,
         "fastqc.contaminant_file");
-    // Bug in FastQC code, error in typo key property in configuration class
-    addSystemProperty(properties, Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY,
-        "fastqc.contmainant_file");
 
     // Adapter file
     addSystemProperty(properties, Settings.QC_CONF_FASTQC_ADAPTER_FILE_KEY,
@@ -609,6 +606,10 @@ public class QC {
     // Set fastQC nofilter default false, if casava=true, filter fastq file
     addSystemProperty(properties, Settings.QC_CONF_FASTQC_NOFILTER_KEY,
         "fastqc.nofilter");
+    
+    addSystemProperty(properties, Settings.QC_CONF_FASTQC_NANO_KEY,
+        "fastqc.nano");
+
 
     // Patch FastQC classes
     RuntimePatchFastQC.runPatchFastQC(Boolean.valueOf(properties
