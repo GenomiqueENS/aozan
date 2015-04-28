@@ -48,8 +48,13 @@ def discovery_run(conf):
 
     if common.is_conf_value_equals_true(HISEQ_STEP_KEY, conf):
         for run_id in (hiseq_run.get_available_run_ids(conf) - run_ids_done):
+
+            if run_id == None or len(run_id) == 0:
+                # No run id found
+                return []
+            
             aozan.welcome(conf)
-            common.log('INFO', 'Discover end run ' + run_id + ' on sequencer ' + common.get_sequencer_type(run_id, conf), conf)
+            common.log('INFO', 'Discover end run ' + str(run_id) + ' on sequencer ' + str(common.get_sequencer_type(run_id, conf)), conf)
             
             if hiseq_run.create_run_summary_reports(run_id, conf):
                 hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
@@ -70,17 +75,24 @@ def check_end_run(run_id, conf):
     """
 
     hiseq_data_path = hiseq_run.find_hiseq_run_path(run_id, conf)
-    if hiseq_data_path == False:
-        return False
-
     reads_number = hiseq_run.get_reads_number(run_id, conf)
+    
+    # TODO
+    if hiseq_data_path == False:
+        print 'no path found '
+        return False
 
     # if reads_number equals -1, runParameters.xml is missing
     if reads_number == -1:
         return False
 
+    prefix, suffix = ('Basecalling_Netcopy_complete_Read', '.txt') if (common.is_sequencer_hiseq(run_id, conf)) else ('RTARead', 'Complete.txt')
+
+    # File generate only by HiSeq sequencer
     for i in range(reads_number):
-        if not os.path.exists(hiseq_data_path + '/' + run_id + '/Basecalling_Netcopy_complete_Read' + str(i + 1) + '.txt'):
+        filename = prefix + str(i + 1) + suffix
+        
+        if not os.path.exists(hiseq_data_path + '/' + run_id + '/' + filename):
             return False
 
     if not os.path.exists(hiseq_data_path + '/' + run_id + '/RTAComplete.txt'):
