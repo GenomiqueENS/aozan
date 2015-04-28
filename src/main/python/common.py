@@ -27,8 +27,10 @@ from email import encoders
 from fr.ens.transcriptome.aozan import Common
 from fr.ens.transcriptome.aozan import Globals
 from fr.ens.transcriptome.aozan import Settings
+from fr.ens.transcriptome.aozan import AozanException
 from fr.ens.transcriptome.aozan.util import FileUtils
 
+from fr.ens.transcriptome.aozan.Settings import AOZAN_DEBUG_KEY
 from fr.ens.transcriptome.aozan.Settings import SEND_MAIL_KEY
 from fr.ens.transcriptome.aozan.Settings import SMTP_SERVER_KEY
 from fr.ens.transcriptome.aozan.Settings import MAIL_ERROR_TO_KEY
@@ -50,6 +52,8 @@ from fr.ens.transcriptome.aozan.Settings import CASAVA_SAMPLESHEETS_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_COMPRESSION_KEY
 from fr.ens.transcriptome.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY
+
+from fr.ens.transcriptome.eoulsan.util import StringUtils
 
 def df(path):
     """Get the free space on a partition.
@@ -460,6 +464,23 @@ def log(level, message, conf):
     logger.log(Level.parse(level), message)
 
 
+def exception_msg(exp, conf):
+    """Create error message when an AozanException is thrown.
+    
+    Arguments:
+        exp: exception
+        conf: configuration dictionary
+    """
+
+    if is_conf_value_equals_true(AOZAN_DEBUG_KEY, conf):
+
+        if isinstance(exp, AozanException) and exp.getWrappedException() != None:
+            exp = exp.getWrappedException()
+
+        return str(exp.getClass().getName()) + ": " + str(exp.getMessage()) + '\n' + str(StringUtils.join(exp.getStackTrace(), '\n\t'))
+    else:
+        return str(exp.getMessage())
+
 def duration_to_human_readable(time):
     """Convert a number of seconds in human readable string.
     
@@ -502,7 +523,8 @@ def load_processed_run_ids(done_file_path):
         run_id = l[:-1]
         if len(run_id) == 0:
             continue
-        result.add(run_id)
+        # Extract first field 
+        result.add(run_id.split('\t')[0])
 
     f.close()
 
@@ -519,11 +541,11 @@ def add_run_id_to_processed_run_ids(run_id, done_file_path, conf):
     """
     sequencer_type = get_sequencer_type(run_id, conf)
     
-    log('INFO', 'Add ' + run_id + ' on sequencer ' + sequencer_type + ' to ' + os.path.basename(done_file_path), conf)
+    log('INFO', 'Add ' + run_id + ' on sequencer ' + str(sequencer_type) + ' to ' + os.path.basename(done_file_path), conf)
 
     f = open(done_file_path, 'a')
 
-    f.write(run_id + '\t' + sequencer_type + '\n')
+    f.write(run_id + '\t' + str(sequencer_type) + '\n')
 
     f.close()
     
@@ -550,10 +572,13 @@ def get_runparameters_path(run_id, conf):
         path to the run parameters file related to the run_id
     """
 
-    sequencer_dir_path = get_input_run_data_path(run_id, conf)
+    sequencer_dir_path = hiseq_run.find_hiseq_run_path(run_id, conf)
+    
+    if sequencer_dir_path == None:
+        return None
     
     # Find file at the root of directory sequencer data
-    res = glob(sequencer_dir_path + "/*Parameters.xml")
+    res = glob(sequencer_dir_path + '/' + run_id + "/*Parameters.xml")
     
     if len(res) == 0:
         # TODO throw exception ?
@@ -562,7 +587,7 @@ def get_runparameters_path(run_id, conf):
     # Extract path
     runParameter_path = res[0]
     
-        # Check result path
+    # Check result path
     if os.path.basename(runParameter_path).lower() == "runparameters.xml":
         return runParameter_path
     
@@ -640,7 +665,9 @@ def check_configuration(conf, configuration_file_path):
         True if the configuration is valid
     """
     
-    steps_to_launch = extract_steps_to_launch(False, conf)
+    # steps_to_launch = extract_steps_to_launch(False, conf)
+    # TODO to debug
+    steps_to_launch = extract_steps_to_launch(True, conf)
 
     msg = ''
 
@@ -772,6 +799,9 @@ def get_sequencer_type(run_id, conf):
         nextseq if version start by 2.X and hiseq if version start by 1.X, other None
     """
 
+    if run_id == None:
+        return None
+    
     # Extract RTA version 
     rtaversion = extract_rtaversion(run_id, conf)
     
