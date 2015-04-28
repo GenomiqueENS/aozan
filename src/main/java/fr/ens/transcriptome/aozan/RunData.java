@@ -297,7 +297,7 @@ public class RunData {
    * @return the run tiles per lane
    */
   public int getRunTilesPerLane() {
-    
+
     return this.getInt("run.info.tiles.per.lane.count");
   }
 
@@ -353,7 +353,13 @@ public class RunData {
    */
   public int getInt(final String key) {
 
-    return Integer.parseInt(get(key));
+    try {
+      return Integer.parseInt(get(key));
+
+    } catch (NumberFormatException e) {
+      throw new AozanRuntimeException(
+          "DataRun getInt throw NumberFormatException on this key " + key);
+    }
   }
 
   /**
@@ -363,7 +369,13 @@ public class RunData {
    */
   public long getLong(final String key) {
 
-    return Long.parseLong(get(key));
+    try {
+      return Long.parseLong(get(key));
+
+    } catch (NumberFormatException e) {
+      throw new AozanRuntimeException(
+          "DataRun getLong throw NumberFormatException on this key " + key);
+    }
   }
 
   /**
@@ -372,8 +384,13 @@ public class RunData {
    * @return the value of the data for the key
    */
   public float getFloat(final String key) {
+    try {
+      return Float.parseFloat(get(key));
 
-    return Float.parseFloat(get(key));
+    } catch (NumberFormatException e) {
+      throw new AozanRuntimeException(
+          "DataRun getFloat throw NumberFormatException on this key " + key);
+    }
   }
 
   /**
@@ -382,8 +399,13 @@ public class RunData {
    * @return the value of the data for the key
    */
   public double getDouble(final String key) {
+    try {
+      return Double.parseDouble(get(key));
 
-    return Double.parseDouble(get(key));
+    } catch (NumberFormatException e) {
+      throw new AozanRuntimeException(
+          "DataRun getDouble throw NumberFormatException on this key " + key);
+    }
   }
 
   //
