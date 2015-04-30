@@ -429,6 +429,26 @@
                 The official Aozan Git repository is now GitHub instead of Google code.
             </action>
         </release>
-				
+
+        <release version="1.4.2" description="Aozan 1.4.2 release"  date="2015-04-14">
+            <action dev="jourdren" type="add">
+                New dependency for errorprone static code analysis tool execution each time mvn compile is called.
+            </action>
+            <action dev="sperrin" type="update">
+                Update detection contaminant project report.
+            </action>
+            <action dev="sperrin" type="fix">
+                With PE run, now all statistical data in quality control report are display, no more NA.
+            </action>
+	</release>				
+        <release version="1.5" description="Aozan 1.5 release"  date="2015-04-29">
+            <action dev="sperrin" type="add">
+                New dependency on FastQC version 0.11.3, publish 25/03/2015.
+            </action>
+            <action dev="sperrin" type="fix">
+                The ProjectStatCollector can now collect data on recovery on undetermined reads when a lane is no indexed, 
+		the control quality report displays NA for this lane.
+            </action>
+	</release>
 	</body>
 </document>

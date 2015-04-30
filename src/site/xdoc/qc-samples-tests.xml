@@ -111,6 +111,7 @@
 	         <tr><td>qc.conf.fastqc.casava</td><td>boolean</td><td>False</td><td>Format fastq type casava/Illumina. (FastQC parameter)</td></tr>
 	         <tr><td>qc.conf.fastqc.nofilter</td><td>boolean</td><td>False</td><td>Option for filter fastq file if casava=true for all modules. (FastQC parameter)</td></tr>
 	         <tr><td>qc.conf.fastqc.process.undetermined.samples</td><td>boolean</td><td>True</td><td>Run FastQC on undetermined indices samples, default at false.</td></tr>
+	         <tr><td>qc.conf.fastqc.nano</td><td>boolean</td><td>False</td><td>Run FastQC on nanopore technilogy which use Fast5 format file instead of FASTQ, default at false.</td></tr>
 	    </table>
 
         <a name="fctests"/>

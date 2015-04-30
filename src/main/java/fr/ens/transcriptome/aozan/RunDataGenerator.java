@@ -56,6 +56,8 @@ public class RunDataGenerator {
   private final List<Collector> collectors;
   private final Properties properties = new Properties();
 
+  private final String runId;
+
   /**
    * Set global configuration for collectors and tests.
    * @param conf global configuration object
@@ -117,7 +119,8 @@ public class RunDataGenerator {
     for (final Collector collector : this.collectors) {
 
       final Stopwatch timerCollector = Stopwatch.createStarted();
-      LOGGER.info(collector.getName().toUpperCase() + " start");
+      LOGGER.info(collector.getName().toUpperCase()
+          + " start on run " + this.runId);
 
       // Configure
       collector.configure(new Properties(this.properties));
@@ -126,7 +129,7 @@ public class RunDataGenerator {
       collector.collect(data);
 
       LOGGER.info(collector.getName().toUpperCase()
-          + " end in "
+          + " end for run " + this.runId + " in "
           + toTimeHumanReadable(timerCollector.elapsed(TimeUnit.MILLISECONDS)));
 
     }
@@ -206,12 +209,14 @@ public class RunDataGenerator {
 
   /**
    * Public constructor.
+   * @param runId
    */
-  public RunDataGenerator(final List<Collector> collectors) {
+  public RunDataGenerator(final List<Collector> collectors, final String runId) {
 
     checkNotNull(collectors, "The list of collectors is null");
 
     this.collectors = addAllCollectors(collectors);
+    this.runId = runId;
 
     // Add collector name requiered in properties
     addCollectorNameInProperties();

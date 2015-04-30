@@ -861,12 +861,7 @@ public class UndeterminedIndexesProcessThreads extends
     // Create parent directory if necessary
     final File parentDir = reportFile.getParentFile();
     if (!parentDir.exists()) {
-      if (!parentDir.mkdirs()) {
-        throw new IOException(
-            "Undetermined: Fail to create parent directory of recovery cluster lane's report ."
-                + parentDir.getAbsolutePath() + " for new file :"
-                + reportFile.getAbsolutePath());
-      }
+      java.nio.file.Files.createDirectories(parentDir.toPath());
     }
 
     return reportFile;
@@ -990,20 +985,14 @@ public class UndeterminedIndexesProcessThreads extends
       final String extension) throws IOException {
 
     final File reportFile =
-        new File(this.reportDir.getAbsolutePath()
-            + "/../Project_" + getProjectSample(sampleName) + "/" + sampleName
+        new File(this.reportDir.getParentFile().getAbsolutePath()
+            + "/Project_" + getProjectSample(sampleName) + "/" + sampleName
             + "_lane" + this.lane + "-potentialindices" + extension);
 
     // Create parent directory if necessary
     final File parentDir = reportFile.getParentFile();
     if (!parentDir.exists()) {
-      if (!parentDir.mkdirs()) {
-        throw new IOException(
-            "Undetermined: Fail to create parent directory of recovery cluster sample's report parent directory :"
-                + parentDir.getAbsolutePath()
-                + " for new file :"
-                + reportFile.getAbsolutePath());
-      }
+      java.nio.file.Files.createDirectories(parentDir.toPath());
     }
 
     return reportFile;

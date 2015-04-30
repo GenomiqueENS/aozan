@@ -361,7 +361,7 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
     common.log("INFO", "exec: " + cmd, conf)
     
     # Create executable file
-    commandfile = tmp_local + '/script_bcl2fastq.sh'
+    commandfile = tmp_path + '/script_bcl2fastq.sh'
     f = open(commandfile, 'w')
     f.write("#! /bin/bash\n\n")
     f.write(cmd)
@@ -489,8 +489,8 @@ def demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_
         
         common.log("CONFIG", "bcl2fastq run with image docker from " + docker.getImageDockerName() + " with command line " + cmd, conf)
         common.log("CONFIG", "bcl2fastq docker mount: " 
-                   + str(os.path.dirname(fastq_output_dir)) + " with " + str(output_docker) + "; " 
-                   + input_run_data_path + " with " + input_docker + "; " + tmp + " with /tmp", conf); 
+                   + str(os.path.dirname(fastq_output_dir)) + ":" + str(output_docker) + "; " 
+                   + input_run_data_path + ":" + input_docker + "; " + tmp + ":/tmp", conf); 
         
         # Mount input directory
         docker.addMountDirectory(input_run_data_path, input_docker)

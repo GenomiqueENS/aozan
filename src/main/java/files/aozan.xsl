@@ -45,7 +45,7 @@ doctype-system="about:legacy-compat"/>
       background: #55D486;
     }
 
-   .sampleData tr:hover, .data tr:hover {
+   .sampleData tr:hover, .data tr:hover, .projectData tr:hover{
       z-index:2;
       box-shadow:0 0 20px rgba(0, 0, 0, 1);
       background:#F6F6B4;
@@ -409,13 +409,13 @@ doctype-system="about:legacy-compat"/>
   </xsl:if>
   
   <a id="project"></a>
-  <xsl:if test="/QCReport[ProjectsReport]">
+  <xsl:if test="/QCReport[ProjectsFilter]">
 	  <div>
 	  <h4>Filter samples by projects</h4>
 	  <table id="filterProject">
 	    <tr>
 	      <td><a href="javascript:void(0);" class="linkFilterActivate" onclick="window.location.reload(true);">ALL</a></td>
-	      <xsl:for-each select="/QCReport/ProjectsReport/ProjectName">
+	      <xsl:for-each select="/QCReport/ProjectsFilter/ProjectName">
 		    <td>
 			  <xsl:element name="a">
 			  <xsl:attribute name="class">linkFilterInactivate</xsl:attribute>
@@ -428,7 +428,9 @@ doctype-system="about:legacy-compat"/>
 	  </table>
 	<!--   end filter by project -->
 	  </div>
+	</xsl:if>
   
+  <xsl:if test="/QCReport[ProjectsReport]">
   <h2>Projects statistics report</h2>
 	<div>
    <table class="projectData">

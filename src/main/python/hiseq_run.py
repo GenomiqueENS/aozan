@@ -224,10 +224,11 @@ def error(short_message, message, conf):
 
 
 def create_run_summary_reports(run_id, conf):
+    return True 
 
-    return True
-    
-def create_run_summary_reports_REAL(run_id, conf):
+
+def create_run_summary_reports_real(run_id, conf):
+
 	""" Copy main files and directory from hiseq run directory to save in report run data directory.
         Save data in two distinct directory on hiseq and on report, and tar.bz2 version
         

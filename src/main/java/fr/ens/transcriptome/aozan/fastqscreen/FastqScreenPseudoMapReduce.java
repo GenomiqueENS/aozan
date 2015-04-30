@@ -42,6 +42,7 @@ import com.google.common.base.Stopwatch;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
+import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
 import fr.ens.transcriptome.eoulsan.bio.readsmappers.Bowtie2ReadsMapper;
@@ -360,31 +361,35 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    */
   private String getMapperArguments() throws AozanException {
 
-    if (this.newArgumentsMapper == null
-        || this.newArgumentsMapper.length() == 0) {
-      if (this.mapperName.equals(new BowtieReadsMapper().getMapperName())) {
+    if (this.newArgumentsMapper != null && this.newArgumentsMapper.isEmpty()) {
 
-        // Parameter for Bowtie
-        return " -l 20 -k 2 --chunkmbs 512"
-            + (this.pairedMode ? " --maxins 1000" : "");
-
-      } else if (this.mapperName.equals(new Bowtie2ReadsMapper()
-          .getMapperName())) {
-
-        // Parameter for Bowtie2
-        return " -k 2 --very-fast-local --no-discordant --no-mixed"
-            + (this.pairedMode ? " --maxins 1000" : "");
-      } else {
-        // No parameter define for mapper
-        throw new AozanException(
-            "FastqScreen fail: no argument defined to the mapper "
-                + this.mapperName
-                + ". Only bowtie or bowtie2 are default parameters.");
-      }
+      // Return parameters setting in configuration Aozan file
+      return this.newArgumentsMapper;
     }
 
-    // Return parameters setting in configuration Aozan file
-    return this.newArgumentsMapper;
+    // Use default argument mapper
+    final String mapperNameLower =
+        this.mapperName.toLowerCase(Globals.DEFAULT_LOCALE);
+
+    if (mapperNameLower.equals(new BowtieReadsMapper().getMapperName()
+        .toLowerCase(Globals.DEFAULT_LOCALE))) {
+
+      // Parameter for Bowtie
+      return " -l 20 -k 2 --chunkmbs 512"
+          + (this.pairedMode ? " --maxins 1000" : "");
+
+    } else if (mapperNameLower.equals(new Bowtie2ReadsMapper().getMapperName()
+        .toLowerCase(Globals.DEFAULT_LOCALE))) {
+      // Parameter for Bowtie2
+      return " -k 2 --very-fast-local --no-discordant --no-mixed"
+          + (this.pairedMode ? " --maxins 1000" : "");
+
+    } else { // No parameter define for mapper
+      throw new AozanException(
+          "FastqScreen fail: no argument defined to the mapper "
+              + this.mapperName
+              + ". Only bowtie or bowtie2 are default parameters.");
+    }
 
   }
 

@@ -365,7 +365,8 @@ public abstract class AbstractFastqCollector implements Collector {
           for (final String sampleName : sampleNames) {
 
             // Skip invalid sample for quality control, like FASTQ file empty
-            if (!isValidFastQSampleForQC(data, lane, sampleName, read)) {
+            if (!isValidFastQSampleForQC(data, lane, sampleName,
+                readIndexedCount)) {
               continue;
             }
 
@@ -424,17 +425,17 @@ public abstract class AbstractFastqCollector implements Collector {
         "demux.lane" + lane + ".sample." + sampleName + ".read" + read;
 
     // Check value exist in rundata, if not then fastq is empty
-    final boolean invalid =
-        (data.get(prefix + ".pf.cluster.count") == null || data.get(prefix
+    final boolean valid =
+        !(data.get(prefix + ".pf.cluster.count") == null || data.get(prefix
             + ".raw.cluster.count") == null);
 
-    if (invalid)
+    if (!valid)
       LOGGER.warning("Sample "
-          + sampleName
-          + " no demultiplexing data found, no quality control data.");
+          + sampleName + " lane " + lane
+          + ": no demultiplexing data found, no quality control data.");
 
     // Return true if sample valid
-    return !invalid;
+    return valid;
 
   }
 

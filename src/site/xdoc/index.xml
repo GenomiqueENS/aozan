@@ -86,6 +86,15 @@
 
 		<section name="What's new in Aozan?">
 
+			<subsection name="FastQC version 0.11.3">
+				<p>Aozan now use the lastest FastQC version (0.11.3) that includes : 
+					<ul><li>process files of Oxford Nanopore reads, </li>
+						<li>Add the SOLID smallRNA adapter to the standard search set, </li>
+						</ul></p>
+				<p>Of course, this new FastQC version bundled in Aozan still contains previous Aozan enhancements to FastQC (the &quot;<b>Bad tiles</b>&quot; module
+				and the optional blast in the &quot;<b>Overrepresented sequences</b>&quot; module).</p>
+			</subsection>
+			
 			<subsection name="New projects tests in quality control report">
 				<p>Enhancement of the quality control report, with a new table on projects test: listing data on all projects in run
 					<a href="./qc-projects-tests.html">more details here.</a>

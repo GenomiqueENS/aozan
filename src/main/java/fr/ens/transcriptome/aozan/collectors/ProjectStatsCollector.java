@@ -95,7 +95,8 @@ public class ProjectStatsCollector implements Collector {
     // Use their data only if a test use them.
 
     return Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME,
-        DesignCollector.COLLECTOR_NAME);
+        DesignCollector.COLLECTOR_NAME,
+        FlowcellDemuxSummaryCollector.COLLECTOR_NAME);
   }
 
   @Override
@@ -462,11 +463,15 @@ public class ProjectStatsCollector implements Collector {
 
       // Check collector is selected
       if (isUndeterminedIndexesCollectorSelected()) {
-        this.rawClusterRecoverySum +=
-            this.data.getSampleRawClusterRecoveryCount(lane, sample);
+        
+        // Check if lane is indexed
+        if (this.data.isLaneIndexed(lane)) {
+          this.rawClusterRecoverySum +=
+              this.data.getSampleRawClusterRecoveryCount(lane, sample);
 
-        this.pfClusterRecoverySum +=
-            this.data.getSamplePFClusterRecoveryCount(lane, sample);
+          this.pfClusterRecoverySum +=
+              this.data.getSamplePFClusterRecoveryCount(lane, sample);
+        }
       }
 
       // Check collector is selected

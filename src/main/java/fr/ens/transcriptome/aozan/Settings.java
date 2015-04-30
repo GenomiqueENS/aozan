@@ -183,6 +183,11 @@ public final class Settings {
   /** Option for filter fastq file if casava=true for all modules. */
   public static final String QC_CONF_FASTQC_NOFILTER_KEY =
       "qc.conf.fastqc.nofilter";
+  /**
+   * New option with FastQC 0.11.3 to nanopore technology, use Fast5 file
+   * instead of FastQ
+   */
+  public static final String QC_CONF_FASTQC_NANO_KEY = "qc.conf.fastqc.nano";
 
   /** Collector cluster density ratio. */
   public static final String QC_CONF_CLUSTER_DENSITY_RATIO_KEY =
@@ -244,7 +249,7 @@ public final class Settings {
   /** Collector project, fastqscreen xsl file */
   public static final String QC_CONF_FASTQSCREEN_PERCENT_CONTAMINATION_THRESHOLD_KEY =
       "qc.conf.fastqscreen.percent.contamination.threshold";
-  
+
   /** Collector read xml collector used. */
   public static final String QC_CONF_READ_XML_COLLECTOR_USED_KEY =
       "qc.conf.read.xml.collector.used";
