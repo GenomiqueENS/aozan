@@ -59,6 +59,11 @@ public class RecoverablePFClusterPercentSampleTest extends AbstractSampleTest {
     String recoveryCountKey;
     String sampleCountKey;
 
+    if (!data.isLaneIndexed(lane)) {
+      return new TestResult("NA");
+    }
+
+    
     if (sampleName == null) {
       // Case undetermined
       recoveryCountKey =

@@ -55,9 +55,13 @@ public class RecoverableRawClusterPercentSampleTest extends AbstractSampleTest {
   @Override
   public TestResult test(final RunData data, final int re2ad,
       final int readSample, final int lane, final String sampleName) {
-    
+
     String recoveryCountKey;
     String sampleCountKey;
+
+    if (!data.isLaneIndexed(lane)) {
+      return new TestResult("NA");
+    }
 
     if (sampleName == null) {
       // Case undetermined
@@ -123,7 +127,8 @@ public class RecoverableRawClusterPercentSampleTest extends AbstractSampleTest {
    * Public constructor.
    */
   public RecoverableRawClusterPercentSampleTest() {
-    super("recoverablerawclusterssamplespercent", "", "Recoverable raw clusters", "%");
+    super("recoverablerawclusterssamplespercent", "",
+        "Recoverable raw clusters", "%");
   }
 
 }
