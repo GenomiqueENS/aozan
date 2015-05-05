@@ -280,46 +280,72 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
     nb_threads = str(get_cpu_count(conf)) 
     tmp_local = conf[TMP_PATH_KEY]
     
+    executable_path = ""
+    
     if common.is_sequencer_hiseq(run_id, conf):
-        #  executable_path = '/usr/local/bin/configureBclToFastq.pl '
+        # executable_path = '/usr/local/bin/configureBclToFastq.pl '
         
         # Create casava makefile
-        executable_path = conf[CASAVA_PATH_KEY] + '/bin/configureBclToFastq.pl '
-        
-        args.extend(['--fastq-cluster-count' , conf[CASAVA_FASTQ_CLUSTER_COUNT_KEY]])
-        args.extend(['--compression', conf[CASAVA_COMPRESSION_KEY]])
-        args.extend(['--gz-level', conf[CASAVA_COMPRESSION_LEVEL_KEY]])
-        args.extend(['--mismatches', nb_mismatch])
-        args.extend(['--input-dir' , input_run_data_path + '/Data/Intensities/BaseCalls'])
-        args.extend(['--sample-sheet', samplesheet_csv_path])
-        args.extend(['--output-dir ' + fastq_output_dir])
-              
+        # executable_path = conf[CASAVA_PATH_KEY] + ' '
+        makefile_args = []
+        makefile_args.extend([str(conf[CASAVA_PATH_KEY]) + '/bin/configureBclToFastq.pl'])
+        makefile_args.extend(['--fastq-cluster-count' , conf[CASAVA_FASTQ_CLUSTER_COUNT_KEY]])
+        makefile_args.extend(['--compression', conf[CASAVA_COMPRESSION_KEY]])
+        makefile_args.extend(['--gz-level', conf[CASAVA_COMPRESSION_LEVEL_KEY]])
+        makefile_args.extend(['--mismatches', nb_mismatch])
+        makefile_args.extend(['--input-dir' , input_run_data_path + '/Data/Intensities/BaseCalls'])
+        makefile_args.extend(['--sample-sheet', samplesheet_csv_path])
+        makefile_args.extend(['--output-dir', fastq_output_dir])
+               
         if common.is_conf_value_equals_true(CASAVA_WITH_FAILED_READS_KEY, conf):
-            args.extend(['--with-failed-reads'])
-
+            makefile_args.extend(['--with-failed-reads'])
+ 
         if common.is_conf_key_exists(CASAVA_ADAPTER_FASTA_FILE_PATH_KEY, conf):
             #  Copy in tmp directory
-
+ 
             adapter_filename = os.path.basename(conf[CASAVA_ADAPTER_FASTA_FILE_PATH_KEY])
-            
+             
             if os.system('cp ' + conf[CASAVA_ADAPTER_FASTA_FILE_PATH_KEY] + ' ' + tmp_local) != 0:
                 error('error copy adapter file for bcl2fastq in tmp directory',
                       'Error copy adapter file for bcl2fastq in tmp directory. \nCommand line:\n cp ' + conf[CASAVA_ADAPTER_FASTA_FILE_PATH_KEY] + ' ' + tmp_local, conf)
                 return False
-            
+             
             adapter_temp_path = tmp_local + '/' + adapter_filename 
-            
+             
             args.extend(['--adapter-sequence', adapter_temp_path])
-    
+     
         if common.is_conf_key_exists(CASAVA_ADDITIONNAL_ARGUMENTS_KEY, conf):
-            args.extend([conf[CASAVA_ADDITIONNAL_ARGUMENTS_KEY]])
-    
+            makefile_args.extend([conf[CASAVA_ADDITIONNAL_ARGUMENTS_KEY]])
+     
         # Retrieve output in file
-        args.extend([' > ' + tmp_path + '/bcl2fastq_output_' + run_id + '.out 2> ' + tmp_path + '/bcl2fastq_output_' + run_id + '.err'])
+        makefile_args.extend([' > ' + tmp_path + '/bcl2fastq_output_' + run_id + '.out 2> ' + tmp_path + '/bcl2fastq_output_' + run_id + '.err'])
         
-
-
-    if common.is_sequencer_nextseq(run_id, conf):
+        cmd = " ".join(makefile_args)
+        common.log("INFO", "exec: " + cmd, conf)
+        exit_code = os.system(cmd)
+        if exit_code != 0:
+            error("error while creating Casava makefile for run " + run_id, 'Error while creating Casava makefile (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
+            return False
+        
+        # Configuration bcl2fastq success, move command output file in fastq_output_dir
+        cmd = 'mv /tmp/bcl2fastq_output_' + run_id + '.*  ' + fastq_output_dir
+        common.log("INFO", "exec: " + cmd, conf)
+        exit_code = os.system(cmd)
+        if exit_code != 0:
+            error("error while moving command output files for run " + run_id, 'Error while moving command output files (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
+        
+        # Get the number of cpu
+        cpu_count = int(conf[CASAVA_THREADS_KEY])
+        if cpu_count < 1:
+            cpu_count = Runtime.getRuntime().availableProcessors()
+    
+        # Launch casava
+        args = []
+        args.extend(['cd', fastq_output_dir])
+        args.extend(['&&', 'make', '-j', str(cpu_count)])
+        args.extend(['>', fastq_output_dir + '/make.out', '2>', fastq_output_dir + '/make.err'])
+        
+    elif common.is_sequencer_nextseq(run_id, conf):
         
         executable_path = 'bcl2fastq '
         
@@ -351,11 +377,11 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
             args.append(conf[CASAVA_ADDITIONNAL_ARGUMENTS_KEY])
 
         # Retrieve output in file
-        args.append('2> ' + tmp_path + '/bcl2fastq_output_' + run_id + '.out')
+        args.extend(['2>', tmp_path + '/bcl2fastq_output_' + run_id + '.out'])
     
     
     # Build command line
-    cmd = executable_path + " ".join(args) 
+    cmd = str(" ".join(args)) 
 
     # Log command line
     common.log("INFO", "exec: " + cmd, conf)
@@ -388,54 +414,13 @@ def demux_run_standalone(run_id, bcl2fastq_version, input_run_data_path, fastq_o
         samplesheet_csv_path: sample sheet path in csv format, version used by bcl2fastq
         conf: configuration dictionary
     """
-    # TODO use bcl2fastq_version
-     
-#     # Create casava makefile
-#     cmd = conf[CASAVA_PATH_KEY] + '/bin/configureBclToFastq.pl ' + \
-#           '--fastq-cluster-count ' + conf[CASAVA_FASTQ_CLUSTER_COUNT_KEY] + ' ' + \
-#           '--compression ' + conf[CASAVA_COMPRESSION_KEY] + ' ' + \
-#           '--gz-level ' + conf[CASAVA_COMPRESSION_LEVEL_KEY] + ' ' \
-#           '--mismatches ' + conf[CASAVA_MISMATCHES_KEY] + ' ' + \
-#           '--input-dir ' + input_run_data_path + '/Data/Intensities/BaseCalls ' + \
-#           '--sample-sheet ' + samplesheet_csv_path + ' ' + \
-#           '--output-dir ' + fastq_output_dir
-#     if common.is_conf_value_equals_true(CASAVA_WITH_FAILED_READS_KEY, conf):
-#         cmd = cmd + ' --with-failed-reads'
-#     if common.is_conf_key_exists(CASAVA_ADAPTER_FASTA_FILE_PATH_KEY, conf):
-#         cmd = cmd + ' --adapter-sequence ' + conf[CASAVA_ADAPTER_FASTA_FILE_PATH_KEY]
-# 
-#     if common.is_conf_key_exists(CASAVA_ADDITIONNAL_ARGUMENTS_KEY, conf):
-#         cmd = cmd + ' ' + conf[CASAVA_ADDITIONNAL_ARGUMENTS_KEY]        
-# 
-#     # Retrieve output in file
-#     cmd = cmd + ' > /tmp/bcl2fastq_output_' + run_id + '.out 2> /tmp/bcl2fastq_output_' + run_id + '.err'
     
     cmd = bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, conf[TMP_PATH_KEY], conf)
     
-    common.log("INFO", "exec: " + cmd, conf)
     exit_code = os.system(cmd)
     if exit_code != 0:
         error("error while creating Casava makefile for run " + run_id,
               'Error while creating Casava makefile (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
-        return False
-    
-    # Configuration bcl2fastq success, move command output file in fastq_output_dir
-    cmd = 'mv /tmp/bcl2fastq_output_' + run_id + '.*  ' + fastq_output_dir
-    common.log("INFO", "exec: " + cmd, conf)
-    exit_code = os.system(cmd)
-    if exit_code != 0:
-        error("error while moving command output files for run " + run_id,
-              'Error while moving command output files (exit code: ' + str(exit_code)
-               + ').\nCommand line:\n' + cmd, conf)
-
-    # Launch casava
-    cmd = 'cd ' + fastq_output_dir + ' && make -j ' + str(get_cpu_count()) + \
-          ' > ' + fastq_output_dir + '/make.out' + ' 2> ' + fastq_output_dir + '/make.err'
-    common.log("INFO", "exec: " + cmd, conf)
-    exit_code = os.system(cmd)
-    if exit_code != 0:
-        error("error while running Casava for run " + run_id,
-              'Error while running Casava (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
         return False
     
     # The output directory must be read only
@@ -445,8 +430,7 @@ def demux_run_standalone(run_id, bcl2fastq_version, input_run_data_path, fastq_o
         error("error while setting read only the output fastq directory for run " + run_id,
               'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
         return False
-
-
+    
     # All ok
     return True
      
@@ -461,8 +445,6 @@ def demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_
         samplesheet_csv_path: sample sheet path in csv format, version used by bcl2fastq
         conf: configuration dictionary
     """
-    
-    
     
     print 'run bcl2fastq with image docker '
 
@@ -497,8 +479,8 @@ def demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_
         docker.addMountDirectory(os.path.dirname(fastq_output_dir), output_docker)
         docker.addMountDirectory(tmp, "/tmp")
         
-        docker.run();
-        #  docker.runtest();
+        # docker.run();
+        docker.runTest();
     
         if docker.getExitValue() != 0:
             error("error while demultiplexing run " + run_id, 'Error while demultiplexing run (exit code: ' 
@@ -512,14 +494,13 @@ def demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_
         return False
     
     # The output directory must be read only
-#   cmd = 'chmod -R ugo-w ' + fastq_output_dir + '/Project_*'
+    #   cmd = 'chmod -R ugo-w ' + fastq_output_dir + '/Project_*'
     cmd = 'find' + fastq_output_dir + ' -type f -name "*.fastq.*" -exec chmod ugo-w {} \; '
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while setting read only the output fastq directory for run " + run_id,
               'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
         return False
-
     
     return True
     
@@ -721,9 +702,10 @@ def demux(run_id, conf):
     bcl2fastq_version = BCL2FASTQ_VERSION_HISEQ if common.is_RTA_1_version(run_id, conf) else BCL2FASTQ_VERSION_NEXTSEQ 
     
     common.log("CONFIG", "bcl2fastq version used " + bcl2fastq_version, conf)
+    common.log("CONFIG", "bcl2fastq mode docker ? " + str(common.is_conf_value_equals_true(DEMUX_DOCKER_ENABLE_KEY), conf), conf)
     
     # Run demultiplexing
-    if True or common.is_conf_value_equals_true(DEMUX_DOCKER_ENABLE_KEY):
+    if common.is_conf_value_equals_true(DEMUX_DOCKER_ENABLE_KEY, conf):
         # With image docker
         if not demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_output_dir, design_csv_path, conf):
             return False
