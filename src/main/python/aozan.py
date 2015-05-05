@@ -277,7 +277,7 @@ def launch_steps(conf):
     Arguments:
         conf: configuration object  
     """
-
+    
     # Discover new runs
     hiseq_run_ids_done = detection_new_run.discover_new_run(conf)
 
@@ -292,19 +292,28 @@ def launch_steps(conf):
 
     # Get the list of run available on HiSeq output
     if sync_run.is_sync_step_enable(conf):
-        for run_id in (hiseq_run_ids_done - sync_run_ids_done - hiseq_run_ids_do_not_process):
-            if lock_sync_step(conf, run_id):
-                welcome(conf)
-                common.log('INFO', 'Synchronize ' + run_id, conf)
-                if sync_run.sync(run_id, conf):
-                    sync_run.add_run_id_to_processed_run_ids(run_id, conf)
-                    sync_run_ids_done.add(run_id)
-                    unlock_sync_step(conf, run_id)
+        
+        try:      
+            for run_id in (hiseq_run_ids_done - sync_run_ids_done - hiseq_run_ids_do_not_process):
+                if lock_sync_step(conf, run_id):
+                    welcome(conf)
+                    common.log('INFO', 'Synchronize ' + run_id, conf)
+                    if sync_run.sync(run_id, conf):
+                        sync_run.add_run_id_to_processed_run_ids(run_id, conf)
+                        sync_run_ids_done.add(run_id)
+                        unlock_sync_step(conf, run_id)
+                    else:
+                        unlock_sync_step(conf, run_id)
+                        return
                 else:
-                    unlock_sync_step(conf, run_id)
-                    return
-            else:
-                common.log('INFO', 'Synchronize ' + run_id + ' is locked.', conf)
+                    common.log('INFO', 'Synchronize ' + run_id + ' is locked.', conf)
+
+        except:
+            exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
+            traceback_msg = traceback.format_exc(sys.exc_info()[2])
+
+            sync_run.error("Fail synchronization for run " + run_id + ", catch exception " + exception_msg,
+                           "Fail synchronization for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg, conf)
 
 
     # Check if new run appears while sync step
@@ -322,19 +331,27 @@ def launch_steps(conf):
     demux_run_ids_done = demux_run.load_processed_run_ids(conf)
     
     if common.is_conf_value_equals_true(DEMUX_STEP_KEY, conf):
-        for run_id in (sync_run_ids_done - demux_run_ids_done):
-            if lock_demux_step(conf, run_id):
-                welcome(conf)
-                common.log('INFO', 'Demux ' + run_id, conf)
-                if demux_run.demux(run_id, conf):
-                    demux_run.add_run_id_to_processed_run_ids(run_id, conf)
-                    demux_run_ids_done.add(run_id)
-                    unlock_demux_step(conf, run_id)
+        try:
+            for run_id in (sync_run_ids_done - demux_run_ids_done):
+                if lock_demux_step(conf, run_id):
+                    welcome(conf)
+                    common.log('INFO', 'Demux ' + run_id, conf)
+                    if demux_run.demux(run_id, conf):
+                        demux_run.add_run_id_to_processed_run_ids(run_id, conf)
+                        demux_run_ids_done.add(run_id)
+                        unlock_demux_step(conf, run_id)
+                    else:
+                        unlock_demux_step(conf, run_id)
+                        return
                 else:
-                    unlock_demux_step(conf, run_id)
-                    return
-            else:
-                common.log('INFO', 'Demux ' + run_id + ' is locked.', conf)
+                    common.log('INFO', 'Demux ' + run_id + ' is locked.', conf)
+
+        except:
+            exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
+            traceback_msg = traceback.format_exc(sys.exc_info()[2])
+
+            demux_run.error("Fail demultiplexing for run " + run_id + ", catch exception " + exception_msg,
+                           "Fail demultiplexing for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg, conf)
 
 
     # Check if new run appears while demux step
@@ -349,19 +366,27 @@ def launch_steps(conf):
     qc_run_ids_done = qc_run.load_processed_run_ids(conf)
     
     if common.is_conf_value_equals_true(QC_STEP_KEY, conf):
-        for run_id in (demux_run_ids_done - qc_run_ids_done):
-            if lock_qc_step(conf, run_id):
-                welcome(conf)
-                common.log('INFO', 'Quality control ' + run_id, conf)
-                if qc_run.qc(run_id, conf):
-                    qc_run.add_run_id_to_processed_run_ids(run_id, conf)
-                    qc_run_ids_done.add(run_id)
-                    unlock_qc_step(conf, run_id)
+        
+        try:
+            for run_id in (demux_run_ids_done - qc_run_ids_done):
+                if lock_qc_step(conf, run_id):
+                    welcome(conf)
+                    common.log('INFO', 'Quality control ' + run_id, conf)
+                    if qc_run.qc(run_id, conf):
+                        qc_run.add_run_id_to_processed_run_ids(run_id, conf)
+                        qc_run_ids_done.add(run_id)
+                        unlock_qc_step(conf, run_id)
+                    else:
+                        unlock_qc_step(conf, run_id)
+                        return
                 else:
-                    unlock_qc_step(conf, run_id)
-                    return
-            else:
-                common.log('INFO', 'Quality control ' + run_id + ' is locked.', conf)
+                    common.log('INFO', 'Quality control ' + run_id + ' is locked.', conf)
+
+        except:
+            exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
+            traceback_msg = traceback.format_exc(sys.exc_info()[2])
+            qc_run.error("Fail quality control for run " + run_id + ", catch exception " + exception_msg,
+                           "Fail quality control for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg, conf)
 
 
     # Check if new run appears while quality control step
@@ -387,8 +412,6 @@ def launch_steps(conf):
             else:
                 common.log('INFO', 'Partial synchronization of ' + run_id + ' is locked.', conf)
 
-
-
 def aozan_main():
     """Aozan main method.
 
@@ -411,7 +434,7 @@ def aozan_main():
         print Globals.WELCOME_MSG
         sys.exit(0)
     
-    # Print default configuration option
+    #  Print default configuration option
     if options.conf:
         print common.print_default_configuration()
         sys.exit(0)
