@@ -11,7 +11,7 @@ doctype-system="about:legacy-compat"/>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>fastqscreen <xsl:value-of select="/ReportFastqScreen/sampleName"/></title>
+  <title>fastqscreen <xsl:value-of select="/ReportFastqScreen/projectName"/></title>
    <style type="text/css">
    
     tr.genomeSample{
