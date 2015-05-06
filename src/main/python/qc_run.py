@@ -5,6 +5,8 @@ Created on 28 oct. 2011
 '''
 import os.path, stat
 import common, time
+import demux_run
+
 from fr.ens.transcriptome.aozan import QC, Settings
 from fr.ens.transcriptome.aozan import AozanException
 from java.lang import Throwable
@@ -17,6 +19,7 @@ from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import QC_REPORT_STYLESHEET_KEY
 from fr.ens.transcriptome.aozan.Settings import QC_REPORT_SAVE_REPORT_DATA_KEY
 from fr.ens.transcriptome.aozan.Settings import TMP_PATH_KEY
+
 
 def load_processed_run_ids(conf):
     """Load the list of the processed run ids.
@@ -59,19 +62,21 @@ def qc(run_id, conf):
     """
 
     start_time = time.time()
-    
-    common.log('INFO', 'QC step: start', conf)
 
     input_run_data_path = common.get_input_run_data_path(run_id, conf)
     
     if input_run_data_path == None:
         return False
     
+    bcl2fastq_version = demux_run.get_bcl2fastq_version(run_id, conf)
+    
     fastq_input_dir = conf[FASTQ_DATA_PATH_KEY] + '/' + run_id
     reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
     reports_data_path = reports_data_base_path + '/' + run_id
     qc_output_dir = reports_data_path + '/qc_' + run_id
     tmp_extension = '.tmp'
+
+    common.log('INFO', 'QC step: start with bcl2fastq version ' + str(bcl2fastq_version), conf)
 
     # Check if input run data data exists
     if input_run_data_path == None:
@@ -116,7 +121,7 @@ def qc(run_id, conf):
     try:
 
         # Initialize the QC object
-        qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id)
+        qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id, bcl2fastq_version)
 
         # Compute the report
         report = qc.computeReport()

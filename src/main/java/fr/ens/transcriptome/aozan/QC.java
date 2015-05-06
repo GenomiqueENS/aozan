@@ -84,6 +84,9 @@ public class QC {
   private static final String TEST_KEY_ENABLED_SUFFIX = ".enable";
   private static final String TEST_KEY_PREFIX = "qc.test.";
 
+  /** Bcl2fastq version to demultiplexing step. */
+  private static final String BCL2FASTQ_VERSION = null;
+
   private final String bclDir;
   private final String fastqDir;
   private final String qcDir;
@@ -97,6 +100,9 @@ public class QC {
   private final Map<String, String> globalConf = new HashMap<>();
 
   private final File tmpDir;
+
+  /** Bcl2fastq version to demultiplexing step. */
+  private final String bcl2fastqVersion;
 
   /**
    * Process data.
@@ -153,7 +159,8 @@ public class QC {
       }
 
       // Create RunDataGenerator object
-      final RunDataGenerator rdg = new RunDataGenerator(this.collectors, this.runId);
+      final RunDataGenerator rdg =
+          new RunDataGenerator(this.collectors, this.runId);
 
       // Set the parameters of the generator
       rdg.setGlobalConf(this.globalConf);
@@ -557,7 +564,7 @@ public class QC {
     this.globalConf.put(CASAVA_OUTPUT_DIR, this.fastqDir);
     this.globalConf.put(QC_OUTPUT_DIR, this.qcDir);
     this.globalConf.put(TMP_DIR, this.tmpDir.getAbsolutePath());
-
+    this.globalConf.put(BCL2FASTQ_VERSION, this.bcl2fastqVersion);
   }
 
   /**
@@ -606,7 +613,7 @@ public class QC {
     // Set fastQC nofilter default false, if casava=true, filter fastq file
     addSystemProperty(properties, Settings.QC_CONF_FASTQC_NOFILTER_KEY,
         "fastqc.nofilter");
-    
+
     addSystemProperty(properties, Settings.QC_CONF_FASTQC_NANO_KEY,
         "fastqc.nano");
 
@@ -694,14 +701,15 @@ public class QC {
    * @param fastqDir fastq directory
    * @param runId run id
    * @param tmpDirname temporary directory path
+   * @param bcl2fastqVersion bcl2fastq version used
    * @throws AozanException if an error occurs while initialize the QC object
    */
   public QC(final Map<String, String> properties, final String bclDir,
       final String fastqDir, final String qcDir, final String tmpDirname,
-      final String runId) throws AozanException {
+      final String runId, final String bcl2fastqVersion) throws AozanException {
 
     this(properties, bclDir, fastqDir, qcDir, tmpDirname == null
-        ? null : new File(tmpDirname), runId);
+        ? null : new File(tmpDirname), runId, bcl2fastqVersion);
   }
 
   /**
@@ -711,11 +719,12 @@ public class QC {
    * @param fastqDir fastq directory
    * @param runId run id
    * @param tmpDir temporary directory
+   * @param bcl2fastqVersion bcl2fastq version used
    * @throws AozanException if an error occurs while initialize the QC object
    */
   public QC(final Map<String, String> properties, final String bclDir,
       final String fastqDir, final String qcDir, final File tmpDir,
-      final String runId) throws AozanException {
+      final String runId, final String bcl2fastqVersion) throws AozanException {
 
     if (properties == null) {
       throw new NullPointerException("The properties object is null");
@@ -725,6 +734,7 @@ public class QC {
     this.fastqDir = fastqDir;
     this.qcDir = qcDir;
     this.runId = runId;
+    this.bcl2fastqVersion = bcl2fastqVersion;
 
     this.tmpDir =
         tmpDir == null
