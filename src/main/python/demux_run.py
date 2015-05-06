@@ -35,6 +35,9 @@ from fr.ens.transcriptome.aozan.Settings import CASAVA_SAMPLESHEET_PREFIX_FILENA
 from fr.ens.transcriptome.aozan.Settings import CASAVA_SAMPLESHEETS_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_THREADS_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_WITH_FAILED_READS_KEY
+from fr.ens.transcriptome.aozan.Settings import HISEQ_BCL2FASTQ_VERSION_KEY
+from fr.ens.transcriptome.aozan.Settings import NEXTSEQ_BCL2FASTQ_VERSION_KEY
+from fr.ens.transcriptome.aozan.Settings import DEMUX_USE_DOCKER_ENABLE_KEY
 from fr.ens.transcriptome.aozan.Settings import INDEX_SEQUENCES_KEY
 from fr.ens.transcriptome.aozan.Settings import FASTQ_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_DESIGN_GENERATOR_COMMAND_KEY
@@ -272,6 +275,23 @@ def get_cpu_count(conf):
 
     return cpu_count
 
+def get_bcl2fastq_version(run_id, conf):
+    """ Return bcl2fastq version to use according to RTA version used for sequencing. With RTA version 1, use blc2fastq 1
+     and with RTA version 2 use bcl2fastq 2.
+
+    Arguments:
+        conf: configuration dictionary
+        run_id: The run id
+    Return:
+        path to report_run_data
+    """
+
+    version = conf[Settings.HISEQ_BCL2FASTQ_VERSION_KEY] if common.is_sequencer_hiseq(run_id, conf) else conf[Settings.NEXTSEQ_BCL2FASTQ_VERSION_KEY]
+    
+    if version != BCL2FASTQ_VERSION_HISEQ and version != BCL2FASTQ_VERSION_NEXTSEQ:
+        raise Exception('Unvalid bcl2fastq version set ' + str(version) + ". Except: " + BCL2FASTQ_VERSION_HISEQ or BCL2FASTQ_VERSION_NEXTSEQ)
+    return 
+
 def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, tmp_path, conf):
         
     args = []
@@ -280,13 +300,9 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
     nb_threads = str(get_cpu_count(conf)) 
     tmp_local = conf[TMP_PATH_KEY]
     
-    executable_path = ""
-    
     if common.is_sequencer_hiseq(run_id, conf):
-        # executable_path = '/usr/local/bin/configureBclToFastq.pl '
         
         # Create casava makefile
-        # executable_path = conf[CASAVA_PATH_KEY] + ' '
         makefile_args = []
         makefile_args.extend([str(conf[CASAVA_PATH_KEY]) + '/bin/configureBclToFastq.pl'])
         makefile_args.extend(['--fastq-cluster-count' , conf[CASAVA_FASTQ_CLUSTER_COUNT_KEY]])
@@ -347,10 +363,10 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
         
     elif common.is_sequencer_nextseq(run_id, conf):
         
-        executable_path = 'bcl2fastq '
         
         #  List arg
         args = []
+        args.extend(['bcl2fastq'])
         args.extend(['--loading-threads', nb_threads])
         args.extend(['--demultiplexing-threads', nb_threads])
         args.extend(['--processing-threads', nb_threads])
@@ -387,7 +403,8 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
     common.log("INFO", "exec: " + cmd, conf)
     
     # Create executable file
-    commandfile = tmp_path + '/script_bcl2fastq.sh'
+    commandfilename = 'script_bcl2fastq.sh'
+    commandfile = tmp_path + '/' + commandfilename
     f = open(commandfile, 'w')
     f.write("#! /bin/bash\n\n")
     f.write(cmd)
@@ -399,7 +416,7 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
               'Error while setting executable command file bcl2fastq to run docker for ' + run_id, conf)
         return False
     
-    return commandfile
+    return commandfilename
         
           
 
@@ -467,7 +484,7 @@ def demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_
     
     try:
         # Set working in docker on parent demultiplexing run directory. Demultiplexing run directory will create by bcl2fastq
-        docker = DockerUtils("/tmp/" + cmd, 'bcl2fastq2', bcl2fastq_version)
+        docker = DockerUtils("/tmp/" + str(cmd), 'bcl2fastq2', bcl2fastq_version)
         
         common.log("CONFIG", "bcl2fastq run with image docker from " + docker.getImageDockerName() + " with command line " + cmd, conf)
         common.log("CONFIG", "bcl2fastq docker mount: " 
@@ -695,17 +712,14 @@ def demux(run_id, conf):
               "Invalid FASTQ compression format: " + conf[CASAVA_COMPRESSION_KEY], conf)
         return False
     
-    # TODO Add in configuration file
-    DEMUX_DOCKER_ENABLE_KEY = 'demux.docker.enable'
-    
     # Set bcl2fastq version used from RTA version used on sequencer
-    bcl2fastq_version = BCL2FASTQ_VERSION_HISEQ if common.is_RTA_1_version(run_id, conf) else BCL2FASTQ_VERSION_NEXTSEQ 
+    bcl2fastq_version = get_bcl2fastq_version(run_id, conf) 
     
     common.log("CONFIG", "bcl2fastq version used " + bcl2fastq_version, conf)
-    common.log("CONFIG", "bcl2fastq mode docker ? " + str(common.is_conf_value_equals_true(DEMUX_DOCKER_ENABLE_KEY), conf), conf)
+    common.log("CONFIG", "bcl2fastq mode docker ? " + str(common.is_conf_value_equals_true(Settings.DEMUX_USE_DOCKER_ENABLE_KEY, conf)), conf)
     
     # Run demultiplexing
-    if common.is_conf_value_equals_true(DEMUX_DOCKER_ENABLE_KEY, conf):
+    if common.is_conf_value_equals_true(Settings.DEMUX_USE_DOCKER_ENABLE_KEY, conf):
         # With image docker
         if not demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_output_dir, design_csv_path, conf):
             return False
