@@ -93,6 +93,13 @@ public final class Settings {
   /** Casava design generator command. */
   public static final String CASAVA_DESIGN_GENERATOR_COMMAND_KEY =
       "casava.design.generator.command";
+  
+  /** Set available use container docker. */
+  public static final String DEMUX_USE_DOCKER_ENABLE_KEY = "demux.use.docker.enable";
+  /** Set bcl2fastq version for HiSeq sequencer. */
+  public static final String HISEQ_BCL2FASTQ_VERSION_KEY = "hiseq.bcl2fastq.version";
+  /** Set bcl2fastq version for NextSeq sequencer. */
+  public static final String NEXTSEQ_BCL2FASTQ_VERSION_KEY = "nextseq.bcl2fastq.version";
 
   /** Demultiplex space factor. */
   public static final String DEMUX_SPACE_FACTOR_KEY = "demux.space.factor";

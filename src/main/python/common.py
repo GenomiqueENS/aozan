@@ -6,7 +6,7 @@ Created on 25 oct. 2011
 @author: Laurent Jourdren
 '''
 
-import hiseq_run, sync_run
+import hiseq_run, sync_run, demux_run
 import smtplib, os.path, time, sys
 import mimetypes
 from email.utils import formatdate 
@@ -50,6 +50,9 @@ from fr.ens.transcriptome.aozan.Settings import TMP_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_SAMPLESHEETS_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_COMPRESSION_KEY
+from fr.ens.transcriptome.aozan.Settings import HISEQ_BCL2FASTQ_VERSION_KEY
+from fr.ens.transcriptome.aozan.Settings import NEXTSEQ_BCL2FASTQ_VERSION_KEY
+from fr.ens.transcriptome.aozan.Settings import DEMUX_USE_DOCKER_ENABLE_KEY
 from fr.ens.transcriptome.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY
 
@@ -1040,7 +1043,12 @@ def set_default_conf(conf):
     conf[Settings.CASAVA_WITH_FAILED_READS_KEY] = 'True'
     conf[Settings.CASAVA_ADDITIONNAL_ARGUMENTS_KEY] = ''
 
-    # Data path
+    # New options since Aozan version 2.0 and managment of NextSeq
+    conf[Settings.DEMUX_USE_DOCKER_ENABLE_KEY] = 'false'
+    conf[Settings.HISEQ_BCL2FASTQ_VERSION_KEY] = demux_run.BCL2FASTQ_VERSION_HISEQ
+    conf[Settings.NEXTSEQ_BCL2FASTQ_VERSION_KEY] = demux_run.BCL2FASTQ_VERSION_NEXTSEQ
+
+    # Data path 
     conf[Settings.TMP_PATH_KEY] = '/tmp'
     conf[Settings.INDEX_SEQUENCES_KEY] = ''
     conf[Settings.INDEX_HTML_TEMPLATE_KEY] = ''
