@@ -34,6 +34,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -66,7 +67,7 @@ public class RunInfoCollector implements Collector {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return null;
+    return ImmutableList.of(AozanCollector.COLLECTOR_NAME);
   }
 
   @Override
