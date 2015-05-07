@@ -26,12 +26,11 @@ package fr.ens.transcriptome.aozan.collectors;
 import static fr.ens.transcriptome.eoulsan.util.XMLUtils.getElementsByTagName;
 import static fr.ens.transcriptome.eoulsan.util.XMLUtils.getTagValue;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -43,35 +42,20 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import com.google.common.collect.ImmutableList;
-
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**
- * This class define a collector for demux statistics data.
- * @since 0.8
- * @author Laurent Jourdren
+ * This class define a collector for demux statistics data from bcl2fastq
+ * version 2.
+ * @since 2.0
+ * @author Sandrine Perrin
  */
-public class DemultiplexingCollector implements Collector {
-
-  /** The collector name. */
-  public static final String COLLECTOR_NAME = "demux";
+public class ConversionStatsCollector extends DemultiplexingCollector {
 
   private String casavaOutputPath;
-
-  @Override
-  public String getName() {
-
-    return COLLECTOR_NAME;
-  }
-
-  @Override
-  public List<String> getCollectorsNamesRequiered() {
-
-    return ImmutableList.of(RunInfoCollector.COLLECTOR_NAME);
-  }
 
   @Override
   public void configure(final Properties properties) {
@@ -83,13 +67,7 @@ public class DemultiplexingCollector implements Collector {
     this.casavaOutputPath = properties.getProperty(QC.CASAVA_OUTPUT_DIR);
   }
 
-  @Override
-  public void collect(final RunData data) {
-  }
-
-  // @Override
-  public void collect(final RunData data, final String file)
-      throws AozanException {
+  public void collect(final RunData data) throws AozanException {
 
     if (data == null) {
       return;
@@ -98,10 +76,14 @@ public class DemultiplexingCollector implements Collector {
     try {
 
       // Demux summary path
-      final String demuxSummaryPath = file;
-      // this.casavaOutputPath
-      // + "/Basecall_Stats_" + data.get("run.info.flow.cell.id")
-      // + "/Flowcell_demux_summary.xml";
+      final String demuxSummaryPath =
+          this.casavaOutputPath + "/Stats/ConversionStats.xml";
+
+      if (!new File(demuxSummaryPath).exists()) {
+        throw new AozanException(
+            "Demultiplexing Collector: source file not exists "
+                + demuxSummaryPath);
+      }
 
       // Create the input stream
       final InputStream is = new FileInputStream(demuxSummaryPath);
@@ -129,7 +111,8 @@ public class DemultiplexingCollector implements Collector {
 
   private void parse(final Document document, final RunData data)
       throws AozanException {
-    final List<TilesStats> demuxData = new ArrayList<>();
+
+    System.out.println("\t demux star parsing xml.");
 
     String projectName;
     String sampleName;
@@ -145,30 +128,34 @@ public class DemultiplexingCollector implements Collector {
         for (final Element barcode : getElementsByTagName(sample, "Barcode")) {
           barcodeSeq = barcode.getAttribute("name");
 
+          // Skip barcode at 'all'
+          if (barcodeSeq.equals("all")) {
+            continue;
+          }
+
           for (final Element lane : getElementsByTagName(barcode, "Lane")) {
             laneNumber = Integer.parseInt(lane.getAttribute("number"));
 
-            final TilesStats stats =
-                new TilesStats(projectName, sampleName, barcodeSeq, laneNumber);
+            System.out.println(String.format(
+                "project %s\tsample %s\tbarcode %s\tlane %s", projectName,
+                sampleName, barcodeSeq, laneNumber));
+
+            // Create Tile stats for new group tiles related tuple
+            // sample/barecode/lane
+            final GroupTilesStats stats =
+                new GroupTilesStats(projectName, sampleName, barcodeSeq,
+                    laneNumber);
             // demuxData.add(stats);
 
-            parseStats(lane, stats);
+            // Add tiles data
+            stats.addTilesStats(lane);
 
+            // Compile data on group tiles in global
             stats.putData(data);
           }
         }
       }
     }
-
-  }
-
-  private void parseStats(final Element lane, final TilesStats stats)
-      throws AozanException {
-
-    for (final Element tile : getElementsByTagName(lane, "Tile")) {
-      stats.add(new TileStats(tile));
-    }
-
   }
 
   @Override
@@ -205,8 +192,10 @@ public class DemultiplexingCollector implements Collector {
 
   }
 
-  private static final class TilesStats {
+  private static final class GroupTilesStats {
 
+    static final String RAW_TYPE = "Raw";
+    static final String PF_TYPE = "Pf";
     private final int readCount = 1;
 
     private final Integer lane;
@@ -232,15 +221,27 @@ public class DemultiplexingCollector implements Collector {
         final ReadStats stats = e.getValue();
         final String prefix = buildPrefixRunData(stats);
 
+        // Global entry
+        runData.put(String.format(PREFIX + ".lane%s.sample.%s.barcode", lane,
+            sampleName), this.barcode);
+
         putReadData(runData, stats, prefix, stats.readNumber);
 
       }
     }
 
+    public void addTilesStats(final Element lane) throws AozanException {
+
+      for (final Element tile : getElementsByTagName(lane, "Tile")) {
+        this.add(new TileStats(tile));
+      }
+
+    }
+
     private String buildPrefixRunData(final ReadStats stats) {
 
-      return String.format("demux.lane%s.%s.read%s.%s", lane, sampleName,
-          stats.readNumber, stats.type);
+      return String.format(PREFIX + ".lane%s.sample.%s.read%s.%s", lane,
+          sampleName, stats.readNumber, stats.type);
     }
 
     private void putReadData(final RunData runData, final ReadStats stats,
@@ -263,10 +264,10 @@ public class DemultiplexingCollector implements Collector {
       for (int read = 1; read <= readCount; read++) {
 
         // Add raw data
-        addDataStats(t, "Raw", read);
+        addDataStats(t, RAW_TYPE, read);
 
         // Add PF data
-        addDataStats(t, "Pf", read);
+        addDataStats(t, PF_TYPE, read);
       }
     }
 
@@ -285,7 +286,7 @@ public class DemultiplexingCollector implements Collector {
 
     }
 
-    public TilesStats(final String projectName, final String sampleName,
+    public GroupTilesStats(final String projectName, final String sampleName,
         final String barcode, final int lane) {
       this.lane = lane;
       this.barcode = barcode;
@@ -298,9 +299,6 @@ public class DemultiplexingCollector implements Collector {
   }
 
   private static final class TileStats {
-
-    static final String RAW_TYPE = "Raw";
-    static final String PF_TYPE = "Pf";
 
     private final Element tileElem;
     private final long clusterCount;
@@ -340,14 +338,54 @@ public class DemultiplexingCollector implements Collector {
     }
   }
 
+  //
+  // Main method for test
+  //
+
+  // TODO remove after test
+  private void collect(final RunData data, final String demuxSummaryPath)
+      throws AozanException {
+
+    if (data == null) {
+      return;
+    }
+
+    try {
+
+      if (!new File(demuxSummaryPath).exists()) {
+        throw new AozanException(
+            "Demultiplexing Collector: source file not exists "
+                + demuxSummaryPath);
+      }
+
+      // Create the input stream
+      final InputStream is = new FileInputStream(demuxSummaryPath);
+
+      final DocumentBuilder dBuilder =
+          DocumentBuilderFactory.newInstance().newDocumentBuilder();
+      final Document doc = dBuilder.parse(is);
+      doc.getDocumentElement().normalize();
+
+      parse(doc, data);
+
+      is.close();
+    } catch (final Exception e) {
+
+      throw new AozanException(e);
+    }
+  }
+
+  // TODO remove after test
   public static void main(String[] argv) throws Exception {
     final String f =
-        "/Users/sandrine/Documents/IBENS/demux/ConversionStats.xml";
+        "/import/rhodos01/shares-net/sequencages/nextseq_500/fastq/"
+            + "150416_NB500892_0002_AH7MNKBGXX/Stats/ConversionStats.xml";
+
     final RunData data = new RunData();
 
-    final DemultiplexingCollector demux = new DemultiplexingCollector();
+    final ConversionStatsCollector demux = new ConversionStatsCollector();
 
     demux.collect(data, f);
-    data.createRunDataFile("/Users/sandrine/Documents/IBENS/demux/demux.data");
+    data.createRunDataFile("/tmp/demux.data");
   }
 }
