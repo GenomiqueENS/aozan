@@ -102,8 +102,7 @@ public final class XMLUtilsWriter {
         XMLUtils.addTagValue(doc, parent, "RunDate", data.get("run.info.date"));
       }
 
-      XMLUtils.addTagValue(doc, parent, "FlowcellId",
-          data.get("run.info.flow.cell.id"));
+      XMLUtils.addTagValue(doc, parent, "FlowcellId", data.getFlowcellId());
       XMLUtils.addTagValue(doc, parent, "InstrumentSN",
           data.get("run.info.instrument"));
       XMLUtils.addTagValue(doc, parent, "InstrumentRunNumber",
