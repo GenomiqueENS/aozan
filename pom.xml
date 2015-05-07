@@ -205,16 +205,37 @@
 
     <!-- Dependency useful to run Docker -->    
     <dependency>
-		<groupId>com.spotify</groupId>
-		<artifactId>docker-client</artifactId>
-		<version>2.6.1</version>
+	<groupId>com.spotify</groupId>
+	<artifactId>docker-client</artifactId>
+	<version>2.6.1</version>
+    </dependency>
+    <dependency>
+	<groupId>org.apache.httpcomponents</groupId>
+	<artifactId>httpclient</artifactId>
+	<version>4.3.5</version>
+    </dependency>
+    <!-- org.slf4j:slf4j-api:jar:1.7.6:compile -->
+    <dependency>
+	<groupId> org.slf4j</groupId>
+	<artifactId>slf4j-api</artifactId>
+	<version>1.7.6</version>
+        <scope>compile</scope>
+    </dependency>
+    
+    <dependency>
+	<groupId>org.apache.httpcomponents</groupId>
+	<artifactId>httpcore</artifactId>
+	<version>4.3.2</version>
+        <scope>compile</scope>
+    </dependency> 
+    
+    <dependency>
+    	<groupId>commons-logging</groupId>
+		<artifactId>commons-logging</artifactId>
+		<version>1.1.1</version>
+		<scope>compile</scope>
 	</dependency>
-	<dependency>
-		<groupId>org.apache.httpcomponents</groupId>
-		<artifactId>httpclient</artifactId>
-		<version>4.3.5</version>
-	</dependency>
-
+    
   </dependencies>
 
   <build>
@@ -536,7 +557,7 @@
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>jython-standalone,eoulsan,poi,guava,fastqc,jbzip2,commons-compress,sam,commons-math3,commons-cli,javassist,aws-java-sdk,docker-client,httpclient</includeArtifactIds>
+              <includeArtifactIds>jython-standalone,eoulsan,poi,guava,fastqc,jbzip2,commons-compress,sam,commons-math3,commons-cli,javassist,aws-java-sdk,docker-client,httpclient,slf4j-api,httpcore,commons-logging</includeArtifactIds>
               <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
             </configuration>
           </execution>

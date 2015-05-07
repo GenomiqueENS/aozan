@@ -72,6 +72,69 @@ public class DockerUtils {
    * Run image Docker with command line.
    * @throws AozanException
    */
+
+  public void runTest() throws AozanException {
+    // Create connection
+    System.out.println(" * TEST Create connection");
+    final DockerClient docker =
+        new DefaultDockerClient("unix:///var/run/docker.sock");
+
+    try {
+      final String image = "genomicpariscentre/bcl2fastq2";
+      // Pull image
+      System.out.println(" * TEST Pull image");
+      docker.pull(image);
+
+      // Create container
+      System.out.println(" * TEST Create config");
+      final ContainerConfig config =
+          ContainerConfig.builder().image(image)
+              .cmd("sh", "-c", "touch /root/lolotiti").build();
+
+      // Version OK
+      // final ContainerConfig config =
+      // ContainerConfig.builder().image("busybox")
+      // .cmd("sh", "-c", "touch /root/lolotiti").user("2715:100").build();
+
+      final HostConfig hostConfig =
+          HostConfig.builder()
+              .binds("/import/mimir03/sequencages/nextseq_500/tmp:/root")
+              .build();
+
+      System.out.println(" * TEST Create container");
+      ContainerCreation creation;
+      creation = docker.createContainer(config);
+      final String id = creation.id();
+      System.out.println("id: " + id);
+
+      // Inspect container
+      System.out.println(" * TEST Inspect container");
+      final ContainerInfo info = docker.inspectContainer(id);
+      System.out.println("info: " + info);
+
+      // Start container
+      System.out.println(" * TEST Start container");
+      docker.startContainer(id, hostConfig);
+
+      // Kill container
+      System.out.println(" * TEST Wait end of container container");
+      System.out.println(docker.waitContainer(id));
+
+      // Remove container
+      System.out.println(" * TEST Remove container");
+      docker.removeContainer(id);
+
+    } catch (DockerException | InterruptedException e) {
+      this.exitValue = -1;
+      this.exception = e;
+      throw new AozanException("TEST Docker fail " + e.getMessage(), e);
+
+    } finally {
+      // Close connection
+      docker.close();
+    }
+  }
+
   public void run() throws AozanException {
 
     // TOTO
@@ -118,9 +181,16 @@ public class DockerUtils {
       // Close connection
       docker.close();
 
-    } catch (DockerException | InterruptedException e) {
+    } catch (DockerException e) {
+      this.exitValue = -1;
       this.exception = e;
-      throw new AozanException(e);
+      throw new AozanException("Docker fail " + e.getMessage(), e);
+
+    } catch (InterruptedException e) {
+      this.exitValue = -1;
+      this.exception = e;
+      throw new AozanException(
+          "Execution docker interrupted " + e.getMessage(), e);
     }
   }
 
@@ -372,14 +442,14 @@ public class DockerUtils {
 
   public static void main(String[] args) {
 
-    // try {
-    // test();
-    //
-    // } catch (DockerException | InterruptedException e1) {
-    // // TODO Auto-generated catch block
-    // e1.printStackTrace();
-    // }
-    //
+    try {
+      test();
+
+    } catch (DockerException | InterruptedException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
+
     // System.exit(0);
 
     // final String cmd = "touch /root/lolotiti_" + new Random().nextInt();
@@ -409,14 +479,17 @@ public class DockerUtils {
       // .addMountDirectory(
       // "/import/mimir03/sequencages/nextseq_500/bcl/150331_TESTHISR_0151_AH9RLKADXX",
       // "/mnt/");
-      script.addMountDirectory("/import/mimir03/sequencages/nextseq_500/tmp",
-          "/tmp");
+      script.addMountDirectory(
+          "/import/rhodos01/shares-net/sequencages/nextseq_500/tmp", "/tmp");
 
       script.setWorkDirectoryDocker("/root");
+
+      System.out.println(script.getImageDockerName());
       script.run();
 
     } catch (AozanException e) {
       // TODO Auto-generated catch block
+      System.out.println(e.getMessage());
       e.printStackTrace();
     }
 
