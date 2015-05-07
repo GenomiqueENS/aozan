@@ -43,9 +43,11 @@ import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.collectors.CollectorRegistry;
+import fr.ens.transcriptome.aozan.collectors.DemultiplexingCollector;
 import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.fastqc.RuntimePatchFastQC;
+import fr.ens.transcriptome.aozan.io.ManagerQCPath;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.AozanTestRegistry;
 import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
@@ -81,11 +83,11 @@ public class QC {
   /** Temporary directory property key. */
   public static final String TMP_DIR = "tmp.dir";
 
+  /** Bcl2fastq version to demultiplexing step. */
+  public static final String BCL2FASTQ_VERSION = "bcl2fast.version";
+
   private static final String TEST_KEY_ENABLED_SUFFIX = ".enable";
   private static final String TEST_KEY_PREFIX = "qc.test.";
-
-  /** Bcl2fastq version to demultiplexing step. */
-  private static final String BCL2FASTQ_VERSION = null;
 
   private final String bclDir;
   private final String fastqDir;
@@ -564,7 +566,13 @@ public class QC {
     this.globalConf.put(CASAVA_OUTPUT_DIR, this.fastqDir);
     this.globalConf.put(QC_OUTPUT_DIR, this.qcDir);
     this.globalConf.put(TMP_DIR, this.tmpDir.getAbsolutePath());
-    this.globalConf.put(BCL2FASTQ_VERSION, this.bcl2fastqVersion);
+
+    // Find bcl2fastq main version (1 or 2) from completed version name
+    this.globalConf.put(BCL2FASTQ_VERSION,
+        DemultiplexingCollector.findBcl2fastqVersion(this.bcl2fastqVersion));
+
+    // Init manager qc path
+    ManagerQCPath.getInstance(casavaDesignFile, bcl2fastqVersion);
   }
 
   /**
@@ -616,7 +624,6 @@ public class QC {
 
     addSystemProperty(properties, Settings.QC_CONF_FASTQC_NANO_KEY,
         "fastqc.nano");
-
 
     // Patch FastQC classes
     RuntimePatchFastQC.runPatchFastQC(Boolean.valueOf(properties
