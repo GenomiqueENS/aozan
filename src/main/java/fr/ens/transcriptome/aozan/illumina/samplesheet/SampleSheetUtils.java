@@ -21,8 +21,9 @@
  *
  */
 
-package fr.ens.transcriptome.aozan.illumina;
+package fr.ens.transcriptome.aozan.illumina.samplesheet;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,24 +34,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import fr.ens.transcriptome.eoulsan.EoulsanException;
+import com.google.common.base.Joiner;
+
+import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.illumina.io.AbstractCasavaDesignTextReader;
+import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
 
 /**
- * This class contains utilty methods for Casava design.
+ * This abstract class contains common utility methods for sample sheet.
  * @since 1.1
  * @author Laurent Jourdren
  */
-public final class CasavaDesignUtil {
+public class SampleSheetUtils {
+
+  public static final String VERSION_1 = "version1";
+
+  public static final String VERSION_2 = "version2";
+
+  public static final String SEP = ",";
 
   /**
    * Check a Casava design object.
    * @param design Casava design object to check
    * @return a list of warnings
-   * @throws EoulsanException if the design is not valid
+   * @throws AozanException if the design is not valid
    */
-  public static List<String> checkCasavaDesign(final CasavaDesign design)
-      throws EoulsanException {
+  public static List<String> checkCasavaDesign(final SampleSheet design)
+      throws AozanException {
 
     return checkCasavaDesign(design, null);
   }
@@ -60,23 +70,28 @@ public final class CasavaDesignUtil {
    * @param design Casava design object to check
    * @param flowCellId flow cell id
    * @return a list of warnings
-   * @throws EoulsanException if the design is not valid
+   * @throws AozanException if the design is not valid
    */
-  public static List<String> checkCasavaDesign(final CasavaDesign design,
-      final String flowCellId) throws EoulsanException {
+  public static List<String> checkCasavaDesign(final SampleSheet design,
+      final String flowCellId) throws AozanException {
 
     if (design == null) {
       throw new NullPointerException("The design object is null");
     }
 
     if (design.size() == 0) {
-      throw new EoulsanException("No samples found in the design.");
+      throw new AozanException("No samples found in the design.");
+    }
+
+    if (design.isVersion1()) {
+      // Check version 1
+      SampleSheetVersion1Utils.checkSampleSheet(design, flowCellId);
+    } else {
+      // Check version 2
+      SampleSheetVersion2Utils.checkSampleSheet(design);
     }
 
     final List<String> warnings = new ArrayList<>();
-
-    String fcid = null;
-    boolean first = true;
 
     final Map<Integer, Set<String>> indexes = new HashMap<>();
     final Set<String> sampleIds = new HashSet<>();
@@ -86,42 +101,7 @@ public final class CasavaDesignUtil {
     final Map<String, String> samplesProjects = new HashMap<>();
     final Map<String, String> samplesIndex = new HashMap<>();
 
-    for (CasavaSample sample : design) {
-
-      // Check if all the fields are not empty
-      checkFCID(sample.getFlowCellId());
-
-      if (flowCellId != null) {
-
-        // Check if the flow cell id is the flow cell id expected
-        if (!flowCellId.trim().toUpperCase()
-            .equals(sample.getFlowCellId().toUpperCase())) {
-          throw new EoulsanException("Bad flowcell name found: "
-              + sample.getFlowCellId() + " (" + flowCellId + " expected).");
-        }
-
-        // Use the case of the flowCellId parameter as case for the flow cell id
-        // of sample
-        sample.setFlowCellId(flowCellId);
-      }
-
-      // Check if all the samples had the same flow cell id
-      if (first) {
-        fcid = sample.getFlowCellId();
-        first = false;
-      } else {
-
-        if (!fcid.equals(sample.getFlowCellId())) {
-          throw new EoulsanException("Two differents flow cell id found: "
-              + fcid + " and " + sample.getFlowCellId() + ".");
-        }
-      }
-
-      // Check the lane number
-      if (sample.getLane() < 1 || sample.getLane() > 8) {
-        throw new EoulsanException("Invalid lane number found: "
-            + sample.getLane() + ".");
-      }
+    for (SampleEntry sample : design) {
 
       // Check if the sample is null or empty
       checkSampleId(sample.getSampleId(), sampleIds);
@@ -138,21 +118,6 @@ public final class CasavaDesignUtil {
       // Check the description
       checkSampleDescription(sample.getSampleId(), sample.getDescription());
 
-      // Check recipe
-      if (isNullOrEmpty(sample.getRecipe())) {
-        throw new EoulsanException("Found a null or empty recipe for sample: "
-            + sample.getSampleId() + ".");
-      }
-      checkCharset(sample.getRecipe());
-
-      // Check operator
-      if (isNullOrEmpty(sample.getOperator())) {
-        throw new EoulsanException(
-            "Found a null or empty operator for sample: "
-                + sample.getSampleId() + ".");
-      }
-      checkCharset(sample.getOperator());
-
       // Check sample project
       checkSampleProject(sample.getSampleProject());
       checkCharset(sample.getSampleProject());
@@ -164,13 +129,13 @@ public final class CasavaDesignUtil {
       if (index == null || "".equals(index.trim())) {
 
         if (laneWithoutIndexes.contains(lane)) {
-          throw new EoulsanException(
+          throw new AozanException(
               "Found two samples without index for the same lane: "
                   + lane + ".");
         }
 
         if (laneWithIndexes.contains(lane)) {
-          throw new EoulsanException(
+          throw new AozanException(
               "Found a lane with indexed and non indexed samples: "
                   + lane + ".");
         }
@@ -179,7 +144,7 @@ public final class CasavaDesignUtil {
       } else {
 
         if (laneWithoutIndexes.contains(lane)) {
-          throw new EoulsanException(
+          throw new AozanException(
               "Found a lane with indexed and non indexed samples: "
                   + lane + ".");
         }
@@ -190,7 +155,7 @@ public final class CasavaDesignUtil {
       if (indexes.containsKey(lane)) {
 
         if (indexes.get(lane).contains(index)) {
-          throw new EoulsanException(
+          throw new AozanException(
               "Found a lane with two time the same index: "
                   + lane + " (" + index + ").");
         }
@@ -212,10 +177,12 @@ public final class CasavaDesignUtil {
     // Return unique warnings
     final List<String> result = new ArrayList<>(new HashSet<>(warnings));
     Collections.sort(result);
+
     return result;
+
   }
 
-  private static void checkCharset(final String s) throws EoulsanException {
+  private static void checkCharset(final String s) throws AozanException {
 
     if (s == null) {
       return;
@@ -226,17 +193,17 @@ public final class CasavaDesignUtil {
       final int c = s.codePointAt(i);
 
       if (c < ' ' || c >= 127) {
-        throw new EoulsanException("Found invalid character '"
+        throw new AozanException("Found invalid character '"
             + (char) c + "' in \"" + s + "\".");
       }
     }
 
   }
 
-  private static void checkFCID(final String fcid) throws EoulsanException {
+  private static void checkFCID(final String fcid) throws AozanException {
 
     if (isNullOrEmpty(fcid)) {
-      throw new EoulsanException("Flow cell id is null or empty.");
+      throw new AozanException("Flow cell id is null or empty.");
     }
 
     // Check charset
@@ -246,7 +213,7 @@ public final class CasavaDesignUtil {
 
       final char c = fcid.charAt(i);
       if (!(Character.isLetterOrDigit(c))) {
-        throw new EoulsanException(
+        throw new AozanException(
             "Invalid flow cell id, only letters or digits are allowed : "
                 + fcid + ".");
       }
@@ -255,11 +222,11 @@ public final class CasavaDesignUtil {
   }
 
   private static void checkSampleId(final String sampleId,
-      final Set<String> sampleIds) throws EoulsanException {
+      final Set<String> sampleIds) throws AozanException {
 
     // Check if null of empty
     if (isNullOrEmpty(sampleId)) {
-      throw new EoulsanException("Found a null or empty sample id.");
+      throw new AozanException("Found a null or empty sample id.");
     }
 
     // Check charset
@@ -270,7 +237,7 @@ public final class CasavaDesignUtil {
 
       final char c = sampleId.charAt(i);
       if (!(Character.isLetterOrDigit(c) || c == '_' || c == '-')) {
-        throw new EoulsanException(
+        throw new AozanException(
             "Invalid sample id, only letters, digits, '-' or '_' characters are allowed : "
                 + sampleId + ".");
       }
@@ -280,11 +247,11 @@ public final class CasavaDesignUtil {
   }
 
   private static void checkSampleRef(final String sampleId,
-      final String sampleRef) throws EoulsanException {
+      final String sampleRef) throws AozanException {
 
     // Check if null of empty
     if (isNullOrEmpty(sampleRef)) {
-      throw new EoulsanException(
+      throw new AozanException(
           "Found a null or empty sample reference for sample: "
               + sampleId + ".");
     }
@@ -296,14 +263,14 @@ public final class CasavaDesignUtil {
     for (int i = 0; i < sampleRef.length(); i++) {
       final char c = sampleRef.charAt(i);
       if (!(Character.isLetterOrDigit(c) || c == ' ' || c == '-' || c == '_')) {
-        throw new EoulsanException(
+        throw new AozanException(
             "Invalid sample reference, only letters, digits, ' ', '-' or '_' characters are allowed: "
                 + sampleRef + ".");
       }
     }
   }
 
-  private static void checkIndex(final String index) throws EoulsanException {
+  private static void checkIndex(final String index) throws AozanException {
 
     if (index == null) {
       return;
@@ -325,19 +292,19 @@ public final class CasavaDesignUtil {
           break;
 
         default:
-          throw new EoulsanException("Invalid index found: " + index + ".");
+          throw new AozanException("Invalid index found: " + index + ".");
         }
       }
     }
   }
 
   private static void checkSampleDescription(final String sampleId,
-      final String sampleDescription) throws EoulsanException {
+      final String sampleDescription) throws AozanException {
 
     // Check if null of empty
     if (isNullOrEmpty(sampleDescription)) {
-      throw new EoulsanException(
-          "Found a null or empty description for sample: " + sampleId);
+      throw new AozanException("Found a null or empty description for sample: "
+          + sampleId);
     }
 
     // Check charset
@@ -347,25 +314,25 @@ public final class CasavaDesignUtil {
     for (int i = 0; i < sampleDescription.length(); i++) {
       final char c = sampleDescription.charAt(i);
       if (c == '\'' || c == '\"') {
-        throw new EoulsanException("Invalid sample description, '"
+        throw new AozanException("Invalid sample description, '"
             + c + "' character is not allowed: " + sampleDescription + ".");
       }
     }
   }
 
   private static void checkSampleProject(final String sampleProject)
-      throws EoulsanException {
+      throws AozanException {
 
     // Check if null of empty
     if (isNullOrEmpty(sampleProject)) {
-      throw new EoulsanException("Found a null or sample project.");
+      throw new AozanException("Found a null or sample project.");
     }
 
     // Check for forbidden characters
     for (int i = 0; i < sampleProject.length(); i++) {
       final char c = sampleProject.charAt(i);
       if (!(Character.isLetterOrDigit(c) || c == '-' || c == '_')) {
-        throw new EoulsanException(
+        throw new AozanException(
             "Invalid sample project, only letters, digits, '-' or '_' characters are allowed: "
                 + sampleProject + ".");
       }
@@ -376,12 +343,12 @@ public final class CasavaDesignUtil {
       final String projectName, final int lane,
       final Map<String, Set<Integer>> sampleInLanes,
       final Map<String, String> samplesProjects, final List<String> warnings)
-      throws EoulsanException {
+      throws AozanException {
 
     // Check if two or more project use the same sample
     if (samplesProjects.containsKey(sampleId)
         && !samplesProjects.get(sampleId).equals(projectName)) {
-      throw new EoulsanException("The sample \""
+      throw new AozanException("The sample \""
           + sampleId + "\" is used by two or more projects.");
     }
 
@@ -438,11 +405,11 @@ public final class CasavaDesignUtil {
 
   private static final void checkSampleIndex(final String sampleName,
       final String index, final Map<String, String> samplesIndex)
-      throws EoulsanException {
+      throws AozanException {
 
     if (samplesIndex.containsKey(sampleName)
         && !samplesIndex.get(sampleName).equals(index)) {
-      throw new EoulsanException("The sample \""
+      throw new AozanException("The sample \""
           + sampleName
           + "\" is defined in several lanes but without the same index.");
     }
@@ -458,17 +425,16 @@ public final class CasavaDesignUtil {
    * Replace index shortcuts in a design object by index sequences.
    * @param design Casava design object
    * @param sequences map for the sequences
-   * @throws EoulsanException if the shortcut is unknown
+   * @throws AozanException if the shortcut is unknown
    */
-  public static void replaceIndexShortcutsBySequences(
-      final CasavaDesign design, final Map<String, String> sequences)
-      throws EoulsanException {
+  public static void replaceIndexShortcutsBySequences(final SampleSheet design,
+      final Map<String, String> sequences) throws AozanException {
 
     if (design == null || sequences == null) {
       return;
     }
 
-    for (final CasavaSample sample : design) {
+    for (final SampleEntry sample : design) {
 
       if (sample.getIndex() == null) {
         throw new NullPointerException("Sample index is null for sample: "
@@ -479,14 +445,14 @@ public final class CasavaDesignUtil {
 
       try {
         checkIndex(index);
-      } catch (EoulsanException e) {
+      } catch (AozanException e) {
 
         final StringBuilder sb = new StringBuilder();
 
         for (String subIndex : index.split("-")) {
 
           if (!sequences.containsKey(subIndex.toLowerCase())) {
-            throw new EoulsanException("Unknown index sequence shortcut ("
+            throw new AozanException("Unknown index sequence shortcut ("
                 + index + ") for sample: " + sample);
           }
 
@@ -505,49 +471,26 @@ public final class CasavaDesignUtil {
   // Parsing methods
   //
 
+  public static final String findSampleSheetVersion(final File sampleSheetFile) {
+
+    return VERSION_1;
+  }
+
+  public static String findSampleSheetVersion(List<String> fields) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
   /**
    * Convert a Casava design to CSV.
    * @param design Casava design object to convert
    * @return a String with the converted design
    */
-  public static final String toCSV(final CasavaDesign design) {
+  public static final String toCSV(final SampleSheet design) {
 
-    final StringBuilder sb = new StringBuilder();
-
-    sb.append("\"FCID\",\"Lane\",\"SampleID\",\"SampleRef\",\"Index\",\"Description\","
-        + "\"Control\",\"Recipe\",\"Operator\",\"SampleProject\"\n");
-
-    if (design == null) {
-      return sb.toString();
-    }
-
-    for (CasavaSample s : design) {
-
-      sb.append(s.getFlowCellId().trim().toUpperCase());
-      sb.append(',');
-      sb.append(s.getLane());
-      sb.append(',');
-      sb.append(quote(s.getSampleId().trim()));
-      sb.append(',');
-      sb.append(quote(s.getSampleRef().trim()));
-      sb.append(',');
-      sb.append(quote(s.getIndex().toUpperCase()));
-      sb.append(',');
-      sb.append(quote(s.getDescription().trim()));
-      sb.append(',');
-      sb.append(s.isControl() ? 'Y' : 'N');
-      sb.append(',');
-      sb.append(quote(s.getRecipe().trim()));
-      sb.append(',');
-      sb.append(quote(s.getOperator().trim()));
-      sb.append(',');
-      sb.append(quote(s.getSampleProject()));
-
-      sb.append('\n');
-
-    }
-
-    return sb.toString();
+    return design.isVersion1()
+        ? SampleSheetVersion1Utils.toCSV(design) : SampleSheetVersion2Utils
+            .toCSV(design);
   }
 
   /**
@@ -556,8 +499,8 @@ public final class CasavaDesignUtil {
    * @return a Casava Design object
    * @throws IOException if an error occurs
    */
-  public static CasavaDesign parseTabulatedDesign(final String s)
-      throws IOException {
+  public static SampleSheet parseTabulatedDesign(final String s,
+      final String version) throws AozanException {
 
     if (s == null) {
       return null;
@@ -566,7 +509,7 @@ public final class CasavaDesignUtil {
     return new AbstractCasavaDesignTextReader() {
 
       @Override
-      public CasavaDesign read() throws IOException {
+      public SampleSheet read(final String version) throws AozanException {
 
         final String[] lines = s.split("\n");
 
@@ -576,21 +519,23 @@ public final class CasavaDesignUtil {
             continue;
           }
 
-          parseLine(parseTabulatedDesignLine(line));
+          parseLine(parseTabulatedDesignLine(line), version);
         }
 
         return getDesign();
       }
-    }.read();
+    }.read(version);
   }
 
   /**
-   * Parse a design in a tabulated format from a String
+   * Parse a design in a tabulated format from a String.
    * @param s string to parse
+   * @param version the version
    * @return a Casava Design object
-   * @throws IOException if an error occurs
+   * @throws AozanException the aozan exception
    */
-  public static CasavaDesign parseCSVDesign(final String s) throws IOException {
+  public static SampleSheet parseCSVDesign(final String s, final String version)
+      throws AozanException {
 
     if (s == null) {
       return null;
@@ -599,7 +544,7 @@ public final class CasavaDesignUtil {
     return new AbstractCasavaDesignTextReader() {
 
       @Override
-      public CasavaDesign read() throws IOException {
+      public SampleSheet read(final String version) throws AozanException {
 
         final String[] lines = s.split("\n");
 
@@ -609,12 +554,12 @@ public final class CasavaDesignUtil {
             continue;
           }
 
-          parseLine(parseCSVDesignLine(line));
+          parseLine(parseCSVDesignLine(line), version);
         }
 
         return getDesign();
       }
-    }.read();
+    }.read(version);
   }
 
   /**
@@ -703,7 +648,266 @@ public final class CasavaDesignUtil {
   // Constructor
   //
 
-  private CasavaDesignUtil() {
+  SampleSheetUtils() {
+
+  }
+
+  //
+  // Internal classes
+  //
+
+  /**
+   * The internal static class manage useful methods only used on version2
+   * sample sheet .
+   * @author Sandrine Perrin
+   * @since 2.4
+   */
+  static final class SampleSheetVersion1Utils {
+
+    private final static List<String> COLUMNS_HEADER = Arrays.asList(
+        "\"FCID\"", "\"Lane\"", "\"SampleID\"", "\"SampleRef\"", "\"Index\"",
+        "\"Description\"", "\"Control\"", "\"Recipe\"", "\"Operator\"",
+        "\"SampleProject\"");
+
+    public static String toCSV(final SampleSheet design) {
+
+      final StringBuilder sb = new StringBuilder();
+
+      sb.append(Joiner.on(SEP).join(COLUMNS_HEADER) + "\n");
+
+      if (design == null) {
+        return sb.toString();
+      }
+
+      for (SampleEntry s : design) {
+
+        sb.append(s.getFlowCellId().trim().toUpperCase());
+        sb.append(SEP);
+        sb.append(s.getLane());
+        sb.append(SEP);
+        sb.append(quote(s.getSampleId().trim()));
+        sb.append(SEP);
+        sb.append(quote(s.getSampleRef().trim()));
+        sb.append(SEP);
+        sb.append(quote(s.getIndex().toUpperCase()));
+        sb.append(SEP);
+        sb.append(quote(s.getDescription().trim()));
+        sb.append(SEP);
+        sb.append(s.isControl() ? 'Y' : 'N');
+        sb.append(SEP);
+        sb.append(quote(s.getRecipe().trim()));
+        sb.append(SEP);
+        sb.append(quote(s.getOperator().trim()));
+        sb.append(SEP);
+        sb.append(quote(s.getSampleProject()));
+
+        sb.append('\n');
+
+      }
+
+      return sb.toString();
+    }
+
+    public static void checkSampleSheet(final SampleSheet design,
+        final String flowCellId) throws AozanException {
+
+      String fcid = null;
+      boolean first = true;
+
+      for (SampleEntry sample : design) {
+
+        // Check if all the fields are not empty
+        checkFCID(sample.getFlowCellId());
+
+        if (flowCellId != null) {
+
+          // Check if the flow cell id is the flow cell id expected
+          if (!flowCellId.trim().toUpperCase()
+              .equals(sample.getFlowCellId().toUpperCase())) {
+            throw new AozanException("Bad flowcell name found: "
+                + sample.getFlowCellId() + " (" + flowCellId + " expected).");
+          }
+
+          // Use the case of the flowCellId parameter as case for the flow cell
+          // id
+          // of sample
+          sample.setFlowCellId(flowCellId);
+        }
+
+        // Check if all the samples had the same flow cell id
+        if (first) {
+          fcid = sample.getFlowCellId();
+          first = false;
+        } else {
+
+          if (!fcid.equals(sample.getFlowCellId())) {
+            throw new AozanException("Two differents flow cell id found: "
+                + fcid + " and " + sample.getFlowCellId() + ".");
+          }
+        }
+
+        // Check the lane number
+        if (sample.getLane() < 1 || sample.getLane() > 8) {
+          throw new AozanException("Invalid lane number found: "
+              + sample.getLane() + ".");
+        }
+
+        // Check recipe
+        if (isNullOrEmpty(sample.getRecipe())) {
+          throw new AozanException("Found a null or empty recipe for sample: "
+              + sample.getSampleId() + ".");
+        }
+        checkCharset(sample.getRecipe());
+
+        // Check operator
+        if (isNullOrEmpty(sample.getOperator())) {
+          throw new AozanException(
+              "Found a null or empty operator for sample: "
+                  + sample.getSampleId() + ".");
+        }
+
+        checkCharset(sample.getOperator());
+
+      }
+    }
+
+    //
+    // Constructor
+    //
+
+    /**
+     * Private constructor
+     */
+    private SampleSheetVersion1Utils() {
+      super();
+    }
+
+  }
+
+  /**
+   * The internal static class manage useful methods only used on version2
+   * sample sheet .
+   * @author Sandrine Perrin
+   * @since 2.4
+   */
+  final static class SampleSheetVersion2Utils {
+
+    private final static String COLUMNS_HEADER =
+        "\"Lane\",\"Sample_ID\",\"SampleRef\",\"Index\",\"Description\","
+            + "\"SampleProject\"\n";
+
+    /**
+     * Convert sample sheet instance in string in csv format.
+     * @param design the design
+     * @return the string
+     */
+    public static String toCSV(final SampleSheet design) {
+
+      // Cast in sample sheet version 2
+      final SampleSheetVersion2 sampleSheetV2 = (SampleSheetVersion2) design;
+
+      final StringBuilder sb = new StringBuilder();
+
+      // Add session Header
+      if (sampleSheetV2.existHeaderSession()) {
+        sb.append("[Header]\n");
+        sb.append(addSession(sampleSheetV2.getHearderEntries()));
+        sb.append("\n");
+      }
+
+      // Add session Reads
+      if (sampleSheetV2.existReadsSession()) {
+        sb.append("[Reads]\n");
+        sb.append(addSession(sampleSheetV2.getReadsSession()));
+        sb.append("\n");
+      }
+
+      // Add session Settings
+      if (sampleSheetV2.existSettingsSession()) {
+        sb.append("[Settings]\n");
+        sb.append(addSession(sampleSheetV2.getSettingsSession()));
+        sb.append("\n");
+      }
+
+      // Add session Data
+      sb.append(addSessionData(sampleSheetV2));
+
+      return sb.toString();
+    }
+
+    /**
+     * Adds the session sample sheet in string csv format, excepted session
+     * data.
+     * @param entries the entries on session
+     * @return string csv format
+     */
+    private static String addSession(final Map<String, String> entries) {
+
+      final StringBuilder sb = new StringBuilder();
+
+      for (Map.Entry<String, String> e : entries.entrySet()) {
+        sb.append(e.getKey());
+        sb.append(SEP);
+        sb.append(e.getValue());
+        sb.append("\n");
+
+      }
+
+      return sb.toString();
+    }
+
+    /**
+     * Adds the session data.
+     * @param design the design
+     * @return the string csv format
+     */
+    private static String addSessionData(final SampleSheet design) {
+
+      final StringBuilder sb = new StringBuilder();
+      sb.append("[Data]\n");
+
+      sb.append(COLUMNS_HEADER);
+
+      if (design == null) {
+        return sb.toString();
+      }
+
+      for (SampleEntry s : design) {
+
+        sb.append(s.getLane());
+        sb.append(SEP);
+        sb.append(quote(s.getSampleId().trim()));
+        sb.append(SEP);
+        sb.append(quote(s.getSampleRef().trim()));
+        sb.append(SEP);
+        sb.append(quote(s.getIndex().toUpperCase()));
+        sb.append(SEP);
+        sb.append(quote(s.getDescription().trim()));
+        sb.append(SEP);
+        sb.append(quote(s.getSampleProject()));
+
+        sb.append('\n');
+
+      }
+
+      return sb.toString();
+    }
+
+    public static void checkSampleSheet(final SampleSheet design) {
+      // Nothing to do
+    }
+
+    //
+    // Constructor
+    //
+
+    /**
+     * Private constructor
+     */
+    private SampleSheetVersion2Utils() {
+      super();
+    }
+
   }
 
 }

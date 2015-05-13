@@ -21,29 +21,36 @@
  *
  */
 
-package fr.ens.transcriptome.aozan.illumina;
+package fr.ens.transcriptome.aozan.illumina.samplesheet;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
+
 /**
  * This class handle a Casava design object.
  * @since 1.1
  * @author Laurent Jourdren
  */
-public class CasavaDesign implements Iterable<CasavaSample> {
+public class SampleSheet implements Iterable<SampleEntry> {
 
-  private final List<CasavaSample> samples = new ArrayList<>();
+  private final String sampleSheetVersion;
+  private final List<SampleEntry> samples = new ArrayList<>();
 
-  public void addSample(final CasavaSample sample) {
+  public void addSample(final SampleEntry sample) {
 
     this.samples.add(sample);
   }
 
+  public boolean isVersion1() {
+    return getSampleSheetVersion().equals(SampleSheetUtils.VERSION_1);
+  }
+
   @Override
-  public Iterator<CasavaSample> iterator() {
+  public Iterator<SampleEntry> iterator() {
 
     return Collections.unmodifiableList(this.samples).iterator();
   }
@@ -54,15 +61,15 @@ public class CasavaDesign implements Iterable<CasavaSample> {
    * @return a list of the samples in the lane in the same order as the Casava
    *         design. Return null if the laneId < 1.
    */
-  public List<CasavaSample> getSampleInLane(final int laneId) {
+  public List<SampleEntry> getSampleInLane(final int laneId) {
 
     if (laneId < 1) {
       return null;
     }
 
-    final List<CasavaSample> result = new ArrayList<>();
+    final List<SampleEntry> result = new ArrayList<>();
 
-    for (CasavaSample s : this.samples) {
+    for (SampleEntry s : this.samples) {
       if (s.getLane() == laneId) {
         result.add(s);
       }
@@ -83,7 +90,31 @@ public class CasavaDesign implements Iterable<CasavaSample> {
   @Override
   public String toString() {
 
-    return CasavaDesign.class.getName() + "{samples=" + this.samples + "}";
+    return SampleEntry.class.getName() + "{samples=" + this.samples + "}";
+  }
+
+  //
+  // Getter
+  //
+
+  /**
+   * Gets the sample sheet version.
+   * @return the sampleSheetVersion
+   */
+  public String getSampleSheetVersion() {
+    return sampleSheetVersion;
+  }
+
+  //
+  // Constructor
+  //
+
+  /**
+   * Public constructor.
+   * @param sampleSheetVersion the sample sheet version
+   */
+  public SampleSheet(final String sampleSheetVersion) {
+    this.sampleSheetVersion = sampleSheetVersion;
   }
 
 }
