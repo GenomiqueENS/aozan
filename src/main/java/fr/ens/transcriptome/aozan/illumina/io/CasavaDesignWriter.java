@@ -25,7 +25,7 @@ package fr.ens.transcriptome.aozan.illumina.io;
 
 import java.io.IOException;
 
-import fr.ens.transcriptome.aozan.illumina.CasavaDesign;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 
 /**
  * This interface define a writer for Casava designs.
@@ -39,6 +39,6 @@ public interface CasavaDesignWriter {
    * @param design design to write
    * @throws IOException if an error occurs while writing the design
    */
-  void writer(CasavaDesign design) throws IOException;
+  void writer(SampleSheet design) throws IOException;
 
 }

@@ -25,7 +25,8 @@ package fr.ens.transcriptome.aozan.illumina.io;
 
 import java.io.IOException;
 
-import fr.ens.transcriptome.aozan.illumina.CasavaDesign;
+import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 
 /**
  * This interface define a reader for Casava designs.
@@ -37,7 +38,8 @@ public interface CasavaDesignReader {
   /**
    * Read a design.
    * @return a CasavaDesign object
-   * @throws IOException if an error occurs while reading the design
+   * @throws AozanException if an error occurs while reading the design
+   * @throws IOException
    */
-  CasavaDesign read() throws IOException;
+  SampleSheet read(final String version) throws AozanException, IOException;
 }

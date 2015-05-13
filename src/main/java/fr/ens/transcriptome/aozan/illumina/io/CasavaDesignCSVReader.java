@@ -31,8 +31,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
-import fr.ens.transcriptome.aozan.illumina.CasavaDesign;
-import fr.ens.transcriptome.aozan.illumina.CasavaDesignUtil;
+import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.transcriptome.eoulsan.Globals;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
@@ -50,7 +51,8 @@ public class CasavaDesignCSVReader extends AbstractCasavaDesignTextReader {
   private final BufferedReader reader;
 
   @Override
-  public CasavaDesign read() throws IOException {
+  public SampleSheet read(final String version) throws IOException,
+      AozanException {
 
     String line = null;
 
@@ -64,8 +66,8 @@ public class CasavaDesignCSVReader extends AbstractCasavaDesignTextReader {
       try {
 
         // Parse the line
-        parseLine(CasavaDesignUtil.parseCSVDesignLine(line));
-      } catch (IOException e) {
+        parseLine(SampleSheetUtils.parseCSVDesignLine(line), version);
+      } catch (AozanException e) {
 
         // If an error occurs while parsing add the line to the exception
         // message

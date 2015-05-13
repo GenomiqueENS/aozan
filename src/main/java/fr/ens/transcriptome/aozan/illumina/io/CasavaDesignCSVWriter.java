@@ -29,8 +29,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 
-import fr.ens.transcriptome.aozan.illumina.CasavaDesign;
-import fr.ens.transcriptome.aozan.illumina.CasavaDesignUtil;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
 /**
@@ -43,9 +43,9 @@ public class CasavaDesignCSVWriter implements CasavaDesignWriter {
   private final Writer writer;
 
   @Override
-  public void writer(final CasavaDesign design) throws IOException {
+  public void writer(final SampleSheet design) throws IOException {
 
-    this.writer.write(CasavaDesignUtil.toCSV(design));
+    this.writer.write(SampleSheetUtils.toCSV(design));
 
     this.writer.close();
   }

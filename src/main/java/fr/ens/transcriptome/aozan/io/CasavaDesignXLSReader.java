@@ -42,8 +42,9 @@ import org.apache.poi.ss.usermodel.Row;
 
 import com.google.common.math.DoubleMath;
 
-import fr.ens.transcriptome.eoulsan.illumina.CasavaDesign;
-import fr.ens.transcriptome.eoulsan.illumina.io.AbstractCasavaDesignTextReader;
+import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.illumina.io.AbstractCasavaDesignTextReader;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 
 /**
  * This class reads a Casava design file in xls format.
@@ -55,7 +56,8 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
   private final InputStream is;
 
   @Override
-  public CasavaDesign read() throws IOException {
+  public SampleSheet read(final String version) throws IOException,
+      AozanException {
 
     // create a POIFSFileSystem object to read the data
     final POIFSFileSystem fs = new POIFSFileSystem(this.is);
@@ -87,7 +89,7 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
 
       // Parse the fields
       if (!isFieldsEmpty(fields)) {
-        parseLine(fields);
+        parseLine(fields, version);
       }
       fields.clear();
 
