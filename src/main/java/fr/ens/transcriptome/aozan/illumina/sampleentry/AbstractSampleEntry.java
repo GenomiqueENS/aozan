@@ -21,25 +21,16 @@
  *
  */
 
-package fr.ens.transcriptome.aozan.illumina;
+package fr.ens.transcriptome.aozan.illumina.sampleentry;
 
+public abstract class AbstractSampleEntry implements SampleEntry {
 
-/**
- * This class define a Casava Sample
- * @since 1.1
- * @author Laurent Jourdren
- */
-public class CasavaSample {
-
-  private String flowCellId;
+  // Required fields for SampleEntry
   private int lane;
   private String sampleId;
   private String sampleRef;
   private String index;
   private String description;
-  private boolean control;
-  private String recipe;
-  private String operator;
   private String sampleProject;
 
   //
@@ -47,17 +38,10 @@ public class CasavaSample {
   //
 
   /**
-   * Get the flow cell id for the sample.
-   * @return Returns the flowCellId
-   */
-  public String getFlowCellId() {
-    return this.flowCellId;
-  }
-
-  /**
    * Get the lane for the sample.
    * @return Returns the lane
    */
+  @Override
   public int getLane() {
     return this.lane;
   }
@@ -66,6 +50,7 @@ public class CasavaSample {
    * Get the sample id.
    * @return Returns the sampleId
    */
+  @Override
   public String getSampleId() {
     return this.sampleId;
   }
@@ -74,6 +59,7 @@ public class CasavaSample {
    * Get the genome reference for the sample.
    * @return Returns the sampleRef
    */
+  @Override
   public String getSampleRef() {
     return this.sampleRef;
   }
@@ -82,6 +68,7 @@ public class CasavaSample {
    * Get the index sequence for the sample.
    * @return Returns the index
    */
+  @Override
   public String getIndex() {
     return this.index;
   }
@@ -90,6 +77,7 @@ public class CasavaSample {
    * Test if the sample is indexed.
    * @return true if the sample is indexed
    */
+  @Override
   public boolean isIndex() {
 
     return this.index != null && !"".equals(this.index.trim());
@@ -99,38 +87,16 @@ public class CasavaSample {
    * Get the description of the sample.
    * @return Returns the description
    */
+  @Override
   public String getDescription() {
     return this.description;
-  }
-
-  /**
-   * Test if the sample is a control
-   * @return Returns the control
-   */
-  public boolean isControl() {
-    return this.control;
-  }
-
-  /**
-   * Get the recipe use to make the sample
-   * @return Returns the recipe
-   */
-  public String getRecipe() {
-    return this.recipe;
-  }
-
-  /**
-   * Get the operator who has made the sample.
-   * @return Returns the operator
-   */
-  public String getOperator() {
-    return this.operator;
   }
 
   /**
    * Get the name of the project for the sample
    * @return Returns the sampleProject
    */
+  @Override
   public String getSampleProject() {
     return this.sampleProject;
   }
@@ -139,18 +105,7 @@ public class CasavaSample {
   // Setters
   //
 
-  /**
-   * Set the flow cell id for the sample.
-   * @param flowCellId The flowCellId to set
-   */
-  public void setFlowCellId(final String flowCellId) {
-    this.flowCellId = flowCellId;
-  }
-
-  /**
-   * Set the lane of the sample
-   * @param lane The lane to set
-   */
+  @Override
   public void setLane(final int lane) {
     this.lane = lane;
   }
@@ -159,6 +114,7 @@ public class CasavaSample {
    * Set the sample id for the sample.
    * @param sampleId The sampleId to set
    */
+  @Override
   public void setSampleId(final String sampleId) {
     this.sampleId = sampleId;
   }
@@ -167,6 +123,7 @@ public class CasavaSample {
    * Set the genome reference for the sample.
    * @param sampleRef The sampleRef to set
    */
+  @Override
   public void setSampleRef(final String sampleRef) {
     this.sampleRef = sampleRef;
   }
@@ -175,6 +132,7 @@ public class CasavaSample {
    * Set the index sequence for the sample
    * @param index The index to set
    */
+  @Override
   public void setIndex(final String index) {
     this.index = index;
   }
@@ -182,55 +140,27 @@ public class CasavaSample {
   /**
    * @param description The description to set
    */
+  @Override
   public void setDescription(final String description) {
     this.description = description;
-  }
-
-  /**
-   * Set if the sample is a control.
-   * @param control The control to set
-   */
-  public void setControl(final boolean control) {
-    this.control = control;
-  }
-
-  /**
-   * Set the recipe used to make the sample
-   * @param recipe The recipe to set
-   */
-  public void setRecipe(final String recipe) {
-    this.recipe = recipe;
-  }
-
-  /**
-   * Set the operator who has made the sample.
-   * @param operator The operator to set
-   */
-  public void setOperator(final String operator) {
-    this.operator = operator;
   }
 
   /**
    * Set the name of the project for the sample.
    * @param sampleProject The sampleProject to set
    */
+  @Override
   public void setSampleProject(final String sampleProject) {
     this.sampleProject = sampleProject;
   }
 
   //
-  // Other methods
+  // Abstracts methods
   //
 
-  public String getDemultiplexedFilenamePrefix(final int readNumber) {
-
+  String getDemultiplexedFilenameSuffix(final int readNumber) {
     final StringBuilder sb = new StringBuilder();
 
-    sb.append(getSampleId());
-    sb.append('_');
-    sb.append(getIndex() == null || "".equals(getIndex().trim())
-        ? "NoIndex" : getIndex());
-    sb.append('_');
     sb.append("L00");
     sb.append(getLane());
     sb.append('_');
@@ -241,38 +171,18 @@ public class CasavaSample {
     return sb.toString();
   }
 
-  public String getNotDemultiplexedFilenamePrefix(final int readNumber) {
+  @Override
+  abstract public String getDemultiplexedFilenamePrefix(final int readNumber);
 
-    final StringBuilder sb = new StringBuilder();
-
-    sb.append("lane");
-    sb.append(getLane());
-    sb.append('_');
-    sb.append("Undetermined");
-    sb.append('_');
-    sb.append("L00");
-    sb.append(getLane());
-    sb.append('_');
-    sb.append("R");
-    sb.append(readNumber);
-    sb.append('_');
-
-    return sb.toString();
-  }
-
-  //
-  // Object methods
-  //
+  @Override
+  abstract public String getNotDemultiplexedFilenamePrefix(final int readNumber);
 
   @Override
   public String toString() {
-
-    return CasavaSample.class.getName()
-        + "{sampleId=" + this.sampleId + ", flowCellId=" + this.flowCellId
-        + ", lane=" + this.lane + ", sampleRef=" + this.sampleRef + ", index="
-        + this.index + ", description=" + this.description + ", control="
-        + this.control + ", recipe=" + this.recipe + ", operator="
-        + this.operator + ", sampleProject=" + this.sampleProject + "}";
+    return "AbstractSampleEntry [lane="
+        + lane + ", sampleId=" + sampleId + ", sampleRef=" + sampleRef
+        + ", index=" + index + ", description=" + description
+        + ", sampleProject=" + sampleProject + "]";
   }
 
 }
