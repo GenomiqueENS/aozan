@@ -44,8 +44,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import com.google.common.base.Joiner;
-
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.QC;
@@ -59,10 +57,16 @@ import fr.ens.transcriptome.aozan.RunData;
  */
 public class ConversionStatsCollector extends DemultiplexingCollector {
 
+  /** The Constant ALL_NAME_KEY. */
   private static final String ALL_NAME_KEY = "all";
+
+  /** The Constant UNKNOWN_NAME_KEY. */
   private static final String UNKNOWN_NAME_KEY = "unknown";
+
+  /** The Constant UNDETERMINED_NAME_KEY. */
   private static final String UNDETERMINED_NAME_KEY = "Undetermined";
 
+  /** The casava output path. */
   private String casavaOutputPath;
 
   @Override
@@ -75,6 +79,7 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
     this.casavaOutputPath = properties.getProperty(QC.CASAVA_OUTPUT_DIR);
   }
 
+  @Override
   public void collect(final RunData data) throws AozanException {
 
     if (data == null) {
@@ -101,6 +106,7 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
       final Document doc = dBuilder.parse(is);
       doc.getDocumentElement().normalize();
 
+      // Parse document to update run data
       parse(doc, data);
 
       is.close();
@@ -117,10 +123,15 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
     }
   }
 
+  /**
+   * Parses the document.
+   * @param document the document
+   * @param data the data
+   * @throws AozanException, it throws if an error occurs when extract data from
+   *           document.
+   */
   private void parse(final Document document, final RunData data)
       throws AozanException {
-
-    System.out.println("\t demux star parsing xml.");
 
     String projectName;
     String sampleName;
@@ -139,10 +150,6 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
           for (final Element lane : getElementsByTagName(barcode, "Lane")) {
             laneNumber = Integer.parseInt(lane.getAttribute("number"));
 
-            System.out.println(String.format(
-                "project %s\tsample %s\tbarcode %s\tlane %s", projectName,
-                sampleName, barcodeSeq, laneNumber));
-
             // Create Tile stats for new group tiles related tuple
             // sample/barecode/lane
             final GroupTilesStats stats =
@@ -160,6 +167,11 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
     }
   }
 
+  /**
+   * Check barcode sequence and replace unknown by undetermined.
+   * @param barcodeSeq the barcode sequence
+   * @return valid barcode sequence
+   */
   private String checkBarcodeSeq(String barcodeSeq) {
 
     if (barcodeSeq.equals(ALL_NAME_KEY)) {
@@ -176,8 +188,12 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
       char c = barcodeSeq.charAt(i);
 
       // Check sequences corresponding to good bases
-      if (c != 'A' && c != 'T' && c != 'C' && c != 'G')
-        throw new AozanRuntimeException("");
+      if (c != 'A'
+          && c != 'T' && c != 'C' && c != 'G' && c != 'a' && c != 't'
+          && c != 'c' && c != 'g')
+
+        throw new AozanRuntimeException(
+            "Demultiplexing Collector: in barcode sequence a base is invalid.");
     }
 
     // Return sequence
@@ -194,17 +210,28 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
   // Internal class
   //
 
-  private static final class BarcodeStats {
+  /**
+   * The internal class compile statistics data per read and type (raw and
+   * passing filter) from tiles.
+   * @author Sandrine Perrin
+   * @since 2.0
+   */
+  private static final class ReadStats {
 
-    private final String barcodeSeq;
     private final String type;
+    private final int readNumber;
 
+    // Statistic data
     private long clusterSum = 0;
-
     private long yieldSum = 0;
     private long yieldQ30Sum = 0;
     private long qualityScoreSum = 0;
 
+    /**
+     * Adds a tile statistics data.
+     * @param data the tiles elements.
+     * @param clusterCount the cluster count for a tile.
+     */
     public void add(final Element data, final long clusterCount) {
 
       this.yieldSum += Long.parseLong(getTagValue(data, "Yield"));
@@ -215,122 +242,64 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
       this.clusterSum += clusterCount;
     }
 
-    public String getBarcodeSeq() {
-      return barcodeSeq;
-    }
+    //
+    // Getter
+    //
 
+    /**
+     * Gets the yield sum.
+     * @return the yield sum
+     */
     public String getYieldSum() {
       return this.yieldSum + "";
     }
 
+    /**
+     * Gets the yield q30 sum.
+     * @return the yield q30 sum
+     */
     public String getYieldQ30Sum() {
       return this.yieldQ30Sum + "";
     }
 
+    /**
+     * Gets the quality score sum.
+     * @return the quality score sum
+     */
     public String getQualityScoreSum() {
       return this.qualityScoreSum + "";
     }
 
+    /**
+     * Gets the cluster sum.
+     * @return the cluster sum
+     */
     public String getClusterSum() {
       return this.clusterSum + "";
     }
 
-    @Override
-    public String toString() {
-      return "BarcodeStats [barcodeSeq="
-          + barcodeSeq + ", type=" + type + ", clusterSum=" + clusterSum
-          + ", yieldSum=" + yieldSum + ", yieldQ30Sum=" + yieldQ30Sum
-          + ", qualityScoreSum=" + qualityScoreSum + "]";
-    }
+    //
+    // Constructor
+    //
 
-    public BarcodeStats(final String barcodeSeq, final String type) {
-
-      this.barcodeSeq = barcodeSeq;
-      this.type = type;
-    }
-
-  }
-
-  private static final class ReadStats {
-
-    private final String type;
-    private final int readNumber;
-    private final Map<String, BarcodeStats> allStats;
-
-    public void add(final Element data, final String barcodeSeq,
-        final long clusterCount) {
-
-      if (!this.allStats.containsKey(barcodeSeq)) {
-        // Add new entry in map stats
-        this.allStats.put(barcodeSeq, new BarcodeStats(barcodeSeq, this.type));
-
-      }
-
-      // Add new statistics data
-      this.allStats.get(barcodeSeq).add(data, clusterCount);
-
-    }
-
-    public String getClusterCount(String barcodeSeq) {
-
-      if (this.allStats.containsKey(barcodeSeq))
-
-        return this.allStats.get(barcodeSeq).getYieldSum();
-
-      throw new AozanRuntimeException(
-          "DemuxCollector: missing tiles statistics Yield sum data related to barcode "
-              + barcodeSeq);
-    }
-
-    public String getYieldSum(final String barcodeSeq) {
-
-      if (this.allStats.containsKey(barcodeSeq))
-
-        return this.allStats.get(barcodeSeq).getYieldSum();
-
-      throw new AozanRuntimeException(
-          "DemuxCollector: missing tiles statistics Yield sum data related to barcode "
-              + barcodeSeq);
-    }
-
-    public String getYieldQ30Sum(final String barcodeSeq) {
-
-      if (this.allStats.containsKey(barcodeSeq))
-
-        return this.allStats.get(barcodeSeq).getYieldQ30Sum();
-
-      throw new AozanRuntimeException(
-          "DemuxCollector: missing tiles statistics Yield Q30 sum data related to barcode "
-              + barcodeSeq);
-    }
-
-    public String getQualityScoreSum(final String barcodeSeq) {
-
-      if (this.allStats.containsKey(barcodeSeq))
-
-        return this.allStats.get(barcodeSeq).getQualityScoreSum();
-
-      throw new AozanRuntimeException(
-          "DemuxCollector: missing tiles statistics Quality Score sum data related to barcode "
-              + barcodeSeq);
-    }
-
-    @Override
-    public String toString() {
-      return "ReadStats [type="
-          + type + ", readNumber=" + readNumber + ", allStats="
-          + Joiner.on("\n").withKeyValueSeparator("=").join(allStats) + "]";
-    }
-
+    /**
+     * Public constructor
+     * @param type the type
+     * @param readNumber the read number
+     */
     public ReadStats(final String type, final int readNumber) {
       this.type = type;
       this.readNumber = readNumber;
-
-      this.allStats = new HashMap<>();
     }
 
   }
 
+  /**
+   * The internal class compile statistics demultiplexing results data per
+   * project, per sample, per lane and per barcode sequence.
+   * @author Sandrine Perrin
+   * @since 2.0
+   */
   private static final class GroupTilesStats {
 
     public static final String RAW_TYPE = "Raw";
@@ -342,14 +311,24 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
     private final String sampleName;
     private final String projectName;
 
+    // Barcode sequence, per default at least 2 : all and one index sequence
+    // Can be use second index sequence
     private List<String> barcodeSeqs;
 
+    /** Save for readNumber-type the reads stats instance. */
     private Map<String, ReadStats> readStats;
 
     //
     // Methods to compile tiles statistics
     //
 
+    /**
+     * Adds a tiles stats.
+     * @param lane the lane element
+     * @param barcodeSeq the barcode sequence
+     * @throws AozanException, it throws if an error occurs when extract data
+     *           from lane element.
+     */
     public void addTilesStats(final Element lane, final String barcodeSeq)
         throws AozanException {
 
@@ -360,13 +339,17 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
 
       for (final Element tile : getElementsByTagName(lane, "Tile")) {
         // Compile tile statistics element
-        this.add(new TileStats(tile), barcodeSeq);
+        this.add(new TileStats(tile));
       }
 
     }
 
-    public void add(final TileStats t, final String barcodeSeq)
-        throws AozanException {
+    /**
+     * Adds a tile data.
+     * @param t the tile stats instance.
+     * @throws AozanException the aozan exception
+     */
+    public void add(final TileStats t) throws AozanException {
 
       if (t == null) {
         return;
@@ -376,16 +359,25 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
       for (int read = 1; read <= readCount; read++) {
 
         // Add raw data
-        addDataStats(t, RAW_TYPE, t.clusterCountRaw, read, barcodeSeq);
+        addDataStats(t, RAW_TYPE, t.clusterCountRaw, read);
 
         // Add PF data
-        addDataStats(t, PF_TYPE, t.clusterCountPF, read, barcodeSeq);
+        addDataStats(t, PF_TYPE, t.clusterCountPF, read);
       }
     }
 
+    /**
+     * Adds the data stats in reads statistics instance to compute all tiles
+     * data.
+     * @param t the tile stats instance
+     * @param type the type between raw or pf
+     * @param clusterCount the cluster count of a tile
+     * @param read the read number
+     * @throws AozanException, it throws if an error occurs when extract data
+     *           from document.
+     */
     private void addDataStats(final TileStats t, final String type,
-        long clusterCount, final int read, final String barcodeSeq)
-        throws AozanException {
+        long clusterCount, final int read) throws AozanException {
 
       final String key = type + "_" + read;
 
@@ -395,7 +387,7 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
 
       // Add value
       final Element e = t.getElementRead(type, read);
-      readStats.get(key).add(e, barcodeSeq, clusterCount);
+      readStats.get(key).add(e, clusterCount);
 
     }
 
@@ -403,21 +395,23 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
     // Methods to update run data
     //
 
+    /**
+     * Update run data.
+     * @param runData the run data
+     */
     public void putData(final RunData runData) {
 
       if (runData == null) {
         return;
       }
 
-      System.out.println(" PUT data contains map "
-          + Joiner.on("\n").withKeyValueSeparator("\t").join(this.readStats));
-
       // Count barcode sequences sequence used
       int count = 0;
 
-      // Parse all barcode seq
       for (String barcodeSeq : this.barcodeSeqs) {
 
+        // Add barcode sequence, the index is not indices with a number to
+        // respect actual syntax entry in rundata
         if (barcodeSeq.equals(UNDETERMINED_NAME_KEY)) {
 
           // Add barcodes
@@ -432,6 +426,7 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
           count++;
         }
 
+        // Parse all barcode seq
         for (Map.Entry<String, ReadStats> e : this.readStats.entrySet()) {
           final ReadStats stats = e.getValue();
 
@@ -441,37 +436,76 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
       }
     }
 
+    /**
+     * Builds the prefix run data.
+     * @param stats the read stats instance
+     * @param barcodeSeq the barcode sequence
+     * @return the prefix
+     */
     private String buildPrefixRunData(final ReadStats stats,
         final String barcodeSeq) {
 
+      if (barcodeSeq.equals(ALL_NAME_KEY)
+          && projectName.equals(ALL_NAME_KEY)
+          && sampleName.equals(ALL_NAME_KEY)) {
+
+        return String.format(PREFIX + ".lane%s.%s.read%s.%s", lane, sampleName,
+            stats.readNumber, stats.type);
+      }
+
       if (barcodeSeq.equals(ALL_NAME_KEY)) {
+
         return String.format(PREFIX + ".lane%s.sample.%s.read%s.%s", lane,
             sampleName, stats.readNumber, stats.type);
       }
 
       if (barcodeSeq.equals(UNDETERMINED_NAME_KEY)) {
-        return String.format(PREFIX + ".lane%s.sample.read%s.%s", lane,
-            stats.readNumber, stats.type);
+        return String.format(PREFIX + ".lane%s.sample.lane%s.read%s.%s", lane,
+            lane, stats.readNumber, stats.type);
       }
 
       return String.format(PREFIX + ".lane%s.sample.%s.read%s.%s.%s", lane,
           sampleName, stats.readNumber, barcodeSeq, stats.type);
     }
 
+    /**
+     * Put read data with statistic data.
+     * @param runData the run data
+     * @param stats the read stats instance
+     * @param barcodeSeq the barcode sequence
+     */
     private void putReadData(final RunData runData, final ReadStats stats,
         String barcodeSeq) {
 
       final String prefix = buildPrefixRunData(stats, barcodeSeq);
 
       // Summary sample
-      runData.put(prefix + ".cluster.count", stats.getClusterCount(barcodeSeq));
-      runData.put(prefix + ".yield", stats.getYieldSum(barcodeSeq));
-      runData.put(prefix + ".yield.q30", stats.getYieldQ30Sum(barcodeSeq));
-      runData.put(prefix + ".quality.score.sum",
-          stats.getQualityScoreSum(barcodeSeq));
+      runData.put(prefix + ".cluster.count", stats.getClusterSum());
+      runData.put(prefix + ".yield", stats.getYieldSum());
+      runData.put(prefix + ".yield.q30", stats.getYieldQ30Sum());
+      runData.put(prefix + ".quality.score.sum", stats.getQualityScoreSum());
+
+      // TODO to remove after test
+      // final String debug =
+      // String.format("%s;%s;%s;%s;lane%s;read%s;%s", "debug", projectName,
+      // sampleName, barcodeSeq, lane, stats.readNumber, stats.type);
+      // runData.put(debug + ".cluster.count", stats.getClusterSum());
+      // runData.put(debug + ".yield", stats.getYieldSum());
+      // runData.put(debug + ".yield.q30", stats.getYieldQ30Sum());
+      // runData.put(debug + ".quality.score.sum", stats.getQualityScoreSum());
 
     }
 
+    //
+    // Constructor
+    //
+
+    /**
+     * Public constructor
+     * @param projectName the project name
+     * @param sampleName the sample name
+     * @param lane the lane
+     */
     public GroupTilesStats(final String projectName, final String sampleName,
         final int lane) {
       this.lane = lane;
@@ -485,7 +519,7 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
   }
 
   /**
-   * The Class TileStats.
+   * The internal class extract data from tile element.
    * @author Sandrine Perrin
    * @since 2.0
    */
@@ -495,35 +529,51 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
     private final long clusterCountPF;
     private final long clusterCountRaw;
 
-    public Element getElementRead(final String type, final int readValue)
+    /**
+     * Gets the element read according to the type (raw pr pf) and read number.
+     * @param type the type
+     * @param readNumber the read number
+     * @return the element read
+     * @throws AozanException the aozan exception
+     */
+    public Element getElementRead(final String type, final int readNumber)
         throws AozanException {
 
+      // Extract element related to the required type
       final Element typeElem = getElementsByTagName(this.tileElem, type).get(0);
 
-      if (this.tileElem.getAttribute("number").equals("1101"))
-        System.out.println("extract tile element for type "
-            + type + " and read " + readValue);
-
+      // Find element read to the required read number
       for (Element readElem : getElementsByTagName(typeElem, "Read")) {
         final String readAtt = readElem.getAttribute("number").trim();
 
-        if (readAtt.equals(readValue + "")) {
+        if (readAtt.equals(readNumber + "")) {
+
+          // Return element
           return readElem;
         }
       }
 
+      // No found expected element
       throw new AozanException(
           "Parse XML file, not found element in tile element for type "
-              + type + " read " + readValue);
+              + type + " read " + readNumber);
     }
 
+    /**
+     * Extract cluster count.
+     * @param type the type
+     * @return cluster count for a tile
+     */
     private long extractClusterCount(final String type) {
 
       final Element e = getElementsByTagName(this.tileElem, type).get(0);
 
       if (e == null) {
-
+        throw new AozanRuntimeException(
+            "Demultiplexing collector: no found tile element related to the type "
+                + type);
       }
+
       return Long.parseLong(getTagValue(e, "ClusterCount"));
     }
 
@@ -531,6 +581,10 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
     // Constructors
     //
 
+    /**
+     * Public constructor
+     * @param tileElem the tile element
+     */
     public TileStats(final Element tileElem) {
 
       this.tileElem = tileElem;
@@ -542,54 +596,4 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
 
   }
 
-  //
-  // Main method for test
-  //
-
-  // TODO remove after test
-  private void collect(final RunData data, final String demuxSummaryPath)
-      throws AozanException {
-
-    if (data == null) {
-      return;
-    }
-
-    try {
-
-      if (!new File(demuxSummaryPath).exists()) {
-        throw new AozanException(
-            "Demultiplexing Collector: source file not exists "
-                + demuxSummaryPath);
-      }
-
-      // Create the input stream
-      final InputStream is = new FileInputStream(demuxSummaryPath);
-
-      final DocumentBuilder dBuilder =
-          DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      final Document doc = dBuilder.parse(is);
-      doc.getDocumentElement().normalize();
-
-      parse(doc, data);
-
-      is.close();
-    } catch (final Exception e) {
-
-      throw new AozanException(e);
-    }
-  }
-
-  // TODO remove after test
-  public static void main(String[] argv) throws Exception {
-    final String f =
-        "/import/rhodos01/shares-net/sequencages/nextseq_500/fastq/"
-            + "150416_NB500892_0002_AH7MNKBGXX/Stats/ConversionStats.xml";
-
-    final RunData data = new RunData();
-
-    final ConversionStatsCollector demux = new ConversionStatsCollector();
-
-    demux.collect(data, f);
-    data.createRunDataFile("/tmp/demux.data");
-  }
 }
