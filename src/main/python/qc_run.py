@@ -9,6 +9,8 @@ import demux_run
 
 from fr.ens.transcriptome.aozan import QC, Settings
 from fr.ens.transcriptome.aozan import AozanException
+from fr.ens.transcriptome.aozan.io import ManagerQCPath
+
 from java.lang import Throwable
 
 from fr.ens.transcriptome.aozan.Settings import FASTQ_DATA_PATH_KEY
@@ -169,6 +171,9 @@ def qc(run_id, conf):
     except Throwable, exp:
         error("error while computing qc report HTML for run " + run_id + ".", common.exception_msg(exp, conf), conf)
         return False
+    
+    # Clean Manager Quality Control path for next run
+    ManagerQCPath.destroyInstance()
 
     # Check if the report has been generated
     if not os.path.exists(html_report_file):
