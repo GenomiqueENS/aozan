@@ -264,6 +264,13 @@ public abstract class AbstractFastqCollector implements Collector {
               this.futureThreads.add(this.executor.submit(thread, thread));
             }
           }
+        } else {
+          // TODO
+
+          LOGGER.severe("FASTQ Collect: fastq is null or empty, key fq is "
+              + fs.getKeyFastqSample() + " tmp fq "
+              + fs.getNameTemporaryFastqFiles() + " sample name "
+              + fs.getSampleName() + " prefix rundata " + fs.getPrefixRundata());
         }
       }
 
@@ -398,6 +405,7 @@ public abstract class AbstractFastqCollector implements Collector {
             // Add undetermined sample
             this.fastqSamples.add(new FastqSample(this.casavaOutputPath,
                 readIndexedCount, lane));
+
           }
         }
       } // Lane
@@ -430,9 +438,13 @@ public abstract class AbstractFastqCollector implements Collector {
             + ".raw.cluster.count") == null);
 
     if (!valid)
-      LOGGER.warning("Sample "
-          + sampleName + " lane " + lane
-          + ": no demultiplexing data found, no quality control data.");
+      LOGGER
+          .warning("Sample "
+              + sampleName
+              + " lane "
+              + lane
+              + ": no demultiplexing data found, no quality control data. Use prefix in rundata "
+              + prefix);
 
     // Return true if sample valid
     return valid;

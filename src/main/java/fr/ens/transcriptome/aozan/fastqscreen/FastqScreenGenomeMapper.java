@@ -42,21 +42,21 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
-
+import com.google.common.base.Joiner;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.Settings;
+import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
+import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
 import fr.ens.transcriptome.eoulsan.data.DataFile;
 import fr.ens.transcriptome.eoulsan.data.protocols.DataProtocolService;
 import fr.ens.transcriptome.eoulsan.data.storages.GenomeDescStorage;
 import fr.ens.transcriptome.eoulsan.data.storages.SimpleGenomeDescStorage;
-import fr.ens.transcriptome.eoulsan.illumina.CasavaDesign;
-import fr.ens.transcriptome.eoulsan.illumina.CasavaSample;
-import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignCSVReader;
 
 /**
  * This class read the alias genome file. It make correspondence between genome
@@ -93,6 +93,8 @@ public class FastqScreenGenomeMapper {
   private final Set<String> genomesToMapping;
 
   private final GenomeDescStorage storage;
+
+  private final String bcl2fastqVersion;
 
   /**
    * Set reference genomes for the samples of a run. Retrieve list of genomes
@@ -163,11 +165,10 @@ public class FastqScreenGenomeMapper {
   public GenomeDescription createGenomeDescription(final DataFile genomeFile)
       throws BadBioEntryException, IOException {
 
-    if (!genomeFile.exists()) {
-      LOGGER.warning("Fastqscreen "
-          + genomeFile.getBasename()
-          + " not exists.");
-    }
+    // if (!genomeFile.exists()) {
+    // LOGGER
+    // .warning("Fastqscreen " + genomeFile.getBasename() + " not exists.");
+    // }
 
     GenomeDescription desc = null;
 
@@ -242,12 +243,12 @@ public class FastqScreenGenomeMapper {
     if (designFile.exists() && designFile.isFile()) {
 
       final CasavaDesignCSVReader casavaReader;
-      final CasavaDesign casavaDesign;
+      final SampleSheet casavaDesign;
 
       try {
         // Reading casava design file in format csv
         casavaReader = new CasavaDesignCSVReader(designFile);
-        casavaDesign = casavaReader.read();
+        casavaDesign = casavaReader.read(this.bcl2fastqVersion);
 
       } catch (final Exception e) {
         // Return empty list
@@ -255,7 +256,7 @@ public class FastqScreenGenomeMapper {
       }
 
       // Retrieve all genome sample included in casava design file
-      for (final CasavaSample casavaSample : casavaDesign) {
+      for (final SampleEntry casavaSample : casavaDesign) {
         final String genomeSample =
             casavaSample.getSampleRef().replaceAll("\"", "").toLowerCase();
 
@@ -264,8 +265,17 @@ public class FastqScreenGenomeMapper {
 
         genomesFromDesign.add(genomeSample.trim());
       }
+
+      // TODO
+      LOGGER.warning("FQS-genomeMapper: list genomes name find in design "
+          + Joiner.on(", ").join(genomesFromDesign));
+
       return genomesFromDesign;
+
     }
+    // TODO
+    LOGGER.warning("FQS-genomeMapper: no genomes name found in design file "
+        + designFile.getAbsolutePath());
 
     // Fail to read design file
     return Collections.emptySet();
@@ -309,7 +319,7 @@ public class FastqScreenGenomeMapper {
     if (genomes.isEmpty()) {
       throw new AozanException(
           "FastqScreen : none genomes contaminant can be use from configuration file: "
-              + val);
+              + val + " found: " + Joiner.on("-").join(genomes));
     }
 
     return Collections.unmodifiableSet(genomes);
@@ -484,6 +494,8 @@ public class FastqScreenGenomeMapper {
         new DataFile(settings.getGenomeDescStoragePath());
     this.storage = SimpleGenomeDescStorage.getInstance(genomeDescStoragePath);
 
+    this.bcl2fastqVersion = this.properties.get(QC.BCL2FASTQ_VERSION);
+
     // Load alias genomes file
     this.genomesNamesConvertor = this.loadAliasGenomesFile();
 
@@ -501,4 +513,5 @@ public class FastqScreenGenomeMapper {
     this.genomesToMapping = this.collectGenomesForMapping();
 
   }
+
 }

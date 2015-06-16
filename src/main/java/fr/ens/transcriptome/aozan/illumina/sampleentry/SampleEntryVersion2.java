@@ -47,7 +47,6 @@ public class SampleEntryVersion2 extends AbstractSampleEntry {
     throw new UnsupportedOperationException();
   }
 
-
   /**
    * Get the flow cell id for the sample.
    * @return Returns the flowCellId

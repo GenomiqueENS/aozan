@@ -95,14 +95,14 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     final String report =
         this.reportDir.getAbsolutePath()
-            + "/" + getFastqSample().getKeyFastqSample() + "-fastqscreen";
+            + "/" + getFastqSample().getPrefixReport() + "-fastqscreen";
 
     writeCSV(report);
     // Report with a link in qc html page
     writeHtml(report);
 
     LOGGER.fine("FASTQSCREEN : save "
-        + getFastqSample().getKeyFastqSample() + " report fastqscreen");
+        + getFastqSample().getPrefixReport() + " report fastqscreen");
 
   }
 
@@ -126,7 +126,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     if (this.isRunPE) {
       final File fileR2 =
           new File(this.reportDir.getAbsolutePath()
-              + "/" + getFastqSample().getPrefixRead2() + "-fastqscreen.csv");
+              + "/" + getFastqSample().getPrefixReport(2) + "-fastqscreen.csv");
 
       if (fileR2.exists()) {
         if (!fileR2.delete()) {
@@ -160,7 +160,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     if (this.isRunPE) {
       final File outputReportR2 =
           new File(this.reportDir.getAbsolutePath()
-              + "/" + getFastqSample().getPrefixRead2() + "-fastqscreen.html");
+              + "/" + getFastqSample().getPrefixReport(2) + "-fastqscreen.html");
 
       if (outputReportR2.exists()) {
         if (!outputReportR2.delete()) {

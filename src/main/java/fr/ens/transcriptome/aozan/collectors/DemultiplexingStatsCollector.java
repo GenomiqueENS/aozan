@@ -59,7 +59,7 @@ import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 public class DemultiplexingStatsCollector implements Collector {
 
   /** The collector name. */
-  public static final String COLLECTOR_NAME = "demux";
+  public static final String COLLECTOR_NAME = "toto";
 
   /** Statistic file from bcl2fastq. */
   private static final String STATS_FILENAME = "ConversionStats.xml";

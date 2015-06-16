@@ -24,11 +24,10 @@
 package fr.ens.transcriptome.aozan.io;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
 
@@ -45,12 +44,15 @@ public class FastqSample {
 
   public static final String FASTQ_EXTENSION = ".fastq";
 
+  private static final String NO_INDEX = "NoIndex";
+
   private final int read;
   private final int lane;
   private final String sampleName;
   private final String projectName;
   private final String descriptionSample;
   private final String index;
+
   private final boolean undeterminedIndices;
 
   private final String runFastqPath;
@@ -118,6 +120,11 @@ public class FastqSample {
   private static CompressionType getCompressionExtension(
       final List<File> fastqFiles) {
 
+    if (fastqFiles.isEmpty()) {
+      throw new AozanRuntimeException(
+          "Fastq Sample, no fastq file found for sample ");
+    }
+
     if (fastqFiles.get(0).getName().endsWith(FASTQ_EXTENSION)) {
       return CompressionType.NONE;
     }
@@ -169,52 +176,30 @@ public class FastqSample {
   }
 
   /**
-   * Set the directory to the fastq files for this fastqSample.
-   * @return directory of fastq files for a fastqSample
-   */
-  private File casavaOutputDir() {
-
-    if (this.undeterminedIndices) {
-      return new File(this.runFastqPath
-          + "/Undetermined_indices/Sample_lane" + this.lane);
-    }
-
-    return new File(this.runFastqPath
-        + "/Project_" + this.projectName + "/Sample_" + this.sampleName);
-  }
-
-  /**
-   * Set the prefix of the fastq file of read1 for this fastqSample.
-   * @return prefix fastq files for this fastqSample
-   */
-  private String prefixFileName(final int read) {
-
-    if (this.undeterminedIndices) {
-      return String.format("lane%d_Undetermined_L%03d_R%d_", this.lane,
-          this.lane, read);
-    }
-
-    return String.format("%s_%s_L%03d_R%d_", this.sampleName,
-        "".equals(this.index) ? "NoIndex" : this.index, this.lane, read);
-  }
-
-  /**
    * Keep files that satisfy the specified filter in this directory and
    * beginning with this prefix.
    * @return an array of abstract pathnames
    */
   private List<File> createListFastqFiles(final int read) {
 
-    return Arrays.asList(new File(casavaOutputDir() + "/")
-        .listFiles(new FileFilter() {
+    return ManagerQCPath.getInstance().createListFastqFiles(this, read);
 
-          @Override
-          public boolean accept(final File pathname) {
-            return pathname.length() > 0
-                && pathname.getName().startsWith(prefixFileName(read))
-                && pathname.getName().contains(FASTQ_EXTENSION);
-          }
-        }));
+  }
+
+  /**
+   * Gets the prefix report filename.
+   * @return the prefix report
+   */
+  public String getPrefixReport(final int read) {
+
+    return ManagerQCPath.getInstance().buildPrefixReport(this, read);
+
+  }
+
+  public String getPrefixReport() {
+
+    return ManagerQCPath.getInstance().buildPrefixReport(this);
+
   }
 
   //
@@ -270,6 +255,14 @@ public class FastqSample {
   }
 
   /**
+   * Gets the index.
+   * @return the index
+   */
+  public String getIndex() {
+    return this.index;
+  }
+
+  /**
    * Get list of fastq files for this sample.
    * @return list fastq files
    */
@@ -310,10 +303,21 @@ public class FastqSample {
     return this.compressionType;
   }
 
+  @Override
+  public String toString() {
+    return "FastqSample [read="
+        + read + ", lane=" + lane + ", sampleName=" + sampleName
+        + ", projectName=" + projectName + ", descriptionSample="
+        + descriptionSample + ", index=" + index + ", undeterminedIndices="
+        + undeterminedIndices + ", runFastqPath=" + runFastqPath
+        + ", keyFastqSample=" + keyFastqSample + ", nameTemporaryFastqFiles="
+        + nameTemporaryFastqFiles + ", fastqFiles=" + fastqFiles
+        + ", compressionType=" + compressionType + "]";
+  }
+
   //
   // Constructor
   //
-
   /**
    * Public constructor corresponding of a technical replica sample.
    * @param casavaOutputPath path to fastq files
@@ -333,7 +337,7 @@ public class FastqSample {
     this.sampleName = sampleName;
     this.projectName = projectName;
     this.descriptionSample = descriptionSample;
-    this.index = index == null ? "" : index;
+    this.index = (index == null || index.isEmpty()) ? NO_INDEX : index;
     this.undeterminedIndices = false;
 
     this.runFastqPath = casavaOutputPath;
@@ -345,9 +349,6 @@ public class FastqSample {
 
     this.nameTemporaryFastqFiles = createNameTemporaryFastqFile();
 
-    LOGGER.fine("Add a sample "
-        + this.getKeyFastqSample() + " " + this.getFastqFiles().size()
-        + " fastq file(s), type compression " + this.compressionType);
   }
 
   /**
@@ -364,7 +365,7 @@ public class FastqSample {
     this.sampleName = "lane" + lane;
     this.projectName = "";
     this.descriptionSample = "";
-    this.index = "";
+    this.index = NO_INDEX;
     this.undeterminedIndices = true;
 
     this.runFastqPath = casavaOutputPath;
@@ -376,8 +377,6 @@ public class FastqSample {
 
     this.nameTemporaryFastqFiles = createNameTemporaryFastqFile();
 
-    LOGGER.fine("Add a sample "
-        + this.getKeyFastqSample() + " " + this.getFastqFiles().size()
-        + " fastq file(s), type compression " + this.compressionType);
   }
+
 }

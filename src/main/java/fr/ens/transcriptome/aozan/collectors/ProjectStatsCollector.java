@@ -34,18 +34,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreenProjectReport;
 import fr.ens.transcriptome.aozan.util.StatisticsUtils;
+import fr.ens.transcriptome.aozan.util.StringUtils;
 import fr.ens.transcriptome.eoulsan.EoulsanRuntimeException;
 
 /**
@@ -57,6 +60,9 @@ import fr.ens.transcriptome.eoulsan.EoulsanRuntimeException;
  */
 public class ProjectStatsCollector implements Collector {
 
+  /** Logger. */
+  private static final Logger LOGGER = Common.getLogger();
+
   /** Collector name. */
   public static final String COLLECTOR_NAME = "projectstats";
 
@@ -65,10 +71,6 @@ public class ProjectStatsCollector implements Collector {
 
   /** Default contaminantion percent threshold. */
   private static final double DEFAULT_CONTAMINATION_PERCENT_THRESHOLD = 0.10;
-
-  /** Splitter. */
-  private static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults()
-      .omitEmptyStrings();
 
   /** Report directory. */
   private String reportDir;
@@ -137,7 +139,7 @@ public class ProjectStatsCollector implements Collector {
 
     // Check optional collector selected
     final List<String> collectorNames =
-        COMMA_SPLITTER.splitToList(properties
+        StringUtils.COMMA_SPLITTER.splitToList(properties
             .getProperty(QC.QC_COLLECTOR_NAMES));
 
     undeterminedIndexesCollectorSelected =
@@ -155,6 +157,15 @@ public class ProjectStatsCollector implements Collector {
 
   @Override
   public void collect(RunData data) throws AozanException {
+
+    // TODO
+    // Save rundata in tmp
+    try {
+      data.createRunDataFile("/tmp/rundata.txt");
+    } catch (IOException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
 
     // Parse FastqSample to build list Project
     final List<ProjectStat> projects = extractProjectsStats(data);
@@ -463,7 +474,7 @@ public class ProjectStatsCollector implements Collector {
 
       // Check collector is selected
       if (isUndeterminedIndexesCollectorSelected()) {
-        
+
         // Check if lane is indexed
         if (this.data.isLaneIndexed(lane)) {
           this.rawClusterRecoverySum +=
@@ -476,6 +487,12 @@ public class ProjectStatsCollector implements Collector {
 
       // Check collector is selected
       if (isFastqScreenCollectorSelected()) {
+
+        // TODO
+        LOGGER.severe("sample "
+            + sample + " in lane " + lane + " data read size "
+            + this.data.size());
+
         this.mappedContaminationPercentSamples.add(this.data
             .getPercentMappedReadOnContaminationSample(lane, sample, READ));
       }

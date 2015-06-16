@@ -24,15 +24,10 @@
 package fr.ens.transcriptome.aozan.illumina.io;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntryVersion1;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntryVersion2;
+import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetVersion2;
@@ -45,28 +40,12 @@ import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetVersion2;
 public abstract class AbstractCasavaDesignTextReader implements
     CasavaDesignReader {
 
-  // Required in this order columns header for version1
-  private static final String[] FIELDNAMES_VERSION1 = new String[] {"FCID",
-      "Lane", "SampleID", "SampleRef", "Index", "Description", "Control",
-      "Recipe", "Operator", "SampleProject"};
-
-  // Required in this order columns header for version2
-  private static final List<String> FIELDNAMES_VERSION2 = Arrays.asList("Lane",
-      "Sample_ID", "Sample_Ref", "index", "Description", "Sample_Project");
-
-  private final static List<String> SESSIONS_HEADER = Arrays.asList("[Header]",
-      "[Reads]", "[Settings]", "[Data]");
-
   private SampleSheet design;
+  private SampleSheetLineReader reader;
+
+  private boolean isCompatibleForQCReport = false;
+  private RunData data;
   private String version;
-  private boolean firstLine = true;
-  private int fieldsCountExpected;
-
-  private String currentSessionName;
-
-  private boolean firstData = true;
-
-  private Map<String, Integer> posFields;
 
   /**
    * Parses the line.
@@ -80,58 +59,23 @@ public abstract class AbstractCasavaDesignTextReader implements
     if (this.design == null) {
       this.version = version;
 
-      if (this.version.equals(SampleSheetUtils.VERSION_2))
+      if (this.version.equals(SampleSheetUtils.VERSION_2)) {
         this.design = new SampleSheetVersion2(version);
-      else
+        this.reader =
+            new SampleSheetLineReaderV2(getData(), isCompatibleForQCReport());
+      } else {
         this.design = new SampleSheet(version);
+        this.reader = new SampleSheetLineReaderV1();
+      }
     }
 
     assert (this.version.equals(version));
 
-    if (this.design.isVersion1()) {
-      parseLineVersion1(fields);
-
-    } else {
-      parseLineVersion2(fields);
-    }
+    this.reader.parseLine(this.design, fields);
 
   }
 
-  private void parseLineVersion1(List<String> fields) throws AozanException {
-
-    trimAndCheckFields(fields);
-
-    if (this.firstLine) {
-      this.firstLine = false;
-
-      for (int i = 0; i < fields.size(); i++) {
-        if (!FIELDNAMES_VERSION1[i].toLowerCase().equals(
-            fields.get(i).toLowerCase())) {
-
-          throw new AozanException("Invalid field name: " + fields.get(i));
-        }
-      }
-
-      return;
-    }
-
-    final SampleEntry sample = new SampleEntryVersion1();
-
-    sample.setFlowCellId(fields.get(0));
-    sample.setLane(parseLane(fields.get(1)));
-    sample.setSampleId(fields.get(2));
-    sample.setSampleRef(fields.get(3));
-    sample.setIndex(fields.get(4));
-    sample.setDescription(fields.get(5));
-    sample.setControl(parseControlField(fields.get(6)));
-    sample.setRecipe(fields.get(7));
-    sample.setOperator(fields.get(8));
-    sample.setSampleProject(fields.get(9));
-
-    this.design.addSample(sample);
-  }
-
-  private static final boolean parseControlField(final String value)
+  protected static final boolean parseControlField(final String value)
       throws AozanException {
 
     if ("".equals(value)) {
@@ -149,7 +93,7 @@ public abstract class AbstractCasavaDesignTextReader implements
     throw new AozanException("Invalid value for the control field: " + value);
   }
 
-  private static final void trimAndCheckFields(final List<String> fields)
+  protected static final void trimAndCheckFields(final List<String> fields)
       throws AozanException {
 
     if (fields == null) {
@@ -183,100 +127,7 @@ public abstract class AbstractCasavaDesignTextReader implements
 
   }
 
-  private void parseLineVersion2(List<String> fields) throws AozanException {
-
-    final String firstField = fields.get(0).trim();
-    final SampleSheetVersion2 design2 = (SampleSheetVersion2) this.design;
-
-    // First field empty
-    if (firstField.isEmpty())
-      return;
-
-    // If first field start with '[' is an new session
-    if (firstField.startsWith("[") && firstField.endsWith("]")) {
-
-      // Check exist
-      if (!SESSIONS_HEADER.contains(firstField))
-        throw new AozanException(
-            "Parsing sample sheet file, invalid session name " + firstField);
-
-      // Set currentSessionName
-      this.currentSessionName = firstField;
-
-    } else {
-
-      if (this.currentSessionName.equals("[Data]")) {
-
-        if (firstData) {
-
-          this.firstData = false;
-          this.fieldsCountExpected = fields.size();
-          this.posFields = extractFieldNames(fields);
-
-        } else {
-          assert (fields.size() == this.fieldsCountExpected);
-
-          final SampleEntry sample = new SampleEntryVersion2();
-          int i = 0;
-
-          String key = FIELDNAMES_VERSION2.get(i++);
-          String value = fields.get(this.posFields.get(key));
-          sample.setLane(parseLane(value));
-
-          key = FIELDNAMES_VERSION2.get(i++);
-          value = fields.get(this.posFields.get(key));
-          sample.setSampleId(value);
-
-          key = FIELDNAMES_VERSION2.get(i++);
-          value = fields.get(this.posFields.get(key));
-          sample.setSampleRef(value);
-
-          key = FIELDNAMES_VERSION2.get(i++);
-          value = fields.get(this.posFields.get(key));
-          sample.setIndex(value);
-
-          key = FIELDNAMES_VERSION2.get(i++);
-          value = fields.get(this.posFields.get(key));
-          sample.setDescription(value);
-
-          key = FIELDNAMES_VERSION2.get(i++);
-          value = fields.get(this.posFields.get(key));
-          sample.setSampleProject(value);
-
-          // Add new sample
-          this.design.addSample(sample);
-        }
-
-      } else {
-        design2.addSessionEntry(fields, this.currentSessionName);
-      }
-    }
-
-  }
-
-  private Map<String, Integer> extractFieldNames(List<String> fields)
-      throws AozanException {
-
-    final Map<String, Integer> pos = new HashMap<>(fields.size());
-
-    // Check all required field exists
-    for (String name : FIELDNAMES_VERSION2) {
-      if (!fields.contains(name)) {
-        throw new AozanException(
-            "Parsing Sample sheet file: missing required field for version2 "
-                + name);
-      }
-    }
-
-    // Locate fields
-    for (int i = 0; i < fields.size(); i++) {
-      pos.put(fields.get(i), i);
-    }
-
-    return pos;
-  }
-
-  private static final int parseLane(final String s) throws AozanException {
+  protected static final int parseLane(final String s) throws AozanException {
 
     if (s == null) {
       return 0;
@@ -299,9 +150,30 @@ public abstract class AbstractCasavaDesignTextReader implements
     return result;
   }
 
+  //
+  // Getters & setters
+  //
+
   protected SampleSheet getDesign() {
 
     return (SampleSheet) this.design;
+  }
+
+  protected boolean isCompatibleForQCReport() {
+    return this.isCompatibleForQCReport;
+  }
+
+  protected RunData getData() {
+
+    return data;
+  }
+
+  public void setCompatibleForQCReport(boolean isCompatibleForQCReport) {
+    this.isCompatibleForQCReport = isCompatibleForQCReport;
+  }
+
+  public void setData(RunData data) {
+    this.data = data;
   }
 
 }

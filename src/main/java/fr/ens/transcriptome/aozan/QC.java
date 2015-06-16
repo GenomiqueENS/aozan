@@ -572,7 +572,7 @@ public class QC {
         DemultiplexingCollector.findBcl2fastqVersion(this.bcl2fastqVersion));
 
     // Init manager qc path
-    ManagerQCPath.getInstance(casavaDesignFile, bcl2fastqVersion);
+    ManagerQCPath.getInstance(this.globalConf);
   }
 
   /**
@@ -741,7 +741,12 @@ public class QC {
     this.fastqDir = fastqDir;
     this.qcDir = qcDir;
     this.runId = runId;
-    this.bcl2fastqVersion = bcl2fastqVersion;
+    this.bcl2fastqVersion =
+        (bcl2fastqVersion == "latest"
+            ? DemultiplexingCollector.VERSION_2
+            : (bcl2fastqVersion.charAt(0) == '1'
+                ? DemultiplexingCollector.VERSION_1
+                : DemultiplexingCollector.VERSION_2));
 
     this.tmpDir =
         tmpDir == null

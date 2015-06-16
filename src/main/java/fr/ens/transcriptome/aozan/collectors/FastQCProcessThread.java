@@ -226,7 +226,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
     // Set the name of the prefix of the report file
     final String filename =
-        getFastqSample().getKeyFastqSample() + "-fastqc.html";
+        getFastqSample().getPrefixReport() + "-fastqc.html";
 
     final File reportFile = new File(this.reportDir, filename);
 
@@ -239,7 +239,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
     }
 
     LOGGER.fine("FASTQC : "
-        + getFastqSample().getKeyFastqSample() + " creation qc report html");
+        + getFastqSample().getPrefixReport() + " creation qc report html");
 
     // Keep only the uncompressed data
     if (reportFile.exists()) {

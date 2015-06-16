@@ -23,9 +23,12 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
+import static fr.ens.transcriptome.aozan.util.StringUtils.COMMA_SPLITTER;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,13 +37,14 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.eoulsan.illumina.CasavaDesign;
-import fr.ens.transcriptome.eoulsan.illumina.CasavaSample;
-import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignCSVReader;
+import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
+import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 
 /**
  * This class define a Casava design Collector.
@@ -52,7 +56,15 @@ public class DesignCollector implements Collector {
   /** The collector name. */
   public static final String COLLECTOR_NAME = "design";
 
+  public static final List<String> FASTQ_COLLECTOR_NAMES = Arrays.asList(
+      "tmppartialfastq", "undeterminedindexes", "fastqc", "globalstats",
+      "fastqscreen", "projectstats");
+
   private File casavaDesignFile;
+
+  private String bcl2fastqVersion;
+
+  private boolean callAtLeastOneFastqCollector;
 
   @Override
   public String getName() {
@@ -63,7 +75,7 @@ public class DesignCollector implements Collector {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return null;
+    return Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME);
   }
 
   @Override
@@ -75,6 +87,26 @@ public class DesignCollector implements Collector {
 
     this.casavaDesignFile =
         new File(properties.getProperty(QC.CASAVA_DESIGN_PATH));
+    this.bcl2fastqVersion = properties.getProperty(QC.BCL2FASTQ_VERSION);
+
+    this.callAtLeastOneFastqCollector =
+        checkCallFastqCollector(properties.getProperty(QC.QC_COLLECTOR_NAMES));
+
+    // TODO
+    System.out.println("call fastq Collector "
+        + this.callAtLeastOneFastqCollector);
+  }
+
+  private boolean checkCallFastqCollector(final String collectorsNames) {
+
+    // Split names
+    for (String name : COMMA_SPLITTER.splitToList(collectorsNames)) {
+
+      if (FASTQ_COLLECTOR_NAMES.contains(name))
+        return true;
+    }
+
+    return false;
   }
 
   @Override
@@ -89,23 +121,32 @@ public class DesignCollector implements Collector {
       final Set<String> projectsName = new TreeSet<>();
 
       // Read Casava design
-      final CasavaDesign design =
-          new CasavaDesignCSVReader(this.casavaDesignFile).read();
+      final SampleSheet design = createSampleSheet(data);
 
-      for (final CasavaSample s : design) {
+      for (final SampleEntry s : design) {
 
         final String prefix =
             "design.lane" + s.getLane() + "." + s.getSampleId();
 
-        data.put(prefix + ".flow.cell.id", s.getFlowCellId());
         data.put(prefix + ".sample.ref", s.getSampleRef());
         data.put(prefix + ".indexed", s.isIndex());
         data.put(prefix + ".index", s.getIndex());
         data.put(prefix + ".description", s.getDescription());
-        data.put(prefix + ".control", s.isControl());
-        data.put(prefix + ".recipe", s.getRecipe());
-        data.put(prefix + ".operator", s.getOperator());
         data.put(prefix + ".sample.project", s.getSampleProject());
+
+        // Extract data exist only with first version
+        if (this.bcl2fastqVersion.equals(DemultiplexingCollector.VERSION_1)) {
+
+          data.put(prefix + ".flow.cell.id", s.getFlowCellId());
+          data.put(prefix + ".control", s.isControl());
+          data.put(prefix + ".recipe", s.getRecipe());
+          data.put(prefix + ".operator", s.getOperator());
+
+        } else if (this.bcl2fastqVersion
+            .equals(DemultiplexingCollector.VERSION_2)) {
+          // TODO add extract columns, retrieve map with key-value
+
+        }
 
         final List<String> samplesInLane;
         if (!samples.containsKey(s.getLane())) {
@@ -133,9 +174,24 @@ public class DesignCollector implements Collector {
       // Add all projects name in data
       data.put("design.projects.names", Joiner.on(",").join(projectsName));
 
+      // TODO
+      System.out.println("save run data after design collector.");
+      data.createRunDataFile("/tmp/rundata.txt");
+
     } catch (final IOException e) {
       throw new AozanException(e);
     }
+  }
+
+  private SampleSheet createSampleSheet(final RunData data) throws IOException,
+      AozanException {
+
+    if (this.callAtLeastOneFastqCollector)
+      return new CasavaDesignCSVReader(this.casavaDesignFile).readForQCReport(
+          data, this.bcl2fastqVersion);
+
+    return new CasavaDesignCSVReader(this.casavaDesignFile)
+        .read(this.bcl2fastqVersion);
   }
 
   @Override

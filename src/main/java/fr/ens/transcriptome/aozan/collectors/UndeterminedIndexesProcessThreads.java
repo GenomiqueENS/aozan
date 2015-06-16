@@ -855,7 +855,7 @@ public class UndeterminedIndexesProcessThreads extends
   private File createLaneResultFile(final String extension) throws IOException {
 
     final File reportFile =
-        new File(this.reportDir, getFastqSample().getKeyFastqSample()
+        new File(this.reportDir, getFastqSample().getPrefixReport()
             + "-potentialindices" + extension);
 
     // Create parent directory if necessary

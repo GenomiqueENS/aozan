@@ -1,5 +1,4 @@
 fr.ens.transcriptome.aozan.collectors.DesignCollector
-fr.ens.transcriptome.aozan.collectors.FlowcellDemuxSummaryCollector
 fr.ens.transcriptome.aozan.collectors.PhasingCollector
 fr.ens.transcriptome.aozan.collectors.ReadCollector
 fr.ens.transcriptome.aozan.collectors.RunInfoCollector
@@ -9,3 +8,5 @@ fr.ens.transcriptome.aozan.collectors.TemporaryPartialFastqCollector
 fr.ens.transcriptome.aozan.collectors.UndeterminedIndexesCollector
 fr.ens.transcriptome.aozan.collectors.GlobalStatsCollector
 fr.ens.transcriptome.aozan.collectors.ProjectStatsCollector
+fr.ens.transcriptome.aozan.collectors.AozanCollector
+fr.ens.transcriptome.aozan.collectors.DemultiplexingCollector

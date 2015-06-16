@@ -23,18 +23,19 @@
 
 package fr.ens.transcriptome.aozan.illumina.io;
 
+import static fr.ens.transcriptome.eoulsan.Globals.DEFAULT_CHARSET;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
-import fr.ens.transcriptome.eoulsan.Globals;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
 /**
@@ -44,11 +45,16 @@ import fr.ens.transcriptome.eoulsan.util.FileUtils;
  */
 public class CasavaDesignCSVReader extends AbstractCasavaDesignTextReader {
 
-  /* Default Charset. */
-  private static final Charset CHARSET = Charset
-      .forName(Globals.DEFAULT_FILE_ENCODING);
-
   private final BufferedReader reader;
+
+  public SampleSheet readForQCReport(final RunData data, String version)
+      throws IOException, AozanException {
+
+    setCompatibleForQCReport(true);
+    setData(data);
+    
+    return read(version);
+  }
 
   @Override
   public SampleSheet read(final String version) throws IOException,
@@ -67,6 +73,7 @@ public class CasavaDesignCSVReader extends AbstractCasavaDesignTextReader {
 
         // Parse the line
         parseLine(SampleSheetUtils.parseCSVDesignLine(line), version);
+
       } catch (AozanException e) {
 
         // If an error occurs while parsing add the line to the exception
@@ -94,7 +101,8 @@ public class CasavaDesignCSVReader extends AbstractCasavaDesignTextReader {
       throw new NullPointerException("InputStream is null");
     }
 
-    this.reader = new BufferedReader(new InputStreamReader(is, CHARSET));
+    this.reader =
+        new BufferedReader(new InputStreamReader(is, DEFAULT_CHARSET));
   }
 
   /**

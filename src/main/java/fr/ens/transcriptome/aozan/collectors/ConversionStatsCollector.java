@@ -133,6 +133,8 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
   private void parse(final Document document, final RunData data)
       throws AozanException {
 
+    final int readIndexedCount = countReadIndexed(data);
+
     String projectName;
     String sampleName;
     String barcodeSeq;
@@ -153,8 +155,8 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
             // Create Tile stats for new group tiles related tuple
             // sample/barecode/lane
             final GroupTilesStats stats =
-                new GroupTilesStats(projectName, sampleName, laneNumber);
-            // demuxData.add(stats);
+                new GroupTilesStats(projectName, sampleName, laneNumber,
+                    readIndexedCount);
 
             // Add tiles data
             stats.addTilesStats(lane, checkBarcodeSeq(barcodeSeq));
@@ -165,6 +167,17 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
         }
       }
     }
+  }
+
+  private int countReadIndexed(RunData data) {
+
+    int count = 0;
+    for (int read = 1; read <= data.getReadCount(); read++) {
+
+      if (!data.isReadIndexed(read))
+        count++;
+    }
+    return count;
   }
 
   /**
@@ -305,7 +318,7 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
     public static final String RAW_TYPE = "Raw";
     public static final String PF_TYPE = "Pf";
 
-    private final int readCount = 1;
+    private final int readCount;
 
     private final Integer lane;
     private final String sampleName;
@@ -507,10 +520,11 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
      * @param lane the lane
      */
     public GroupTilesStats(final String projectName, final String sampleName,
-        final int lane) {
+        final int lane, final int readCount) {
       this.lane = lane;
       this.sampleName = sampleName;
       this.projectName = projectName;
+      this.readCount = readCount;
 
       this.readStats = new HashMap<>();
       this.barcodeSeqs = new ArrayList<>();

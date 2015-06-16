@@ -23,7 +23,11 @@
 
 package fr.ens.transcriptome.aozan.illumina.samplesheet;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingStandardFile;
+
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,10 +39,15 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.illumina.io.AbstractCasavaDesignTextReader;
+import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
 import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
+import fr.ens.transcriptome.aozan.io.CasavaDesignXLSReader;
+import fr.ens.transcriptome.eoulsan.util.FileUtils;
+import fr.ens.transcriptome.eoulsan.util.StringUtils;
 
 /**
  * This abstract class contains common utility methods for sample sheet.
@@ -52,6 +61,38 @@ public class SampleSheetUtils {
   public static final String VERSION_2 = "version2";
 
   public static final String SEP = ",";
+
+  public static SampleSheet getSampleSheet(final File sampleSheetFile,
+      String sampleSheetVersion) throws FileNotFoundException, IOException,
+      AozanException {
+
+    checkNotNull(sampleSheetVersion, "sample sheet version");
+    checkExistingStandardFile(sampleSheetFile, "sample sheet");
+
+    final String extension = StringUtils.extension(sampleSheetFile.getName());
+
+    switch (extension) {
+    case ".csv":
+      return new CasavaDesignCSVReader(sampleSheetFile)
+          .read(sampleSheetVersion);
+    case ".xls":
+      return new CasavaDesignXLSReader(sampleSheetFile)
+          .read(sampleSheetVersion);
+    default:
+      throw new AozanException(
+          "Sample sheet: create instance from file fail, extension ("
+              + extension + ") invalid " + sampleSheetFile);
+    }
+
+  }
+
+  public static SampleSheet getSampleSheet(final String sampleSheetFilename,
+      String sampleSheetVersion) throws FileNotFoundException, IOException,
+      AozanException {
+
+    return getSampleSheet(new File(sampleSheetFilename), sampleSheetVersion);
+
+  }
 
   /**
    * Check a Casava design object.
@@ -470,16 +511,6 @@ public class SampleSheetUtils {
   //
   // Parsing methods
   //
-
-  public static final String findSampleSheetVersion(final File sampleSheetFile) {
-
-    return VERSION_1;
-  }
-
-  public static String findSampleSheetVersion(List<String> fields) {
-    // TODO Auto-generated method stub
-    return null;
-  }
 
   /**
    * Convert a Casava design to CSV.

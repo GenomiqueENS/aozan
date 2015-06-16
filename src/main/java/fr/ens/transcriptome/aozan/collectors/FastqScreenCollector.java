@@ -32,6 +32,7 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreen;
@@ -190,6 +191,10 @@ public class FastqScreenCollector extends AbstractFastqCollector {
         data.get("design.lane"
             + fastqSample.getLane() + "." + fastqSample.getSampleName()
             + ".sample.ref");
+
+    Common.getLogger().info(
+        "FQS-extract genomeRef for sample "
+            + fastqSample.getSampleName() + " find name " + genomeSample);
 
     // Get corresponding valid genome name for mapping
     final String genomeReferenceSample =

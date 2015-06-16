@@ -46,14 +46,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
+import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.eoulsan.EoulsanRuntimeException;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.eoulsan.bio.ReadSequence;
 import fr.ens.transcriptome.eoulsan.bio.io.FastqReader;
 import fr.ens.transcriptome.eoulsan.bio.io.FastqWriter;
-import fr.ens.transcriptome.eoulsan.illumina.CasavaDesign;
-import fr.ens.transcriptome.eoulsan.illumina.CasavaSample;
-import fr.ens.transcriptome.eoulsan.illumina.io.CasavaDesignCSVReader;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
 
 /**
@@ -66,20 +66,22 @@ public class ReDemux {
 
   private final File inputDir;
   private final File outputDir;
-  private final CasavaDesign design;
+  private final SampleSheet design;
   private final Map<Integer, ReDemuxLane> lanesToRedemux = Maps.newHashMap();
+
+  private String bcl2fastqVersion;
 
   /**
    * Redemux a lane.
    */
   private static class ReDemuxLane {
 
-    private final CasavaDesign design;
+    private final SampleSheet design;
     private final int lane;
     private final List<Integer> reads;
     private final File inputDir;
     private final File outputDir;
-    private final Map<Pattern, CasavaSample> newIndexes = Maps.newHashMap();
+    private final Map<Pattern, SampleEntry> newIndexes = Maps.newHashMap();
 
     /**
      * Add an index for the re-demultiplexing.
@@ -135,9 +137,9 @@ public class ReDemux {
       Preconditions.checkNotNull(index, "Index argument cannot be null");
 
       final Pattern pattern = Pattern.compile(index);
-      CasavaSample sample = null;
+      SampleEntry sample = null;
 
-      for (CasavaSample s : design.getSampleInLane(this.lane)) {
+      for (SampleEntry s : design.getSampleInLane(this.lane)) {
 
         if (pattern.matcher(s.getIndex()).matches()) {
 
@@ -167,11 +169,11 @@ public class ReDemux {
 
       Preconditions.checkNotNull(index, "Index argument cannot be null");
 
-      CasavaSample sample = null;
+      SampleEntry sample = null;
       int bestScore = Integer.MAX_VALUE;
       int bestCoreCount = 0;
 
-      for (CasavaSample s : design.getSampleInLane(this.lane)) {
+      for (SampleEntry s : design.getSampleInLane(this.lane)) {
 
         final String sampleIndex = s.getIndex();
 
@@ -350,7 +352,7 @@ public class ReDemux {
 
       final Map<Pattern, FastqWriter> result = Maps.newHashMap();
 
-      for (Map.Entry<Pattern, CasavaSample> e : this.newIndexes.entrySet()) {
+      for (Map.Entry<Pattern, SampleEntry> e : this.newIndexes.entrySet()) {
 
         final String sampleProject = e.getValue().getSampleProject();
         final String sampleName = e.getValue().getSampleId();
@@ -390,7 +392,7 @@ public class ReDemux {
 
       final Map<String, Entity> result = new HashMap<>();
 
-      for (Map.Entry<Pattern, CasavaSample> e : this.newIndexes.entrySet()) {
+      for (Map.Entry<Pattern, SampleEntry> e : this.newIndexes.entrySet()) {
 
         final String sampleProject = e.getValue().getSampleProject();
         final String sampleName = e.getValue().getSampleId();
@@ -436,7 +438,7 @@ public class ReDemux {
 
       private FastqWriter fw;
       private List<Pattern> patterns;
-      private CasavaSample cs;
+      private SampleEntry cs;
 
       void addPattern(final Pattern p) {
 
@@ -454,11 +456,11 @@ public class ReDemux {
         return patterns;
       }
 
-      public CasavaSample getCs() {
+      public SampleEntry getCs() {
         return cs;
       }
 
-      Entity(final FastqWriter fw, final CasavaSample cs) {
+      Entity(final FastqWriter fw, final SampleEntry cs) {
         this.fw = fw;
         this.patterns = new ArrayList<>();
         this.cs = cs;
@@ -530,7 +532,7 @@ public class ReDemux {
      * @param inputDir input directory
      * @param outputDir output directory
      */
-    public ReDemuxLane(final CasavaDesign design, final int lane,
+    public ReDemuxLane(final SampleSheet design, final int lane,
         final File inputDir, final File outputDir) {
 
       this.design = design;
@@ -614,7 +616,7 @@ public class ReDemux {
    * @param design Casava design object
    * @param outputDir output directory
    */
-  public ReDemux(final File baseDir, final CasavaDesign design,
+  public ReDemux(final File baseDir, final SampleSheet design,
       final File outputDir) {
 
     Preconditions.checkNotNull(design, "design argument cannot be null");
@@ -629,16 +631,17 @@ public class ReDemux {
   //
 
   public static void redemultiplex(final File designFile,
-      final List<String> lanesAndIndex, final File outputDir)
-      throws FileNotFoundException, IOException, AozanException,
-      BadBioEntryException {
+      final String bcl2fastqVersion, final List<String> lanesAndIndex,
+      final File outputDir) throws FileNotFoundException, IOException,
+      AozanException, BadBioEntryException {
 
     Preconditions.checkNotNull(designFile, "design file cannot be null");
     Preconditions.checkNotNull(lanesAndIndex, "laneAndIndex cannot be null");
     Preconditions.checkNotNull(outputDir, "output directory cannot be null");
 
     // Load design
-    final CasavaDesign design = new CasavaDesignCSVReader(designFile).read();
+    final SampleSheet design =
+        new CasavaDesignCSVReader(designFile).read(bcl2fastqVersion);
 
     // Create ReDemux object
     ReDemux rd = new ReDemux(designFile.getParentFile(), design, outputDir);
@@ -675,8 +678,8 @@ public class ReDemux {
       System.exit(1);
     }
 
-    redemultiplex(new File(list.get(0)), list.subList(1, list.size()),
-        new File(System.getProperty("user.dir")));
+    redemultiplex(new File(list.get(0)), list.get(1),
+        list.subList(1, list.size()), new File(System.getProperty("user.dir")));
   }
 
 }
