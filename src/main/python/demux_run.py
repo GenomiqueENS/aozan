@@ -288,9 +288,12 @@ def get_bcl2fastq_version(run_id, conf):
 
     version = conf[Settings.HISEQ_BCL2FASTQ_VERSION_KEY] if common.is_sequencer_hiseq(run_id, conf) else conf[Settings.NEXTSEQ_BCL2FASTQ_VERSION_KEY]
     
-    if version != BCL2FASTQ_VERSION_HISEQ and version != BCL2FASTQ_VERSION_NEXTSEQ:
+    print "bcl2fastq from conf file is "+ str(version)
+    
+    if not (version == BCL2FASTQ_VERSION_HISEQ or version == BCL2FASTQ_VERSION_NEXTSEQ):
         raise Exception('Unvalid bcl2fastq version set ' + str(version) + ". Except: " + BCL2FASTQ_VERSION_HISEQ or BCL2FASTQ_VERSION_NEXTSEQ)
-    return 
+    
+    return version 
 
 def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, tmp_path, conf):
         
