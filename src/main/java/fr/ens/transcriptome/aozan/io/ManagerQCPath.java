@@ -264,7 +264,7 @@ public class ManagerQCPath {
   public String buildPrefixReport(final FastqSample fastqSample, final int read) {
 
     if (fastqSample.isIndeterminedIndices()) {
-      return String.format("lane%s_Undetermined_%s", fastqSample.getLane(),
+      return String.format("lane%s_Undetermined%s", fastqSample.getLane(),
           getConstantFastqSuffix(fastqSample.getLane(), read));
     }
 
