@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.python.google.common.base.Preconditions;
+
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
@@ -52,7 +54,7 @@ public class CasavaDesignCSVReader extends AbstractCasavaDesignTextReader {
 
     setCompatibleForQCReport(true);
     setData(data);
-    
+
     return read(version);
   }
 
@@ -87,6 +89,30 @@ public class CasavaDesignCSVReader extends AbstractCasavaDesignTextReader {
     return getDesign();
   }
 
+  /**
+   * Inits the reader and check file is valid.
+   * @param file the file
+   * @return the buffered reader
+   * @throws FileNotFoundException if file not exist or is empty
+   */
+  private BufferedReader initReader(final File file)
+      throws FileNotFoundException {
+
+    Preconditions.checkNotNull(file, "sample sheet");
+
+    if (!file.isFile()) {
+      throw new FileNotFoundException("File not found: "
+          + file.getAbsolutePath());
+    }
+
+    if (file.length() == 0) {
+      throw new FileNotFoundException("File is empty: "
+          + file.getAbsolutePath());
+    }
+
+    return FileUtils.createBufferedReader(file);
+  }
+
   //
   // Constructors
   //
@@ -111,16 +137,7 @@ public class CasavaDesignCSVReader extends AbstractCasavaDesignTextReader {
    */
   public CasavaDesignCSVReader(final File file) throws FileNotFoundException {
 
-    if (file == null) {
-      throw new NullPointerException("File is null");
-    }
-
-    if (!file.isFile()) {
-      throw new FileNotFoundException("File not found: "
-          + file.getAbsolutePath());
-    }
-
-    this.reader = FileUtils.createBufferedReader(file);
+    this.reader = initReader(file);
   }
 
   /**
@@ -134,14 +151,7 @@ public class CasavaDesignCSVReader extends AbstractCasavaDesignTextReader {
       throw new NullPointerException("Filename is null");
     }
 
-    final File file = new File(filename);
-
-    if (!file.isFile()) {
-      throw new FileNotFoundException("File not found: "
-          + file.getAbsolutePath());
-    }
-
-    this.reader = FileUtils.createBufferedReader(file);
+    this.reader = initReader(new File(filename));
   }
 
 }
