@@ -24,7 +24,6 @@
 package fr.ens.transcriptome.aozan.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static fr.ens.transcriptome.eoulsan.LocalEoulsanRuntime.initEoulsanRuntimeForExternalApp;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,8 +42,6 @@ import com.spotify.docker.client.messages.ContainerInfo;
 import com.spotify.docker.client.messages.HostConfig;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.eoulsan.EoulsanException;
-import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
 import fr.ens.transcriptome.eoulsan.util.ProcessUtils;
 
 public class DockerUtils {
@@ -505,7 +502,12 @@ public class DockerUtils {
     final String image = "genomicpariscentre/bcl2fastq2";
     // Pull image
     System.out.println(" * Pull image");
-    docker.pull(image);
+
+    try {
+      docker.pull(image);
+    } catch (DockerException de) {
+      de.printStackTrace();
+    }
 
     // Create container
     System.out.println(" * Create config");
@@ -519,8 +521,11 @@ public class DockerUtils {
     // .cmd("sh", "-c", "touch /root/lolotiti").user("2715:100").build();
 
     final HostConfig hostConfig =
-        HostConfig.builder()
-            .binds("/import/mimir03/sequencages/nextseq_500/tmp:/root").build();
+        HostConfig
+            .builder()
+            .binds(
+                "/import/rhodos01/shares-net/sequencages/nextseq_500/tmp:/root")
+            .build();
 
     System.out.println(" * Create container");
     final ContainerCreation creation = docker.createContainer(config);
@@ -530,7 +535,6 @@ public class DockerUtils {
     // Inspect container
     System.out.println(" * Inspect container");
     final ContainerInfo info = docker.inspectContainer(id);
-    System.out.println("info: " + info);
 
     // Start container
     System.out.println(" * Start container");
@@ -547,37 +551,6 @@ public class DockerUtils {
     // Close connection
     docker.close();
 
-    /**
-     * Message output * Create connection SLF4J: Failed to load class
-     * "org.slf4j.impl.StaticLoggerBinder". SLF4J: Defaulting to no-operation
-     * (NOP) logger implementation SLF4J: See
-     * http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
-     * Pull image Create config Create container id:
-     * 7d270292eeeacaa49197e330fec49614ce6b77b95ec0b39e45231245e4e5b95f Inspect
-     * container info: ContainerInfo{id=7d
-     * 270292eeeacaa49197e330fec49614ce6b77b95ec0b39e45231245e4e5b95f,
-     * created=Wed Apr 08 13:55:29 CEST 2015, path=sh, args=[-c, touch
-     * /root/lolotiti], config=ContainerConfig{hostname=7d270292eeea,
-     * domainname=, user=2715:100, memory=0, memorySwap=0, cpuShares=0, cpuset=,
-     * attachStdin=false, attachStdout=false, attachStderr=false,
-     * portSpecs=null, exposedPorts=null, tty=false, openStdin=false,
-     * stdinOnce=false,
-     * env=[PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin],
-     * cmd=[sh, -c, touch /root/lolotiti], image=busybox, volumes=null,
-     * workingDir=, entrypoint=null, networkDisabled=false, onBuild=null},
-     * hostConfig=HostConfig{binds=null, containerIDFile=, lxcConf=null,
-     * privileged=false, portBindings=null, links=null, publishAllPorts=false,
-     * dns=null, dnsSearch=null, volumesFrom=null, networkMode=},
-     * state=ContainerState{running=false, pid=0, exitCode=0, startedAt=Sat Jan
-     * 01 01:00:00 CET 1, finishedAt=Sat Jan 01 01:00:00 CET 1},
-     * image=4986bf8c15363d1c5d15512d5266f8777bfba4974ac56e3270e7760f6f0a8125,
-     * networkSettings=NetworkSettings{ipAddress=, ipPrefixLen=0, gateway=,
-     * bridge=, portMapping=null, ports=null}, resolvConfPath=, hostnamePath=,
-     * hostsPath=, name=/silly_bohr, driver=aufs, execDriver=native-0.2,
-     * processLabel=, mountLabel=, volumes=null, volumesRW=null} Start container
-     * Wait end of container container ContainerExit{statusCode=0} Remove
-     * container
-     */
   }
 
 }
