@@ -577,7 +577,7 @@ def get_runparameters_path(run_id, conf):
 
     sequencer_dir_path = hiseq_run.find_hiseq_run_path(run_id, conf)
     
-    if sequencer_dir_path == None:
+    if sequencer_dir_path == False:
         return None
     
     # Find file at the root of directory sequencer data
@@ -883,6 +883,9 @@ def is_RTA_1_version(run_id, conf):
     
     rta_version = extract_rtaversion(run_id, conf)
     
+    if rta_version is None:
+        return None
+    
     return rta_version.startswith("1.")
     
 def is_RTA_2_version(run_id, conf):
@@ -897,6 +900,9 @@ def is_RTA_2_version(run_id, conf):
     
     rta_version = extract_rtaversion(run_id, conf)
     
+    if rta_version is None:
+        return None
+            
     return rta_version.startswith("2.")
 
         
