@@ -23,6 +23,7 @@
 
 package fr.ens.transcriptome.aozan.illumina.io;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.transcriptome.eoulsan.Globals.DEFAULT_CHARSET;
 
 import java.io.BufferedReader;
@@ -31,8 +32,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
-import org.python.google.common.base.Preconditions;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
@@ -98,7 +97,7 @@ public class CasavaDesignCSVReader extends AbstractCasavaDesignTextReader {
   private BufferedReader initReader(final File file)
       throws FileNotFoundException {
 
-    Preconditions.checkNotNull(file, "sample sheet");
+    checkNotNull(file, "sample sheet");
 
     if (!file.isFile()) {
       throw new FileNotFoundException("File not found: "
