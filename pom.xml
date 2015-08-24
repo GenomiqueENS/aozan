@@ -243,7 +243,7 @@
 	<dependency>
 		<groupId>de.gesellix</groupId>
 		<artifactId>unix-socket-factory</artifactId>
-		<version>2014-09-26T18-52-33</version>
+		<version>2015-01-27T15-02-14</version>
 		<scope>runtime</scope>
 	</dependency>
 
