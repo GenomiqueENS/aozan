@@ -45,7 +45,7 @@ doctype-system="about:legacy-compat"/>
       background: #55D486;
     }
 
-   .sampleData tr:hover, .data tr:hover, .projectData, .sampleStatsData tr:hover{
+   .sampleData tr:hover, .data tr:hover, .projectData tr:hover, .sampleStatsData tr:hover{
       z-index:2;
       box-shadow:0 0 20px rgba(0, 0, 0, 1);
       background:#F6F6B4;
@@ -235,7 +235,7 @@ doctype-system="about:legacy-compat"/>
 		color:#000000;
 	}
 
-	#filterProject td{
+	#tableFilter td{
 		border:#ffffff;
 		border-style:hidden;
 	}
@@ -246,11 +246,20 @@ doctype-system="about:legacy-compat"/>
 
 			
         // Retrieve list lane number related to projet
-        function filterRow(lanes_related_project, project_name, elemLink) {
+        function filterRow(lanes_related_project, typeFilter, name, elemLink) {
 
+
+			if (typeFilter == 'project'){
+				filterProject(lanes_related_project, name, elemLink);
+			} else {
+				filterSample(lanes_related_project, name, elemLink);
+			}
+		}
+	
+		function filterProject(lanes_related_project, project_name, elemLink) {
+		
             init_all('none');
-
-            //Split
+	        //Split
             var lanes = lanes_related_project[0].split(',');
 
             if (project_name == "Undetermined"){
@@ -288,7 +297,12 @@ doctype-system="about:legacy-compat"/>
 
             update_link_css(elemLink)
         }
-					   
+	
+		function filterSample(lanes_related_project, sample_name, elemLink) {
+					
+           // init_all('none');
+		}						   
+
 		function update_link_css(elemLink){
 			// Change class link
 	       // Inactivate link
@@ -409,18 +423,18 @@ doctype-system="about:legacy-compat"/>
   </xsl:if>
   
   <a id="project"></a>
-  <xsl:if test="/QCReport[ProjectsFilter]">
+  <xsl:if test="/QCReport[TableFilter]">
 	  <div>
-	  <h4>Filter samples by projects</h4>
-	  <table id="filterProject">
+	  <h4>Filter samples data tables</h4>
+	  <table id="tableFilter">
 	    <tr>
 	      <td><a href="javascript:void(0);" class="linkFilterActivate" onclick="window.location.reload(true);">ALL</a></td>
-	      <xsl:for-each select="/QCReport/ProjectsFilter/ProjectName">
+	      <xsl:for-each select="/QCReport/TableFilter/ElementFilter">
 		    <td>
 			  <xsl:element name="a">
 			  <xsl:attribute name="class">linkFilterInactivate</xsl:attribute>
 			  <xsl:attribute name="href">javascript:void(0);</xsl:attribute>
-			  <xsl:attribute name="onclick">javascript:filterRow([<xsl:value-of select="@cmdJS"></xsl:value-of>], '<xsl:value-of select="." />', this);</xsl:attribute>
+			  <xsl:attribute name="onclick">javascript:filterRow([<xsl:value-of select="@cmdJS"></xsl:value-of>], '<xsl:value-of select="@typeFilter"></xsl:value-of>', '<xsl:value-of select="." />', this);</xsl:attribute>
 				<xsl:value-of select="." /></xsl:element>
 			</td>
 	      </xsl:for-each>
@@ -461,7 +475,7 @@ doctype-system="about:legacy-compat"/>
   <xsl:if test="/QCReport[SamplesStatsReport]">
   <h2>Samples statistics report</h2>
 	<div>
-   <table class="sampleStatsData">
+   <table class="projectData">
   <tr class="headerColumns">
 	<th>Samples</th>
     <xsl:for-each select="/QCReport/SamplesStatsReport/Columns/Column">
