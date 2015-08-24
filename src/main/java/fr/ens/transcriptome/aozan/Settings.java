@@ -97,9 +97,9 @@ public final class Settings {
   /** Set available use container docker. */
   public static final String DEMUX_USE_DOCKER_ENABLE_KEY = "demux.use.docker.enable";
   /** Set bcl2fastq version for HiSeq sequencer. */
-  public static final String HISEQ_BCL2FASTQ_VERSION_KEY = "hiseq.bcl2fastq.version";
+  public static final String BCL2FASTQ_VERSION_FOR_HISEQ_KEY = "bcl2fastq.version.for.hiseq";
   /** Set bcl2fastq version for NextSeq sequencer. */
-  public static final String NEXTSEQ_BCL2FASTQ_VERSION_KEY = "nextseq.bcl2fastq.version";
+  public static final String BCL2FASTQ_VERSION_FOR_NEXTSEQ_KEY = "bcl2fastq.version.for.nextseq";
 
   /** Demultiplex space factor. */
   public static final String DEMUX_SPACE_FACTOR_KEY = "demux.space.factor";
