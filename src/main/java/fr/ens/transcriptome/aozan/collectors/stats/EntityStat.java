@@ -129,29 +129,30 @@ public class EntityStat implements Comparable<EntityStat> {
     }
 
     final RunData data = new RunData();
+    final String prefix = getPrefixRunData();
+
     StatisticsUtils stats = null;
 
-    data.put(getPrefixRunData() + ".lanes", Joiner.on(",").join(this.lanes));
-    data.put(getPrefixRunData() + ".genomes.ref",
-        Joiner.on(",").join(getGenomes()));
-    data.put(getPrefixRunData() + ".samples.count", samples.size());
-    data.put(getPrefixRunData() + ".isindexed", isIndexed);
+    data.put(prefix + ".lanes", Joiner.on(",").join(this.lanes));
+    data.put(prefix + ".genomes.ref", Joiner.on(",").join(getGenomes()));
+    data.put(prefix + ".samples.count", samples.size());
+    data.put(prefix + ".isindexed", isIndexed);
 
     // Compile data on raw cluster
     stats = new StatisticsUtils(this.rawClusterSamples);
 
-    data.put(getPrefixRunData() + ".raw.cluster.sum", stats.getSumToInteger());
-    data.put(getPrefixRunData() + ".raw.cluster.min", stats.getMin().intValue());
-    data.put(getPrefixRunData() + ".raw.cluster.max", stats.getMax().intValue());
+    data.put(prefix + ".raw.cluster.sum", stats.getSumToInteger());
+    data.put(prefix + ".raw.cluster.min", stats.getMin().intValue());
+    data.put(prefix + ".raw.cluster.max", stats.getMax().intValue());
 
     // Compile data on raw cluster
     stats = new StatisticsUtils(this.pfClusterSamples);
 
-    data.put(getPrefixRunData() + ".pf.cluster.sum", stats.getSumToInteger());
-    data.put(getPrefixRunData() + ".pf.cluster.min", stats.getMin().intValue());
-    data.put(getPrefixRunData() + ".pf.cluster.max", stats.getMax().intValue());
+    data.put(prefix + ".pf.cluster.sum", stats.getSumToInteger());
+    data.put(prefix + ".pf.cluster.min", stats.getMin().intValue());
+    data.put(prefix + ".pf.cluster.max", stats.getMax().intValue());
 
-    addConditionalRundata(data);
+    addConditionalRundata(data, prefix);
 
     asCompiledData = true;
 
@@ -161,23 +162,21 @@ public class EntityStat implements Comparable<EntityStat> {
   /**
    * Adds the conditional rundata.
    * @param data the data
+   * @param prefix the prefix
    */
-  private void addConditionalRundata(final RunData data) {
+  private void addConditionalRundata(final RunData data, final String prefix) {
 
     // Check collector is selected
     if (this.statisticsCollector.isUndeterminedIndexesCollectorSelected()) {
       // Compile data on recoverable cluster
-      data.put(getPrefixRunData() + ".raw.cluster.recovery.sum",
-          rawClusterRecoverySum);
-      data.put(getPrefixRunData() + ".pf.cluster.recovery.sum",
-          pfClusterRecoverySum);
+      data.put(prefix + ".raw.cluster.recovery.sum", rawClusterRecoverySum);
+      data.put(prefix + ".pf.cluster.recovery.sum", pfClusterRecoverySum);
     }
 
     // Check collector is selected
     if (this.statisticsCollector.isFastqScreenCollectorSelected()) {
       // Compile data on detection contamination
-      data.put(getPrefixRunData()
-          + ".samples.exceeded.contamination.threshold.count",
+      data.put(prefix + ".samples.exceeded.contamination.threshold.count",
           getSamplesWithContaminationCount());
     }
   }
@@ -296,6 +295,10 @@ public class EntityStat implements Comparable<EntityStat> {
    * @return the prefix run data
    */
   private String getPrefixRunData() {
+
+    if (this.statisticsCollector.isSampleStatisticsCollector())
+      return this.statisticsCollector.getCollectorPrefix() + samples.get(0);
+
     return this.statisticsCollector.getCollectorPrefix() + projectName;
   }
 
@@ -363,10 +366,19 @@ public class EntityStat implements Comparable<EntityStat> {
 
   @Override
   public String toString() {
-    return "ProjectStat [data="
-        + data + ", projectName=" + projectName + ", fastqscreenReportSamples="
-        + fastqscreenReportToCompile.size() + ", genomes=" + genomes
-        + ", samples=" + samples + ", projectDir=" + projectDir + "]";
+    return "EntityStat [projectName="
+        + projectName + ", entityName=" + entityName + ", reportDirectory="
+        + reportDirectory + ", fastqscreenReportToCompile="
+        + fastqscreenReportToCompile + ", genomes=" + genomes + ", samples="
+        + samples + ", lanes=" + lanes + ", statisticsCollector="
+        + statisticsCollector + ", rawClusterSamples=" + rawClusterSamples
+        + ", pfClusterSamples=" + pfClusterSamples
+        + ", mappedContaminationPercentSamples="
+        + mappedContaminationPercentSamples + ", sampleCount=" + sampleCount
+        + ", isIndexed=" + isIndexed + ", rawClusterRecoverySum="
+        + rawClusterRecoverySum + ", pfClusterRecoverySum="
+        + pfClusterRecoverySum + ", projectDir=" + projectDir
+        + ", asCompiledData=" + asCompiledData + "]";
   }
 
   //
