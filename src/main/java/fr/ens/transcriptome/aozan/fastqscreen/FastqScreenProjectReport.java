@@ -44,7 +44,7 @@ import com.google.common.base.Joiner;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
-import fr.ens.transcriptome.aozan.collectors.ProjectStatsCollector.ProjectStat;
+import fr.ens.transcriptome.aozan.collectors.stats.EntityStat;
 import fr.ens.transcriptome.aozan.util.XMLUtilsWriter;
 
 /**
@@ -56,7 +56,7 @@ import fr.ens.transcriptome.aozan.util.XMLUtilsWriter;
 public class FastqScreenProjectReport {
 
   /** Project data instance. */
-  private final ProjectStat projectStat;
+  private final EntityStat entitiesStat;
 
   /** Stylesheet xsl file. */
   private final File fastqscreenXSLFile;
@@ -124,7 +124,7 @@ public class FastqScreenProjectReport {
     root.appendChild(project);
 
     // Parsing all sample on project
-    for (File fqsxml : projectStat.getFastqScreenReport()) {
+    for (File fqsxml : entitiesStat.getFastqScreenReport()) {
 
       // Buid document on sample xml file
       final Document srcDoc = buildDom(fqsxml);
@@ -182,8 +182,8 @@ public class FastqScreenProjectReport {
 
     if (doc == null) {
       throw new AozanException("Fail to create document from file "
-          + xmlFile.getAbsolutePath() + " for project "
-          + projectStat.getProjectName());
+          + xmlFile.getAbsolutePath() + " for "
+          + entitiesStat.getName());
     }
 
     doc.getDocumentElement().normalize();
@@ -318,9 +318,9 @@ public class FastqScreenProjectReport {
    * @param project the project
    * @param xslFile the xsl file
    */
-  public FastqScreenProjectReport(final ProjectStat project, final File xslFile) {
+  public FastqScreenProjectReport(final EntityStat project, final File xslFile) {
 
-    this.projectStat = project;
+    this.entitiesStat = project;
     this.fastqscreenXSLFile = xslFile;
 
   }
