@@ -294,7 +294,23 @@ public class RunInfo {
     }
   }
 
-  public int getTilesCount() {
+  /**
+   * Gets the Nextseq tiles count per lane (surfaces × swaths × camera segments
+   * × tiles per swath per segment).
+   * @return the Nextseq tiles count
+   */
+  private int getNextseqTilesCount() {
+    return this.flowCellSurfaceCount
+        * this.flowCellSwathCount * this.flowCellTileCount
+        * this.flowCellSectionPerLane;
+  }
+
+  /**
+   * Gets the Hiseq tiles count per lane (surfaces × swaths × tiles per swath
+   * per segment).
+   * @return the Hiseq tiles count
+   */
+  private int getHiseqTilesCount() {
 
     return this.flowCellSurfaceCount
         * this.flowCellSwathCount * this.flowCellTileCount;
@@ -303,6 +319,20 @@ public class RunInfo {
   //
   // Getters
   //
+
+  /**
+   * Gets the tiles count.
+   * @return the tiles count
+   */
+  public int getTilesCount() {
+
+    if (this.flowCellSectionPerLane == -1)
+      // Case Hiseq compute tile count
+      return getHiseqTilesCount();
+
+    // Case NextSeq compute tile count, add data from camera number
+    return getNextseqTilesCount();
+  }
 
   /**
    * @return Returns the id
