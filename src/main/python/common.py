@@ -50,8 +50,8 @@ from fr.ens.transcriptome.aozan.Settings import TMP_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_SAMPLESHEETS_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_COMPRESSION_KEY
-from fr.ens.transcriptome.aozan.Settings import HISEQ_BCL2FASTQ_VERSION_KEY
-from fr.ens.transcriptome.aozan.Settings import NEXTSEQ_BCL2FASTQ_VERSION_KEY
+from fr.ens.transcriptome.aozan.Settings import BCL2FASTQ_VERSION_FOR_HISEQ_KEY
+from fr.ens.transcriptome.aozan.Settings import BCL2FASTQ_VERSION_FOR_NEXTSEQ_KEY
 from fr.ens.transcriptome.aozan.Settings import DEMUX_USE_DOCKER_ENABLE_KEY
 from fr.ens.transcriptome.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY
@@ -282,9 +282,11 @@ def send_msg(subject, message, is_error, conf):
         server.sendmail(mail_from, dests, composed)
         server.quit()
     else:
-        print '-------------'
-        print composed
-        print '-------------'
+        pass
+        # TODO Actived option print after test step
+        # print '-------------'
+        # print composed
+        # print '-------------'
 
 def send_msg_with_attachment(subject, message, attachment_file, conf):
     """Send a message to the user about the data extraction."""
@@ -359,9 +361,11 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
         server.sendmail(mail_from, dests, composed)
         server.quit()
     else:
-        print '-------------'
-        print composed
-        print '-------------'
+        pass
+        # TODO Actived option print after test step
+        # print '-------------'
+        # print composed
+        # print '-------------'
 
 def create_msg(mail_from, mail_to, mail_cc, mail_bcc, subject, message, conf):
     """Create a message to send.
@@ -480,7 +484,7 @@ def exception_msg(exp, conf):
         if isinstance(exp, AozanException) and exp.getWrappedException() != None:
             exp = exp.getWrappedException()
 
-        return str(exp.getClass().getName()) + ": " + str(exp.getMessage()) + '\n' + str(StringUtils.join(exp.getStackTrace(), '\n\t'))
+        return ' withTrace \n\t' + str(exp.getClass().getName()) + ": " + str(exp.getMessage()) + '\n' + str(StringUtils.join(exp.getStackTrace(), '\n\t'))
     else:
         return str(exp.getMessage())
 
@@ -711,8 +715,11 @@ def check_configuration(conf, configuration_file_path):
             msg += '\n\t* Fastq data directory does not exists: ' + conf[FASTQ_DATA_PATH_KEY]
     
         # Check if casava designs path exists
-        if not is_dir_exists(CASAVA_PATH_KEY, conf):
-            msg += '\n\t* Casava/bcl2fastq path directory does not exists: ' + conf[CASAVA_PATH_KEY]
+        if is_conf_value_equals_true(DEMUX_USE_DOCKER_ENABLE_KEY, conf):
+            pass
+        else:
+            if not is_dir_exists(CASAVA_PATH_KEY, conf):
+                msg += '\n\t* Casava/bcl2fastq path directory does not exists: ' + conf[CASAVA_PATH_KEY]
 
         # Check compression type: three values None, gzip (default) bzip2
         if not is_fastq_compression_format_valid(conf):
@@ -1051,8 +1058,9 @@ def set_default_conf(conf):
 
     # New options since Aozan version 2.0 and managment of NextSeq
     conf[Settings.DEMUX_USE_DOCKER_ENABLE_KEY] = 'false'
-    conf[Settings.HISEQ_BCL2FASTQ_VERSION_KEY] = demux_run.BCL2FASTQ_VERSION_HISEQ
-    conf[Settings.NEXTSEQ_BCL2FASTQ_VERSION_KEY] = demux_run.BCL2FASTQ_VERSION_NEXTSEQ
+    # Set at default value
+    conf[Settings.BCL2FASTQ_VERSION_FOR_HISEQ_KEY] = demux_run.BCL2FASTQ_VERSION_1
+    conf[Settings.BCL2FASTQ_VERSION_FOR_NEXTSEQ_KEY] = demux_run.BCL2FASTQ_VERSION_2
 
     # Data path 
     conf[Settings.TMP_PATH_KEY] = '/tmp'

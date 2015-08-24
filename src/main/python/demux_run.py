@@ -35,8 +35,8 @@ from fr.ens.transcriptome.aozan.Settings import CASAVA_SAMPLESHEET_PREFIX_FILENA
 from fr.ens.transcriptome.aozan.Settings import CASAVA_SAMPLESHEETS_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_THREADS_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_WITH_FAILED_READS_KEY
-from fr.ens.transcriptome.aozan.Settings import HISEQ_BCL2FASTQ_VERSION_KEY
-from fr.ens.transcriptome.aozan.Settings import NEXTSEQ_BCL2FASTQ_VERSION_KEY
+from fr.ens.transcriptome.aozan.Settings import BCL2FASTQ_VERSION_FOR_HISEQ_KEY
+from fr.ens.transcriptome.aozan.Settings import BCL2FASTQ_VERSION_FOR_NEXTSEQ_KEY
 from fr.ens.transcriptome.aozan.Settings import DEMUX_USE_DOCKER_ENABLE_KEY
 from fr.ens.transcriptome.aozan.Settings import INDEX_SEQUENCES_KEY
 from fr.ens.transcriptome.aozan.Settings import FASTQ_DATA_PATH_KEY
@@ -44,8 +44,8 @@ from fr.ens.transcriptome.aozan.Settings import CASAVA_DESIGN_GENERATOR_COMMAND_
 from fr.ens.transcriptome.aozan import Settings
 
 
-BCL2FASTQ_VERSION_HISEQ = "1.8.4"
-BCL2FASTQ_VERSION_NEXTSEQ = "latest"
+BCL2FASTQ_VERSION_1 = "1.8.4"
+BCL2FASTQ_VERSION_2 = "latest"
 
 def load_processed_run_ids(conf):
     """Load the list of the processed run ids.
@@ -286,16 +286,16 @@ def get_bcl2fastq_version(run_id, conf):
         path to report_run_data
     """
 
-    version = conf[Settings.HISEQ_BCL2FASTQ_VERSION_KEY] if common.is_sequencer_hiseq(run_id, conf) else conf[Settings.NEXTSEQ_BCL2FASTQ_VERSION_KEY]
+    version = conf[Settings.BCL2FASTQ_VERSION_FOR_HISEQ_KEY] if common.is_sequencer_hiseq(run_id, conf) else conf[Settings.BCL2FASTQ_VERSION_FOR_NEXTSEQ_KEY]
     
-    print "bcl2fastq from conf file is "+ str(version)
+    print "DEBUG bcl2fastq from conf file is " + str(version)
     
-    if not (version == BCL2FASTQ_VERSION_HISEQ or version == BCL2FASTQ_VERSION_NEXTSEQ):
-        raise Exception('Unvalid bcl2fastq version set ' + str(version) + ". Except: " + BCL2FASTQ_VERSION_HISEQ or BCL2FASTQ_VERSION_NEXTSEQ)
+    if not (version == BCL2FASTQ_VERSION_1 or version == BCL2FASTQ_VERSION_2):
+        raise Exception('Invalid bcl2fastq version set ' + str(version) + ". Except: " + BCL2FASTQ_VERSION_1 or BCL2FASTQ_VERSION_1)
     
     return version 
 
-def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, tmp_path, conf):
+def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, tmp_path, bcl2fastq_version, conf):
         
     args = []
     
@@ -303,7 +303,7 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
     nb_threads = str(get_cpu_count(conf)) 
     tmp_local = conf[TMP_PATH_KEY]
     
-    if common.is_sequencer_hiseq(run_id, conf):
+    if bcl2fastq_version == BCL2FASTQ_VERSION_1:
         
         # Create casava makefile
         makefile_args = []
@@ -331,7 +331,7 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
              
             adapter_temp_path = tmp_local + '/' + adapter_filename 
              
-            args.extend(['--adapter-sequence', adapter_temp_path])
+            makefile_args.extend(['--adapter-sequence', adapter_temp_path])
      
         if common.is_conf_key_exists(CASAVA_ADDITIONNAL_ARGUMENTS_KEY, conf):
             makefile_args.extend([conf[CASAVA_ADDITIONNAL_ARGUMENTS_KEY]])
@@ -339,19 +339,24 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
         # Retrieve output in file
         makefile_args.extend([' > ' + tmp_path + '/bcl2fastq_output_' + run_id + '.out 2> ' + tmp_path + '/bcl2fastq_output_' + run_id + '.err'])
         
-        cmd = " ".join(makefile_args)
-        common.log("INFO", "exec: " + cmd, conf)
-        exit_code = os.system(cmd)
-        if exit_code != 0:
-            error("error while creating Casava makefile for run " + run_id, 'Error while creating Casava makefile (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
-            return False
+        # Build command line for bcl2fast version 1.X: add 1st command
+        cmd = str(" ".join(makefile_args))
+        cmd += '\n\n'
+#         exit_code = 0 #os.system(cmd)
+#         if exit_code != 0:
+#             error("error while creating Casava makefile for run " + run_id, 'Error while creating Casava makefile (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
+#             return False
         
+        # Build command line for bcl2fast version 1.X: add 2st command
         # Configuration bcl2fastq success, move command output file in fastq_output_dir
-        cmd = 'mv /tmp/bcl2fastq_output_' + run_id + '.*  ' + fastq_output_dir
+        cmd += '\n if [ $? -ne 0 ]; then echo FAIL to configure bcl2fastq ; exit 1 ; fi \n'
+        cmd += 'mv /tmp/bcl2fastq_output_' + run_id + '.*  ' + fastq_output_dir
+        cmd += '\n'
+        
         common.log("INFO", "exec: " + cmd, conf)
-        exit_code = os.system(cmd)
-        if exit_code != 0:
-            error("error while moving command output files for run " + run_id, 'Error while moving command output files (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
+#         exit_code = 0 # os.system(cmd)
+#         if exit_code != 0:
+#             error("error while moving command output files for run " + run_id, 'Error while moving command output files (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
         
         # Get the number of cpu
         cpu_count = int(conf[CASAVA_THREADS_KEY])
@@ -359,14 +364,19 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
             cpu_count = Runtime.getRuntime().availableProcessors()
     
         # Launch casava
-        args = []
-        args.extend(['cd', fastq_output_dir])
-        args.extend(['&&', 'make', '-j', str(cpu_count)])
-        args.extend(['>', fastq_output_dir + '/make.out', '2>', fastq_output_dir + '/make.err'])
+        #args = []
+        #args.extend(['cd', fastq_output_dir])
+        #args.extend(['&&', 'make', '-j', str(cpu_count)])
+        #args.extend(['>', fastq_output_dir + '/make.out', '2>', fastq_output_dir + '/make.err'])
         
-    elif common.is_sequencer_nextseq(run_id, conf):
+        cmd += 'cd '  + str(fastq_output_dir) + ' && make -j ' + str(cpu_count) 
+        cmd += ' > ' + str(fastq_output_dir) + '/make.out 2> ' + str(fastq_output_dir) + '/make.err'
         
+        # Build command line for bcl2fast version 1.X: add 3rd command
+        # cmd += str(" ".join(args))
+        cmd += '\n\n'
         
+    elif  bcl2fastq_version == BCL2FASTQ_VERSION_2:
         #  List arg
         args = []
         args.extend(['bcl2fastq'])
@@ -399,15 +409,15 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
         args.extend(['2>', tmp_path + '/bcl2fastq_output_' + run_id + '.out'])
     
     
-    # Build command line
-    cmd = str(" ".join(args)) 
+        # Build command line for bcl2fast version 2.X
+        cmd = str(" ".join(args)) 
 
     # Log command line
     common.log("INFO", "exec: " + cmd, conf)
     
     # Create executable file
     commandfilename = 'script_bcl2fastq.sh'
-    commandfile = tmp_path + '/' + commandfilename
+    commandfile = str(conf[TMP_PATH_KEY]) + '/' + commandfilename
     f = open(commandfile, 'w')
     f.write("#! /bin/bash\n\n")
     f.write(cmd)
@@ -419,7 +429,9 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
               'Error while setting executable command file bcl2fastq to run docker for ' + run_id, conf)
         return False
     
-    return commandfilename
+    print 'DEBUG script exe to bcl2fastq path ' + str(commandfile)
+    
+    return commandfile
         
           
 
@@ -435,7 +447,7 @@ def demux_run_standalone(run_id, bcl2fastq_version, input_run_data_path, fastq_o
         conf: configuration dictionary
     """
     
-    cmd = bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, conf[TMP_PATH_KEY], conf)
+    cmd = bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, conf[TMP_PATH_KEY], bcl2fastq_version, conf)
     
     exit_code = os.system(cmd)
     if exit_code != 0:
@@ -466,7 +478,7 @@ def demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_
         conf: configuration dictionary
     """
     
-    print 'run bcl2fastq with image docker '
+    print 'DEBUG run bcl2fastq with image docker '
 
     # In docker mount with input_run_data_path
     input_docker = '/mnt/'
@@ -482,25 +494,28 @@ def demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_
     samplesheet_csv_docker = tmp_docker + os.path.basename(samplesheet_csv_path)
         
     
-    cmd = bcl2fastq_get_command(run_id, input_run_data_path_in_docker, fastq_data_path_in_docker, samplesheet_csv_docker, tmp_docker, conf)
+    cmd = bcl2fastq_get_command(run_id, input_run_data_path_in_docker, fastq_data_path_in_docker, samplesheet_csv_docker, tmp_docker, bcl2fastq_version, conf)
     
+    # Extract filename to execute
+    filename = os.path.basename(cmd)
     
     try:
         # Set working in docker on parent demultiplexing run directory. Demultiplexing run directory will create by bcl2fastq
-        docker = DockerUtils("/tmp/" + str(cmd), 'bcl2fastq2', bcl2fastq_version)
+        docker = DockerUtils("/tmp/" + str(filename), 'bcl2fastq2', bcl2fastq_version)
+        #docker = DockerUtils('touch /tmp/totot', 'bcl2fastq2', bcl2fastq_version)
         
         common.log("CONFIG", "bcl2fastq run with image docker from " + docker.getImageDockerName() + " with command line " + cmd, conf)
         common.log("CONFIG", "bcl2fastq docker mount: " 
                    + str(os.path.dirname(fastq_output_dir)) + ":" + str(output_docker) + "; " 
-                   + input_run_data_path + ":" + input_docker + "; " + tmp + ":/tmp", conf); 
+                   + input_run_data_path + ":" + input_docker + "; " + tmp + ":" + tmp_docker, conf); 
         
         # Mount input directory
         docker.addMountDirectory(input_run_data_path, input_docker)
         docker.addMountDirectory(os.path.dirname(fastq_output_dir), output_docker)
-        docker.addMountDirectory(tmp, "/tmp")
+        docker.addMountDirectory(tmp, tmp_docker)
         
-        # docker.run();
-        docker.runTest();
+        docker.run();
+        # docker.runTest();
     
         if docker.getExitValue() != 0:
             error("error while demultiplexing run " + run_id, 'Error while demultiplexing run (exit code: ' 
@@ -540,7 +555,7 @@ def archive_demux_stat(run_id, bcl2fastq_version, fastq_output_dir, reports_data
     archive_run_dir = basecall_stats_prefix + run_id 
     archive_run_tar_file = reports_data_path + '/' + basecall_stats_file
     
-    if bcl2fastq_version == BCL2FASTQ_VERSION_HISEQ:
+    if bcl2fastq_version == BCL2FASTQ_VERSION_1:
         # Archive basecall stats
         flow_cell_id_in_conf_xml = get_flowcell_id_in_demultiplex_xml(fastq_output_dir)
         cmd = 'cd ' + fastq_output_dir + ' &&  mv Basecall_Stats_' + flow_cell_id_in_conf_xml + ' ' + archive_run_dir + ' && ' + \

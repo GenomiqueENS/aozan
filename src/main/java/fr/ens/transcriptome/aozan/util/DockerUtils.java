@@ -26,15 +26,22 @@ package fr.ens.transcriptome.aozan.util;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import com.google.common.base.Joiner;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
+import com.spotify.docker.client.DockerClient.LogsParameter;
 import com.spotify.docker.client.DockerException;
+import com.spotify.docker.client.LogMessage;
+import com.spotify.docker.client.LogStream;
 import com.spotify.docker.client.messages.ContainerConfig;
 import com.spotify.docker.client.messages.ContainerCreation;
 import com.spotify.docker.client.messages.ContainerExit;
@@ -42,6 +49,7 @@ import com.spotify.docker.client.messages.ContainerInfo;
 import com.spotify.docker.client.messages.HostConfig;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.eoulsan.EoulsanLogger;
 import fr.ens.transcriptome.eoulsan.util.ProcessUtils;
 
 public class DockerUtils {
@@ -53,9 +61,12 @@ public class DockerUtils {
   private static final String DEFAULT_VERSION = "latest";
   private static final String WORK_DIRECTORY_DOCKER_DEFAULT = "/root";
 
+  private final File stdoutFile;
+  private final File stderrFile;
+
   private final String imageDockerVersion;
   private final String imageDockerName;
-  private final String commandLine;
+  private final List<String> commandLine;
   private final List<String> mountArgument = new ArrayList<>();
 
   private String permission;
@@ -148,26 +159,40 @@ public class DockerUtils {
       final String id = createContainer(docker, imageName);
       System.out.println("id: " + id);
 
-      // Inspect container
-      System.out.println(" * Inspect container");
-      final ContainerInfo info = docker.inspectContainer(id);
-      System.out.println("info: " + info);
-
       // Start container
       System.out.println(" * Start container");
       docker.startContainer(id, hostConfig);
 
+      final ContainerInfo info = docker.inspectContainer(id);
+      System.out.println("info: " + info);
+
+      // Redirect stdout and stderr
+      final LogStream logStream =
+          docker.logs(id, LogsParameter.FOLLOW, LogsParameter.STDERR,
+              LogsParameter.STDOUT);
+      redirect(logStream, this.stdoutFile, this.stderrFile);
+
       // Kill container
       System.out.println(" * Wait end of container container");
       final ContainerExit ce = docker.waitContainer(id);
-      System.out.println(ce);
+
+      // Inspect container
+      System.out.println(" * Inspect container");
+      final int exitValue2 = info.state().exitCode();
+
+      System.out.println("container exit "
+          + ce + "\t info status found " + exitValue2);
+      
       this.exitValue = ce.statusCode();
 
       // TODO
-      if (exitValue == 0)
-        System.out.println("SUCCESS run docker " + docker.info());
-      else
-        System.out.println("FAIL run docker " + docker.info());
+      if (this.exitValue == 0) {
+        System.out.print("SUCCESS run docker ");
+        System.out.println(docker.info());
+      } else {
+        System.out.println("FAIL run docker ");
+        System.out.println(docker.info());
+      }
 
       // TODO check end docker image
 
@@ -237,6 +262,52 @@ public class DockerUtils {
   }
 
   /**
+   * Redirect the outputs of the container to files.
+   * @param logStream the log stream
+   * @param stdout stdout output file
+   * @param stderr stderr output file
+   */
+  private static void redirect(final LogStream logStream, final File stdout,
+      final File stderr) {
+
+    final Runnable r = new Runnable() {
+
+      @Override
+      public void run() {
+
+        try (WritableByteChannel stdoutChannel =
+            Channels.newChannel(new FileOutputStream(stderr));
+            WritableByteChannel stderrChannel =
+                Channels.newChannel(new FileOutputStream(stdout))) {
+
+          for (LogMessage message; logStream.hasNext();) {
+
+            message = logStream.next();
+            switch (message.stream()) {
+
+            case STDOUT:
+              stdoutChannel.write(message.content());
+              break;
+
+            case STDERR:
+              stderrChannel.write(message.content());
+              break;
+
+            case STDIN:
+            default:
+              break;
+            }
+          }
+        } catch (IOException e) {
+          EoulsanLogger.getLogger().severe(e.getMessage());
+        }
+      }
+    };
+
+    new Thread(r).start();
+  }
+
+  /**
    * Inits the Docker Client.
    * @param imageName the image name
    * @return the docker client
@@ -290,17 +361,17 @@ public class DockerUtils {
 
     // Create container
     System.out.println(" * Create config");
-    final String cmd = buildArgumentsCommandDocker();
+    final List<String> dockerBashCommand = buildArgumentsCommandDocker();
 
     ContainerConfig config;
 
     if (this.permission == null) {
       config =
-          ContainerConfig.builder().image(imageName).cmd("sh", "-c", cmd)
+          ContainerConfig.builder().image(imageName).cmd(dockerBashCommand)
               .workingDir(this.workDirectoryDocker).build();
     } else {
       config =
-          ContainerConfig.builder().image(imageName).cmd("sh", "-c", cmd)
+          ContainerConfig.builder().image(imageName).cmd(dockerBashCommand)
               .user(this.permission).workingDir(this.workDirectoryDocker)
               .build();
 
@@ -324,9 +395,17 @@ public class DockerUtils {
     return name + ":" + this.imageDockerVersion;
   }
 
-  private String buildArgumentsCommandDocker() {
+  private List<String> buildArgumentsCommandDocker() {
 
-    return this.commandLine;
+    final List<String> cmd = new ArrayList<>();
+    cmd.add("bash");
+    cmd.add("-c");
+
+    cmd.add("\"");
+    cmd.addAll(commandLine);
+    cmd.add("\"");
+
+    return cmd;
 
   }
 
@@ -421,13 +500,16 @@ public class DockerUtils {
     checkNotNull(commandLine, "commande line");
     checkNotNull(softwareName, "software image Docker");
 
-    this.commandLine = commandLine;
+    this.commandLine = splitShellCommandLine(commandLine);
     this.imageDockerName = softwareName;
 
     this.imageDockerVersion = softwareVersion;
 
     this.depotPublicName = DEPOT_DEFAULT;
     this.permission = setDefaultPermission();
+
+    this.stderrFile = new File("/tmp", "STDERR");
+    this.stdoutFile = new File("/tmp", "STDOUT");
 
     System.out
         .println("----------------- setting permissions/user in container config "
@@ -451,44 +533,46 @@ public class DockerUtils {
 
     // final String cmd = "touch /root/lolotiti_" + new Random().nextInt();
 
-    final String cmd =
-        "/usr/local/bin/bcl2fastq -v 2> /root/bcl_version"
-            + new Random().nextInt() + ".txt";
-
-    final String name = "bcl2fastq2";
-    final String version = "1.8.4";
-    final String dir = "/tmp/aozan";
-
-    try {
-      // final DockerUtils dV2 = new DockerUtils(cmd, name);
-      // dV2.addMountDirectory(dir, "/root");
-      // dV2.run();
-      //
-      // final DockerUtils dV1 = new DockerUtils(cmd, name, version);
-      // dV1.addMountDirectory(dir, "/root");
-      // dV1.run();
-
-      final DockerUtils script =
-          new DockerUtils("/tmp/script_bcl2fastq.sh", name, version);
-      // script.addMountDirectory("/import/mimir03/sequencages/nextseq_500/fastq",
-      // "/root/");
-      // script
-      // .addMountDirectory(
-      // "/import/mimir03/sequencages/nextseq_500/bcl/150331_TESTHISR_0151_AH9RLKADXX",
-      // "/mnt/");
-      script.addMountDirectory(
-          "/import/rhodos01/shares-net/sequencages/nextseq_500/tmp", "/tmp");
-
-      script.setWorkDirectoryDocker("/root");
-
-      System.out.println(script.getImageDockerName());
-      script.run();
-
-    } catch (AozanException e) {
-      // TODO Auto-generated catch block
-      System.out.println(e.getMessage());
-      e.printStackTrace();
-    }
+    // final String cmd =
+    // "/usr/local/bin/bcl2fastq -v 2> /root/bcl_version"
+    // + new Random().nextInt() + ".txt";
+    //
+    // final String name = "bcl2fastq2";
+    // final String version = "1.8.4";
+    // final String dir = "/tmp/aozan";
+    //
+    // try {
+    // // final DockerUtils dV2 = new DockerUtils(cmd, name);
+    // // dV2.addMountDirectory(dir, "/root");
+    // // dV2.run();
+    // //
+    // // final DockerUtils dV1 = new DockerUtils(cmd, name, version);
+    // // dV1.addMountDirectory(dir, "/root");
+    // // dV1.run();
+    //
+    // final DockerUtils script =
+    // new DockerUtils("/tmp/script_bcl2fastq.sh", name, version);
+    // //
+    // script.addMountDirectory("/import/mimir03/sequencages/nextseq_500/fastq",
+    // // "/root/");
+    // // script
+    // // .addMountDirectory(
+    // //
+    // "/import/mimir03/sequencages/nextseq_500/bcl/150331_TESTHISR_0151_AH9RLKADXX",
+    // // "/mnt/");
+    // script.addMountDirectory(
+    // "/import/rhodos01/shares-net/sequencages/nextseq_500/tmp", "/tmp");
+    //
+    // script.setWorkDirectoryDocker("/root");
+    //
+    // System.out.println(script.getImageDockerName());
+    // script.run();
+    //
+    // } catch (AozanException e) {
+    // // TODO Auto-generated catch block
+    // System.out.println(e.getMessage());
+    // e.printStackTrace();
+    // }
 
   }
 
@@ -499,7 +583,7 @@ public class DockerUtils {
     final DockerClient docker =
         new DefaultDockerClient("unix:///var/run/docker.sock");
 
-    final String image = "genomicpariscentre/bcl2fastq2";
+    final String image = "genomicpariscentre/bcl2fastq2:latest";
     // Pull image
     System.out.println(" * Pull image");
 
@@ -513,7 +597,7 @@ public class DockerUtils {
     System.out.println(" * Create config");
     final ContainerConfig config =
         ContainerConfig.builder().image(image)
-            .cmd("sh", "-c", "touch /root/lolotiti").build();
+            .cmd("bash", "-c", "\"touch", "/root/lolotiti\"").build();
 
     // Version OK
     // final ContainerConfig config =
@@ -529,6 +613,9 @@ public class DockerUtils {
 
     System.out.println(" * Create container");
     final ContainerCreation creation = docker.createContainer(config);
+    
+    System.out.println("Ping: " + docker.ping());
+    
     final String id = creation.id();
     System.out.println("id: " + id);
 
@@ -539,11 +626,13 @@ public class DockerUtils {
     // Start container
     System.out.println(" * Start container");
     docker.startContainer(id, hostConfig);
+    System.out.println("info: " + info);
 
     // Kill container
     System.out.println(" * Wait end of container container");
     System.out.println(docker.waitContainer(id));
 
+    
     // Remove container
     System.out.println(" * Remove container");
     docker.removeContainer(id);
@@ -551,6 +640,79 @@ public class DockerUtils {
     // Close connection
     docker.close();
 
+  }
+
+  public static List<String> splitShellCommandLine(final String commandline) {
+
+    if (commandline == null) {
+      return null;
+    }
+
+    final String s = commandline.trim();
+
+    final List<String> result = new ArrayList<>();
+
+    final StringBuilder sb = new StringBuilder();
+    boolean escape = false;
+    boolean inArgument = false;
+    char quote = ' ';
+
+    for (int i = 0; i < s.length(); i++) {
+
+      final char c = s.charAt(i);
+
+      if (escape) {
+
+        if (c == '\"') {
+          sb.append(c);
+        }
+
+        escape = false;
+        continue;
+      }
+
+      if (c == '\\') {
+        escape = true;
+        continue;
+      }
+
+      if ((c == '"' || c == '\'') && !inArgument) {
+        quote = c;
+        inArgument = true;
+        continue;
+      }
+
+      if ((c == ' ' && !inArgument) || (c == quote && inArgument)) {
+
+        if (inArgument) {
+          result.add(sb.toString());
+        } else {
+
+          String s2 = sb.toString().trim();
+          if (!s2.isEmpty()) {
+            result.add(s2);
+          }
+        }
+
+        sb.setLength(0);
+        inArgument = false;
+        continue;
+      }
+
+      sb.append(c);
+    }
+
+    if (inArgument) {
+      result.add(sb.toString());
+    } else {
+
+      String s2 = sb.toString().trim();
+      if (!s2.isEmpty()) {
+        result.add(s2);
+      }
+    }
+
+    return Collections.unmodifiableList(result);
   }
 
 }
