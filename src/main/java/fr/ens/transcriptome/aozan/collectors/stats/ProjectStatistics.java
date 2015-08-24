@@ -37,7 +37,8 @@ import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.StatisticsCollector;
 
 /**
- * The class define a statistic collector on project's data to build a project summary table in qc report. 
+ * The class define a statistic collector on project's data to build a project
+ * summary table in qc report.
  * @author Sandrine Perrin
  * @since 2.0
  */
@@ -57,6 +58,16 @@ public class ProjectStatistics extends StatisticsCollector {
   @Override
   public String getCollectorPrefix() {
     return COLLECTOR_PREFIX;
+  }
+
+  @Override
+  public boolean isSampleStatisticsCollector() {
+    return false;
+  }
+
+  @Override
+  public boolean isProjectStatisticsCollector() {
+    return true;
   }
 
   @Override

@@ -37,7 +37,8 @@ import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.StatisticsCollector;
 
 /**
- * The class define a statistic collector on sample's data to build a project summary table in qc report. 
+ * The class define a statistic collector on sample's data to build a project
+ * summary table in qc report.
  * @author Sandrine Perrin
  * @since 2.0
  */
@@ -49,6 +50,7 @@ public class SampleStatistics extends StatisticsCollector {
   /** Collector prefix for updating rundata */
   public static final String COLLECTOR_PREFIX = "samplestats.";
 
+
   @Override
   public String getName() {
     return COLLECTOR_NAME;
@@ -57,6 +59,16 @@ public class SampleStatistics extends StatisticsCollector {
   @Override
   public String getCollectorPrefix() {
     return COLLECTOR_PREFIX;
+  }
+
+  @Override
+  public boolean isSampleStatisticsCollector() {
+    return true;
+  }
+
+  @Override
+  public boolean isProjectStatisticsCollector() {
+    return false;
   }
 
   public List<EntityStat> extractEntityStats(final RunData data)
@@ -97,6 +109,7 @@ public class SampleStatistics extends StatisticsCollector {
 
   }
 
+
   /**
    * Extract fastqscreen xml report create for samples.
    * @return the list of xml file used to create project report.
@@ -132,4 +145,5 @@ public class SampleStatistics extends StatisticsCollector {
 
   public SampleStatistics() {
   }
+
 }

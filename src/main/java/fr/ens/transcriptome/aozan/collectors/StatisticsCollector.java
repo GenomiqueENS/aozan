@@ -128,6 +128,7 @@ public abstract class StatisticsCollector implements Collector {
   @Override
   public void collect(RunData data) throws AozanException {
 
+
     // Parse FastqSample to build list Project
     final List<EntityStat> stats = extractEntityStats(data);
 
@@ -180,6 +181,18 @@ public abstract class StatisticsCollector implements Collector {
    */
   public abstract List<EntityStat> extractEntityStats(final RunData data)
       throws AozanException;
+
+  /**
+   * Checks if is sample statistics collector.
+   * @return true, if is sample statistics collector
+   */
+  public abstract boolean isSampleStatisticsCollector();
+
+  /**
+   * Checks if is project statistics collector.
+   * @return true, if is project statistics collector
+   */
+  public abstract boolean isProjectStatisticsCollector();
 
   /**
    * Gets the collector prefix.
