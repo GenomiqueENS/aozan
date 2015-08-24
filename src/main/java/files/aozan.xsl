@@ -45,7 +45,7 @@ doctype-system="about:legacy-compat"/>
       background: #55D486;
     }
 
-   .sampleData tr:hover, .data tr:hover, .projectData tr:hover{
+   .sampleData tr:hover, .data tr:hover, .projectData, .sampleStatsData tr:hover{
       z-index:2;
       box-shadow:0 0 20px rgba(0, 0, 0, 1);
       background:#F6F6B4;
@@ -441,6 +441,34 @@ doctype-system="about:legacy-compat"/>
     </xsl:for-each>
   </tr>
   <xsl:for-each select="/QCReport/ProjectsReport/Projects/Project">
+  <tr class="{@name}">
+  	<td><xsl:value-of select="@name"/></td>
+    <xsl:for-each select="Test">
+      <td class="score{@score}">
+        <xsl:if test="@type='int'"><xsl:value-of select="format-number(.,'### ### ### ### ###','aozan')"/></xsl:if>
+        <xsl:if test="@type='float'"><xsl:value-of select="format-number(.,'### ### ### ##0.00','aozan')"/></xsl:if>
+        <xsl:if test="@type='percent'"><xsl:value-of select="format-number(.,'#0.00%','aozan')"/></xsl:if>
+        <xsl:if test="@type='string'"><xsl:value-of select="."/></xsl:if>
+        <xsl:if test="@type='url'"><a href="{.}">link</a></xsl:if>
+      </td>
+    </xsl:for-each>
+  </tr>
+    </xsl:for-each>
+  </table>
+	</div>
+	</xsl:if>
+  
+  <xsl:if test="/QCReport[SamplesStatsReport]">
+  <h2>Samples statistics report</h2>
+	<div>
+   <table class="sampleStatsData">
+  <tr class="headerColumns">
+	<th>Samples</th>
+    <xsl:for-each select="/QCReport/SamplesStatsReport/Columns/Column">
+      <th><xsl:value-of select="."/><xsl:if test="@unit!=''"> (<xsl:value-of select="@unit"/>)</xsl:if></th>
+    </xsl:for-each>
+  </tr>
+  <xsl:for-each select="/QCReport/SamplesStatsReport/SamplesStats/SampleStats">
   <tr class="{@name}">
   	<td><xsl:value-of select="@name"/></td>
     <xsl:for-each select="Test">

@@ -54,6 +54,7 @@ import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
 import fr.ens.transcriptome.aozan.tests.lane.LaneTest;
 import fr.ens.transcriptome.aozan.tests.project.ProjectTest;
 import fr.ens.transcriptome.aozan.tests.sample.SampleTest;
+import fr.ens.transcriptome.aozan.tests.samplestats.SampleStatsTest;
 
 /**
  * This class is the main QC class.
@@ -97,7 +98,8 @@ public class QC {
   private final List<Collector> collectors = new ArrayList<>();
   private final List<GlobalTest> globalTests = new ArrayList<>();
   private final List<LaneTest> laneTests = new ArrayList<>();
-  private final List<ProjectTest> projectTests = new ArrayList<>();
+  private final List<ProjectTest> projectStatsTests = new ArrayList<>();
+  private final List<SampleStatsTest> samplesStatsTests = new ArrayList<>();
   private final List<SampleTest> sampleTests = new ArrayList<>();
   private final Map<String, String> globalConf = new HashMap<>();
 
@@ -177,8 +179,8 @@ public class QC {
 
     // Create the report
     final QCReport qcReport =
-        new QCReport(data, this.globalTests, this.laneTests, this.projectTests,
-            this.sampleTests);
+        new QCReport(data, this.globalTests, this.laneTests,
+            this.projectStatsTests, this.samplesStatsTests, this.sampleTests);
 
     // Create the completed raw data file
     writeRawData(qcReport, dataFile);
@@ -370,7 +372,13 @@ public class QC {
 
           } else if (test instanceof ProjectTest) {
             for (final AozanTest t : tests) {
-              this.projectTests.add((ProjectTest) t);
+              this.projectStatsTests.add((ProjectTest) t);
+              mapTests.put(key, t);
+            }
+
+          } else if (test instanceof SampleStatsTest) {
+            for (final AozanTest t : tests) {
+              this.samplesStatsTests.add((SampleStatsTest) t);
               mapTests.put(key, t);
             }
           }
@@ -394,7 +402,10 @@ public class QC {
     for (final SampleTest test : this.sampleTests) {
       test.init();
     }
-    for (final ProjectTest test : this.projectTests) {
+    for (final ProjectTest test : this.projectStatsTests) {
+      test.init();
+    }
+    for (final SampleStatsTest test : this.samplesStatsTests) {
       test.init();
     }
   }
@@ -451,7 +462,10 @@ public class QC {
     for (final SampleTest st : this.sampleTests) {
       testsList.add(st);
     }
-    for (final ProjectTest st : this.projectTests) {
+    for (final ProjectTest st : this.projectStatsTests) {
+      testsList.add(st);
+    }
+    for (final SampleStatsTest st : this.samplesStatsTests) {
       testsList.add(st);
     }
 
@@ -742,7 +756,7 @@ public class QC {
     this.qcDir = qcDir;
     this.runId = runId;
     this.bcl2fastqVersion =
-        (bcl2fastqVersion == "latest"
+        ((bcl2fastqVersion == "latest" || bcl2fastqVersion.charAt(0) == '2')
             ? DemultiplexingCollector.VERSION_2
             : (bcl2fastqVersion.charAt(0) == '1'
                 ? DemultiplexingCollector.VERSION_1

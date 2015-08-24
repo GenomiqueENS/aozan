@@ -29,8 +29,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -50,6 +52,7 @@ import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
 import fr.ens.transcriptome.aozan.tests.lane.LaneTest;
 import fr.ens.transcriptome.aozan.tests.project.ProjectTest;
 import fr.ens.transcriptome.aozan.tests.sample.SampleTest;
+import fr.ens.transcriptome.aozan.tests.samplestats.SampleStatsTest;
 import fr.ens.transcriptome.aozan.util.XMLUtilsWriter;
 
 /**
@@ -66,7 +69,8 @@ public class QCReport {
 
   private final List<GlobalTest> globalTests = new ArrayList<>();
   private final List<LaneTest> laneTests = new ArrayList<>();
-  private final List<ProjectTest> projectTests = new ArrayList<>();
+  private final List<ProjectTest> projectStatsTests = new ArrayList<>();
+  private final List<SampleStatsTest> samplesStatsTests = new ArrayList<>();
   private final List<SampleTest> sampleTests = new ArrayList<>();
   private Document doc;
 
@@ -179,7 +183,7 @@ public class QCReport {
     }
   }
 
-  private void doProjectsTests(final Element parentElement) {
+  private void doProjectsStatsTests(final Element parentElement) {
 
     final Document doc = this.doc;
     final List<String> projects = this.data.getProjectsNameList();
@@ -190,7 +194,7 @@ public class QCReport {
     final Element columns = doc.createElement("Columns");
     root.appendChild(columns);
 
-    for (final ProjectTest test : this.projectTests) {
+    for (final ProjectTest test : this.projectStatsTests) {
       final Element columnElement = doc.createElement("Column");
       columnElement.setAttribute("testname", test.getName());
       columnElement.setAttribute("description", test.getDescription());
@@ -207,7 +211,7 @@ public class QCReport {
       projectElement.setAttribute("name", project);
       projectsElement.appendChild(projectElement);
 
-      for (final ProjectTest test : this.projectTests) {
+      for (final ProjectTest test : this.projectStatsTests) {
         final TestResult result = test.test(this.data, project);
 
         final Element testElement = doc.createElement("Test");
@@ -216,6 +220,48 @@ public class QCReport {
         testElement.setAttribute("type", result.getType());
         testElement.setTextContent(result.getMessage());
         projectElement.appendChild(testElement);
+
+      }
+    }
+  }
+
+  private void doSamplesStatsTests(final Element parentElement) {
+
+    final Document doc = this.doc;
+    final List<String> samplesNames = extractSamplesNamesInRun();
+
+    final Element root = doc.createElement("SamplesStatsReport");
+    parentElement.appendChild(root);
+
+    final Element columns = doc.createElement("Columns");
+    root.appendChild(columns);
+
+    for (final SampleStatsTest test : this.samplesStatsTests) {
+      final Element columnElement = doc.createElement("Column");
+      columnElement.setAttribute("testname", test.getName());
+      columnElement.setAttribute("description", test.getDescription());
+      columnElement.setAttribute("unit", test.getUnit());
+      columnElement.setTextContent(test.getColumnName());
+      columns.appendChild(columnElement);
+    }
+
+    final Element samplesStatsElement = doc.createElement("SamplesStats");
+    root.appendChild(samplesStatsElement);
+
+    for (String sampleName : samplesNames) {
+      final Element sampleStatsElement = doc.createElement("SampleStats");
+      sampleStatsElement.setAttribute("name", sampleName);
+      samplesStatsElement.appendChild(sampleStatsElement);
+
+      for (final SampleStatsTest test : this.samplesStatsTests) {
+        final TestResult result = test.test(this.data, sampleName);
+
+        final Element testElement = doc.createElement("Test");
+        testElement.setAttribute("name", test.getName());
+        testElement.setAttribute("score", Integer.toString(result.getScore()));
+        testElement.setAttribute("type", result.getType());
+        testElement.setTextContent(result.getMessage());
+        sampleStatsElement.appendChild(testElement);
 
       }
     }
@@ -310,6 +356,26 @@ public class QCReport {
     }
 
     return projectsNameWithLaneNumber;
+  }
+
+  /**
+   * Extract samples names in run from Rundata instance.
+   * @return the list of samples names
+   */
+  private List<String> extractSamplesNamesInRun() {
+
+    final Set<String> names = new TreeSet<>();
+
+    final int laneCount = this.data.getLaneCount();
+
+    for (int lane = 1; lane <= laneCount; lane++) {
+      // Add all samples names by lane and ignore replica
+      names.addAll(this.data.getSamplesNameListInLane(lane));
+    }
+
+    // Sorted samples set
+
+    return Collections.unmodifiableList(new ArrayList<>(names));
   }
 
   /**
@@ -450,8 +516,12 @@ public class QCReport {
         doLanesTests(root);
       }
 
-      if (!this.projectTests.isEmpty()) {
-        doProjectsTests(root);
+      if (!this.projectStatsTests.isEmpty()) {
+        doProjectsStatsTests(root);
+      }
+
+      if (!this.samplesStatsTests.isEmpty()) {
+        doSamplesStatsTests(root);
       }
 
       if (!this.sampleTests.isEmpty()) {
@@ -520,11 +590,14 @@ public class QCReport {
    * @param data Run data
    * @param globalTests list of the global tests
    * @param laneTests list of the read tests
-   * @param projectTests
+   * @param projectStatsTests the project stats tests
+   * @param samplesStatsTests the samples stats tests
    * @param sampleTests list of the sample tests
    */
   public QCReport(final RunData data, final List<GlobalTest> globalTests,
-      final List<LaneTest> laneTests, List<ProjectTest> projectTests,
+      final List<LaneTest> laneTests,
+      final List<ProjectTest> projectStatsTests,
+      final List<SampleStatsTest> samplesStatsTests,
       final List<SampleTest> sampleTests) {
 
     this.data = data;
@@ -537,8 +610,12 @@ public class QCReport {
       this.laneTests.addAll(laneTests);
     }
 
-    if (projectTests != null) {
-      this.projectTests.addAll(projectTests);
+    if (projectStatsTests != null) {
+      this.projectStatsTests.addAll(projectStatsTests);
+    }
+
+    if (samplesStatsTests != null) {
+      this.samplesStatsTests.addAll(samplesStatsTests);
     }
 
     if (sampleTests != null) {
