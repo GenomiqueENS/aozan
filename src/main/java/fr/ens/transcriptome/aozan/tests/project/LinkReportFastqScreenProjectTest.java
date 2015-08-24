@@ -31,7 +31,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.collectors.ProjectStatsCollector;
+import fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.TestResult;
 
@@ -57,7 +57,7 @@ public class LinkReportFastqScreenProjectTest extends AbstractProjectTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(ProjectStatsCollector.COLLECTOR_NAME);
+    return ImmutableList.of(ProjectStatistics.COLLECTOR_NAME);
   }
 
   //

@@ -31,7 +31,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.collectors.ProjectStatsCollector;
+import fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.TestResult;
 import fr.ens.transcriptome.aozan.util.ScoreInterval;
@@ -50,7 +50,7 @@ public class PercentRecoverableRawClusterProjectTest extends
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(ProjectStatsCollector.COLLECTOR_NAME);
+    return ImmutableList.of(ProjectStatistics.COLLECTOR_NAME);
   }
 
   @Override
@@ -62,10 +62,10 @@ public class PercentRecoverableRawClusterProjectTest extends
 
     // Build key for run data
     final String recoveryCountKey =
-        ProjectStatsCollector.COLLECTOR_PREFIX
+        ProjectStatistics.COLLECTOR_PREFIX
             + projectName + ".raw.cluster.recovery.sum";
     final String rawClusterSumKey =
-        ProjectStatsCollector.COLLECTOR_PREFIX
+        ProjectStatistics.COLLECTOR_PREFIX
             + projectName + ".raw.cluster.sum";
 
     try {

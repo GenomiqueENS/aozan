@@ -27,7 +27,7 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
-import fr.ens.transcriptome.aozan.collectors.ProjectStatsCollector;
+import fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics;
 
 /**
  * The class define a test the sum on raw clusters on samples in a project.
@@ -39,13 +39,13 @@ public class RawClusterSumProjectTest extends AbstractSimpleProjectTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(ProjectStatsCollector.COLLECTOR_NAME);
+    return ImmutableList.of(ProjectStatistics.COLLECTOR_NAME);
   }
 
   @Override
   protected String getKey(final String projectName) {
 
-    return ProjectStatsCollector.COLLECTOR_PREFIX
+    return ProjectStatistics.COLLECTOR_PREFIX
         + projectName + ".raw.cluster.sum";
   }
 

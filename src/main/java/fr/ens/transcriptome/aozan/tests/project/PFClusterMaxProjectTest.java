@@ -27,7 +27,7 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
-import fr.ens.transcriptome.aozan.collectors.ProjectStatsCollector;
+import fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics;
 
 /**
  * The class define a test the maximum on passing filter clusters on samples in
@@ -40,13 +40,13 @@ public class PFClusterMaxProjectTest extends AbstractSimpleProjectTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(ProjectStatsCollector.COLLECTOR_NAME);
+    return ImmutableList.of(ProjectStatistics.COLLECTOR_NAME);
   }
 
   @Override
   protected String getKey(final String projectName) {
 
-    return ProjectStatsCollector.COLLECTOR_PREFIX
+    return ProjectStatistics.COLLECTOR_PREFIX
         + projectName + ".pf.cluster.max";
   }
 
