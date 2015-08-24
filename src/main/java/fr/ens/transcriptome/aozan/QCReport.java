@@ -227,6 +227,11 @@ public class QCReport {
 
   private void doSamplesStatsTests(final Element parentElement) {
 
+    // Check needed to add this tests
+    if (asToIgnoreSampleStatsTestsForQCReport()) {
+      return;
+    }
+
     final Document doc = this.doc;
     final List<String> samplesNames = extractSamplesNamesInRun();
 
@@ -271,42 +276,53 @@ public class QCReport {
    * Generate the QC report for projects data.
    * @param parentElement parent Element
    */
-  private void doProjectsFilter(final Element parentElement) {
+  private void addElementForFilter(final Element parentElement) {
 
     final Document doc = this.doc;
 
-    // Add undetermined sample
-    final String list = this.data.getProjectsName();
-    // Add projects name
-    final List<String> projectsName = COMMA_SPLITTER.splitToList(list);
+    final List<String> elements = new ArrayList<>();
+    String typeFilter;
+
+    if (asToIgnoreSampleStatsTestsForQCReport()) {
+      typeFilter = "project";
+      final String list = this.data.getProjectsName();
+      elements.addAll(COMMA_SPLITTER.splitToList(list));
+
+    } else {
+
+      typeFilter = "sample";
+      elements.addAll(extractSamplesNamesInRun());
+    }
+
 
     // Build map associate lanes number with project
-    final ListMultimap<String, Integer> lanesNumberRelatedProjectName =
-        extractLaneNumberRelatedProjectName();
+    final ListMultimap<String, Integer> lanesNumberRelatedElement =
+        extractLaneNumberRelatedProjectName(typeFilter);
 
-    final Element projects = doc.createElement("ProjectsFilter");
-    parentElement.appendChild(projects);
+    final Element filter = doc.createElement("TableFilter");
+    parentElement.appendChild(filter);
 
-    for (final String projectName : projectsName) {
+    for (final String element : elements) {
 
-      final Element project = doc.createElement("ProjectName");
-      project.setAttribute("classValue", "projectName");
+      final Element elementFilter = doc.createElement("ElementFilter");
+      elementFilter.setAttribute("classValue", "elementFilter");
 
       // Extract lanes number related project name
       final Set<Integer> lanesRelatedProject =
-          Sets.newTreeSet(lanesNumberRelatedProjectName.get(projectName));
+          Sets.newTreeSet(lanesNumberRelatedElement.get(element));
 
       // Build command javascript for filter line samples report by project
-      project.setAttribute("cmdJS",
+      elementFilter.setAttribute("cmdJS",
           "'" + Joiner.on(",").join(lanesRelatedProject) + "'");
+      elementFilter.setAttribute("typeFilter", typeFilter);
 
-      project.setTextContent(projectName);
-      projects.appendChild(project);
+      elementFilter.setTextContent(element);
+      filter.appendChild(elementFilter);
     }
 
     // Add Element for undetermined lane
-    final Element undeterminedLanes = doc.createElement("ProjectName");
-    undeterminedLanes.setAttribute("classValue", "projectName");
+    final Element undeterminedLanes = doc.createElement("ElementFilter");
+    undeterminedLanes.setAttribute("classValue", "elementFilter");
 
     // Build list lane number
     final List<Integer> s = new ArrayList<>();
@@ -319,63 +335,10 @@ public class QCReport {
     }
 
     undeterminedLanes.setAttribute("cmdJS", "'" + Joiner.on(",").join(s) + "'");
+    undeterminedLanes.setAttribute("typeFilter", typeFilter);
 
     undeterminedLanes.setTextContent("Undetermined");
-    projects.appendChild(undeterminedLanes);
-  }
-
-  /**
-   * Collect lanes number for each project name to run.
-   * @return map associate project name related lane number
-   */
-  private ListMultimap<String, Integer> extractLaneNumberRelatedProjectName() {
-
-    final ListMultimap<String, Integer> projectsNameWithLaneNumber =
-        ArrayListMultimap.create();
-
-    final int laneCount = this.data.getLaneCount();
-
-    // Parse lane run
-    for (int lane = 1; lane <= laneCount; lane++) {
-
-      // Extract samples name in lane
-      final List<String> samplesNameInLane =
-          COMMA_SPLITTER.splitToList(this.data.getSamplesNameInLane(lane));
-
-      for (final String sampleName : samplesNameInLane) {
-        // Extract project name corresponding to sample name
-        final String key =
-            "design.lane" + lane + "." + sampleName + ".sample.project";
-
-        final String projectName = this.data.get(key);
-        if (projectName != null) {
-          // Add project name and lane number in map
-          projectsNameWithLaneNumber.put(projectName, lane);
-        }
-      }
-    }
-
-    return projectsNameWithLaneNumber;
-  }
-
-  /**
-   * Extract samples names in run from Rundata instance.
-   * @return the list of samples names
-   */
-  private List<String> extractSamplesNamesInRun() {
-
-    final Set<String> names = new TreeSet<>();
-
-    final int laneCount = this.data.getLaneCount();
-
-    for (int lane = 1; lane <= laneCount; lane++) {
-      // Add all samples names by lane and ignore replica
-      names.addAll(this.data.getSamplesNameListInLane(lane));
-    }
-
-    // Sorted samples set
-
-    return Collections.unmodifiableList(new ArrayList<>(names));
+    filter.appendChild(undeterminedLanes);
   }
 
   /**
@@ -525,7 +488,7 @@ public class QCReport {
       }
 
       if (!this.sampleTests.isEmpty()) {
-        doProjectsFilter(root);
+        addElementForFilter(root);
         doSamplesTests(root);
       }
     } catch (final ParserConfigurationException e) {
@@ -579,6 +542,90 @@ public class QCReport {
     doTests();
 
     return XMLUtilsWriter.createHTMLFileFromXSL(this.doc, is);
+  }
+
+  /**
+   * Collect lanes number for each project name to run.
+   * @param typeFilter
+   * @return map associate project name related lane number
+   */
+  private ListMultimap<String, Integer> extractLaneNumberRelatedProjectName(
+      final String typeFilter) {
+
+    final ListMultimap<String, Integer> nameWithLaneNumber =
+        ArrayListMultimap.create();
+
+    final int laneCount = this.data.getLaneCount();
+
+    // Parse lane run
+    for (int lane = 1; lane <= laneCount; lane++) {
+
+      // Extract samples name in lane
+      final List<String> samplesNameInLane =
+          this.data.getSamplesNameListInLane(lane);
+
+      switch (typeFilter) {
+
+      case "sample":
+        
+        for (final String sampleName : samplesNameInLane) {
+          nameWithLaneNumber.put(sampleName, lane);
+        }
+        
+        break;
+      default:
+
+        for (final String sampleName : samplesNameInLane) {
+          // Extract project name corresponding to sample name
+          final String key =
+              "design.lane" + lane + "." + sampleName + ".sample.project";
+          
+          final String projectName = this.data.get(key);
+          if (projectName != null) {
+            // Add project name and lane number in map
+            nameWithLaneNumber.put(projectName, lane);
+          }
+        }
+        break;
+        
+      }
+
+    }
+
+    return nameWithLaneNumber;
+  }
+
+  /**
+   * State qc report.
+   * @param data the data
+   * @return true, if successful
+   */
+  private boolean asToIgnoreSampleStatsTestsForQCReport() {
+
+    final List<String> projetsNamesInRun = this.data.getProjectsNameList();
+
+    return projetsNamesInRun.size() > 1;
+
+  }
+
+  /**
+   * Extract samples names in run from Rundata instance.
+   * @return the list of samples names
+   */
+  private List<String> extractSamplesNamesInRun() {
+
+    final Set<String> names = new TreeSet<>();
+
+    final int laneCount = this.data.getLaneCount();
+
+    for (int lane = 1; lane <= laneCount; lane++) {
+      // Add all samples names by lane and ignore replica
+      names.addAll(this.data.getSamplesNameListInLane(lane));
+    }
+
+    // Sorted samples set
+
+    return Collections.unmodifiableList(new ArrayList<>(names));
   }
 
   //
