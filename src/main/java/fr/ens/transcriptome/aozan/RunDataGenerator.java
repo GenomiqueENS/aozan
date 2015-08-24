@@ -38,7 +38,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 
 import fr.ens.transcriptome.aozan.collectors.Collector;
-import fr.ens.transcriptome.aozan.collectors.ProjectStatsCollector;
+import fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics;
+import fr.ens.transcriptome.aozan.collectors.stats.SampleStatistics;
 
 /**
  * This Class collect Data.
@@ -159,13 +160,16 @@ public class RunDataGenerator {
 
     final List<Collector> collectorsNewOrder = new ArrayList<>();
 
-    Collector projectStat = null;
+    final List<Collector> statisticsCollector = new ArrayList<>();
 
     for (final Collector collector : collectorsInitOrder) {
 
       // Collector selected
-      if (collector.getName().equals(ProjectStatsCollector.COLLECTOR_NAME)) {
-        projectStat = collector;
+      // TODO to change
+      if (collector instanceof ProjectStatistics
+          || collector instanceof SampleStatistics) {
+
+        statisticsCollector.add(collector);
 
       } else {
         collectorsNewOrder.add(collector);
@@ -173,13 +177,15 @@ public class RunDataGenerator {
     }
 
     // Check ProjectCollector founded
-    if (projectStat != null) {
-      collectorsNewOrder.add(projectStat);
+    if (!statisticsCollector.isEmpty()) {
+      collectorsNewOrder.addAll(statisticsCollector);
     }
 
     if (collectorsInitOrder.size() != collectorsNewOrder.size()) {
       throw new RuntimeException(
-          "Reorder collector list, generate list with different size.");
+          "Reorder collector list, generate list with different size.\n\tinit list "
+              + Joiner.on(",").join(collectorsInitOrder) + "\n\tnew order "
+              + Joiner.on(",").join(collectorsNewOrder));
     }
 
     // Return list with new order
