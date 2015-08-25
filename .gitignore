@@ -16,4 +16,5 @@ aozan.iml
 
 src/main/java/fr/ens/transcriptome/aozan/AozanDemo.java
 src/main/java/fr/ens/transcriptome/aozan/AozanDebug.java
+src/main/java/fr/ens/transcriptome/aozan/DemuxNextSeqCheckingResult.java
 src/main/java/fr/ens/transcriptome/aozan/illumina/PPMain.java
