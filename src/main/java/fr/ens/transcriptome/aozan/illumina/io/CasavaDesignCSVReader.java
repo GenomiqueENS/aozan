@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import com.google.common.base.Preconditions;
+
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
@@ -48,11 +50,11 @@ public class CasavaDesignCSVReader extends AbstractCasavaDesignTextReader {
 
   private final BufferedReader reader;
 
-  public SampleSheet readForQCReport(final RunData data, String version)
+  public SampleSheet readForQCReport(String version, final int laneCount)
       throws IOException, AozanException {
 
     setCompatibleForQCReport(true);
-    setData(data);
+    setLaneCount(laneCount);
 
     return read(version);
   }

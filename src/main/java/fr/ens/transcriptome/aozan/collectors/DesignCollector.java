@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -186,9 +187,13 @@ public class DesignCollector implements Collector {
   private SampleSheet createSampleSheet(final RunData data) throws IOException,
       AozanException {
 
-    if (this.callAtLeastOneFastqCollector)
+    if (this.callAtLeastOneFastqCollector) {
+
+      Preconditions.checkNotNull(data, "run data instance");
+
       return new CasavaDesignCSVReader(this.casavaDesignFile).readForQCReport(
-          data, this.bcl2fastqVersion);
+          this.bcl2fastqVersion, data.getLaneCount());
+    }
 
     return new CasavaDesignCSVReader(this.casavaDesignFile)
         .read(this.bcl2fastqVersion);

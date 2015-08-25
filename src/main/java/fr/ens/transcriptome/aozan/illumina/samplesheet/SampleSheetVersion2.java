@@ -19,17 +19,34 @@ public class SampleSheetVersion2 extends SampleSheet {
   private final Map<String, String> headerSession;
   private final Map<String, String> readsSession;
   private final Map<String, String> settingsSession;
+  private int lastIndice = 0;
 
-  public void addSample(final SampleEntry sample) {
+  public void addSample(final SampleEntry sample, boolean isColumnLaneExist) {
 
     super.addSample(sample);
 
     // Save order
 
     final String key = buildKey(sample.getSampleId(), sample.getLane());
-    final int indice = list.size() + 1;
+    final int indice = findPositionInSamplesheetFile(sample, isColumnLaneExist);
 
     list.put(key, indice);
+  }
+
+  private int findPositionInSamplesheetFile(final SampleEntry sample,
+      final boolean isColumnLaneExist) {
+
+    if (isColumnLaneExist) {
+      return ++lastIndice;
+    }
+
+    if (sample.getLane() == 1) {
+      return ++lastIndice;
+    }
+
+    // Return order found for sample in lane 1
+    return this.list.get(buildKey(sample.getSampleId(), 1));
+
   }
 
   public void addSessionEntry(final List<String> fields,
@@ -151,6 +168,14 @@ public class SampleSheetVersion2 extends SampleSheet {
   //
   // Constructor
   //
+
+  @Override
+  public String toString() {
+    return "SampleSheetVersion2 [list="
+        + list + ", headerSession=" + headerSession + ", readsSession="
+        + readsSession + ", settingsSession=" + settingsSession
+        + ", lastIndice=" + lastIndice + "]";
+  }
 
   public SampleSheetVersion2(String sampleSheetVersion) {
     super(sampleSheetVersion);

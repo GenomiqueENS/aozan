@@ -20,8 +20,6 @@ import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetVersion2;
 
 class SampleSheetLineReaderV2 extends SampleSheetLineReader {
 
-  private static final int DEFAULT_LANE_COUNT = 2;
-
   // Required in this order columns header for version2
   private static final List<String> FIELDNAMES_VERSION2_REQUIERED = Arrays
       .asList("Sample_ID");
@@ -29,6 +27,9 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
   private static final List<String> FIELDNAMES_VERSION2_REQUIERED_FOR_QC =
       Arrays.asList("Sample_ID", "Sample_Ref", "index", "Description",
           "Sample_Project");
+
+  private static final List<String> FIELDNAMES_VERSION2_FORBIDDEN = Arrays
+      .asList("Sample_Name", "SampleName");
 
   private static final List<String> FIELDNAMES_VERSION2 = buildList();
 
@@ -95,6 +96,9 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
 
     } else {
       // assert (fields.size() == this.fieldsCountExpected);
+
+      // Check field on sample description in run
+      // trimAndCheckFields(fields, fieldsCountExpected);
 
       if (isColumnLaneExist()) {
         // Set lane value on sample
@@ -176,7 +180,7 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
     }
 
     // Add sample in design instance
-    design2.addSample(sample);
+    design2.addSample(sample, isColumnLaneExist());
   }
 
   private static List<String> buildList() {
@@ -213,6 +217,14 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
       }
     }
 
+    for (String name : FIELDNAMES_VERSION2_FORBIDDEN) {
+      if (fields.contains(name)) {
+
+        throw new AozanException(
+            "Parsing Sample sheet file: the column name can not use " + name);
+      }
+    }
+
     // Locate fields
     for (int i = 0; i < fields.size(); i++) {
       if (FIELDNAMES_VERSION2.contains(fields.get(i))) {
@@ -238,13 +250,12 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
   //
   // Constructor
   //
-  public SampleSheetLineReaderV2(final RunData data,
+  public SampleSheetLineReaderV2(final int laneCount,
       final boolean compatibleForQCReport) {
 
     this.isCompatibleForQCReport = compatibleForQCReport;
 
-    this.laneCount = (data == null ? DEFAULT_LANE_COUNT : data.getLaneCount());
+    this.laneCount = (laneCount == -1 ? 2 : laneCount);
 
   }
-
 }

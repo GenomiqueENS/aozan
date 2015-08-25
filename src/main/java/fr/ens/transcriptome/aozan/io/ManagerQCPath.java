@@ -75,6 +75,8 @@ public class ManagerQCPath {
   /** The fastq directory. */
   private final File fastqDirectory;
 
+  private final int laneCount;
+
   //
   // Get instance method
   //
@@ -91,6 +93,7 @@ public class ManagerQCPath {
 
     if (manager == null) {
 
+      final int laneCount = Integer.parseInt(globalConf.get(QC.LANE_COUNT));
       // Extract sample sheet file
       final File samplesheetFile =
           new File(globalConf.get(QC.CASAVA_DESIGN_PATH));
@@ -99,10 +102,11 @@ public class ManagerQCPath {
       final String samplesheetVersion = globalConf.get(QC.BCL2FASTQ_VERSION);
 
       // Extract fastq output directory
-      final File fastq = new File(globalConf.get(QC.CASAVA_OUTPUT_DIR));
+      final File fastqDir = new File(globalConf.get(QC.CASAVA_OUTPUT_DIR));
 
       // Return instance
-      return getInstance(samplesheetFile, samplesheetVersion, fastq);
+      return getInstance(samplesheetFile, samplesheetVersion, fastqDir,
+          laneCount);
     }
 
     return manager;
@@ -112,13 +116,15 @@ public class ManagerQCPath {
    * Gets the single instance of ManagerQCPath.
    * @param samplesheetFilename the samplesheet file
    * @param bcl2fastqVersion the bcl2fasq version
-   * @param fastq the fastq directory
+   * @param fastqDir the fastq directory
+   * @param laneCount the lane count
    * @return single instance of ManagerQCPath
    * @throws AozanException if an error occurs when create instance during
    *           parsing sample sheet file
    */
   public static ManagerQCPath getInstance(final File samplesheetFilename,
-      final String bcl2fastqVersion, final File fastq) throws AozanException {
+      final String bcl2fastqVersion, final File fastqDir, final int laneCount)
+      throws AozanException {
 
     if (manager == null) {
 
@@ -129,14 +135,14 @@ public class ManagerQCPath {
 
           manager =
               new ManagerQCPath().new ManagerQCPathVersion1(
-                  samplesheetFilename, bcl2fastqVersion, fastq);
+                  samplesheetFilename, bcl2fastqVersion, fastqDir, laneCount);
 
         } else if (bcl2fastqVersion.equals(SampleSheetUtils.VERSION_2)) {
 
           // Instance ManagerQCPath for sample sheet version 2
           manager =
               new ManagerQCPath().new ManagerQCPathVersion2(
-                  samplesheetFilename, bcl2fastqVersion, fastq);
+                  samplesheetFilename, bcl2fastqVersion, fastqDir, laneCount);
 
         } else {
           throw new AozanException(
@@ -161,7 +167,7 @@ public class ManagerQCPath {
    * @return single instance of ManagerQCPath
    */
   public static ManagerQCPath getInstance(final SampleSheet samplesheet,
-      final File fastq) {
+      final File fastq, final int laneCount) {
 
     if (manager == null) {
 
@@ -171,12 +177,14 @@ public class ManagerQCPath {
       if (version.equals(SampleSheetUtils.VERSION_1)) {
         // Instance ManagerQCPath for sample sheet version 1
         manager =
-            new ManagerQCPath().new ManagerQCPathVersion1(samplesheet, fastq);
+            new ManagerQCPath().new ManagerQCPathVersion1(samplesheet, fastq,
+                laneCount);
 
       } else if (version.equals(SampleSheetUtils.VERSION_2)) {
         // Instance ManagerQCPath for sample sheet version 2
         manager =
-            new ManagerQCPath().new ManagerQCPathVersion2(samplesheet, fastq);
+            new ManagerQCPath().new ManagerQCPathVersion2(samplesheet, fastq,
+                laneCount);
       }
     }
 
@@ -320,10 +328,11 @@ public class ManagerQCPath {
    * @throws IOException if an error occurs during reading sample sheet file
    * @throws FileNotFoundException if sample sheet file not exist
    */
-  private ManagerQCPath(final File samplesheet, final String bcl2fastqVersion)
-      throws FileNotFoundException, IOException, AozanException {
+  private ManagerQCPath(final File samplesheet, final String bcl2fastqVersion,
+      final int laneCount) throws FileNotFoundException, IOException,
+      AozanException {
 
-    this(samplesheet, bcl2fastqVersion, samplesheet.getParentFile());
+    this(samplesheet, bcl2fastqVersion, samplesheet.getParentFile(), laneCount);
   }
 
   /**
@@ -336,17 +345,18 @@ public class ManagerQCPath {
    * @throws FileNotFoundException if sample sheet file not exist
    */
   private ManagerQCPath(final File samplesheet, final String bcl2fastqVersion,
-      final File fastq) throws FileNotFoundException, IOException,
-      AozanException {
+      final File fastq, final int laneCount) throws FileNotFoundException,
+      IOException, AozanException {
 
     checkExistingStandardFile(samplesheet, "sample sheet");
     checkExistingDirectoryFile(fastq, "fastq directory");
 
     this.samplesheet =
-        SampleSheetUtils.getSampleSheet(samplesheet, bcl2fastqVersion);
+        SampleSheetUtils.getSampleSheet(samplesheet, bcl2fastqVersion, laneCount);
 
     this.bcl2fastqVersion = bcl2fastqVersion;
     this.fastqDirectory = fastq;
+    this.laneCount = laneCount;
   }
 
   /**
@@ -354,12 +364,13 @@ public class ManagerQCPath {
    * @param samplesheet the samplesheet
    * @param fastq the fastq
    */
-  private ManagerQCPath(final SampleSheet samplesheet, final File fastq) {
+  private ManagerQCPath(final SampleSheet samplesheet, final File fastq,
+      final int laneCount) {
 
     this.samplesheet = samplesheet;
     this.bcl2fastqVersion = this.samplesheet.getSampleSheetVersion();
     this.fastqDirectory = fastq;
-
+    this.laneCount = laneCount;
   }
 
   /**
@@ -370,6 +381,7 @@ public class ManagerQCPath {
     this.bcl2fastqVersion = null;
     this.samplesheet = null;
     this.fastqDirectory = null;
+    this.laneCount = -1;
   }
 
   //
@@ -426,16 +438,17 @@ public class ManagerQCPath {
      * Private constructor a new manager qc path.
      * @param samplesheet the sample sheet file
      * @param bcl2fastqVersion the bcl2fasq version
-     * @param fastq the fastq directory
+     * @param fastqDir the fastq directory
+     * @param laneCount the lane count
      * @throws FileNotFoundException the file not found exception
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws AozanException the aozan exception
      */
     private ManagerQCPathVersion1(final File samplesheet,
-        final String bcl2fastqVersion, final File fastq)
+        final String bcl2fastqVersion, final File fastqDir, final int laneCount)
         throws FileNotFoundException, IOException, AozanException {
 
-      super(samplesheet, bcl2fastqVersion, fastq);
+      super(samplesheet, bcl2fastqVersion, fastqDir, laneCount);
 
     }
 
@@ -445,8 +458,8 @@ public class ManagerQCPath {
      * @param fastq the fastq directory
      */
     private ManagerQCPathVersion1(final SampleSheet samplesheet,
-        final File fastq) {
-      super(samplesheet, fastq);
+        final File fastq, final int laneCount) {
+      super(samplesheet, fastq, laneCount);
     }
   }
 
@@ -490,6 +503,8 @@ public class ManagerQCPath {
       if (this.sampleSheetV2 == null)
         throw new AozanRuntimeException("sample sheet not init");
 
+      System.out.println("samplesheet save " + this.sampleSheetV2);
+
       return String.format("%s_S%d%s",
           fastqSample.getSampleName().replace("_", "-"),
           this.sampleSheetV2.extractOrderNumberSample(fastqSample),
@@ -504,34 +519,36 @@ public class ManagerQCPath {
      * Private constructor a new manager qc path.
      * @param samplesheet the sample sheet file
      * @param bcl2fastqVersion the bcl2fasq version
-     * @param fastq the fastq directory
+     * @param fastqDir the fastq directory
+     * @param laneCount the lane count
      * @throws FileNotFoundException the file not found exception
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws AozanException the aozan exception
      */
     private ManagerQCPathVersion2(final File samplesheet,
-        final String bcl2fastqVersion, final File fastq)
+        final String bcl2fastqVersion, final File fastqDir, final int laneCount)
         throws FileNotFoundException, IOException, AozanException {
 
-      super(samplesheet, bcl2fastqVersion, fastq);
+      super(samplesheet, bcl2fastqVersion, fastqDir, laneCount);
 
       if (ManagerQCPath.this.samplesheet == null)
         System.out.println("in cons sample sheet is null ");
 
       this.sampleSheetV2 =
           (SampleSheetVersion2) SampleSheetUtils.getSampleSheet(samplesheet,
-              bcl2fastqVersion);
+              bcl2fastqVersion, laneCount);
 
     }
 
     /**
      * Private constructor a new manager qc path version2.
      * @param samplesheet the sample sheet file
-     * @param fastq the fastq directory
+     * @param fastqDir the fastq directory
+     * @param laneCount the lane count
      */
     private ManagerQCPathVersion2(final SampleSheet samplesheet,
-        final File fastq) {
-      super(samplesheet, fastq);
+        final File fastqDir, final int laneCount) {
+      super(samplesheet, fastqDir, laneCount);
       this.sampleSheetV2 = (SampleSheetVersion2) samplesheet;
     }
   }

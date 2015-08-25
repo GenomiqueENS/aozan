@@ -43,8 +43,8 @@ public abstract class AbstractCasavaDesignTextReader implements
   private SampleSheet design;
   private SampleSheetLineReader reader;
 
-  private boolean isCompatibleForQCReport = false;
-  private RunData data;
+  private boolean isCompatibleForQCReport = true;
+  private int laneCount;
   private String version;
 
   /**
@@ -62,7 +62,8 @@ public abstract class AbstractCasavaDesignTextReader implements
       if (this.version.equals(SampleSheetUtils.VERSION_2)) {
         this.design = new SampleSheetVersion2(version);
         this.reader =
-            new SampleSheetLineReaderV2(getData(), isCompatibleForQCReport());
+            new SampleSheetLineReaderV2(getLaneCount(),
+                isCompatibleForQCReport());
       } else {
         this.design = new SampleSheet(version);
         this.reader = new SampleSheetLineReaderV1();
@@ -163,17 +164,17 @@ public abstract class AbstractCasavaDesignTextReader implements
     return this.isCompatibleForQCReport;
   }
 
-  protected RunData getData() {
+  protected int getLaneCount() {
 
-    return data;
+    return laneCount;
   }
 
   public void setCompatibleForQCReport(boolean isCompatibleForQCReport) {
     this.isCompatibleForQCReport = isCompatibleForQCReport;
   }
 
-  public void setData(RunData data) {
-    this.data = data;
+  public void setLaneCount(final int laneCount) {
+    this.laneCount = laneCount;
   }
 
 }

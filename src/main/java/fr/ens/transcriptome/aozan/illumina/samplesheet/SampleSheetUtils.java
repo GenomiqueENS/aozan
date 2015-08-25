@@ -63,8 +63,8 @@ public class SampleSheetUtils {
   public static final String SEP = ",";
 
   public static SampleSheet getSampleSheet(final File sampleSheetFile,
-      String sampleSheetVersion) throws FileNotFoundException, IOException,
-      AozanException {
+      String sampleSheetVersion, final int laneCount)
+      throws FileNotFoundException, IOException, AozanException {
 
     checkNotNull(sampleSheetVersion, "sample sheet version");
     checkExistingStandardFile(sampleSheetFile, "sample sheet");
@@ -73,11 +73,17 @@ public class SampleSheetUtils {
 
     switch (extension) {
     case ".csv":
-      return new CasavaDesignCSVReader(sampleSheetFile)
-          .read(sampleSheetVersion);
+      if (laneCount < 1)
+        return new CasavaDesignCSVReader(sampleSheetFile)
+            .read(sampleSheetVersion);
+      return new CasavaDesignCSVReader(sampleSheetFile).readForQCReport(
+          sampleSheetVersion, laneCount);
+
     case ".xls":
+
       return new CasavaDesignXLSReader(sampleSheetFile)
           .read(sampleSheetVersion);
+
     default:
       throw new AozanException(
           "Sample sheet: create instance from file fail, extension ("
@@ -87,10 +93,11 @@ public class SampleSheetUtils {
   }
 
   public static SampleSheet getSampleSheet(final String sampleSheetFilename,
-      String sampleSheetVersion) throws FileNotFoundException, IOException,
-      AozanException {
+      String sampleSheetVersion, final int laneCount)
+      throws FileNotFoundException, IOException, AozanException {
 
-    return getSampleSheet(new File(sampleSheetFilename), sampleSheetVersion);
+    return getSampleSheet(new File(sampleSheetFilename), sampleSheetVersion,
+        laneCount);
 
   }
 
