@@ -81,6 +81,12 @@ public class RunInfo {
   // Parser
   //
 
+  public void parse(final String filepath) throws ParserConfigurationException,
+      SAXException, IOException {
+
+    parse(FileUtils.createInputStream(new File(filepath)));
+  }
+
   /**
    * Parses the run info file
    * @param file the run info file
