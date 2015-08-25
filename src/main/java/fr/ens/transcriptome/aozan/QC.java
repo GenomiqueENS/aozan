@@ -84,6 +84,8 @@ public class QC {
   /** Temporary directory property key. */
   public static final String TMP_DIR = "tmp.dir";
 
+  public static final String LANE_COUNT = "lane.count";
+
   /** Bcl2fastq version to demultiplexing step. */
   public static final String BCL2FASTQ_VERSION = "bcl2fast.version";
 
@@ -107,6 +109,8 @@ public class QC {
 
   /** Bcl2fastq version to demultiplexing step. */
   private final String bcl2fastqVersion;
+
+  private final int laneCount;
 
   /**
    * Process data.
@@ -584,9 +588,11 @@ public class QC {
     // Find bcl2fastq main version (1 or 2) from completed version name
     this.globalConf.put(BCL2FASTQ_VERSION,
         DemultiplexingCollector.findBcl2fastqVersion(this.bcl2fastqVersion));
+    this.globalConf.put(LANE_COUNT, "" + laneCount);
 
     // Init manager qc path
     ManagerQCPath.getInstance(this.globalConf);
+
   }
 
   /**
@@ -720,17 +726,20 @@ public class QC {
    * @param properties QC properties
    * @param bclDir BCL directory
    * @param fastqDir fastq directory
-   * @param runId run id
+   * @param qcDir the qc dir
    * @param tmpDirname temporary directory path
+   * @param runId run id
    * @param bcl2fastqVersion bcl2fastq version used
+   * @param laneCount the lane count
    * @throws AozanException if an error occurs while initialize the QC object
    */
   public QC(final Map<String, String> properties, final String bclDir,
       final String fastqDir, final String qcDir, final String tmpDirname,
-      final String runId, final String bcl2fastqVersion) throws AozanException {
+      final String runId, final String bcl2fastqVersion, final int laneCount)
+      throws AozanException {
 
     this(properties, bclDir, fastqDir, qcDir, tmpDirname == null
-        ? null : new File(tmpDirname), runId, bcl2fastqVersion);
+        ? null : new File(tmpDirname), runId, bcl2fastqVersion, laneCount);
   }
 
   /**
@@ -738,14 +747,17 @@ public class QC {
    * @param properties QC properties
    * @param bclDir BCL directory
    * @param fastqDir fastq directory
-   * @param runId run id
+   * @param qcDir the qc dir
    * @param tmpDir temporary directory
+   * @param runId run id
    * @param bcl2fastqVersion bcl2fastq version used
+   * @param laneCount the lane count
    * @throws AozanException if an error occurs while initialize the QC object
    */
   public QC(final Map<String, String> properties, final String bclDir,
       final String fastqDir, final String qcDir, final File tmpDir,
-      final String runId, final String bcl2fastqVersion) throws AozanException {
+      final String runId, final String bcl2fastqVersion, final int laneCount)
+      throws AozanException {
 
     if (properties == null) {
       throw new NullPointerException("The properties object is null");
@@ -755,6 +767,7 @@ public class QC {
     this.fastqDir = fastqDir;
     this.qcDir = qcDir;
     this.runId = runId;
+    this.laneCount = laneCount;
     this.bcl2fastqVersion =
         ((bcl2fastqVersion == "latest" || bcl2fastqVersion.charAt(0) == '2')
             ? DemultiplexingCollector.VERSION_2
