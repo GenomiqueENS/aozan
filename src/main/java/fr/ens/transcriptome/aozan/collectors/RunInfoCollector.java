@@ -63,6 +63,12 @@ public class RunInfoCollector implements Collector {
 
     return COLLECTOR_NAME;
   }
+  
+  @Override
+  public boolean isStatisticCollector() {
+    return false;
+  }
+
 
   @Override
   public List<String> getCollectorsNamesRequiered() {

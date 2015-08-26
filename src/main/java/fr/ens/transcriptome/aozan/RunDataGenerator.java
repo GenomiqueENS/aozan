@@ -154,7 +154,7 @@ public class RunDataGenerator {
    * @param collectorsInitOrder the collectors init order
    * @return the same list with new order
    */
-  private List<Collector> addAllCollectors(
+  private List<Collector> reorderCollector(
       final List<Collector> collectorsInitOrder) {
     // Force ProjectCollector, must be the last
 
@@ -166,11 +166,8 @@ public class RunDataGenerator {
 
       // Collector selected
       // TODO to change
-      if (collector instanceof ProjectStatistics
-          || collector instanceof SampleStatistics) {
-
+      if (collector.isStatisticCollector()) {
         statisticsCollector.add(collector);
-
       } else {
         collectorsNewOrder.add(collector);
       }
@@ -221,7 +218,7 @@ public class RunDataGenerator {
 
     checkNotNull(collectors, "The list of collectors is null");
 
-    this.collectors = addAllCollectors(collectors);
+    this.collectors = reorderCollector(collectors);
     this.runId = runId;
 
     // Add collector name requiered in properties

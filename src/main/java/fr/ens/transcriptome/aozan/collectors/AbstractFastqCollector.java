@@ -176,6 +176,11 @@ public abstract class AbstractFastqCollector implements Collector {
   // Collector methods
   //
 
+  @Override
+  public boolean isStatisticCollector() {
+    return false;
+  }
+
   /**
    * Get the name of the collectors required to run this collector.
    * @return a list of String with the name of the required collectors
@@ -267,10 +272,12 @@ public abstract class AbstractFastqCollector implements Collector {
         } else {
           // TODO
 
-          LOGGER.severe("FASTQ Collect: fastq is null or empty, key fq is "
-              + fs.getKeyFastqSample() + " tmp fq "
-              + fs.getNameTemporaryFastqFiles() + " sample name "
-              + fs.getSampleName() + " prefix rundata " + fs.getPrefixRundata());
+          LOGGER
+              .severe("FASTQ Collect: fastq is null or empty, key fq is "
+                  + fs.getKeyFastqSample() + " tmp fq "
+                  + fs.getNameTemporaryFastqFiles() + " sample name "
+                  + fs.getSampleName() + " prefix rundata "
+                  + fs.getPrefixRundata());
         }
       }
 

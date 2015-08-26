@@ -61,6 +61,11 @@ public abstract class StatisticsCollector implements Collector {
   private boolean fastqScreenCollectorSelected = false;
 
   @Override
+  public boolean isStatisticCollector() {
+    return true;
+  }
+
+  @Override
   public List<String> getCollectorsNamesRequiered() {
 
     // UndeterminedIndexesCollector and FastqScreenCollector is optional for

@@ -74,6 +74,11 @@ public class DesignCollector implements Collector {
   }
 
   @Override
+  public boolean isStatisticCollector() {
+    return false;
+  }
+
+  @Override
   public List<String> getCollectorsNamesRequiered() {
 
     return Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME);

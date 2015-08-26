@@ -56,6 +56,11 @@ abstract class AbstractMetricsCollector implements Collector {
   /** The reads count. */
   private int readsCount;
 
+  @Override
+  public boolean isStatisticCollector() {
+    return false;
+  }
+
   /**
    * Get the name of the collectors required to run this collector.
    * @return a list of String with the name of the required collectors

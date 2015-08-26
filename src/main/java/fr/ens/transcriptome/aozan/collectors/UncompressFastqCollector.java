@@ -62,6 +62,11 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
   }
 
   @Override
+  public boolean isStatisticCollector() {
+    return false;
+  }
+
+  @Override
   protected boolean isProcessUndeterminedIndicesSamples() {
     return this.isProcessUndeterminedIndicesSamples;
   }

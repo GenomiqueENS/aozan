@@ -66,4 +66,10 @@ public interface Collector {
    */
   public void clear();
 
+  /**
+   * Checks if is statistic collector, if it's true, should be executed at the
+   * end.
+   * @return true, if is statistic collector
+   */
+  public boolean isStatisticCollector();
 }

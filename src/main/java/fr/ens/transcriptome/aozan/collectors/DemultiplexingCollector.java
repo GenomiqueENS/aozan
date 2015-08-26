@@ -86,6 +86,11 @@ public class DemultiplexingCollector implements Collector {
   }
 
   @Override
+  public boolean isStatisticCollector() {
+    return false;
+  }
+
+  @Override
   public void configure(final Properties properties) {
 
     if (properties == null) {
@@ -103,9 +108,6 @@ public class DemultiplexingCollector implements Collector {
       // Conversion collector
       this.subCollector = new ConversionStatsCollector();
     }
-
-    System.out.println("Demux configure this sub collector "
-        + subCollector.getClass().getName());
 
     // Init collector
     subCollector.configure(properties);
