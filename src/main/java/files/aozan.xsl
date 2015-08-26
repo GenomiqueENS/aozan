@@ -244,64 +244,93 @@ doctype-system="about:legacy-compat"/>
   <script type="text/javascript">
 	<xsl:comment><![CDATA[
 
-			
-        // Retrieve list lane number related to projet
+     // Retrieve list lane number related to projet
         function filterRow(lanes_related_project, typeFilter, name, elemLink) {
 
-
-			if (typeFilter == 'project'){
-				filterProject(lanes_related_project, name, elemLink);
+			init_all('none');
+			if (name == "Undetermined"){
+				filterUndetermined(lanes_related_project);
+			} else if (typeFilter == 'project'){
+				filterProject(lanes_related_project, name);
 			} else {
-				filterSample(lanes_related_project, name, elemLink);
+				filterSample(lanes_related_project, name);
 			}
-		}
-	
-		function filterProject(lanes_related_project, project_name, elemLink) {
-		
-            init_all('none');
-	        //Split
-            var lanes = lanes_related_project[0].split(',');
 
-            if (project_name == "Undetermined"){
-                var table_read = document.getElementsByClassName('sampleData');
-
-                // Parsing read
-                for (var read = 0; read < table_read.length ; read++){
-                    // Parsing lanes set in parameters
-                    for (var j=0; j < lanes.length; j++){
-
-                        // Get rows number
-                        var node_lane = table_read[read].getElementsByClassName(lanes[j]);
-                        var last_row = node_lane.length -1 ;
-                        // Display last rows from selected lane
-                        node_lane[last_row].style.display ="table-row";
-                    }
-                }
-            } else {
-              // Filter sample table data
-              for (var n=0; n < lanes.length; n++){
-                  var node = document.getElementsByClassName(lanes[n]);
-                  for (var i=0; i < node.length; i++){
-                      node[i].style.display ="table-row";
-
-                  }
-              }
-
-              // Filter project table data
-              var projects = document.getElementsByClassName('projectData')[0];
-              var project_row = projects.getElementsByClassName(project_name);
-
-              // One row by project
-              project_row[0].style.display ="table-row";
-            }
 
             update_link_css(elemLink)
+		}
+
+
+		function filterUndetermined(lanes_related_project) {
+
+			//Split
+            var lanes = lanes_related_project[0].split(',');
+
+			var table_read = document.getElementsByClassName('sampleData');
+			// Parsing read
+			for (var read = 0; read < table_read.length ; read++){
+				// Parsing lanes set in parameters
+				for (var j=0; j < lanes.length; j++){
+
+					// Get rows number
+					var node_lane = table_read[read].getElementsByClassName(lanes[j]);
+					var last_row = node_lane.length -1 ;
+					// Display last rows from selected lane
+					node_lane[last_row].style.display ="table-row";
+				}
+			}
+		}
+
+		function filterProject(lanes_related_project, project_name) {
+
+			//Split
+            var lanes = lanes_related_project[0].split(',');
+
+			// Filter sample table data
+			for (var n=0; n < lanes.length; n++){
+				var node = document.getElementsByClassName(lanes[n]);
+				for (var i=0; i < node.length; i++){
+					node[i].style.display ="table-row";
+				}
+			}
+
+			// Filter project table data
+			var projects = document.getElementsByClassName('projectData')[0];
+			var project_row = projects.getElementsByClassName(project_name);
+
+			// One row by project
+			project_row[0].style.display ="table-row";
         }
-	
-		function filterSample(lanes_related_project, sample_name, elemLink) {
-					
-           // init_all('none');
-		}						   
+
+		function filterSample(lanes_related_project, sample_name) {
+
+			//Split
+            var lanes = lanes_related_project[0].split(',');
+
+			// Filter sample table data
+			for (var n=0; n < lanes.length; n++){
+				var node = document.getElementsByClassName(lanes[n]);
+
+				for (var i=0; i < node.length; i++){
+					sample_value =  node[i].cells[1].innerHTML;
+					if (sample_value.trim() == sample_name){
+						node[i].style.display ="table-row";
+					}
+				}
+			}
+
+			// Display project table data
+			var projects = document.getElementsByClassName('projectData')[0];
+			projects.rows[1].style.display ="table-row";
+
+			// Filter sample table data
+			var samples = document.getElementsByClassName('projectData')[1];
+			var replica = samples.getElementsByClassName(sample_name);
+
+			// One row by replica
+			replica[0].style.display ="table-row";
+		}
+			   
 
 		function update_link_css(elemLink){
 			// Change class link
