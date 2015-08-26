@@ -103,10 +103,7 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
    */
   private void initMetricsMap(final RunData data) {
 
-    final int tilesCount =
-        data.getInt("run.info.flow.cell.tile.count")
-            * data.getInt("run.info.flow.cell.surface.count")
-            * data.getInt("run.info.flow.cell.swath.count");
+    final int tilesCount = data.getTilesCount();
 
     final int lanesCount = data.getLaneCount();
     final int readsCount = data.getReadCount();
