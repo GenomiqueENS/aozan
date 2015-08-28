@@ -1,4 +1,4 @@
-package fr.ens.transcriptome.aozan.tests.project;
+package fr.ens.transcriptome.aozan.tests.projectstats;
 
 import static fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics.COLLECTOR_PREFIX;
 
@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics;
 
-public class LanesRunProjectTest extends AbstractSimpleProjectTest {
+public class GenomesProjectTest  extends AbstractSimpleProjectTest {
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -19,7 +19,7 @@ public class LanesRunProjectTest extends AbstractSimpleProjectTest {
   @Override
   protected String getKey(final String projectName) {
 
-    return COLLECTOR_PREFIX + projectName + ".lanes";
+    return COLLECTOR_PREFIX + projectName + ".genomes.ref";
   }
 
   @Override
@@ -35,8 +35,9 @@ public class LanesRunProjectTest extends AbstractSimpleProjectTest {
   /**
    * Public constructor.
    */
-  public LanesRunProjectTest() {
-    super("lanesrunproject", "", "Lane(s)");
+  public GenomesProjectTest() {
+    super("genomesproject", "", "Genome(s)");
   }
+
 
 }

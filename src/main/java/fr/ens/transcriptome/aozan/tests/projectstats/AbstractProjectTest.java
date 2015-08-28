@@ -21,7 +21,7 @@
  *
  */
 
-package fr.ens.transcriptome.aozan.tests.project;
+package fr.ens.transcriptome.aozan.tests.projectstats;
 
 /**
  * This class define a abstract Global test.

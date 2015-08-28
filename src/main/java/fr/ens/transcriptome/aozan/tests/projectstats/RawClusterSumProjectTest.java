@@ -21,7 +21,7 @@
  *
  */
 
-package fr.ens.transcriptome.aozan.tests.project;
+package fr.ens.transcriptome.aozan.tests.projectstats;
 
 import java.util.List;
 
@@ -30,14 +30,11 @@ import com.google.common.collect.ImmutableList;
 import fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics;
 
 /**
- * The class define test on samples count on a project which exceed a contaminant
- * threshold on percent mapped reads on dataset contaminants genomes. The
- * default value of threshold is 0.10, can be redefine in configuration file.
+ * The class define a test the sum on raw clusters on samples in a project.
  * @author Sandrine Perrin
  * @since 1.4
  */
-public class SamplesExceededContaminationThresholdProjectTest extends
-    AbstractSimpleProjectTest {
+public class RawClusterSumProjectTest extends AbstractSimpleProjectTest {
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -49,7 +46,7 @@ public class SamplesExceededContaminationThresholdProjectTest extends
   protected String getKey(final String projectName) {
 
     return ProjectStatistics.COLLECTOR_PREFIX
-        + projectName + ".samples.exceeded.contamination.threshold.count";
+        + projectName + ".raw.cluster.sum";
   }
 
   @Override
@@ -65,9 +62,8 @@ public class SamplesExceededContaminationThresholdProjectTest extends
   /**
    * Public constructor.
    */
-  public SamplesExceededContaminationThresholdProjectTest() {
-    super("samplesexceededcontaminationthreshold", "",
-        "Sample(s) exceeded contamination threshold");
+  public RawClusterSumProjectTest() {
+    super("rawclustersumproject", "", "Raw clusters sum");
   }
 
 }

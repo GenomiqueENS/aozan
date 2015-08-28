@@ -21,7 +21,7 @@
  *
  */
 
-package fr.ens.transcriptome.aozan.tests.project;
+package fr.ens.transcriptome.aozan.tests.projectstats;
 
 import java.util.List;
 
@@ -30,11 +30,12 @@ import com.google.common.collect.ImmutableList;
 import fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics;
 
 /**
- * The class define a test the sum on raw clusters on samples in a project.
+ * The class define a test the minimum on passing filter clusters on samples in
+ * a project.
  * @author Sandrine Perrin
  * @since 1.4
  */
-public class RawClusterSumProjectTest extends AbstractSimpleProjectTest {
+public class PFClusterMinProjectTest extends AbstractSimpleProjectTest {
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -46,7 +47,7 @@ public class RawClusterSumProjectTest extends AbstractSimpleProjectTest {
   protected String getKey(final String projectName) {
 
     return ProjectStatistics.COLLECTOR_PREFIX
-        + projectName + ".raw.cluster.sum";
+        + projectName + ".pf.cluster.min";
   }
 
   @Override
@@ -62,8 +63,8 @@ public class RawClusterSumProjectTest extends AbstractSimpleProjectTest {
   /**
    * Public constructor.
    */
-  public RawClusterSumProjectTest() {
-    super("rawclustersumproject", "", "Raw clusters sum");
+  public PFClusterMinProjectTest() {
+    super("pfclusterminproject", "", "PF clusters min");
   }
 
 }

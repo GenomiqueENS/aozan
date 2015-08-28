@@ -21,7 +21,7 @@
  *
  */
 
-package fr.ens.transcriptome.aozan.tests.project;
+package fr.ens.transcriptome.aozan.tests.projectstats;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,13 +37,12 @@ import fr.ens.transcriptome.aozan.tests.TestResult;
 import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
 /**
- * The class define test to compute the percent recoverable raw clusters for a
- * project.
+ * The class define test to compute the percent recoverable passing filter
+ * clusters for a project.
  * @author Sandrine Perrin
  * @since 1.4
  */
-public class PercentRecoverableRawClusterProjectTest extends
-    AbstractProjectTest {
+public class PercentRecoverablePFClusterProjectTest extends AbstractProjectTest {
 
   private final ScoreInterval interval = new ScoreInterval();
 
@@ -63,20 +62,20 @@ public class PercentRecoverableRawClusterProjectTest extends
     // Build key for run data
     final String recoveryCountKey =
         ProjectStatistics.COLLECTOR_PREFIX
-            + projectName + ".raw.cluster.recovery.sum";
-    final String rawClusterSumKey =
+            + projectName + ".pf.cluster.recovery.sum";
+    final String pfClusterSumKey =
         ProjectStatistics.COLLECTOR_PREFIX
-            + projectName + ".raw.cluster.sum";
+            + projectName + ".pf.cluster.sum";
 
     try {
       // Set raw cluster sum for a project
-      final long rawClusterCount = data.getLong(rawClusterSumKey);
+      final long pfClusterCount = data.getLong(pfClusterSumKey);
 
       // Set recoverable raw cluster sum for a project
       final long recoveryCount = data.getLong(recoveryCountKey);
 
       // Compute percent
-      final double percent = (double) recoveryCount / (double) rawClusterCount;
+      final double percent = (double) recoveryCount / (double) pfClusterCount;
 
       if (interval == null)
         return new TestResult(percent, true);
@@ -109,8 +108,8 @@ public class PercentRecoverableRawClusterProjectTest extends
   /**
    * Public constructor.
    */
-  public PercentRecoverableRawClusterProjectTest() {
-    super("recoverablerawclusterpercent", "", "Recoverable raw cluster ", "%");
+  public PercentRecoverablePFClusterProjectTest() {
+    super("recoverablepfclusterpercent", "", "Recoverable PF cluster ", "%");
   }
 
 }

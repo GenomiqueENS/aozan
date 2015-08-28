@@ -50,7 +50,7 @@ import com.google.common.collect.Sets;
 import fr.ens.transcriptome.aozan.tests.TestResult;
 import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
 import fr.ens.transcriptome.aozan.tests.lane.LaneTest;
-import fr.ens.transcriptome.aozan.tests.project.ProjectTest;
+import fr.ens.transcriptome.aozan.tests.projectstats.ProjectTest;
 import fr.ens.transcriptome.aozan.tests.sample.SampleTest;
 import fr.ens.transcriptome.aozan.tests.samplestats.SampleStatsTest;
 import fr.ens.transcriptome.aozan.util.XMLUtilsWriter;

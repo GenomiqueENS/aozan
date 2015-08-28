@@ -20,7 +20,7 @@
  *      http://www.transcriptome.ens.fr/aozan
  *
  */
-package fr.ens.transcriptome.aozan.tests.project;
+package fr.ens.transcriptome.aozan.tests.projectstats;
 
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.tests.AozanTest;

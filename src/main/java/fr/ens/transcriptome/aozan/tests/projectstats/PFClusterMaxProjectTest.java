@@ -21,7 +21,7 @@
  *
  */
 
-package fr.ens.transcriptome.aozan.tests.project;
+package fr.ens.transcriptome.aozan.tests.projectstats;
 
 import java.util.List;
 
@@ -30,12 +30,12 @@ import com.google.common.collect.ImmutableList;
 import fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics;
 
 /**
- * The class define a test the minimum on passing filter clusters on samples in
+ * The class define a test the maximum on passing filter clusters on samples in
  * a project.
  * @author Sandrine Perrin
  * @since 1.4
  */
-public class PFClusterMinProjectTest extends AbstractSimpleProjectTest {
+public class PFClusterMaxProjectTest extends AbstractSimpleProjectTest {
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -47,7 +47,7 @@ public class PFClusterMinProjectTest extends AbstractSimpleProjectTest {
   protected String getKey(final String projectName) {
 
     return ProjectStatistics.COLLECTOR_PREFIX
-        + projectName + ".pf.cluster.min";
+        + projectName + ".pf.cluster.max";
   }
 
   @Override
@@ -63,8 +63,7 @@ public class PFClusterMinProjectTest extends AbstractSimpleProjectTest {
   /**
    * Public constructor.
    */
-  public PFClusterMinProjectTest() {
-    super("pfclusterminproject", "", "PF clusters min");
+  public PFClusterMaxProjectTest() {
+    super("pfclustermaxproject", "", "PF clusters max");
   }
-
 }

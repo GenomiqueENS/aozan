@@ -26,4 +26,4 @@
  * to launch and creates a report of a quality control.
  * @since 1.4
  */
-package fr.ens.transcriptome.aozan.tests.project;
+package fr.ens.transcriptome.aozan.tests.projectstats;

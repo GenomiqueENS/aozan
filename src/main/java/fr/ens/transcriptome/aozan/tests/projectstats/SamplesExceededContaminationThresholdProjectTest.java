@@ -21,43 +21,41 @@
  *
  */
 
-package fr.ens.transcriptome.aozan.tests.project;
+package fr.ens.transcriptome.aozan.tests.projectstats;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 
-import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics;
-import fr.ens.transcriptome.aozan.tests.AozanTest;
-import fr.ens.transcriptome.aozan.tests.TestResult;
 
-public class LinkReportFastqScreenProjectTest extends AbstractProjectTest {
-
-  @Override
-  public List<AozanTest> configure(Map<String, String> properties)
-      throws AozanException {
-    return Collections.singletonList((AozanTest) this);
-  }
-
-  @Override
-  public TestResult test(RunData data, String projectName) {
-
-    // Get HTML report URL
-    final String filename = String.format("%s-fastqscreen.html", projectName);
-
-    final String url = "Project_" + projectName + "/" + filename;
-
-    return new TestResult(9, url, "url");
-  }
+/**
+ * The class define test on samples count on a project which exceed a contaminant
+ * threshold on percent mapped reads on dataset contaminants genomes. The
+ * default value of threshold is 0.10, can be redefine in configuration file.
+ * @author Sandrine Perrin
+ * @since 1.4
+ */
+public class SamplesExceededContaminationThresholdProjectTest extends
+    AbstractSimpleProjectTest {
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
     return ImmutableList.of(ProjectStatistics.COLLECTOR_NAME);
+  }
+
+  @Override
+  protected String getKey(final String projectName) {
+
+    return ProjectStatistics.COLLECTOR_PREFIX
+        + projectName + ".samples.exceeded.contamination.threshold.count";
+  }
+
+  @Override
+  protected Class<?> getValueType() {
+
+    return Integer.class;
   }
 
   //
@@ -67,9 +65,9 @@ public class LinkReportFastqScreenProjectTest extends AbstractProjectTest {
   /**
    * Public constructor.
    */
-  public LinkReportFastqScreenProjectTest() {
-
-    super("linkprojectreport", "link report fastqScreen", "FastqScreen report");
+  public SamplesExceededContaminationThresholdProjectTest() {
+    super("samplesexceededcontaminationthreshold", "",
+        "Sample(s) exceeded contamination threshold");
   }
 
 }

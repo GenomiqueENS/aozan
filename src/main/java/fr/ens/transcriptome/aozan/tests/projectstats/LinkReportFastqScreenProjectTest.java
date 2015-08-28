@@ -21,39 +21,43 @@
  *
  */
 
-package fr.ens.transcriptome.aozan.tests.project;
+package fr.ens.transcriptome.aozan.tests.projectstats;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 
+import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics;
+import fr.ens.transcriptome.aozan.tests.AozanTest;
+import fr.ens.transcriptome.aozan.tests.TestResult;
 
-/**
- * The class define a test the maximum on passing filter clusters on samples in
- * a project.
- * @author Sandrine Perrin
- * @since 1.4
- */
-public class PFClusterMaxProjectTest extends AbstractSimpleProjectTest {
+public class LinkReportFastqScreenProjectTest extends AbstractProjectTest {
+
+  @Override
+  public List<AozanTest> configure(Map<String, String> properties)
+      throws AozanException {
+    return Collections.singletonList((AozanTest) this);
+  }
+
+  @Override
+  public TestResult test(RunData data, String projectName) {
+
+    // Get HTML report URL
+    final String filename = String.format("%s-fastqscreen.html", projectName);
+
+    final String url = "Project_" + projectName + "/" + filename;
+
+    return new TestResult(9, url, "url");
+  }
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
     return ImmutableList.of(ProjectStatistics.COLLECTOR_NAME);
-  }
-
-  @Override
-  protected String getKey(final String projectName) {
-
-    return ProjectStatistics.COLLECTOR_PREFIX
-        + projectName + ".pf.cluster.max";
-  }
-
-  @Override
-  protected Class<?> getValueType() {
-
-    return Integer.class;
   }
 
   //
@@ -63,7 +67,9 @@ public class PFClusterMaxProjectTest extends AbstractSimpleProjectTest {
   /**
    * Public constructor.
    */
-  public PFClusterMaxProjectTest() {
-    super("pfclustermaxproject", "", "PF clusters max");
+  public LinkReportFastqScreenProjectTest() {
+
+    super("linkprojectreport", "link report fastqScreen", "FastqScreen report");
   }
+
 }
