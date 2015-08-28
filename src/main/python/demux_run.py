@@ -364,12 +364,12 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
             cpu_count = Runtime.getRuntime().availableProcessors()
     
         # Launch casava
-        #args = []
-        #args.extend(['cd', fastq_output_dir])
-        #args.extend(['&&', 'make', '-j', str(cpu_count)])
-        #args.extend(['>', fastq_output_dir + '/make.out', '2>', fastq_output_dir + '/make.err'])
+        # args = []
+        # args.extend(['cd', fastq_output_dir])
+        # args.extend(['&&', 'make', '-j', str(cpu_count)])
+        # args.extend(['>', fastq_output_dir + '/make.out', '2>', fastq_output_dir + '/make.err'])
         
-        cmd += 'cd '  + str(fastq_output_dir) + ' && make -j ' + str(cpu_count) 
+        cmd += 'cd ' + str(fastq_output_dir) + ' && make -j ' + str(cpu_count) 
         cmd += ' > ' + str(fastq_output_dir) + '/make.out 2> ' + str(fastq_output_dir) + '/make.err'
         
         # Build command line for bcl2fast version 1.X: add 3rd command
@@ -497,14 +497,14 @@ def demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_
     cmd = bcl2fastq_get_command(run_id, input_run_data_path_in_docker, fastq_data_path_in_docker, samplesheet_csv_docker, tmp_docker, bcl2fastq_version, conf)
     
     # Extract filename to execute
-    filename = os.path.basename(cmd)
+    dockerCommand = "/tmp/" + str(os.path.basename(cmd))
     
     try:
         # Set working in docker on parent demultiplexing run directory. Demultiplexing run directory will create by bcl2fastq
-        docker = DockerUtils("/tmp/" + str(filename), 'bcl2fastq2', bcl2fastq_version)
-        #docker = DockerUtils('touch /tmp/totot', 'bcl2fastq2', bcl2fastq_version)
+        docker = DockerUtils(dockerCommand, 'bcl2fastq2', bcl2fastq_version)
+        # docker = DockerUtils('touch /tmp/totot', 'bcl2fastq2', bcl2fastq_version)
         
-        common.log("CONFIG", "bcl2fastq run with image docker from " + docker.getImageDockerName() + " with command line " + cmd, conf)
+        common.log("CONFIG", "bcl2fastq run with image docker from " + docker.getImageDockerName() + " with command line " + dockerCommand, conf)
         common.log("CONFIG", "bcl2fastq docker mount: " 
                    + str(os.path.dirname(fastq_output_dir)) + ":" + str(output_docker) + "; " 
                    + input_run_data_path + ":" + input_docker + "; " + tmp + ":" + tmp_docker, conf); 
@@ -530,7 +530,7 @@ def demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_
     
     # The output directory must be read only
     #   cmd = 'chmod -R ugo-w ' + fastq_output_dir + '/Project_*'
-    cmd = 'find' + fastq_output_dir + ' -type f -name "*.fastq.*" -exec chmod ugo-w {} \; '
+    cmd = 'find ' + fastq_output_dir + ' -type f -name "*.fastq.*" -exec chmod ugo-w {} \; '
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while setting read only the output fastq directory for run " + run_id,
