@@ -1018,6 +1018,13 @@ def load_conf(conf, conf_file_path):
                 if fields[0].strip() in converting_table_key:
                     conf[converting_table_key[fields[0].strip()]] = fields[1].strip()
     f.close()
+    
+    # Save configuration file path
+    conf[Settings.AOZAN_CONF_FILE_PATH] = conf_file_path
+    
+    # Put configuration in code Java
+    Settings.setGlobalsConfiguration(conf)
+    
     return conf
 
 
