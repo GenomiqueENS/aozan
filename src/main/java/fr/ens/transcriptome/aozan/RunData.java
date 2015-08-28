@@ -317,6 +317,14 @@ public class RunData {
   }
 
   /**
+   * Gets the sequencer type.
+   * @return the sequencer type
+   */
+  public String getSequencerType() {
+    return this.get("run.info.sequencer.type");
+  }
+
+  /**
    * Get the cycles count in the read.
    * @param read the read number
    * @return cycles count in the read
@@ -651,7 +659,7 @@ public class RunData {
    * @return the map
    */
   public Map<String, String> getMap() {
-    
+
     return Collections.unmodifiableMap(map);
   }
 
