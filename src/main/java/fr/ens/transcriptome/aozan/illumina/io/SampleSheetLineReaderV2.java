@@ -253,9 +253,10 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
   public SampleSheetLineReaderV2(final int laneCount,
       final boolean compatibleForQCReport) {
 
-    this.isCompatibleForQCReport = compatibleForQCReport;
-
     this.laneCount = (laneCount == -1 ? 2 : laneCount);
+
+    // TODO throw exception if incompatible data
+    this.isCompatibleForQCReport = compatibleForQCReport && this.laneCount > 0;
 
   }
 }

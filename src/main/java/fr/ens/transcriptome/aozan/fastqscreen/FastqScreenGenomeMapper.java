@@ -141,6 +141,12 @@ public class FastqScreenGenomeMapper {
           this.genomesReferencesSampleRenamed.put(genome, aliasGenomeName);
         }
       }
+
+      LOGGER.warning(
+          "DEBUG genomes name available for mapping \n"
+              + Joiner.on("\n").withKeyValueSeparator("\t")
+                  .join(genomesReferencesSampleRenamed));
+
     }
 
     // Update alias genomes file
@@ -399,14 +405,6 @@ public class FastqScreenGenomeMapper {
 
     final String genomeTrimmed =
         genome.replaceAll("\"", "").trim().toLowerCase();
-
-    // TODO
-    System.out.println("Check FQS genome mapper search "
-        + genomeTrimmed
-        + " in this tab "
-        + Joiner.on("\n").withKeyValueSeparator("\t")
-            .join(genomesReferencesSampleRenamed) + "\n Is included "
-        + this.genomesReferencesSampleRenamed.get(genomeTrimmed));
 
     return this.genomesReferencesSampleRenamed.get(genomeTrimmed);
 

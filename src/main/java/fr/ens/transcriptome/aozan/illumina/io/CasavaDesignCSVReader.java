@@ -74,6 +74,9 @@ public class CasavaDesignCSVReader extends AbstractCasavaDesignTextReader {
 
       try {
 
+        // TODO
+        System.out.println("Current lane in samplesheet " + line);
+        
         // Parse the line
         parseLine(SampleSheetUtils.parseCSVDesignLine(line), version);
 

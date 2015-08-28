@@ -98,9 +98,6 @@ public class DesignCollector implements Collector {
     this.callAtLeastOneFastqCollector =
         checkCallFastqCollector(properties.getProperty(QC.QC_COLLECTOR_NAMES));
 
-    // TODO
-    System.out.println("call fastq Collector "
-        + this.callAtLeastOneFastqCollector);
   }
 
   private boolean checkCallFastqCollector(final String collectorsNames) {
@@ -179,10 +176,6 @@ public class DesignCollector implements Collector {
 
       // Add all projects name in data
       data.put("design.projects.names", Joiner.on(",").join(projectsName));
-
-      // TODO
-      System.out.println("save run data after design collector.");
-      data.createRunDataFile("/tmp/rundata.txt");
 
     } catch (final IOException e) {
       throw new AozanException(e);

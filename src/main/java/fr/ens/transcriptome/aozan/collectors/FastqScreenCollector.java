@@ -192,14 +192,16 @@ public class FastqScreenCollector extends AbstractFastqCollector {
             + fastqSample.getLane() + "." + fastqSample.getSampleName()
             + ".sample.ref");
 
-    Common.getLogger().info(
-        "FQS-extract genomeRef for sample "
-            + fastqSample.getSampleName() + " find name " + genomeSample);
-
     // Get corresponding valid genome name for mapping
     final String genomeReferenceSample =
         FastqScreenGenomeMapper.getInstance().getGenomeReferenceCorresponding(
             genomeSample);
+
+    Common.getLogger().info(
+        "FQS-extract genomeRef for sample "
+            + fastqSample.getSampleName() + " find name " + genomeSample
+            + " search related name in genome available on mapping "
+            + (genomeReferenceSample == null ? "NoFOUND" : genomeReferenceSample));
 
     // Genome can be use for mapping
     if (genomeReferenceSample != null) {

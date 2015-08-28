@@ -23,6 +23,7 @@
 
 package fr.ens.transcriptome.aozan.io;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingDirectoryFile;
 import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingStandardFile;
 
@@ -352,7 +353,8 @@ public class ManagerQCPath {
     checkExistingDirectoryFile(fastq, "fastq directory");
 
     this.samplesheet =
-        SampleSheetUtils.getSampleSheet(samplesheet, bcl2fastqVersion, laneCount);
+        SampleSheetUtils.getSampleSheet(samplesheet, bcl2fastqVersion,
+            laneCount);
 
     this.bcl2fastqVersion = bcl2fastqVersion;
     this.fastqDirectory = fastq;
@@ -499,11 +501,8 @@ public class ManagerQCPath {
             getConstantFastqSuffix(fastqSample.getLane(), read));
       }
 
-      // TODO
-      if (this.sampleSheetV2 == null)
-        throw new AozanRuntimeException("sample sheet not init");
-
-      System.out.println("samplesheet save " + this.sampleSheetV2);
+      checkNotNull(this.sampleSheetV2,
+          "sample sheet on version 2 instance not initialize.");
 
       return String.format("%s_S%d%s",
           fastqSample.getSampleName().replace("_", "-"),
@@ -530,9 +529,6 @@ public class ManagerQCPath {
         throws FileNotFoundException, IOException, AozanException {
 
       super(samplesheet, bcl2fastqVersion, fastqDir, laneCount);
-
-      if (ManagerQCPath.this.samplesheet == null)
-        System.out.println("in cons sample sheet is null ");
 
       this.sampleSheetV2 =
           (SampleSheetVersion2) SampleSheetUtils.getSampleSheet(samplesheet,

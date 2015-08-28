@@ -63,12 +63,11 @@ public class RunInfoCollector implements Collector {
 
     return COLLECTOR_NAME;
   }
-  
+
   @Override
   public boolean isStatisticCollector() {
     return false;
   }
-
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -99,6 +98,7 @@ public class RunInfoCollector implements Collector {
 
       data.put(PREFIX + ".run.id", runInfo.getId());
       data.put(PREFIX + ".run.number", runInfo.getNumber());
+      data.put(PREFIX + ".sequencer.type", runInfo.getSequencerType());
       data.put(PREFIX + ".flow.cell.id", runInfo.getFlowCell());
       data.put(PREFIX + ".flow.cell.lane.count", runInfo.getFlowCellLaneCount());
       data.put(PREFIX + ".flow.cell.surface.count",
@@ -109,13 +109,15 @@ public class RunInfoCollector implements Collector {
       data.put(PREFIX + ".instrument", runInfo.getInstrument());
       data.put(PREFIX + ".date", runInfo.getDate());
 
-      data.put(PREFIX + ".read.count", runInfo.getReads().size());
-
-      // Specific run data with RTA v2.X
-      data.put(PREFIX + ".flow.cell.section.per.lane",
-          runInfo.getFlowCellSectionPerLane());
+      // Value specific on RTA version 1.X otherwise value is -1
       data.put(PREFIX + ".flow.cell.lane.per.section",
           runInfo.getFlowCellLanePerSection());
+      // Value specific on RTA version 2.X otherwise value is -1
+      data.put(PREFIX + ".flow.cell.section.per.lane",
+          runInfo.getFlowCellSectionPerLane());
+
+      data.put(PREFIX + ".read.count", runInfo.getReads().size());
+
       data.put(PREFIX + ".image.channels",
           Joiner.on(",").join(runInfo.getImageChannels()));
 
