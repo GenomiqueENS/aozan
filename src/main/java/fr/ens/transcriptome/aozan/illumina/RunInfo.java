@@ -332,12 +332,37 @@ public class RunInfo {
    */
   public int getTilesCount() {
 
-    if (this.flowCellSectionPerLane == -1)
+    if (isHiseqSequencer())
       // Case Hiseq compute tile count
       return getHiseqTilesCount();
 
     // Case NextSeq compute tile count, add data from camera number
     return getNextseqTilesCount();
+  }
+
+  /**
+   * Checks if is next seq sequencer.
+   * @return true, if is next seq sequencer
+   */
+  public boolean isNextSeqSequencer() {
+    return this.flowCellSectionPerLane > 0;
+  }
+
+  /**
+   * Checks if is hiseq sequencer.
+   * @return true, if is hiseq sequencer
+   */
+  public boolean isHiseqSequencer() {
+    return this.flowCellSectionPerLane == -1;
+  }
+
+  /**
+   * Gets the sequencer type.
+   * @return the sequencer type
+   */
+  public String getSequencerType() {
+
+    return (isNextSeqSequencer() ? "nextseq" : "hiseq");
   }
 
   /**
