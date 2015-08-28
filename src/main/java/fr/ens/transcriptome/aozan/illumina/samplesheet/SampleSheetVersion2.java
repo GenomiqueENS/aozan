@@ -40,7 +40,7 @@ public class SampleSheetVersion2 extends SampleSheet {
       return ++lastIndice;
     }
 
-    if (sample.getLane() == 1) {
+    if (sample.getLane() == 1 || sample.getLane() == 0) {
       return ++lastIndice;
     }
 
@@ -85,9 +85,6 @@ public class SampleSheetVersion2 extends SampleSheet {
     return headerSession;
   }
 
-  // TODO
-  static boolean first = true;
-
   public int extractOrderNumberSample(final FastqSample fastqSample) {
 
     if (this.list == null || this.list.isEmpty())
@@ -110,20 +107,6 @@ public class SampleSheetVersion2 extends SampleSheet {
       key = buildKey(fastqSample.getSampleName(), fastqSample.getLane());
     }
 
-    if (first) {
-
-      // TODO
-      System.out.println("contains list sample with order \n"
-          + Joiner.on("\n\t").withKeyValueSeparator("=").join(this.list));
-
-      System.out.println("order find in samplesheet for sample "
-          + fastqSample.getSampleName()
-          + " -> "
-          + this.list.get(fastqSample.getSampleName()
-              + "_" + fastqSample.getLane()));
-
-      first = false;
-    }
     return this.list.get(key);
   }
 
