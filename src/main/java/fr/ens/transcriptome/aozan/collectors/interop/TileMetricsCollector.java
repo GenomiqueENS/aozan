@@ -103,7 +103,7 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
    */
   private void initMetricsMap(final RunData data) {
 
-    final int tilesCount = data.getTilesCount();
+    final int tilesCount = computeTilesCount(data);
 
     final int lanesCount = data.getLaneCount();
     final int readsCount = data.getReadCount();
@@ -112,6 +112,30 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
       this.tileMetrics.put(lane, new TileMetricsPerLane(lane, readsCount,
           tilesCount, this.densityRatio));
     }
+
+  }
+
+  //
+  // Getters
+  //
+
+  /**
+   * Gets the tiles count.
+   * @return the tiles count
+   */
+  public int computeTilesCount(final RunData data) {
+
+    if (data.getSequencerType().equals("hiseq")) {
+      return data.getInt("run.info.flow.cell.tile.count")
+          * data.getInt("run.info.flow.cell.surface.count")
+          * data.getInt("run.info.flow.cell.swath.count");
+    }
+
+    // Case NextSeq compute tile count, add data from camera number
+    return data.getInt("run.info.flow.cell.tile.count")
+        * data.getInt("run.info.flow.cell.surface.count")
+        * data.getInt("run.info.flow.cell.swath.count")
+        * data.getInt("run.info.flow.cell.section.per.lane");
 
   }
 
