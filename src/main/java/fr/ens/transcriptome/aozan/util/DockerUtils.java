@@ -1,28 +1,29 @@
 /*
- *                  Eoulsan development code
+ *                  Aozan development code
  *
  * This code may be freely distributed and modified under the
- * terms of the GNU Lesser General Public License version 2.1 or
- * later and CeCILL-C. This should be distributed with the code.
- * If you do not have a copy, see:
+ * terms of the GNU General Public License version 3 or later 
+ * and CeCILL. This should be distributed with the code. If you 
+ * do not have a copy, see:
  *
- *      http://www.gnu.org/licenses/lgpl-2.1.txt
- *      http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.txt
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
  *
  * Copyright for this code is held jointly by the Genomic platform
  * of the Institut de Biologie de l'École Normale Supérieure and
  * the individual authors. These should be listed in @author doc
  * comments.
  *
- * For more information on the Eoulsan project and its aims,
- * or to join the Eoulsan Google group, visit the home page
- * at:
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page at:
  *
- *      http://www.transcriptome.ens.fr/eoulsan
+ *      http://www.transcriptome.ens.fr/aozan
  *
  */
+
 package fr.ens.transcriptome.aozan.util;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
@@ -33,9 +34,10 @@ import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
+import java.util.logging.Logger;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.DockerClient.LogsParameter;
@@ -49,10 +51,14 @@ import com.spotify.docker.client.messages.ContainerInfo;
 import com.spotify.docker.client.messages.HostConfig;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.eoulsan.EoulsanLogger;
 import fr.ens.transcriptome.eoulsan.util.ProcessUtils;
 
 public class DockerUtils {
+
+  /** Logger. */
+  private static final Logger LOGGER = Common.getLogger();
 
   private static final char SEPARATOR = File.separatorChar;
 
@@ -65,8 +71,8 @@ public class DockerUtils {
   private final File stderrFile;
 
   private final String imageDockerVersion;
-  private final String imageDockerName;
-  private final List<String> commandLine;
+  private final String imageName;
+  private final String commandLine;
   private final List<String> mountArgument = new ArrayList<>();
 
   private String permission;
@@ -76,37 +82,51 @@ public class DockerUtils {
   private int exitValue = -1;
   private Throwable exception = null;
 
-  /**
-   * Run image Docker with command line.
-   * @throws AozanException
-   */
-
-  public void runTest() throws AozanException {
+  public void runRescue() {
     // Create connection
     System.out.println(" * TEST Create connection");
     final DockerClient docker =
         new DefaultDockerClient("unix:///var/run/docker.sock");
 
     try {
-      final String image = "genomicpariscentre/bcl2fastq2";
+      final String image = "genomicpariscentre/bcl2fastq2:latest";
+      // final String image = "genomicpariscentre/bcl2fastq";
+      // final String image = "bcl2fastq-v17";
+
       // Pull image
       System.out.println(" * TEST Pull image");
       docker.pull(image);
 
       // Create container
       System.out.println(" * TEST Create config");
-      final ContainerConfig config =
-          ContainerConfig.builder().image(image)
-              .cmd("sh", "-c", "touch /root/lolotiti").build();
 
-      // Version OK
-      // final ContainerConfig config =
-      // ContainerConfig.builder().image("busybox")
-      // .cmd("sh", "-c", "touch /root/lolotiti").user("2715:100").build();
+      final HostConfig hostConfigInit =
+          HostConfig
+              .builder()
+              .binds(
+                  "/import/rhodos01/shares-net/sequencages/nextseq_500/test/fastq:/root/",
+                  "/import/rhodos01/shares-net/sequencages/nextseq_500/test/bcl/150331_TESTHISR_0151_AH9RLKADXX:/mnt/",
+                  "/import/rhodos01/shares-net/sequencages/nextseq_500/test/tmp:/tmp/")
+              .build();
+
+      System.out.println("Montage " + Joiner.on(",").join(this.mountArgument));
 
       final HostConfig hostConfig =
-          HostConfig.builder()
-              .binds("/import/mimir03/sequencages/nextseq_500/tmp:/root")
+          HostConfig.builder().binds(this.mountArgument).build();
+
+      String cmd = "/tmp/bcl2fastq.sh";
+      final String permission = "2715:1064";
+      final String workDir = "/root";
+
+      // Create container
+      System.out.println(" * Create config "
+          + "\n\tdocker " + docker + "\n\t imagename " + image
+          + "\n\t host Configure is  " + hostConfig + "\n\tcommend line " + cmd
+          + "\n\twork directory " + workDir + "\n\tpermission " + permission);
+
+      final ContainerConfig config =
+          ContainerConfig.builder().image(image).cmd(cmd)
+              .hostConfig(hostConfig).user(permission).workingDir(workDir)
               .build();
 
       System.out.println(" * TEST Create container");
@@ -122,55 +142,63 @@ public class DockerUtils {
 
       // Start container
       System.out.println(" * TEST Start container");
-      docker.startContainer(id, hostConfig);
-
-      // Kill container
-      System.out.println(" * TEST Wait end of container container");
-      System.out.println(docker.waitContainer(id));
-
-      // Remove container
-      System.out.println(" * TEST Remove container");
-      docker.removeContainer(id);
-
-    } catch (DockerException | InterruptedException e) {
-      this.exitValue = -1;
-      this.exception = e;
-      throw new AozanException("TEST Docker fail " + e.getMessage(), e);
-
-    } finally {
-      // Close connection
-      docker.close();
-    }
-  }
-
-  public void run() throws AozanException {
-
-    // TOTO
-    checkOSCompatibilityDocker();
-
-    try {
-      final String imageName = buildImageName();
-
-      final DockerClient docker = init(imageName);
-
-      final HostConfig hostConfig = configure();
-
-      System.out.println(" * Create container");
-      final String id = createContainer(docker, imageName);
-      System.out.println("id: " + id);
-
-      // Start container
-      System.out.println(" * Start container");
-      docker.startContainer(id, hostConfig);
-
-      final ContainerInfo info = docker.inspectContainer(id);
-      System.out.println("info: " + info);
+      docker.startContainer(id);
 
       // Redirect stdout and stderr
       final LogStream logStream =
           docker.logs(id, LogsParameter.FOLLOW, LogsParameter.STDERR,
               LogsParameter.STDOUT);
       redirect(logStream, this.stdoutFile, this.stderrFile);
+
+      // Kill container
+      System.out.println(" * TEST Wait end of container container");
+      System.out.println(docker.waitContainer(id));
+
+      this.exitValue = info.state().exitCode();
+
+      // Remove container
+      System.out.println(" * TEST Remove container");
+      docker.removeContainer(id);
+
+    } catch (DockerException | InterruptedException e) {
+
+      e.printStackTrace();
+
+    } finally {
+      // Close connection
+      docker.close();
+    }
+
+  }
+
+  public void run() throws AozanException {
+
+    // TODO
+    checkOSCompatibilityDocker();
+
+    try {
+      final String imageName = buildImageName();
+
+      LOGGER.info("Docker build on image name  " + imageName);
+
+      final DockerClient docker = initDockerClient(imageName);
+      final HostConfig hostConfig = initHostConfig();
+
+      final ContainerCreation creation =
+          buildContainerDocker(docker, hostConfig, imageName);
+
+      final String id = creation.id();
+
+      final ContainerInfo info = docker.inspectContainer(id);
+      System.out.println("* Info: " + info);
+
+      LOGGER.warning(info.toString());
+
+      // Start container
+      System.out.println(" * Start container");
+      docker.startContainer(id);
+
+      initLoggerStream(docker, id);
 
       // Kill container
       System.out.println(" * Wait end of container container");
@@ -182,19 +210,8 @@ public class DockerUtils {
 
       System.out.println("container exit "
           + ce + "\t info status found " + exitValue2);
-      
+
       this.exitValue = ce.statusCode();
-
-      // TODO
-      if (this.exitValue == 0) {
-        System.out.print("SUCCESS run docker ");
-        System.out.println(docker.info());
-      } else {
-        System.out.println("FAIL run docker ");
-        System.out.println(docker.info());
-      }
-
-      // TODO check end docker image
 
       // Remove container
       System.out.println(" * Remove container");
@@ -203,108 +220,80 @@ public class DockerUtils {
       // Close connection
       docker.close();
 
-    } catch (DockerException e) {
+    } catch (DockerException | InterruptedException e) {
       this.exitValue = -1;
       this.exception = e;
       throw new AozanException("Docker fail " + e.getMessage(), e);
-
-    } catch (InterruptedException e) {
-      this.exitValue = -1;
-      this.exception = e;
-      throw new AozanException(
-          "Execution docker interrupted " + e.getMessage(), e);
     }
   }
 
   /**
    * Adds the mount directory.
-   * @param localDirectory the local directory
-   * @param dockerDirectory the docker directory
+   * @param localDirectoryPath the local directory
+   * @param dockerDirectoryPath the docker directory
    * @return the string
    * @throws AozanException the Aozan exception
    */
-  public void addMountDirectory(final String localDirectory,
-      final String dockerDirectory) throws AozanException {
+  public void addMountDirectory(final String localDirectoryPath,
+      final String dockerDirectoryPath) throws AozanException {
 
-    if (localDirectory == null) {
-      throw new AozanException("Error Docker: local directory is null. "
-          + localDirectory);
-    }
+    checkArgument(!Strings.isNullOrEmpty(localDirectoryPath),
+        " local directory setting to mount partition on Docker -> "
+            + localDirectoryPath);
+    checkArgument(!Strings.isNullOrEmpty(dockerDirectoryPath),
+        " docker directory setting to mount partition on Docker -> "
+            + dockerDirectoryPath);
 
-    // if (!new File(localDirectory).exists()) {
-    // throw new AozanException("Error Docker: local directory does not exist. "
-    // + localDirectory + " ? " + new File(localDirectory).exists());
-    // }
+    final File localDir = new File(localDirectoryPath);
 
-    if (dockerDirectory == null) {
-      throw new AozanException(
-          "Error Docker: local directory is null or does not exist. "
-              + dockerDirectory);
-    }
+    checkArgument(localDir.exists(),
+        "local directory for partition Docker does not exist.-> "
+            + localDirectoryPath);
+    checkArgument(localDir.isDirectory(),
+        "local directory for partition Docker is not a directory.-> "
+            + localDirectoryPath);
 
     // Check it is absolute path
-    if (localDirectory.trim().charAt(0) != SEPARATOR
-        || dockerDirectory.trim().charAt(0) != SEPARATOR) {
-      throw new AozanException(
-          "Error Docker: directories path must be absolute local "
-              + localDirectory + " docker directory " + dockerDirectory);
-    }
+    checkArgument(localDirectoryPath.trim().charAt(0) == SEPARATOR
+        || dockerDirectoryPath.trim().charAt(0) == SEPARATOR,
+        "Error Docker: directories path must be absolute local "
+            + localDirectoryPath + " docker directory " + dockerDirectoryPath);
 
-    this.mountArgument.add(localDirectory + ":" + dockerDirectory);
+    this.mountArgument.add(localDirectoryPath + ":" + dockerDirectoryPath);
+
+    LOGGER.info("Docker for image "
+        + imageName + " mount partition "
+        + this.mountArgument.get(this.mountArgument.size() - 1));
   }
 
   //
-  // Private methods
+  // Private methods for launch Docker
   //
 
-  private void checkOSCompatibilityDocker() throws AozanException {
+  private void checkOSCompatibilityDocker() {
+    // TODO Auto-generated method stub
 
   }
 
   /**
-   * Redirect the outputs of the container to files.
-   * @param logStream the log stream
-   * @param stdout stdout output file
-   * @param stderr stderr output file
+   * Builds the image name in depot Docker.
+   * @return image name
    */
-  private static void redirect(final LogStream logStream, final File stdout,
-      final File stderr) {
+  private String buildImageName() {
 
-    final Runnable r = new Runnable() {
+    checkArgument(!Strings.isNullOrEmpty(this.depotPublicName),
+        "depot public name for Docker");
 
-      @Override
-      public void run() {
+    checkArgument(!Strings.isNullOrEmpty(this.imageName), "image Docker");
 
-        try (WritableByteChannel stdoutChannel =
-            Channels.newChannel(new FileOutputStream(stderr));
-            WritableByteChannel stderrChannel =
-                Channels.newChannel(new FileOutputStream(stdout))) {
+    final String name =
+        String.format("%s/%s", this.depotPublicName, this.imageName);
 
-          for (LogMessage message; logStream.hasNext();) {
+    if (Strings.isNullOrEmpty(this.imageDockerVersion)) {
+      return name;
+    }
 
-            message = logStream.next();
-            switch (message.stream()) {
-
-            case STDOUT:
-              stdoutChannel.write(message.content());
-              break;
-
-            case STDERR:
-              stderrChannel.write(message.content());
-              break;
-
-            case STDIN:
-            default:
-              break;
-            }
-          }
-        } catch (IOException e) {
-          EoulsanLogger.getLogger().severe(e.getMessage());
-        }
-      }
-    };
-
-    new Thread(r).start();
+    return String.format("%s:%s", name, this.imageDockerVersion);
   }
 
   /**
@@ -314,12 +303,13 @@ public class DockerUtils {
    * @throws DockerException the docker exception
    * @throws InterruptedException the interrupted exception
    */
-  private DockerClient init(final String imageName) throws DockerException,
-      InterruptedException, AozanException {
+  private DockerClient initDockerClient(final String imageName)
+      throws DockerException, InterruptedException, AozanException {
+
+    checkArgument(!Strings.isNullOrEmpty(imageName), "image Docker name");
 
     // TODO
-    System.out.println(" * Create connection");
-    // Create connection
+    System.out.println(" * Create connection with image " + imageName);
 
     final DockerClient docker =
         new DefaultDockerClient("unix:///var/run/docker.sock");
@@ -334,18 +324,15 @@ public class DockerUtils {
 
   /**
    * Configure Docker.
-   * @return the host config
-   * @throws AozanException the Aozan exception
+   * @return the host config for Docker
    */
-  private HostConfig configure() throws AozanException {
+  private HostConfig initHostConfig() {
 
-    if (this.mountArgument.isEmpty())
-      throw new AozanException(
-          "Error Docker: no mount directory settings to configure hostDocker");
+    checkArgument(
+        !this.mountArgument.isEmpty(),
+        "Error Docker: no mount directory settings to configure hostConfig for Docker Client");
 
-    final String args = Joiner.on(",").join(this.mountArgument);
-
-    return HostConfig.builder().binds(args).build();
+    return HostConfig.builder().binds(this.mountArgument).build();
   }
 
   /**
@@ -353,295 +340,88 @@ public class DockerUtils {
    * @param docker the docker
    * @param imageName the image name
    * @return the string
+   * @throws AozanException
    * @throws DockerException the docker exception
    * @throws InterruptedException the interrupted exception
    */
-  private String createContainer(final DockerClient docker,
-      final String imageName) throws DockerException, InterruptedException {
+  private ContainerCreation buildContainerDocker(final DockerClient docker,
+      final HostConfig hostConfig, final String imageName)
+      throws AozanException {
+    // throws DockerException, InterruptedException {
+
+    checkNotNull(this.commandLine, "Docker image not command line setting.");
+    checkNotNull(this.workDirectoryDocker,
+        "Docker image not work directory setting.");
 
     // Create container
-    System.out.println(" * Create config");
-    final List<String> dockerBashCommand = buildArgumentsCommandDocker();
+    System.out.println(" * Create config "
+        + "\n\tdocker " + docker + "\n\t imagename " + imageName
+        + "\n\t host Configure is  " + hostConfig + "\n\tcommend line "
+        + this.commandLine + "\n\twork directory " + this.workDirectoryDocker);
 
     ContainerConfig config;
 
-    if (this.permission == null) {
+    if (Strings.isNullOrEmpty(this.permission)) {
+      System.out.println(" * config without permission");
+
       config =
-          ContainerConfig.builder().image(imageName).cmd(dockerBashCommand)
-              .workingDir(this.workDirectoryDocker).build();
-    } else {
-      config =
-          ContainerConfig.builder().image(imageName).cmd(dockerBashCommand)
-              .user(this.permission).workingDir(this.workDirectoryDocker)
+          ContainerConfig.builder().image(imageName).cmd(this.commandLine)
+              .hostConfig(hostConfig).workingDir(this.workDirectoryDocker)
               .build();
+    } else {
+      System.out.println(" * config with permission -> " + this.permission);
+      config =
+          ContainerConfig.builder().image(imageName).cmd(this.commandLine)
+              .hostConfig(hostConfig).user(this.permission)
+              .workingDir(this.workDirectoryDocker).build();
 
     }
-    return docker.createContainer(config).id();
 
-  }
+    config =
+        ContainerConfig.builder().image(imageName).cmd(this.commandLine)
+            .user(this.permission).workingDir(this.workDirectoryDocker).build();
 
-  /**
-   * Builds the image name in depot Docker.
-   * @return image name
-   */
-  private String buildImageName() {
-
-    final String name = this.depotPublicName + "/" + this.imageDockerName;
-
-    if (this.imageDockerVersion == null || this.imageDockerVersion.isEmpty()) {
-      return name;
-    }
-
-    return name + ":" + this.imageDockerVersion;
-  }
-
-  private List<String> buildArgumentsCommandDocker() {
-
-    final List<String> cmd = new ArrayList<>();
-    cmd.add("bash");
-    cmd.add("-c");
-
-    cmd.add("\"");
-    cmd.addAll(commandLine);
-    cmd.add("\"");
-
-    return cmd;
-
-  }
-
-  //
-  // Getters and setters
-  //
-
-  private String setDefaultPermission() throws AozanException {
-
+    System.out.println(" * Create container " + config);
     try {
-      final String user = ProcessUtils.execToString("id -u");
-      final String group = ProcessUtils.execToString("id -g");
+      return docker.createContainer(config);
 
-      return user.trim() + ":" + group.trim();
+    } catch (DockerException e) {
+      System.out.println("Docker exception");
+      e.printStackTrace();
 
-    } catch (IOException e) {
-      throw new AozanException(e);
+    } catch (InterruptedException e) {
+      System.out.println("Docker exception");
+      e.printStackTrace();
     }
 
+    throw new AozanException("FAIL creation container Docker ");
   }
 
   /**
-   * Sets the permission.
-   * @param permissions the new permission
+   * Inits the logger stream.
+   * @param docker the docker
+   * @param id the id
+   * @throws DockerException the docker exception
+   * @throws InterruptedException the interrupted exception
    */
-  public void setPermission(final String user, final String group) {
-    // TODO check syntax
-    this.permission = user + ":" + group;
-  }
-
-  /**
-   * Sets the depot docker name.
-   * @param depotName the new depot docker name
-   */
-  public void setDepotDockerName(final String depotName) {
-    this.depotPublicName = depotName;
-  }
-
-  /**
-   * Sets the work directory docker.
-   * @param workDirectoryDocker the new work directory docker
-   */
-  public void setWorkDirectoryDocker(final String workDirectoryDocker) {
-    this.workDirectoryDocker = workDirectoryDocker;
-  }
-
-  /**
-   * Gets the exit value.
-   * @return the exit value
-   */
-  public int getExitValue() {
-    return this.exitValue;
-  }
-
-  /**
-   * Gets the image docker name.
-   * @return the image docker name
-   */
-  public String getImageDockerName() {
-    return String.format("%s/%s:%s", this.depotPublicName,
-        this.imageDockerName, this.imageDockerVersion);
-  }
-
-  /**
-   * Gets the exception.
-   * @return the exception
-   */
-  public Throwable getException() {
-    return this.exception;
+  private void initLoggerStream(final DockerClient docker, final String id)
+      throws DockerException, InterruptedException {
+    // Redirect stdout and stderr
+    final LogStream logStream =
+        docker.logs(id, LogsParameter.FOLLOW, LogsParameter.STDERR,
+            LogsParameter.STDOUT);
+    redirect(logStream, this.stdoutFile, this.stderrFile);
   }
 
   //
-  // Constructor
+  // Static method
   //
 
-  public DockerUtils(final String commandLine, final String softwareName)
-      throws AozanException {
-    this(commandLine, softwareName, DEFAULT_VERSION);
-  }
-
   /**
-   * Public constructor to initialize parameters to a docker images.
-   * @param commandLine the command line
-   * @param softwareName the software name
-   * @param softwareVersion the software version
-   * @param workDirectory the work directory
-   * @throws AozanException
+   * Split shell command line.
+   * @param commandline the command line
+   * @return the list
    */
-  public DockerUtils(final String commandLine, final String softwareName,
-      final String softwareVersion) throws AozanException {
-
-    checkNotNull(commandLine, "commande line");
-    checkNotNull(softwareName, "software image Docker");
-
-    this.commandLine = splitShellCommandLine(commandLine);
-    this.imageDockerName = softwareName;
-
-    this.imageDockerVersion = softwareVersion;
-
-    this.depotPublicName = DEPOT_DEFAULT;
-    this.permission = setDefaultPermission();
-
-    this.stderrFile = new File("/tmp", "STDERR");
-    this.stdoutFile = new File("/tmp", "STDOUT");
-
-    System.out
-        .println("----------------- setting permissions/user in container config "
-            + this.permission);
-
-    this.workDirectoryDocker = WORK_DIRECTORY_DOCKER_DEFAULT;
-
-  }
-
-  public static void main(String[] args) {
-
-    try {
-      test();
-
-    } catch (DockerException | InterruptedException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
-    }
-
-    // System.exit(0);
-
-    // final String cmd = "touch /root/lolotiti_" + new Random().nextInt();
-
-    // final String cmd =
-    // "/usr/local/bin/bcl2fastq -v 2> /root/bcl_version"
-    // + new Random().nextInt() + ".txt";
-    //
-    // final String name = "bcl2fastq2";
-    // final String version = "1.8.4";
-    // final String dir = "/tmp/aozan";
-    //
-    // try {
-    // // final DockerUtils dV2 = new DockerUtils(cmd, name);
-    // // dV2.addMountDirectory(dir, "/root");
-    // // dV2.run();
-    // //
-    // // final DockerUtils dV1 = new DockerUtils(cmd, name, version);
-    // // dV1.addMountDirectory(dir, "/root");
-    // // dV1.run();
-    //
-    // final DockerUtils script =
-    // new DockerUtils("/tmp/script_bcl2fastq.sh", name, version);
-    // //
-    // script.addMountDirectory("/import/mimir03/sequencages/nextseq_500/fastq",
-    // // "/root/");
-    // // script
-    // // .addMountDirectory(
-    // //
-    // "/import/mimir03/sequencages/nextseq_500/bcl/150331_TESTHISR_0151_AH9RLKADXX",
-    // // "/mnt/");
-    // script.addMountDirectory(
-    // "/import/rhodos01/shares-net/sequencages/nextseq_500/tmp", "/tmp");
-    //
-    // script.setWorkDirectoryDocker("/root");
-    //
-    // System.out.println(script.getImageDockerName());
-    // script.run();
-    //
-    // } catch (AozanException e) {
-    // // TODO Auto-generated catch block
-    // System.out.println(e.getMessage());
-    // e.printStackTrace();
-    // }
-
-  }
-
-  public static void test() throws DockerException, InterruptedException {
-
-    // Create connection
-    System.out.println(" * Create connection");
-    final DockerClient docker =
-        new DefaultDockerClient("unix:///var/run/docker.sock");
-
-    final String image = "genomicpariscentre/bcl2fastq2:latest";
-    // Pull image
-    System.out.println(" * Pull image");
-
-    try {
-      docker.pull(image);
-    } catch (DockerException de) {
-      de.printStackTrace();
-    }
-
-    // Create container
-    System.out.println(" * Create config");
-    final ContainerConfig config =
-        ContainerConfig.builder().image(image)
-            .cmd("bash", "-c", "\"touch", "/root/lolotiti\"").build();
-
-    // Version OK
-    // final ContainerConfig config =
-    // ContainerConfig.builder().image("busybox")
-    // .cmd("sh", "-c", "touch /root/lolotiti").user("2715:100").build();
-
-    final HostConfig hostConfig =
-        HostConfig
-            .builder()
-            .binds(
-                "/import/rhodos01/shares-net/sequencages/nextseq_500/tmp:/root")
-            .build();
-
-    System.out.println(" * Create container");
-    final ContainerCreation creation = docker.createContainer(config);
-    
-    System.out.println("Ping: " + docker.ping());
-    
-    final String id = creation.id();
-    System.out.println("id: " + id);
-
-    // Inspect container
-    System.out.println(" * Inspect container");
-    final ContainerInfo info = docker.inspectContainer(id);
-
-    // Start container
-    System.out.println(" * Start container");
-    docker.startContainer(id, hostConfig);
-    System.out.println("info: " + info);
-
-    // Kill container
-    System.out.println(" * Wait end of container container");
-    System.out.println(docker.waitContainer(id));
-
-    
-    // Remove container
-    System.out.println(" * Remove container");
-    docker.removeContainer(id);
-
-    // Close connection
-    docker.close();
-
-  }
-
   public static List<String> splitShellCommandLine(final String commandline) {
 
     if (commandline == null) {
@@ -713,6 +493,162 @@ public class DockerUtils {
     }
 
     return Collections.unmodifiableList(result);
+  }
+
+  /**
+   * Redirect the outputs of the container to files.
+   * @param logStream the log stream
+   * @param stdout stdout output file
+   * @param stderr stderr output file
+   */
+  private static void redirect(final LogStream logStream, final File stdout,
+      final File stderr) {
+
+    final Runnable r = new Runnable() {
+
+      @Override
+      public void run() {
+
+        try (WritableByteChannel stdoutChannel =
+            Channels.newChannel(new FileOutputStream(stderr));
+            WritableByteChannel stderrChannel =
+                Channels.newChannel(new FileOutputStream(stdout))) {
+
+          for (LogMessage message; logStream.hasNext();) {
+
+            message = logStream.next();
+            switch (message.stream()) {
+
+            case STDOUT:
+              stdoutChannel.write(message.content());
+              break;
+
+            case STDERR:
+              stderrChannel.write(message.content());
+              break;
+
+            case STDIN:
+            default:
+              break;
+            }
+          }
+        } catch (IOException e) {
+          EoulsanLogger.getLogger().severe(e.getMessage());
+        }
+      }
+    };
+
+    new Thread(r).start();
+  }
+
+  //
+  // Getters and setters
+  //
+
+  private String setDefaultPermission() throws AozanException {
+
+    try {
+      final String user = ProcessUtils.execToString("id -u");
+      final String group = ProcessUtils.execToString("id -g");
+
+      return user.trim() + ":" + group.trim();
+
+    } catch (IOException e) {
+      throw new AozanException(e);
+    }
+
+  }
+
+  /**
+   * Sets the permission.
+   * @param permissions the new permission
+   */
+  public void setPermission(final String user, final String group) {
+    // TODO check syntax
+    this.permission = user.trim() + ":" + group.trim();
+  }
+
+  /**
+   * Sets the depot docker name.
+   * @param depotName the new depot docker name
+   */
+  public void setDepotDockerName(final String depotName) {
+    this.depotPublicName = depotName;
+  }
+
+  /**
+   * Sets the work directory docker.
+   * @param workDirectoryDocker the new work directory docker
+   */
+  public void setWorkDirectoryDocker(final String workDirectoryDocker) {
+
+    checkArgument(!Strings.isNullOrEmpty(workDirectoryDocker),
+        "work directory setting for Docker");
+
+    this.workDirectoryDocker = workDirectoryDocker;
+  }
+
+  /**
+   * Gets the exit value.
+   * @return the exit value
+   */
+  public int getExitValue() {
+    return this.exitValue;
+  }
+
+  /**
+   * Gets the image docker name.
+   * @return the image docker name
+   */
+  public String getImageDockerName() {
+    return String.format("%s/%s:%s", this.depotPublicName, this.imageName,
+        this.imageDockerVersion);
+  }
+
+  /**
+   * Gets the exception.
+   * @return the exception
+   */
+  public Throwable getException() {
+    return this.exception;
+  }
+
+  //
+  // Constructor
+  //
+
+  public DockerUtils(final String commandLine, final String softwareName)
+      throws AozanException {
+    this(commandLine, softwareName, DEFAULT_VERSION);
+  }
+
+  /**
+   * Public constructor to initialize parameters to a docker images.
+   * @param commandLine the command line
+   * @param softwareName the software name
+   * @param softwareVersion the software version
+   * @param workDirectory the work directory
+   * @throws AozanException
+   */
+  public DockerUtils(final String commandLine, final String softwareName,
+      final String softwareVersion) throws AozanException {
+
+    checkNotNull(commandLine, "commande line");
+    checkNotNull(softwareName, "software image Docker");
+
+    this.commandLine = Joiner.on(" ").join(splitShellCommandLine(commandLine));
+
+    this.imageName = softwareName.trim();
+    this.imageDockerVersion = softwareVersion.trim();
+
+    this.depotPublicName = DEPOT_DEFAULT;
+    this.permission = setDefaultPermission();
+
+    this.stderrFile = new File("/tmp", "STDERR");
+    this.stdoutFile = new File("/tmp", "STDOUT");
+
+    this.workDirectoryDocker = WORK_DIRECTORY_DOCKER_DEFAULT;
+
   }
 
 }
