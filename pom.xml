@@ -207,8 +207,10 @@
     <dependency>
 		<groupId>com.spotify</groupId>
 		<artifactId>docker-client</artifactId>
-		<version>2.6.1</version>
+		<classifier>shaded</classifier>
+		<version>3.1.3</version>
 	</dependency>
+	
 	<dependency>
 		<groupId>org.apache.httpcomponents</groupId>
 		<artifactId>httpclient</artifactId>
@@ -236,14 +238,6 @@
 		<groupId>org.slf4j</groupId>
 		<artifactId>slf4j-api</artifactId>
 		<version>1.7.6</version>
-		<scope>runtime</scope>
-	</dependency>
-
-	<!-- Required by Docker -->
-	<dependency>
-		<groupId>de.gesellix</groupId>
-		<artifactId>unix-socket-factory</artifactId>
-		<version>2015-01-27T15-02-14</version>
 		<scope>runtime</scope>
 	</dependency>
 
@@ -568,7 +562,7 @@
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>jython-standalone,eoulsan,poi,guava,fastqc,jbzip2,commons-compress,sam,commons-math3,commons-cli,javassist,aws-java-sdk,docker-client,httpclient,httpcore,commons-logging,slf4j-api,unix-socket-factory</includeArtifactIds>
+              <includeArtifactIds>jython-standalone,eoulsan,poi,guava,fastqc,jbzip2,commons-compress,sam,commons-math3,commons-cli,javassist,aws-java-sdk,docker-client,httpclient,httpcore,commons-logging,slf4j-api</includeArtifactIds>
               <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
             </configuration>
           </execution>
