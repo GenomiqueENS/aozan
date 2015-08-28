@@ -23,6 +23,9 @@
 
 package fr.ens.transcriptome.aozan;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * This class define constants to keys of configuration Aozan file.
  * @since 1.2.1
@@ -40,6 +43,10 @@ public final class Settings {
   public static final String AOZAN_LOG_PATH_KEY = "aozan.log.path";
   /** Aozan directory var path. */
   public static final String AOZAN_VAR_PATH_KEY = "aozan.var.path";
+
+  public static final String AOZAN_CONF_FILE_PATH =
+      "aozan.configuration.file.path";
+
   /** Aozan directory bcl path. */
   public static final String BCL_DATA_PATH_KEY = "bcl.data.path";
   /** Aozan bcl space factor. */
@@ -93,13 +100,16 @@ public final class Settings {
   /** Casava design generator command. */
   public static final String CASAVA_DESIGN_GENERATOR_COMMAND_KEY =
       "casava.design.generator.command";
-  
+
   /** Set available use container docker. */
-  public static final String DEMUX_USE_DOCKER_ENABLE_KEY = "demux.use.docker.enable";
+  public static final String DEMUX_USE_DOCKER_ENABLE_KEY =
+      "demux.use.docker.enable";
   /** Set bcl2fastq version for HiSeq sequencer. */
-  public static final String BCL2FASTQ_VERSION_FOR_HISEQ_KEY = "bcl2fastq.version.for.hiseq";
+  public static final String BCL2FASTQ_VERSION_FOR_HISEQ_KEY =
+      "bcl2fastq.version.for.hiseq";
   /** Set bcl2fastq version for NextSeq sequencer. */
-  public static final String BCL2FASTQ_VERSION_FOR_NEXTSEQ_KEY = "bcl2fastq.version.for.nextseq";
+  public static final String BCL2FASTQ_VERSION_FOR_NEXTSEQ_KEY =
+      "bcl2fastq.version.for.nextseq";
 
   /** Demultiplex space factor. */
   public static final String DEMUX_SPACE_FACTOR_KEY = "demux.space.factor";
@@ -279,4 +289,43 @@ public final class Settings {
    */
   public static final String QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY =
       "qc.conf.fastqscreen.process.undetermined.samples";
+
+  //
+  // Read contains configuration Aozan file
+  //
+  private static Map<String, String> aozanConfiguration = null;
+
+  /**
+   * Sets the globals configuration.
+   * @param conf the conf
+   */
+  public static void setGlobalsConfiguration(final Map<String, String> conf) {
+
+    aozanConfiguration = Collections.unmodifiableMap(conf);
+  }
+
+  /**
+   * Gets the property from aozan configuration.
+   * @param key the key
+   * @return the property from aozan configuration
+   */
+  public static String getPropertyFromAozanConfiguration(final String key) {
+
+    if (aozanConfiguration.isEmpty())
+      return null;
+
+    return aozanConfiguration.get(key.trim());
+  }
+
+  public static String getLoggerPathFromAozanConfiguration() {
+    return aozanConfiguration.get(AOZAN_LOG_PATH_KEY);
+  }
+
+  public static String getLoggerLevelFromAozanConfiguration() {
+    return aozanConfiguration.get(AOZAN_LOG_LEVEL_KEY);
+  }
+
+  public static String getConfigurationFilePathOnAozanConfiguration() {
+    return aozanConfiguration.get(AOZAN_CONF_FILE_PATH);
+  }
 }
