@@ -349,6 +349,33 @@ public abstract class AbstractFastqCollector implements Collector {
   }
 
   /**
+   * Clear qc directory after successfully all FastqCollector.
+   */
+  @Override
+  public void clear() {
+
+    // Delete temporary uncompress fastq file
+    this.fastqStorage.clear();
+
+    // Delete all data files fastqSample per fastqSample
+    for (final FastqSample fs : this.fastqSamples) {
+
+      if (fs.getFastqFiles().isEmpty()) {
+        // Nothing to do
+        continue;
+      }
+
+      deleteTemporaryDatafile(fs);
+
+      deleteFastqScreenSampleReportXML(fs);
+    }
+  }
+
+  //
+  // Private methods
+  //
+
+  /**
    * Construct the map with all samples to treat.
    * @param data result data object
    */
@@ -622,29 +649,6 @@ public abstract class AbstractFastqCollector implements Collector {
 
     // Close the thread pool
     executor.shutdown();
-  }
-
-  /**
-   * Clear qc directory after successfully all FastqCollector.
-   */
-  @Override
-  public void clear() {
-
-    // Delete temporary uncompress fastq file
-    this.fastqStorage.clear();
-
-    // Delete all data files fastqSample per fastqSample
-    for (final FastqSample fs : this.fastqSamples) {
-
-      if (fs.getFastqFiles().isEmpty()) {
-        // Nothing to do
-        continue;
-      }
-
-      deleteTemporaryDatafile(fs);
-
-      deleteFastqScreenSampleReportXML(fs);
-    }
   }
 
   /**
