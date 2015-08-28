@@ -33,10 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import com.google.common.base.Preconditions;
-
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
@@ -74,9 +71,6 @@ public class CasavaDesignCSVReader extends AbstractCasavaDesignTextReader {
 
       try {
 
-        // TODO
-        System.out.println("Current lane in samplesheet " + line);
-        
         // Parse the line
         parseLine(SampleSheetUtils.parseCSVDesignLine(line), version);
 
