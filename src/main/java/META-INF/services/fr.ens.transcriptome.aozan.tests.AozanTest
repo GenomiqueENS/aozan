@@ -87,4 +87,11 @@ fr.ens.transcriptome.aozan.tests.samplestats.PercentRecoverableRawClusterSampleT
 fr.ens.transcriptome.aozan.tests.samplestats.RawClusterMinSampleTest        
 fr.ens.transcriptome.aozan.tests.samplestats.PFClusterMaxSampleTest
 fr.ens.transcriptome.aozan.tests.samplestats.RawClusterSumSampleTest
+fr.ens.transcriptome.aozan.tests.samplestats.PercentSampleInProjectSamplestatsTest
+fr.ens.transcriptome.aozan.tests.samplestats.MeanQualityScoreSamplestatsTest
+fr.ens.transcriptome.aozan.tests.samplestats.PercentQ30BasePFSamplestatsTest
+fr.ens.transcriptome.aozan.tests.samplestats.PercentSampleInRunSamplestatsTest
+fr.ens.transcriptome.aozan.tests.samplestats.PercentPassingFilterSamplestatsTest
+fr.ens.transcriptome.aozan.tests.samplestats.RecoverableClusterRawCountSamplestatsTest
+fr.ens.transcriptome.aozan.tests.samplestats.RecoverableClusterFPCountSamplestatsTest
                          
