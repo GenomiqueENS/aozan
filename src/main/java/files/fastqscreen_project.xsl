@@ -202,6 +202,7 @@ doctype-system="about:legacy-compat"/>
   <div class="runReport">
   	  	
   <ul>
+  	<li><b>Sequencer Type: </b> <xsl:value-of select="/QCReport/SequencerType"/></li>
     <li><b>Run Id: </b> <xsl:value-of select="/ReportFastqScreen/RunId"/></li>
     <li><b>Flow cell: </b> <xsl:value-of select="/ReportFastqScreen/FlowcellId"/></li>
     <li><b>Date: </b> <xsl:value-of select="/ReportFastqScreen/RunDate"/></li>

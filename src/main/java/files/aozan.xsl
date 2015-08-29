@@ -385,6 +385,7 @@ doctype-system="about:legacy-compat"/>
 
 <div class="report">
   <ul>
+  	<li><b>Sequencer Type: </b> <xsl:value-of select="/QCReport/SequencerType"/></li>
     <li><b>Run Id: </b> <xsl:value-of select="/QCReport/RunId"/></li>
     <li><b>Flow cell: </b> <xsl:value-of select="/QCReport/FlowcellId"/></li>
     <li><b>Run started: </b> <xsl:value-of select="/QCReport/RunDate"/></li>
@@ -507,6 +508,8 @@ doctype-system="about:legacy-compat"/>
    <table class="projectData">
   <tr class="headerColumns">
 	<th>Samples</th>
+	<th>Description</th>
+	<th>Index</th>
     <xsl:for-each select="/QCReport/SamplesStatsReport/Columns/Column">
       <th><xsl:value-of select="."/><xsl:if test="@unit!=''"> (<xsl:value-of select="@unit"/>)</xsl:if></th>
     </xsl:for-each>
@@ -514,6 +517,8 @@ doctype-system="about:legacy-compat"/>
   <xsl:for-each select="/QCReport/SamplesStatsReport/SamplesStats/SampleStats">
   <tr class="{@name}">
   	<td><xsl:value-of select="@name"/></td>
+  	<td><xsl:value-of select="@description"/></td>
+  	<td><xsl:value-of select="@index"/></td>
     <xsl:for-each select="Test">
       <td class="score{@score}">
         <xsl:if test="@type='int'"><xsl:value-of select="format-number(.,'### ### ### ### ###','aozan')"/></xsl:if>

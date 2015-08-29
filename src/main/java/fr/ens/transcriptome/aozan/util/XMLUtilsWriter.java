@@ -98,6 +98,9 @@ public final class XMLUtilsWriter {
         final Date runDate = sdf.parse(data.get("run.info.date"));
         XMLUtils.addTagValue(doc, parent, "RunDate",
             dateFormatter.format(runDate));
+        
+        XMLUtils.addTagValue(doc, parent, "SequencerType", data.getSequencerType());
+        
       } catch (final ParseException e1) {
         XMLUtils.addTagValue(doc, parent, "RunDate", data.get("run.info.date"));
       }
