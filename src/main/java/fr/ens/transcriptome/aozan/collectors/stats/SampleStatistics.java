@@ -50,6 +50,7 @@ public class SampleStatistics extends StatisticsCollector {
   /** Collector prefix for updating rundata */
   public static final String COLLECTOR_PREFIX = "samplestats.";
 
+  public static final String UNDETERMINED_SAMPLE = "undetermined";
 
   @Override
   public String getName() {
@@ -79,6 +80,9 @@ public class SampleStatistics extends StatisticsCollector {
     // Initialization ProjectStats with the project name
     final Map<String, EntityStat> samples = new HashMap<>();
 
+    samples.put(UNDETERMINED_SAMPLE, new EntityStat(data, UNDETERMINED_SAMPLE,
+        UNDETERMINED_SAMPLE, this, null));
+
     // Add projects name
     for (int lane = 1; lane <= laneCount; lane++) {
 
@@ -96,6 +100,9 @@ public class SampleStatistics extends StatisticsCollector {
 
         // Update Statistics
         samples.get(sampleName).addEntity(lane, sampleName);
+
+        // Update Statistics on undetermined sample
+        samples.get(UNDETERMINED_SAMPLE).addEntity(lane, "lane" + lane);
       }
     }
 
@@ -108,7 +115,6 @@ public class SampleStatistics extends StatisticsCollector {
     return Collections.unmodifiableList(samplesSorted);
 
   }
-
 
   /**
    * Extract fastqscreen xml report create for samples.

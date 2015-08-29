@@ -141,12 +141,6 @@ public class FastqScreenGenomeMapper {
           this.genomesReferencesSampleRenamed.put(genome, aliasGenomeName);
         }
       }
-
-      LOGGER.warning(
-          "DEBUG genomes name available for mapping \n"
-              + Joiner.on("\n").withKeyValueSeparator("\t")
-                  .join(genomesReferencesSampleRenamed));
-
     }
 
     // Update alias genomes file

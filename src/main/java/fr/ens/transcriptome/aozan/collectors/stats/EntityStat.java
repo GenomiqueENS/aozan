@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
@@ -108,6 +109,8 @@ public class EntityStat implements Comparable<EntityStat> {
   /** Data compile in run data. */
   private boolean asCompiledData = false;
 
+  private final boolean undeterminedSample;
+
   @Override
   public int compareTo(final EntityStat that) {
 
@@ -134,7 +137,10 @@ public class EntityStat implements Comparable<EntityStat> {
     StatisticsUtils stats = null;
 
     data.put(prefix + ".lanes", Joiner.on(",").join(this.lanes));
-    data.put(prefix + ".genomes.ref", Joiner.on(",").join(getGenomes()));
+
+    data.put(prefix + ".genomes.ref", (this.genomes.isEmpty() ? "NA" : Joiner
+        .on(",").join(getGenomes())));
+
     data.put(prefix + ".samples.count", samples.size());
     data.put(prefix + ".isindexed", isIndexed);
 
@@ -214,8 +220,9 @@ public class EntityStat implements Comparable<EntityStat> {
     this.samples.add(sample);
 
     // Extract from samplesheet file
-    this.genomes.add(data.getSampleGenome(lane, sample));
-
+    if (data.getSampleGenome(lane, sample) != null) {
+      this.genomes.add(data.getSampleGenome(lane, sample));
+    }
   }
 
   /**
@@ -227,16 +234,18 @@ public class EntityStat implements Comparable<EntityStat> {
    */
   private void computeConditionalRundata(final int lane, final String sample) {
 
+    final String name = (isUndeterminedSample() ? null : sample);
+
     // Check collector is selected
     if (this.statisticsCollector.isUndeterminedIndexesCollectorSelected()) {
 
       // Check if lane is indexed
       if (this.data.isLaneIndexed(lane)) {
         this.rawClusterRecoverySum +=
-            this.data.getSampleRawClusterRecoveryCount(lane, sample);
+            this.data.getSampleRawClusterRecoveryCount(lane, name);
 
         this.pfClusterRecoverySum +=
-            this.data.getSamplePFClusterRecoveryCount(lane, sample);
+            this.data.getSamplePFClusterRecoveryCount(lane, name);
       }
     }
 
@@ -244,7 +253,7 @@ public class EntityStat implements Comparable<EntityStat> {
     if (this.statisticsCollector.isFastqScreenCollectorSelected()) {
 
       this.mappedContaminationPercentSamples.add(this.data
-          .getPercentMappedReadOnContaminationSample(lane, sample, READ));
+          .getPercentMappedReadOnContaminationSample(lane, name, READ));
     }
 
   }
@@ -252,6 +261,10 @@ public class EntityStat implements Comparable<EntityStat> {
   //
   // Getter
   //
+
+  public boolean isUndeterminedSample() {
+    return undeterminedSample;
+  }
 
   /**
    * Gets the samples with contamination count.
@@ -296,8 +309,14 @@ public class EntityStat implements Comparable<EntityStat> {
    */
   private String getPrefixRunData() {
 
-    if (this.statisticsCollector.isSampleStatisticsCollector())
+    if (this.statisticsCollector.isSampleStatisticsCollector()) {
+
+      if (isUndeterminedSample())
+        return this.statisticsCollector.getCollectorPrefix()
+            + SampleStatistics.UNDETERMINED_SAMPLE;
+
       return this.statisticsCollector.getCollectorPrefix() + samples.get(0);
+    }
 
     return this.statisticsCollector.getCollectorPrefix() + projectName;
   }
@@ -311,7 +330,8 @@ public class EntityStat implements Comparable<EntityStat> {
   private String buildName(final String projectName, final String sampleName) {
 
     return this.projectName
-        + (sampleName == null || sampleName.isEmpty() ? "" : " " + sampleName);
+        + (sampleName == null || sampleName.isEmpty() || isUndeterminedSample()
+            ? "" : " " + sampleName);
   }
 
   /**
@@ -336,6 +356,9 @@ public class EntityStat implements Comparable<EntityStat> {
     // + projectName + " samples count " + sampleCount
     // + " incompatible with fastqscreen report found "
     // + this.fastqscreenReportToCompile.size());
+
+    if (this.fastqscreenReportToCompile == null)
+      return Collections.emptyList();
 
     return Collections.unmodifiableList(this.fastqscreenReportToCompile);
   }
@@ -421,6 +444,10 @@ public class EntityStat implements Comparable<EntityStat> {
     this.lanes = new LinkedHashSet<>();
     this.samples = new ArrayList<>();
 
+    this.undeterminedSample =
+        Strings.isNullOrEmpty(sampleName) ? false : (sampleName.trim()
+            .equals(SampleStatistics.UNDETERMINED_SAMPLE));
+
     // Compile demultiplexing data
     this.rawClusterSamples = new ArrayList<>();
     this.pfClusterSamples = new ArrayList<>();
@@ -428,11 +455,12 @@ public class EntityStat implements Comparable<EntityStat> {
 
     this.reportDirectory = statCollector.getReportDirectory();
     this.projectDir =
-        new File(reportDirectory + "/Project_" + this.projectName);
+        (isUndeterminedSample() ? new File(reportDirectory
+            + "/Undetermined_indices") : new File(reportDirectory
+            + "/Project_" + this.projectName));
 
     this.statisticsCollector = statCollector;
 
     this.fastqscreenReportToCompile = fastqscreenReportToCompile;
   }
-
 }

@@ -253,6 +253,11 @@ public class RunData {
    */
   public double getPercentMappedReadOnContaminationSample(final int lane,
       final String sampleName, final int read) {
+
+    if (sampleName == null)
+      return this.getDouble("fastqscreen.lane"
+          + lane + ".undetermined.read" + read + ".mappedexceptgenomesample");
+
     return this.getDouble("fastqscreen.lane"
         + lane + ".sample." + sampleName + ".read" + read + "." + sampleName
         + ".mappedexceptgenomesample");

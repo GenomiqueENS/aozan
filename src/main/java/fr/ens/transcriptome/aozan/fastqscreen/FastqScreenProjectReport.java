@@ -70,6 +70,10 @@ public class FastqScreenProjectReport {
   public void createReport(final File reportHtml) throws AozanException,
       IOException {
 
+    if (entitiesStat.getFastqScreenReport().isEmpty()) {
+      return;
+    }
+
     // Call stylesheet file for report
     InputStream is = null;
     if (fastqscreenXSLFile == null) {
@@ -182,8 +186,7 @@ public class FastqScreenProjectReport {
 
     if (doc == null) {
       throw new AozanException("Fail to create document from file "
-          + xmlFile.getAbsolutePath() + " for "
-          + entitiesStat.getName());
+          + xmlFile.getAbsolutePath() + " for " + entitiesStat.getName());
     }
 
     doc.getDocumentElement().normalize();

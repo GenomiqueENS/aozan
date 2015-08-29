@@ -47,6 +47,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
 
+import fr.ens.transcriptome.aozan.collectors.stats.SampleStatistics;
 import fr.ens.transcriptome.aozan.tests.TestResult;
 import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
 import fr.ens.transcriptome.aozan.tests.lane.LaneTest;
@@ -256,6 +257,10 @@ public class QCReport {
     for (String sampleName : samplesNames) {
       final Element sampleStatsElement = doc.createElement("SampleStats");
       sampleStatsElement.setAttribute("name", sampleName);
+      sampleStatsElement.setAttribute("description",
+          this.data.getSampleDescription(1, sampleName));
+      sampleStatsElement.setAttribute("index",
+          this.data.getIndexSample(1, sampleName));
       samplesStatsElement.appendChild(sampleStatsElement);
 
       for (final SampleStatsTest test : this.samplesStatsTests) {
@@ -293,7 +298,6 @@ public class QCReport {
       typeFilter = "sample";
       elements.addAll(extractSamplesNamesInRun());
     }
-
 
     // Build map associate lanes number with project
     final ListMultimap<String, Integer> lanesNumberRelatedElement =
@@ -567,11 +571,11 @@ public class QCReport {
       switch (typeFilter) {
 
       case "sample":
-        
+
         for (final String sampleName : samplesNameInLane) {
           nameWithLaneNumber.put(sampleName, lane);
         }
-        
+
         break;
       default:
 
@@ -579,7 +583,7 @@ public class QCReport {
           // Extract project name corresponding to sample name
           final String key =
               "design.lane" + lane + "." + sampleName + ".sample.project";
-          
+
           final String projectName = this.data.get(key);
           if (projectName != null) {
             // Add project name and lane number in map
@@ -587,7 +591,7 @@ public class QCReport {
           }
         }
         break;
-        
+
       }
 
     }
@@ -622,6 +626,9 @@ public class QCReport {
       // Add all samples names by lane and ignore replica
       names.addAll(this.data.getSamplesNameListInLane(lane));
     }
+
+    // Add Undetermined sample
+    names.add(SampleStatistics.UNDETERMINED_SAMPLE);
 
     // Sorted samples set
 

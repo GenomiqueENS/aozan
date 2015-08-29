@@ -341,7 +341,7 @@ public class FastqSample {
     this.undeterminedIndices = false;
 
     this.runFastqPath = casavaOutputPath;
-
+    
     this.fastqFiles = createListFastqFiles(this.read);
 
     this.compressionType = getCompressionExtension(this.fastqFiles);
