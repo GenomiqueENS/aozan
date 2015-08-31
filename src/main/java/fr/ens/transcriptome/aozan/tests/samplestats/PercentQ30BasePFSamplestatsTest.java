@@ -65,6 +65,7 @@ public class PercentQ30BasePFSamplestatsTest extends AbstractSampleTest {
 
     long q30Cumul = 0;
     long rawCumul = 0;
+    int readIndexedCount = 0;
 
     try {
       for (int read = 1; read <= readCount; read++) {
@@ -72,9 +73,13 @@ public class PercentQ30BasePFSamplestatsTest extends AbstractSampleTest {
         if (data.isReadIndexed(read))
           continue;
 
+        readIndexedCount++;
+
         for (int lane = 1; lane <= laneCount; lane++) {
 
-          final String prefix = buildPrefixRundata(sampleName, lane, read);
+          final String prefix =
+              buildPrefixRundata(sampleName, lane, readIndexedCount);
+          
           q30Cumul += data.getLong(prefix + ".pf.yield.q30");
           rawCumul += data.getLong(prefix + ".pf.yield");
         }

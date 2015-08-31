@@ -65,16 +65,19 @@ public class MeanQualityScoreSamplestatsTest extends AbstractSampleTest {
 
     long qualityScoreSum = 0;
     long yieldSum = 0;
-
+    int readIndexedCount = 0;
+    
     try {
       for (int read = 1; read <= readCount; read++) {
 
         if (data.isReadIndexed(read))
           continue;
-
+        
+        readIndexedCount++;
+        
         for (int lane = 1; lane <= laneCount; lane++) {
 
-          final String prefix = buildPrefixRundata(sampleName, lane, read);
+          final String prefix = buildPrefixRundata(sampleName, lane, readIndexedCount);
           qualityScoreSum += data.getLong(prefix + ".pf.quality.score.sum");
           yieldSum += data.getLong(prefix + ".pf.yield");
         }

@@ -71,15 +71,11 @@ public class PercentSampleInRunSamplestatsTest extends AbstractSampleTest {
 
     try {
       // Parse all samples, each lane should contain same sample
-      for (String sample : data.getSamplesNameListInLane(1)) {
+      for (int lane = 1; lane <= laneCount; lane++) {
 
-        for (int lane = 1; lane <= laneCount; lane++) {
+        final String key = "demux.lane" + lane + ".all.read1.raw.cluster.count";
 
-          final String key =
-              SampleStatistics.COLLECTOR_PREFIX + sample + ".raw.cluster.sum";
-
-          rawClusterInRunSum += data.getLong(key);
-        }
+        rawClusterInRunSum += data.getLong(key);
 
         // Add undetermined data
         rawClusterInRunSum +=

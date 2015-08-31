@@ -23,21 +23,31 @@
 
 package fr.ens.transcriptome.aozan.tests.samplestats;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 
+import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.stats.SampleStatistics;
+import fr.ens.transcriptome.aozan.tests.AozanTest;
+import fr.ens.transcriptome.aozan.tests.TestResult;
+import fr.ens.transcriptome.aozan.util.ScoreInterval;
 
 /**
- * The class define test on samples count on a project which exceed a contaminant
- * threshold on percent mapped reads on dataset contaminants genomes. The
- * default value of threshold is 0.10, can be redefine in configuration file.
+ * The class define test on samples count on a project which exceed a
+ * contaminant threshold on percent mapped reads on dataset contaminants
+ * genomes. The default value of threshold is 0.10, can be redefine in
+ * configuration file.
  * @author Sandrine Perrin
  * @since 1.4
  */
 public class SamplesExceededContaminationThresholdSampleTest extends
-    AbstractSimpleSampleTest {
+    AbstractSampleTest {
+
+  private final ScoreInterval interval = new ScoreInterval();
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -46,16 +56,41 @@ public class SamplesExceededContaminationThresholdSampleTest extends
   }
 
   @Override
-  protected String getKey(final String sampleName) {
+  public TestResult test(RunData data, String sampleName) {
 
-    return SampleStatistics.COLLECTOR_PREFIX
-        + sampleName + ".samples.exceeded.contamination.threshold.count";
+    if (sampleName.equals(SampleStatistics.UNDETERMINED_SAMPLE)) {
+      return new TestResult("NA");
+    }
+
+    try {
+      final String key =
+          SampleStatistics.COLLECTOR_PREFIX
+              + sampleName + ".samples.exceeded.contamination.threshold.count";
+
+      final int val = data.getInt(key);
+
+      if (interval == null)
+        return new TestResult(val);
+
+      return new TestResult(this.interval.getScore(val), val);
+
+    } catch (NumberFormatException e) {
+
+      return new TestResult("NA");
+
+    }
   }
 
   @Override
-  protected Class<?> getValueType() {
+  public List<AozanTest> configure(Map<String, String> properties)
+      throws AozanException {
 
-    return Integer.class;
+    if (properties == null)
+      throw new NullPointerException("The properties object is null");
+
+    this.interval.configureDoubleInterval(properties);
+
+    return Collections.singletonList((AozanTest) this);
   }
 
   //

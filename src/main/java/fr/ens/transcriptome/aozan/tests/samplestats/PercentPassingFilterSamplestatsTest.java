@@ -60,9 +60,9 @@ public class PercentPassingFilterSamplestatsTest extends AbstractSampleTest {
     }
 
     // Build key for run data
-    final String recoveryCountKey =
+    final String rawClusterSumKey =
         SampleStatistics.COLLECTOR_PREFIX
-            + sampleName + ".pf.cluster.recovery.sum";
+            + sampleName + ".raw.cluster.sum";
     final String pfClusterSumKey =
         SampleStatistics.COLLECTOR_PREFIX + sampleName + ".pf.cluster.sum";
 
@@ -71,10 +71,10 @@ public class PercentPassingFilterSamplestatsTest extends AbstractSampleTest {
       final long pfClusterCount = data.getLong(pfClusterSumKey);
 
       // Set recoverable raw cluster sum for a project
-      final long recoveryCount = data.getLong(recoveryCountKey);
+      final long rawClusterCount = data.getLong(rawClusterSumKey);
 
       // Compute percent
-      final double percent = (double) recoveryCount / (double) pfClusterCount;
+      final double percent = (double) pfClusterCount / (double) rawClusterCount;
 
       if (interval == null)
         return new TestResult(percent, true);

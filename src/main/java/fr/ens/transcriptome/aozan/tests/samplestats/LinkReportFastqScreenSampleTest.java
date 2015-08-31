@@ -23,6 +23,9 @@
 
 package fr.ens.transcriptome.aozan.tests.samplestats;
 
+import static fr.ens.transcriptome.aozan.collectors.stats.SampleStatistics.UNDETERMINED_SAMPLE;
+import static fr.ens.transcriptome.aozan.io.ManagerQCPath.UNDETERMINED_DIR_NAME;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -44,12 +47,18 @@ public class LinkReportFastqScreenSampleTest extends AbstractSampleTest {
   }
 
   @Override
-  public TestResult test(RunData data, String projectName) {
+  public TestResult test(RunData data, String sampleName) {
 
     // Get HTML report URL
-    final String filename = String.format("%s-fastqscreen.html", projectName);
+    final String filename = String.format("%s-fastqscreen.html", sampleName);
 
-    final String url = "Project_" + projectName + "/" + filename;
+    // Get project name to build url
+    final String projectName =
+        (sampleName.equals(UNDETERMINED_SAMPLE)
+            ? UNDETERMINED_DIR_NAME : "Project_"
+                + data.getProjectSample(1, sampleName));
+
+    final String url = projectName + "/" + filename;
 
     return new TestResult(9, url, "url");
   }
