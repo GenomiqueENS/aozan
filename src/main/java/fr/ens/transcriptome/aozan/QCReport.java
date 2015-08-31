@@ -297,6 +297,9 @@ public class QCReport {
 
       typeFilter = "sample";
       elements.addAll(extractSamplesNamesInRun());
+
+      // Remove Undetermined if exists
+      elements.remove(SampleStatistics.UNDETERMINED_SAMPLE);
     }
 
     // Build map associate lanes number with project
@@ -341,7 +344,7 @@ public class QCReport {
     undeterminedLanes.setAttribute("cmdJS", "'" + Joiner.on(",").join(s) + "'");
     undeterminedLanes.setAttribute("typeFilter", typeFilter);
 
-    undeterminedLanes.setTextContent("Undetermined");
+    undeterminedLanes.setTextContent("undetermined");
     filter.appendChild(undeterminedLanes);
   }
 
@@ -416,7 +419,7 @@ public class QCReport {
         // Undetermined indexes
         if (!noIndex) {
           addSample(readElement, read, readSample, lane, null, null, null,
-              "Undetermined");
+              "undetermined");
         }
       }
     }
@@ -428,10 +431,10 @@ public class QCReport {
 
     final Element sampleElement = this.doc.createElement("Sample");
     sampleElement.setAttribute("name", sampleName == null
-        ? "Undetermined" : sampleName);
+        ? "undetermined" : sampleName);
     sampleElement.setAttribute("desc", desc == null ? "No description" : desc);
     sampleElement.setAttribute("project", projectName == null
-        ? "Undetermined" : projectName);
+        ? "undetermined" : projectName);
     sampleElement.setAttribute("lane", Integer.toString(lane));
     sampleElement.setAttribute("index", index);
 

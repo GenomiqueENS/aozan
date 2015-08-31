@@ -22,6 +22,8 @@
  */
 package fr.ens.transcriptome.aozan.fastqscreen;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,6 +31,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,6 +46,7 @@ import org.xml.sax.SAXException;
 import com.google.common.base.Joiner;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.collectors.stats.EntityStat;
 import fr.ens.transcriptome.aozan.util.XMLUtilsWriter;
@@ -54,6 +58,9 @@ import fr.ens.transcriptome.aozan.util.XMLUtilsWriter;
  * @since 1.4
  */
 public class FastqScreenProjectReport {
+
+  /** Logger. */
+  private static final Logger LOGGER = Common.getLogger();
 
   /** Project data instance. */
   private final EntityStat entitiesStat;
@@ -69,6 +76,8 @@ public class FastqScreenProjectReport {
    */
   public void createReport(final File reportHtml) throws AozanException,
       IOException {
+
+    checkNotNull(reportHtml, "fastqscreen report filename");
 
     if (entitiesStat.getFastqScreenReport().isEmpty()) {
       return;

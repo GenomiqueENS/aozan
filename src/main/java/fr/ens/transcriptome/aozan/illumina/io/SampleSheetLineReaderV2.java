@@ -233,12 +233,6 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
       }
     }
 
-    // TODO
-    Common.getLogger().warning(
-        "SAMPLE-SHEET: columns "
-            + pos.size() + " found position "
-            + Joiner.on("\t").withKeyValueSeparator(":").join(pos));
-
     return pos;
   }
 
