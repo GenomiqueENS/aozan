@@ -23,6 +23,8 @@
 
 package fr.ens.transcriptome.aozan.collectors.stats;
 
+import static fr.ens.transcriptome.aozan.io.ManagerQCPath.UNDETERMINED_DIR_NAME;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,6 +60,9 @@ public class EntityStat implements Comparable<EntityStat> {
 
   /** Project name. */
   private final String projectName;
+
+  /** The sample name. */
+  private final String sampleName;
 
   /** The entity name. */
   private final String entityName;
@@ -273,6 +278,10 @@ public class EntityStat implements Comparable<EntityStat> {
   private String getSamplesWithContaminationCount() {
     int count = 0;
 
+    if (isUndeterminedSample()) {
+      return "NA";
+    }
+
     for (double percent : this.mappedContaminationPercentSamples) {
 
       if (percent >= this.statisticsCollector.getContaminationThreshold())
@@ -299,6 +308,10 @@ public class EntityStat implements Comparable<EntityStat> {
    * @return the report html file
    */
   public File getReportHtmlFile() {
+
+    if (this.statisticsCollector.isSampleStatisticsCollector()) {
+      return new File(this.projectDir, this.sampleName + "-fastqscreen.html");
+    }
 
     return new File(this.projectDir, this.projectName + "-fastqscreen.html");
   }
@@ -347,15 +360,6 @@ public class EntityStat implements Comparable<EntityStat> {
    * @return the fastq screen report
    */
   public List<File> getFastqScreenReport() {
-
-    // if (!this.statisticsCollector.isFastqScreenCollectorSelected())
-    // throw new UnsupportedOperationException();
-    //
-    // if (this.fastqscreenReportToCompile.size() != this.sampleCount)
-    // throw new EoulsanRuntimeException("In project "
-    // + projectName + " samples count " + sampleCount
-    // + " incompatible with fastqscreen report found "
-    // + this.fastqscreenReportToCompile.size());
 
     if (this.fastqscreenReportToCompile == null)
       return Collections.emptyList();
@@ -438,6 +442,8 @@ public class EntityStat implements Comparable<EntityStat> {
 
     this.data = runData;
     this.projectName = projectName;
+    this.sampleName = sampleName;
+
     this.entityName = buildName(this.projectName, sampleName);
 
     this.genomes = new LinkedHashSet<>();
@@ -455,8 +461,8 @@ public class EntityStat implements Comparable<EntityStat> {
 
     this.reportDirectory = statCollector.getReportDirectory();
     this.projectDir =
-        (isUndeterminedSample() ? new File(reportDirectory
-            + "/Undetermined_indices") : new File(reportDirectory
+        (isUndeterminedSample() ? new File(reportDirectory,
+            UNDETERMINED_DIR_NAME) : new File(reportDirectory
             + "/Project_" + this.projectName));
 
     this.statisticsCollector = statCollector;
