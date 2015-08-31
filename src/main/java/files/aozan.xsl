@@ -248,7 +248,7 @@ doctype-system="about:legacy-compat"/>
         function filterRow(lanes_related_project, typeFilter, name, elemLink) {
 
 			init_all('none');
-			if (name == "Undetermined"){
+			if (name == "undetermined"){
 				filterUndetermined(lanes_related_project);
 			} else if (typeFilter == 'project'){
 				filterProject(lanes_related_project, name);
@@ -279,6 +279,10 @@ doctype-system="about:legacy-compat"/>
 					node_lane[last_row].style.display ="table-row";
 				}
 			}
+			
+	
+			// Display row on undetermined in Sample statistics table
+			filterSample(lanes_related_project, "undetermined");
 		}
 
 		function filterProject(lanes_related_project, project_name) {

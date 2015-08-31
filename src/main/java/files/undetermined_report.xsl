@@ -291,7 +291,7 @@ doctype-system="about:legacy-compat"/>
 
 				<div class="report">
 					<ul>
-						<li><b>Sequencer Type: </b> <xsl:value-of select="/QCReport/SequencerType"/></li>
+						<li><b>Sequencer Type: </b> <xsl:value-of select="/RecoveryClusterReport/SequencerType"/></li>
 						<li>
 							<b>Run Id: </b>
 							<xsl:value-of select="/RecoveryClusterReport/RunId" />
