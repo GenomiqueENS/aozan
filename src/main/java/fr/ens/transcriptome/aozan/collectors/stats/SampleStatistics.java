@@ -23,6 +23,8 @@
 
 package fr.ens.transcriptome.aozan.collectors.stats;
 
+import static fr.ens.transcriptome.aozan.io.ManagerQCPath.UNDETERMINED_DIR_NAME;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
@@ -81,7 +83,8 @@ public class SampleStatistics extends StatisticsCollector {
     final Map<String, EntityStat> samples = new HashMap<>();
 
     samples.put(UNDETERMINED_SAMPLE, new EntityStat(data, UNDETERMINED_SAMPLE,
-        UNDETERMINED_SAMPLE, this, null));
+        UNDETERMINED_SAMPLE, this,
+        extractFastqscreenReportForUndeterminedSample()));
 
     // Add projects name
     for (int lane = 1; lane <= laneCount; lane++) {
@@ -100,10 +103,10 @@ public class SampleStatistics extends StatisticsCollector {
 
         // Update Statistics
         samples.get(sampleName).addEntity(lane, sampleName);
-
-        // Update Statistics on undetermined sample
-        samples.get(UNDETERMINED_SAMPLE).addEntity(lane, "lane" + lane);
       }
+
+      // Update Statistics on undetermined sample on each lane
+      samples.get(UNDETERMINED_SAMPLE).addEntity(lane, "lane" + lane);
     }
 
     // Sorted list project
@@ -124,25 +127,67 @@ public class SampleStatistics extends StatisticsCollector {
   private List<File> extractFastqscreenReport(final String projectName,
       final String sampleName) throws AozanException {
 
-    final File projectDir =
-        new File(this.getReportDirectory(), "/Project_" + projectName);
+    List<File> reports = new ArrayList<>();
 
-    // Exrtact in project directy all fastqscreen report xml
-    final List<File> reports =
-        Arrays.asList(projectDir.listFiles(new FileFilter() {
-
-          @Override
-          public boolean accept(final File pathname) {
-            return pathname.length() > 0
-                && pathname.getName().startsWith(sampleName)
-                && pathname.getName().endsWith("-fastqscreen.xml");
-          }
-        }));
+    if (projectName.equals(UNDETERMINED_SAMPLE)) {
+      reports = extractFastqscreenReportForUndeterminedSample();
+    } else {
+      reports = extractFastqscreenReportOnProject(projectName, sampleName);
+    }
 
     // Sort by filename
     Collections.sort(reports);
 
     return Collections.unmodifiableList(reports);
+  }
+
+  /**
+   * Extract fastqscreen report on project.
+   * @param projectName the project name
+   * @param sampleName the sample name
+   * @return the list
+   */
+  private List<File> extractFastqscreenReportOnProject(
+      final String projectName, final String sampleName) {
+
+    List<File> reports;
+    final File projectDir =
+        new File(this.getReportDirectory(), "/Project_" + projectName);
+
+    // Extract in project directory all fastqscreen report xml
+    reports = Arrays.asList(projectDir.listFiles(new FileFilter() {
+
+      @Override
+      public boolean accept(final File pathname) {
+        return pathname.length() > 0
+            && pathname.getName().startsWith(sampleName)
+            && pathname.getName().endsWith("-fastqscreen.xml");
+      }
+    }));
+    return reports;
+  }
+
+  /**
+   * Extract fastqscreen report for undetermined sample.
+   * @return the list
+   * @throws AozanException the aozan exception
+   */
+  private List<File> extractFastqscreenReportForUndeterminedSample()
+      throws AozanException {
+
+    final File dir = new File(this.getReportDirectory(), UNDETERMINED_DIR_NAME);
+
+    // Extract in project directy all fastqscreen report xml
+    return Arrays.asList(dir.listFiles(new FileFilter() {
+
+      @Override
+      public boolean accept(final File pathname) {
+
+        return pathname.length() > 0
+            && pathname.getName().endsWith("-fastqscreen.xml");
+      }
+    }));
+
   }
 
   //
