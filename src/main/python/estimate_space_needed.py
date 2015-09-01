@@ -7,7 +7,7 @@ Created on 15 avril 2012
 
 import common
 from java.io import File
-from fr.ens.transcriptome.eoulsan.illumina import RunInfo
+from fr.ens.transcriptome.aozan.illumina import RunInfo
 from xml.dom.minidom import parse
 
 from fr.ens.transcriptome.aozan.Settings import HISEQ_DATA_PATH_KEY

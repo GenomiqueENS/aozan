@@ -5,7 +5,7 @@ Created on 25 oct. 2011
 
 @author: Laurent Jourdren
 '''
-import os.path, stat
+import os.path, stat, sys
 import common, hiseq_run, time
 from xml.etree.ElementTree import ElementTree
 from java.io import IOException
@@ -14,9 +14,9 @@ from java.util import HashMap
 from fr.ens.transcriptome.eoulsan import EoulsanException
 from fr.ens.transcriptome.aozan.io import CasavaDesignXLSReader
 from fr.ens.transcriptome.aozan.util import DockerUtils
-from fr.ens.transcriptome.eoulsan.illumina import CasavaDesignUtil
-from fr.ens.transcriptome.eoulsan.illumina.io import CasavaDesignCSVReader
-from fr.ens.transcriptome.eoulsan.illumina.io import CasavaDesignCSVWriter
+from fr.ens.transcriptome.aozan.illumina.io import CasavaDesignCSVReader
+from fr.ens.transcriptome.aozan.illumina.io import CasavaDesignCSVWriter
+from fr.ens.transcriptome.aozan.illumina.samplesheet import SampleSheetUtils
 
 from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import TMP_PATH_KEY
@@ -171,7 +171,7 @@ def check_samplesheet(run_id, samplesheet_filename, conf):
             design = CasavaDesignXLSReader(input_design_xls_path).read()
 
             # Replace index sequence shortcuts by sequences
-            CasavaDesignUtil.replaceIndexShortcutsBySequences(design, load_index_sequences(conf))
+            SampleSheetUtils.replaceIndexShortcutsBySequences(design, load_index_sequences(conf))
 
             # Write CSV design file
             CasavaDesignCSVWriter(design_csv_path).writer(design)
@@ -416,22 +416,26 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
     common.log("INFO", "exec: " + cmd, conf)
     
     # Create executable file
-    commandfilename = 'script_bcl2fastq.sh'
+    commandfilename = 'bcl2fastq2.sh'
     commandfile = str(conf[TMP_PATH_KEY]) + '/' + commandfilename
     f = open(commandfile, 'w')
     f.write("#! /bin/bash\n\n")
+    f.flush()
     f.write(cmd)
+    f.flush()
+    f.write("\n")
+    f.flush()
     f.close
     
     # Change permission
-    if os.system("chmod 775 " + commandfile) != 0:
+    if os.system("chmod 755 " + commandfile) != 0:
         error("error while setting executable command file bcl2fastq to run docker for " + run_id,
               'Error while setting executable command file bcl2fastq to run docker for ' + run_id, conf)
         return False
     
     print 'DEBUG script exe to bcl2fastq path ' + str(commandfile)
     
-    return commandfile
+    return (commandfile, cmd)
         
           
 
@@ -494,17 +498,35 @@ def demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_
     samplesheet_csv_docker = tmp_docker + os.path.basename(samplesheet_csv_path)
         
     
-    cmd = bcl2fastq_get_command(run_id, input_run_data_path_in_docker, fastq_data_path_in_docker, samplesheet_csv_docker, tmp_docker, bcl2fastq_version, conf)
+    (cmdFile, cmd) = bcl2fastq_get_command(run_id, input_run_data_path_in_docker, fastq_data_path_in_docker, samplesheet_csv_docker, tmp_docker, bcl2fastq_version, conf)
+    
+    if not os.path.exists(cmdFile):
+        error("error while create script bcl2fastq for run " + run_id ,
+              "error while create script bcl2fastq " + cmdFile + " for run  " + run_id , conf)
+    else:
+        common.log("WARNING", "ok for script bcl2fastq " + cmdFile + " for run  " + run_id, conf)
+        
+    
+    # Copy file
+    dir = os.path.dirname(cmdFile)
+    os.system('cp -p ' + cmdFile + ' ' + dir +'/toto.sh ')
     
     # Extract filename to execute
-    dockerCommand = "/tmp/" + str(os.path.basename(cmd))
+    dockerCommand = "/tmp/toto.sh"# + str(os.path.basename(cmdFile))
+    # dockerCommand = "/tmp/bcl2fastq2_copy.sh" # + str(os.path.basename(cmd))
+    # dockerCommand = "bcl2fastq"
+    common.log("WARNING", "command build for docker " + dockerCommand
+               + " is equals to right syntax " + str(dockerCommand == '/tmp/bcl2fastq2.sh'), conf)
     
+    # dockerCommand = '/tmp/bcl2fastq.sh'
     try:
         # Set working in docker on parent demultiplexing run directory. Demultiplexing run directory will create by bcl2fastq
         docker = DockerUtils(dockerCommand, 'bcl2fastq2', bcl2fastq_version)
         # docker = DockerUtils('touch /tmp/totot', 'bcl2fastq2', bcl2fastq_version)
         
-        common.log("CONFIG", "bcl2fastq run with image docker from " + docker.getImageDockerName() + " with command line " + dockerCommand, conf)
+        common.log("CONFIG", "bcl2fastq run with image docker from " + docker.getImageDockerName() 
+                   + " with command line " + dockerCommand, conf)
+        
         common.log("CONFIG", "bcl2fastq docker mount: " 
                    + str(os.path.dirname(fastq_output_dir)) + ":" + str(output_docker) + "; " 
                    + input_run_data_path + ":" + input_docker + "; " + tmp + ":" + tmp_docker, conf); 
@@ -530,12 +552,12 @@ def demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_
     
     # The output directory must be read only
     #   cmd = 'chmod -R ugo-w ' + fastq_output_dir + '/Project_*'
-    cmd = 'find ' + fastq_output_dir + ' -type f -name "*.fastq.*" -exec chmod ugo-w {} \; '
-    common.log("INFO", "exec: " + cmd, conf)
-    if os.system(cmd) != 0:
-        error("error while setting read only the output fastq directory for run " + run_id,
-              'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
-        return False
+    # cmd = 'find ' + fastq_output_dir + ' -type f -name "*.fastq.*" -exec chmod ugo-w {} \; '
+    # common.log("INFO", "exec: " + cmd, conf)
+    # if os.system(cmd) != 0:
+    #    error("error while setting read only the output fastq directory for run " + run_id,
+    #          'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
+    #    return False
     
     return True
     
@@ -744,6 +766,9 @@ def demux(run_id, conf):
     else:        
         if not demux_run_standalone(run_id, bcl2fastq_version, input_run_data_path, fastq_output_dir, design_csv_path, conf):
             return False
+   
+    # TODO
+    sys.exit(0)
    
     # Copy design to output directory
     cmd = "cp -p " + design_csv_path + ' ' + fastq_output_dir

@@ -6,10 +6,10 @@ Created on 8 déc. 2011
 @author: jourdren
 '''
 
-import common, hiseq_run
+import common, hiseq_run, detection_end_run
 import os
 from java.io import File
-from fr.ens.transcriptome.eoulsan.illumina import RunInfo
+from fr.ens.transcriptome.aozan.illumina import RunInfo
 
 from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import HISEQ_DATA_PATH_KEY
@@ -49,7 +49,7 @@ def get_available_run_ids(conf):
         for f in files:
             if os.path.isdir(hiseq_data_path + '/' + f) and \
                 hiseq_run.check_run_id(f, conf) and \
-                not hiseq_run.check_end_run(f, conf) and \
+                not detection_end_run.check_end_run(f, conf) and \
                 os.path.exists(hiseq_data_path + '/' + f + '/First_Base_Report.htm'):
 
                 result.add(f)
