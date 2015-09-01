@@ -504,7 +504,8 @@ public class ManagerQCPath {
       checkNotNull(this.sampleSheetV2,
           "sample sheet on version 2 instance not initialize.");
 
-      return String.format("%s_S%d%s", fastqSample.getSampleName(),
+      return String.format("%s_S%d%s",
+          fastqSample.getSampleName().replace("_", "-"),
           this.sampleSheetV2.extractOrderNumberSample(fastqSample),
           getConstantFastqSuffix(fastqSample.getLane(), read));
     }

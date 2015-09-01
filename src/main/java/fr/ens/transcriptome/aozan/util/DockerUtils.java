@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
@@ -72,7 +73,7 @@ public class DockerUtils {
 
   private final String imageDockerVersion;
   private final String imageName;
-  private final String commandLine;
+  private final List<String> commandLine;
   private final List<String> mountArgument = new ArrayList<>();
 
   private String permission;
@@ -82,16 +83,18 @@ public class DockerUtils {
   private int exitValue = -1;
   private Throwable exception = null;
 
-  public void runRescue() {
+  public void run() {
     // Create connection
     System.out.println(" * TEST Create connection");
     final DockerClient docker =
         new DefaultDockerClient("unix:///var/run/docker.sock");
 
     try {
-      final String image = "genomicpariscentre/bcl2fastq2:latest";
-      // final String image = "genomicpariscentre/bcl2fastq";
-      // final String image = "bcl2fastq-v17";
+      // final String image = "genomicpariscentre/bcl2fastq2:latest";
+      final String image = buildImageName();
+      LOGGER.warning("BUILD docker image name " + image);
+
+      assert (image.equals("genomicpariscentre/bcl2fastq2:latest"));
 
       // Pull image
       System.out.println(" * TEST Pull image");
@@ -100,25 +103,24 @@ public class DockerUtils {
       // Create container
       System.out.println(" * TEST Create config");
 
-      final HostConfig hostConfigInit =
-          HostConfig
-              .builder()
-              .binds(
-                  "/import/rhodos01/shares-net/sequencages/nextseq_500/test/fastq:/root/",
-                  "/import/rhodos01/shares-net/sequencages/nextseq_500/test/bcl/150331_TESTHISR_0151_AH9RLKADXX:/mnt/",
-                  "/import/rhodos01/shares-net/sequencages/nextseq_500/test/tmp:/tmp/")
-              .build();
-
-      System.out.println("Montage " + Joiner.on(",").join(this.mountArgument));
-
       final HostConfig hostConfig =
           HostConfig.builder().binds(this.mountArgument).build();
 
-      String cmd = "/tmp/bcl2fastq.sh";
-      final String permission = "2715:1064";
-      final String workDir = "/root";
+      // String cmd = "/tmp/bcl2fastq.sh";
+      List<String> cmd = this.commandLine;
+      // List<String> cmd =
+      // new ArrayList<>(Arrays.asList("/tmp/bcl2fastq2_copy.sh"));
 
-      // Create container
+      final String permission = this.permission;
+      final String workDir = this.workDirectoryDocker;
+
+      // // Create container
+      // System.out.println(" * Create config "
+      // + "\n\tdocker " + docker + "\n\t imagename " + image
+      // + "\n\t host Configure is  " + hostConfig + "\n\tcommend line "
+      // + Joiner.on(" ").join(cmd) + "\n\twork directory " + workDir
+      // + "\n\tpermission " + permission);
+
       System.out.println(" * Create config "
           + "\n\tdocker " + docker + "\n\t imagename " + image
           + "\n\t host Configure is  " + hostConfig + "\n\tcommend line " + cmd
@@ -171,7 +173,7 @@ public class DockerUtils {
 
   }
 
-  public void run() throws AozanException {
+  public void runFail() throws AozanException {
 
     // TODO
     checkOSCompatibilityDocker();
@@ -636,7 +638,7 @@ public class DockerUtils {
     checkNotNull(commandLine, "commande line");
     checkNotNull(softwareName, "software image Docker");
 
-    this.commandLine = Joiner.on(" ").join(splitShellCommandLine(commandLine));
+    this.commandLine = splitShellCommandLine(commandLine);
 
     this.imageName = softwareName.trim();
     this.imageDockerVersion = softwareVersion.trim();
