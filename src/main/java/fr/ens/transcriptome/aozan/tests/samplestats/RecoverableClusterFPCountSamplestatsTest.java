@@ -65,7 +65,7 @@ public class RecoverableClusterFPCountSamplestatsTest extends
    * Public constructor.
    */
   public RecoverableClusterFPCountSamplestatsTest() {
-    super("recoverypfclustersamplestats", "", "Recovery PF clusters sum");
+    super("recoverypfclustersamplestats", "", "Recovery_PF clusters sum");
   }
 
 }

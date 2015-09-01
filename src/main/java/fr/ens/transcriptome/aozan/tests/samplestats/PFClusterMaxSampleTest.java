@@ -64,6 +64,6 @@ public class PFClusterMaxSampleTest extends AbstractSimpleSampleTest {
    * Public constructor.
    */
   public PFClusterMaxSampleTest() {
-    super("pfclustermaxsample", "", "PF clusters max");
+    super("pfclustermaxsample", "", "PF_clusters_max");
   }
 }

@@ -65,7 +65,7 @@ public class RecoverableClusterRawCountSamplestatsTest extends
    * Public constructor.
    */
   public RecoverableClusterRawCountSamplestatsTest() {
-    super("recoveryrawclustersamplestats", "", "Recovery raw clusters sum");
+    super("recoveryrawclustersamplestats", "", "Recovery_raw clusters sum");
   }
 
 }
