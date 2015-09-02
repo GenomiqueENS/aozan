@@ -23,6 +23,7 @@
 
 package fr.ens.transcriptome.aozan.illumina;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static fr.ens.transcriptome.eoulsan.util.XMLUtils.getAttributeNames;
 import static fr.ens.transcriptome.eoulsan.util.XMLUtils.getElementsByTagName;
 import static fr.ens.transcriptome.eoulsan.util.XMLUtils.getTagValue;
@@ -43,6 +44,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
@@ -84,7 +88,10 @@ public class RunInfo {
   public void parse(final String filepath) throws ParserConfigurationException,
       SAXException, IOException {
 
-    parse(FileUtils.createInputStream(new File(filepath)));
+    checkArgument(!Strings.isNullOrEmpty(filepath),
+        "RunInfo.xml path");
+
+    parse(new File(filepath));
   }
 
   /**
@@ -96,6 +103,8 @@ public class RunInfo {
    */
   public void parse(final File file) throws ParserConfigurationException,
       SAXException, IOException {
+
+    checkArgument(file.exists(), "RunInfo.xml not exists");
 
     parse(FileUtils.createInputStream(file));
   }
