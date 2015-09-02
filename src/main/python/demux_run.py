@@ -677,7 +677,7 @@ def demux(run_id, conf):
     if not os.path.exists(input_run_data_path):
         error("Basecalling data directory does not exists",
               "Basecalling data directory does not exists: " + str(input_run_data_path), conf)
-        return False
+        # return False
 
     # Check if root input fastq data directory exists
     if not common.is_dir_exists(FASTQ_DATA_PATH_KEY, conf):
@@ -692,10 +692,11 @@ def demux(run_id, conf):
         return False
     
     # Check if casava/bcl2fastq basedir path exists
-    if not common.is_dir_exists(CASAVA_PATH_KEY, conf):
-        error("Casava/bcl2fastq directory path does not exists",
-              "Casava/bcl2fastq path does not exists: " + conf[CASAVA_SAMPLESHEETS_PATH_KEY], conf)
-        return False
+    if not common.is_conf_value_equals_true(DEMUX_USE_DOCKER_ENABLE_KEY, conf):
+        if not common.is_dir_exists(CASAVA_PATH_KEY, conf):
+            error("Casava/bcl2fastq directory path does not exists",
+                  "Casava/bcl2fastq path does not exists: " + conf[CASAVA_PATH_KEY], conf)
+            return False
     
     # Check if temporary directory exists
     if not common.is_dir_exists(TMP_PATH_KEY, conf):
@@ -766,9 +767,6 @@ def demux(run_id, conf):
     else:        
         if not demux_run_standalone(run_id, bcl2fastq_version, input_run_data_path, fastq_output_dir, design_csv_path, conf):
             return False
-   
-    # TODO
-    sys.exit(0)
    
     # Copy design to output directory
     cmd = "cp -p " + design_csv_path + ' ' + fastq_output_dir
