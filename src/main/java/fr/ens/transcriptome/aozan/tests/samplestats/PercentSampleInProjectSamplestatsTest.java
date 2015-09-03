@@ -30,8 +30,11 @@ import java.util.Map;
 import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics;
 import fr.ens.transcriptome.aozan.collectors.stats.SampleStatistics;
+import fr.ens.transcriptome.aozan.io.ManagerQCPath;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.TestResult;
 import fr.ens.transcriptome.aozan.util.ScoreInterval;
@@ -49,13 +52,16 @@ public class PercentSampleInProjectSamplestatsTest extends AbstractSampleTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(SampleStatistics.COLLECTOR_NAME);
+    return ImmutableList.of(SampleStatistics.COLLECTOR_NAME,
+        ProjectStatistics.COLLECTOR_NAME);
   }
 
   @Override
   public TestResult test(RunData data, String sampleName) {
 
-    if (sampleName == null) {
+    if (sampleName == null
+        || sampleName.equals(SampleStatistics.UNDETERMINED_SAMPLE)) {
+
       return new TestResult("NA");
     }
 
@@ -63,23 +69,24 @@ public class PercentSampleInProjectSamplestatsTest extends AbstractSampleTest {
     final String rawClusterSumKey =
         SampleStatistics.COLLECTOR_PREFIX + sampleName + ".raw.cluster.sum";
 
-    final int laneCount = data.getLaneCount();
-
     final long rawClusterSampleSum = data.getLong(rawClusterSumKey);
-    long rawClusterInProjectSum = 0;
+
+    final String projectName = data.getProjectSample(1, sampleName);
 
     try {
-      // Parse all samples, each lane should contain same sample
-      for (int lane = 1; lane <= laneCount; lane++) {
 
-        final String key = "demux.lane" + lane + ".all.read1.raw.cluster.count";
-
-        rawClusterInProjectSum += data.getLong(key);
-      }
+      final long rawClusterInProjectSum =
+          data.getLong("projectstats."
+              + projectName.toLowerCase(Globals.DEFAULT_LOCALE)
+              + ".raw.cluster.sum");
 
       // Compute percent sample in project
       final double percent =
           (double) rawClusterSampleSum / (double) rawClusterInProjectSum;
+
+      System.out.println(" sample "
+          + rawClusterSampleSum + " projetct " + rawClusterInProjectSum + " % "
+          + percent);
 
       if (interval == null)
         return new TestResult(percent, true);

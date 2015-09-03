@@ -76,11 +76,6 @@ public class PercentSampleInRunSamplestatsTest extends AbstractSampleTest {
         final String key = "demux.lane" + lane + ".all.read1.raw.cluster.count";
 
         rawClusterInRunSum += data.getLong(key);
-
-        // Add undetermined data
-        rawClusterInRunSum +=
-            data.getLong(SampleStatistics.COLLECTOR_PREFIX
-                + "undetermined.raw.cluster.sum");
       }
 
       // Compute percent sample in project
