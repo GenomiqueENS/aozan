@@ -100,7 +100,7 @@ public final class XMLUtilsWriter {
             dateFormatter.format(runDate));
 
         XMLUtils.addTagValue(doc, parent, "SequencerType", data
-            .getSequencerType().toLowerCase(Globals.DEFAULT_LOCALE));
+            .getSequencerType().toUpperCase(Globals.DEFAULT_LOCALE));
 
       } catch (final ParseException e1) {
         XMLUtils.addTagValue(doc, parent, "RunDate", data.get("run.info.date"));
