@@ -831,8 +831,8 @@ public class SampleSheetUtils {
   final static class SampleSheetVersion2Utils {
 
     private final static String COLUMNS_HEADER =
-        "\"Lane\",\"Sample_ID\",\"SampleRef\",\"Index\",\"Description\","
-            + "\"SampleProject\"\n";
+        "\"lane\",\"SampleID\",\"sampleref\",\"index\",\"description\","
+            + "\"sampleproject\"\n";
 
     /**
      * Convert sample sheet instance in string in csv format.

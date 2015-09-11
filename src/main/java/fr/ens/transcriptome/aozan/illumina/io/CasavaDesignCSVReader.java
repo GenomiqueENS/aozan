@@ -47,7 +47,7 @@ public class CasavaDesignCSVReader extends AbstractCasavaDesignTextReader {
 
   private final BufferedReader reader;
 
-  public SampleSheet readForQCReport(String version, final int laneCount)
+  public SampleSheet readForQCReport(final String version, final int laneCount)
       throws IOException, AozanException {
 
     setCompatibleForQCReport(true);
