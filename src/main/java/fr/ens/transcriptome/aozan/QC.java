@@ -108,7 +108,7 @@ public class QC {
   private final File tmpDir;
 
   /** Bcl2fastq version to demultiplexing step. */
-  private final String bcl2fastqVersion;
+  private final String bcl2fastqMajorVersion;
 
   private final int laneCount;
 
@@ -586,8 +586,8 @@ public class QC {
     this.globalConf.put(TMP_DIR, this.tmpDir.getAbsolutePath());
 
     // Find bcl2fastq main version (1 or 2) from completed version name
-    this.globalConf.put(BCL2FASTQ_VERSION,
-        DemultiplexingCollector.findBcl2fastqVersion(this.bcl2fastqVersion));
+    this.globalConf.put(BCL2FASTQ_VERSION, DemultiplexingCollector
+        .findBcl2fastqVersion(this.bcl2fastqMajorVersion));
     this.globalConf.put(LANE_COUNT, "" + laneCount);
 
     // Init manager qc path
@@ -750,14 +750,14 @@ public class QC {
    * @param qcDir the qc dir
    * @param tmpDir temporary directory
    * @param runId run id
-   * @param bcl2fastqVersion bcl2fastq version used
+   * @param bcl2fastqMajorVersion bcl2fastq version used
    * @param laneCount the lane count
    * @throws AozanException if an error occurs while initialize the QC object
    */
   public QC(final Map<String, String> properties, final String bclDir,
       final String fastqDir, final String qcDir, final File tmpDir,
-      final String runId, final String bcl2fastqVersion, final int laneCount)
-      throws AozanException {
+      final String runId, final String bcl2fastqMajorVersion,
+      final int laneCount) throws AozanException {
 
     if (properties == null) {
       throw new NullPointerException("The properties object is null");
@@ -768,12 +768,7 @@ public class QC {
     this.qcDir = qcDir;
     this.runId = runId;
     this.laneCount = laneCount;
-    this.bcl2fastqVersion =
-        ((bcl2fastqVersion == "latest" || bcl2fastqVersion.charAt(0) == '2')
-            ? DemultiplexingCollector.VERSION_2
-            : (bcl2fastqVersion.charAt(0) == '1'
-                ? DemultiplexingCollector.VERSION_1
-                : DemultiplexingCollector.VERSION_2));
+    this.bcl2fastqMajorVersion = bcl2fastqMajorVersion;
 
     this.tmpDir =
         tmpDir == null
