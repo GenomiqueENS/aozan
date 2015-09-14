@@ -28,17 +28,15 @@ public class SampleSheetVersion2 extends SampleSheet {
     // Save order
 
     final String key = buildKey(sample.getSampleId(), sample.getLane());
-    final int indice = findPositionInSamplesheetFile(sample, isColumnLaneExist);
+    final int indice = findPositionInSamplesheetFile(sample);
+
+    System.out.println("find position on sample in design order "
+        + indice + " \n\tfor sample " + sample.toString());
 
     list.put(key, indice);
   }
 
-  private int findPositionInSamplesheetFile(final SampleEntry sample,
-      final boolean isColumnLaneExist) {
-
-    if (isColumnLaneExist) {
-      return ++lastIndice;
-    }
+  private int findPositionInSamplesheetFile(final SampleEntry sample) {
 
     if (sample.getLane() == 1 || sample.getLane() == 0) {
       return ++lastIndice;
