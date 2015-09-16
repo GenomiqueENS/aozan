@@ -1,7 +1,6 @@
 package fr.ens.transcriptome.aozan.illumina.io;
 
 import java.util.List;
-import java.util.Map;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
@@ -11,13 +10,6 @@ import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 class SampleSheetLineReaderV1 extends SampleSheetLineReader {
 
   private boolean firstLine = true;
-  private int fieldsCountExpected;
-
-  private String currentSessionName;
-
-  private boolean firstData = true;
-
-  private Map<String, Integer> posFields;
 
   // Required in this order columns header for version1
   private static final String[] FIELDNAMES_VERSION1 = new String[] {"FCID",

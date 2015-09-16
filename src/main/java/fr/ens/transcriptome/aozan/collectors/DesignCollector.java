@@ -138,6 +138,10 @@ public class DesignCollector implements Collector {
         data.put(prefix + ".description", s.getDescription());
         data.put(prefix + ".sample.project", s.getSampleProject());
 
+        if (s.isDualIndex()){
+          data.put(prefix + ".index2", s.getIndex2());
+        }
+        
         // Extract data exist only with first version
         if (SampleSheetUtils.isBcl2fastqVersion1(this.bcl2fastqVersion)) {
 

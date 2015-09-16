@@ -196,6 +196,10 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
           sample.setIndex(value);
           break;
 
+        case "index2":
+          sample.setIndex2(value);
+          break;
+          
         case "description":
           sample.setDescription(value);
           break;

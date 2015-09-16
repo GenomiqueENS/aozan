@@ -23,6 +23,8 @@
 
 package fr.ens.transcriptome.aozan.illumina.sampleentry;
 
+import com.google.common.base.Strings;
+
 public abstract class AbstractSampleEntry implements SampleEntry {
 
   // Required fields for SampleEntry
@@ -32,6 +34,8 @@ public abstract class AbstractSampleEntry implements SampleEntry {
   private String index;
   private String description;
   private String sampleProject;
+
+  private String index2;
 
   //
   // Getters
@@ -74,13 +78,32 @@ public abstract class AbstractSampleEntry implements SampleEntry {
   }
 
   /**
+   * Get the index sequence for the sample.
+   * @return Returns the index
+   */
+  @Override
+  public String getIndex2() {
+    return this.index2;
+  }
+
+  /**
    * Test if the sample is indexed.
    * @return true if the sample is indexed
    */
   @Override
   public boolean isIndex() {
 
-    return this.index != null && !"".equals(this.index.trim());
+    return !Strings.isNullOrEmpty(this.index);
+  }
+
+  /**
+   * Test if the sample is indexed.
+   * @return true if the sample is indexed
+   */
+  @Override
+  public boolean isDualIndex() {
+
+    return !Strings.isNullOrEmpty(this.index2);
   }
 
   /**
@@ -137,6 +160,16 @@ public abstract class AbstractSampleEntry implements SampleEntry {
     this.index = index;
   }
 
+
+  /**
+   * Set the index sequence for the sample
+   * @param index The index to set
+   */
+  @Override
+  public void setIndex2(final String index) {
+    this.index2 = index;
+  }
+
   /**
    * @param description The description to set
    */
@@ -182,7 +215,7 @@ public abstract class AbstractSampleEntry implements SampleEntry {
     return "AbstractSampleEntry [lane="
         + lane + ", sampleId=" + sampleId + ", sampleRef=" + sampleRef
         + ", index=" + index + ", description=" + description
-        + ", sampleProject=" + sampleProject + "]";
+        + ", sampleProject=" + sampleProject + ", index2=" + index2 + "]";
   }
 
 }

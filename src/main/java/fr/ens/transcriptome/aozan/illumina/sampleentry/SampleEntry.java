@@ -56,10 +56,22 @@ public interface SampleEntry {
   public String getIndex();
 
   /**
+   * Gets the index2, in case on dual indexes.
+   * @return the index2
+   */
+  public String getIndex2();
+
+  /**
    * Test if the sample is indexed.
    * @return true if the sample is indexed
    */
   public boolean isIndex();
+
+  /**
+   * Checks if is dual index.
+   * @return true, if is dual index
+   */
+  public boolean isDualIndex();
 
   /**
    * Get the description of the sample.
@@ -92,6 +104,20 @@ public interface SampleEntry {
   public String getSampleProject();
 
   /**
+   * Gets the demultiplexed filename prefix.
+   * @param readNumber the read number
+   * @return the demultiplexed filename prefix
+   */
+  public String getDemultiplexedFilenamePrefix(final int readNumber);
+
+  /**
+   * Gets the not demultiplexed filename prefix.
+   * @param readNumber the read number
+   * @return the not demultiplexed filename prefix
+   */
+  public String getNotDemultiplexedFilenamePrefix(final int readNumber);
+
+  /**
    * Set the flow cell id for the sample.
    * @param flowCellId The flowCellId to set
    */
@@ -120,6 +146,12 @@ public interface SampleEntry {
    * @param index The index to set
    */
   public void setIndex(String index);
+
+  /**
+   * Set the index sequence for the sample
+   * @param index The index to set
+   */
+  public void setIndex2(String index);
 
   /**
    * @param description The description to set
@@ -161,11 +193,5 @@ public interface SampleEntry {
    * @param sampleProject The sampleProject to set
    */
   public void setSampleProject(String sampleProject);
-
-  public String getDemultiplexedFilenamePrefix(int readNumber);
-
-  public String getNotDemultiplexedFilenamePrefix(int readNumber);
-
-  public String toString();
 
 }
