@@ -4,7 +4,7 @@
 ############################################################
 
 # Set the base image to bcl2fastq-1.8.4
-FROM genomicpariscentre/bcl2fastq:1.8.4
+FROM genomicpariscentre/bcl2fastq2:2.17
 
 # File Author / Maintainer
 MAINTAINER Laurent Jourdren <jourdren@biologie.ens.fr>
@@ -19,27 +19,16 @@ RUN yum install -y java-1.7.0-openjdk.x86_64
 RUN mkdir /aozan_data
 
 # Install Aozan public version
-ADD https://github.com/GenomicParisCentre/aozan/releases/download/v1.5/aozan-1.5.tar.gz /tmp/
+ADD https://github.com/GenomicParisCentre/aozan/releases/download/v2.0/aozan-2.0.tar.gz /tmp/
 
 RUN cd /usr/local && tar xvzf /tmp/aozan-*.tar.gz && rm /tmp/aozan-*.tar.gz
 
 RUN ln -s /usr/local/aozan*/aozan.sh /usr/local/bin
 
-
-# Patch bcl2fast configuration file for use bz2 compression type
-# Comment 2 lines
-RUN sed -i -e 's/^COMPRESSION:=gzip$/#COMPRESSION:=gzip/' -e 's/^COMPRESSIONSUFFIX:=.gz$/#COMPRESSIONSUFFIX:=.gz/' /usr/local/share/bcl2fastq-*/makefiles/Config.mk
-
-# Install blast
-RUN cd /tmp ; wget download.opensuse.org/repositories/home:/joscott/CentOS_CentOS-5/x86_64/ncbi-blast-2.2.29_plus-2.3.x86_64.rpm
-
-RUN yum -y --nogpgcheck localinstall /tmp/ncbi-blast*.rpm
-
-RUN rm -rf /tmp/*.rpm
-
-
-# Add script to run blastall via script legacy_blast.pl
-RUN echo -e  '#! /bin/bash\n\n/usr/bin/legacy_blast.pl blastall $@\n' > /usr/local/blastall && chmod +x /usr/local/blastall
+# Install requiered dependencies
+RUN yum install -y rsync
+RUN yum install -y bzip2.x86_64
+RUN yum install -y zip.x86_64
 
 
 # Build usefull directory for Aozan
