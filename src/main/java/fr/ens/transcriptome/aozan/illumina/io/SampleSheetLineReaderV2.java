@@ -241,11 +241,14 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
       }
     }
 
-    for (String name : FIELDNAMES_VERSION2_REQUIERED_FOR_QC) {
-      if (!fields.contains(name)) {
-        throw new AozanException(
-            "Parsing Sample sheet file: missing required field to create quality control report "
-                + name + " in header " + Joiner.on(", ").join(fields));
+    if (isCompatibleForQCReport) {
+      // Check exist usefull columns in sample sheet
+      for (String name : FIELDNAMES_VERSION2_REQUIERED_FOR_QC) {
+        if (!fields.contains(name)) {
+          throw new AozanException(
+              "Parsing Sample sheet file: missing required field to create quality control report "
+                  + name + " in header " + Joiner.on(", ").join(fields));
+        }
       }
     }
 
