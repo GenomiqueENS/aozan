@@ -56,6 +56,7 @@ import fr.ens.transcriptome.eoulsan.util.XMLUtils;
  * @author Laurent Jourdren
  */
 
+// TODO REMOVE
 public class DemultiplexingStatsCollector implements Collector {
 
   /** The collector name. */

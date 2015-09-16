@@ -84,10 +84,6 @@ public class PercentSampleInProjectSamplestatsTest extends AbstractSampleTest {
       final double percent =
           (double) rawClusterSampleSum / (double) rawClusterInProjectSum;
 
-      System.out.println(" sample "
-          + rawClusterSampleSum + " projetct " + rawClusterInProjectSum + " % "
-          + percent);
-
       if (interval == null)
         return new TestResult(percent, true);
 

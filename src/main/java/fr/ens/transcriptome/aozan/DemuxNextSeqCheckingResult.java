@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.common.base.Splitter;
 import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
@@ -26,9 +25,13 @@ import fr.ens.transcriptome.eoulsan.util.StringUtils;
 public class DemuxNextSeqCheckingResult {
 
   private final static String DIR =
-      "/import/rhodos01/shares-net/sequencages/nextseq_500/fastq";
+      "/import/rhodos01/shares-net/sequencages/nextseq_500/fastq/checkDemuxResult";
   private final static String OUTPUT_DIR =
       "/import/rhodos01/shares-net/sequencages/nextseq_500/fastq/checkDemuxResult";
+  private static final String DIR_SAMPLESHEET =
+      "/import/rhodos01/shares-net/sequencages/nextseq_500/samplesheets";
+
+  private static final String ID = "onetile-run04_";
 
   public static void main(String[] argv) throws Exception {
 
@@ -45,10 +48,10 @@ public class DemuxNextSeqCheckingResult {
       e.printStackTrace();
     }
 
-    // checkIndexesInUndeterminedFile(design, runId);
+    checkIndexesInUndeterminedFile(design, runId);
 
     // Check passing filter reads in Undetermined fastq file
-    // checkPFReadsUndeterminedFile(design, runId);
+    checkPFReadsUndeterminedFile(design, runId);
 
     // Check quality in sample fastq file
     checkQualityInSampleFastq(design, runId);
@@ -58,8 +61,8 @@ public class DemuxNextSeqCheckingResult {
   private static void checkIndexesInUndeterminedFile(SampleSheet design,
       String runId) throws Exception {
 
-    createResultFile(design, runId, "Undetermined_", "_R1_001.fastq.gz",
-        "demuxWithIndex_", "forDemuxWithoutIndex");
+    createResultFile(design, runId, "Undetermined_", "_R1_001.fastq.gz", ID
+        + "demuxWithIndex_", "forDemuxWithoutIndex");
 
   }
 
@@ -69,8 +72,8 @@ public class DemuxNextSeqCheckingResult {
     for (SampleEntry entry : design) {
       final String sampleName = entry.getSampleProject();
 
-      createResultFile(design, runId + "/" + sampleName, "2015-00",
-          "_R1_001.fastq.gz", "sampleQuality_", "forSample");
+      createResultFile(design, runId + "/" + sampleName, "2015_00",
+          "_R1_001.fastq.gz", ID + "sampleQuality_", "forSample");
 
     }
   }
@@ -78,8 +81,8 @@ public class DemuxNextSeqCheckingResult {
   private static void checkPFReadsUndeterminedFile(final SampleSheet design,
       final String runId) throws Exception {
 
-    createResultFile(design, runId, "Undetermined_", "_R1_001.fastq.gz",
-        "readNoPF_", "forUndetermined");
+    createResultFile(design, runId, "Undetermined_", "_R1_001.fastq.gz", ID
+        + "readNoPF_", "forUndetermined");
   }
 
   private static void createResultFile(final SampleSheet design,
@@ -241,7 +244,7 @@ public class DemuxNextSeqCheckingResult {
       final String bcl2fastqVersion) throws Exception {
 
     // Design file path
-    final File f = new File(DIR, runId + "/samplesheet_" + runId + ".csv");
+    final File f = new File(DIR_SAMPLESHEET, "/samplesheet_" + runId + ".csv");
 
     return new CasavaDesignCSVReader(f).read(bcl2fastqVersion);
   }

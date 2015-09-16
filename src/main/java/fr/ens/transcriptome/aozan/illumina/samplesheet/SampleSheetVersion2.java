@@ -30,9 +30,6 @@ public class SampleSheetVersion2 extends SampleSheet {
     final String key = buildKey(sample.getSampleId(), sample.getLane());
     final int indice = findPositionInSamplesheetFile(sample);
 
-    System.out.println("find position on sample in design order "
-        + indice + " \n\tfor sample " + sample.toString());
-
     list.put(key, indice);
   }
 
