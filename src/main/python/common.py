@@ -152,8 +152,13 @@ def is_conf_value_defined(settings_key, expected_value, conf):
         return boolean
     """
 
+    value = None
+    
     # Get value
-    value = conf[settings_key]
+    try:
+        value = conf[settings_key]
+    except KeyError:
+        return False
 
     # Test if value is defined
     if value == None:
@@ -282,11 +287,9 @@ def send_msg(subject, message, is_error, conf):
         server.sendmail(mail_from, dests, composed)
         server.quit()
     else:
-        pass
-        # TODO Actived option print after test step
-        # print '-------------'
-        # print composed
-        # print '-------------'
+        print '-------------'
+        print composed
+        print '-------------'
 
 def send_msg_with_attachment(subject, message, attachment_file, conf):
     """Send a message to the user about the data extraction."""
@@ -361,11 +364,9 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
         server.sendmail(mail_from, dests, composed)
         server.quit()
     else:
-        pass
-        # TODO Actived option print after test step
-        # print '-------------'
-        # print composed
-        # print '-------------'
+        print '-------------'
+        print composed
+        print '-------------'
 
 def create_msg(mail_from, mail_to, mail_cc, mail_bcc, subject, message, conf):
     """Create a message to send.
@@ -531,7 +532,7 @@ def load_processed_run_ids(done_file_path):
         if len(run_id) == 0:
             continue
         # Extract first field 
-        result.add(run_id.split('\t')[0])
+        result.add(run_id.strip())
 
     f.close()
 
@@ -552,7 +553,7 @@ def add_run_id_to_processed_run_ids(run_id, done_file_path, conf):
 
     f = open(done_file_path, 'a')
 
-    f.write(run_id + '\t' + str(sequencer_type) + '\n')
+    f.write(run_id+ '\n')
 
     f.close()
     
@@ -590,13 +591,11 @@ def get_runparameters_path(run_id, conf):
     if len(res) == 0:
         # TODO throw exception ?
         return None
-    
-    # Extract path
-    runParameter_path = res[0]
-    
+        
     # Check result path
-    if os.path.basename(runParameter_path).lower() == "runparameters.xml":
-        return runParameter_path
+    for run_parameter_path in res:
+	    if os.path.basename(run_parameter_path).lower() == "runparameters.xml":
+	        return run_parameter_path
     
     return None
 
