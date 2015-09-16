@@ -11,7 +11,10 @@ from xml.etree.ElementTree import ElementTree
 from java.io import IOException
 from java.lang import Runtime, Throwable
 from java.util import HashMap
-from fr.ens.transcriptome.eoulsan import EoulsanException
+
+from fr.ens.transcriptome.aozan import AozanException
+from fr.ens.transcriptome.aozan.collectors.DemultiplexingCollector import VERSION_1
+from fr.ens.transcriptome.aozan.collectors.DemultiplexingCollector import VERSION_2 
 from fr.ens.transcriptome.aozan.io import CasavaDesignXLSReader
 from fr.ens.transcriptome.aozan.util import DockerUtils
 from fr.ens.transcriptome.aozan.illumina.io import CasavaDesignCSVReader
@@ -118,7 +121,7 @@ def get_flowcell_id_in_demultiplex_xml(fastq_output_dir):
     tree = ElementTree()
     tree.parse(fastq_output_dir + '/DemultiplexConfig.xml')
 
-    return tree.find("FlowcellInfo").attrib['ID']
+    return tree.find("Flowcell").attrib['flowcell-id']
 
 
 def build_samplesheet_filename(run_id, conf):
@@ -134,7 +137,7 @@ def build_samplesheet_filename(run_id, conf):
 
     return conf[CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + '_' + instrument_sn + '_%04d' % run_number
 
-def check_samplesheet(run_id, samplesheet_filename, conf):
+def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_version, conf):
     """ Check sample sheet and convert in csv format if useful.
 
     Arguments:
@@ -154,6 +157,8 @@ def check_samplesheet(run_id, samplesheet_filename, conf):
     
     
     common.log("INFO", "Flowcell id: " + flow_cell_id, conf)
+    common.log("INFO", "bcl2fastq version : " + str(bcl2fastq_version), conf)
+    common.log("INFO", "sample sheet format for bcl2fastq : " + str(conf[CASAVA_SAMPLESHEET_FORMAT_KEY]), conf)    
     
     if common.is_conf_value_defined(CASAVA_SAMPLESHEET_FORMAT_KEY, 'xls', conf):
 
@@ -164,11 +169,11 @@ def check_samplesheet(run_id, samplesheet_filename, conf):
             error("no casava sample sheet found", "No casava sample sheet found for " + run_id + " run.\n" + \
               'You must provide a ' + samplesheet_filename + '.xls file in ' + conf[CASAVA_SAMPLESHEETS_PATH_KEY] + \
               ' directory to demultiplex and create fastq files for this run.\n', conf)
-            return False, None
+            return False, []
 
         try:
             # Load XLS design file
-            design = CasavaDesignXLSReader(input_design_xls_path).read()
+            design = CasavaDesignXLSReader(input_design_xls_path).read(bcl2fastq_version)
 
             # Replace index sequence shortcuts by sequences
             SampleSheetUtils.replaceIndexShortcutsBySequences(design, load_index_sequences(conf))
@@ -178,10 +183,10 @@ def check_samplesheet(run_id, samplesheet_filename, conf):
 
         except IOException, exp:
             error("error while converting " + samplesheet_filename + ".xls to CSV format", exp.getMessage(), conf)
-            return False, None
-        except EoulsanException, exp:
+            return False, []
+        except AozanException, exp:
             error("error while converting " + samplesheet_filename + ".xls to CSV format", exp.getMessage(), conf)
-            return False, None
+            return False, []
 
     elif common.is_conf_value_defined(CASAVA_SAMPLESHEET_FORMAT_KEY, 'csv', conf):
 
@@ -192,21 +197,21 @@ def check_samplesheet(run_id, samplesheet_filename, conf):
             error("no casava sample sheet found", "No casava sample sheet found for " + run_id + " run.\n" + \
               'You must provide a ' + samplesheet_filename + '.csv file in ' + conf[CASAVA_SAMPLESHEETS_PATH_KEY] + \
               ' directory to demultiplex and create fastq files for this run.\n', conf)
-            return False, None
+            return False, []
 
         cmd = 'cp ' + input_design_csv_path + ' ' + design_csv_path
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
             error("error while copying Casava CSV sample sheet file to temporary directory for run " + run_id,
                   'Error while copying Casava CSV sample sheet file to temporary directory.\nCommand line:\n' + cmd, conf)
-            return False, None
+            return False, []
 
     elif common.is_conf_value_defined(CASAVA_SAMPLESHEET_FORMAT_KEY, 'command', conf):
         
         action_error_msg = 'Error while creating Casava CSV sample sheet file' 
         if not common.is_conf_key_exists(CASAVA_DESIGN_GENERATOR_COMMAND_KEY, conf):
             error(action_error_msg + ' for run ' + run_id, action_error_msg + ' the command is empty.', conf)
-            return False, None
+            return False, []
 
         cmd = conf[CASAVA_DESIGN_GENERATOR_COMMAND_KEY] + ' ' + run_id + ' ' + design_csv_path
         common.log("INFO", "exec: " + cmd, conf)
@@ -224,16 +229,18 @@ def check_samplesheet(run_id, samplesheet_filename, conf):
 
     # Check if Casava CSV design file has been created
     if not os.path.exists(design_csv_path):
-            error("error while reading Casava CSV sample sheet file for run " + run_id,
+        error("error while reading Casava CSV sample sheet file for run " + run_id,
                   'Error while reading Casava CSV sample sheet file, the sample sheet file does not exist: \n' + design_csv_path, conf)
+
+    design_warnings = {}
 
     # Check Casava CSV design file
     try:
         # Load CSV design file
-        # design = CasavaDesignCSVReader(design_csv_path).read()
+        design = CasavaDesignCSVReader(design_csv_path).read(bcl2fastq_version)
 
         # Check values of design file
-        design_warnings = []  # CasavaDesignUtil.checkCasavaDesign(design, flow_cell_id)
+        design_warnings = SampleSheetUtils.checkCasavaDesign(design, flow_cell_id)
 
 
     # TODO: remove lock
@@ -241,7 +248,7 @@ def check_samplesheet(run_id, samplesheet_filename, conf):
     except IOException, exp:
         error("error while checking " + samplesheet_filename + ".csv file ", exp.getMessage(), conf)
         return False, design_warnings
-    except EoulsanException, exp:
+    except AozanException, exp:
         error("error while checking " + samplesheet_filename + ".csv file ", exp.getMessage(), conf)
         return False, design_warnings
 
@@ -275,6 +282,7 @@ def get_cpu_count(conf):
 
     return cpu_count
 
+
 def get_bcl2fastq_version(run_id, conf):
     """ Return bcl2fastq version to use according to RTA version used for sequencing. With RTA version 1, use blc2fastq 1
      and with RTA version 2 use bcl2fastq 2.
@@ -283,19 +291,25 @@ def get_bcl2fastq_version(run_id, conf):
         conf: configuration dictionary
         run_id: The run id
     Return:
-        path to report_run_data
+		bcl2fastq version used for image Docker
     """
 
     version = conf[Settings.BCL2FASTQ_VERSION_FOR_HISEQ_KEY] if common.is_sequencer_hiseq(run_id, conf) else conf[Settings.BCL2FASTQ_VERSION_FOR_NEXTSEQ_KEY]
     
     print "DEBUG bcl2fastq from conf file is " + str(version)
     
-    if not (version == BCL2FASTQ_VERSION_1 or version == BCL2FASTQ_VERSION_2):
-        raise Exception('Invalid bcl2fastq version set ' + str(version) + ". Except: " + BCL2FASTQ_VERSION_1 or BCL2FASTQ_VERSION_1)
+    if not (version.startswith('1') or version.startswith('2') or version == 'latest'):
+        raise Exception('Invalid bcl2fastq version set ' + str(version) + ". Except: " + BCL2FASTQ_VERSION_1 or BCL2FASTQ_VERSION_2)
     
-    return version 
+    if version.startswith('1'):
+        major = VERSION_1
 
-def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, tmp_path, bcl2fastq_version, conf):
+    if version.startswith('2') or version == 'latest':
+        major = VERSION_2
+    
+    return major, version
+
+def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, tmp_path, bcl2fastq_major_version, conf):
         
     args = []
     
@@ -303,7 +317,7 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
     nb_threads = str(get_cpu_count(conf)) 
     tmp_local = conf[TMP_PATH_KEY]
     
-    if bcl2fastq_version == BCL2FASTQ_VERSION_1:
+    if bcl2fastq_major_version == VERSION_1:
         
         # Create casava makefile
         makefile_args = []
@@ -376,7 +390,7 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
         # cmd += str(" ".join(args))
         cmd += '\n\n'
         
-    elif  bcl2fastq_version == BCL2FASTQ_VERSION_2:
+    elif  bcl2fastq_major_version == VERSION_2:
         #  List arg
         args = []
         args.extend(['bcl2fastq'])
@@ -439,7 +453,7 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
         
           
 
-def demux_run_standalone(run_id, bcl2fastq_version, input_run_data_path, fastq_output_dir, samplesheet_csv_path, conf):
+def demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, conf):
     """ Demultiplexing the run with bcl2fastq on version parameter.
 
     Arguments:
@@ -451,16 +465,22 @@ def demux_run_standalone(run_id, bcl2fastq_version, input_run_data_path, fastq_o
         conf: configuration dictionary
     """
     
-    cmd = bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, conf[TMP_PATH_KEY], bcl2fastq_version, conf)
+    bcl2fastq_major_version, bcl2fastq_version = get_bcl2fastq_version(run_id, conf)
+    
+    commandfile, cmd = bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, conf[TMP_PATH_KEY], bcl2fastq_major_version, conf)
+    
+    common.log('WARNING',
+			'demultiplexing in standalone with bcl2fastq version ' + str(bcl2fastq_version) + ', run this script ' + str(cmd), conf)
     
     exit_code = os.system(cmd)
     if exit_code != 0:
-        error("error while creating Casava makefile for run " + run_id,
-              'Error while creating Casava makefile (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
+        error("error while setting executable command file bcl2fastq for run " + run_id,
+              'Error while setting executable command file bcl2fastq (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
         return False
     
     # The output directory must be read only
-    cmd = 'chmod -R ugo-w ' + fastq_output_dir + '/Project_*'
+    # cmd = 'chmod -R ugo-w ' + fastq_output_dir + '/Project_*'
+    cmd = 'find ' + fastq_output_dir + ' -type f -name "*.fastq.*" -exec chmod ugo-w {} \; '
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while setting read only the output fastq directory for run " + run_id,
@@ -470,12 +490,11 @@ def demux_run_standalone(run_id, bcl2fastq_version, input_run_data_path, fastq_o
     # All ok
     return True
      
-def demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_output_dir, samplesheet_csv_path, conf):
+def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, conf):
     """ Demultiplexing the run with bcl2fastq on version parameter with image Docker.
 
     Arguments:
         run id: The run id
-        bcl2fastq_version: bcl2fastq version used 
         input_run_data_path: input run data path to demultiplexing 
         fastq_output_dir: fastq directory to save result on demultiplexing
         samplesheet_csv_path: sample sheet path in csv format, version used by bcl2fastq
@@ -492,13 +511,15 @@ def demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_
     output_docker = '/root/'
     fastq_data_path_in_docker = output_docker + os.path.basename(fastq_output_dir)
     
+    bcl2fastq_major_version, bcl2fastq_version = get_bcl2fastq_version(run_id, conf)
+    
     tmp = conf[TMP_PATH_KEY]
     tmp_docker = '/tmp/'
     
     samplesheet_csv_docker = tmp_docker + os.path.basename(samplesheet_csv_path)
         
     
-    (cmdFile, cmd) = bcl2fastq_get_command(run_id, input_run_data_path_in_docker, fastq_data_path_in_docker, samplesheet_csv_docker, tmp_docker, bcl2fastq_version, conf)
+    (cmdFile, cmd) = bcl2fastq_get_command(run_id, input_run_data_path_in_docker, fastq_data_path_in_docker, samplesheet_csv_docker, tmp_docker, bcl2fastq_major_version, conf)
     
     if not os.path.exists(cmdFile):
         error("error while create script bcl2fastq for run " + run_id ,
@@ -509,10 +530,10 @@ def demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_
     
     # Copy file
     dir = os.path.dirname(cmdFile)
-    os.system('cp -p ' + cmdFile + ' ' + dir +'/toto.sh ')
+    os.system('cp -p ' + cmdFile + ' ' + dir + '/toto.sh ')
     
     # Extract filename to execute
-    dockerCommand = "/tmp/toto.sh"# + str(os.path.basename(cmdFile))
+    dockerCommand = "/tmp/toto.sh"  # + str(os.path.basename(cmdFile))
     # dockerCommand = "/tmp/bcl2fastq2_copy.sh" # + str(os.path.basename(cmd))
     # dockerCommand = "bcl2fastq"
     common.log("WARNING", "command build for docker " + dockerCommand
@@ -551,17 +572,17 @@ def demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_
         return False
     
     # The output directory must be read only
-    #   cmd = 'chmod -R ugo-w ' + fastq_output_dir + '/Project_*'
-    # cmd = 'find ' + fastq_output_dir + ' -type f -name "*.fastq.*" -exec chmod ugo-w {} \; '
-    # common.log("INFO", "exec: " + cmd, conf)
-    # if os.system(cmd) != 0:
-    #    error("error while setting read only the output fastq directory for run " + run_id,
-    #          'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
-    #    return False
+    # cmd = 'chmod -R ugo-w ' + fastq_output_dir + '/Project_*'
+    cmd = 'find ' + fastq_output_dir + ' -type f -name "*.fastq.*" -exec chmod ugo-w {} \; '
+    common.log("INFO", "exec: " + cmd, conf)
+    if os.system(cmd) != 0:
+        error("error while setting read only the output fastq directory for run " + run_id,
+             'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
+        return False
     
     return True
     
-def archive_demux_stat(run_id, bcl2fastq_version, fastq_output_dir, reports_data_path, basecall_stats_file, basecall_stats_prefix, conf):
+def archive_demux_stat(run_id, bcl2fastq_version, fastq_output_dir, reports_data_path, basecall_stats_file, basecall_stats_prefix, design_csv_path, conf):
     """ Archive demultplexing statistics results file.
 
     Arguments:
@@ -571,28 +592,31 @@ def archive_demux_stat(run_id, bcl2fastq_version, fastq_output_dir, reports_data
         reports_data_path: directory to save archives
         basecall_stats_file: file to archive
         basecall_stats_prefix: prefix file to archive
+        design_csv_path: sample sheet in csv
         conf: configuration dictionary
     """
     
-    archive_run_dir = basecall_stats_prefix + run_id 
+    archive_run_dir = reports_data_path + '/' + basecall_stats_prefix + run_id 
     archive_run_tar_file = reports_data_path + '/' + basecall_stats_file
     
     if bcl2fastq_version == BCL2FASTQ_VERSION_1:
         # Archive basecall stats
         flow_cell_id_in_conf_xml = get_flowcell_id_in_demultiplex_xml(fastq_output_dir)
-        cmd = 'cd ' + fastq_output_dir + ' &&  mv Basecall_Stats_' + flow_cell_id_in_conf_xml + ' ' + archive_run_dir + ' && ' + \
-            'tar cjf ' + archive_run_tar_file + ' ' + archive_run_dir + ' && ' + \
-            'cp -rp ' + archive_run_dir + ' ' + reports_data_path + ' && ' + \
-            'mv ' + archive_run_dir + ' Basecall_Stats_' + flow_cell_id_in_conf_xml
+        cmd_list = []
+        cmd_list.extend(['cd', fastq_output_dir, '&&'])
+        cmd_list.extend(['mv', 'Basecall_Stats_' + flow_cell_id_in_conf_xml, archive_run_dir, '&&'])
+        cmd_list.extend(['tar', 'cjf', archive_run_tar_file, archive_run_dir, '&&'])
+        cmd_list.extend(['cp', '-rp', archive_run_dir, reports_data_path, '&&'])
+        cmd_list.extend(['mv', archive_run_dir, 'Basecall_Stats_' + flow_cell_id_in_conf_xml])
         
+        cmd = " ".join(cmd_list)
     else:
         # With bcl2fastq 2
         cmd_list = []
         cmd_list.extend(['cd', fastq_output_dir, '&&'])
         cmd_list.extend(['mkdir', archive_run_dir, '&&' ])
-        cmd_list.extend(['mv', 'Reports', 'Stats', 'InterOp', archive_run_dir, '&&'])
-        cmd_list.extend(['tar cjf', archive_run_tar_file, archive_run_dir, '&&' ])
-        cmd_list.extend(['cp -rp', archive_run_dir, reports_data_path])
+        cmd_list.extend(['cp', '-r', 'Reports', 'Stats', 'InterOp', design_csv_path, archive_run_dir, '&&'])
+        cmd_list.extend(['tar cjf', archive_run_tar_file, archive_run_dir])
         
         cmd = " ".join(cmd_list)
         
@@ -731,7 +755,9 @@ def demux(run_id, conf):
     output_df = common.df(conf[FASTQ_DATA_PATH_KEY])
     du_factor = float(conf[DEMUX_SPACE_FACTOR_KEY])
     space_needed = input_path_du * du_factor
-
+    
+    bcl2fastq_major_version, bcl2fastq_version = get_bcl2fastq_version(run_id, conf)
+    
     common.log("WARNING", "Demux step: input disk usage: " + str(input_path_du), conf)
     common.log("WARNING", "Demux step: output disk free: " + str(output_df), conf)
     common.log("WARNING", "Demux step: space needed: " + str(space_needed), conf)
@@ -743,7 +769,7 @@ def demux(run_id, conf):
         return False
 
     # Check and convert if useful samplesheet
-    design_csv_path, design_warnings = check_samplesheet(run_id, design_filename, conf)
+    design_csv_path, design_warnings = check_samplesheet(run_id, design_filename, bcl2fastq_major_version, conf)
     if not design_csv_path:
         return False
 
@@ -753,19 +779,17 @@ def demux(run_id, conf):
               "Invalid FASTQ compression format: " + conf[CASAVA_COMPRESSION_KEY], conf)
         return False
     
-    # Set bcl2fastq version used from RTA version used on sequencer
-    bcl2fastq_version = get_bcl2fastq_version(run_id, conf) 
     
-    common.log("CONFIG", "bcl2fastq version used " + bcl2fastq_version, conf)
+    common.log("CONFIG", "bcl2fastq version used " + bcl2fastq_major_version, conf)
     common.log("CONFIG", "bcl2fastq mode docker ? " + str(common.is_conf_value_equals_true(Settings.DEMUX_USE_DOCKER_ENABLE_KEY, conf)), conf)
     
     # Run demultiplexing
     if common.is_conf_value_equals_true(Settings.DEMUX_USE_DOCKER_ENABLE_KEY, conf):
         # With image docker
-        if not demux_run_with_docker(run_id, bcl2fastq_version, input_run_data_path, fastq_output_dir, design_csv_path, conf):
+        if not demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, design_csv_path, conf):
             return False
     else:        
-        if not demux_run_standalone(run_id, bcl2fastq_version, input_run_data_path, fastq_output_dir, design_csv_path, conf):
+        if not demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, design_csv_path, conf):
             return False
    
     # Copy design to output directory
@@ -777,7 +801,7 @@ def demux(run_id, conf):
         return False
 
     # Create archives on demultiplexing statistics 
-    if not archive_demux_stat(run_id, bcl2fastq_version, fastq_output_dir, reports_data_path, basecall_stats_file, basecall_stats_prefix, conf):
+    if not archive_demux_stat(run_id, bcl2fastq_major_version, fastq_output_dir, reports_data_path, basecall_stats_file, basecall_stats_prefix, design_csv_path, conf):
         return False
     
     # Archive samplesheet
