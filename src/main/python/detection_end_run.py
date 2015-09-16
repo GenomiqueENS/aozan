@@ -117,8 +117,9 @@ def check_end_run_since(run_id, secs, conf):
     last = 0
 
     for i in range(reads_number):
-        file_to_test = hiseq_data_path + '/' + run_id + '/Basecalling_Netcopy_complete_Read' + str(i + 1) + '.txt'
+        file_to_test = hiseq_data_path + '/' + run_id  + '/' + build_read_complete(run_id, i, conf)
         if not os.path.exists(file_to_test):
+            print "DEBUG: check file on end run is not found " + str(file_to_test)
             return -2
         else:
             m_time = os.stat(file_to_test).st_mtime
@@ -127,5 +128,14 @@ def check_end_run_since(run_id, secs, conf):
 
     if (time.time() - last) < secs:
         return last
-    return -3
+    
+    return 0
+
+def build_read_complete(run_id, i, conf):
+    
+    if common.is_sequencer_hiseq(run_id, conf):
+        return  'Basecalling_Netcopy_complete_Read' + str(i + 1) + '.txt'
+    
+    else:
+        return  'RTARead'+ str(i + 1) + 'Complete.txt'
 

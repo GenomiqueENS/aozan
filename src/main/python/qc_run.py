@@ -71,7 +71,7 @@ def qc(run_id, conf):
     if input_run_data_path == None:
         return False
     
-    bcl2fastq_version = demux_run.get_bcl2fastq_version(run_id, conf)
+    bcl2fastq_major_version, bcl2fastq_version = demux_run.get_bcl2fastq_version(run_id, conf)
     
     fastq_input_dir = conf[FASTQ_DATA_PATH_KEY] + '/' + run_id
     reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
@@ -123,15 +123,20 @@ def qc(run_id, conf):
 
     try:
         # Find lane count 
-        run_info = RunInfo()
         run_info_path = hiseq_run.get_runinfos_file(run_id, conf)
+        
+        if run_info_path is None:
+            error("error to find RunInfo.xml file "+ run_id + ".",
+                  "error to find RunInfo.xml file "+ run_id + ".", conf)
+        
+        run_info = RunInfo()
         run_info.parse(run_info_path)
 
         laneCount = run_info.getFlowCellLaneCount()
 
         
         # Initialize the QC object
-        qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id, bcl2fastq_version, laneCount)
+        qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id, bcl2fastq_major_version, laneCount)
 
         # Compute the report
         report = qc.computeReport()
