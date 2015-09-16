@@ -25,6 +25,7 @@ package fr.ens.transcriptome.aozan.illumina.io;
 import static fr.ens.transcriptome.aozan.collectors.DemultiplexingCollector.VERSION_1;
 import static fr.ens.transcriptome.aozan.collectors.DemultiplexingCollector.VERSION_2;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -52,6 +53,9 @@ public class CasavaDesignReaderTest extends TestCase {
   private static final Splitter COMMA_SPLITTER = Splitter.on(",").trimResults()
       .omitEmptyStrings();
 
+  private static final String EXPECTED_SMALLER_CSV = "[Data]\nSampleID\n"
+      + "2015_067\n" + "2015_068\n" + "2015_069";
+
   private static final String EXPECTED_CSV =
       "SampleID,index,Sample_Project,Description,Sample_Ref\n"
           + "2015_067,CGATGT,Project_A2015,Description,arabidopsis\n"
@@ -75,6 +79,19 @@ public class CasavaDesignReaderTest extends TestCase {
 
   private String path;
   private File outputFile;
+
+  public void testReadsShortCSVVersion() {
+
+    try {
+      new CasavaDesignCSVReader(new ByteArrayInputStream(
+          EXPECTED_SMALLER_CSV.getBytes())).read(VERSION_2);
+
+    } catch (IOException | AozanException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+  }
 
   /**
    * Reads xls samplesheet file and check samplesheet instance is the same that
