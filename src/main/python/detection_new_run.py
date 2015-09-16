@@ -55,11 +55,14 @@ def get_available_run_ids(conf):
 
         files = os.listdir(hiseq_data_path)
         for f in files:
-            if os.path.isdir(hiseq_data_path + '/' + f) and \
-                hiseq_run.check_run_id(f, conf) and \
-                not detection_end_run.check_end_run(f, conf) and \
-                os.path.exists(hiseq_data_path + '/' + f + '/RunInfo.xml'):
+            
+            if not (os.path.isdir(hiseq_data_path + '/' + f) and hiseq_run.check_run_id(f, conf)):
+                # No valid entry
+                continue
                 
+            if not detection_end_run.check_end_run(f, conf) and \
+                os.path.exists(hiseq_data_path + '/' + f + '/RunInfo.xml'):
+                # TODO
                 # os.path.exists(hiseq_data_path + '/' + f + '/First_Base_Report.htm'):
 
                 result.add(f)

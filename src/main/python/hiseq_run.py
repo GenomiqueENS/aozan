@@ -11,57 +11,58 @@ from fr.ens.transcriptome.aozan.Settings import HISEQ_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import HISEQ_STEP_KEY
 from fr.ens.transcriptome.aozan.Settings import TMP_PATH_KEY
-import cmd
+
+
 # from pickle import FALSE
 # from macpath import pathsep
 
 DENY_FILE = 'sequencer_run.deny'
 
 def load_deny_run_ids(conf):
-    """Load the list of the run ids to not process.
+	"""Load the list of the run ids to not process.
 
     Arguments:
         conf: configuration dictionary
     """
 
-    return common.load_processed_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/hiseq.deny')
+	return common.load_processed_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/hiseq.deny')
 
 
 def get_runinfos_file(run_id, conf):
-    """Get the RunInfos.xml path.
+	"""Get the RunInfos.xml path.
 
     Arguments:
         runtId: the run id
         conf: configuration dictionary
     """
-    
-    sequencer_path = find_hiseq_run_path(run_id, conf)
-    
-    if not sequencer_path:
-        return None
-    
-    return sequencer_path + '/' + run_id + '/RunInfo.xml'
+
+	sequencer_path = find_hiseq_run_path(run_id, conf)
+
+	if type(sequencer_path) is bool:
+		return None
+
+	return sequencer_path + '/' + run_id + '/RunInfo.xml'
 
 def get_reads_number(run_id, conf):
-    """Get the number of read of a run.
+	"""Get the number of read of a run.
 
 	    Arguments:
 		    runtId: the run id
 		    conf: configuration dictionary
 	"""
 
-    file_src = get_runinfos_file(run_id, conf)
-    
-    
-    if not file_src:
-        return -1
-    
-    tree = ElementTree()
-    tree.parse(file_src)
+	file_src = get_runinfos_file(run_id, conf)
 
-    reads = tree.find("Run/Reads")
 
-    return len(reads)
+	if not file_src:
+		return -1
+
+	tree = ElementTree()
+	tree.parse(file_src)
+
+	reads = tree.find("Run/Reads")
+
+	return len(reads)
 
 
 def check_run_id(run_id, conf):
@@ -205,7 +206,10 @@ def get_hiseq_data_paths(conf):
 def find_hiseq_run_path(run_id, conf):
 
 	for path in get_hiseq_data_paths(conf):
-		if (os.path.exists(path.strip() + '/' + run_id)):
+
+		path_to_test = path.strip() + '/' + run_id
+
+		if (os.path.exists(path_to_test)):
 			return path.strip()
 
 	return False
@@ -224,14 +228,14 @@ def error(short_message, message, conf):
 
 
 def create_run_summary_reports(run_id, conf):
-    return True 
-
-
-def create_run_summary_reports_real(run_id, conf):
+# 	return True
+# 
+# 
+# def create_run_summary_reports_real(run_id, conf):
 
 	""" Copy main files and directory from hiseq run directory to save in report run data directory.
         Save data in two distinct directory on hiseq and on report, and tar.bz2 version
-        
+
 	Arguments:
 		runId: the run id
 		conf: configuration dictionary
@@ -247,29 +251,33 @@ def create_run_summary_reports_real(run_id, conf):
 	hiseq_log_prefix = 'hiseq_log_'
 	report_archive_file = report_prefix + run_id + '.tar.bz2'
 	hiseq_log_archive_file = hiseq_log_prefix + run_id + '.tar.bz2'
-	
+
 	# Save quality control data
 	tmp_path = tmp_base_path + '/' + run_id
 
 	# Check if reports_data_path exists
 	if not os.path.exists(reports_data_base_path):
-		error("Report directory does not exists", "Report directory does not exists: " + reports_data_base_path, conf)
+		error("Report directory does not exists", 
+			"Report directory does not exists: " + reports_data_base_path, conf)
 		return False
-	
+
 	# Check if temporary directory exists
 	if not os.path.exists(tmp_base_path):
-		error("Temporary directory does not exists", "Temporary directory does not exists: " + tmp_base_path, conf)
+		error("Temporary directory does not exists", 
+			"Temporary directory does not exists: " + tmp_base_path, conf)
 		return False
 
 
 	# Check if reports archive exists
 	if os.path.exists(reports_data_path + '/' + report_archive_file):
-		error('Report archive already exists for run ' + run_id, 'Report archive already exists for run ' + run_id + ' : ' + report_archive_file, conf)
+		error('Report archive already exists for run ' + run_id, 
+			'Report archive already exists for run ' + run_id + ' : ' + report_archive_file, conf)
 		return False
 
 	# Check if hiseq log archive exists
 	if os.path.exists(reports_data_path + '/' + hiseq_log_archive_file):
-		error('Hiseq log archive already exists for run ' + run_id, 'Hiseq log archive already exists for run ' + run_id + ' : ' + hiseq_log_archive_file, conf)
+		error('Hiseq log archive already exists for run ' + run_id, 
+			'Hiseq log archive already exists for run ' + run_id + ' : ' + hiseq_log_archive_file, conf)
 		return False
 
 	# Create if not exists archive directory for the run
@@ -278,15 +286,16 @@ def create_run_summary_reports_real(run_id, conf):
 
 	# Create run tmp  directory
 	if os.path.exists(tmp_path):
-		error('Tempory run data directory already exists for run ' + run_id + ' : ' + hiseq_log_archive_file, conf)
+		error('Temporary run data directory already exists for run ' + run_id, 
+			'Temporary run data directory already exists for run ' + run_id + ' : ' + hiseq_log_archive_file, conf)
 	else:
 		os.mkdir(tmp_path)
 
 
 	# Define set file to copy in report archive, check if exists (depend on parameters Illumina)
-	files = ['InterOp' , 'RunInfo.xml' , 'runParameters.xml']
+	files = ['InterOp' , 'RunInfo.xml' , 'runParameters.xml', 'RunParameters.xml']
 	files_to_copy = common.list_existing_files(source_path, files)
-	
+
 	if (files_to_copy == None):
 		common.log("WARNING", "Archive " + hiseq_log_archive_file + " not create: none file exists " + files + ' in ' + source_path, conf)
 	else:
@@ -295,8 +304,9 @@ def create_run_summary_reports_real(run_id, conf):
             'cd ' + tmp_base_path + ' && ' + \
             'mv ' + run_id + ' ' + hiseq_log_prefix + run_id + ' && ' + \
             'tar cjf ' + reports_data_path + '/' + hiseq_log_archive_file + ' ' + hiseq_log_prefix + run_id + ' && ' + \
-            'rm -rf ' + tmp_path + ' && rm -rf ' + hiseq_log_prefix + run_id
-			
+            'rm -rf ' + tmp_path 
+			#+ ' && rm -rf ' + hiseq_log_prefix + run_id
+
 		common.log("INFO", "exec: " + cmd, conf)
 		if os.system(cmd) != 0:
 			error("error while saving Illumina quality control for run " + run_id, 'Error saving Illumina quality control.\nCommand line:\n' + cmd, conf)
@@ -305,22 +315,25 @@ def create_run_summary_reports_real(run_id, conf):
 	# Save html reports
 	if os.path.exists(tmp_path):
 		cmd = 'rm -rf ' + tmp_path
-		
+
 		common.log("INFO", "exec: " + cmd, conf)
 		if os.system(cmd) != 0:
 			error("error while removing existing temporary directory", 'Error while removing existing temporary directory.\nCommand line:\n' + cmd, conf)
 			return False
 
 	os.mkdir(tmp_path)
-	
+
 	# Define set file to copy in report archive, check if exists (depend on parameters Illumina)
-	path_source_data = source_path + '/Data'
-	files = ['Status_Files', 'reports', 'Status.htm', '../First_Base_Report.htm' ]
-	files_to_copy = common.list_existing_files(path_source_data, files)
-	if (files_to_copy == None):
-		common.log("WARNING", "Archive " + report_archive_file + " not create: none file exists " + files + ' in ' + source_path, conf)
+	if common.is_sequencer_hiseq(run_id, conf):
+		files = ['./Data/Status_Files', './Data/reports', './Data/Status.htm', './First_Base_Report.htm' ]
 	else: 
-		cmd = 'cd ' + path_source_data + ' && ' + \
+		files = ['./Config', './Recipe', './RTALogs', './RTAConfiguration.xml', './RunCompletionStatus.xml' ]
+	
+	files_to_copy = common.list_existing_files(source_path, files)
+	if (files_to_copy == None):
+		common.log("WARNING", "Archive " + report_archive_file + " not create: none file exists " + str(files) + ' in ' + source_path, conf)
+	else:
+		cmd = 'cd ' + source_path + ' && ' + \
             'cp -rp ' + files_to_copy + tmp_path + ' && ' + \
             'cd ' + tmp_base_path + ' && ' + \
             'mv ' + run_id + ' ' + report_prefix + run_id + ' && ' + \
@@ -328,18 +341,18 @@ def create_run_summary_reports_real(run_id, conf):
             'mv ' + report_prefix + run_id + ' ' + reports_data_path
 			# 'cd ' + base_dir_path + ' && ' + \
 			# 'cp -p ../First_Base_Report.htm ' + reports_data_path + '/' + run_id + '/ && ' + \
-		
+
 		common.log("INFO", "exec: " + cmd, conf)
 		if os.system(cmd) != 0:
 			error("error while saving Illumina html reports for run " + run_id, 'Error saving Illumina html reports.\nCommand line:\n' + cmd, conf)
 			return False
 
-		
+
 	# Create index.hml file
 	common.create_html_index_file(conf, run_id, [HISEQ_STEP_KEY])
 
 	# Set read only archives files
 	os.chmod(reports_data_path + '/' + report_archive_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
 	os.chmod(reports_data_path + '/' + hiseq_log_archive_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
-	
+
 	return True
