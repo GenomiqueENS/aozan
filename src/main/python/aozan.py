@@ -337,6 +337,7 @@ def launch_steps(conf):
         
     demux_run_ids_done = demux_run.load_processed_run_ids(conf)
     print 'DEBUG launchStep demux done '+ str(demux_run_ids_done)
+    print 'DEBUG runs to demux '+ str(sync_run_ids_done - demux_run_ids_done)
     
     if common.is_conf_value_equals_true(DEMUX_STEP_KEY, conf):
         try:
@@ -377,11 +378,13 @@ def launch_steps(conf):
 
     qc_run_ids_done = qc_run.load_processed_run_ids(conf)
     print 'DEBUG launchStep qc done '+ str(qc_run_ids_done)
+    print 'DEBUG runs to qc '+ str(demux_run_ids_done - qc_run_ids_done)
     
     if common.is_conf_value_equals_true(QC_STEP_KEY, conf):
         
         try:
             for run_id in (demux_run_ids_done - qc_run_ids_done):
+                print 'DEBUG: check type on run id ', type(run_id), '|'+run_id+'|', len(run_id)
                 print 'DEBUG qc launch on ' + str(run_id)
                 if lock_qc_step(conf, run_id):
                     welcome(conf)
@@ -406,6 +409,7 @@ def launch_steps(conf):
     # Check if new run appears while quality control step
     if common.is_conf_value_equals_true(QC_STEP_KEY, conf) and len(detection_new_run.discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
         print 'DEBUG New run discovery relaunch steps at the start'
+        # TODO
         launch_steps(conf)
         return
 
@@ -439,7 +443,7 @@ def aozan_main():
     parser.add_option('-q', '--quiet', action='store_true', dest='quiet',
                 default=False, help='quiet')
     parser.add_option('-v', '--version', action='store_true', dest='version', help='Aozan version')
-    parser.add_option('-c', '--conf', action='store_true', dest='conf', help='Configuration Aozan by default, charge before configuration file.')
+    parser.add_option('-c', '--conf', action='store_true', dest='conf', help='Default Aozan configuration Aozan, load before configuration file.')
 
     # Parse command line arguments
     (options, args) = parser.parse_args()
@@ -524,6 +528,11 @@ def aozan_main():
                 # Send a mail with the exception
                 common.send_msg("[Aozan] Exception: " + exception_msg, traceback_msg, is_not_error_message, conf)
                 
+                common.log('INFO', 'End of Aozan', conf)
+                
+                # Remove lock file
+                delete_lock_file(lock_file_path)
+               
                 # Cancel logger, in case not be cancel properly 
                 Common.cancelLogger()
     else:
