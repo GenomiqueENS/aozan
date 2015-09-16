@@ -46,6 +46,7 @@ import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
 import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
 
 /**
  * This class define a Casava design Collector.
@@ -138,17 +139,22 @@ public class DesignCollector implements Collector {
         data.put(prefix + ".sample.project", s.getSampleProject());
 
         // Extract data exist only with first version
-        if (this.bcl2fastqVersion.equals(DemultiplexingCollector.VERSION_1)) {
+        if (SampleSheetUtils.isBcl2fastqVersion1(this.bcl2fastqVersion)) {
 
           data.put(prefix + ".flow.cell.id", s.getFlowCellId());
           data.put(prefix + ".control", s.isControl());
           data.put(prefix + ".recipe", s.getRecipe());
           data.put(prefix + ".operator", s.getOperator());
 
-        } else if (this.bcl2fastqVersion
-            .equals(DemultiplexingCollector.VERSION_2)) {
+        } else if (SampleSheetUtils
+            .isBcl2fastqVersion2(this.bcl2fastqVersion)) {
           // TODO add extract columns, retrieve map with key-value
 
+        } else {
+
+          throw new AozanException(
+              "Design collector bcl2fastq version is invalid "
+                  + this.bcl2fastqVersion);
         }
 
         final List<String> samplesInLane;

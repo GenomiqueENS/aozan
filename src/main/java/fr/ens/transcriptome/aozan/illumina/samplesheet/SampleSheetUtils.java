@@ -23,7 +23,7 @@
 
 package fr.ens.transcriptome.aozan.illumina.samplesheet;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkArgument;
 import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingStandardFile;
 
 import java.io.File;
@@ -39,14 +39,14 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.illumina.io.AbstractCasavaDesignTextReader;
 import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
 import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
 import fr.ens.transcriptome.aozan.io.CasavaDesignXLSReader;
-import fr.ens.transcriptome.eoulsan.util.FileUtils;
 import fr.ens.transcriptome.eoulsan.util.StringUtils;
 
 /**
@@ -56,17 +56,17 @@ import fr.ens.transcriptome.eoulsan.util.StringUtils;
  */
 public class SampleSheetUtils {
 
-  public static final String VERSION_1 = "version1";
-
-  public static final String VERSION_2 = "version2";
-
   public static final String SEP = ",";
+
+  public static final String VERSION_1 = "1";
+  public static final String VERSION_2 = "2";
 
   public static SampleSheet getSampleSheet(final File sampleSheetFile,
       String sampleSheetVersion, final int laneCount)
       throws FileNotFoundException, IOException, AozanException {
 
-    checkNotNull(sampleSheetVersion, "sample sheet version");
+    checkArgument(!Strings.isNullOrEmpty(sampleSheetVersion),
+        "sample sheet version");
     checkExistingStandardFile(sampleSheetFile, "sample sheet");
 
     final String extension = StringUtils.extension(sampleSheetFile.getName());
@@ -652,6 +652,53 @@ public class SampleSheetUtils {
     result.add(sb.toString());
 
     return result;
+  }
+
+  //
+  // Static method
+  //
+  /**
+   * Find bcl2fastq version.
+   * @param version the version
+   * @return the string
+   */
+  public static String findBcl2fastqMajorVersion(final String fullVersion) {
+
+    checkArgument(!Strings.isNullOrEmpty(fullVersion),
+        "bcl2fastq full version name: " + fullVersion);
+
+    if (fullVersion.startsWith(VERSION_1))
+      return VERSION_1;
+
+    if (fullVersion.startsWith(VERSION_2) || fullVersion.startsWith("latest"))
+
+      return VERSION_2;
+
+    // Throw an exception version invalid for pipeline
+    throw new AozanRuntimeException(
+        "Demultiplexing collector, can be recognize bcl2fastq version (not start with 1 or 2) : "
+            + fullVersion);
+  }
+
+  public static boolean isBcl2fastqVersion1(final String version) {
+
+    // Check it is a full version name or major
+    final String majorVersion =
+        (version.indexOf(".") > 0
+            ? findBcl2fastqMajorVersion(version) : version);
+
+    return majorVersion.equals(VERSION_1);
+  }
+
+  public static boolean isBcl2fastqVersion2(final String version) {
+
+    // Check it is a full version name or major
+    final String majorVersion =
+        (version.indexOf(".") > 0
+            ? findBcl2fastqMajorVersion(version) : version);
+
+    return majorVersion.equals(VERSION_2);
+
   }
 
   //

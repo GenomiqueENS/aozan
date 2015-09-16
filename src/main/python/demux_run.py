@@ -13,8 +13,8 @@ from java.lang import Runtime, Throwable
 from java.util import HashMap
 
 from fr.ens.transcriptome.aozan import AozanException
-from fr.ens.transcriptome.aozan.collectors.DemultiplexingCollector import VERSION_1
-from fr.ens.transcriptome.aozan.collectors.DemultiplexingCollector import VERSION_2 
+from fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils import VERSION_1
+from fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils import VERSION_2 
 from fr.ens.transcriptome.aozan.io import CasavaDesignXLSReader
 from fr.ens.transcriptome.aozan.util import DockerUtils
 from fr.ens.transcriptome.aozan.illumina.io import CasavaDesignCSVReader

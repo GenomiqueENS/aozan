@@ -136,7 +136,7 @@ def qc(run_id, conf):
 
         
         # Initialize the QC object
-        qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id, bcl2fastq_major_version, laneCount)
+        qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id, bcl2fastq_version, laneCount)
 
         # Compute the report
         report = qc.computeReport()

@@ -46,7 +46,13 @@ public class SampleSheet implements Iterable<SampleEntry> {
   }
 
   public boolean isVersion1() {
-    return getSampleSheetVersion().equals(SampleSheetUtils.VERSION_1);
+
+    return SampleSheetUtils.isBcl2fastqVersion1(getSampleSheetVersion());
+  }
+
+  public boolean isVersion2() {
+
+    return SampleSheetUtils.isBcl2fastqVersion2(getSampleSheetVersion());
   }
 
   @Override

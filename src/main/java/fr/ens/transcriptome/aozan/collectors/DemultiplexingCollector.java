@@ -23,18 +23,15 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.List;
 import java.util.Properties;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
 
 public class DemultiplexingCollector implements Collector {
 
@@ -44,34 +41,12 @@ public class DemultiplexingCollector implements Collector {
   /** Prefix for run data */
   public static final String PREFIX = "demux";
 
-  public static final String VERSION_1 = "version1";
-  public static final String VERSION_2 = "version2";
-
   private String casavaOutputPath;
   private Collector subCollector;
 
-  /**
-   * Find bcl2fastq version.
-   * @param version the version
-   * @return the string
-   */
-  public static String findBcl2fastqVersion(final String version) {
-
-    checkNotNull(version, "Version on bcl2fastq can not be null.");
-
-    // Check if version 1
-    if (version.trim().startsWith(VERSION_1))
-      return VERSION_1;
-
-    // Check if version 1
-    if (version.trim().startsWith(VERSION_2))
-      return VERSION_2;
-
-    // Throw an exception version invalid for pipeline
-    throw new AozanRuntimeException(
-        "Demultiplexing collector, can be recognize bcl2fastq version (not start with 1 or 2) : "
-            + version);
-  }
+  //
+  // Useful methods
+  //
 
   @Override
   public String getName() {
@@ -100,7 +75,7 @@ public class DemultiplexingCollector implements Collector {
     final String bcl2fastqVersion =
         properties.getProperty(QC.BCL2FASTQ_VERSION);
 
-    if (bcl2fastqVersion.equals(VERSION_1)) {
+    if (bcl2fastqVersion.equals(SampleSheetUtils.VERSION_1)) {
       // Call flowcell collector
       this.subCollector = new FlowcellDemuxSummaryCollector();
 

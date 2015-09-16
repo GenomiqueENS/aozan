@@ -22,9 +22,6 @@
  */
 package fr.ens.transcriptome.aozan.illumina.io;
 
-import static fr.ens.transcriptome.aozan.collectors.DemultiplexingCollector.VERSION_1;
-import static fr.ens.transcriptome.aozan.collectors.DemultiplexingCollector.VERSION_2;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -84,7 +81,7 @@ public class CasavaDesignReaderTest extends TestCase {
 
     try {
       new CasavaDesignCSVReader(new ByteArrayInputStream(
-          EXPECTED_SMALLER_CSV.getBytes())).read(VERSION_2);
+          EXPECTED_SMALLER_CSV.getBytes())).read(SampleSheetUtils.VERSION_2);
 
     } catch (IOException | AozanException e) {
       // TODO Auto-generated catch block
@@ -100,7 +97,7 @@ public class CasavaDesignReaderTest extends TestCase {
   public void testReadsXLSVersion2WithoutLaneColumnToCreate() {
 
     final File samplesheet = new File(path, SAMPLESHEET_BCL2FASTQ_V2_FILENAME);
-    final String bcl2fastqVersion = VERSION_2;
+    final String bcl2fastqVersion = SampleSheetUtils.VERSION_2;
 
     // Create CSV file
     convertSamplesheetToCSV(samplesheet, bcl2fastqVersion, outputFile);
@@ -111,7 +108,7 @@ public class CasavaDesignReaderTest extends TestCase {
 
     // Compare with expected content
     final Map<String, SampleSheetTest> samplesheetExpected =
-        buildSamplesheetExpected(EXPECTED_CSV, VERSION_2);
+        buildSamplesheetExpected(EXPECTED_CSV, SampleSheetUtils.VERSION_2);
 
     compareSamplesheetV2(samplesheetExpected, samplesheetTested, false);
   }
@@ -144,7 +141,7 @@ public class CasavaDesignReaderTest extends TestCase {
   public void testReadsXLSVersion1() {
 
     final File samplesheet = new File(path, SAMPLESHEET_BCL2FASTQ_V1_FILENAME);
-    final String bcl2fastqVersion = VERSION_1;
+    final String bcl2fastqVersion = SampleSheetUtils.VERSION_1;
     final int laneCount = 2;
 
     // Create CSV file
@@ -155,7 +152,7 @@ public class CasavaDesignReaderTest extends TestCase {
         readSamplesheetCSV(bcl2fastqVersion, laneCount);
 
     final Map<String, SampleSheetTest> samplesheetExpected =
-        buildSamplesheetExpected(EXPECTED_CSV_FULL, VERSION_1);
+        buildSamplesheetExpected(EXPECTED_CSV_FULL, SampleSheetUtils.VERSION_1);
 
     // Compare with expected content
     compareSamplesheetV1(samplesheetExpected, samplesheetTested);
@@ -422,7 +419,7 @@ public class CasavaDesignReaderTest extends TestCase {
     // Constructor
     //
     SampleSheetTest(final String line, final String version) {
-      this.optionalFieds = version.equals(VERSION_1);
+      this.optionalFieds = version.equals(SampleSheetUtils.VERSION_1);
 
       parse(line);
 

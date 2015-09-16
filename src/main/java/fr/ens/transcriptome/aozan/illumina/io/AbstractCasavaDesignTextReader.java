@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.List;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetVersion2;
@@ -59,7 +58,7 @@ public abstract class AbstractCasavaDesignTextReader implements
     if (this.design == null) {
       this.version = version;
 
-      if (this.version.equals(SampleSheetUtils.VERSION_2)) {
+      if (SampleSheetUtils.isBcl2fastqVersion2(this.version)) {
         this.design = new SampleSheetVersion2(version);
         this.reader =
             new SampleSheetLineReaderV2(getLaneCount(),

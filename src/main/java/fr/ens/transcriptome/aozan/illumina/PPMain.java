@@ -21,22 +21,25 @@ public class PPMain {
     final File csvV1 = new File(dir, "design_SNL110_0151.xls");
 
     SampleSheet design =
-        new CasavaDesignXLSReader(csvV1).read(SampleSheetUtils.VERSION_1);
+        new CasavaDesignXLSReader(csvV1)
+            .read(SampleSheetUtils.VERSION_1);
 
     new CasavaDesignCSVWriter(new File("/tmp", csvV1.getName().replace("xls",
         "csv"))).writer(design);
 
     design =
-        new CasavaDesignXLSReader(csvV2Short).read(SampleSheetUtils.VERSION_2);
+        new CasavaDesignXLSReader(csvV2Short)
+            .read(SampleSheetUtils.VERSION_2);
 
-    new CasavaDesignCSVWriter(new File("/tmp", csvV2Short.getName().replace("xls",
-        "csv"))).writer(design);
+    new CasavaDesignCSVWriter(new File("/tmp", csvV2Short.getName().replace(
+        "xls", "csv"))).writer(design);
 
     design =
-        new CasavaDesignXLSReader(csvV2Long).read(SampleSheetUtils.VERSION_2);
+        new CasavaDesignXLSReader(csvV2Long)
+            .read(SampleSheetUtils.VERSION_2);
 
-    new CasavaDesignCSVWriter(new File("/tmp", csvV2Long.getName().replace("xls",
-        "csv"))).writer(design);
+    new CasavaDesignCSVWriter(new File("/tmp", csvV2Long.getName().replace(
+        "xls", "csv"))).writer(design);
 
   }
 }
