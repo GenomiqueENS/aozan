@@ -7,6 +7,7 @@ Created on 25 oct. 2011
 '''
 import os.path, stat, sys
 import common, hiseq_run, time
+import glob
 from xml.etree.ElementTree import ElementTree
 from java.io import IOException
 from java.lang import Runtime, Throwable
@@ -466,8 +467,8 @@ def demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesh
     """
     
     bcl2fastq_major_version, bcl2fastq_version = get_bcl2fastq_version(run_id, conf)
-    
-    commandfile, cmd = bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, conf[TMP_PATH_KEY], bcl2fastq_major_version, conf)
+    tmp = conf[TMP_PATH_KEY]
+    commandfile, cmd = bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, tmp, bcl2fastq_major_version, conf)
     
     common.log('WARNING',
 			'demultiplexing in standalone with bcl2fastq version ' + str(bcl2fastq_version) + ', run this script ' + str(cmd), conf)
@@ -478,6 +479,13 @@ def demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesh
               'Error while setting executable command file bcl2fastq (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
         return False
     
+#     cmd = 'cp ' + tmp + '/bcl2fastq_output_' + run_id + '.out ' + tmp + '/bcl2fastq_output_' + run_id + '.out ' + fastq_output_dir + '/' + run_id
+#     common.log("INFO", "exec: " + cmd, conf)
+#     if os.system(cmd) != 0:
+#         error("error while setting read only the output fastq directory for run " + run_id,
+# 			 'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
+#         return False
+
     # The output directory must be read only
     # cmd = 'chmod -R ugo-w ' + fastq_output_dir + '/Project_*'
     cmd = 'find ' + fastq_output_dir + ' -type f -name "*.fastq.*" -exec chmod ugo-w {} \; '
@@ -572,7 +580,13 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
         return False
     
     # The output directory must be read only
-    # cmd = 'chmod -R ugo-w ' + fastq_output_dir + '/Project_*'
+#     cmd = 'cp ' + tmp_docker + '/bcl2fastq_output_' + run_id + '.out ' + tmp_docker + '/bcl2fastq_output_' + run_id + '.out ' + fastq_data_path_in_docker + '/' + run_id
+#     common.log("INFO", "exec: " + cmd, conf)
+#     if os.system(cmd) != 0:
+#         error("error while setting read only the output fastq directory for run " + run_id,
+#              'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
+#         return False
+       
     cmd = 'find ' + fastq_output_dir + ' -type f -name "*.fastq.*" -exec chmod ugo-w {} \; '
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
@@ -581,6 +595,19 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
         return False
     
     return True
+   
+def isConfirmedFastqExistence(fastq_output_dir):
+	""" Archive demultplexing statistics results file.
+
+    Arguments:
+    	fastq_output_dir: fastq directory to save result on demultiplexing
+    
+    	Return true if define at least on FASTQ files
+    """ 
+    
+	fastq_files = glob.glob(fastq_output_dir + "/*fastq*")
+    
+	return len(fastq_files) > 0 
     
 def archive_demux_stat(run_id, bcl2fastq_version, fastq_output_dir, reports_data_path, basecall_stats_file, basecall_stats_prefix, design_csv_path, conf):
     """ Archive demultplexing statistics results file.
@@ -791,6 +818,11 @@ def demux(run_id, conf):
     else:        
         if not demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, design_csv_path, conf):
             return False
+   
+    if not isConfirmedFastqExistence(fastq_output_dir):
+        error("error with bcl2fastq execution for run " + run_id,
+              "Error with bcl2fastq execution for run " + run_id + " none FASTQ files found in " + fastq_output_dir, conf)
+        return False
    
     # Copy design to output directory
     cmd = "cp -p " + design_csv_path + ' ' + fastq_output_dir
