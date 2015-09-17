@@ -119,4 +119,16 @@ public class SampleEntryVersion2 extends AbstractSampleEntry {
 
     return sb.toString();
   }
+
+  @Override
+  public String toString() {
+    return "SampleEntryVersion2 [orderNumber="
+        + orderNumber + ", getLane()=" + getLane() + ", getSampleId()="
+        + getSampleId() + ", getSampleRef()=" + getSampleRef()
+        + ", getIndex()=" + getIndex() + ", getIndex2()=" + getIndex2()
+        + ", isIndex()=" + isIndex() + ", isDualIndex()=" + isDualIndex()
+        + ", getDescription()=" + getDescription() + ", getSampleProject()="
+        + getSampleProject() + "]";
+  }
+
 }

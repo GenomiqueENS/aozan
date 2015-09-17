@@ -136,15 +136,16 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
 
         // Set sample as the same line contains in sample sheet file
         createSample(design2, fields, laneNumber);
-      } else if (!isCompatibleForQCReport) {
-
-        // Set sample as the same line contains in sample sheet file
-        createSample(design2, fields, 0);
-
-      } else {
+        
+      } else if (isCompatibleForQCReport) {
 
         // Set same sample for each lane and add field lane
         createAndDuplicateSample(design2, fields);
+
+      } else {
+
+        // Set sample as the same line contains in sample sheet file
+        createSample(design2, fields, 0);
       }
     }
   }
@@ -199,7 +200,7 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
         case "index2":
           sample.setIndex2(value);
           break;
-          
+
         case "description":
           sample.setDescription(value);
           break;
@@ -232,6 +233,8 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
   private Map<String, Integer> checkHeaderColumnSessionData(
       final List<String> rawFields) throws AozanException {
 
+    System.out.println("raw field " + Joiner.on(",").join(rawFields));
+
     final List<String> fields = convertAndLowerCase(rawFields);
 
     final Map<String, Integer> pos = new HashMap<>(fields.size());
@@ -241,7 +244,7 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
       if (!fields.contains(name)) {
         throw new AozanException(
             "Parsing Sample sheet file: missing required field for version2 "
-                + name);
+                + name + " in header columns " + Joiner.on(",").join(fields));
       }
     }
 
@@ -294,9 +297,9 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
     final List<String> l = new LinkedList<>();
 
     for (String field : rawFields) {
-
-      if (field.equals("SampleID")) {
-        l.add(field);
+      System.out.println("compare field " + field);
+      if (field.equals("Sample_ID") || field.equals("SampleID")) {
+        l.add(field.replaceAll("[_ -]", ""));
       } else {
         l.add(field.replaceAll("[_ -]", "").toLowerCase(Globals.DEFAULT_LOCALE));
       }

@@ -28,6 +28,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.common.base.Joiner;
+
 import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
 
 /**
@@ -96,7 +98,8 @@ public class SampleSheet implements Iterable<SampleEntry> {
   @Override
   public String toString() {
 
-    return SampleEntry.class.getName() + "{samples=" + this.samples + "}";
+    return SampleEntry.class.getName()
+        + "{samples=" + Joiner.on("\t").join(this.samples) + "}";
   }
 
   //

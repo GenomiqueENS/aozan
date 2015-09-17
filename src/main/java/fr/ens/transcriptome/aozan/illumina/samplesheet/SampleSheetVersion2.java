@@ -149,10 +149,11 @@ public class SampleSheetVersion2 extends SampleSheet {
 
   @Override
   public String toString() {
-    return "SampleSheetVersion2 [list="
-        + list + ", headerSession=" + headerSession + ", readsSession="
-        + readsSession + ", settingsSession=" + settingsSession
-        + ", lastIndice=" + lastIndice + "]";
+    return "SampleSheetVersion2 [headerSession="
+        + headerSession + ", readsSession=" + readsSession
+        + ", settingsSession=" + settingsSession + ", lastIndice=" + lastIndice
+        + ", list=\n\t" + Joiner.on("\n\t").withKeyValueSeparator("\t").join(list)
+        + "]";
   }
 
   public SampleSheetVersion2(String sampleSheetVersion) {
