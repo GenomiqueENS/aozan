@@ -55,6 +55,15 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
 
   private final InputStream is;
 
+  public SampleSheet readForQCReport(String sampleSheetVersion, int laneCount)
+      throws IOException, AozanException {
+
+    setCompatibleForQCReport(true);
+    setLaneCount(laneCount);
+
+    return read(sampleSheetVersion);
+  }
+
   @Override
   public SampleSheet read(final String version) throws IOException,
       AozanException {

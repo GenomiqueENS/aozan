@@ -80,9 +80,12 @@ public class SampleSheetUtils {
           sampleSheetVersion, laneCount);
 
     case ".xls":
+      if (laneCount < 1)
+        return new CasavaDesignXLSReader(sampleSheetFile)
+            .read(sampleSheetVersion);
 
-      return new CasavaDesignXLSReader(sampleSheetFile)
-          .read(sampleSheetVersion);
+      return new CasavaDesignXLSReader(sampleSheetFile).readForQCReport(
+          sampleSheetVersion, laneCount);
 
     default:
       throw new AozanException(
@@ -879,7 +882,7 @@ public class SampleSheetUtils {
 
     private final static String COLUMNS_HEADER =
         "\"lane\",\"SampleID\",\"sampleref\",\"index\",\"description\","
-            + "\"sampleproject\"\n";
+            + "\"Sample_Project\"\n";
 
     /**
      * Convert sample sheet instance in string in csv format.
