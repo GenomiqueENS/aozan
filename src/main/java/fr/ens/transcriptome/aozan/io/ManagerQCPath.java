@@ -547,8 +547,8 @@ public class ManagerQCPath {
     private String buildFastqSampleName(final FastqSample fastqSample) {
 
       // With bcl2fastq version 2.15 and 2.16, in sample name
-      if (sampleSheetV2.getSampleSheetVersion().endsWith("15")
-          || sampleSheetV2.getSampleSheetVersion().endsWith("16")) {
+      if (sampleSheetV2.getSampleSheetVersion().startsWith("2.15")
+          || sampleSheetV2.getSampleSheetVersion().startsWith("2.16")) {
         
         return fastqSample.getSampleName().replace("_", "-");
       }
