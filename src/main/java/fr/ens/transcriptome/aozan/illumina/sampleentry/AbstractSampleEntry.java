@@ -35,7 +35,7 @@ public abstract class AbstractSampleEntry implements SampleEntry {
   private String description;
   private String sampleProject;
 
-  private String index2;
+  private String index2 = "";
 
   //
   // Getters

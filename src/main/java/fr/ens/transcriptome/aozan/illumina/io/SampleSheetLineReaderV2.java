@@ -46,10 +46,10 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
 
   // Required in this order columns header for version2
   private static final List<String> FIELDNAMES_VERSION2_REQUIERED = Arrays
-      .asList("SampleID");
+      .asList("sampleid");
 
   private static final List<String> FIELDNAMES_VERSION2_REQUIERED_FOR_QC =
-      Arrays.asList("SampleID", "sampleref", "index", "description",
+      Arrays.asList("sampleid", "sampleref", "index", "index2" ,"description",
           "sampleproject");
 
   private static final List<String> FIELDNAMES_VERSION2_FORBIDDEN = Arrays
@@ -136,7 +136,7 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
 
         // Set sample as the same line contains in sample sheet file
         createSample(design2, fields, laneNumber);
-        
+
       } else if (isCompatibleForQCReport) {
 
         // Set same sample for each lane and add field lane
@@ -185,7 +185,7 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
 
         switch (key) {
 
-        case "SampleID":
+        case "sampleid":
           sample.setSampleId(value);
           break;
 
@@ -233,9 +233,8 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
   private Map<String, Integer> checkHeaderColumnSessionData(
       final List<String> rawFields) throws AozanException {
 
-    System.out.println("raw field " + Joiner.on(",").join(rawFields));
-
     final List<String> fields = convertAndLowerCase(rawFields);
+    checkFieds(rawFields, fields);
 
     final Map<String, Integer> pos = new HashMap<>(fields.size());
 
@@ -278,8 +277,15 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
 
         pos.put(fields.get(i), i);
 
+        // } else if (fields.get(i).equals("index2")) {
+        //
+        // pos.put(fields.get(i), i);
+
       }
+
     }
+    System.out.println("position header fields "
+        + Joiner.on("\n").withKeyValueSeparator("=").join(pos));
 
     // Check exist lane columns in sample sheet
     this.columnLaneFound = pos.containsKey("lane");
@@ -297,15 +303,55 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
     final List<String> l = new LinkedList<>();
 
     for (String field : rawFields) {
-      System.out.println("compare field " + field);
-      if (field.equals("Sample_ID") || field.equals("SampleID")) {
-        l.add(field.replaceAll("[_ -]", ""));
-      } else {
-        l.add(field.replaceAll("[_ -]", "").toLowerCase(Globals.DEFAULT_LOCALE));
-      }
+      l.add(field.replaceAll("[_ -]", "").toLowerCase(Globals.DEFAULT_LOCALE));
     }
 
     return Collections.unmodifiableList(l);
+  }
+
+  /**
+   * Check fields with right syntax for bcl2fastq 2.
+   * @param fields the fields
+   * @throws AozanException the Aozan Exception
+   */
+  private void checkFieds(final List<String> fields,
+      final List<String> fieldsConverted) throws AozanException {
+
+    final String s = Joiner.on(",").join(fields);
+
+    // Check SampleID or Sample_ID exist
+    if (!(fields.contains("SampleID") || fields.contains("Sample_ID"))) {
+      throw new AozanException(
+          "in sample sheet missing requiered field SampleID or Sample_ID ("
+              + s + ").");
+    }
+
+    if (fieldsConverted.contains("sampleproject")) {
+      // Check SampleProject or Sample_Project exist in raw fields
+      if (!(fields.contains("SampleProject") || fields
+          .contains("Sample_Project"))) {
+        throw new AozanException(
+            "in sample sheet missing requiered field SampleProject or Sample_Project ("
+                + s + ").");
+      }
+    }
+
+    if (fieldsConverted.contains("index")) {
+      // Check index exist in raw fields
+      if (!fields.contains("index")) {
+        throw new AozanException(
+            "in sample sheet missing requiered field index (" + s + ").");
+      }
+    }
+
+    if (fieldsConverted.contains("index2")) {
+      // Check index exist in raw fields
+      if (!fields.contains("index2")) {
+        throw new AozanException(
+            "in sample sheet missing requiered field index2 (" + s + ").");
+      }
+    }
+
   }
 
   private boolean isColumnLaneExist() {

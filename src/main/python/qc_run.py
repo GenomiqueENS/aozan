@@ -10,7 +10,6 @@ import demux_run, hiseq_run
 from fr.ens.transcriptome.aozan import QC, Settings
 from fr.ens.transcriptome.aozan import AozanException
 from fr.ens.transcriptome.aozan.io import ManagerQCPath
-from fr.ens.transcriptome.aozan.illumina import RunInfo
 
 from java.lang import Throwable
 
@@ -122,21 +121,10 @@ def qc(run_id, conf):
     qc_output_dir = qc_output_dir + tmp_extension
 
     try:
-        # Find lane count 
-        run_info_path = hiseq_run.get_runinfos_file(run_id, conf)
-        
-        if run_info_path is None:
-            error("error to find RunInfo.xml file "+ run_id + ".",
-                  "error to find RunInfo.xml file "+ run_id + ".", conf)
-        
-        run_info = RunInfo()
-        run_info.parse(run_info_path)
-
-        laneCount = run_info.getFlowCellLaneCount()
-
+        lane_count = common.get_flowcell_lane_count(run_id, conf)
         
         # Initialize the QC object
-        qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id, bcl2fastq_version, laneCount)
+        qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id, bcl2fastq_version, lane_count)
 
         # Compute the report
         report = qc.computeReport()

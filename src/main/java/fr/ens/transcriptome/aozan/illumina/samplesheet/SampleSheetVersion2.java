@@ -21,9 +21,12 @@ public class SampleSheetVersion2 extends SampleSheet {
   private final Map<String, String> settingsSession;
   private int lastIndice = 0;
 
+  private boolean columnLaneExist;
+
   public void addSample(final SampleEntry sample, boolean isColumnLaneExist) {
 
     super.addSample(sample);
+    setColumnLaneExist(isColumnLaneExist);
 
     // Save order
 
@@ -143,6 +146,14 @@ public class SampleSheetVersion2 extends SampleSheet {
     return !settingsSession.isEmpty();
   }
 
+  public boolean isColumnHeaderLaneExist() {
+    return this.columnLaneExist;
+  }
+
+  private void setColumnLaneExist(boolean isColumnLaneExist) {
+    this.columnLaneExist = isColumnLaneExist;
+  }
+
   //
   // Constructor
   //
@@ -152,8 +163,8 @@ public class SampleSheetVersion2 extends SampleSheet {
     return "SampleSheetVersion2 [headerSession="
         + headerSession + ", readsSession=" + readsSession
         + ", settingsSession=" + settingsSession + ", lastIndice=" + lastIndice
-        + ", list=\n\t" + Joiner.on("\n\t").withKeyValueSeparator("\t").join(list)
-        + "]";
+        + ", columnLaneexist=" + isColumnHeaderLaneExist() + ", list=\n\t"
+        + Joiner.on("\n\t").withKeyValueSeparator("\t").join(list) + "]";
   }
 
   public SampleSheetVersion2(String sampleSheetVersion) {

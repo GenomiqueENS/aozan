@@ -10,7 +10,7 @@ import common, hiseq_run, time
 import glob
 from xml.etree.ElementTree import ElementTree
 from java.io import IOException
-from java.lang import Runtime, Throwable
+from java.lang import Runtime, Throwable, Exception
 from java.util import HashMap
 
 from fr.ens.transcriptome.aozan import AozanException
@@ -47,6 +47,7 @@ from fr.ens.transcriptome.aozan.Settings import FASTQ_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_DESIGN_GENERATOR_COMMAND_KEY
 from fr.ens.transcriptome.aozan import Settings
 
+from fr.ens.transcriptome.eoulsan.util import StringUtils
 
 BCL2FASTQ_VERSION_1 = "1.8.4"
 BCL2FASTQ_VERSION_2 = "latest"
@@ -138,7 +139,7 @@ def build_samplesheet_filename(run_id, conf):
 
     return conf[CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + '_' + instrument_sn + '_%04d' % run_number
 
-def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_version, conf):
+def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_major_version, conf):
     """ Check sample sheet and convert in csv format if useful.
 
     Arguments:
@@ -151,19 +152,21 @@ def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_version, conf):
     """
     
     flow_cell_id = hiseq_run.get_flow_cell(run_id)
-    
+    lane_count = common.get_flowcell_lane_count(run_id, conf)
+     
     input_design_xls_path = conf[CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + samplesheet_filename + '.xls'
     input_design_csv_path = conf[CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + samplesheet_filename + '.csv'
     design_csv_path = conf[TMP_PATH_KEY] + '/' + samplesheet_filename + '.csv'
     
     
     common.log("INFO", "Flowcell id: " + flow_cell_id, conf)
-    common.log("INFO", "bcl2fastq version : " + str(bcl2fastq_version), conf)
+    common.log("INFO", "bcl2fastq major version : " + str(bcl2fastq_major_version) + ' with lane count ' + str(lane_count), conf)
     common.log("INFO", "sample sheet format for bcl2fastq : " + str(conf[CASAVA_SAMPLESHEET_FORMAT_KEY]), conf)    
     
     if common.is_conf_value_defined(CASAVA_SAMPLESHEET_FORMAT_KEY, 'xls', conf):
 
         # Convert design in XLS format to CSV format
+        common.log("INFO", "sample sheet filename : " + str(input_design_xls_path), conf)
 
         # Check if the xls design exists
         if not os.path.exists(input_design_xls_path):
@@ -173,8 +176,10 @@ def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_version, conf):
             return False, []
 
         try:
+            
             # Load XLS design file
-            design = CasavaDesignXLSReader(input_design_xls_path).read(bcl2fastq_version)
+            design = CasavaDesignXLSReader(input_design_xls_path).readForQCReport(str(bcl2fastq_major_version), lane_count)
+            #design = CasavaDesignXLSReader(input_design_xls_path).read(bcl2fastq_major_version)
 
             # Replace index sequence shortcuts by sequences
             SampleSheetUtils.replaceIndexShortcutsBySequences(design, load_index_sequences(conf))
@@ -182,16 +187,21 @@ def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_version, conf):
             # Write CSV design file
             CasavaDesignCSVWriter(design_csv_path).writer(design)
 
-        except IOException, exp:
-            error("error while converting " + samplesheet_filename + ".xls to CSV format", exp.getMessage(), conf)
-            return False, []
         except AozanException, exp:
-            error("error while converting " + samplesheet_filename + ".xls to CSV format", exp.getMessage(), conf)
+            print str(StringUtils.join(exp.getStackTrace(), '\n\t'))
+ 
+            error("error Aozan while converting " + samplesheet_filename + ".xls to CSV format", exp.getMessage(), conf)
+            return False, []
+        except Exception, exp:
+            print str(StringUtils.join(exp.getStackTrace(), '\n\t'))
+            
+            error("error java while converting " + samplesheet_filename + ".xls to CSV format", exp.getMessage(), conf)
             return False, []
 
     elif common.is_conf_value_defined(CASAVA_SAMPLESHEET_FORMAT_KEY, 'csv', conf):
 
         # Copy the CSV file
+        common.log("INFO", "sample sheet filename : " + str(input_design_xls_path), conf)
 
         # Check if the csv design exists
         if not os.path.exists(input_design_csv_path):
@@ -238,7 +248,7 @@ def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_version, conf):
     # Check Casava CSV design file
     try:
         # Load CSV design file
-        design = CasavaDesignCSVReader(design_csv_path).read(bcl2fastq_version)
+        design = CasavaDesignCSVReader(design_csv_path).readForQCReport(bcl2fastq_major_version, lane_count)
 
         # Check values of design file
         design_warnings = SampleSheetUtils.checkCasavaDesign(design, flow_cell_id)

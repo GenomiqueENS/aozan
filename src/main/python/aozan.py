@@ -363,7 +363,7 @@ def launch_steps(conf):
             traceback_msg = traceback.format_exc(sys.exc_info()[2])
 
             demux_run.error("Fail demultiplexing for run " + run_id + ", catch exception " + exception_msg,
-                           "Fail demultiplexing for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg, conf)
+                            "Fail demultiplexing for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg, conf)
 
 
     # Check if new run appears while demux step

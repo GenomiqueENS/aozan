@@ -881,7 +881,11 @@ public class SampleSheetUtils {
   final static class SampleSheetVersion2Utils {
 
     private final static String COLUMNS_HEADER =
-        "\"lane\",\"SampleID\",\"sampleref\",\"index\",\"description\","
+        "\"SampleID\",\"sampleref\",\"index\",\"index2\",\"description\","
+            + "\"Sample_Project\"\n";
+
+    private final static String COLUMNS_HEADER_WITH_LANE =
+        "\"lane\",\"SampleID\",\"sampleref\",\"index\",\"index2\",\"description\","
             + "\"Sample_Project\"\n";
 
     /**
@@ -917,8 +921,48 @@ public class SampleSheetUtils {
         sb.append("\n");
       }
 
-      // Add session Data
+      // if (sampleSheetV2.isColumnHeaderLaneExist()) {
+      // // Add session Data
+      // sb.append(addSessionDataWithLane(sampleSheetV2));
+      // } else {
       sb.append(addSessionData(sampleSheetV2));
+      // }
+
+      return sb.toString();
+    }
+
+    private static String addSessionDataWithLane(SampleSheetVersion2 design) {
+
+      final StringBuilder sb = new StringBuilder();
+      sb.append("[Data]\n");
+
+      sb.append(COLUMNS_HEADER_WITH_LANE);
+
+      if (design == null) {
+        return sb.toString();
+      }
+
+      for (SampleEntry s : design) {
+
+        System.out.println("with lane " + s);
+
+        sb.append(s.getLane());
+        sb.append(SEP);
+        sb.append(quote(s.getSampleId().trim()));
+        sb.append(SEP);
+        sb.append(quote(s.getSampleRef().trim()));
+        sb.append(SEP);
+        sb.append(quote(s.getIndex().toUpperCase()));
+        sb.append(SEP);
+        sb.append(quote(s.getIndex2().toUpperCase()));
+        sb.append(SEP);
+        sb.append(quote(s.getDescription().trim()));
+        sb.append(SEP);
+        sb.append(quote(s.getSampleProject()));
+
+        sb.append('\n');
+
+      }
 
       return sb.toString();
     }
@@ -954,7 +998,7 @@ public class SampleSheetUtils {
       final StringBuilder sb = new StringBuilder();
       sb.append("[Data]\n");
 
-      sb.append(COLUMNS_HEADER);
+      sb.append(COLUMNS_HEADER_WITH_LANE);
 
       if (design == null) {
         return sb.toString();
@@ -969,6 +1013,8 @@ public class SampleSheetUtils {
         sb.append(quote(s.getSampleRef().trim()));
         sb.append(SEP);
         sb.append(quote(s.getIndex().toUpperCase()));
+        sb.append(SEP);
+        sb.append(quote(s.getIndex2().toUpperCase()));
         sb.append(SEP);
         sb.append(quote(s.getDescription().trim()));
         sb.append(SEP);
