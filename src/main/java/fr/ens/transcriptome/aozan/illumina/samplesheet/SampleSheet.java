@@ -29,6 +29,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
 
@@ -123,6 +125,10 @@ public class SampleSheet implements Iterable<SampleEntry> {
    * @param sampleSheetVersion the sample sheet version
    */
   public SampleSheet(final String sampleSheetVersion) {
+
+    Preconditions.checkArgument(!Strings.isNullOrEmpty(sampleSheetVersion),
+        "sample sheet version not define");
+
     this.sampleSheetVersion = sampleSheetVersion;
   }
 

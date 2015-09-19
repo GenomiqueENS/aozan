@@ -43,6 +43,7 @@ import com.google.common.base.Strings;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
+import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.illumina.io.AbstractCasavaDesignTextReader;
 import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
 import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
@@ -55,6 +56,8 @@ import fr.ens.transcriptome.eoulsan.util.StringUtils;
  * @author Laurent Jourdren
  */
 public class SampleSheetUtils {
+
+  public static final String LATEST_VERSION_NAME = "latest";
 
   public static final String SEP = ",";
 
@@ -69,28 +72,35 @@ public class SampleSheetUtils {
         "sample sheet version");
     checkExistingStandardFile(sampleSheetFile, "sample sheet");
 
+    final String majorVersion =
+        SampleSheetUtils.findBcl2fastqMajorVersion(sampleSheetVersion);
+
     final String extension = StringUtils.extension(sampleSheetFile.getName());
+
+    Common.getLogger().warning(
+        "DEBUG: sample sheet utils reads file "
+            + sampleSheetFile.getAbsolutePath() + "\nfrom version "
+            + majorVersion + " lane count set at " + laneCount);
 
     switch (extension) {
     case ".csv":
       if (laneCount < 1)
-        return new CasavaDesignCSVReader(sampleSheetFile)
-            .read(sampleSheetVersion);
+        return new CasavaDesignCSVReader(sampleSheetFile).read(majorVersion);
       return new CasavaDesignCSVReader(sampleSheetFile).readForQCReport(
-          sampleSheetVersion, laneCount);
+          majorVersion, laneCount);
 
     case ".xls":
       if (laneCount < 1)
-        return new CasavaDesignXLSReader(sampleSheetFile)
-            .read(sampleSheetVersion);
+        return new CasavaDesignXLSReader(sampleSheetFile).read(majorVersion);
 
       return new CasavaDesignXLSReader(sampleSheetFile).readForQCReport(
-          sampleSheetVersion, laneCount);
+          majorVersion, laneCount);
 
     default:
       throw new AozanException(
           "Sample sheet: create instance from file fail, extension ("
-              + extension + ") invalid " + sampleSheetFile);
+              + extension + ") invalid " + sampleSheetFile
+              + " version setting: " + majorVersion);
     }
 
   }
@@ -110,7 +120,7 @@ public class SampleSheetUtils {
    * @return a list of warnings
    * @throws AozanException if the design is not valid
    */
-  public static List<String> checkCasavaDesign(final SampleSheet design)
+  public static List<String> checkCasavaDesignTODO(final SampleSheet design)
       throws AozanException {
 
     return checkCasavaDesign(design, null);
@@ -673,13 +683,13 @@ public class SampleSheetUtils {
     if (fullVersion.startsWith(VERSION_1))
       return VERSION_1;
 
-    if (fullVersion.startsWith(VERSION_2) || fullVersion.startsWith("latest"))
+    if (fullVersion.startsWith(VERSION_2) || fullVersion.startsWith(LATEST_VERSION_NAME))
 
       return VERSION_2;
 
     // Throw an exception version invalid for pipeline
     throw new AozanRuntimeException(
-        "Demultiplexing collector, can be recognize bcl2fastq version (not start with 1 or 2) : "
+        "Demultiplexing collector, can be recognize bcl2fastq version (not start with 1 or 2 or latest) : "
             + fullVersion);
   }
 
@@ -700,7 +710,7 @@ public class SampleSheetUtils {
         (version.indexOf(".") > 0
             ? findBcl2fastqMajorVersion(version) : version);
 
-    return majorVersion.equals(VERSION_2);
+    return majorVersion.equals(VERSION_2) || majorVersion.equals(LATEST_VERSION_NAME);
 
   }
 

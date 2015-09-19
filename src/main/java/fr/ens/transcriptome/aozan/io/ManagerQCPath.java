@@ -376,7 +376,7 @@ public class ManagerQCPath {
     checkExistingDirectoryFile(fastq, "fastq directory");
 
     this.samplesheet =
-        SampleSheetUtils.getSampleSheet(samplesheet, bcl2fastqVersion,
+        SampleSheetUtils.getSampleSheet(samplesheet, bcl2fastqMajorVersion,
             laneCount);
 
     this.bcl2fastqVersion = bcl2fastqVersion;
@@ -549,7 +549,7 @@ public class ManagerQCPath {
       // With bcl2fastq version 2.15 and 2.16, in sample name
       if (sampleSheetV2.getSampleSheetVersion().startsWith("2.15")
           || sampleSheetV2.getSampleSheetVersion().startsWith("2.16")) {
-        
+
         return fastqSample.getSampleName().replace("_", "-");
       }
 

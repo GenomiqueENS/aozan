@@ -138,10 +138,10 @@ public class DesignCollector implements Collector {
         data.put(prefix + ".description", s.getDescription());
         data.put(prefix + ".sample.project", s.getSampleProject());
 
-        if (s.isDualIndex()){
+        if (s.isDualIndex()) {
           data.put(prefix + ".index2", s.getIndex2());
         }
-        
+
         // Extract data exist only with first version
         if (SampleSheetUtils.isBcl2fastqVersion1(this.bcl2fastqVersion)) {
 
@@ -150,8 +150,7 @@ public class DesignCollector implements Collector {
           data.put(prefix + ".recipe", s.getRecipe());
           data.put(prefix + ".operator", s.getOperator());
 
-        } else if (SampleSheetUtils
-            .isBcl2fastqVersion2(this.bcl2fastqVersion)) {
+        } else if (SampleSheetUtils.isBcl2fastqVersion2(this.bcl2fastqVersion)) {
           // TODO add extract columns, retrieve map with key-value
 
         } else {
@@ -195,16 +194,18 @@ public class DesignCollector implements Collector {
   private SampleSheet createSampleSheet(final RunData data) throws IOException,
       AozanException {
 
+    final String majorVersion =
+        SampleSheetUtils.findBcl2fastqMajorVersion(this.bcl2fastqVersion);
+
     if (this.callAtLeastOneFastqCollector) {
 
       Preconditions.checkNotNull(data, "run data instance");
 
       return new CasavaDesignCSVReader(this.casavaDesignFile).readForQCReport(
-          this.bcl2fastqVersion, data.getLaneCount());
+          majorVersion, data.getLaneCount());
     }
 
-    return new CasavaDesignCSVReader(this.casavaDesignFile)
-        .read(this.bcl2fastqVersion);
+    return new CasavaDesignCSVReader(this.casavaDesignFile).read(majorVersion);
   }
 
   @Override
