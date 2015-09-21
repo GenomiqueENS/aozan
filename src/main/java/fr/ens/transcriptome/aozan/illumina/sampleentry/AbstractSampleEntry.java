@@ -25,7 +25,7 @@ package fr.ens.transcriptome.aozan.illumina.sampleentry;
 
 import com.google.common.base.Strings;
 
-public abstract class AbstractSampleEntry implements SampleEntry {
+public abstract class AbstractSampleEntry implements Sample {
 
   // Required fields for SampleEntry
   private int lane;

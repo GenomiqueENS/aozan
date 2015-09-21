@@ -12,7 +12,7 @@ import java.util.List;
 import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
+import fr.ens.transcriptome.aozan.illumina.sampleentry.Sample;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.transcriptome.aozan.util.StatisticsUtils;
@@ -69,7 +69,7 @@ public class DemuxNextSeqCheckingResult {
   private static void checkQualityInSampleFastq(final SampleSheet design,
       final String runId) throws Exception {
 
-    for (SampleEntry entry : design) {
+    for (Sample entry : design) {
       final String sampleName = entry.getSampleProject();
 
       createResultFile(design, runId + "/" + sampleName, "2015_00",
@@ -219,7 +219,7 @@ public class DemuxNextSeqCheckingResult {
   private static String searchSample(final String sequenceIndex,
       final SampleSheet design) {
 
-    for (SampleEntry entry : design) {
+    for (Sample entry : design) {
       if (sequenceIndex.equals(entry.getIndex())) {
         return entry.getSampleId();
       }

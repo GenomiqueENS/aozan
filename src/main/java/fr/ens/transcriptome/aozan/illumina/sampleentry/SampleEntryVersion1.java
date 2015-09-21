@@ -23,7 +23,8 @@
 
 package fr.ens.transcriptome.aozan.illumina.sampleentry;
 
-public class SampleEntryVersion1 extends AbstractSampleEntry {
+public class SampleEntryVersion1 extends AbstractSampleEntry implements
+    SampleV1 {
 
   private String flowCellId;
   private String recipe;
@@ -96,16 +97,6 @@ public class SampleEntryVersion1 extends AbstractSampleEntry {
   @Override
   public void setFlowCellId(final String flowCellId) {
     this.flowCellId = flowCellId;
-  }
-
-  @Override
-  public int getOrderNumber() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setOrderNumber(int orderNumber) {
-    throw new UnsupportedOperationException();
   }
 
   @Override

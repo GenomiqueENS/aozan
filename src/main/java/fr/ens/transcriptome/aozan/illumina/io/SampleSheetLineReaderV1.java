@@ -3,8 +3,8 @@ package fr.ens.transcriptome.aozan.illumina.io;
 import java.util.List;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
 import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntryVersion1;
+import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleV1;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 
 class SampleSheetLineReaderV1 extends SampleSheetLineReader {
@@ -36,7 +36,7 @@ class SampleSheetLineReaderV1 extends SampleSheetLineReader {
       return;
     }
 
-    final SampleEntry sample = new SampleEntryVersion1();
+    final SampleV1 sample = new SampleEntryVersion1();
 
     sample.setFlowCellId(fields.get(0));
     sample.setLane(parseLane(fields.get(1)));

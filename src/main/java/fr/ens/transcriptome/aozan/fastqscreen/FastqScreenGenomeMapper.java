@@ -37,19 +37,20 @@ import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
-import com.google.common.base.Joiner;
+
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
+import fr.ens.transcriptome.aozan.illumina.sampleentry.Sample;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
@@ -256,7 +257,7 @@ public class FastqScreenGenomeMapper {
       }
 
       // Retrieve all genome sample included in casava design file
-      for (final SampleEntry casavaSample : casavaDesign) {
+      for (final Sample casavaSample : casavaDesign) {
         final String genomeSample =
             casavaSample.getSampleRef().replaceAll("\"", "").toLowerCase();
 

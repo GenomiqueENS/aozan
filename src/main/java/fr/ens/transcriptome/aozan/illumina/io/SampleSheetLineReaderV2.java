@@ -37,8 +37,8 @@ import com.google.common.base.Preconditions;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
 import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntryVersion2;
+import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleV2;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetVersion2;
 
@@ -49,7 +49,7 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
       .asList("sampleid");
 
   private static final List<String> FIELDNAMES_VERSION2_REQUIERED_FOR_QC =
-      Arrays.asList("sampleid", "sampleref", "index", "index2" ,"description",
+      Arrays.asList("sampleid", "sampleref", "index", "description",
           "sampleproject");
 
   private static final List<String> FIELDNAMES_VERSION2_FORBIDDEN = Arrays
@@ -113,7 +113,7 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
       SampleSheetVersion2 design2) throws AozanException {
 
     if (firstLineData) {
-
+      design2.setHeaderColumns(fields);
       this.firstLineData = false;
       this.positionFields = checkHeaderColumnSessionData(fields);
       this.fieldsCountExpected = positionFields.size();
@@ -125,11 +125,6 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
               + isCompatibleForQCReport);
 
     } else {
-      // assert (fields.size() == this.fieldsCountExpected);
-
-      // Check field on sample description in run
-      // trimAndCheckFields(fields, fieldsCountExpected);
-
       if (isColumnLaneExist()) {
         // Set lane value on sample
         int laneNumber = parseLane(fields.get(this.positionFields.get("lane")));
@@ -167,7 +162,7 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
     Preconditions.checkNotNull(fields,
         "fields for one line on sample sheet file");
 
-    final SampleEntry sample = new SampleEntryVersion2();
+    final SampleV2 sample = new SampleEntryVersion2();
     sample.setLane(laneNumber);
 
     for (int indice = 0; indice <= this.fieldsCountExpected; indice++) {
@@ -198,6 +193,7 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
           break;
 
         case "index2":
+          design2.setDualIndexes();
           sample.setIndex2(value);
           break;
 
@@ -210,6 +206,7 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
           break;
 
         default:
+          sample.setOptionalColumns(key, value);
         }
       }
     }

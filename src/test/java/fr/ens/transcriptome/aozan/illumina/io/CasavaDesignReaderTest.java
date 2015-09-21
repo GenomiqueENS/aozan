@@ -38,7 +38,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
+import fr.ens.transcriptome.aozan.illumina.sampleentry.Sample;
+import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleV1;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.transcriptome.aozan.io.CasavaDesignXLSReader;
@@ -259,11 +260,11 @@ public class CasavaDesignReaderTest extends TestCase {
       final SampleSheet tested, final boolean withLane) {
 
     assertFalse("No sample expected loaded ", samplesheetExpected.isEmpty());
-    for (SampleEntry e : tested) {
+    for (Sample e : tested) {
       System.out.println("compared tested sample " + e);
     }
     
-    for (SampleEntry e : tested) {
+    for (Sample e : tested) {
       System.out.println("compared tested sample " + e);
       final String sampleId = e.getSampleId();
       final int laneNumber = e.getLane();
@@ -296,7 +297,7 @@ public class CasavaDesignReaderTest extends TestCase {
   }
 
   private void compareSamplesheetEntryV2(final SampleSheetTest expected,
-      final SampleEntry tested, final boolean withLane) {
+      final Sample tested, final boolean withLane) {
 
     assertEquals("Sample ref", expected.getSampleRef(), tested.getSampleRef());
     assertEquals("Sample description", expected.getDescription(),
@@ -316,7 +317,9 @@ public class CasavaDesignReaderTest extends TestCase {
       final Map<String, SampleSheetTest> samplesheetExpected,
       final SampleSheet tested) {
 
-    for (SampleEntry e : tested) {
+    for (Sample s : tested) {
+      
+      final SampleV1 e = (SampleV1) s;
       final String sampleId = e.getSampleId();
       final int lane = e.getLane();
 

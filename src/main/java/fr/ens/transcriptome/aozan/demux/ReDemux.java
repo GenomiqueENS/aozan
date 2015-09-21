@@ -47,7 +47,7 @@ import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
+import fr.ens.transcriptome.aozan.illumina.sampleentry.Sample;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.eoulsan.EoulsanRuntimeException;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
@@ -81,7 +81,7 @@ public class ReDemux {
     private final List<Integer> reads;
     private final File inputDir;
     private final File outputDir;
-    private final Map<Pattern, SampleEntry> newIndexes = Maps.newHashMap();
+    private final Map<Pattern, Sample> newIndexes = Maps.newHashMap();
 
     /**
      * Add an index for the re-demultiplexing.
@@ -137,9 +137,9 @@ public class ReDemux {
       Preconditions.checkNotNull(index, "Index argument cannot be null");
 
       final Pattern pattern = Pattern.compile(index);
-      SampleEntry sample = null;
+      Sample sample = null;
 
-      for (SampleEntry s : design.getSampleInLane(this.lane)) {
+      for (Sample s : design.getSampleInLane(this.lane)) {
 
         if (pattern.matcher(s.getIndex()).matches()) {
 
@@ -169,11 +169,11 @@ public class ReDemux {
 
       Preconditions.checkNotNull(index, "Index argument cannot be null");
 
-      SampleEntry sample = null;
+      Sample sample = null;
       int bestScore = Integer.MAX_VALUE;
       int bestCoreCount = 0;
 
-      for (SampleEntry s : design.getSampleInLane(this.lane)) {
+      for (Sample s : design.getSampleInLane(this.lane)) {
 
         final String sampleIndex = s.getIndex();
 
@@ -352,7 +352,7 @@ public class ReDemux {
 
       final Map<Pattern, FastqWriter> result = Maps.newHashMap();
 
-      for (Map.Entry<Pattern, SampleEntry> e : this.newIndexes.entrySet()) {
+      for (Map.Entry<Pattern, Sample> e : this.newIndexes.entrySet()) {
 
         final String sampleProject = e.getValue().getSampleProject();
         final String sampleName = e.getValue().getSampleId();
@@ -392,7 +392,7 @@ public class ReDemux {
 
       final Map<String, Entity> result = new HashMap<>();
 
-      for (Map.Entry<Pattern, SampleEntry> e : this.newIndexes.entrySet()) {
+      for (Map.Entry<Pattern, Sample> e : this.newIndexes.entrySet()) {
 
         final String sampleProject = e.getValue().getSampleProject();
         final String sampleName = e.getValue().getSampleId();
@@ -438,7 +438,7 @@ public class ReDemux {
 
       private FastqWriter fw;
       private List<Pattern> patterns;
-      private SampleEntry cs;
+      private Sample cs;
 
       void addPattern(final Pattern p) {
 
@@ -456,11 +456,11 @@ public class ReDemux {
         return patterns;
       }
 
-      public SampleEntry getCs() {
+      public Sample getCs() {
         return cs;
       }
 
-      Entity(final FastqWriter fw, final SampleEntry cs) {
+      Entity(final FastqWriter fw, final Sample cs) {
         this.fw = fw;
         this.patterns = new ArrayList<>();
         this.cs = cs;

@@ -44,7 +44,9 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
+import fr.ens.transcriptome.aozan.illumina.sampleentry.Sample;
+import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleV1;
+import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleV2;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
 
@@ -127,7 +129,7 @@ public class DesignCollector implements Collector {
       // Read Casava design
       final SampleSheet design = createSampleSheet(data);
 
-      for (final SampleEntry s : design) {
+      for (final Sample s : design) {
 
         final String prefix =
             "design.lane" + s.getLane() + "." + s.getSampleId();
@@ -145,13 +147,16 @@ public class DesignCollector implements Collector {
         // Extract data exist only with first version
         if (SampleSheetUtils.isBcl2fastqVersion1(this.bcl2fastqVersion)) {
 
-          data.put(prefix + ".flow.cell.id", s.getFlowCellId());
-          data.put(prefix + ".control", s.isControl());
-          data.put(prefix + ".recipe", s.getRecipe());
-          data.put(prefix + ".operator", s.getOperator());
+          final SampleV1 v1 = (SampleV1) s;
+
+          data.put(prefix + ".flow.cell.id", v1.getFlowCellId());
+          data.put(prefix + ".control", v1.isControl());
+          data.put(prefix + ".recipe", v1.getRecipe());
+          data.put(prefix + ".operator", v1.getOperator());
 
         } else if (SampleSheetUtils.isBcl2fastqVersion2(this.bcl2fastqVersion)) {
           // TODO add extract columns, retrieve map with key-value
+          final SampleV2 v2 = (SampleV2) s;
 
         } else {
 

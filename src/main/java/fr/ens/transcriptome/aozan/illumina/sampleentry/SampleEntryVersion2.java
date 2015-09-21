@@ -23,65 +23,14 @@
 
 package fr.ens.transcriptome.aozan.illumina.sampleentry;
 
-public class SampleEntryVersion2 extends AbstractSampleEntry {
+import java.util.HashMap;
+import java.util.Map;
+
+public class SampleEntryVersion2 extends AbstractSampleEntry implements
+    SampleV2 {
 
   private int orderNumber;
-
-  @Override
-  public void setControl(final boolean control) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setRecipe(final String recipe) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setOperator(final String operator) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setFlowCellId(final String flowCellId) {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Get the flow cell id for the sample.
-   * @return Returns the flowCellId
-   */
-  @Override
-  public String getFlowCellId() {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Test if the sample is a control
-   * @return Returns the control
-   */
-  @Override
-  public boolean isControl() {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Get the recipe use to make the sample
-   * @return Returns the recipe
-   */
-  @Override
-  public String getRecipe() {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Get the operator who has made the sample.
-   * @return Returns the operator
-   */
-  @Override
-  public String getOperator() {
-    throw new UnsupportedOperationException();
-  }
+  private Map<String, String> optionalColumns = new HashMap<>();
 
   @Override
   public int getOrderNumber() {
@@ -91,6 +40,11 @@ public class SampleEntryVersion2 extends AbstractSampleEntry {
   @Override
   public void setOrderNumber(int orderNumber) {
     this.orderNumber = orderNumber;
+  }
+
+  @Override
+  public void setOptionalColumns(final String key, final String value) {
+    this.optionalColumns.put(key, value);
   }
 
   @Override

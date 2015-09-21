@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -46,7 +47,8 @@ import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.illumina.io.AbstractCasavaDesignTextReader;
 import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
+import fr.ens.transcriptome.aozan.illumina.sampleentry.Sample;
+import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleV1;
 import fr.ens.transcriptome.aozan.io.CasavaDesignXLSReader;
 import fr.ens.transcriptome.eoulsan.util.StringUtils;
 
@@ -120,7 +122,7 @@ public class SampleSheetUtils {
    * @return a list of warnings
    * @throws AozanException if the design is not valid
    */
-  public static List<String> checkCasavaDesignTODO(final SampleSheet design)
+  public static List<String> checkCasavaDesign(final SampleSheet design)
       throws AozanException {
 
     return checkCasavaDesign(design, null);
@@ -136,6 +138,30 @@ public class SampleSheetUtils {
   public static List<String> checkCasavaDesign(final SampleSheet design,
       final String flowCellId) throws AozanException {
 
+    if (design.isVersion1()) {
+
+      Preconditions.checkArgument(!Strings.isNullOrEmpty(flowCellId),
+          "flowCellId is not define for a sample sheet version 1");
+      return checkCasavaDesignV1(design, flowCellId);
+
+    } else if (design.isVersion2()) {
+      return checkCasavaDesignV2(design);
+    } else {
+
+      throw new AozanException("Sample sheet instance has invalid version.");
+    }
+
+  }
+
+  public static List<String> checkCasavaDesignV2(final SampleSheet design)
+      throws AozanException {
+
+    return null;
+  }
+
+  public static List<String> checkCasavaDesignV1(final SampleSheet design,
+      final String flowCellId) throws AozanException {
+
     if (design == null) {
       throw new NullPointerException("The design object is null");
     }
@@ -144,13 +170,7 @@ public class SampleSheetUtils {
       throw new AozanException("No samples found in the design.");
     }
 
-    if (design.isVersion1()) {
-      // Check version 1
-      SampleSheetVersion1Utils.checkSampleSheet(design, flowCellId);
-    } else {
-      // Check version 2
-      SampleSheetVersion2Utils.checkSampleSheet(design);
-    }
+    checkSampleSheet(design, flowCellId);
 
     final List<String> warnings = new ArrayList<>();
 
@@ -162,7 +182,7 @@ public class SampleSheetUtils {
     final Map<String, String> samplesProjects = new HashMap<>();
     final Map<String, String> samplesIndex = new HashMap<>();
 
-    for (SampleEntry sample : design) {
+    for (Sample sample : design) {
 
       // Check if the sample is null or empty
       checkSampleId(sample.getSampleId(), sampleIds);
@@ -495,7 +515,7 @@ public class SampleSheetUtils {
       return;
     }
 
-    for (final SampleEntry sample : design) {
+    for (final Sample sample : design) {
 
       if (sample.getIndex() == null) {
         throw new NullPointerException("Sample index is null for sample: "
@@ -540,8 +560,7 @@ public class SampleSheetUtils {
   public static final String toCSV(final SampleSheet design) {
 
     return design.isVersion1()
-        ? SampleSheetVersion1Utils.toCSV(design) : SampleSheetVersion2Utils
-            .toCSV(design);
+        ? SampleSheetVersion1.toCSV(design) : SampleSheetVersion2.toCSV(design);
   }
 
   /**
@@ -683,7 +702,8 @@ public class SampleSheetUtils {
     if (fullVersion.startsWith(VERSION_1))
       return VERSION_1;
 
-    if (fullVersion.startsWith(VERSION_2) || fullVersion.startsWith(LATEST_VERSION_NAME))
+    if (fullVersion.startsWith(VERSION_2)
+        || fullVersion.startsWith(LATEST_VERSION_NAME))
 
       return VERSION_2;
 
@@ -710,7 +730,8 @@ public class SampleSheetUtils {
         (version.indexOf(".") > 0
             ? findBcl2fastqMajorVersion(version) : version);
 
-    return majorVersion.equals(VERSION_2) || majorVersion.equals(LATEST_VERSION_NAME);
+    return majorVersion.equals(VERSION_2)
+        || majorVersion.equals(LATEST_VERSION_NAME);
 
   }
 
@@ -728,7 +749,7 @@ public class SampleSheetUtils {
     return s == null || s.isEmpty();
   }
 
-  private static String quote(final String s) {
+  static String quote(final String s) {
 
     if (s == null) {
       return "";
@@ -742,315 +763,102 @@ public class SampleSheetUtils {
     return trimmed;
   }
 
+  public static void checkSampleSheet(final SampleSheet design)
+      throws AozanException {
+    checkSampleSheet(design, null);
+  }
+
+  public static void checkSampleSheet(final SampleSheet design,
+      final String flowCellId) throws AozanException {
+
+    if (design.isVersion1()) {
+
+      Preconditions.checkArgument(!Strings.isNullOrEmpty(flowCellId),
+          "flowCellId is not define for a sample sheet version 1");
+      checkSampleSheetV1(design, flowCellId);
+
+    } else if (design.isVersion2()) {
+      checkSampleSheetV2(design);
+    } else {
+
+      throw new AozanException("Sample sheet instance has invalid version.");
+    }
+
+  }
+
+  public static void checkSampleSheetV2(SampleSheet design) {
+    // TODO Auto-generated method stub
+
+  }
+
+  public static void checkSampleSheetV1(final SampleSheet design,
+      final String flowCellId) throws AozanException {
+
+    String fcid = null;
+    boolean first = true;
+
+    for (Sample s : design) {
+
+      final SampleV1 sample = (SampleV1) s;
+      // Check if all the fields are not empty
+      checkFCID(sample.getFlowCellId());
+
+      if (flowCellId != null) {
+
+        // Check if the flow cell id is the flow cell id expected
+        if (!flowCellId.trim().toUpperCase()
+            .equals(sample.getFlowCellId().toUpperCase())) {
+          throw new AozanException("Bad flowcell name found: "
+              + sample.getFlowCellId() + " (" + flowCellId + " expected).");
+        }
+
+        // Use the case of the flowCellId parameter as case for the flow cell
+        // id
+        // of sample
+        sample.setFlowCellId(flowCellId);
+      }
+
+      // Check if all the samples had the same flow cell id
+      if (first) {
+        fcid = sample.getFlowCellId();
+        first = false;
+      } else {
+
+        if (!fcid.equals(sample.getFlowCellId())) {
+          throw new AozanException("Two differents flow cell id found: "
+              + fcid + " and " + sample.getFlowCellId() + ".");
+        }
+      }
+
+      // Check the lane number
+      if (sample.getLane() < 1 || sample.getLane() > 8) {
+        throw new AozanException("Invalid lane number found: "
+            + sample.getLane() + ".");
+      }
+
+      // Check recipe
+      if (isNullOrEmpty(sample.getRecipe())) {
+        throw new AozanException("Found a null or empty recipe for sample: "
+            + sample.getSampleId() + ".");
+      }
+      checkCharset(sample.getRecipe());
+
+      // Check operator
+      if (isNullOrEmpty(sample.getOperator())) {
+        throw new AozanException("Found a null or empty operator for sample: "
+            + sample.getSampleId() + ".");
+      }
+
+      checkCharset(sample.getOperator());
+
+    }
+  }
+
   //
   // Constructor
   //
 
   SampleSheetUtils() {
-
-  }
-
-  //
-  // Internal classes
-  //
-
-  /**
-   * The internal static class manage useful methods only used on version2
-   * sample sheet .
-   * @author Sandrine Perrin
-   * @since 2.4
-   */
-  static final class SampleSheetVersion1Utils {
-
-    private final static List<String> COLUMNS_HEADER = Arrays.asList(
-        "\"FCID\"", "\"Lane\"", "\"SampleID\"", "\"SampleRef\"", "\"Index\"",
-        "\"Description\"", "\"Control\"", "\"Recipe\"", "\"Operator\"",
-        "\"SampleProject\"");
-
-    public static String toCSV(final SampleSheet design) {
-
-      final StringBuilder sb = new StringBuilder();
-
-      sb.append(Joiner.on(SEP).join(COLUMNS_HEADER) + "\n");
-
-      if (design == null) {
-        return sb.toString();
-      }
-
-      for (SampleEntry s : design) {
-
-        sb.append(s.getFlowCellId().trim().toUpperCase());
-        sb.append(SEP);
-        sb.append(s.getLane());
-        sb.append(SEP);
-        sb.append(quote(s.getSampleId().trim()));
-        sb.append(SEP);
-        sb.append(quote(s.getSampleRef().trim()));
-        sb.append(SEP);
-        sb.append(quote(s.getIndex().toUpperCase()));
-        sb.append(SEP);
-        sb.append(quote(s.getDescription().trim()));
-        sb.append(SEP);
-        sb.append(s.isControl() ? 'Y' : 'N');
-        sb.append(SEP);
-        sb.append(quote(s.getRecipe().trim()));
-        sb.append(SEP);
-        sb.append(quote(s.getOperator().trim()));
-        sb.append(SEP);
-        sb.append(quote(s.getSampleProject()));
-
-        sb.append('\n');
-
-      }
-
-      return sb.toString();
-    }
-
-    public static void checkSampleSheet(final SampleSheet design,
-        final String flowCellId) throws AozanException {
-
-      String fcid = null;
-      boolean first = true;
-
-      for (SampleEntry sample : design) {
-
-        // Check if all the fields are not empty
-        checkFCID(sample.getFlowCellId());
-
-        if (flowCellId != null) {
-
-          // Check if the flow cell id is the flow cell id expected
-          if (!flowCellId.trim().toUpperCase()
-              .equals(sample.getFlowCellId().toUpperCase())) {
-            throw new AozanException("Bad flowcell name found: "
-                + sample.getFlowCellId() + " (" + flowCellId + " expected).");
-          }
-
-          // Use the case of the flowCellId parameter as case for the flow cell
-          // id
-          // of sample
-          sample.setFlowCellId(flowCellId);
-        }
-
-        // Check if all the samples had the same flow cell id
-        if (first) {
-          fcid = sample.getFlowCellId();
-          first = false;
-        } else {
-
-          if (!fcid.equals(sample.getFlowCellId())) {
-            throw new AozanException("Two differents flow cell id found: "
-                + fcid + " and " + sample.getFlowCellId() + ".");
-          }
-        }
-
-        // Check the lane number
-        if (sample.getLane() < 1 || sample.getLane() > 8) {
-          throw new AozanException("Invalid lane number found: "
-              + sample.getLane() + ".");
-        }
-
-        // Check recipe
-        if (isNullOrEmpty(sample.getRecipe())) {
-          throw new AozanException("Found a null or empty recipe for sample: "
-              + sample.getSampleId() + ".");
-        }
-        checkCharset(sample.getRecipe());
-
-        // Check operator
-        if (isNullOrEmpty(sample.getOperator())) {
-          throw new AozanException(
-              "Found a null or empty operator for sample: "
-                  + sample.getSampleId() + ".");
-        }
-
-        checkCharset(sample.getOperator());
-
-      }
-    }
-
-    //
-    // Constructor
-    //
-
-    /**
-     * Private constructor
-     */
-    private SampleSheetVersion1Utils() {
-      super();
-    }
-
-  }
-
-  /**
-   * The internal static class manage useful methods only used on version2
-   * sample sheet .
-   * @author Sandrine Perrin
-   * @since 2.4
-   */
-  final static class SampleSheetVersion2Utils {
-
-    private final static String COLUMNS_HEADER =
-        "\"SampleID\",\"sampleref\",\"index\",\"index2\",\"description\","
-            + "\"Sample_Project\"\n";
-
-    private final static String COLUMNS_HEADER_WITH_LANE =
-        "\"lane\",\"SampleID\",\"sampleref\",\"index\",\"index2\",\"description\","
-            + "\"Sample_Project\"\n";
-
-    /**
-     * Convert sample sheet instance in string in csv format.
-     * @param design the design
-     * @return the string
-     */
-    public static String toCSV(final SampleSheet design) {
-
-      // Cast in sample sheet version 2
-      final SampleSheetVersion2 sampleSheetV2 = (SampleSheetVersion2) design;
-
-      final StringBuilder sb = new StringBuilder();
-
-      // Add session Header
-      if (sampleSheetV2.existHeaderSession()) {
-        sb.append("[Header]\n");
-        sb.append(addSession(sampleSheetV2.getHearderEntries()));
-        sb.append("\n");
-      }
-
-      // Add session Reads
-      if (sampleSheetV2.existReadsSession()) {
-        sb.append("[Reads]\n");
-        sb.append(addSession(sampleSheetV2.getReadsSession()));
-        sb.append("\n");
-      }
-
-      // Add session Settings
-      if (sampleSheetV2.existSettingsSession()) {
-        sb.append("[Settings]\n");
-        sb.append(addSession(sampleSheetV2.getSettingsSession()));
-        sb.append("\n");
-      }
-
-      // if (sampleSheetV2.isColumnHeaderLaneExist()) {
-      // // Add session Data
-      // sb.append(addSessionDataWithLane(sampleSheetV2));
-      // } else {
-      sb.append(addSessionData(sampleSheetV2));
-      // }
-
-      return sb.toString();
-    }
-
-    private static String addSessionDataWithLane(SampleSheetVersion2 design) {
-
-      final StringBuilder sb = new StringBuilder();
-      sb.append("[Data]\n");
-
-      sb.append(COLUMNS_HEADER_WITH_LANE);
-
-      if (design == null) {
-        return sb.toString();
-      }
-
-      for (SampleEntry s : design) {
-
-        System.out.println("with lane " + s);
-
-        sb.append(s.getLane());
-        sb.append(SEP);
-        sb.append(quote(s.getSampleId().trim()));
-        sb.append(SEP);
-        sb.append(quote(s.getSampleRef().trim()));
-        sb.append(SEP);
-        sb.append(quote(s.getIndex().toUpperCase()));
-        sb.append(SEP);
-        sb.append(quote(s.getIndex2().toUpperCase()));
-        sb.append(SEP);
-        sb.append(quote(s.getDescription().trim()));
-        sb.append(SEP);
-        sb.append(quote(s.getSampleProject()));
-
-        sb.append('\n');
-
-      }
-
-      return sb.toString();
-    }
-
-    /**
-     * Adds the session sample sheet in string csv format, excepted session
-     * data.
-     * @param entries the entries on session
-     * @return string csv format
-     */
-    private static String addSession(final Map<String, String> entries) {
-
-      final StringBuilder sb = new StringBuilder();
-
-      for (Map.Entry<String, String> e : entries.entrySet()) {
-        sb.append(e.getKey());
-        sb.append(SEP);
-        sb.append(e.getValue());
-        sb.append("\n");
-
-      }
-
-      return sb.toString();
-    }
-
-    /**
-     * Adds the session data.
-     * @param design the design
-     * @return the string csv format
-     */
-    private static String addSessionData(final SampleSheet design) {
-
-      final StringBuilder sb = new StringBuilder();
-      sb.append("[Data]\n");
-
-      sb.append(COLUMNS_HEADER_WITH_LANE);
-
-      if (design == null) {
-        return sb.toString();
-      }
-
-      for (SampleEntry s : design) {
-
-        sb.append(s.getLane());
-        sb.append(SEP);
-        sb.append(quote(s.getSampleId().trim()));
-        sb.append(SEP);
-        sb.append(quote(s.getSampleRef().trim()));
-        sb.append(SEP);
-        sb.append(quote(s.getIndex().toUpperCase()));
-        sb.append(SEP);
-        sb.append(quote(s.getIndex2().toUpperCase()));
-        sb.append(SEP);
-        sb.append(quote(s.getDescription().trim()));
-        sb.append(SEP);
-        sb.append(quote(s.getSampleProject()));
-
-        sb.append('\n');
-
-      }
-
-      return sb.toString();
-    }
-
-    public static void checkSampleSheet(final SampleSheet design) {
-      // Nothing to do
-    }
-
-    //
-    // Constructor
-    //
-
-    /**
-     * Private constructor
-     */
-    private SampleSheetVersion2Utils() {
-      super();
-    }
 
   }
 

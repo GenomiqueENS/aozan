@@ -32,19 +32,19 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntry;
+import fr.ens.transcriptome.aozan.illumina.sampleentry.Sample;
 
 /**
  * This class handle a Casava design object.
  * @since 1.1
  * @author Laurent Jourdren
  */
-public class SampleSheet implements Iterable<SampleEntry> {
+public class SampleSheet implements Iterable<Sample> {
 
   private final String sampleSheetVersion;
-  private final List<SampleEntry> samples = new ArrayList<>();
+  private final List<Sample> samples = new ArrayList<>();
 
-  public void addSample(final SampleEntry sample) {
+  public void addSample(final Sample sample) {
 
     this.samples.add(sample);
   }
@@ -60,7 +60,7 @@ public class SampleSheet implements Iterable<SampleEntry> {
   }
 
   @Override
-  public Iterator<SampleEntry> iterator() {
+  public Iterator<Sample> iterator() {
 
     return Collections.unmodifiableList(this.samples).iterator();
   }
@@ -71,15 +71,15 @@ public class SampleSheet implements Iterable<SampleEntry> {
    * @return a list of the samples in the lane in the same order as the Casava
    *         design. Return null if the laneId < 1.
    */
-  public List<SampleEntry> getSampleInLane(final int laneId) {
+  public List<Sample> getSampleInLane(final int laneId) {
 
     if (laneId < 1) {
       return null;
     }
 
-    final List<SampleEntry> result = new ArrayList<>();
+    final List<Sample> result = new ArrayList<>();
 
-    for (SampleEntry s : this.samples) {
+    for (Sample s : this.samples) {
       if (s.getLane() == laneId) {
         result.add(s);
       }
@@ -100,7 +100,7 @@ public class SampleSheet implements Iterable<SampleEntry> {
   @Override
   public String toString() {
 
-    return SampleEntry.class.getName()
+    return Sample.class.getName()
         + "{samples=" + Joiner.on("\t").join(this.samples) + "}";
   }
 
