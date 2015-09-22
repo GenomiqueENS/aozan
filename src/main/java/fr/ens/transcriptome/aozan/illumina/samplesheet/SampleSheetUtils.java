@@ -156,7 +156,7 @@ public class SampleSheetUtils {
   public static List<String> checkCasavaDesignV2(final SampleSheet design)
       throws AozanException {
 
-    return null;
+    return Collections.emptyList();
   }
 
   public static List<String> checkCasavaDesignV1(final SampleSheet design,
