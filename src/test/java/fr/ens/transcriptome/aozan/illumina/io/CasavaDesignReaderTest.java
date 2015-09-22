@@ -52,21 +52,27 @@ public class CasavaDesignReaderTest extends TestCase {
 
   private static final Splitter COMMA_SPLITTER = Splitter.on(",").trimResults();
 
-  private static final String EXPECTED_WIHTHEADER_SMALLER_CSV = "[Header]\n"
-      + "IEMFileVersion,4\n" + "Experiment Name,141216\n" + "Date,17/12/2014\n"
-      + "Workflow,GenerateFASTQ\n" + "Application,NextSeq FASTQ Only"
-      + "Assay,TruSeq LT\n" + "Description\n" + "Chemistry,Default\n\n"
-      + "[Reads]\n43\n43\n\n" + "[Settings]\n\n" + "[Data]\nSample_ID\n"
-      + "2015_067\n" + "2015_068\n" + "2015_069";
+  // private static final String EXPECTED_WIHTHEADER_SMALLER_CSV = "[Header]\n"
+  // + "IEMFileVersion,4\n" + "Experiment Name,141216\n" + "Date,17/12/2014\n"
+  // + "Workflow,GenerateFASTQ\n" + "Application,NextSeq FASTQ Only"
+  // + "Assay,TruSeq LT\n" + "Description\n" + "Chemistry,Default\n\n"
+  // + "[Reads]\n43\n43\n\n" + "[Settings]\n\n" + "[Data]\nSample_ID\n"
+  // + "2015_067\n" + "2015_068\n" + "2015_069";
+
+  private static final String EXPECTED_WIHTHEADER_SMALLER_CSV =
+      "Sample_ID,index,Sample_Project,Description,Sample_Ref\n"
+          + "2015_067,CGATGT,Project_A2015,Description,arabidopsis\n"
+          + "2015_068,TGACCA,Project_A2015,Description,arabidopsis\n"
+          + "2015_069,GCCAAT,Project_A2015,Description,arabidopsis";
 
   private static final String EXPECTED_SMALLER_CSV = "[Data]\nSample_ID\n"
       + "2015_067\n" + "2015_068\n" + "2015_069";
 
   private static final String EXPECTED_CSV =
-      "Sample_ID,index,Sample_Project,Description,Sample_Ref,index2\n"
-          + "2015_067,CGATGT,Project_A2015,Description,arabidopsis,\n"
-          + "2015_068,TGACCA,Project_A2015,Description,arabidopsis,\n"
-          + "2015_069,GCCAAT,Project_A2015,Description,arabidopsis,";
+      "Sample_ID,index,Sample_Project,Description,Sample_Ref\n"
+          + "2015_067,CGATGT,Project_A2015,Description,arabidopsis\n"
+          + "2015_068,TGACCA,Project_A2015,Description,arabidopsis\n"
+          + "2015_069,GCCAAT,Project_A2015,Description,arabidopsis";
 
   private static final String EXPECTED_WITH_DUALINDEX_CSV =
       "Sample_ID,index,Sample_Project,Description,Sample_Ref,index2\n"
@@ -75,22 +81,22 @@ public class CasavaDesignReaderTest extends TestCase {
           + "2015_069,GCCAAT,Project_A2015,Description,arabidopsis,TAGAGT";
 
   private static final String EXPECTED_CSV_FULL =
-      "Sample_ID,index,Sample_Project,Description,Sample_Ref,index2,lane,FCID,Control,Recipe,Operator\n"
-          + "2015_067,CGATGT,Project_A2015,Description,arabidopsis,,1,H9RLKADXX,N,R1,plateform,\n"
-          + "2015_068,TGACCA,Project_A2015,Description,arabidopsis,,1,H9RLKADXX,N,R1,plateform,\n"
-          + "2015_069,GCCAAT,Project_A2015,Description,arabidopsis,,1,H9RLKADXX,N,R1,plateform,\n"
-          + "2015_067,CGATGT,Project_A2015,Description,arabidopsis,,2,H9RLKADXX,N,R1,plateform,\n"
-          + "2015_068,TGACCA,Project_A2015,Description,arabidopsis,,2,H9RLKADXX,N,R1,plateform,\n"
-          + "2015_069,GCCAAT,Project_A2015,Description,arabidopsis,,2,H9RLKADXX,N,R1,plateform";
+      "Sample_ID,index,Sample_Project,Description,Sample_Ref,lane,FCID,Control,Recipe,Operator\n"
+          + "2015_067,CGATGT,Project_A2015,Description,arabidopsis,1,H9RLKADXX,N,R1,plateform,\n"
+          + "2015_068,TGACCA,Project_A2015,Description,arabidopsis,1,H9RLKADXX,N,R1,plateform,\n"
+          + "2015_069,GCCAAT,Project_A2015,Description,arabidopsis,1,H9RLKADXX,N,R1,plateform,\n"
+          + "2015_067,CGATGT,Project_A2015,Description,arabidopsis,2,H9RLKADXX,N,R1,plateform,\n"
+          + "2015_068,TGACCA,Project_A2015,Description,arabidopsis,2,H9RLKADXX,N,R1,plateform,\n"
+          + "2015_069,GCCAAT,Project_A2015,Description,arabidopsis,2,H9RLKADXX,N,R1,plateform";
 
   private static final String EXPECTED_FULL_WITH_DUALINDEX_CSV =
-      "Sample_ID,index,Sample_Project,Description,Sample_Ref,index2,lane,FCID,Control,Recipe,Operator\n"
-          + "2015_067,CGATGT,Project_A2015,Description,arabidopsis,GTCGAT,1,H9RLKADXX,N,R1,plateform\n"
-          + "2015_068,TGACCA,Project_A2015,Description,arabidopsis,GATGTG,1,H9RLKADXX,N,R1,plateform\n"
-          + "2015_069,GCCAAT,Project_A2015,Description,arabidopsis,TAGAGT,1,H9RLKADXX,N,R1,plateform\n"
-          + "2015_067,CGATGT,Project_A2015,Description,arabidopsis,GTCGAT,2,H9RLKADXX,N,R1,plateform\n"
-          + "2015_068,TGACCA,Project_A2015,Description,arabidopsis,GATGTG,2,H9RLKADXX,N,R1,plateform\n"
-          + "2015_069,GCCAAT,Project_A2015,Description,arabidopsis,TAGAGT,2,H9RLKADXX,N,R1,plateform";
+      "Sample_ID,index,Sample_Project,Description,Sample_Ref,lane,index2,FCID,Control,Recipe,Operator\n"
+          + "2015_067,CGATGT,Project_A2015,Description,arabidopsis,1,GTCGAT,H9RLKADXX,N,R1,plateform\n"
+          + "2015_068,TGACCA,Project_A2015,Description,arabidopsis,1,GATGTG,H9RLKADXX,N,R1,plateform\n"
+          + "2015_069,GCCAAT,Project_A2015,Description,arabidopsis,1,TAGAGT,H9RLKADXX,N,R1,plateform\n"
+          + "2015_067,CGATGT,Project_A2015,Description,arabidopsis,2,GTCGAT,H9RLKADXX,N,R1,plateform\n"
+          + "2015_068,TGACCA,Project_A2015,Description,arabidopsis,2,GATGTG,H9RLKADXX,N,R1,plateform\n"
+          + "2015_069,GCCAAT,Project_A2015,Description,arabidopsis,2,TAGAGT,H9RLKADXX,N,R1,plateform";
 
   private static final String SAMPLESHEET_BCL2FASTQ_V2_FILENAME =
       "samplesheet_version_bcl2fastq2.xls";
@@ -98,13 +104,49 @@ public class CasavaDesignReaderTest extends TestCase {
   private static final String SAMPLESHEET_DUALINDEX_BCL2FASTQ_V2_FILENAME =
       "samplesheet_version_bcl2fastq2_v2.xls";
 
+  private static final String SAMPLESHEET_WITH_HEADER_BCL2FASTQ_V2_FILENAME =
+      "samplesheet_short_bcl2fastq2.xls";
+
   private static final String SAMPLESHEET_BCL2FASTQ_V1_FILENAME =
       "design_version_bcl2fastq.xls";
+
   private static final String SAMPLESHEET_CSV = "samplesheet.csv";
 
   private String path;
   private File outputFile;
 
+  public void testReadsWithHeaderVersion2() {
+
+    testSampleSheet(SAMPLESHEET_WITH_HEADER_BCL2FASTQ_V2_FILENAME,
+        SampleSheetUtils.VERSION_2, EXPECTED_WIHTHEADER_SMALLER_CSV, false);
+  }
+
+  private void testSampleSheet(final String samplesheetFileToTest,
+      final String version, final String expectedDataName,
+      final boolean withLane) {
+
+    final File samplesheet = new File(path, samplesheetFileToTest);
+    final String bcl2fastqVersion = version;
+
+    int laneNumber = (withLane ? 2 : -1);
+
+    // Create CSV file
+    convertSamplesheetToCSV(samplesheet, bcl2fastqVersion, outputFile, 0);
+
+    // Load sample sheet CSV
+    final SampleSheet samplesheetTested =
+        readSamplesheetCSV(outputFile, bcl2fastqVersion, laneNumber);
+
+    // Compare with expected content
+    final Map<String, SampleSheetTest> samplesheetExpected =
+        buildSamplesheetExpected(expectedDataName, version);
+
+    compareSamplesheetV2(samplesheetExpected, samplesheetTested, withLane);
+  }
+
+  /**
+   * Test reads short csv version.
+   */
   public void testReadsShortCSVVersion() {
 
     try {
@@ -119,70 +161,26 @@ public class CasavaDesignReaderTest extends TestCase {
   }
 
   /**
-   * Reads xls samplesheet file and check samplesheet instance is the same that
-   * expected, with right converting index sequences.
+   * Reads xls sample sheet file and check sample sheet instance is the same
+   * that expected, with right converting index sequences.
    */
   public void testReadsXLSVersion2WithoutLaneColumnToCreate() {
 
-    final File samplesheet = new File(path, SAMPLESHEET_BCL2FASTQ_V2_FILENAME);
-    final String bcl2fastqVersion = SampleSheetUtils.VERSION_2;
-
-    // Create CSV file
-    convertSamplesheetToCSV(samplesheet, bcl2fastqVersion, outputFile, 0);
-
-    // Load samplesheet csv
-    final SampleSheet samplesheetTested =
-        readSamplesheetCSV(outputFile, bcl2fastqVersion, -1);
-
-    // Compare with expected content
-    final Map<String, SampleSheetTest> samplesheetExpected =
-        buildSamplesheetExpected(EXPECTED_CSV, SampleSheetUtils.VERSION_2);
-
-    compareSamplesheetV2(samplesheetExpected, samplesheetTested, false);
+    testSampleSheet(SAMPLESHEET_BCL2FASTQ_V2_FILENAME,
+        SampleSheetUtils.VERSION_2, EXPECTED_CSV, false);
   }
 
   public void testReadsXLSVersion2WithLaneColumnToCreate() {
 
-    final File samplesheet = new File(path, SAMPLESHEET_BCL2FASTQ_V2_FILENAME);
-    final String bcl2fastqVersion = SampleSheetUtils.VERSION_2;
-    final int laneCount = 2;
+    testSampleSheet(SAMPLESHEET_BCL2FASTQ_V2_FILENAME,
+        SampleSheetUtils.VERSION_2, EXPECTED_CSV_FULL, true);
 
-    // Create CSV file
-    convertSamplesheetToCSV(samplesheet, bcl2fastqVersion, outputFile,
-        laneCount);
-
-    // Load samplesheet csv
-    final SampleSheet samplesheetTested =
-        readSamplesheetCSV(outputFile, bcl2fastqVersion, laneCount);
-
-    // Compare with expected content with content column lane
-    final Map<String, SampleSheetTest> samplesheetExpected =
-        buildSamplesheetExpected(EXPECTED_CSV_FULL, SampleSheetUtils.VERSION_2);
-
-    compareSamplesheetV2(samplesheetExpected, samplesheetTested, true);
   }
 
   public void testReadsXLSVersion2DualIndexWithLaneColumnToCreate() {
 
-    final File samplesheet =
-        new File(path, SAMPLESHEET_DUALINDEX_BCL2FASTQ_V2_FILENAME);
-    final String bcl2fastqVersion = SampleSheetUtils.VERSION_2;
-    final int laneCount = 2;
-
-    // Create CSV file
-    convertSamplesheetToCSV(samplesheet, bcl2fastqVersion, outputFile,
-        laneCount);
-
-    // Load samplesheet csv
-    final SampleSheet samplesheetTested =
-        readSamplesheetCSV(outputFile, bcl2fastqVersion, laneCount);
-
-    // Compare with expected content with content column lane
-    final Map<String, SampleSheetTest> samplesheetExpected =
-        buildSamplesheetExpected(EXPECTED_FULL_WITH_DUALINDEX_CSV,
-            SampleSheetUtils.VERSION_2);
-
-    compareSamplesheetV2(samplesheetExpected, samplesheetTested, true);
+    testSampleSheet(SAMPLESHEET_DUALINDEX_BCL2FASTQ_V2_FILENAME,
+        SampleSheetUtils.VERSION_2, EXPECTED_FULL_WITH_DUALINDEX_CSV, true);
   }
 
   public void testReadsCSVVersion2WithLaneColumnToCreate() {
@@ -232,23 +230,8 @@ public class CasavaDesignReaderTest extends TestCase {
    */
   public void testReadsXLSVersion1() {
 
-    final File samplesheet = new File(path, SAMPLESHEET_BCL2FASTQ_V1_FILENAME);
-    final String bcl2fastqVersion = SampleSheetUtils.VERSION_1;
-    final int laneCount = 2;
-
-    // Create CSV file
-    convertSamplesheetToCSV(samplesheet, bcl2fastqVersion, outputFile,
-        laneCount);
-
-    // Load samplesheet csv
-    final SampleSheet samplesheetTested =
-        readSamplesheetCSV(outputFile, bcl2fastqVersion, laneCount);
-
-    final Map<String, SampleSheetTest> samplesheetExpected =
-        buildSamplesheetExpected(EXPECTED_CSV_FULL, SampleSheetUtils.VERSION_1);
-
-    // Compare with expected content
-    compareSamplesheetV1(samplesheetExpected, samplesheetTested);
+    testSampleSheet(SAMPLESHEET_BCL2FASTQ_V1_FILENAME,
+        SampleSheetUtils.VERSION_1, EXPECTED_CSV_FULL, true);
   }
 
   //
@@ -260,12 +243,8 @@ public class CasavaDesignReaderTest extends TestCase {
       final SampleSheet tested, final boolean withLane) {
 
     assertFalse("No sample expected loaded ", samplesheetExpected.isEmpty());
-    for (Sample e : tested) {
-      System.out.println("compared tested sample " + e);
-    }
 
     for (Sample e : tested) {
-      System.out.println("compared tested sample " + e);
       final String sampleId = e.getSampleId();
       final int laneNumber = e.getLane();
 
@@ -393,7 +372,7 @@ public class CasavaDesignReaderTest extends TestCase {
     try {
 
       SampleSheet design;
-      if (laneCount == 0) {
+      if (laneCount == -1) {
         design = new CasavaDesignXLSReader(samplesheet).read(bcl2fastqVersion);
       } else {
         design =
@@ -430,14 +409,22 @@ public class CasavaDesignReaderTest extends TestCase {
     final Map<String, SampleSheetTest> s = new TreeMap<>();
     boolean first = true;
 
+    boolean isLaneColumnExist = false;
+    boolean isIndex2ColumnExist = false;
+
     for (String line : NEWLINE_SPLITTER.splitToList(expected)) {
 
       if (first) {
         // Skip header
         first = false;
+        isLaneColumnExist = line.contains("lane");
+        isIndex2ColumnExist = line.contains("index2");
+
       } else {
 
-        final SampleSheetTest sample = new SampleSheetTest(line, version);
+        final SampleSheetTest sample =
+            new SampleSheetTest(line, version, isLaneColumnExist,
+                isIndex2ColumnExist);
         s.put(sample.getKey(), sample);
       }
     }
@@ -473,20 +460,24 @@ public class CasavaDesignReaderTest extends TestCase {
 
   class SampleSheetTest {
 
+    private final boolean index2ColumnExist;
+    private final boolean laneColumnExist;
+
     private String sampleID;
     private String index;
-    private String index2 = "";
     private String sampleProject;
     private String description;
     private String sampleRef;
     private boolean optionalFieds;
 
     // Additional fields
-    private int lane;
-    private String FCID;
-    private String control;
-    private String recipe;
-    private String operator;
+    private String index2 = "";
+    private int lane = 0;
+
+    private String FCID = "";
+    private String control = "";
+    private String recipe = "";
+    private String operator = "";
 
     private void parse(final String csv) {
 
@@ -498,19 +489,20 @@ public class CasavaDesignReaderTest extends TestCase {
       this.sampleProject = fields.next();
       this.description = fields.next();
       this.sampleRef = fields.next();
-      this.index2 = fields.next();
 
-      if (fields.hasNext()) {
+      if (laneColumnExist) {
         this.lane = Integer.parseInt(fields.next());
-      } else {
-        this.lane = 0;
+      }
+
+      if (index2ColumnExist) {
+        this.index2 = fields.next();
       }
 
       if (optionalFieds) {
-        this.FCID = fields.next();
-        this.control = fields.next();
-        this.recipe = fields.next();
-        this.operator = fields.next();
+        this.FCID = (fields.hasNext() ? fields.next() : "");
+        this.control = (fields.hasNext() ? fields.next() : "");
+        this.recipe = (fields.hasNext() ? fields.next() : "");
+        this.operator = (fields.hasNext() ? fields.next() : "");
       }
     }
 
@@ -531,7 +523,6 @@ public class CasavaDesignReaderTest extends TestCase {
     }
 
     public String getIndex2() {
-      System.out.println("Compare index");
       return index2;
     }
 
@@ -578,9 +569,11 @@ public class CasavaDesignReaderTest extends TestCase {
     //
     // Constructor
     //
-    SampleSheetTest(final String line, final String version) {
+    SampleSheetTest(final String line, final String version,
+        boolean isLaneColumnExist, boolean isIndex2ColumnExist) {
       this.optionalFieds = version.equals(SampleSheetUtils.VERSION_1);
-
+      this.laneColumnExist = isLaneColumnExist;
+      this.index2ColumnExist = isIndex2ColumnExist;
       parse(line);
 
     }
