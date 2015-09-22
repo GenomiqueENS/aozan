@@ -29,6 +29,7 @@ import java.util.List;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetVersion1;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetVersion2;
 
 /**
@@ -64,7 +65,7 @@ public abstract class AbstractCasavaDesignTextReader implements
             new SampleSheetLineReaderV2(getLaneCount(),
                 isCompatibleForQCReport());
       } else {
-        this.design = new SampleSheet(version);
+        this.design = new SampleSheetVersion1(version);
         this.reader = new SampleSheetLineReaderV1();
       }
     }

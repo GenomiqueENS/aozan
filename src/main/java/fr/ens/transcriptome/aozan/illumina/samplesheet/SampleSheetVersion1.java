@@ -11,24 +11,21 @@ import com.google.common.base.Joiner;
 import fr.ens.transcriptome.aozan.illumina.sampleentry.Sample;
 import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleV1;
 
-public class SampleSheetVersion1 {
+public class SampleSheetVersion1 extends SampleSheet {
 
   private final static List<String> COLUMNS_HEADER = Arrays.asList("\"FCID\"",
       "\"Lane\"", "\"SampleID\"", "\"SampleRef\"", "\"Index\"",
       "\"Description\"", "\"Control\"", "\"Recipe\"", "\"Operator\"",
       "\"SampleProject\"");
 
-  public static String toCSV(final SampleSheet design) {
+  @Override
+  public String toCSV() {
 
     final StringBuilder sb = new StringBuilder();
 
     sb.append(Joiner.on(SEP).join(COLUMNS_HEADER) + "\n");
 
-    if (design == null) {
-      return sb.toString();
-    }
-
-    for (Sample e : design) {
+    for (Sample e : this) {
 
       final SampleV1 s = (SampleV1) e;
 
@@ -59,4 +56,10 @@ public class SampleSheetVersion1 {
     return sb.toString();
   }
 
+  //
+  // Public constructor
+  //
+  public SampleSheetVersion1(final String sampleSheetVersion) {
+    super(sampleSheetVersion);
+  }
 }

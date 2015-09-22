@@ -1,5 +1,8 @@
 package fr.ens.transcriptome.aozan.illumina.sampleentry;
 
+import java.util.Map;
+import java.util.Set;
+
 public interface SampleV2 extends Sample {
 
   /**
@@ -19,6 +22,24 @@ public interface SampleV2 extends Sample {
    * @param key the key
    * @param value the value
    */
-  void setOptionalColumns(String key, String value);
+  void setAdditionalColumns(String key, String value);
+
+  /**
+   * Gets the additional columns.
+   * @return the additional columns
+   */
+  Map<String, String> getAdditionalColumns();
+
+  /**
+   * Gets the additional header columns.
+   * @return the additional header columns
+   */
+  Set<String> getAdditionalHeaderColumns();
+
+  /**
+   * Checks if is lane setting.
+   * @return true, if is lane setting
+   */
+  public boolean isLaneSetting();
 
 }

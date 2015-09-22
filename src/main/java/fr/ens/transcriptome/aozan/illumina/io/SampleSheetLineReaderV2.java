@@ -49,8 +49,7 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
       .asList("sampleid");
 
   private static final List<String> FIELDNAMES_VERSION2_REQUIERED_FOR_QC =
-      Arrays.asList("sampleid", "sampleref", "index", "description",
-          "sampleproject");
+      Arrays.asList("sampleref", "index", "description", "sampleproject");
 
   private static final List<String> FIELDNAMES_VERSION2_FORBIDDEN = Arrays
       .asList("samplename");
@@ -163,53 +162,51 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
         "fields for one line on sample sheet file");
 
     final SampleV2 sample = new SampleEntryVersion2();
-    sample.setLane(laneNumber);
+    boolean asSetLaneNumber = false;
 
-    for (int indice = 0; indice <= this.fieldsCountExpected; indice++) {
+    for (Map.Entry<String, Integer> e : this.positionFields.entrySet()) {
+      final String key = e.getKey();
+      final String value = fields.get(e.getValue());
 
-      final String key = FIELDNAMES_VERSION2.get(indice);
+      switch (key) {
 
-      if (key == null) {
-        throw new AozanException("Parsing design file, key is invalid: "
-            + key + " no position found in list "
-            + Joiner.on("\t").withKeyValueSeparator("=").join(positionFields));
-      }
+      case "sampleid":
+        sample.setSampleId(value);
+        break;
 
-      if (this.positionFields.containsKey(key)) {
-        final String value = fields.get(this.positionFields.get(key));
+      case "sampleref":
+        sample.setSampleRef(value);
+        break;
 
-        switch (key) {
+      case "lane":
+        sample.setLane(parseLane(value));
+        asSetLaneNumber = true;
+        break;
 
-        case "sampleid":
-          sample.setSampleId(value);
-          break;
+      case "index":
+        sample.setIndex(value);
+        break;
 
-        case "sampleref":
-          sample.setSampleRef(value);
-          break;
+      case "index2":
+        design2.setDualIndexes();
+        sample.setIndex2(value);
+        break;
 
-        case "index":
-          sample.setIndex(value);
-          break;
+      case "description":
+        sample.setDescription(value);
+        break;
 
-        case "index2":
-          design2.setDualIndexes();
-          sample.setIndex2(value);
-          break;
+      case "sampleproject":
+        sample.setSampleProject(value);
+        break;
 
-        case "description":
-          sample.setDescription(value);
-          break;
-
-        case "sampleproject":
-          sample.setSampleProject(value);
-          break;
-
-        default:
-          sample.setOptionalColumns(key, value);
-        }
+      default:
+        sample.setAdditionalColumns(key, value);
       }
     }
+
+    if (!asSetLaneNumber)
+      sample.setLane(laneNumber);
 
     // Add sample in design instance
     design2.addSample(sample, isColumnLaneExist());
@@ -274,9 +271,9 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
 
         pos.put(fields.get(i), i);
 
-        // } else if (fields.get(i).equals("index2")) {
-        //
-        // pos.put(fields.get(i), i);
+      } else if (fields.get(i).equals("index2")) {
+
+        pos.put(fields.get(i), i);
 
       }
 

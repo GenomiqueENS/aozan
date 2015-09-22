@@ -23,14 +23,16 @@
 
 package fr.ens.transcriptome.aozan.illumina.sampleentry;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 public class SampleEntryVersion2 extends AbstractSampleEntry implements
     SampleV2 {
 
   private int orderNumber;
-  private Map<String, String> optionalColumns = new HashMap<>();
+  private Map<String, String> additionalColumns = new TreeMap<>();
 
   @Override
   public int getOrderNumber() {
@@ -43,8 +45,18 @@ public class SampleEntryVersion2 extends AbstractSampleEntry implements
   }
 
   @Override
-  public void setOptionalColumns(final String key, final String value) {
-    this.optionalColumns.put(key, value);
+  public void setAdditionalColumns(final String key, final String value) {
+    this.additionalColumns.put(key, value);
+  }
+
+  @Override
+  public Map<String, String> getAdditionalColumns() {
+    return Collections.unmodifiableMap(this.additionalColumns);
+  }
+
+  @Override
+  public Set<String> getAdditionalHeaderColumns() {
+    return Collections.unmodifiableSet(this.additionalColumns.keySet());
   }
 
   @Override
@@ -72,6 +84,12 @@ public class SampleEntryVersion2 extends AbstractSampleEntry implements
     sb.append(getDemultiplexedFilenameSuffix(readNumber));
 
     return sb.toString();
+  }
+
+  @Override
+  public boolean isLaneSetting() {
+
+    return this.getLane() > 0;
   }
 
   @Override

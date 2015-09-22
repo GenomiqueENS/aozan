@@ -43,6 +43,11 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
 
 public class SampleSheetVersion2 extends SampleSheet {
 
+  /** Header columns requiered for Aozan QC report */
+  private final static String COLUMNS_HEADER_FOR_AOZAN =
+      "\"SampleID\",\"sampleref\",\"index\",\"description\","
+          + "\"Sample_Project\"";
+
   // Save order sample entry from sample sheet file
   private Map<String, Integer> ordonnancementColumns;
 
@@ -113,10 +118,6 @@ public class SampleSheetVersion2 extends SampleSheet {
 
   }
 
-  public Map<String, String> getHearderEntries() {
-    return headerSession;
-  }
-
   public int extractOrderNumberSample(final FastqSample fastqSample) {
 
     if (this.ordonnancementColumns == null
@@ -155,94 +156,111 @@ public class SampleSheetVersion2 extends SampleSheet {
     return String.format("%s_%s", sampleName, laneNumber);
   }
 
-  public String createHeaderColumnsInStringForCSV() {
-    final String start = "\"";
-    final String end = "\"\n";
+  public String createHeaderColumnsInStringForCSV(final SampleV2 s) {
 
     final StringBuilder sb = new StringBuilder();
 
-    sb.append(start);
-    sb.append(Joiner.on("\",\"").join(this.dataSessionHeaderColumns));
-    sb.append(end);
+    sb.append(COLUMNS_HEADER_FOR_AOZAN);
+
+    if (s.isLaneSetting()) {
+      sb.append(SEP);
+      sb.append(quote("lane"));
+    }
+
+    if (isDualIndexes()) {
+      sb.append(SEP);
+      sb.append(quote("index2"));
+    }
+
+    // Add additional columns
+    for (String h : s.getAdditionalHeaderColumns()) {
+      sb.append(SEP);
+      sb.append(quote(h));
+    }
+    sb.append("\n");
 
     return sb.toString();
   }
-
-  // private final static String COLUMNS_HEADER =
-  // "\"SampleID\",\"sampleref\",\"index\",\"index2\",\"description\","
-  // + "\"Sample_Project\"\n";
-  //
-  // private final static String COLUMNS_HEADER_WITH_LANE =
-  // "\"lane\",\"SampleID\",\"sampleref\",\"index\",\"index2\",\"description\","
-  // + "\"Sample_Project\"\n";
 
   /**
    * Convert sample sheet instance in string in csv format.
    * @param design the design
    * @return the string
    */
-  public static String toCSV(final SampleSheet design) {
+  public String toCSV() {
 
     // Cast in sample sheet version 2
-    final SampleSheetVersion2 sampleSheetV2 = (SampleSheetVersion2) design;
 
     final StringBuilder sb = new StringBuilder();
 
     // Add session Header
-    if (sampleSheetV2.existHeaderSession()) {
+    if (existHeaderSession()) {
       sb.append("[Header]\n");
-      sb.append(addSession(sampleSheetV2.getHearderEntries()));
+      sb.append(addSession(getHearderEntries()));
       sb.append("\n");
     }
 
     // Add session Reads
-    if (sampleSheetV2.existReadsSession()) {
+    if (existReadsSession()) {
       sb.append("[Reads]\n");
-      sb.append(addSession(sampleSheetV2.getReadsSession()));
+      sb.append(addSession(getReadsSession()));
       sb.append("\n");
     }
 
     // Add session Settings
-    if (sampleSheetV2.existSettingsSession()) {
+    if (existSettingsSession()) {
       sb.append("[Settings]\n");
-      sb.append(addSession(sampleSheetV2.getSettingsSession()));
+      sb.append(addSession(getSettingsSession()));
       sb.append("\n");
     }
 
-    sb.append(addSessionData(sampleSheetV2));
+    sb.append(addSessionData());
 
     return sb.toString();
   }
 
-  private static String addSessionData(SampleSheetVersion2 design) {
+  private String addSessionData() {
 
     final StringBuilder sb = new StringBuilder();
     sb.append("[Data]\n");
 
-    if (design == null) {
-      return sb.toString();
-    }
+    boolean first = true;
 
-    // Create header columns
-    sb.append(design.createHeaderColumnsInStringForCSV());
-
-    for (Sample e : design) {
+    for (Sample e : this) {
 
       final SampleV2 s = (SampleV2) e;
 
-      sb.append(s.getLane());
-      sb.append(SEP);
+      if (first) {
+        // Create header columns
+        sb.append(createHeaderColumnsInStringForCSV(s));
+        first = false;
+      }
+
       sb.append(quote(s.getSampleId().trim()));
       sb.append(SEP);
       sb.append(quote(s.getSampleRef().trim()));
       sb.append(SEP);
       sb.append(quote(s.getIndex().toUpperCase()));
       sb.append(SEP);
-      sb.append(quote(s.getIndex2().toUpperCase()));
-      sb.append(SEP);
       sb.append(quote(s.getDescription().trim()));
       sb.append(SEP);
       sb.append(quote(s.getSampleProject()));
+
+      if (s.isLaneSetting()) {
+        sb.append(SEP);
+        sb.append(s.getLane());
+      }
+
+      if (isDualIndexes()) {
+        sb.append(SEP);
+        sb.append(quote(s.getIndex2().toUpperCase()));
+      }
+
+      // Add additional columns
+      for (Map.Entry<String, String> col : s.getAdditionalColumns().entrySet()) {
+        sb.append(SEP);
+        sb.append(quote(col.getValue()));
+      }
 
       sb.append('\n');
 
@@ -291,6 +309,14 @@ public class SampleSheetVersion2 extends SampleSheet {
    */
   public Map<String, String> getSettingsSession() {
     return settingsSession;
+  }
+
+  /**
+   * Gets the hearder entries.
+   * @return the hearder entries
+   */
+  public Map<String, String> getHearderEntries() {
+    return headerSession;
   }
 
   /**

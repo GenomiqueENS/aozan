@@ -559,8 +559,7 @@ public class SampleSheetUtils {
    */
   public static final String toCSV(final SampleSheet design) {
 
-    return design.isVersion1()
-        ? SampleSheetVersion1.toCSV(design) : SampleSheetVersion2.toCSV(design);
+    return design.toCSV();
   }
 
   /**

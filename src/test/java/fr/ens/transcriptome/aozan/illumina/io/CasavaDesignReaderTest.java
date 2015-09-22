@@ -230,26 +230,26 @@ public class CasavaDesignReaderTest extends TestCase {
    * Reads xls samplesheet file and check samplesheet instance is the same that
    * expected, with right converting index sequences.
    */
-  // public void testReadsXLSVersion1() {
-  //
-  // final File samplesheet = new File(path, SAMPLESHEET_BCL2FASTQ_V1_FILENAME);
-  // final String bcl2fastqVersion = SampleSheetUtils.VERSION_1;
-  // final int laneCount = 2;
-  //
-  // // Create CSV file
-  // convertSamplesheetToCSV(samplesheet, bcl2fastqVersion, outputFile,
-  // laneCount);
-  //
-  // // Load samplesheet csv
-  // final SampleSheet samplesheetTested =
-  // readSamplesheetCSV(outputFile, bcl2fastqVersion, laneCount);
-  //
-  // final Map<String, SampleSheetTest> samplesheetExpected =
-  // buildSamplesheetExpected(EXPECTED_CSV_FULL, SampleSheetUtils.VERSION_1);
-  //
-  // // Compare with expected content
-  // compareSamplesheetV1(samplesheetExpected, samplesheetTested);
-  // }
+  public void testReadsXLSVersion1() {
+
+    final File samplesheet = new File(path, SAMPLESHEET_BCL2FASTQ_V1_FILENAME);
+    final String bcl2fastqVersion = SampleSheetUtils.VERSION_1;
+    final int laneCount = 2;
+
+    // Create CSV file
+    convertSamplesheetToCSV(samplesheet, bcl2fastqVersion, outputFile,
+        laneCount);
+
+    // Load samplesheet csv
+    final SampleSheet samplesheetTested =
+        readSamplesheetCSV(outputFile, bcl2fastqVersion, laneCount);
+
+    final Map<String, SampleSheetTest> samplesheetExpected =
+        buildSamplesheetExpected(EXPECTED_CSV_FULL, SampleSheetUtils.VERSION_1);
+
+    // Compare with expected content
+    compareSamplesheetV1(samplesheetExpected, samplesheetTested);
+  }
 
   //
   // Private methods
@@ -263,7 +263,7 @@ public class CasavaDesignReaderTest extends TestCase {
     for (Sample e : tested) {
       System.out.println("compared tested sample " + e);
     }
-    
+
     for (Sample e : tested) {
       System.out.println("compared tested sample " + e);
       final String sampleId = e.getSampleId();
@@ -306,7 +306,7 @@ public class CasavaDesignReaderTest extends TestCase {
         tested.getSampleProject());
     assertEquals("Sample index", expected.getIndex(), tested.getIndex());
 
-    assertEquals("Sample index", expected.getIndex2(), tested.getIndex2());
+    assertEquals("Sample index2", expected.getIndex2(), tested.getIndex2());
 
     if (withLane) {
       assertEquals("Sample lane", expected.getLane(), tested.getLane());
@@ -318,7 +318,7 @@ public class CasavaDesignReaderTest extends TestCase {
       final SampleSheet tested) {
 
     for (Sample s : tested) {
-      
+
       final SampleV1 e = (SampleV1) s;
       final String sampleId = e.getSampleId();
       final int lane = e.getLane();

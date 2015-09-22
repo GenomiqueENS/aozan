@@ -39,7 +39,7 @@ import fr.ens.transcriptome.aozan.illumina.sampleentry.Sample;
  * @since 1.1
  * @author Laurent Jourdren
  */
-public class SampleSheet implements Iterable<Sample> {
+public abstract class SampleSheet implements Iterable<Sample> {
 
   private final String sampleSheetVersion;
   private final List<Sample> samples = new ArrayList<>();
@@ -58,6 +58,8 @@ public class SampleSheet implements Iterable<Sample> {
 
     return SampleSheetUtils.isBcl2fastqVersion2(getSampleSheetVersion());
   }
+
+  public abstract String toCSV();
 
   @Override
   public Iterator<Sample> iterator() {
