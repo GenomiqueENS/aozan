@@ -27,6 +27,7 @@ import static fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils.S
 import static fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils.quote;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,8 @@ import java.util.Map;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
@@ -43,7 +46,7 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
 
 public class SampleSheetVersion2 extends SampleSheet {
 
-  /** Header columns requiered for Aozan QC report */
+  /** Header columns required for Aozan QC report */
   private final static String COLUMNS_HEADER_FOR_AOZAN =
       "\"SampleID\",\"sampleref\",\"index\",\"description\","
           + "\"Sample_Project\"";
@@ -52,7 +55,7 @@ public class SampleSheetVersion2 extends SampleSheet {
   private Map<String, Integer> ordonnancementColumns;
 
   private final Map<String, String> headerSession;
-  private final Map<String, String> readsSession;
+  private final Multimap<String, String> readsSession;
   private final Map<String, String> settingsSession;
   private ArrayList<String> dataSessionHeaderColumns;
 
@@ -203,7 +206,7 @@ public class SampleSheetVersion2 extends SampleSheet {
     // Add session Reads
     if (existReadsSession()) {
       sb.append("[Reads]\n");
-      sb.append(addSession(getReadsSession()));
+      sb.append(readsSessionToString());
       sb.append("\n");
     }
 
@@ -293,6 +296,25 @@ public class SampleSheetVersion2 extends SampleSheet {
     // Nothing to do
   }
 
+  public String readsSessionToString() {
+    final StringBuilder sb = new StringBuilder();
+
+    for (Map.Entry<String, Collection<String>> e : this.readsSession.asMap()
+        .entrySet()) {
+
+      for (String s : e.getValue()) {
+
+        sb.append(quote(e.getKey()));
+        sb.append(SEP);
+        sb.append(quote(s));
+      }
+      sb.append("\n");
+    }
+
+    return sb.toString();
+
+  }
+
   //
   // Getters & setters
   //
@@ -300,7 +322,7 @@ public class SampleSheetVersion2 extends SampleSheet {
   /**
    * @return the readsSession
    */
-  public Map<String, String> getReadsSession() {
+  public Multimap<String, String> getReadsSession() {
     return readsSession;
   }
 
@@ -418,11 +440,10 @@ public class SampleSheetVersion2 extends SampleSheet {
     this.headerSession = new HashMap<>();
     this.settingsSession = new HashMap<>();
 
-    this.readsSession = new HashMap<>();
+    this.readsSession = ArrayListMultimap.create();
     this.dataSessionHeaderColumns = new ArrayList<>();
 
     this.ordonnancementColumns = new HashMap<>();
     this.dualIndexesSample = false;
   }
-
 }
