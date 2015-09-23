@@ -103,9 +103,9 @@ public class AozanCollector implements Collector {
     data.put(PREFIX + ".logger.path",
         Settings.getConfigurationFilePathOnAozanConfiguration());
     data.put(PREFIX + ".logger.path",
-        Settings.getLoggerLevelFromAozanConfiguration());
-    data.put(PREFIX + ".logger.level",
         Settings.getLoggerPathFromAozanConfiguration());
+    data.put(PREFIX + ".logger.level",
+        Settings.getLoggerLevelFromAozanConfiguration());
 
   }
 
