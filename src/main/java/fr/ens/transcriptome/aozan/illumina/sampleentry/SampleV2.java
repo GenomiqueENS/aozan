@@ -25,6 +25,11 @@ package fr.ens.transcriptome.aozan.illumina.sampleentry;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * The Interface SampleV2.
+ * @author Sandrine Perrin
+ * @since 2.4
+ */
 public interface SampleV2 extends Sample {
 
   /**

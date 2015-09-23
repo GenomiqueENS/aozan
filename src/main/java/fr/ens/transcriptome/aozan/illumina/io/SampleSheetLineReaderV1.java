@@ -29,6 +29,11 @@ import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntryVersion1;
 import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleV1;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 
+/**
+ * The Class SampleSheetLineReaderV1.
+ * @author Sandrine Perrin
+ * @since 2.4
+ */
 class SampleSheetLineReaderV1 extends SampleSheetLineReader {
 
   private boolean firstLine = true;

@@ -30,6 +30,11 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.collectors.stats.SampleStatistics;
 
+/**
+ * The Class SampleCountSampleTest.
+ * @author Sandrine Perrin
+ * @since 2.4
+ */
 public class SampleCountSampleTest extends AbstractSimpleSampleTest {
 
   @Override

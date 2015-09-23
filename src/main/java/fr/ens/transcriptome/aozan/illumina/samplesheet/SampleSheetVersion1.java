@@ -33,8 +33,14 @@ import com.google.common.base.Joiner;
 import fr.ens.transcriptome.aozan.illumina.sampleentry.Sample;
 import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleV1;
 
+/**
+ * The Class SampleSheetVersion1.
+ * @author Sandrine Perrin
+ * @since 2.4
+ */
 public class SampleSheetVersion1 extends SampleSheet {
 
+  /** The Constant COLUMNS_HEADER. */
   private final static List<String> COLUMNS_HEADER = Arrays.asList("\"FCID\"",
       "\"Lane\"", "\"SampleID\"", "\"SampleRef\"", "\"Index\"",
       "\"Description\"", "\"Control\"", "\"Recipe\"", "\"Operator\"",
@@ -81,6 +87,10 @@ public class SampleSheetVersion1 extends SampleSheet {
   //
   // Public constructor
   //
+  /**
+   * Instantiates a new sample sheet version1.
+   * @param sampleSheetVersion the sample sheet version
+   */
   public SampleSheetVersion1(final String sampleSheetVersion) {
     super(sampleSheetVersion);
   }

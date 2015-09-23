@@ -30,6 +30,11 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics;
 
+/**
+ * The Class GenomesProjectTest.
+ * @author Sandrine Perrin
+ * @since 2.4
+ */
 public class GenomesProjectTest extends AbstractSimpleProjectTest {
 
   @Override

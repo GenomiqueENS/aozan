@@ -179,7 +179,7 @@ def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_major_version, con
             
             # Load XLS design file
             design = CasavaDesignXLSReader(input_design_xls_path).readForQCReport(str(bcl2fastq_major_version), lane_count)
-            #design = CasavaDesignXLSReader(input_design_xls_path).read(bcl2fastq_major_version)
+            # design = CasavaDesignXLSReader(input_design_xls_path).read(bcl2fastq_major_version)
 
             # Replace index sequence shortcuts by sequences
             SampleSheetUtils.replaceIndexShortcutsBySequences(design, load_index_sequences(conf))

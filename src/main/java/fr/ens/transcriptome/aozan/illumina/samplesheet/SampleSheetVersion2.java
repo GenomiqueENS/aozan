@@ -44,6 +44,11 @@ import fr.ens.transcriptome.aozan.illumina.sampleentry.Sample;
 import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleV2;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
+/**
+ * The Class SampleSheetVersion2.
+ * @author Sandrine Perrin
+ * @since 2.0
+ */
 public class SampleSheetVersion2 extends SampleSheet {
 
   /** Header columns required for Aozan QC report */
@@ -65,6 +70,11 @@ public class SampleSheetVersion2 extends SampleSheet {
 
   private boolean dualIndexesSample;
 
+  /**
+   * Adds the sample.
+   * @param sample the sample
+   * @param isColumnLaneExist the is column lane exist
+   */
   public void addSample(final Sample sample, boolean isColumnLaneExist) {
 
     super.addSample(sample);
@@ -78,17 +88,12 @@ public class SampleSheetVersion2 extends SampleSheet {
     ordonnancementColumns.put(key, indice);
   }
 
-  private int findPositionInSamplesheetFile(final Sample sample) {
-
-    if (sample.getLane() == 1 || sample.getLane() == 0) {
-      return ++lastIndice;
-    }
-
-    // Return order found for sample in lane 1
-    return this.ordonnancementColumns.get(buildKey(sample.getSampleId(), 1));
-
-  }
-
+  /**
+   * Adds the session entry.
+   * @param fields the fields
+   * @param sessionName the session name
+   * @throws AozanException the aozan exception
+   */
   public void addSessionEntry(final List<String> fields,
       final String sessionName) throws AozanException {
 
@@ -121,6 +126,11 @@ public class SampleSheetVersion2 extends SampleSheet {
 
   }
 
+  /**
+   * Extract order number sample.
+   * @param fastqSample the fastq sample
+   * @return the int
+   */
   public int extractOrderNumberSample(final FastqSample fastqSample) {
 
     if (this.ordonnancementColumns == null
@@ -147,18 +157,11 @@ public class SampleSheetVersion2 extends SampleSheet {
     return this.ordonnancementColumns.get(key);
   }
 
-  private boolean useLaneNumberInKey() {
-
-    final String first = this.ordonnancementColumns.keySet().iterator().next();
-
-    return first.endsWith("0");
-  }
-
-  private String buildKey(String sampleName, int laneNumber) {
-
-    return String.format("%s_%s", sampleName, laneNumber);
-  }
-
+  /**
+   * Creates the header columns in string for csv.
+   * @param s the s
+   * @return the string
+   */
   public String createHeaderColumnsInStringForCSV(final SampleV2 s) {
 
     final StringBuilder sb = new StringBuilder();
@@ -222,6 +225,41 @@ public class SampleSheetVersion2 extends SampleSheet {
     return sb.toString();
   }
 
+  //
+  // Private methods
+  //
+
+  /**
+   * Use lane number in key.
+   * @return true, if successful
+   */
+  private boolean useLaneNumberInKey() {
+
+    final String first = this.ordonnancementColumns.keySet().iterator().next();
+
+    return first.endsWith("0");
+  }
+
+  private String buildKey(String sampleName, int laneNumber) {
+
+    return String.format("%s_%s", sampleName, laneNumber);
+  }
+
+  private int findPositionInSamplesheetFile(final Sample sample) {
+
+    if (sample.getLane() == 1 || sample.getLane() == 0) {
+      return ++lastIndice;
+    }
+
+    // Return order found for sample in lane 1
+    return this.ordonnancementColumns.get(buildKey(sample.getSampleId(), 1));
+
+  }
+
+  /**
+   * Adds the session data.
+   * @return the string
+   */
   private String addSessionData() {
 
     final StringBuilder sb = new StringBuilder();
@@ -292,10 +330,19 @@ public class SampleSheetVersion2 extends SampleSheet {
     return sb.toString();
   }
 
+  /**
+   * Check sample sheet.
+   * @param design the design
+   */
   public static void checkSampleSheet(final SampleSheet design) {
+    // TODO
     // Nothing to do
   }
 
+  /**
+   * Reads session to string.
+   * @return the string
+   */
   public String readsSessionToString() {
     final StringBuilder sb = new StringBuilder();
 
@@ -320,6 +367,7 @@ public class SampleSheetVersion2 extends SampleSheet {
   //
 
   /**
+   * Gets the reads session.
    * @return the readsSession
    */
   public Multimap<String, String> getReadsSession() {
@@ -327,6 +375,7 @@ public class SampleSheetVersion2 extends SampleSheet {
   }
 
   /**
+   * Gets the settings session.
    * @return the settingsSession
    */
   public Map<String, String> getSettingsSession() {

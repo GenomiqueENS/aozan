@@ -230,8 +230,23 @@ public class CasavaDesignReaderTest extends TestCase {
    */
   public void testReadsXLSVersion1() {
 
-    testSampleSheet(SAMPLESHEET_BCL2FASTQ_V1_FILENAME,
-        SampleSheetUtils.VERSION_1, EXPECTED_CSV_FULL, true);
+    final File samplesheet = new File(path, SAMPLESHEET_BCL2FASTQ_V1_FILENAME);
+    final String bcl2fastqVersion = SampleSheetUtils.VERSION_1;
+    final int laneCount = 2;
+
+    // Create CSV file
+    convertSamplesheetToCSV(samplesheet, bcl2fastqVersion, outputFile,
+        laneCount);
+
+    // Load samplesheet csv
+    final SampleSheet samplesheetTested =
+        readSamplesheetCSV(outputFile, bcl2fastqVersion, laneCount);
+
+    final Map<String, SampleSheetTest> samplesheetExpected =
+        buildSamplesheetExpected(EXPECTED_CSV_FULL, SampleSheetUtils.VERSION_1);
+
+    // Compare with expected content
+    compareSamplesheetV1(samplesheetExpected, samplesheetTested);
   }
 
   //

@@ -22,6 +22,11 @@
  */
 package fr.ens.transcriptome.aozan.illumina.sampleentry;
 
+/**
+ * The Interface Sample.
+ * @author Sandrine Perrin
+ * @since 2.4
+ */
 public interface Sample {
 
   /**

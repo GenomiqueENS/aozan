@@ -28,10 +28,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+/**
+ * The Class SampleEntryVersion2.
+ * @author Sandrine Perrin
+ * @since 2.4
+ */
 public class SampleEntryVersion2 extends AbstractSampleEntry implements
     SampleV2 {
 
+  /** The order number. */
   private int orderNumber;
+
+  /** The additional columns. */
   private Map<String, String> additionalColumns = new TreeMap<>();
 
   @Override

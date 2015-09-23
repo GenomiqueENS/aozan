@@ -24,6 +24,11 @@ package fr.ens.transcriptome.aozan.util;
 
 import com.google.common.base.Splitter;
 
+/**
+ * The Class StringUtils.
+ * @author Sandrine Perrin
+ * @since 2.4
+ */
 public class StringUtils {
 
   /** Splitter. */

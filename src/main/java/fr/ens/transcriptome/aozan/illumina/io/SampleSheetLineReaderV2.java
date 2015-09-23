@@ -42,6 +42,11 @@ import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleV2;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetVersion2;
 
+/**
+ * The Class SampleSheetLineReaderV2.
+ * @author Sandrine Perrin
+ * @since 2.4
+ */
 class SampleSheetLineReaderV2 extends SampleSheetLineReader {
 
   // Required in this order columns header for version2
@@ -108,6 +113,12 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
 
   }
 
+  /**
+   * Adds the session data entry.
+   * @param fields the fields
+   * @param design2 the design2
+   * @throws AozanException the aozan exception
+   */
   private void addSessionDataEntry(List<String> fields,
       SampleSheetVersion2 design2) throws AozanException {
 
@@ -144,6 +155,12 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
     }
   }
 
+  /**
+   * Creates the and duplicate sample.
+   * @param design2 the design2
+   * @param fields the fields
+   * @throws AozanException the aozan exception
+   */
   private void createAndDuplicateSample(final SampleSheetVersion2 design2,
       final List<String> fields) throws AozanException {
 
@@ -154,6 +171,13 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
     }
   }
 
+  /**
+   * Creates the sample.
+   * @param design2 the design2
+   * @param fields the fields
+   * @param laneNumber the lane number
+   * @throws AozanException the Aozan exception
+   */
   private void createSample(final SampleSheetVersion2 design2,
       final List<String> fields, int laneNumber) throws AozanException {
 
@@ -212,18 +236,12 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
     design2.addSample(sample, isColumnLaneExist());
   }
 
-  private static List<String> buildList() {
-    final List<String> l = new ArrayList<>();
-
-    l.addAll(FIELDNAMES_VERSION2_REQUIERED);
-    l.addAll(FIELDNAMES_VERSION2_REQUIERED_FOR_QC);
-
-    // Optional
-    l.add("Lane");
-
-    return Collections.unmodifiableList(l);
-  }
-
+  /**
+   * Check header column session data.
+   * @param rawFields the raw fields
+   * @return the map
+   * @throws AozanException the aozan exception
+   */
   private Map<String, Integer> checkHeaderColumnSessionData(
       final List<String> rawFields) throws AozanException {
 
@@ -268,18 +286,13 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
         pos.put(fields.get(i), i);
 
       } else if (fields.get(i).equals("lane")) {
-
         pos.put(fields.get(i), i);
 
       } else if (fields.get(i).equals("index2")) {
-
         pos.put(fields.get(i), i);
 
       }
-
     }
-    System.out.println("position header fields "
-        + Joiner.on("\n").withKeyValueSeparator("=").join(pos));
 
     // Check exist lane columns in sample sheet
     this.columnLaneFound = pos.containsKey("lane");
@@ -348,9 +361,29 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
 
   }
 
+  /**
+   * Checks if is column lane exist.
+   * @return true, if is column lane exist
+   */
   private boolean isColumnLaneExist() {
 
     return this.columnLaneFound;
+  }
+
+  /**
+   * Builds the list.
+   * @return the list
+   */
+  private static List<String> buildList() {
+    final List<String> l = new ArrayList<>();
+
+    l.addAll(FIELDNAMES_VERSION2_REQUIERED);
+    l.addAll(FIELDNAMES_VERSION2_REQUIERED_FOR_QC);
+
+    // Optional
+    l.add("Lane");
+
+    return Collections.unmodifiableList(l);
   }
 
   //

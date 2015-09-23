@@ -44,21 +44,37 @@ public abstract class SampleSheet implements Iterable<Sample> {
   private final String sampleSheetVersion;
   private final List<Sample> samples = new ArrayList<>();
 
+  /**
+   * Adds the sample.
+   * @param sample the sample
+   */
   public void addSample(final Sample sample) {
 
     this.samples.add(sample);
   }
 
+  /**
+   * Checks if is version1.
+   * @return true, if is version1
+   */
   public boolean isVersion1() {
 
     return SampleSheetUtils.isBcl2fastqVersion1(getSampleSheetVersion());
   }
 
+  /**
+   * Checks if is version2.
+   * @return true, if is version2
+   */
   public boolean isVersion2() {
 
     return SampleSheetUtils.isBcl2fastqVersion2(getSampleSheetVersion());
   }
 
+  /**
+   * To CSV.
+   * @return the string
+   */
   public abstract String toCSV();
 
   @Override

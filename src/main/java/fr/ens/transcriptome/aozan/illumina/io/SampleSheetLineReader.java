@@ -28,6 +28,11 @@ import java.util.List;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 
+/**
+ * The Class SampleSheetLineReader.
+ * @author Sandrine Perrin
+ * @since 2.4
+ */
 public abstract class SampleSheetLineReader extends
     AbstractCasavaDesignTextReader {
 
@@ -36,6 +41,12 @@ public abstract class SampleSheetLineReader extends
     return null;
   }
 
+  /**
+   * Parses the line.
+   * @param design the design
+   * @param fields the fields
+   * @throws AozanException the aozan exception
+   */
   public abstract void parseLine(final SampleSheet design,
       final List<String> fields) throws AozanException;
 

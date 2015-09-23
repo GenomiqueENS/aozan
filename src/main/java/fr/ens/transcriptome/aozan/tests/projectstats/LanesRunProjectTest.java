@@ -30,6 +30,11 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics;
 
+/**
+ * The Class LanesRunProjectTest.
+ * @author Sandrine Perrin
+ * @since 2.4
+ */
 public class LanesRunProjectTest extends AbstractSimpleProjectTest {
 
   @Override

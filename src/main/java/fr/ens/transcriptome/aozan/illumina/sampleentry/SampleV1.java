@@ -22,6 +22,11 @@
  */
 package fr.ens.transcriptome.aozan.illumina.sampleentry;
 
+/**
+ * The Interface SampleV1.
+ * @author Sandrine Perrin
+ * @since 2.4
+ */
 public interface SampleV1 extends Sample {
 
   /**
@@ -31,13 +36,13 @@ public interface SampleV1 extends Sample {
   public String getFlowCellId();
 
   /**
-   * Test if the sample is a control
+   * Test if the sample is a control.
    * @return Returns the control
    */
   public boolean isControl();
 
   /**
-   * Get the recipe use to make the sample
+   * Get the recipe use to make the sample.
    * @return Returns the recipe
    */
   public String getRecipe();
@@ -61,7 +66,7 @@ public interface SampleV1 extends Sample {
   public void setControl(boolean control);
 
   /**
-   * Set the recipe used to make the sample
+   * Set the recipe used to make the sample.
    * @param recipe The recipe to set
    */
   public void setRecipe(String recipe);

@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -54,18 +53,33 @@ import fr.ens.transcriptome.eoulsan.util.StringUtils;
 
 /**
  * This abstract class contains common utility methods for sample sheet.
- * @since 1.1
  * @author Laurent Jourdren
+ * @since 1.1
  */
 public class SampleSheetUtils {
 
+  /** The Constant LATEST_VERSION_NAME. */
   public static final String LATEST_VERSION_NAME = "latest";
 
+  /** The Constant SEP. */
   public static final String SEP = ",";
 
+  /** The Constant VERSION_1. */
   public static final String VERSION_1 = "1";
+  
+  /** The Constant VERSION_2. */
   public static final String VERSION_2 = "2";
 
+  /**
+   * Gets the sample sheet.
+   * @param sampleSheetFile the sample sheet file
+   * @param sampleSheetVersion the sample sheet version
+   * @param laneCount the lane count
+   * @return the sample sheet
+   * @throws FileNotFoundException the file not found exception
+   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws AozanException the aozan exception
+   */
   public static SampleSheet getSampleSheet(final File sampleSheetFile,
       String sampleSheetVersion, final int laneCount)
       throws FileNotFoundException, IOException, AozanException {
@@ -107,6 +121,16 @@ public class SampleSheetUtils {
 
   }
 
+  /**
+   * Gets the sample sheet.
+   * @param sampleSheetFilename the sample sheet filename
+   * @param sampleSheetVersion the sample sheet version
+   * @param laneCount the lane count
+   * @return the sample sheet
+   * @throws FileNotFoundException the file not found exception
+   * @throws IOException Signals that an I/O exception has occurred.
+   * @throws AozanException the aozan exception
+   */
   public static SampleSheet getSampleSheet(final String sampleSheetFilename,
       String sampleSheetVersion, final int laneCount)
       throws FileNotFoundException, IOException, AozanException {
@@ -153,12 +177,25 @@ public class SampleSheetUtils {
 
   }
 
+  /**
+   * Check casava design v2.
+   * @param design the design
+   * @return the list
+   * @throws AozanException the aozan exception
+   */
   public static List<String> checkCasavaDesignV2(final SampleSheet design)
       throws AozanException {
 
     return Collections.emptyList();
   }
 
+  /**
+   * Check casava design v1.
+   * @param design the design
+   * @param flowCellId the flow cell id
+   * @return the list
+   * @throws AozanException the aozan exception
+   */
   public static List<String> checkCasavaDesignV1(final SampleSheet design,
       final String flowCellId) throws AozanException {
 
@@ -263,6 +300,11 @@ public class SampleSheetUtils {
 
   }
 
+  /**
+   * Check charset.
+   * @param s the s
+   * @throws AozanException the aozan exception
+   */
   private static void checkCharset(final String s) throws AozanException {
 
     if (s == null) {
@@ -281,6 +323,11 @@ public class SampleSheetUtils {
 
   }
 
+  /**
+   * Check fcid.
+   * @param fcid the fcid
+   * @throws AozanException the aozan exception
+   */
   private static void checkFCID(final String fcid) throws AozanException {
 
     if (isNullOrEmpty(fcid)) {
@@ -302,6 +349,12 @@ public class SampleSheetUtils {
 
   }
 
+  /**
+   * Check sample id.
+   * @param sampleId the sample id
+   * @param sampleIds the sample ids
+   * @throws AozanException the aozan exception
+   */
   private static void checkSampleId(final String sampleId,
       final Set<String> sampleIds) throws AozanException {
 
@@ -327,6 +380,12 @@ public class SampleSheetUtils {
     sampleIds.add(sampleId);
   }
 
+  /**
+   * Check sample ref.
+   * @param sampleId the sample id
+   * @param sampleRef the sample ref
+   * @throws AozanException the aozan exception
+   */
   private static void checkSampleRef(final String sampleId,
       final String sampleRef) throws AozanException {
 
@@ -351,6 +410,11 @@ public class SampleSheetUtils {
     }
   }
 
+  /**
+   * Check index.
+   * @param index the index
+   * @throws AozanException the aozan exception
+   */
   private static void checkIndex(final String index) throws AozanException {
 
     if (index == null) {
@@ -379,6 +443,12 @@ public class SampleSheetUtils {
     }
   }
 
+  /**
+   * Check sample description.
+   * @param sampleId the sample id
+   * @param sampleDescription the sample description
+   * @throws AozanException the aozan exception
+   */
   private static void checkSampleDescription(final String sampleId,
       final String sampleDescription) throws AozanException {
 
@@ -401,6 +471,11 @@ public class SampleSheetUtils {
     }
   }
 
+  /**
+   * Check sample project.
+   * @param sampleProject the sample project
+   * @throws AozanException the aozan exception
+   */
   private static void checkSampleProject(final String sampleProject)
       throws AozanException {
 
@@ -420,6 +495,16 @@ public class SampleSheetUtils {
     }
   }
 
+  /**
+   * Check sample and project.
+   * @param sampleId the sample id
+   * @param projectName the project name
+   * @param lane the lane
+   * @param sampleInLanes the sample in lanes
+   * @param samplesProjects the samples projects
+   * @param warnings the warnings
+   * @throws AozanException the aozan exception
+   */
   private static void checkSampleAndProject(final String sampleId,
       final String projectName, final int lane,
       final Map<String, Set<Integer>> sampleInLanes,
@@ -451,6 +536,11 @@ public class SampleSheetUtils {
     lanes.add(lane);
   }
 
+  /**
+   * Check sample in lanes.
+   * @param sampleInLanes the sample in lanes
+   * @param warnings the warnings
+   */
   private static void checkSampleInLanes(
       final Map<String, Set<Integer>> sampleInLanes, final List<String> warnings) {
 
@@ -484,6 +574,13 @@ public class SampleSheetUtils {
     }
   }
 
+  /**
+   * Check sample index.
+   * @param sampleName the sample name
+   * @param index the index
+   * @param samplesIndex the samples index
+   * @throws AozanException the aozan exception
+   */
   private static final void checkSampleIndex(final String sampleName,
       final String index, final Map<String, String> samplesIndex)
       throws AozanException {
@@ -563,10 +660,11 @@ public class SampleSheetUtils {
   }
 
   /**
-   * Parse a design in a tabulated format from a String
+   * Parse a design in a tabulated format from a String.
    * @param s string to parse
+   * @param version the version
    * @return a Casava Design object
-   * @throws IOException if an error occurs
+   * @throws AozanException the aozan exception
    */
   public static SampleSheet parseTabulatedDesign(final String s,
       final String version) throws AozanException {
@@ -690,7 +788,7 @@ public class SampleSheetUtils {
   //
   /**
    * Find bcl2fastq version.
-   * @param version the version
+   * @param fullVersion the full version
    * @return the string
    */
   public static String findBcl2fastqMajorVersion(final String fullVersion) {
@@ -712,6 +810,11 @@ public class SampleSheetUtils {
             + fullVersion);
   }
 
+  /**
+   * Checks if is bcl2fastq version1.
+   * @param version the version
+   * @return true, if is bcl2fastq version1
+   */
   public static boolean isBcl2fastqVersion1(final String version) {
 
     // Check it is a full version name or major
@@ -722,6 +825,11 @@ public class SampleSheetUtils {
     return majorVersion.equals(VERSION_1);
   }
 
+  /**
+   * Checks if is bcl2fastq version2.
+   * @param version the version
+   * @return true, if is bcl2fastq version2
+   */
   public static boolean isBcl2fastqVersion2(final String version) {
 
     // Check it is a full version name or major
@@ -739,7 +847,7 @@ public class SampleSheetUtils {
   //
 
   /**
-   * Test if a string is null or empty
+   * Test if a string is null or empty.
    * @param s string to test
    * @return true if the input string is null or empty
    */
@@ -748,6 +856,11 @@ public class SampleSheetUtils {
     return s == null || s.isEmpty();
   }
 
+  /**
+   * Quote.
+   * @param s the s
+   * @return the string
+   */
   static String quote(final String s) {
 
     if (s == null) {
@@ -762,11 +875,22 @@ public class SampleSheetUtils {
     return trimmed;
   }
 
+  /**
+   * Check sample sheet.
+   * @param design the design
+   * @throws AozanException the aozan exception
+   */
   public static void checkSampleSheet(final SampleSheet design)
       throws AozanException {
     checkSampleSheet(design, null);
   }
 
+  /**
+   * Check sample sheet.
+   * @param design the design
+   * @param flowCellId the flow cell id
+   * @throws AozanException the aozan exception
+   */
   public static void checkSampleSheet(final SampleSheet design,
       final String flowCellId) throws AozanException {
 
@@ -785,11 +909,21 @@ public class SampleSheetUtils {
 
   }
 
+  /**
+   * Check sample sheet v2.
+   * @param design the design
+   */
   public static void checkSampleSheetV2(SampleSheet design) {
     // TODO Auto-generated method stub
 
   }
 
+  /**
+   * Check sample sheet v1.
+   * @param design the design
+   * @param flowCellId the flow cell id
+   * @throws AozanException the aozan exception
+   */
   public static void checkSampleSheetV1(final SampleSheet design,
       final String flowCellId) throws AozanException {
 
@@ -857,6 +991,9 @@ public class SampleSheetUtils {
   // Constructor
   //
 
+  /**
+   * Instantiates a new sample sheet utils.
+   */
   SampleSheetUtils() {
 
   }

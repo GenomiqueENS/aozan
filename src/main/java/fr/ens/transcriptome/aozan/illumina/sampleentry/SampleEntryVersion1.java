@@ -23,6 +23,11 @@
 
 package fr.ens.transcriptome.aozan.illumina.sampleentry;
 
+/**
+ * The Class SampleEntryVersion1.
+ * @author Sandrine Perrin
+ * @since 2.4
+ */
 public class SampleEntryVersion1 extends AbstractSampleEntry implements
     SampleV1 {
 
