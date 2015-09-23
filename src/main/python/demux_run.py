@@ -801,6 +801,10 @@ def demux(run_id, conf):
     common.log("WARNING", "Demux step: input disk usage: " + str(input_path_du), conf)
     common.log("WARNING", "Demux step: output disk free: " + str(output_df), conf)
     common.log("WARNING", "Demux step: space needed: " + str(space_needed), conf)
+    
+    common.log("CONFIG", "bcl2fastq version used " + bcl2fastq_major_version, conf)
+    common.log("CONFIG", "bcl2fastq mode docker ? " + str(common.is_conf_value_equals_true(Settings.DEMUX_USE_DOCKER_ENABLE_KEY, conf)), conf)
+    
 
     # Check if free space is available
     if output_df < space_needed:
@@ -818,10 +822,6 @@ def demux(run_id, conf):
         error("error while checking FASTQ compression format",
               "Invalid FASTQ compression format: " + conf[CASAVA_COMPRESSION_KEY], conf)
         return False
-    
-    
-    common.log("CONFIG", "bcl2fastq version used " + bcl2fastq_major_version, conf)
-    common.log("CONFIG", "bcl2fastq mode docker ? " + str(common.is_conf_value_equals_true(Settings.DEMUX_USE_DOCKER_ENABLE_KEY, conf)), conf)
     
     # Run demultiplexing
     if common.is_conf_value_equals_true(Settings.DEMUX_USE_DOCKER_ENABLE_KEY, conf):
