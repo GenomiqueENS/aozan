@@ -281,17 +281,17 @@ def launch_steps(conf):
     
     # Discover new runs
     hiseq_run_ids_done = detection_new_run.discover_new_run(conf)
-    print 'DEBUG launchStep run done '+ str(hiseq_run_ids_done)
+    #print 'DEBUG launchStep run done '+ str(hiseq_run_ids_done)
     
     # Load run do not process
     hiseq_run_ids_do_not_process = hiseq_run.load_deny_run_ids(conf)
-    print 'DEBUG launchStep run deny '+ str(hiseq_run_ids_do_not_process)
+    #print 'DEBUG launchStep run deny '+ str(hiseq_run_ids_do_not_process)
     #
     # Sync hiseq and storage
     #
 
     sync_run_ids_done = sync_run.load_processed_run_ids(conf)
-    print 'DEBUG launchStep sync done '+ str(sync_run_ids_done)
+    #print 'DEBUG launchStep sync done '+ str(sync_run_ids_done)
 
     # Get the list of run available on HiSeq output
     if sync_run.is_sync_step_enable(conf):
@@ -299,7 +299,7 @@ def launch_steps(conf):
         try:      
             for run_id in (hiseq_run_ids_done - sync_run_ids_done - hiseq_run_ids_do_not_process):
                 
-                print 'DEBUG sync launch on '+ str(run_id)
+                #print 'DEBUG sync launch on '+ str(run_id)
                 
                 if lock_sync_step(conf, run_id):
                     welcome(conf)
@@ -324,7 +324,7 @@ def launch_steps(conf):
 
     # Check if new run appears while sync step
     if  sync_run.is_sync_step_enable(conf) and len(detection_new_run.discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
-        print 'DEBUG New run discovery relaunch steps at the start'
+        #print 'DEBUG New run discovery relaunch steps at the start'
         launch_steps(conf)
         return
 
@@ -336,14 +336,14 @@ def launch_steps(conf):
         sync_run_ids_done = hiseq_run_ids_done
         
     demux_run_ids_done = demux_run.load_processed_run_ids(conf)
-    print 'DEBUG launchStep demux done '+ str(demux_run_ids_done)
-    print 'DEBUG runs to demux '+ str(sync_run_ids_done - demux_run_ids_done)
+    #print 'DEBUG launchStep demux done '+ str(demux_run_ids_done)
+    #print 'DEBUG runs to demux '+ str(sync_run_ids_done - demux_run_ids_done)
     
     if common.is_conf_value_equals_true(DEMUX_STEP_KEY, conf):
         try:
             for run_id in (sync_run_ids_done - demux_run_ids_done):
                 
-                print 'DEBUG demux launch on ' + str(run_id)
+                #print 'DEBUG demux launch on ' + str(run_id)
                 
                 if lock_demux_step(conf, run_id):
                     welcome(conf)
@@ -368,7 +368,7 @@ def launch_steps(conf):
 
     # Check if new run appears while demux step
     if common.is_conf_value_equals_true(DEMUX_STEP_KEY, conf) and len(detection_new_run.discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
-        print 'DEBUG New run discovery relaunch steps at the start'
+        #print 'DEBUG New run discovery relaunch steps at the start'
         launch_steps(conf)
         return
 
@@ -377,15 +377,15 @@ def launch_steps(conf):
     #
 
     qc_run_ids_done = qc_run.load_processed_run_ids(conf)
-    print 'DEBUG launchStep qc done '+ str(qc_run_ids_done)
-    print 'DEBUG runs to qc '+ str(demux_run_ids_done - qc_run_ids_done)
+    #print 'DEBUG launchStep qc done '+ str(qc_run_ids_done)
+    #print 'DEBUG runs to qc '+ str(demux_run_ids_done - qc_run_ids_done)
     
     if common.is_conf_value_equals_true(QC_STEP_KEY, conf):
         
         try:
             for run_id in (demux_run_ids_done - qc_run_ids_done):
-                print 'DEBUG: check type on run id ', type(run_id), '|'+run_id+'|', len(run_id)
-                print 'DEBUG qc launch on ' + str(run_id)
+                #print 'DEBUG: check type on run id ', type(run_id), '|'+run_id+'|', len(run_id)
+                #print 'DEBUG qc launch on ' + str(run_id)
                 if lock_qc_step(conf, run_id):
                     welcome(conf)
                     common.log('INFO', 'Quality control ' + run_id, conf)
@@ -408,7 +408,7 @@ def launch_steps(conf):
 
     # Check if new run appears while quality control step
     if common.is_conf_value_equals_true(QC_STEP_KEY, conf) and len(detection_new_run.discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
-        print 'DEBUG New run discovery relaunch steps at the start'
+        #print 'DEBUG New run discovery relaunch steps at the start'
         # TODO
         launch_steps(conf)
         return

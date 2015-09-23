@@ -461,8 +461,6 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
               'Error while setting executable command file bcl2fastq to run docker for ' + run_id, conf)
         return False
     
-    print 'DEBUG script exe to bcl2fastq path ' + str(commandfile)
-    
     return (commandfile, cmd)
         
           
@@ -522,8 +520,6 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
         conf: configuration dictionary
     """
     
-    print 'DEBUG run bcl2fastq with image docker '
-
     # In docker mount with input_run_data_path
     input_docker = '/mnt/'
     input_run_data_path_in_docker = input_docker 
