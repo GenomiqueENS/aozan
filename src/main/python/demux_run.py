@@ -233,16 +233,19 @@ def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_major_version, con
         if not os.path.exists(design_csv_path):
             error(action_error_msg + ' for run ' + run_id,
                   action_error_msg + ', the external command did not create Casava CSV file:\n' + cmd, conf)
+            return False, []
     else:
         error(action_error_msg + ' for run ' + run_id,
                   'No method to get Casava sample sheet file has been defined. Please, set the "casava.samplesheet.format" property.\n', conf)
+        return False, []
 
 
     # Check if Casava CSV design file has been created
     if not os.path.exists(design_csv_path):
         error("error while reading Casava CSV sample sheet file for run " + run_id,
                   'Error while reading Casava CSV sample sheet file, the sample sheet file does not exist: \n' + design_csv_path, conf)
-
+        return False, []
+    
     design_warnings = {}
 
     # Check Casava CSV design file
@@ -481,20 +484,20 @@ def demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesh
     commandfile, cmd = bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, tmp, bcl2fastq_major_version, conf)
     
     common.log('WARNING',
-			'demultiplexing in standalone with bcl2fastq version ' + str(bcl2fastq_version) + ', run this script ' + str(cmd), conf)
+               'demultiplexing in standalone with bcl2fastq version ' + str(bcl2fastq_version) + ', run this script ' + str(cmd), conf)
     
     exit_code = os.system(cmd)
     if exit_code != 0:
         error("error while setting executable command file bcl2fastq for run " + run_id,
               'Error while setting executable command file bcl2fastq (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
         return False
-    
-#     cmd = 'cp ' + tmp + '/bcl2fastq_output_' + run_id + '.out ' + tmp + '/bcl2fastq_output_' + run_id + '.out ' + fastq_output_dir + '/' + run_id
-#     common.log("INFO", "exec: " + cmd, conf)
-#     if os.system(cmd) != 0:
-#         error("error while setting read only the output fastq directory for run " + run_id,
-# 			 'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
-#         return False
+     
+    cmd = 'cp ' + tmp + '/bcl2fastq_output_' + run_id + '.* ' + fastq_output_dir
+    common.log("INFO", "exec: " + cmd, conf)
+    if os.system(cmd) != 0:
+        error("error while setting read only the output fastq directory for run " + run_id,
+ 			 'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
+        return False
 
     # The output directory must be read only
     # cmd = 'chmod -R ugo-w ' + fastq_output_dir + '/Project_*'
@@ -590,12 +593,12 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
         return False
     
     # The output directory must be read only
-#     cmd = 'cp ' + tmp_docker + '/bcl2fastq_output_' + run_id + '.out ' + tmp_docker + '/bcl2fastq_output_' + run_id + '.out ' + fastq_data_path_in_docker + '/' + run_id
-#     common.log("INFO", "exec: " + cmd, conf)
-#     if os.system(cmd) != 0:
-#         error("error while setting read only the output fastq directory for run " + run_id,
-#              'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
-#         return False
+    cmd = 'cp ' + tmp + '/bcl2fastq_output_' + run_id + '.* ' + fastq_output_dir 
+    common.log("INFO", "exec: " + cmd, conf)
+    if os.system(cmd) != 0:
+        error("error while setting read only the output fastq directory for run " + run_id,
+         'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
+        return False
        
     cmd = 'find ' + fastq_output_dir + ' -type f -name "*.fastq.*" -exec chmod ugo-w {} \; '
     common.log("INFO", "exec: " + cmd, conf)
@@ -607,7 +610,7 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
     return True
    
 def isConfirmedFastqExistence(fastq_output_dir):
-	""" Archive demultplexing statistics results file.
+    """ Archive demultplexing statistics results file.
 
     Arguments:
     	fastq_output_dir: fastq directory to save result on demultiplexing
@@ -615,9 +618,9 @@ def isConfirmedFastqExistence(fastq_output_dir):
     	Return true if define at least on FASTQ files
     """ 
     
-	fastq_files = glob.glob(fastq_output_dir + "/*fastq*")
+    fastq_files = glob.glob(fastq_output_dir + "/*fastq*")
     
-	return len(fastq_files) > 0 
+    return len(fastq_files) > 0 
     
 def archive_demux_stat(run_id, bcl2fastq_version, fastq_output_dir, reports_data_path, basecall_stats_file, basecall_stats_prefix, design_csv_path, conf):
     """ Archive demultplexing statistics results file.
