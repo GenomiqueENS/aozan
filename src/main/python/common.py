@@ -59,6 +59,9 @@ from fr.ens.transcriptome.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_ENABLE
 
 from fr.ens.transcriptome.eoulsan.util import StringUtils
 
+HISEQ_NAME = 'hiseq'
+NEXTSEQ_NAME = 'nextseq'
+
 def df(path):
     """Get the free space on a partition.
 
@@ -238,7 +241,7 @@ def get_flowcell_lane_count(run_id, conf):
 	
 	if run_info_path is None:
 		error("error to find RunInfo.xml file " + run_id + ".",
-			  "error to find RunInfo.xml file " + run_id + ".", conf)
+			  "error to find RunInfo.xml file " + run_id + ".", get_last_error_file(conf), conf)
 	
 	run_info = RunInfo()
 	run_info.parse(run_info_path)
@@ -654,12 +657,16 @@ def create_html_index_file(conf, run_id, sections):
     result = ''
   
     for line in lines:
+        
         if line.startswith('<!--START_SECTION'):
-            section_name = line.split(' ')[1]
-            if section_name in sections and (is_conf_value_equals_true(section_name, conf) or section_name.startswith('optional')):
-                write_lines = True
-            else:
-                write_lines = False
+            tokens = line.split(' ')
+            #  Extract step name in start section 
+            section_name = tokens[1]
+            # Extraction version 
+            version = tokens[2]
+            
+            write_lines = is_section_to_add_in_report(sections, section_name, version, run_id, conf)
+            
         elif line.startswith('<!--END_SECTION'):
             write_lines = True
 
@@ -674,6 +681,45 @@ def create_html_index_file(conf, run_id, sections):
     f_out = open(output_file_path, 'w')
     f_out.write(result)
     f_out.close()
+   
+   
+def is_section_to_add_in_report(sections, section_name, version, run_id, conf):
+    """
+    Check if the section is required in report
+    
+    Arguments:
+        sections: The list of section to write, use step key from configuration
+        section_name: section name checked
+        run_id: The run id
+        conf: configuration dictionary
+
+    True if test pass
+    """
+    
+    # Check the current section name is included in sections required
+    if section_name not in sections: 
+        return False
+    
+    # Check the section name related to a step name required or it is an optional section
+    if not (is_conf_value_equals_true(section_name, conf) or section_name.startswith('optional')):
+        return False
+        
+    # Check if version on the section 
+    if version == 'all':
+        return True
+    
+    
+    sequencer_type = get_sequencer_type(run_id, conf)
+    if sequencer_type in version:
+        return True
+    
+    #  Check if version end with 1 or 2  bcl2fastq1 bcl2fastq2
+    major, full = demux_run.get_bcl2fastq_version(run_id, conf)
+    if version.endswith(major): 
+        return True
+    
+    # Section added in report html
+    return False
 
 def check_configuration(conf, configuration_file_path):
     """ Check if path useful exists
@@ -832,10 +878,10 @@ def get_sequencer_type(run_id, conf):
     if rtaversion != None:    
         
         if rtaversion.startswith("1."):
-            return "hiseq"
+            return HISEQ_NAME
         
         if rtaversion.startswith("2."):
-            return "nextseq"
+            return NEXTSEQ_NAME
         
     # TODO throw exception
     return None
@@ -850,7 +896,7 @@ def is_sequencer_hiseq(run_id, conf):
         true if sequencer is a HiSeq 
     """
     
-    return get_sequencer_type(run_id, conf) == "hiseq"
+    return get_sequencer_type(run_id, conf) == HISEQ_NAME
     
     
 def is_sequencer_nextseq(run_id, conf):
@@ -863,7 +909,7 @@ def is_sequencer_nextseq(run_id, conf):
         true if sequencer is a NextSeq 
     """
 
-    return get_sequencer_type(run_id, conf) == "nextseq"
+    return get_sequencer_type(run_id, conf) == NEXTSEQ_NAME
 
         
 def extract_rtaversion(run_id, conf):
