@@ -178,7 +178,7 @@ def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_major_version, con
         try:
             
             # Load XLS design file
-            design = CasavaDesignXLSReader(input_design_xls_path).readForQCReport(str(bcl2fastq_major_version), lane_count)
+            design = CasavaDesignXLSReader(input_design_xls_path).read(str(bcl2fastq_major_version))
             # design = CasavaDesignXLSReader(input_design_xls_path).read(bcl2fastq_major_version)
 
             # Replace index sequence shortcuts by sequences
@@ -251,7 +251,7 @@ def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_major_version, con
     # Check Casava CSV design file
     try:
         # Load CSV design file
-        design = CasavaDesignCSVReader(design_csv_path).readForQCReport(bcl2fastq_major_version, lane_count)
+        design = CasavaDesignCSVReader(design_csv_path).read(str(bcl2fastq_major_version))
 
         # Check values of design file
         design_warnings = SampleSheetUtils.checkCasavaDesign(design, flow_cell_id)
