@@ -29,6 +29,7 @@ import java.util.Properties;
 import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
@@ -75,13 +76,17 @@ public class DemultiplexingCollector implements Collector {
     final String bcl2fastqVersion =
         properties.getProperty(QC.BCL2FASTQ_VERSION);
 
-    if (bcl2fastqVersion.equals(SampleSheetUtils.VERSION_1)) {
+    if (SampleSheetUtils.isBcl2fastqVersion1(bcl2fastqVersion)) {
       // Call flowcell collector
       this.subCollector = new FlowcellDemuxSummaryCollector();
 
-    } else {
+    } else if (SampleSheetUtils.isBcl2fastqVersion2(bcl2fastqVersion)) {
       // Conversion collector
       this.subCollector = new ConversionStatsCollector();
+      
+    } else {
+      throw new AozanRuntimeException("bcl2fastq version is invalid "
+          + bcl2fastqVersion + " to identify required Demux collector.");
     }
 
     // Init collector
