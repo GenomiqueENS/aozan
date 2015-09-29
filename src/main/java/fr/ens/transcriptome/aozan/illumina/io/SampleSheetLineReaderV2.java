@@ -35,7 +35,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleEntryVersion2;
 import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleV2;
@@ -68,6 +67,7 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
 
   private final int laneCount;
 
+  @SuppressWarnings("unused")
   private int fieldsCountExpected;
 
   private String currentSessionName;

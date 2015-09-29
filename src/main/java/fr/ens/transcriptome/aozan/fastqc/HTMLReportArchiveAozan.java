@@ -70,6 +70,7 @@ public class HTMLReportArchiveAozan extends HTMLReportArchive {
   private final File file;
 
   private void unzipZipFile(File file) throws IOException {
+    @SuppressWarnings("resource")
     ZipFile zipFile = new ZipFile(file);
     Enumeration<? extends ZipEntry> entries = zipFile.entries();
     int size;

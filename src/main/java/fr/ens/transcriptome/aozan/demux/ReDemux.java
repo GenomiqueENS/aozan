@@ -49,6 +49,7 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
 import fr.ens.transcriptome.aozan.illumina.sampleentry.Sample;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
+import fr.ens.transcriptome.eoulsan.EoulsanException;
 import fr.ens.transcriptome.eoulsan.EoulsanRuntimeException;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.eoulsan.bio.ReadSequence;
@@ -69,6 +70,7 @@ public class ReDemux {
   private final SampleSheet design;
   private final Map<Integer, ReDemuxLane> lanesToRedemux = Maps.newHashMap();
 
+  @SuppressWarnings("unused")
   private String bcl2fastqVersion;
 
   /**

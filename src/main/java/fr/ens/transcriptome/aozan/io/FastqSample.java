@@ -25,10 +25,8 @@ package fr.ens.transcriptome.aozan.io;
 
 import java.io.File;
 import java.util.List;
-import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
-import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
 
 /**
@@ -38,9 +36,6 @@ import fr.ens.transcriptome.eoulsan.io.CompressionType;
  * @author Sandrine Perrin
  */
 public class FastqSample {
-
-  /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
 
   public static final String FASTQ_EXTENSION = ".fastq";
 
@@ -341,7 +336,7 @@ public class FastqSample {
     this.undeterminedIndices = false;
 
     this.runFastqPath = casavaOutputPath;
-    
+
     this.fastqFiles = createListFastqFiles(this.read);
 
     this.compressionType = getCompressionExtension(this.fastqFiles);

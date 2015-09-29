@@ -45,7 +45,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import fr.ens.transcriptome.eoulsan.util.FileUtils;

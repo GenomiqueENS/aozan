@@ -43,7 +43,6 @@ import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.collectors.CollectorRegistry;
-import fr.ens.transcriptome.aozan.collectors.DemultiplexingCollector;
 import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.fastqc.RuntimePatchFastQC;

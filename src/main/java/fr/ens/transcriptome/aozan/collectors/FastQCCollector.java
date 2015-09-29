@@ -25,7 +25,7 @@ package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
 import java.util.Properties;
-import java.util.logging.Logger;
+
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
@@ -38,9 +38,6 @@ import fr.ens.transcriptome.aozan.io.FastqSample;
  * @author Laurent Jourdren
  */
 public class FastQCCollector extends AbstractFastqCollector {
-
-  /** Logger. */
-  private static final Logger LOGGER = fr.ens.transcriptome.aozan.Common.getLogger();
 
   /** The collector name. */
   public static final String COLLECTOR_NAME = "fastqc";
@@ -69,7 +66,7 @@ public class FastQCCollector extends AbstractFastqCollector {
         final int confThreads =
             Integer.parseInt(properties.getProperty(
                 Settings.QC_CONF_THREADS_KEY).trim());
-        
+
         if (confThreads > 0) {
           this.numberThreads = confThreads;
         }

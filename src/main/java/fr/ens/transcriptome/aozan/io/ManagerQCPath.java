@@ -34,20 +34,15 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
-import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetVersion2;
 
 public class ManagerQCPath {
-
-  /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
 
   // Singleton
   private static ManagerQCPath manager;

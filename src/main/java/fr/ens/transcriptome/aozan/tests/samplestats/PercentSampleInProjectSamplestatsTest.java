@@ -34,7 +34,6 @@ import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics;
 import fr.ens.transcriptome.aozan.collectors.stats.SampleStatistics;
-import fr.ens.transcriptome.aozan.io.ManagerQCPath;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.TestResult;
 import fr.ens.transcriptome.aozan.util.ScoreInterval;
