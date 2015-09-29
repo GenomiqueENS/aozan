@@ -58,7 +58,6 @@ public class HitNoLibrariesFastqScreenSamplestatsTest extends
     for (int lane = 1; lane <= laneCount; lane++) {
 
       final String key = getKey(sampleName, lane);
-      System.out.println("key is " + key);
 
       // Check value exist
       if (data.get(key) == null) {
@@ -70,7 +69,7 @@ public class HitNoLibrariesFastqScreenSamplestatsTest extends
     }
 
     try {
-      final double percent = value * 100 / (double) laneCount;
+      final double percent = value / (double) laneCount * 100;
 
       if (getInterval() == null)
         return new TestResult(percent);

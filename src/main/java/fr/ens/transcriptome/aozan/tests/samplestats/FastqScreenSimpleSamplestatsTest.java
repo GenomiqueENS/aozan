@@ -77,7 +77,7 @@ public class FastqScreenSimpleSamplestatsTest extends AbstractSimpleSampleTest {
     }
 
     try {
-      final double percent = value * 100 / (double) laneCount;
+      final double percent = value / (double) laneCount * 100;
 
       if (getInterval() == null)
         return new TestResult(percent);

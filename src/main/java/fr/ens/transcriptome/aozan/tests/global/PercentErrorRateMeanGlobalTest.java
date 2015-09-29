@@ -70,7 +70,7 @@ public class PercentErrorRateMeanGlobalTest extends AbstractGlobalTest {
     try {
 
       // Compute percent sample in project
-      final double percent = errRatePhixSum * 100 / (double) laneCount;
+      final double percent = errRatePhixSum / (double) laneCount * 100;
 
       if (interval == null)
         return new TestResult(percent, true);
