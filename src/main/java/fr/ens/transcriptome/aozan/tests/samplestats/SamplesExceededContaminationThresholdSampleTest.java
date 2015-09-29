@@ -56,7 +56,7 @@ public class SamplesExceededContaminationThresholdSampleTest extends
   }
 
   @Override
-  public TestResult test(RunData data, String sampleName) {
+  public TestResult test(final RunData data, final String sampleName) {
 
     if (sampleName.equals(SampleStatistics.UNDETERMINED_SAMPLE)) {
       return new TestResult("NA");

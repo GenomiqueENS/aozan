@@ -38,13 +38,12 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 
 import fr.ens.transcriptome.aozan.collectors.Collector;
-import fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics;
-import fr.ens.transcriptome.aozan.collectors.stats.SampleStatistics;
 
 /**
  * This Class collect Data.
  * @since 0.8
  * @author Laurent Jourdren
+ * @author Sandrine Perrin
  */
 public class RunDataGenerator {
 

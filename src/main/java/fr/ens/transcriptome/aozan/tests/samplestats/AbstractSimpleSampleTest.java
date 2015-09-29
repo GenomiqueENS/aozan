@@ -61,10 +61,10 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
 
   /**
    * Get the the key in the RunData object for the value to test.
-   * @param projectName the project name
+   * @param sampleName the sample name
    * @return a String with the required key
    */
-  protected abstract String getKey(final String projectName);
+  protected abstract String getKey(final String sampleName);
 
   /**
    * Transform the value.
@@ -75,6 +75,23 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
   protected Number transformValue(final Number value, final RunData data) {
 
     return value;
+  }
+
+  /**
+   * Transform the score.
+   * @param score value to transform
+   * @param data run data
+   * @param read index of read
+   * @param readSample index of read without indexed reads
+   * @param lane lane index
+   * @param sampleName sample name
+   * @return the transformed score
+   */
+  protected int transformScore(final int score, final RunData data,
+      final int read, final int readSample, final int lane,
+      final String sampleName) {
+
+    return score;
   }
 
   /**
@@ -159,6 +176,10 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
   protected boolean testIndexedRead() {
 
     return false;
+  }
+
+  public ScoreInterval getInterval() {
+    return this.interval;
   }
 
   //

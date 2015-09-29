@@ -53,7 +53,7 @@ public class RecoverablePFClusterPercentSampleTest extends AbstractSampleTest {
   }
 
   @Override
-  public TestResult test(final RunData data, final int re2ad,
+  public TestResult test(final RunData data, final int read,
       final int readSample, final int lane, final String sampleName) {
     
     String recoveryCountKey;

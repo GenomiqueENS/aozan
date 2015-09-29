@@ -128,12 +128,6 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
       this.positionFields = checkHeaderColumnSessionData(fields);
       this.fieldsCountExpected = positionFields.size();
 
-      Common.getLogger().warning(
-          "DEBUG: to parse line from samplesheet V2 option is Column lane exist "
-              + isColumnLaneExist()
-              + " compatibility with QCReport is requiered "
-              + isCompatibleForQCReport);
-
     } else {
       if (isColumnLaneExist()) {
         // Set lane value on sample
