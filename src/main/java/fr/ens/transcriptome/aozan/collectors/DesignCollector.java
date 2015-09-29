@@ -23,8 +23,6 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
-import static fr.ens.transcriptome.aozan.util.StringUtils.COMMA_SPLITTER;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -68,8 +66,6 @@ public class DesignCollector implements Collector {
 
   private String bcl2fastqVersion;
 
-  private boolean callAtLeastOneFastqCollector;
-
   @Override
   public String getName() {
 
@@ -98,21 +94,6 @@ public class DesignCollector implements Collector {
         new File(properties.getProperty(QC.CASAVA_DESIGN_PATH));
     this.bcl2fastqVersion = properties.getProperty(QC.BCL2FASTQ_VERSION);
 
-    this.callAtLeastOneFastqCollector =
-        checkCallFastqCollector(properties.getProperty(QC.QC_COLLECTOR_NAMES));
-
-  }
-
-  private boolean checkCallFastqCollector(final String collectorsNames) {
-
-    // Split names
-    for (String name : COMMA_SPLITTER.splitToList(collectorsNames)) {
-
-      if (FASTQ_COLLECTOR_NAMES.contains(name))
-        return true;
-    }
-
-    return false;
   }
 
   @Override
@@ -155,9 +136,15 @@ public class DesignCollector implements Collector {
           data.put(prefix + ".operator", v1.getOperator());
 
         } else if (SampleSheetUtils.isBcl2fastqVersion2(this.bcl2fastqVersion)) {
-          // TODO add extract columns, retrieve map with key-value
+
           final SampleV2 v2 = (SampleV2) s;
 
+          // Include additional columns
+          for (Map.Entry<String, String> e : v2.getAdditionalColumns()
+              .entrySet()) {
+            data.put(prefix + "." + e.getKey().replaceAll(" _-", "."),
+                e.getValue());
+          }
         } else {
 
           throw new AozanException(
@@ -202,15 +189,10 @@ public class DesignCollector implements Collector {
     final String majorVersion =
         SampleSheetUtils.findBcl2fastqMajorVersion(this.bcl2fastqVersion);
 
-    if (this.callAtLeastOneFastqCollector) {
+    Preconditions.checkNotNull(data, "run data instance");
 
-      Preconditions.checkNotNull(data, "run data instance");
-
-      return new CasavaDesignCSVReader(this.casavaDesignFile).readForQCReport(
-          majorVersion, data.getLaneCount());
-    }
-
-    return new CasavaDesignCSVReader(this.casavaDesignFile).read(majorVersion);
+    return new CasavaDesignCSVReader(this.casavaDesignFile).readForQCReport(
+        majorVersion, data.getLaneCount());
   }
 
   @Override
