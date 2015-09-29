@@ -535,6 +535,7 @@ def aozan_main():
                
                 # Cancel logger, in case not be cancel properly 
                 Common.cancelLogger()
+                sys.exit(1)
     else:
         if not options.quiet:
             print "A lock file exists."
