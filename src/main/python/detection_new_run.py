@@ -162,7 +162,7 @@ def send_report(run_id, conf):
 
     sequencer_type = common.get_sequencer_type(run_id, conf)
 
-    if sequencer_type == 'hiseq':
+    if sequencer_type == common.HISEQ_NAME:
         # With HiSeq send the first base report file
         attachment_file = str(hiseq_run.find_hiseq_run_path(run_id, conf)) + '/' + run_id + '/First_Base_Report.htm'
         message = 'You will find attached to this message the first base report on sequencer HiSeq for the run ' + run_id + '.\n\n' + description_run
