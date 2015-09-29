@@ -19,6 +19,8 @@ fr.ens.transcriptome.aozan.tests.global.RawClustersPhixStandardDeviationGlobalTe
 fr.ens.transcriptome.aozan.tests.global.RawClustersStandardDeviationGlobalTest
 fr.ens.transcriptome.aozan.tests.global.SamplesCountGlobalTest
 fr.ens.transcriptome.aozan.tests.global.UndeterminedClustersPercentGlobalTest
+fr.ens.transcriptome.aozan.tests.global.PercentErrorRateMeanGlobalTest
+fr.ens.transcriptome.aozan.tests.global.DensityClusterMeanGlobalTest
 fr.ens.transcriptome.aozan.tests.lane.ClusterDensityLaneTest
 fr.ens.transcriptome.aozan.tests.lane.ErrorRate100CycleLaneTest
 fr.ens.transcriptome.aozan.tests.lane.ErrorRate35CycleLaneTest
@@ -94,4 +96,6 @@ fr.ens.transcriptome.aozan.tests.samplestats.PercentSampleInRunSamplestatsTest
 fr.ens.transcriptome.aozan.tests.samplestats.PercentPassingFilterSamplestatsTest
 fr.ens.transcriptome.aozan.tests.samplestats.RecoverableClusterRawCountSamplestatsTest
 fr.ens.transcriptome.aozan.tests.samplestats.RecoverableClusterFPCountSamplestatsTest
+fr.ens.transcriptome.aozan.tests.samplestats.HitNoLibrariesFastqScreenSamplestatsTest
+fr.ens.transcriptome.aozan.tests.samplestats.FastqScreenSimpleSamplestatsTest
                          
