@@ -172,6 +172,12 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+	<dependency>
+		<groupId>org.testng</groupId>
+		<artifactId>testng</artifactId>
+		<version>6.1.1</version>
+		<scope>compile</scope>
+	</dependency>	
     <dependency>
        <groupId>org.apache.commons</groupId>
        <artifactId>commons-compress</artifactId>
@@ -326,6 +332,24 @@
           <skip>false</skip>
         </configuration>
       </plugin>
+      <plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-failsafe-plugin</artifactId>
+			<version>2.17</version>
+			<configuration>
+				<suiteXmlFiles>
+					<suiteXmlFile>src/test/testng.xml</suiteXmlFile>
+				</suiteXmlFiles>
+			</configuration>
+			<executions>
+				<execution>
+					<goals>
+						<goal>integration-test</goal>
+						<goal>verify</goal>
+					</goals>
+				</execution>
+			</executions>
+		</plugin>
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
