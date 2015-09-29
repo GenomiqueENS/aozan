@@ -240,6 +240,14 @@
 		<version>1.7.6</version>
 		<scope>runtime</scope>
 	</dependency>
+	
+	<!-- Required by Docker to run on credne -->
+	<dependency>
+		<groupId>com.github.jnr</groupId>
+		<artifactId>jnr-unixsocket</artifactId>
+		<version>0.8</version>
+	</dependency>
+	
 
   </dependencies>
 
