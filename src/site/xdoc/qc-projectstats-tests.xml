@@ -41,12 +41,12 @@
      	Usually a property named "<b>interval</b>" exists for each test, however if this property is not set, 
      	the value will be computed but not checked if it is the correct interval.
      
-     The project tests reuse date collected from samples tests and other quality control tests <a href="qc-samples-tests.html#contamination">
+     The project tests reuse data collected from samples tests and other quality control tests <a href="qc-samples-tests.html#contamination">
      on detection contamination</a> and <a href="qc-samples-tests.html#recoveryclusters">analysis undetermined clusters</a>
 	 Please report to those documentation pages for more information. 
      You will find below all the parameters for all the available tests in Aozan:</p>
 
-       <h4>Configuration project quality tests</h4>
+       <h4>Configuration project statistics quality tests</h4>
        <table>
          <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
 
@@ -59,7 +59,7 @@
 		<tr><td>qc.test.rawclustermaxproject.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable raw cluster maximum count in samples on project  test</td></tr>
 		<tr><td>qc.test.rawclustersumproject.enable</td><td>integer interval</td><td>False</td>
-			<td>Enable raw cluster minimum sum on project  test</td></tr>
+			<td>Enable raw cluster sum on project  test</td></tr>
 		<tr><td>qc.test.pfclusterminproject.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable passing filter cluster minimum count in samples on project  test</td></tr>
 		<tr><td>qc.test.pfclustermaxproject.enable</td><td>integer interval</td><td>False</td>
@@ -75,10 +75,12 @@
        </p>
        <table>
        	<tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
-		<tr><td>qc.test.samplesexceededcontaminationthreshold.enable</td><td>integer interval</td><td>False</td>
-			<td>Enable samples excedeed contamination threshold test. Use other quality control test (qc.test.fsqmapped.enable)</td></tr>
+		<tr><td>qc.test.recoverablerawcluster.enable</td><td>integer</td><td>False</td>
+			<td>Enable recoverable raw cluster in samples test</td></tr>
 		<tr><td>qc.test.recoverablerawclusterpercent.enable</td><td>percent</td><td>False</td>
 			<td>Enable recoverable raw cluster in samples test</td></tr>
+		<tr><td>qc.test.recoverablepfcluster.enable</td><td>integer</td><td>False</td>
+			<td>Enable recoverable passing filter cluster in samples test</td></tr>
 		<tr><td>qc.test.recoverablepfclusterpercent.enable</td><td>percent</td><td>False</td>
 			<td>Enable recoverable passing filter cluster in samples test</td></tr>
 	  </table>
@@ -89,6 +91,8 @@
        </p>
        <table>
        	<tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
+		<tr><td>qc.test.samplesexceededcontaminationthreshold.enable</td><td>integer interval</td><td>False</td>
+			<td>Enable samples excedeed contamination threshold test. Use other quality control test (qc.test.fsqmapped.enable)</td></tr>
 		<tr><td>qc.test.linkprojectreport.enable</td><td>link</td><td>False</td>
 			<td>Enable link to detection contamination project report compilation samples data</td></tr>
        </table>
