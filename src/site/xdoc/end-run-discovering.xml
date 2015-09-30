@@ -43,7 +43,8 @@
 	 
      <table>
 	   <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-	   <tr><td>hiseq.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
+	   <tr><td>hiseq.step</td><td>boolean</td><td>True</td><td>Enable the step, 
+	   		check all Hiseq or NextSeq run through all run data path directories.</td></tr>
 	   <!--tr><td>hiseq.step</td><td>integer</td><td>12</td><td>Set the maximal number of hour since the end of sequencing 
 	     to send an email to inform users of the end of the run.</td></tr-->
      </table>

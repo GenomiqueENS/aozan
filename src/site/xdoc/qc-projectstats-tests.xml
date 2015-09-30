@@ -32,7 +32,7 @@
 
   <body>
 
-    <section name="Quality control projects tests">		
+    <section name="Quality control projects statistics tests">		
     	
     	
      <p>User can add project tests to perform in this steps, if the demultiplexing statistic file is available. 
@@ -66,8 +66,6 @@
 			<td>Enable passing filter cluster minimum count in samples on project  test</td></tr>
 		<tr><td>qc.test.pfclustersumproject.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable passing filter cluster sum on project  test</td></tr>
-		<tr><td>qc.test.recoverablerawclusterpercent.enable</td><td>percent</td><td>False</td>
-			<td>Enable recoverable raw cluster in samples test</td></tr>
        </table>
 
        
@@ -79,6 +77,8 @@
        	<tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
 		<tr><td>qc.test.samplesexceededcontaminationthreshold.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable samples excedeed contamination threshold test. Use other quality control test (qc.test.fsqmapped.enable)</td></tr>
+		<tr><td>qc.test.recoverablerawclusterpercent.enable</td><td>percent</td><td>False</td>
+			<td>Enable recoverable raw cluster in samples test</td></tr>
 		<tr><td>qc.test.recoverablepfclusterpercent.enable</td><td>percent</td><td>False</td>
 			<td>Enable recoverable passing filter cluster in samples test</td></tr>
 	  </table>

@@ -67,7 +67,7 @@
 			<item name="Configuration example" href="/aozan-example.conf"/>
 
 			<item name="Built-in steps" href="/steps.html" collapse="true">
-				<item name="First base report" href="/first-base-report.html"/>
+				<item name="First base report" href="/new-run-discovering.html"/>
 				<item name="End run discovering" href="/end-run-discovering.html"/>
 				<item name="Synchronization" href="/synchronization.html"/>
 				<item name="Demultiplexing" href="/demultiplexing.html"/>

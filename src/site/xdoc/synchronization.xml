@@ -37,7 +37,7 @@
 <section name="Synchronization step">
 
     <p>This step copy output run files from the HiSeq computer to another place (usually a safe storage).
-    CIF files can be excluded from the copy.</p>
+    On a HiSeq sequencer, CIF files can be excluded from the copy.</p>
 
        <h4>Configuration parameters</h4>
 
@@ -48,9 +48,9 @@
 	   <tr><td>sync.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
 	   <tr><td>sync.space.factor</td><td>double</td><td>0.2</td><td>Factor to use to get the estimation of space needed
 	     in bcl directory for the run from the space used in hiSeq directory by the run</td></tr>
-	   <tr><td>sync.exclude.cif</td><td>boolean</td><td>True</td><td>Do not copy CIF files</td></tr>
+	   <tr><td>sync.exclude.cif</td><td>boolean</td><td>True</td><td>Do not copy CIF files, only HiSeq sequencer concerned.</td></tr>
 	   <tr><td>sync.continuous.sync</td><td>boolean</td><td>False</td><td>Enable continuous synchronization of working runs at each Aozan launch 
-	   	 to avoid a big synchronization at the end of the runs. <b>WARNING:</b> This feature is <u>EXPERIMENTAL</u></td></tr>
+	   	 to avoid a big synchronization at the end of the runs.</td></tr>
 	    <tr><td>sync.continuous.sync.min.age.files</td><td>integer</td><td>15</td><td>Minimal age of files in minutes to be synchronized in a partial synchronization</td></tr>
  	    <tr><td>demux.use.hiseq.output</td><td>boolean</td><td>False</td><td>If it is true and no synchronization step, use direct Hiseq output for demultiplexage step</td></tr>
      </table>

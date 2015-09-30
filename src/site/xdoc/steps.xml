@@ -42,27 +42,22 @@
 		an example is <a href="./aozan-example.conf">here.</a>. The available steps are:</p>
 		<p/>
 		<ul>
-			<li><a href="first-base-report.html">Send first base report</a>
-                              <ul>
-			        <li>send an email with the first base report, if a new run is currently running</li>
-                              </ul>
-                         </li>
+			<li><a href="new-run-discovering.xml">New run discovering</a>
+               <ul><li>send an email, if a new run is currently running. 
+               	For HiSeq Illumina sequencer, send in attachment the first base report</li></ul>
+            </li>
 			<p/>
 			
 			<li><a href="end-run-discovering.html">End of run detection</a>
-				<ul>
-                                  <li>Checks &quot;<tt>Basecalling_Netcopy_complete.txt</tt>&quot; file creation in the run directory</li>
-				  <li>Can handle multiple HiSeq sequencer outputs</li>
-                                </ul>
+				<ul><li>Checks &quot;<tt>Basecalling_Netcopy_complete.txt</tt>&quot; file creation in the run directory</li>
+				  <li>Can handle multiple HiSeq sequencer outputs</li></ul>
 			</li>
 			<p/>
 			
 	
 			<li><a href="synchronization.html">NAS and mid-term storage synchronization</a>
-				<ul>
-                                  <li>Uses rsync</li>
-				  <li>Does not copy CIF files (optional)</li>
-                                </ul>
+				<ul><li>Uses rsync</li>
+				    <li>Does not copy CIF files (optional)</li></ul>
 			</li>
 			<p/>
 			
@@ -72,8 +67,7 @@
 				  <li>Parallel computation is done with &quot;<tt>make -j</tt>&quot;</li>
 				  <li>CASAVA or bcl2fastq has been modified to provide bzip2 compression functionality (optional)</li>
 				  <li>Creates one fastq file by sample</li>
-				  <li>Uses alias for samples indexes (optional)</li>
-                                </ul>
+				  <li>Uses alias for samples indexes (optional)</li></ul>
 			</li>
 			<p/>
 			

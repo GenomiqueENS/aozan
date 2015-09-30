@@ -97,10 +97,10 @@
 			
 			<subsection name="New projects tests in quality control report">
 				<p>Enhancement of the quality control report, with a new table on projects test: listing data on all projects in run
-					<a href="./qc-projects-tests.html">more details here.</a>
+					<a href="./qc-projectstats-tests.html">more details here.</a>
 					 <p>An example of table built with projects tests.</p>
 				       <div align="center">
-				       		<a href="./qc-projects-tests.html"><img src="images/qc_project_test_650px.png" alt="example on report with run data" border="1"/></a>
+				       		<a href="./qc-projectstats-tests.html"><img src="images/qc_project_test_650px.png" alt="example on report with run data" border="1"/></a>
 				       </div>
 				  </p>
 			</subsection>

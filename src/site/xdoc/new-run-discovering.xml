@@ -25,19 +25,19 @@
 -->
 <document>
 
-
-	
-	
 	<properties>
-		<title>First base report</title>
+		<title>New run discovering</title>
 		<author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
 	</properties>
 
 	<body>
-		<section name="First base report step">
+		<section name="New run discovering step">
      
-     	<p>This step check if a new run is currently running and if the first base report has been generated. 
-     	If true send an email with the first base report.</p>
+     	<p>This step check if a new run is currently running.
+     	   With a HiSeq sequencer if the first base report has been generated, if true send an email with the first base report. 
+     	   With a NextSeq sequencer, first base report has not been generated, Aozan check existence on first file created by sequence.
+     		If true send an email with main feature on the new run. 
+     		</p>
 
      	<h4>Configuration parameters</h4>
 	 
@@ -47,10 +47,17 @@
 	   		<tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
 	   		<tr><td>first.base.report.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
 	 	</table>
-     	<p>An example of email sent for the first base report step.</p>
-       <div align="center">
-         <img src="images/mail_firstbasereport_450px.png" alt="example of mail sent after detection new run" border="1"/>
-       </div>
+     	<p>Example of email sent for the new run discovering step</p>
+    	<div align="center">
+		  <table>
+		  	<tr><th>Example on HiSeq run with First base report</th><th>Example on NextSeq run</th></tr>
+		  	<tr style="text-align:center; background-color: #FFFFFF"><td>
+				<img src="images/mail_firstbasereport_450px.png" alt="example mail on HiSeq run with First base report" style="vertical-align:middle"/>
+    		</td><td>
+    	 		<img src="images/mail_newrun_nextseq.png" 
+    	 		alt="example mail on NextSeq run"  border="1"/>
+        	</td></tr></table>
+        </div>
        
    		</section>
 

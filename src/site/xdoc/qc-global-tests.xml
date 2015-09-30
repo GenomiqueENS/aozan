@@ -105,7 +105,19 @@
 		
 		<tr><td>qc.test.globalsamplescount.enable</td><td>boolean</td><td>False</td><td>Enable global samples count test</td></tr>
 		<tr><td>qc.test.globalsamplescount.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global samples count</td></tr>
+
+		<tr><td>qc.test.globalsamplescount.enable</td><td>boolean</td><td>False</td><td>Enable global samples count test</td></tr>
+		<tr><td>qc.test.globalsamplescount.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global samples count</td></tr>
+				
+		<tr><td>qc.test.globalsamplescount.enable</td><td>boolean</td><td>False</td><td>Enable global samples count test</td></tr>
+		<tr><td>qc.test.globalsamplescount.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of global samples count</td></tr>
 		
+		<tr><td>qc.test.globalerrorrate.enable</td><td>boolean</td><td>False</td><td>Enable errorrate test on run</td></tr>
+        <tr><td>qc.test.globalerrorrate.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of errorrate</td></tr>
+        
+        <tr><td>qc.test.globaldensitycluster.enable</td><td>boolean</td><td>False</td><td>Enable cluster density test</td></tr>
+        <tr><td>qc.test.globaldensitycluster.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of cluster density</td></tr>
+         
        </table>
 
        <p>An example of table built with lanes global tests.</p>

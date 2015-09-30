@@ -49,8 +49,9 @@
 					<a href="#requirements">Requirements</a>
 				</li>
                     <ul>
-	                      <li><a href="#casava">Installing Casava</a></li>
 	                      <li><a href="#bcl2fastq">Installing bcl2fastq</a></li>
+	                      <li><a href="#bcl2fastq2">Installing bcl2fastq2</a></li>
+	                      <li><a href="#docker">Installing docker (optional)</a></li>
 	                      <li><a href="#blastall">Installing ncbi-blast+ (optional)</a></li>
                     </ul>
 	            <li>
@@ -101,13 +102,13 @@
    the end of the analysis of the previous run.</p>
 
    <p>The 5 steps of Aozan are:</p>
-   <ul>
-     <li><a href="first-base-report.html">First base report end step</a></li>
+   <ol>
+     <li><a href="new-run-discovering.html">New run discovering step</a></li>
      <li><a href="end-run-discovering.html">End run discovering step</a></li>
      <li><a href="synchronization.html">Synchronization step</a></li>
      <li><a href="demultiplexing.html">Demultiplexing step</a></li>
      <li><a href="quality-control.html">Quality control step</a></li>
-   </ul>
+   </ol>
  </section>
 
  <a name="requirements"/>
@@ -116,56 +117,18 @@
 
  <p>To run Aozan, you need to install the following software:</p>
  <ul>
-   <li>Java 6 or above (tested with Oracle JRE and OpenJDK)</li>
-   <li>CASAVA/bcl2fastq 1.8.2 or above</li>
+   <li>Java 7 or above (tested with Oracle JRE and OpenJDK)</li>
+   <li>Docker 1.7.1 or above, for demultiplexing step or launching Aozan</li>
+   <li>bcl2fastq 1.8.2 or above</li>
+   <li>bcl2fastq 2, in preference to version 2.17.1.14</li>
    <li>rsync 3.0.x or later</li>
  </ul>
 
  <p>On Ubuntu, you can install requirements (except CASAVA) with the following command:</p>
 <source>
-$ sudo apt-get install openjdk-6-jre-headless rsync
+$ sudo apt-get install openjdk-7-jre-headless rsync
 </source>
 
- <a name="casava"/>
- <subsection name="Installing CASAVA/bcl2fastq">
-
- <p>CASAVA or bcl2fastq can be downloaded on the Illumina website
- <a href="http://support.illumina.com/sequencing/sequencing_software/casava/downloads.ilmn">here for CASAVA</a> and
-<a href="http://support.illumina.com/downloads/bcl2fastq_conversion_software_184.ilmn">here for bcl2fast</a>.</p>
-
- <p>Next, we download and install CASAVA 1.8.2 on Ubuntu with the following lines:</p>
-
- <source>
-# Download CASAVA 1.8.2
-$ wget https://my.illumina.com/download/summary/Wr-sNFYJn0GHBVp759vFtw
-
-# Install runtime and compilation depenencies
-$ sudo apt-get install alien cmake libboost-all-dev libxml2-dev libz-dev libbz2-dev libncurses5-dev libxml-simple-perl xsltproc gnuplot
-
-# Launch compilation and installation
-$ VERSION=1.8.2 &amp;&amp; \
-  tar xjf CASAVA_v$VERSION.tar.bz2 &amp;&amp; \
-  mkdir CASAVA_v$VERSION-build &amp;&amp; \
-  cd CASAVA_v$VERSION-build &amp;&amp; \
-  ../CASAVA_v$VERSION/src/configure \
-    --prefix=/usr/local/casava-$VERSION \
-    --with-cmake=/usr/bin/cmake &amp;&amp; \
-  sudo make install
-
-# Remove CASAVA examples (not mandatory, save lot of space on the system)
-$ sudo rm -rf /usr/local/casava-$VERSION/share/CASAVA-$VERSION/examples
-</source>
-
- 	<h4>Patching Casava to allow bzip2 compression of fastq files</h4>
-
-    <p>To enable bzip2 compression in CASAVA 1.8, you need to comment with a '<tt>#</tt>' the next lines in
-      the  <tt>/usr/local/casava/share/CASAVA-1.8.2/makefiles/Config.mk</tt>:</p>
-<source>
-COMPRESSION:=gzip
-COMPRESSIONSUFFIX:=.gz
-</source>
-
-  </subsection>
 
   <a name="bcl2fastq"/>
    <subsection name="Installing bcl2fastq">
@@ -207,8 +170,37 @@ COMPRESSIONSUFFIX:=.gz
 		</source>
 
  </subsection>
+ 
+<a name="bcl2fastq2"/>
+<subsection name="Installing bcl2fastq2">
+	<p>Since September 2014, Illmunina publish a new version on bcl2fastq software, compatible with RTA version 2 (Real Time Analysis)
+		used on NextSeq 500 sequencer. This version is more simple to install.</p>
+<source> 
+$ cd /tmp 
+$ wget --no-check-certificate https://support.illumina.com/content/dam/illumina-support/documents/downloads/software/bcl2fastq/bcl2fastq2-v2.17.1.14-Linux-x86_64.rpm
 
- <a name="ncbi-blast+"/>
+# Install
+$ yum -y --nogpgcheck localinstall /tmp/bcl2fastq2-*.rpm
+
+# Patch a punctual error to search css file for create the final report html 
+$ cd /usr/local/bin 
+$ ln -s ../share/
+			
+# Install requiered dependencies
+$ yum install -y zip.x86_64
+</source>
+</subsection>
+   	
+<a name="docker"/>
+<subsection name="Installing docker">
+	<p>Now with Aozan, you can launch demultiplexing step with a Docker image on bcl2fastq from repository of the platform here. 
+		<a href="https://hub.docker.com/u/genomicpariscentre/">
+			<img src="images/logo_docker.png" alt="link to the platform repository Docker" border="1" /></a>
+		Installation using Docker: <a href="https://docs.docker.com/installation/">look at documentation Docker web site</a> 
+		</p>
+</subsection>
+   	
+   	<a name="ncbi-blast+"/>
  <subsection name="Installing ncbi-blast+, optional for quality control">
 
  <p>To installing ncbi-blast+ (or blastall) on your system (Ubuntu or centos), use the following command line: </p>
@@ -439,7 +431,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
 
    </subsection>
 
-    <subsection name="Illumina configuration">
+    <subsection name="Illumina HiSeq configuration">
 	    <p>In the lastest versions of HSC (HSC-2.x.x), <tt>Status_Files/</tt> and <tt>reports/</tt> directories in <tt>Basecalls/Data</tt> are no more created by default.
 	    This files are useful to display run statistics of working run without requiering SAV.</p>
 	    <p>You can force the creation of the directories by editing the <tt>C:\Illumina\RTA\Configs\HiSeq.Configuration.xml</tt> file and adding the following line :
@@ -458,7 +450,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
    </p>
 
    <ul>
-     <li><a href="first-base-report.html">First base report end step</a></li>
+     <li><a href="new-run-discovering.html">New run discovering step</a></li>
      <li><a href="end-run-discovering.html">End run discovering step</a></li>
      <li><a href="synchronization.html">Synchronization step</a></li>
      <li><a href="demultiplexing.html">Demultiplexing step</a></li>
