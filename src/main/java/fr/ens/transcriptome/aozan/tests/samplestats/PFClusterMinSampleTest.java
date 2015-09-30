@@ -64,7 +64,7 @@ public class PFClusterMinSampleTest extends AbstractSimpleSampleTest {
    * Public constructor.
    */
   public PFClusterMinSampleTest() {
-    super("pfclusterminsample", "", "PF_clusters_min");
+    super("samplestatspfclustermin", "", "PF_clusters_min");
   }
 
 }

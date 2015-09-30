@@ -69,12 +69,12 @@ public class HitNoLibrariesFastqScreenSamplestatsTest extends
     }
 
     try {
-      final double percent = value / (double) laneCount / 100.0;
+      final double percent = value / (double) laneCount;
 
       if (getInterval() == null)
         return new TestResult(percent);
 
-      return new TestResult(getInterval().getScore(percent), percent);
+      return new TestResult(getInterval().getScore(percent), percent, true);
 
     } catch (NumberFormatException e) {
 
@@ -127,7 +127,7 @@ public class HitNoLibrariesFastqScreenSamplestatsTest extends
    * Public constructor.
    */
   public HitNoLibrariesFastqScreenSamplestatsTest() {
-    super("hitnolibrariessum", "", "fastqScreen mapped except genome sample",
-        "%");
+    super("samplestathitnolibrariessum", "",
+        "fastqScreen mapped except genome sample", "%");
   }
 }

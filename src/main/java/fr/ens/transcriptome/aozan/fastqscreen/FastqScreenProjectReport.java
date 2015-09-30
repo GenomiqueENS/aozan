@@ -119,7 +119,7 @@ public class FastqScreenProjectReport {
       doc = docBuilder.newDocument();
 
     } catch (ParserConfigurationException e) {
-      e.printStackTrace();
+      throw new AozanException(e);
     }
 
     // Create the root element and add it to the document

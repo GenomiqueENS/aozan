@@ -61,14 +61,7 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
     setCompatibleForQCReport(true);
     setLaneCount(laneCount);
 
-    try {
-      return read(sampleSheetVersion);
-    } catch (IOException | AozanException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-
-    throw new AozanException("read sample sheet failed");
+    return read(sampleSheetVersion);
   }
 
   @Override

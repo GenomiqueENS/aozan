@@ -67,9 +67,6 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
 
   private final int laneCount;
 
-  @SuppressWarnings("unused")
-  private int fieldsCountExpected;
-
   private String currentSessionName;
 
   private boolean firstLineData = true;
@@ -126,7 +123,6 @@ class SampleSheetLineReaderV2 extends SampleSheetLineReader {
       design2.setHeaderColumns(fields);
       this.firstLineData = false;
       this.positionFields = checkHeaderColumnSessionData(fields);
-      this.fieldsCountExpected = positionFields.size();
 
     } else {
       if (isColumnLaneExist()) {

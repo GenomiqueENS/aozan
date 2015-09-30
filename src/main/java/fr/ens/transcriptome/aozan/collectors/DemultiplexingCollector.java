@@ -23,6 +23,7 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
+import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
@@ -73,6 +74,8 @@ public class DemultiplexingCollector implements Collector {
       return;
     }
 
+    this.casavaOutputPath = properties.getProperty(QC.CASAVA_OUTPUT_DIR);
+
     final String bcl2fastqVersion =
         properties.getProperty(QC.BCL2FASTQ_VERSION);
 
@@ -83,7 +86,7 @@ public class DemultiplexingCollector implements Collector {
     } else if (SampleSheetUtils.isBcl2fastqVersion2(bcl2fastqVersion)) {
       // Conversion collector
       this.subCollector = new ConversionStatsCollector();
-      
+
     } else {
       throw new AozanRuntimeException("bcl2fastq version is invalid "
           + bcl2fastqVersion + " to identify required Demux collector.");

@@ -408,6 +408,90 @@ public class EntityStat implements Comparable<EntityStat> {
         + ", asCompiledData=" + asCompiledData + "]";
   }
 
+  
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result =
+        prime * result + ((entityName == null) ? 0 : entityName.hashCode());
+    result = prime * result + ((genomes == null) ? 0 : genomes.hashCode());
+    result = prime * result + (isIndexed ? 1231 : 1237);
+    result = prime * result + ((lanes == null) ? 0 : lanes.hashCode());
+    result =
+        prime * result + ((projectDir == null) ? 0 : projectDir.hashCode());
+    result =
+        prime * result + ((projectName == null) ? 0 : projectName.hashCode());
+    result =
+        prime
+            * result
+            + ((reportDirectory == null) ? 0 : reportDirectory.hashCode());
+    result = prime * result + sampleCount;
+    result =
+        prime * result + ((sampleName == null) ? 0 : sampleName.hashCode());
+    result = prime * result + ((samples == null) ? 0 : samples.hashCode());
+    result = prime * result + (undeterminedSample ? 1231 : 1237);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    EntityStat other = (EntityStat) obj;
+    if (entityName == null) {
+      if (other.entityName != null)
+        return false;
+    } else if (!entityName.equals(other.entityName))
+      return false;
+    if (genomes == null) {
+      if (other.genomes != null)
+        return false;
+    } else if (!genomes.equals(other.genomes))
+      return false;
+    if (isIndexed != other.isIndexed)
+      return false;
+    if (lanes == null) {
+      if (other.lanes != null)
+        return false;
+    } else if (!lanes.equals(other.lanes))
+      return false;
+    if (projectDir == null) {
+      if (other.projectDir != null)
+        return false;
+    } else if (!projectDir.equals(other.projectDir))
+      return false;
+    if (projectName == null) {
+      if (other.projectName != null)
+        return false;
+    } else if (!projectName.equals(other.projectName))
+      return false;
+    if (reportDirectory == null) {
+      if (other.reportDirectory != null)
+        return false;
+    } else if (!reportDirectory.equals(other.reportDirectory))
+      return false;
+    if (sampleCount != other.sampleCount)
+      return false;
+    if (sampleName == null) {
+      if (other.sampleName != null)
+        return false;
+    } else if (!sampleName.equals(other.sampleName))
+      return false;
+    if (samples == null) {
+      if (other.samples != null)
+        return false;
+    } else if (!samples.equals(other.samples))
+      return false;
+    if (undeterminedSample != other.undeterminedSample)
+      return false;
+    return true;
+  }
+
   //
   // Constructor
   //
@@ -416,6 +500,7 @@ public class EntityStat implements Comparable<EntityStat> {
    * @param runData the run data
    * @param projectName the project name
    * @param statCollector the stat collector
+   * @param fastqscreenReportToCompile the fastqscreen report to compile
    * @throws AozanException if an error occurs when listing source fastqscreen
    *           xml report file.
    */
@@ -431,9 +516,8 @@ public class EntityStat implements Comparable<EntityStat> {
    * @param runData the run data
    * @param projectName the project name
    * @param sampleName the sample name
-   * @param reportDirectory the report directory
-   * @param isFastqScreenCollectorSelected the is fastq screen collector
-   *          selected
+   * @param statCollector the stat collector
+   * @param fastqscreenReportToCompile the fastqscreen report to compile
    * @throws AozanException the aozan exception
    */
   public EntityStat(final RunData runData, final String projectName,

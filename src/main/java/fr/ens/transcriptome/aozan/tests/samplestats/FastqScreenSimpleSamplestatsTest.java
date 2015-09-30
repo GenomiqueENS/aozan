@@ -77,12 +77,12 @@ public class FastqScreenSimpleSamplestatsTest extends AbstractSimpleSampleTest {
     }
 
     try {
-      final double percent = value / (double) laneCount / 100.0;
+      final double percent = value / (double) laneCount;
 
       if (getInterval() == null)
         return new TestResult(percent);
 
-      return new TestResult(getInterval().getScore(percent), percent);
+      return new TestResult(getInterval().getScore(percent), percent, true);
 
     } catch (NumberFormatException e) {
 
@@ -223,7 +223,7 @@ public class FastqScreenSimpleSamplestatsTest extends AbstractSimpleSampleTest {
    */
   public FastqScreenSimpleSamplestatsTest(final String genome,
       final boolean isGenomeContamination) {
-    super("fsqmappedsum", "", "fastqscreen "
+    super("samplestatsfsqmapped", "", "fastqscreen "
         + (isGenomeContamination ? "" : "single ") + "mapped on " + genome, "%");
     this.genomeReference = genome;
     this.isGenomeContamination = isGenomeContamination;

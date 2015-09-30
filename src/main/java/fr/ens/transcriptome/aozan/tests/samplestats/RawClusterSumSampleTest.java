@@ -63,7 +63,7 @@ public class RawClusterSumSampleTest extends AbstractSimpleSampleTest {
    * Public constructor.
    */
   public RawClusterSumSampleTest() {
-    super("rawclustersumsample", "", "Raw_clusters_sum");
+    super("samplestatrawclustersum", "", "Raw_clusters_sum");
   }
 
 }

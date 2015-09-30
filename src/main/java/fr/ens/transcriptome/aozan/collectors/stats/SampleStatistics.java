@@ -127,12 +127,13 @@ public class SampleStatistics extends StatisticsCollector {
   private List<File> extractFastqscreenReport(final String projectName,
       final String sampleName) throws AozanException {
 
-    List<File> reports = new ArrayList<>();
+    final List<File> reports = new ArrayList<>();
 
     if (projectName.equals(UNDETERMINED_SAMPLE)) {
-      reports = extractFastqscreenReportForUndeterminedSample();
+      reports.addAll(extractFastqscreenReportForUndeterminedSample());
     } else {
-      reports = extractFastqscreenReportOnProject(projectName, sampleName);
+      reports
+          .addAll(extractFastqscreenReportOnProject(projectName, sampleName));
     }
 
     // Sort by filename

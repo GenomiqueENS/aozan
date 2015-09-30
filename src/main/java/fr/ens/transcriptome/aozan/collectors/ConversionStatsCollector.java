@@ -86,20 +86,18 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
       return;
     }
 
-    try {
+    // Demux summary path
+    final String demuxSummaryPath =
+        this.casavaOutputPath + "/Stats/ConversionStats.xml";
 
-      // Demux summary path
-      final String demuxSummaryPath =
-          this.casavaOutputPath + "/Stats/ConversionStats.xml";
+    if (!new File(demuxSummaryPath).exists()) {
+      throw new AozanException(
+          "Demultiplexing Collector: source file not exists "
+              + demuxSummaryPath);
+    }
 
-      if (!new File(demuxSummaryPath).exists()) {
-        throw new AozanException(
-            "Demultiplexing Collector: source file not exists "
-                + demuxSummaryPath);
-      }
-
-      // Create the input stream
-      final InputStream is = new FileInputStream(demuxSummaryPath);
+    // Create the input stream
+    try (InputStream is = new FileInputStream(demuxSummaryPath)) {
 
       final DocumentBuilder dBuilder =
           DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -109,7 +107,6 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
       // Parse document to update run data
       parse(doc, data);
 
-      is.close();
     } catch (final IOException e) {
 
       throw new AozanException(e);

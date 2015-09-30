@@ -101,7 +101,7 @@ public class SamplesExceededContaminationThresholdSampleTest extends
    * Public constructor.
    */
   public SamplesExceededContaminationThresholdSampleTest() {
-    super("replicatexceededcontaminationthreshold", "",
+    super("samplestatexceededcontaminationthreshold", "",
         "Sample(s) exceeded contamination threshold");
   }
 

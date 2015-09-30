@@ -64,7 +64,7 @@ public class PFClusterSumSampleTest extends AbstractSimpleSampleTest {
    * Public constructor.
    */
   public PFClusterSumSampleTest() {
-    super("pfclustersumsample", "", "PF_clusters_sum");
+    super("samplestatpfclustersum", "", "PF_clusters_sum");
   }
 
 }

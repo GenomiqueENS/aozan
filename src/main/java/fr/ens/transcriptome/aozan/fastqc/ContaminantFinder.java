@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import uk.ac.babraham.FastQC.Sequence.Contaminant.Contaminant;
 import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.Settings;
@@ -153,7 +154,8 @@ public class ContaminantFinder {
 
       br.close();
     } catch (final IOException e) {
-      e.printStackTrace();
+      throw new AozanRuntimeException(
+          "In contaminant finder class, fail to reads contaminant list.");
     }
 
     return c.toArray(new Contaminant[0]);

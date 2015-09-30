@@ -134,17 +134,15 @@ public class ManagerQCPath {
         if (SampleSheetUtils.isBcl2fastqVersion1(bcl2fastqMajorVersion)) {
 
           manager =
-              new ManagerQCPath().new ManagerQCPathVersion1(
-                  samplesheetFilename, bcl2fastqVersion, bcl2fastqMajorVersion,
-                  fastqDir, laneCount);
+              new ManagerQCPathVersion1(samplesheetFilename, bcl2fastqVersion,
+                  bcl2fastqMajorVersion, fastqDir, laneCount);
 
         } else if (SampleSheetUtils.isBcl2fastqVersion2(bcl2fastqMajorVersion)) {
 
           // Instance ManagerQCPath for sample sheet version 2
           manager =
-              new ManagerQCPath().new ManagerQCPathVersion2(
-                  samplesheetFilename, bcl2fastqVersion, bcl2fastqMajorVersion,
-                  fastqDir, laneCount);
+              new ManagerQCPathVersion2(samplesheetFilename, bcl2fastqVersion,
+                  bcl2fastqMajorVersion, fastqDir, laneCount);
 
         } else {
           throw new AozanException(
@@ -178,15 +176,11 @@ public class ManagerQCPath {
 
       if (SampleSheetUtils.isBcl2fastqVersion1(version)) {
         // Instance ManagerQCPath for sample sheet version 1
-        manager =
-            new ManagerQCPath().new ManagerQCPathVersion1(samplesheet, fastq,
-                laneCount);
+        manager = new ManagerQCPathVersion1(samplesheet, fastq, laneCount);
 
       } else if (SampleSheetUtils.isBcl2fastqVersion1(version)) {
         // Instance ManagerQCPath for sample sheet version 2
-        manager =
-            new ManagerQCPath().new ManagerQCPathVersion2(samplesheet, fastq,
-                laneCount);
+        manager = new ManagerQCPathVersion2(samplesheet, fastq, laneCount);
       }
     }
 
@@ -313,6 +307,8 @@ public class ManagerQCPath {
   /**
    * Keep files that satisfy the specified filter in this directory and
    * beginning with this prefix.
+   * @param fastqSample the fastq sample
+   * @param read the read number
    * @return an array of abstract pathnames
    */
   public List<File> createListFastqFiles(final FastqSample fastqSample,
@@ -397,18 +393,6 @@ public class ManagerQCPath {
     this.laneCount = laneCount;
   }
 
-  /**
-   * Default constructor
-   */
-  private ManagerQCPath() {
-
-    this.bcl2fastqVersion = null;
-    this.bcl2fastqMajorVersion = null;
-    this.samplesheet = null;
-    this.fastqDirectory = null;
-    this.laneCount = -1;
-  }
-
   //
   // Internal class
   //
@@ -419,7 +403,7 @@ public class ManagerQCPath {
    * @author Sandrine Perrin
    * @since 2.0
    */
-  final class ManagerQCPathVersion1 extends ManagerQCPath {
+  final static class ManagerQCPathVersion1 extends ManagerQCPath {
 
     /**
      * Set the directory to the fastq files for this fastqSample.
@@ -497,7 +481,7 @@ public class ManagerQCPath {
    * @author Sandrine Perrin
    * @since 2.0
    */
-  final class ManagerQCPathVersion2 extends ManagerQCPath {
+  final static class ManagerQCPathVersion2 extends ManagerQCPath {
 
     /** The sample sheet version2. */
     private final SampleSheetVersion2 sampleSheetV2;

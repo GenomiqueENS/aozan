@@ -33,7 +33,6 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.logging.Logger;
 
-import com.google.common.base.Stopwatch;
 import com.google.common.io.Files;
 
 import fr.ens.transcriptome.aozan.AozanException;

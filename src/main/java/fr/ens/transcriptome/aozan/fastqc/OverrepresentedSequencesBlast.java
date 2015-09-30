@@ -389,11 +389,9 @@ public class OverrepresentedSequencesBlast {
       }
 
     } catch (final IOException e) {
-      // e.printStackTrace();
       throw new AozanException(e);
 
     } catch (final InterruptedException e) {
-      // e.printStackTrace();
       throw new AozanException(e);
     }
   }

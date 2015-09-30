@@ -190,7 +190,6 @@ public class SampleSheetVersion2 extends SampleSheet {
 
   /**
    * Convert sample sheet instance in string in csv format.
-   * @param design the design
    * @return the string
    */
   public String toCSV() {

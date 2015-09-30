@@ -47,6 +47,7 @@ import org.xml.sax.SAXException;
 
 import com.google.common.base.Strings;
 
+import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
@@ -87,8 +88,7 @@ public class RunInfo {
   public void parse(final String filepath) throws ParserConfigurationException,
       SAXException, IOException {
 
-    checkArgument(!Strings.isNullOrEmpty(filepath),
-        "RunInfo.xml path");
+    checkArgument(!Strings.isNullOrEmpty(filepath), "RunInfo.xml path");
 
     parse(new File(filepath));
   }
@@ -153,6 +153,9 @@ public class RunInfo {
           case "Number":
             this.number = Integer.parseInt(value);
             break;
+          default:
+            throw new AozanRuntimeException(
+                "in RunInfo unvalid value for name attribute on run tag.");
           }
         }
 
@@ -226,6 +229,10 @@ public class RunInfo {
           case "IsIndexedRead":
             read.indexedRead = "Y".equals(value.toUpperCase().trim());
             break;
+          default:
+            throw new AozanRuntimeException(
+                "in RunInfo unvalid value for name attribute on read tag.");
+
           }
 
           if (read.getNumber() == 0) {
@@ -273,6 +280,10 @@ public class RunInfo {
         case "LanePerSection":
           this.flowCellLanePerSection = value;
           break;
+        default:
+          throw new AozanRuntimeException(
+              "in RunInfo unvalid value for name attribute FlowcellLayout tag.");
+
         }
       }
     }

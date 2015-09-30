@@ -111,7 +111,7 @@ public class FastqScreenSampleReport {
       doc = docBuilder.newDocument();
 
     } catch (ParserConfigurationException e) {
-      e.printStackTrace();
+      throw new AozanException(e);
     }
 
     // Create the root element and add it to the document
@@ -314,7 +314,7 @@ public class FastqScreenSampleReport {
 
   /**
    * Instantiates a new fastq screen project report.
-   * @param project the project
+   * @param entites the entites
    * @param xslFile the xsl file
    */
   public FastqScreenSampleReport(final EntityStat entites, final File xslFile) {

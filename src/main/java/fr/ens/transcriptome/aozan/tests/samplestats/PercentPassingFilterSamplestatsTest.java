@@ -108,7 +108,7 @@ public class PercentPassingFilterSamplestatsTest extends AbstractSampleTest {
    * Public constructor.
    */
   public PercentPassingFilterSamplestatsTest() {
-    super("passingfilterclusterreplicapercent", "", "Passing filter", "%");
+    super("samplestatspassingfilterclusterpercent", "", "Passing filter", "%");
   }
 
 }

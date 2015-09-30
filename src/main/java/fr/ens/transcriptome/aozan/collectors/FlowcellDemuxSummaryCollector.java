@@ -75,16 +75,14 @@ public class FlowcellDemuxSummaryCollector extends DemultiplexingCollector {
       return;
     }
 
-    try {
+    // Demux summary path
+    final String demuxSummaryPath =
+        this.casavaOutputPath
+            + "/Basecall_Stats_" + data.getFlowcellId()
+            + "/Flowcell_demux_summary.xml";
 
-      // Demux summary path
-      final String demuxSummaryPath =
-          this.casavaOutputPath
-              + "/Basecall_Stats_" + data.getFlowcellId()
-              + "/Flowcell_demux_summary.xml";
-
-      // Create the input stream
-      final InputStream is = new FileInputStream(demuxSummaryPath);
+    // Create the input stream
+    try (InputStream is = new FileInputStream(demuxSummaryPath)) {
 
       final DocumentBuilder dBuilder =
           DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -93,7 +91,6 @@ public class FlowcellDemuxSummaryCollector extends DemultiplexingCollector {
 
       parse(doc, data);
 
-      is.close();
     } catch (final IOException e) {
 
       throw new AozanException(e);
