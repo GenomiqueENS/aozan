@@ -103,7 +103,7 @@ public class PercentErrorRateMeanGlobalTest extends AbstractGlobalTest {
    * Public constructor.
    */
   public PercentErrorRateMeanGlobalTest() {
-    super("errorratemean", "", "Error mean", "%");
+    super("globalerrorrate", "", "Error mean", "%");
   }
 
 }

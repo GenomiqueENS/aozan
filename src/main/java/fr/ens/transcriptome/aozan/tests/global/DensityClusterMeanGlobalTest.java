@@ -69,7 +69,7 @@ public class DensityClusterMeanGlobalTest extends AbstractGlobalTest {
     }
 
     try {
-      final long clusterRawMean = clusterRawSum / laneCount; 
+      final long clusterRawMean = clusterRawSum / laneCount;
       final double density = clusterRawMean * densityRatio / 1000.0;
 
       if (interval == null)
@@ -103,7 +103,7 @@ public class DensityClusterMeanGlobalTest extends AbstractGlobalTest {
    * Public constructor.
    */
   public DensityClusterMeanGlobalTest() {
-    super("densityclustermean", "", "Density Cluster");
+    super("globaldensitycluster", "", "Density Cluster");
   }
 
 }
