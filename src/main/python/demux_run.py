@@ -310,8 +310,6 @@ def get_bcl2fastq_version(run_id, conf):
 
     version = conf[Settings.BCL2FASTQ_VERSION_FOR_HISEQ_KEY] if common.is_sequencer_hiseq(run_id, conf) else conf[Settings.BCL2FASTQ_VERSION_FOR_NEXTSEQ_KEY]
     
-    print "DEBUG bcl2fastq from conf file is " + str(version)
-    
     if not (version.startswith('1') or version.startswith('2') or version == 'latest'):
         raise Exception('Invalid bcl2fastq version set ' + str(version) + ". Except: " + BCL2FASTQ_VERSION_1 or BCL2FASTQ_VERSION_2)
     
