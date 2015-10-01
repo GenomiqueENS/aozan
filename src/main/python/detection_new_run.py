@@ -59,9 +59,8 @@ def get_available_run_ids(conf):
             if not (os.path.isdir(hiseq_data_path + '/' + f) and hiseq_run.check_run_id(f, conf)):
                 # No valid entry
                 continue
-                
-            if not detection_end_run.check_end_run(f, conf) and \
-                os.path.exists(hiseq_data_path + '/' + f + '/RunInfo.xml'):
+            
+            if os.path.exists(hiseq_data_path + '/' + f + '/RunInfo.xml') and not detection_end_run.check_end_run(f, conf):
                 # TODO
                 # os.path.exists(hiseq_data_path + '/' + f + '/First_Base_Report.htm'):
 

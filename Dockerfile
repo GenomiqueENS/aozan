@@ -4,7 +4,7 @@
 ############################################################
 
 # Set the base image to bcl2fastq-1.8.4
-FROM genomicpariscentre/bcl2fastq2:2.17
+FROM genomicpariscentre/bcl2fastq2:2.17.1.14
 
 # File Author / Maintainer
 MAINTAINER Laurent Jourdren <jourdren@biologie.ens.fr>
