@@ -79,7 +79,6 @@ def check_end_run(run_id, conf):
     
     # TODO
     if hiseq_data_path == False:
-        print 'no path found '
         return False
 
     # if reads_number equals -1, runParameters.xml is missing

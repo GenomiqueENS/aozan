@@ -5,7 +5,8 @@ Created on 6 avril 2015
 
 With include NextSeq management, replace old first_base_report.py
  
-@author: sperrin
+@author: Laurent Jourdren
+@author: Sandrine Perrin
 '''
 
 import common, aozan, hiseq_run, detection_end_run
@@ -19,7 +20,7 @@ from fr.ens.transcriptome.aozan.Settings import HISEQ_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import FIRST_BASE_REPORT_STEP_KEY
 from fr.ens.transcriptome.aozan.Settings import HISEQ_STEP_KEY
 
-DONE_FILE = 'detection_new_run.done'
+DONE_FILE = 'first_base_report.done'
 
 
 def load_processed_run_ids(conf):
@@ -60,10 +61,13 @@ def get_available_run_ids(conf):
                 # No valid entry
                 continue
             
-            if os.path.exists(hiseq_data_path + '/' + f + '/RunInfo.xml') and not detection_end_run.check_end_run(f, conf):
+            # NextSeq sequencer create this file after clusterisation step
+            if not os.path.exists(hiseq_data_path + '/' + f + '/RunInfo.xml'):
+                continue
+            
+            if not detection_end_run.check_end_run(f, conf):
                 # TODO
                 # os.path.exists(hiseq_data_path + '/' + f + '/First_Base_Report.htm'):
-
                 result.add(f)
 
     return result
@@ -113,6 +117,10 @@ def send_report(run_id, conf):
     #
 
     run_info_path = hiseq_run.get_runinfos_file(run_id, conf)
+    
+    if run_info_path is None:
+        return
+    
     run_info = RunInfo()
     run_info.parse(File(run_info_path))
 

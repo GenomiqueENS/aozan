@@ -41,7 +41,12 @@ def get_runinfos_file(run_id, conf):
 	if type(sequencer_path) is bool:
 		return None
 
-	return sequencer_path + '/' + run_id + '/RunInfo.xml'
+	path = sequencer_path + '/' + run_id + '/RunInfo.xml'
+
+	if not os.path.exists(path):
+		return None
+	
+	return path
 
 def get_reads_number(run_id, conf):
 	"""Get the number of read of a run.
