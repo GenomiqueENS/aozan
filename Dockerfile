@@ -19,7 +19,7 @@ RUN yum install -y java-1.7.0-openjdk.x86_64
 RUN mkdir /aozan_data
 
 # Install Aozan public version
-ADD https://github.com/GenomicParisCentre/aozan/releases/download/v2.0/aozan-2.0.tar.gz /tmp/
+ADD https://github.com/GenomicParisCentre/aozan/releases/download/v2.0-rc1/aozan-2.0-rc1.tar.gz /tmp/
 
 RUN cd /usr/local && tar xvzf /tmp/aozan-*.tar.gz && rm /tmp/aozan-*.tar.gz
 

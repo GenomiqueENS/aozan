@@ -441,7 +441,7 @@
                 With PE run, now all statistical data in quality control report are display, no more NA.
             </action>
 	</release>				
-        <release version="1.5" description="Aozan 1.5 release"  date="2015-04-29">
+    <release version="1.5" description="Aozan 1.5 release"  date="2015-04-29">
             <action dev="sperrin" type="add">
                 New dependency on FastQC version 0.11.3, publish 25/03/2015.
             </action>
@@ -450,5 +450,23 @@
 		the control quality report displays NA for this lane.
             </action>
 	</release>
+  
+	<release version="2.0-rc1" description="Aozan 2.0-rc1 release"  date="2015-10-01">
+            <action dev="sperrin" type="add">
+                Now Aozan can manager HiSeq and NextSeq sequencer at the same time.
+            </action>
+            <action dev="sperrin" type="add">
+                Now Aozan can manager futhermore bcl2fastq2 and new version on sample sheet file.
+            </action>
+            <action dev="sperrin" type="add">
+                Now Aozan can run the demultiplexing step with Docker images on bcl2fastq 1 or 2.
+            </action>
+            <action dev="sperrin" type="add">
+                The final quality control report includes a sample statistic table to compile data on technical replica
+            	if the run contains only one project name.
+            </action>
+            
+	</release>
+	
 	</body>
 </document>
