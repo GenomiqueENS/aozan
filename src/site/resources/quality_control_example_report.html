@@ -37,7 +37,7 @@
       background: #55D486;
     }
 
-   .sampleData tr:hover, .data tr:hover {
+   .sampleData tr:hover, .data tr:hover, .projectData tr:hover, .sampleStatsData tr:hover{
       z-index:2;
       box-shadow:0 0 20px rgba(0, 0, 0, 1);
       background:#F6F6B4;
@@ -197,6 +197,7 @@
 		text-align:center;
 		padding-left:5px;
 		padding-right:5px;
+		white-space:nowrap;
 	}
 
 	.linkFilterInactivate {
@@ -218,36 +219,117 @@
 		text-align:center;
 		padding-left:5px;
 		padding-right:5px;
+		white-space:nowrap;
 	}
+
 	.linkFilterInactivate:hover, .linkFilterActivate:hover {
 		background-color:#9A1319;
 		color:#000000;
 	}
 
-	#filterProject td{
+	#tableFilter td{
 		border:#ffffff;
 		border-style:hidden;
 	}
 
-	#data_simulated{
-    	padding-left: 50px;
-    }
-
   </style>
-<script language="javascript">
+<script type="text/javascript">
 <!--
 
-		function filterRow(project, elemLink) {
+     // Retrieve list lane number related to projet
+        function filterRow(lanes_related_project, typeFilter, name, elemLink) {
 
 			init_all('none');
-
-			var tab = document.getElementsByClassName(project);
-
-			for (var i=0; i < tab.length; i++){
-				tab[i].style.display ="table-row";
+			if (name == "undetermined"){
+				filterUndetermined(lanes_related_project);
+			} else if (typeFilter == 'project'){
+				filterProject(lanes_related_project, name);
+			} else {
+				filterSample(lanes_related_project, name);
 			}
 
-	        // Change class link
+
+            update_link_css(elemLink)
+		}
+
+
+		function filterUndetermined(lanes_related_project) {
+
+			//Split
+            var lanes = lanes_related_project[0].split(',');
+
+			var table_read = document.getElementsByClassName('sampleData');
+			// Parsing read
+			for (var read = 0; read < table_read.length ; read++){
+				// Parsing lanes set in parameters
+				for (var j=0; j < lanes.length; j++){
+
+					// Get rows number
+					var node_lane = table_read[read].getElementsByClassName(lanes[j]);
+					var last_row = node_lane.length -1 ;
+					// Display last rows from selected lane
+					node_lane[last_row].style.display ="table-row";
+				}
+			}
+
+
+			// Display row on undetermined in Sample statistics table
+			filterSample(lanes_related_project, "undetermined");
+		}
+
+		function filterProject(lanes_related_project, project_name) {
+
+			//Split
+            var lanes = lanes_related_project[0].split(',');
+
+			// Filter sample table data
+			for (var n=0; n < lanes.length; n++){
+				var node = document.getElementsByClassName(lanes[n]);
+				for (var i=0; i < node.length; i++){
+					node[i].style.display ="table-row";
+				}
+			}
+
+			// Filter project table data
+			var projects = document.getElementsByClassName('projectData')[0];
+			var project_row = projects.getElementsByClassName(project_name);
+
+			// One row by project
+			project_row[0].style.display ="table-row";
+        }
+
+		function filterSample(lanes_related_project, sample_name) {
+
+			//Split
+            var lanes = lanes_related_project[0].split(',');
+
+			// Filter sample table data
+			for (var n=0; n < lanes.length; n++){
+				var node = document.getElementsByClassName(lanes[n]);
+
+				for (var i=0; i < node.length; i++){
+					sample_value =  node[i].cells[1].innerHTML;
+					if (sample_value.trim() == sample_name){
+						node[i].style.display ="table-row";
+					}
+				}
+			}
+
+			// Display project table data
+			var projects = document.getElementsByClassName('projectData')[0];
+			projects.rows[1].style.display ="table-row";
+
+			// Filter sample table data
+			var samples = document.getElementsByClassName('projectData')[1];
+			var replica = samples.getElementsByClassName(sample_name);
+
+			// One row by replica
+			replica[0].style.display ="table-row";
+		}
+
+
+		function update_link_css(elemLink){
+			// Change class link
 	       // Inactivate link
 	       document.getElementsByClassName('linkFilterActivate')[0].setAttribute('class', 'linkFilterInactivate');
 	       // Activate new element
@@ -257,9 +339,19 @@
 			window.location = '#project';
 		}
 
-		function init_all(display_val){
 
-			var tab = document.getElementsByClassName('sampleData');
+		function init_all(display_val){
+			init_table(display_val,'sampleData')
+			init_table(display_val,'projectData')
+
+			var header = document.getElementsByClassName('headerColumns');
+			for (var i=0; i < header.length; i++){
+				header[i].style.display = "table-row";
+			}
+		}
+
+		function init_table(display_val, class_name){
+			var tab = document.getElementsByClassName(class_name);
 
 			for (var n=0; n < tab.length; n++){
 				var rows = tab[n].getElementsByTagName('tr');
@@ -268,16 +360,8 @@
 					rows[i].style.display = display_val;
 				}
 			}
-
-			var header = document.getElementsByClassName('headerColumns');
-			for (var i=0; i < header.length; i++){
-				header[i].style.display = "table-row";
-			}
 		}
-
-		-->
-</script>
-
+		--></script>
   </style>
   </head>
   <body>
@@ -456,30 +540,26 @@
         </tbody>
       </table>
 
-      <a name="project"/>
+      <a id="project"/>
 		<div>
 		<h4>Filter by projects</h4>
-		<table id="filterProject">
+		<table id="tableFilter">
 		<tr>
 		<td>
 		<a href="javascript:void(0);" class="linkFilterActivate" onclick="window.location.reload(true);">ALL</a>
 		</td>
 		<td>
-		<a class="linkFilterInactivate" href="javascript:void(0);" onclick="javascript:filterRow(['Project_name_1'], this);">Project_name_1</a>
+		<a class="linkFilterInactivate" href="javascript:void(0);" onclick="javascript:filterRow(['1,2'], 'sample', '2013_0001', this);">2013_0001</a>
 		</td>
 		<td>
-		<a class="linkFilterInactivate" href="javascript:void(0);" onclick="javascript:filterRow(['Project_name_2'], this);">Project_name_2</a>
+		<a class="linkFilterInactivate" href="javascript:void(0);" onclick="javascript:filterRow(['1,2'], 'sample', '2013_0002', this);">2013_0002</a>
 		</td>
 		<td>
-		<a class="linkFilterInactivate" href="javascript:void(0);" onclick="javascript:filterRow(['Project_name_3'], this);">Project_name_3</a>
-		</td>
-		<td>
-		<a class="linkFilterInactivate" href="javascript:void(0);" onclick="javascript:filterRow(['Undetermined'], this);">Undetermined</a>
+		<a class="linkFilterInactivate" href="javascript:void(0);" onclick="javascript:filterRow(['1,2,3,4'], 'sample', 'undetermined', this);">undetermined</a>
 		</td>
 		</tr>
 		</table>
 
-		<a id="project"></a>
           <h2>Projects statistics report</h2>
           <table class="projectstat">
           <tr>
@@ -488,15 +568,28 @@
           <tr>
           <td class="Project_name_1">Project_name_1</td><td class="score-1">2</td><td class="score-1">hg19</td><td class="score-1">1</td><td class="score-1">true</td><td class="score-1">23 547 544</td><td class="score-1">12.32%</td><td class="score-1">0</td><td class="score9"><a href="quality_control_example_project/Project_name_1-fastqscreen.html">link</a></td>
           </tr>
-          <tr>
-          <td class="Project_name_2">Project_name_2</td><td class="score-1">2</td><td class="score-1">R norvegicus</td><td class="score-1">1</td><td class="score-1">true</td><td class="score-1">17 317 392</td><td class="score-1">3.45%</td><td class="score-1">3</td><td class="score9"><a href="quality_control_example_project/Project_name_1-fastqscreen.html">link</a></td>
-          </tr>
-          <tr>
-          <td class="Project_name_3">Project_name_3</td><td class="score-1">2</td><td class="score-1">mm10</td><td class="score-1">2</td><td class="score-1">true</td><td class="score-1">42 548 227</td><td class="score-1">10.19%</td><td class="score-1">2</td><td class="score9"><a href="quality_control_example_project/Project_name_1-fastqscreen.html">link</a></td>
-          </tr>
           </table>
 
-      <a name="sample"></a>
+          <h2>Samples statistics report</h2>
+		<div>
+
+
+          <table class="projectData">
+<tbody><tr class="headerColumns">
+<th>Samples</th><th>Description</th><th>Index</th><th>Raw_clusters_sum</th><th>PF_clusters_sum</th><th>Passing filter (%)</th><th>Sample in Run (%)</th><th>Sample in Project (%)</th><th>&gt;= Q30 Base PF (%)</th><th>Mean quality score base PF</th><th>Recovery_raw clusters sum</th><th>Recoverable raw cluster  (%)</th><th>Recovery_PF clusters sum</th><th>Recoverable PF cluster  (%)</th><th>FastqScreen report</th><th>Raw_clusters_max</th><th>Raw_clusters_min</th><th>PF_clusters_max</th><th>PF_clusters_min</th><th>Samples count</th><th>Sample(s) exceeded contamination threshold</th><th>fastqScreen mapped except genome sample (%)</th><th>fastqscreen mapped on adapters (%)</th><th>fastqscreen mapped on lsuref (%)</th><th>fastqscreen mapped on ssuref (%)</th><th>fastqscreen mapped on phix (%)</th><th>fastqscreen single mapped on droso545 (%)</th>
+</tr>
+<tr class="2013_0001">
+<td>2013_0001</td><td>SD460</td><td>ATCACG</td><td class="score9">88 332 180</td><td class="score9">88 332 180</td><td class="score-1">100.00%</td><td class="score-1">12.74%</td><td class="score-1">16.85%</td><td class="score9">90.45%</td><td class="score-1">33.67</td><td class="score-1">4 092 115</td><td class="score-1">4.63%</td><td class="score-1">4 092 115</td><td class="score-1">4.63%</td><td class="score9"><a href="quality_control_example_project/Project_name_1-fastqscreen.html">link</a></td><td class="score-1">22 768 333</td><td class="score-1">21 288 466</td><td class="score-1">22 768 333</td><td class="score-1">21 288 466</td><td class="score-1">4</td><td class="score-1">0</td><td class="score-1">0.00</td><td class="score-1">0.00</td><td class="score-1">0.00</td><td class="score-1">0.00</td><td class="score-1">0.00</td><td class="score-1">0.87</td>
+</tr>
+<tr class="2013_0002">
+<td>2013_0002</td><td>SD461</td><td>CGATGT</td><td class="score9">105 603 566</td><td class="score9">105 603 566</td><td class="score-1">100.00%</td><td class="score-1">15.23%</td><td class="score-1">20.14%</td><td class="score9">90.41%</td><td class="score-1">33.66</td><td class="score-1">2 784 656</td><td class="score-1">2.64%</td><td class="score-1">2 784 656</td><td class="score-1">2.64%</td><td class="score9"><a href="quality_control_example_project/Project_name_1-fastqscreen.html">link</a></td><td class="score-1">27 237 908</td><td class="score-1">25 532 332</td><td class="score-1">27 237 908</td><td class="score-1">25 532 332</td><td class="score-1">4</td><td class="score-1">0</td><td class="score-1">0.00</td><td class="score-1">0.00</td><td class="score-1">0.00</td><td class="score-1">0.00</td><td class="score-1">0.00</td><td class="score-1">0.87</td>
+</tr>
+<tr class="undetermined">
+<td>undetermined</td><td></td><td></td><td class="score9">169 267 115</td><td class="score9">31 522 771</td><td class="score-1">18.62%</td><td class="score-1">24.41%</td><td class="score-1">NA</td><td class="score0">74.95%</td><td class="score-1">30.50</td><td class="score-1">16 763 923</td><td class="score-1">9.90%</td><td class="score-1">16 763 923</td><td class="score-1">53.18%</td><td class="score9"><a href="quality_control_example_project/Project_name_1-fastqscreen.html">link</a></td><td class="score-1">44 476 163</td><td class="score-1">40 439 953</td><td class="score-1">8 214 839</td><td class="score-1">7 699 759</td><td class="score-1">4</td><td class="score-1">NA</td><td class="score-1">0.65</td><td class="score-1">0.00</td><td class="score-1">0.00</td><td class="score-1">0.00</td><td class="score-1">0.10</td><td class="score-1">0.54</td>
+</tr>
+</tbody></table>
+
+      <a id="sample"></a>
       <h2>Samples Quality report</h2>
       <h3>Read 1</h3>
       <table class="sampleData">
@@ -538,7 +631,7 @@
 			<th>link report fastqScreen</th>
 			<th>Sample name</th>
           </tr>
-          <tr class="Project_name_1">
+          <tr class="1">
             <td>1</td>
             <td>2013_0001</td>
             <td>description</td>
@@ -605,7 +698,7 @@
             <td class="repeat">2013_0001<br>
               Project_name_1</td>
           </tr>
-          <tr class="Project_name_1">
+          <tr class="1">
             <td>1</td>
             <td>2013_0002</td>
             <td>description</td>
@@ -673,140 +766,7 @@
             <td class="repeat">2013_0002<br>
               Project_name_1</td>
           </tr>
-          <tr class="Project_name_2">
-            <td>1</td>
-            <td>2013_0003</td>
-            <td>description</td>
-            <td>TTAGGC</td>
-            <td>Project_name_2</td>
-            <td class="score-1">17 317 392</td>
-            <td class="score9">16 922 556</td>
-            <td class="score9">97.72%</td>
-            <td class="score-1">18.54%</td>
-            <td class="score9">99.00%</td>
-            <td class="score-1">39.13</td>
-            <td class="score9">565 015</td>
-<td class="score-1">
-<a href="./quality_control_example_project/lane1-potentialindices.html">link</a>
-</td>
-<td class="score9">
-<a href="./quality_control_example_project/fastqc_report.html#M0">link</a>
-</td>
-<td class="score9">
-<a href="./quality_control_example_project/fastqc_report.html#M1">link</a>
-</td>
-<td class="score0">
-<a href="./quality_control_example_project/fastqc_report.html#M2">link</a>
-</td>
-<td class="score9">
-<a href="./quality_control_example_project/fastqc_report.html#M2">link</a>
-</td>
-<td class="score4">
-<a href="./quality_control_example_project/fastqc_report.html#M3">link</a>
-</td>
-<td class="score9">
-<a href="./quality_control_example_project/fastqc_report.html#M5">link</a>
-</td>
-<td class="score4">
-<a href="./quality_control_example_project/fastqc_report.html#M6">link</a>
-</td>
-<td class="score9">
-<a href="./quality_control_example_project/fastqc_report.html#M7">link</a>
-</td>
-<td class="score9">
-<a href="./quality_control_example_project/fastqc_report.html#M8">link</a>
-</td>
-<td class="score9">
-<a href="./quality_control_example_project/fastqc_report.html#M9">link</a>
-</td>
-<td class="score9">
-<a href="./quality_control_example_project/fastqc_report.html#M10">link</a>
-</td>
-<td class="score0">
-<a href="./quality_control_example_project/fastqc_report.html#M10">link</a>
-</td>
-<td class="score4">
-<a href="./quality_control_example_project/fastqc_report.html#M11">link</a>
-</td>
-            <td class="score9">2.93%</td>
-            <td class="score9">0.59%</td>
-            <td class="score9">0.01%</td>
-            <td class="score9">0.96%</td>
-            <td class="score9">1.51%</td>
-            <td>NA</td>
-            <td>NA</td>
-            <td class="score9"><a href="./quality_control_example_project/2013_0001_ATCACG_L001_R1_001-fastqscreen.html">link</a></td>
-            <td class="repeat">2013_0003<br>
-              Project_name_2</td>
-          </tr>
-          <tr class="Project_name_2">
-            <td>1</td>
-            <td>2013_0004</td>
-            <td>description</td>
-            <td>TGACCA</td>
-            <td>Project_name_2</td>
-            <td class="score-1">20 894 826</td>
-            <td class="score9">20 399 618</td>
-            <td class="score9">97.63%</td>
-            <td class="score-1">22.37%</td>
-            <td class="score9">99.15%</td>
-            <td class="score-1">39.22</td>
-            <td class="score9">1 265 015</td>
-<td class="score-1">
-<a href="./quality_control_example_project/lane1-potentialindices.html">link</a>
-</td>
-<td class="score9">
-<a href="./quality_control_example_project/fastqc_report.html#M0">link</a>
-</td>
-<td class="score9">
-<a href="./quality_control_example_project/fastqc_report.html#M1">link</a>
-</td>
-<td class="score0">
-<a href="./quality_control_example_project/fastqc_report.html#M2">link</a>
-</td>
-<td class="score9">
-<a href="./quality_control_example_project/fastqc_report.html#M2">link</a>
-</td>
-<td class="score4">
-<a href="./quality_control_example_project/fastqc_report.html#M3">link</a>
-</td>
-<td class="score9">
-<a href="./quality_control_example_project/fastqc_report.html#M5">link</a>
-</td>
-<td class="score4">
-<a href="./quality_control_example_project/fastqc_report.html#M6">link</a>
-</td>
-<td class="score9">
-<a href="./quality_control_example_project/fastqc_report.html#M7">link</a>
-</td>
-<td class="score9">
-<a href="./quality_control_example_project/fastqc_report.html#M8">link</a>
-</td>
-<td class="score9">
-<a href="./quality_control_example_project/fastqc_report.html#M9">link</a>
-</td>
-<td class="score9">
-<a href="./quality_control_example_project/fastqc_report.html#M10">link</a>
-</td>
-<td class="score0">
-<a href="./quality_control_example_project/fastqc_report.html#M10">link</a>
-</td>
-<td class="score4">
-<a href="./quality_control_example_project/fastqc_report.html#M11">link</a>
-</td>
-
-            <td class="score9">2.54%</td>
-            <td class="score9">2.28%</td>
-            <td class="score9">0.00%</td>
-            <td class="score9">0.22%</td>
-            <td class="score9">0.07%</td>
-            <td>NA</td>
-            <td>NA</td>
-            <td class="score9"><a href="./quality_control_example_project/2013_0001_ATCACG_L001_R1_001-fastqscreen.html">link</a></td>
-            <td class="repeat">2013_0004<br>
-              Project_name_2</td>
-          </tr>
-          <tr class="Undetermined">
+          <tr class="1">
             <td>1</td>
             <td>Undetermined</td>
             <td>No description</td>
@@ -873,12 +833,12 @@
             <td class="repeat">Undetermined<br>
               Undetermined</td>
           </tr>
-          <tr class="Project_name_3">
+          <tr class="2">
             <td>2</td>
-            <td>2013_0005</td>
+            <td>2013_0001</td>
             <td>description</td>
             <td>ATCACG</td>
-            <td>Project_name_3</td>
+            <td>Project_name_1</td>
             <td class="score-1">50 494 677</td>
             <td class="score9">49 252 508</td>
             <td class="score9">97.23%</td>
@@ -937,15 +897,15 @@
             <td>NA</td>
             <td class="score9">61.45%</td>
             <td class="score9"><a href="./quality_control_example_project/2013_0001_ATCACG_L001_R1_001-fastqscreen.html">link</a></td>
-            <td class="repeat">2013_0005<br>
-              Project_name_3</td>
+            <td class="repeat">2013_0001<br>
+              Project_name_1</td>
           </tr>
-          <tr class="Project_name_3">
+          <tr class="2">
             <td>2</td>
-            <td>2013_0006</td>
+            <td>2013_0002</td>
             <td>description</td>
             <td>CGATGT</td>
-            <td>Project_name_3</td>
+            <td>Project_name_1</td>
             <td class="score-1">42 548 227</td>
             <td class="score9">40 901 610</td>
             <td class="score9">98.23%</td>
@@ -1004,10 +964,10 @@
             <td>NA</td>
             <td class="score9">58.16%</td>
             <td class="score9"><a href="./quality_control_example_project/2013_0001_ATCACG_L001_R1_001-fastqscreen.html">link</a></td>
-            <td class="repeat">2013_0006<br>
-              Project_name_3</td>
+            <td class="repeat">2013_0002<br>
+              Project_name_1</td>
           </tr>
-          <tr class="Undetermined">
+          <tr class="2">
             <td>2</td>
             <td>Undetermined</td>
             <td>No description</td>
