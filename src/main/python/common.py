@@ -732,10 +732,8 @@ def check_configuration(conf, configuration_file_path):
         True if the configuration is valid
     """
     
-    # steps_to_launch = extract_steps_to_launch(False, conf)
-    # TODO to debug
-    steps_to_launch = extract_steps_to_launch(True, conf)
-
+    steps_to_launch = extract_steps_to_launch(False, conf)
+    
     msg = ''
 
     # # Path common on all steps
