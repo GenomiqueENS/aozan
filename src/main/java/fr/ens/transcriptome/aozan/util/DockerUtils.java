@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
@@ -45,7 +46,6 @@ import com.spotify.docker.client.LogMessage;
 import com.spotify.docker.client.LogStream;
 import com.spotify.docker.client.messages.ContainerConfig;
 import com.spotify.docker.client.messages.ContainerCreation;
-import com.spotify.docker.client.messages.ContainerExit;
 import com.spotify.docker.client.messages.ContainerInfo;
 import com.spotify.docker.client.messages.HostConfig;
 
@@ -83,7 +83,6 @@ public class DockerUtils {
 
   public void run() {
     // Create connection
-    System.out.println(" * TEST Create connection");
     final DockerClient docker =
         new DefaultDockerClient("unix:///var/run/docker.sock");
 
@@ -92,15 +91,10 @@ public class DockerUtils {
       final String image = buildImageName();
       LOGGER.warning("BUILD docker image name " + image);
 
-      assert (image.equals("genomicpariscentre/bcl2fastq2:latest"));
-
       // Pull image
-      System.out.println(" * TEST Pull image");
       docker.pull(image);
 
       // Create container
-      System.out.println(" * TEST Create config");
-
       final HostConfig hostConfig =
           HostConfig.builder().binds(this.mountArgument).build();
 
@@ -113,35 +107,27 @@ public class DockerUtils {
       final String workDir = this.workDirectoryDocker;
 
       // // Create container
-      // System.out.println(" * Create config "
-      // + "\n\tdocker " + docker + "\n\t imagename " + image
-      // + "\n\t host Configure is  " + hostConfig + "\n\tcommend line "
-      // + Joiner.on(" ").join(cmd) + "\n\twork directory " + workDir
-      // + "\n\tpermission " + permission);
-
-      System.out.println(" * Create config "
+      LOGGER.warning("Docker create config "
           + "\n\tdocker " + docker + "\n\t imagename " + image
-          + "\n\t host Configure is  " + hostConfig + "\n\tcommend line " + cmd
-          + "\n\twork directory " + workDir + "\n\tpermission " + permission);
+          + "\n\t host Configure is  " + hostConfig + "\n\tcommend line "
+          + Joiner.on(" ").join(cmd) + "\n\twork directory " + workDir
+          + "\n\tpermission " + permission);
 
       final ContainerConfig config =
           ContainerConfig.builder().image(image).cmd(cmd)
               .hostConfig(hostConfig).user(permission).workingDir(workDir)
               .build();
 
-      System.out.println(" * TEST Create container");
       ContainerCreation creation;
       creation = docker.createContainer(config);
       final String id = creation.id();
-      System.out.println("id: " + id);
 
       // Inspect container
-      System.out.println(" * TEST Inspect container");
       final ContainerInfo info = docker.inspectContainer(id);
-      System.out.println("info: " + info);
+      LOGGER.info("Docker container id: " + id);
+      LOGGER.info("Docker container info: " + info);
 
       // Start container
-      System.out.println(" * TEST Start container");
       docker.startContainer(id);
 
       // Redirect stdout and stderr
@@ -151,14 +137,13 @@ public class DockerUtils {
       redirect(logStream, this.stdoutFile, this.stderrFile);
 
       // Kill container
-      System.out.println(" * TEST Wait end of container container");
-      System.out.println(docker.waitContainer(id));
+      LOGGER.info("Docker exit value " + docker.waitContainer(id));
 
       this.exitValue = info.state().exitCode();
 
       // Remove container
-      System.out.println(" * TEST Remove container");
       docker.removeContainer(id);
+      LOGGER.info("Docker succes remove container " + id);
 
     } catch (DockerException | InterruptedException e) {
 
@@ -169,62 +154,6 @@ public class DockerUtils {
       docker.close();
     }
 
-  }
-
-  public void runFail() throws AozanException {
-
-    // TODO
-    checkOSCompatibilityDocker();
-
-    try {
-      final String imageName = buildImageName();
-
-      LOGGER.info("Docker build on image name  " + imageName);
-
-      final DockerClient docker = initDockerClient(imageName);
-      final HostConfig hostConfig = initHostConfig();
-
-      final ContainerCreation creation =
-          buildContainerDocker(docker, hostConfig, imageName);
-
-      final String id = creation.id();
-
-      final ContainerInfo info = docker.inspectContainer(id);
-      System.out.println("* Info: " + info);
-
-      LOGGER.warning(info.toString());
-
-      // Start container
-      System.out.println(" * Start container");
-      docker.startContainer(id);
-
-      initLoggerStream(docker, id);
-
-      // Kill container
-      System.out.println(" * Wait end of container container");
-      final ContainerExit ce = docker.waitContainer(id);
-
-      // Inspect container
-      System.out.println(" * Inspect container");
-      final int exitValue2 = info.state().exitCode();
-
-      System.out.println("container exit "
-          + ce + "\t info status found " + exitValue2);
-
-      this.exitValue = ce.statusCode();
-
-      // Remove container
-      System.out.println(" * Remove container");
-      docker.removeContainer(id);
-
-      // Close connection
-      docker.close();
-
-    } catch (DockerException | InterruptedException e) {
-      this.exitValue = -1;
-      this.exception = e;
-      throw new AozanException("Docker fail " + e.getMessage(), e);
-    }
   }
 
   /**
