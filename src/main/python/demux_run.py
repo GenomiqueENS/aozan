@@ -482,7 +482,9 @@ def demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesh
     common.log('WARNING',
                'demultiplexing in standalone with bcl2fastq version ' + str(bcl2fastq_version) + ', run this script ' + str(cmd), conf)
     
-    exit_code = os.system(cmd)
+    bcl2fastq_executable_path = conf[CASAVA_PATH_KEY]
+    
+    exit_code = os.system(bcl2fastq_executable_path + '/' + cmd)
     if exit_code != 0:
         error("error while setting executable command file bcl2fastq for run " + run_id,
               'Error while setting executable command file bcl2fastq (exit code: ' + str(exit_code) + ').\nCommand line:\n' + cmd, conf)
