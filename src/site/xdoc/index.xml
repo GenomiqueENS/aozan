@@ -86,6 +86,25 @@
 
 		<section name="What's new in Aozan?">
 
+			<subsection name="Aozan 2.0 manage HiSeq and NextSeq sequencers">
+				<p>Aozan can manage several sequencer, and now several type on sequencers.
+					Features are the same between this models.
+				</p>
+			</subsection>
+
+			<subsection name="bcl2fastq 2 software">
+				<p>Related to use of NextSeq, bcl2fastq version 2 can demultiplexing Hiseq or NextSeq run.
+					Aozan can manage with this new version and the new format sample sheet file. 
+				</p>
+			</subsection>
+
+			<subsection name="Docker available for demultiplexing step">
+				<p>Aozan can run demultiplexing step with a Docker images on bcl2fastq software. 
+					This images are available <a href="https://hub.docker.com/r/genomicpariscentre">on our repository</a>.
+				</p>
+			</subsection>
+			
+						
 			<subsection name="FastQC version 0.11.3">
 				<p>Aozan now use the lastest FastQC version (0.11.3) that includes : 
 					<ul><li>process files of Oxford Nanopore reads, </li>
