@@ -3,7 +3,7 @@
 # Based on CentOS with bcl2fastq-1.8.4 images made by Laurent Jourdren
 ############################################################
 
-# Set the base image to bcl2fastq-1.8.4
+# Set the base image to bcl2fastq2:2.17.1.14
 FROM genomicpariscentre/bcl2fastq2:2.17.1.14
 
 # File Author / Maintainer
@@ -14,6 +14,7 @@ MAINTAINER Laurent Jourdren <jourdren@biologie.ens.fr>
 
 # Install java 7
 RUN yum install -y java-1.7.0-openjdk.x86_64
+RUN yum install -y tar.x86_64
 
 # Build work directory
 RUN mkdir /aozan_data
@@ -29,6 +30,17 @@ RUN ln -s /usr/local/aozan*/aozan.sh /usr/local/bin
 RUN yum install -y rsync
 RUN yum install -y bzip2.x86_64
 RUN yum install -y zip.x86_64
+
+# Install blast
+RUN cd /tmp ; wget download.opensuse.org/repositories/home:/joscott/CentOS_CentOS-6/x86_64/ncbi-blast-2.2.29_plus-2.2.x86_64.rpm
+
+RUN yum -y --nogpgcheck localinstall /tmp/ncbi-blast*.rpm
+
+RUN rm -rf /tmp/*.rpm
+
+
+# Add script to run blastall via script legacy_blast.pl
+RUN echo -e  '#! /bin/bash\n\n/usr/bin/legacy_blast.pl blastall $@\n' > /usr/local/blastall && chmod +x /usr/local/blastall
 
 
 # Build usefull directory for Aozan
