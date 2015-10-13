@@ -454,7 +454,15 @@ def error(short_message, message, last_error_file_path, conf):
     if last_error_file_path == False:
         return
 
-    new_error = short_message + ' ' + message
+    new_error = ''
+    if short_message != None:
+        new_error = short_message
+    if message != None:
+        new_error += ' ' + message
+
+    if len(new_error) == 0:
+        new_error = 'Error without description'
+
     new_error.replace('\n', ' ')
     log('SEVERE', new_error, conf)
 
