@@ -70,9 +70,10 @@ public class FastqSample {
 
     final String firstFastqFileName = this.fastqFiles.get(0).getName();
 
-    return firstFastqFileName.substring(0, firstFastqFileName.length()
-        - FASTQ_EXTENSION.length()
-        - this.compressionType.getExtension().length());
+    return firstFastqFileName.substring(0,
+        firstFastqFileName.length()
+            - FASTQ_EXTENSION.length()
+            - this.compressionType.getExtension().length());
 
   }
 
@@ -124,8 +125,8 @@ public class FastqSample {
       return CompressionType.NONE;
     }
 
-    return CompressionType.getCompressionTypeByFilename(fastqFiles.get(0)
-        .getName());
+    return CompressionType
+        .getCompressionTypeByFilename(fastqFiles.get(0).getName());
 
   }
 

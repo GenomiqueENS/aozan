@@ -21,7 +21,7 @@
  *
  */
 
-package fr.ens.transcriptome.aozan.io;
+package fr.ens.transcriptome.aozan.illumina.samplesheet.io;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,8 +42,6 @@ import org.apache.poi.ss.usermodel.Row;
 
 import com.google.common.math.DoubleMath;
 
-import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.illumina.io.AbstractCasavaDesignTextReader;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 
 /**
@@ -51,22 +49,34 @@ import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
  * @since 0.1
  * @author Laurent Jourdren
  */
-public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
+public class SampleSheetXLSReader implements SampleSheetReader {
 
   private final InputStream is;
-
-  public SampleSheet readForQCReport(String sampleSheetVersion, int laneCount)
-      throws IOException, AozanException {
-
-    setCompatibleForQCReport(true);
-    setLaneCount(laneCount);
-
-    return read(sampleSheetVersion);
-  }
+  private int version = -1;
 
   @Override
-  public SampleSheet read(final String version) throws IOException,
-      AozanException {
+  public SampleSheet read() throws IOException {
+
+    final SampleSheetParser parser;
+
+    switch (this.version) {
+
+    case -1:
+      parser = new SampleSheetDiscoverFormatParser();
+      break;
+
+    case 1:
+      parser = new SampleSheetV1Parser();
+      break;
+
+    case 2:
+      parser = new SampleSheetV2Parser();
+      break;
+
+    default:
+      throw new IOException(
+          "Unknown bcl2fastq samplesheet format version: " + this.version);
+    }
 
     // create a POIFSFileSystem object to read the data
     final POIFSFileSystem fs = new POIFSFileSystem(this.is);
@@ -98,7 +108,7 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
 
       // Parse the fields
       if (!isFieldsEmpty(fields)) {
-        parseLine(fields, version);
+        parser.parseLine(fields);
       }
       fields.clear();
 
@@ -106,7 +116,7 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
 
     this.is.close();
 
-    return getDesign();
+    return parser.getSampleSheet();
   }
 
   /**
@@ -147,6 +157,24 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
     return true;
   }
 
+  /**
+   * Set the version of the samplesheet file to read.
+   * @param version the version of the samplesheet file to read
+   */
+  public void setVersion(final int version) {
+
+    this.version = version;
+  }
+
+  /**
+   * Get the version of the samplesheet file to read.
+   * @return the version of the samplesheet file to read
+   */
+  public int getVersion() {
+
+    return this.version;
+  }
+
   //
   // Constructors
   //
@@ -155,7 +183,7 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
    * Public constructor.
    * @param is InputStream to use
    */
-  public CasavaDesignXLSReader(final InputStream is) {
+  public SampleSheetXLSReader(final InputStream is) {
 
     if (is == null) {
       throw new NullPointerException("InputStream is null");
@@ -168,15 +196,15 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
    * Public constructor.
    * @param file File to use
    */
-  public CasavaDesignXLSReader(final File file) throws FileNotFoundException {
+  public SampleSheetXLSReader(final File file) throws FileNotFoundException {
 
     if (file == null) {
       throw new NullPointerException("File is null");
     }
 
     if (!file.isFile()) {
-      throw new FileNotFoundException("File not found: "
-          + file.getAbsolutePath());
+      throw new FileNotFoundException(
+          "File not found: " + file.getAbsolutePath());
     }
 
     this.is = new FileInputStream(file);
@@ -186,7 +214,7 @@ public class CasavaDesignXLSReader extends AbstractCasavaDesignTextReader {
    * Public constructor.
    * @param filename Filename to use
    */
-  public CasavaDesignXLSReader(final String filename)
+  public SampleSheetXLSReader(final String filename)
       throws FileNotFoundException {
 
     this(new File(filename));

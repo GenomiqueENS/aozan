@@ -49,9 +49,9 @@ import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.Settings;
-import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.Sample;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.Sample;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
 import fr.ens.transcriptome.eoulsan.data.DataFile;
@@ -72,8 +72,8 @@ public class FastqScreenGenomeMapper {
   private static final Logger LOGGER = Common.getLogger();
 
   /** Splitter. */
-  private static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults()
-      .omitEmptyStrings();
+  private static final Splitter COMMA_SPLITTER =
+      Splitter.on(',').trimResults().omitEmptyStrings();
 
   /** Pattern. */
   private static final Pattern PATTERN = Pattern.compile(".,;:/-_'");
@@ -94,8 +94,6 @@ public class FastqScreenGenomeMapper {
   private final Set<String> genomesToMapping;
 
   private final GenomeDescStorage storage;
-
-  private final String bcl2fastqVersion;
 
   /**
    * Set reference genomes for the samples of a run. Retrieve list of genomes
@@ -179,9 +177,8 @@ public class FastqScreenGenomeMapper {
 
     // Compute the genome description
     if (desc == null) {
-      desc =
-          GenomeDescription.createGenomeDescFromFasta(genomeFile.open(),
-              genomeFile.getName());
+      desc = GenomeDescription.createGenomeDescFromFasta(genomeFile.open(),
+          genomeFile.getName());
 
       if (this.storage != null) {
         this.storage.put(genomeFile, desc);
@@ -203,17 +200,14 @@ public class FastqScreenGenomeMapper {
       return;
     }
 
-    final File aliasGenomesFile =
-        new File(
-            this.properties
-                .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
+    final File aliasGenomesFile = new File(this.properties
+        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
 
     try {
       if (aliasGenomesFile.exists()) {
 
-        final Writer fw =
-            Files.asCharSink(aliasGenomesFile, Globals.DEFAULT_FILE_ENCODING,
-                FileWriteMode.APPEND).openStream();
+        final Writer fw = Files.asCharSink(aliasGenomesFile,
+            Globals.DEFAULT_FILE_ENCODING, FileWriteMode.APPEND).openStream();
 
         for (final String genomeSample : genomesToAdd) {
           fw.write(genomeSample + "=\n");
@@ -223,8 +217,8 @@ public class FastqScreenGenomeMapper {
         fw.close();
       }
     } catch (final IOException ignored) {
-      LOGGER
-          .warning("Writing alias genomes file failed : file can not be updated.");
+      LOGGER.warning(
+          "Writing alias genomes file failed : file can not be updated.");
     }
   }
 
@@ -243,13 +237,13 @@ public class FastqScreenGenomeMapper {
 
     if (designFile.exists() && designFile.isFile()) {
 
-      final CasavaDesignCSVReader casavaReader;
-      final SampleSheet casavaDesign;
+      final SampleSheetCSVReader samplesheetReader;
+      final SampleSheet samplesheet;
 
       try {
         // Reading casava design file in format csv
-        casavaReader = new CasavaDesignCSVReader(designFile);
-        casavaDesign = casavaReader.read(this.bcl2fastqVersion);
+        samplesheetReader = new SampleSheetCSVReader(designFile);
+        samplesheet = samplesheetReader.read();
 
       } catch (final Exception e) {
         // Return empty list
@@ -257,7 +251,7 @@ public class FastqScreenGenomeMapper {
       }
 
       // Retrieve all genome sample included in casava design file
-      for (final Sample casavaSample : casavaDesign) {
+      for (final Sample casavaSample : samplesheet) {
         final String genomeSample =
             casavaSample.getSampleRef().replaceAll("\"", "").toLowerCase();
 
@@ -297,7 +291,8 @@ public class FastqScreenGenomeMapper {
     final Set<String> genomes = new HashSet<>();
 
     if (val == null || val.isEmpty()) {
-      throw new AozanException("FastqScreen : none genomes contaminant define.");
+      throw new AozanException(
+          "FastqScreen : none genomes contaminant define.");
     }
 
     for (final String genome : COMMA_SPLITTER.split(val)) {
@@ -336,10 +331,9 @@ public class FastqScreenGenomeMapper {
   private Map<String, String> loadAliasGenomesFile() throws AozanException {
 
     // Extract property on alias genomes path
-    final String val =
-        this.properties.get(
-            Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY)
-            .trim();
+    final String val = this.properties
+        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY)
+        .trim();
     if (val == null || val.length() == 0) {
       LOGGER.fine("FastqScreen no alias genome file parameter define.");
       return Collections.emptyMap();
@@ -381,8 +375,8 @@ public class FastqScreenGenomeMapper {
       br.close();
 
     } catch (final IOException ignored) {
-      LOGGER
-          .warning("Reading alias genomes file failed : none genome sample can be used for detection contamination.");
+      LOGGER.warning(
+          "Reading alias genomes file failed : none genome sample can be used for detection contamination.");
       return Collections.emptyMap();
     }
 
@@ -481,21 +475,19 @@ public class FastqScreenGenomeMapper {
         .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
     settings.setGenomeMapperIndexStoragePath(this.properties
         .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY));
-    settings.setGenomeStoragePath(this.properties
-        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY));
+    settings.setGenomeStoragePath(
+        this.properties.get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY));
 
     // Set data protocol from Eoulsan not load for Aozan because it needs to add
     // dependencies
-    DataProtocolService.getInstance().addClassesToNotLoad(
-        Lists.newArrayList(
+    DataProtocolService.getInstance()
+        .addClassesToNotLoad(Lists.newArrayList(
             "fr.ens.transcriptome.eoulsan.data.protocols.S3DataProtocol",
             "fr.ens.transcriptome.eoulsan.data.protocols.S3NDataProtocol"));
 
     final DataFile genomeDescStoragePath =
         new DataFile(settings.getGenomeDescStoragePath());
     this.storage = SimpleGenomeDescStorage.getInstance(genomeDescStoragePath);
-
-    this.bcl2fastqVersion = this.properties.get(QC.BCL2FASTQ_VERSION);
 
     // Load alias genomes file
     this.genomesNamesConvertor = this.loadAliasGenomesFile();

@@ -46,9 +46,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.Sample;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.Sample;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 import fr.ens.transcriptome.eoulsan.EoulsanException;
 import fr.ens.transcriptome.eoulsan.EoulsanRuntimeException;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
@@ -143,7 +143,7 @@ public class ReDemux {
 
       for (Sample s : design.getSampleInLane(this.lane)) {
 
-        if (pattern.matcher(s.getIndex()).matches()) {
+        if (pattern.matcher(s.getIndex1()).matches()) {
 
           // Check if the index matches with more than one sample
           if (sample != null)
@@ -156,8 +156,8 @@ public class ReDemux {
 
       // Check if the index matches with one sample
       if (sample == null) {
-        throw new AozanException("No sample matches with index on lane "
-            + this.lane + ": " + index);
+        throw new AozanException(
+            "No sample matches with index on lane " + this.lane + ": " + index);
       }
       this.newIndexes.put(pattern, sample);
     }
@@ -177,7 +177,7 @@ public class ReDemux {
 
       for (Sample s : design.getSampleInLane(this.lane)) {
 
-        final String sampleIndex = s.getIndex();
+        final String sampleIndex = s.getIndex1();
 
         // TODO instead call mismatches method from Undetermined Thread
         final int mismatches = mismatches(index, sampleIndex);
@@ -194,8 +194,8 @@ public class ReDemux {
 
       // Check if the index matches with one sample
       if (sample == null) {
-        throw new AozanException("No sample matches with index on lane "
-            + this.lane + ": " + index);
+        throw new AozanException(
+            "No sample matches with index on lane " + this.lane + ": " + index);
       }
 
       // Check the number of mismatches of the best score
@@ -266,9 +266,8 @@ public class ReDemux {
 
       // Get the compression of the undetermined file to use the same
       // compression for the new files
-      final CompressionType compression =
-          CompressionType.getCompressionTypeByFilename(undeterminedFiles.get(0)
-              .getName());
+      final CompressionType compression = CompressionType
+          .getCompressionTypeByFilename(undeterminedFiles.get(0).getName());
 
       // Create the writers
       // final Map<Pattern, FastqWriter> writers =
@@ -349,21 +348,20 @@ public class ReDemux {
      * @throws IOException if one of the output files cannot be created
      */
     private Map<Pattern, FastqWriter> createWriters(final int read,
-        final CompressionType compression) throws FileNotFoundException,
-        IOException {
+        final CompressionType compression)
+            throws FileNotFoundException, IOException {
 
       final Map<Pattern, FastqWriter> result = Maps.newHashMap();
 
       for (Map.Entry<Pattern, Sample> e : this.newIndexes.entrySet()) {
 
-        final String sampleProject = e.getValue().getSampleProject();
+        final String sampleProject = e.getValue().getProject();
         final String sampleName = e.getValue().getSampleId();
-        final String sampleIndex = e.getValue().getIndex();
+        final String sampleIndex = e.getValue().getIndex1();
 
         // Define the output directory
-        final File subdir =
-            new File(this.outputDir, "Project_"
-                + sampleProject + File.separator + "Sample_" + sampleName);
+        final File subdir = new File(this.outputDir, "Project_"
+            + sampleProject + File.separator + "Sample_" + sampleName);
 
         // Create output directory if not exists
         if (!subdir.isDirectory()) {
@@ -374,8 +372,8 @@ public class ReDemux {
         }
 
         // Define the output file
-        final File file =
-            new File(subdir, sampleName
+        final File file = new File(subdir,
+            sampleName
                 + "_" + sampleIndex + "_L00" + lane + "_R" + read + "_redemux_"
                 + e.getKey().pattern() + ".fastq" + compression.getExtension());
 
@@ -389,21 +387,20 @@ public class ReDemux {
     }
 
     private Map<String, Entity> createWriters2(final int read,
-        final CompressionType compression) throws FileNotFoundException,
-        IOException {
+        final CompressionType compression)
+            throws FileNotFoundException, IOException {
 
       final Map<String, Entity> result = new HashMap<>();
 
       for (Map.Entry<Pattern, Sample> e : this.newIndexes.entrySet()) {
 
-        final String sampleProject = e.getValue().getSampleProject();
+        final String sampleProject = e.getValue().getProject();
         final String sampleName = e.getValue().getSampleId();
-        final String sampleIndex = e.getValue().getIndex();
+        final String sampleIndex = e.getValue().getIndex1();
 
         // Define the output directory
-        final File subdir =
-            new File(this.outputDir, "Project_"
-                + sampleProject + File.separator + "Sample_" + sampleName);
+        final File subdir = new File(this.outputDir, "Project_"
+            + sampleProject + File.separator + "Sample_" + sampleName);
 
         // Create output directory if not exists
         if (!subdir.isDirectory()) {
@@ -414,8 +411,8 @@ public class ReDemux {
         }
 
         // Define the output file
-        final File file =
-            new File(subdir, sampleName
+        final File file = new File(subdir,
+            sampleName
                 + "_" + sampleIndex + "_L00" + lane + "_R" + read
                 + "_redemux_.fastq" + compression.getExtension());
 
@@ -423,8 +420,8 @@ public class ReDemux {
             compression.createOutputStream(new FileOutputStream(file));
 
         if (!result.containsKey(sampleName)) {
-          result
-              .put(sampleName, new Entity(new FastqWriter(out), e.getValue()));
+          result.put(sampleName,
+              new Entity(new FastqWriter(out), e.getValue()));
         }
 
         result.get(sampleName).addPattern(e.getKey());
@@ -557,8 +554,8 @@ public class ReDemux {
       throws AozanException {
 
     // TODO extract max lane number from designfile
-    Preconditions.checkArgument(lane >= 1 && lane <= 8, "Invalid lane number: "
-        + lane);
+    Preconditions.checkArgument(lane >= 1 && lane <= 8,
+        "Invalid lane number: " + lane);
 
     final ReDemuxLane reDemuxLane;
 
@@ -635,15 +632,14 @@ public class ReDemux {
   public static void redemultiplex(final File designFile,
       final String bcl2fastqVersion, final List<String> lanesAndIndex,
       final File outputDir) throws FileNotFoundException, IOException,
-      AozanException, BadBioEntryException {
+          AozanException, BadBioEntryException {
 
     Preconditions.checkNotNull(designFile, "design file cannot be null");
     Preconditions.checkNotNull(lanesAndIndex, "laneAndIndex cannot be null");
     Preconditions.checkNotNull(outputDir, "output directory cannot be null");
 
     // Load design
-    final SampleSheet design =
-        new CasavaDesignCSVReader(designFile).read(bcl2fastqVersion);
+    final SampleSheet design = new SampleSheetCSVReader(designFile).read();
 
     // Create ReDemux object
     ReDemux rd = new ReDemux(designFile.getParentFile(), design, outputDir);

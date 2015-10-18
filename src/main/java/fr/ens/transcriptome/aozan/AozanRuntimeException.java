@@ -43,6 +43,25 @@ public class AozanRuntimeException extends RuntimeException {
   private static final long serialVersionUID = 1L;
 
   /**
+   * Create a new AozanRuntimeException with a message and a cause.
+   * @param message the message
+   * @param cause the cause
+   */
+  public AozanRuntimeException(String message, Throwable cause) {
+
+    super(message, cause);
+  }
+
+  /**
+   * Create a new AozanRuntimeException with a cause.
+   * @param cause the cause
+   */
+  public AozanRuntimeException(Throwable cause) {
+
+    super(cause);
+  }
+
+  /**
    * Create a new AozanRuntimeException with a message.
    * @param message the message
    */

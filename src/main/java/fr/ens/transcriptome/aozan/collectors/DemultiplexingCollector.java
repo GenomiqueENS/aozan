@@ -23,7 +23,6 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
-import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
@@ -33,7 +32,7 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
+import fr.ens.transcriptome.aozan.illumina.Bcl2FastqUtils;
 
 public class DemultiplexingCollector implements Collector {
 
@@ -79,11 +78,11 @@ public class DemultiplexingCollector implements Collector {
     final String bcl2fastqVersion =
         properties.getProperty(QC.BCL2FASTQ_VERSION);
 
-    if (SampleSheetUtils.isBcl2fastqVersion1(bcl2fastqVersion)) {
+    if (Bcl2FastqUtils.isBcl2fastqVersion1(bcl2fastqVersion)) {
       // Call flowcell collector
       this.subCollector = new FlowcellDemuxSummaryCollector();
 
-    } else if (SampleSheetUtils.isBcl2fastqVersion2(bcl2fastqVersion)) {
+    } else if (Bcl2FastqUtils.isBcl2fastqVersion2(bcl2fastqVersion)) {
       // Conversion collector
       this.subCollector = new ConversionStatsCollector();
 

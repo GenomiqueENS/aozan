@@ -1,26 +1,3 @@
-/*
- *                  Aozan development code
- *
- * This code may be freely distributed and modified under the
- * terms of the GNU General Public License version 3 or later 
- * and CeCILL. This should be distributed with the code. If you 
- * do not have a copy, see:
- *
- *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
- *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
- *
- * Copyright for this code is held jointly by the Genomic platform
- * of the Institut de Biologie de l'École Normale Supérieure and
- * the individual authors. These should be listed in @author doc
- * comments.
- *
- * For more information on the Aozan project and its aims,
- * or to join the Aozan Google group, visit the home page at:
- *
- *      http://www.transcriptome.ens.fr/aozan
- *
- */
-
 package fr.ens.transcriptome.aozan.io;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -38,14 +15,12 @@ import java.util.Map;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.QC;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.Sample;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
-import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetVersion2;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
+import fr.ens.transcriptome.eoulsan.util.Version;
 
 public class ManagerQCPath {
-
-  // Singleton
-  private static ManagerQCPath manager;
 
   /** The Constant FASTQ_EXTENSION. */
   public static final String FASTQ_EXTENSION = ".fastq";
@@ -62,20 +37,49 @@ public class ManagerQCPath {
   /** The Constant UNDETERMINED_PREFIX. */
   public static final String UNDETERMINED_PREFIX = SAMPLE_PREFIX + "lane";
 
-  /** The samplesheet instance. */
-  private final SampleSheet samplesheet;
+  private static ManagerQCPath singleton;
 
-  /** The bcl2fastq version. */
-  private final String bcl2fastqVersion;
-  private final String bcl2fastqMajorVersion;
+  private final Bcl2FastqVersion version;
 
   /** The fastq directory. */
   private final File fastqDirectory;
 
-  private final int laneCount;
+  /** The samplesheet instance. */
+  private final SampleSheet samplesheet;
 
   //
-  // Get instance method
+  // Enum
+  //
+
+  private enum Bcl2FastqVersion {
+    BCL2FASTQ_1, BCL2FASTQ_2, BCL2FASTQ_2_15;
+
+    public static Bcl2FastqVersion parseVersion(final String version) {
+
+      if (version == null) {
+        throw new NullPointerException("The version argument cannot be null");
+      }
+
+      final Version v = new Version(version);
+
+      switch (v.getMajor()) {
+
+      case 1:
+        return BCL2FASTQ_1;
+
+      case 2:
+        return v.getMinor() >= 15 ? BCL2FASTQ_2_15 : BCL2FASTQ_2;
+
+      default:
+        throw new AozanRuntimeException(
+            "Unknown bcl2fast major version: " + v.getMajor());
+
+      }
+    }
+  };
+
+  //
+  // Singleton
   //
 
   /**
@@ -85,163 +89,43 @@ public class ManagerQCPath {
    * @throws AozanException if an error occurs when create instance during
    *           parsing sample sheet file
    */
-  public static ManagerQCPath getInstance(final Map<String, String> globalConf)
+  public static void initizalize(final Map<String, String> globalConf)
       throws AozanException {
 
-    if (manager == null) {
-
-      final int laneCount = Integer.parseInt(globalConf.get(QC.LANE_COUNT));
-      // Extract sample sheet file
-      final File samplesheetFile =
-          new File(globalConf.get(QC.CASAVA_DESIGN_PATH));
-
-      // Extract sample sheet version
-      final String samplesheetVersion = globalConf.get(QC.BCL2FASTQ_VERSION);
-
-      // Extract fastq output directory
-      final File fastqDir = new File(globalConf.get(QC.CASAVA_OUTPUT_DIR));
-
-      // Return instance
-      return getInstance(samplesheetFile, samplesheetVersion, fastqDir,
-          laneCount);
+    if (singleton != null) {
+      throw new IllegalStateException("Singleton has been already initialized");
     }
 
-    return manager;
-  }
+    // Extract sample sheet file
+    final File samplesheetFile =
+        new File(globalConf.get(QC.CASAVA_DESIGN_PATH));
 
-  /**
-   * Gets the single instance of ManagerQCPath.
-   * @param samplesheetFilename the samplesheet file
-   * @param bcl2fastqVersion the bcl2fasq version
-   * @param fastqDir the fastq directory
-   * @param laneCount the lane count
-   * @return single instance of ManagerQCPath
-   * @throws AozanException if an error occurs when create instance during
-   *           parsing sample sheet file
-   */
-  public static ManagerQCPath getInstance(final File samplesheetFilename,
-      final String bcl2fastqVersion, final File fastqDir, final int laneCount)
-      throws AozanException {
+    // Extract sample sheet version
+    final String samplesheetVersion = globalConf.get(QC.BCL2FASTQ_VERSION);
 
-    if (manager == null) {
+    // Extract fastq output directory
+    final File fastqDir = new File(globalConf.get(QC.CASAVA_OUTPUT_DIR));
 
-      try {
-
-        final String bcl2fastqMajorVersion =
-            SampleSheetUtils.findBcl2fastqMajorVersion(bcl2fastqVersion);
-
-        // Instance ManagerQCPath for sample sheet version 1
-        if (SampleSheetUtils.isBcl2fastqVersion1(bcl2fastqMajorVersion)) {
-
-          manager =
-              new ManagerQCPathVersion1(samplesheetFilename, bcl2fastqVersion,
-                  bcl2fastqMajorVersion, fastqDir, laneCount);
-
-        } else if (SampleSheetUtils.isBcl2fastqVersion2(bcl2fastqMajorVersion)) {
-
-          // Instance ManagerQCPath for sample sheet version 2
-          manager =
-              new ManagerQCPathVersion2(samplesheetFilename, bcl2fastqVersion,
-                  bcl2fastqMajorVersion, fastqDir, laneCount);
-
-        } else {
-          throw new AozanException(
-              "Can not possible to initialize ManagerQCPath, sample sheet version invalid "
-                  + bcl2fastqVersion);
-        }
-
-      } catch (IOException e) {
-        throw new AozanException(e.getMessage(), e);
-      }
+    try {
+      singleton =
+          new ManagerQCPath(samplesheetFile, samplesheetVersion, fastqDir);
+    } catch (IOException e) {
+      throw new AozanException(e);
     }
-
-    // Return instance of manager
-    return manager;
-
   }
 
-  /**
-   * Gets the single instance of ManagerQCPath.
-   * @param samplesheet the sample sheet
-   * @param fastq the fastq directory
-   * @return single instance of ManagerQCPath
-   */
-  public static ManagerQCPath getInstance(final SampleSheet samplesheet,
-      final File fastq, final int laneCount) {
-
-    if (manager == null) {
-
-      // Extract sample sheet version
-      final String version = samplesheet.getSampleSheetVersion();
-
-      if (SampleSheetUtils.isBcl2fastqVersion1(version)) {
-        // Instance ManagerQCPath for sample sheet version 1
-        manager = new ManagerQCPathVersion1(samplesheet, fastq, laneCount);
-
-      } else if (SampleSheetUtils.isBcl2fastqVersion1(version)) {
-        // Instance ManagerQCPath for sample sheet version 2
-        manager = new ManagerQCPathVersion2(samplesheet, fastq, laneCount);
-      }
-    }
-
-    // Return instance manager
-    return manager;
-
-  }
-
-  /**
-   * Gets the single instance of ManagerQCPath.
-   * @return single instance of ManagerQCPath
-   */
   public static ManagerQCPath getInstance() {
 
-    if (manager == null) {
-      throw new AozanRuntimeException("Manager QC path not initialized yet.");
+    if (singleton == null) {
+      throw new IllegalStateException("Singleton has not been initialized");
     }
 
-    return manager;
-  }
-
-  // TODO method for test
-  public static void destroyInstance() {
-    manager = null;
-  }
-
-  /**
-   * Gets the constant fastq suffix.
-   * @param lane the lane
-   * @param read the read
-   * @return the constant fastq suffix
-   */
-  private static String getConstantFastqSuffix(final int lane, final int read) {
-
-    return String.format("_L%03d_R%d_001", lane, read);
+    return singleton;
   }
 
   //
-  // Getters
+  // Other methods
   //
-
-  /**
-   * @return the bcl2fastqVersion
-   */
-  public String getBcl2fastqVersion() {
-    return bcl2fastqVersion;
-  }
-
-  /**
-   * @return the bcl2fastqMajorVersion
-   */
-  public String getBcl2fastqMajorVersion() {
-    return bcl2fastqMajorVersion;
-  }
-
-  /**
-   * @return the lane count
-   */
-  public int getLaneCount() {
-    return this.laneCount;
-  }
 
   /**
    * @return the fastqDirectory
@@ -250,18 +134,45 @@ public class ManagerQCPath {
     return fastqDirectory;
   }
 
-  //
-  // Methods to get path file or directory
-  //
-
   /**
    * Find fastq output directory.
-   * @param fastSample the fast sample
+   * @param fastqSample the fast sample
    * @return the fastq output directory.
    */
-  public File casavaOutputDir(final FastqSample fastSample) {
+  public File casavaOutputDir(final FastqSample fastqSample) {
 
-    return manager.casavaOutputDir(fastSample);
+    if (fastqSample == null) {
+      throw new NullPointerException("fastqSample argument cannot be null");
+    }
+
+    switch (this.version) {
+
+    case BCL2FASTQ_1:
+
+      if (fastqSample.isIndeterminedIndices()) {
+        return new File(getFastqDirectory()
+            + "/" + UNDETERMINED_DIR_NAME + "/" + UNDETERMINED_PREFIX
+            + fastqSample.getLane());
+      }
+
+      return new File(getFastqDirectory()
+          + "/" + PROJECT_PREFIX + fastqSample.getProjectName() + "/"
+          + SAMPLE_PREFIX + fastqSample.getSampleName());
+
+    case BCL2FASTQ_2:
+    case BCL2FASTQ_2_15:
+
+      if (fastqSample.isIndeterminedIndices()) {
+        return getFastqDirectory();
+      }
+
+      return new File(getFastqDirectory() + "/" + fastqSample.getProjectName());
+
+    default:
+      throw new IllegalStateException(
+          "Unhandled Bcl2FastqVersion enum value: " + this.version);
+    }
+
   }
 
   /**
@@ -270,7 +181,43 @@ public class ManagerQCPath {
    */
   public String prefixFileName(final FastqSample fastqSample, final int read) {
 
-    return manager.prefixFileName(fastqSample, read);
+    switch (this.version) {
+
+    case BCL2FASTQ_1:
+
+      if (fastqSample.isIndeterminedIndices()) {
+
+        return String.format("lane%d_Undetermined%s", fastqSample.getLane(),
+            getConstantFastqSuffix(fastqSample.getLane(), read));
+      }
+
+      return String.format("%s_%s%s", fastqSample.getSampleName(),
+          fastqSample.getIndex(),
+          getConstantFastqSuffix(fastqSample.getLane(), read));
+
+    case BCL2FASTQ_2:
+    case BCL2FASTQ_2_15:
+
+      if (fastqSample.isIndeterminedIndices()) {
+
+        return String.format("Undetermined_S0%s",
+            getConstantFastqSuffix(fastqSample.getLane(), read));
+      }
+
+      checkNotNull(this.samplesheet,
+          "sample sheet on version 2 instance not initialize.");
+
+      // Build sample name on fastq file according to version used
+      final String fastqSampleName = buildFastqSampleName(fastqSample);
+
+      return String.format("%s_S%d%s", fastqSampleName,
+          extractOrderNumberSample(this.samplesheet, fastqSample),
+          getConstantFastqSuffix(fastqSample.getLane(), read));
+
+    default:
+      throw new IllegalStateException(
+          "Unhandled Bcl2FastqVersion enum value: " + this.version);
+    }
   }
 
   /**
@@ -279,7 +226,8 @@ public class ManagerQCPath {
    * @param read the read number
    * @return the prefix report filename
    */
-  public String buildPrefixReport(final FastqSample fastqSample, final int read) {
+  public String buildPrefixReport(final FastqSample fastqSample,
+      final int read) {
 
     if (fastqSample.isIndeterminedIndices()) {
       return String.format("lane%s_Undetermined%s", fastqSample.getLane(),
@@ -321,262 +269,115 @@ public class ManagerQCPath {
           public boolean accept(final File pathname) {
 
             return pathname.length() > 0
-                && pathname.getName().startsWith(
-                    manager.prefixFileName(fastqSample, read))
+                && pathname.getName()
+                    .startsWith(singleton.prefixFileName(fastqSample, read))
                 && pathname.getName().contains(FASTQ_EXTENSION);
           }
         }));
   }
 
   //
-  // Private constructor
+  // Other methods
   //
 
-  /**
-   * Instantiates a new manager qc path.
-   * @param samplesheet the sample sheet file
-   * @param bcl2fastqVersion the bcl2fastq full version name
-   * @param bcl2fastqMajorVersion the bcl2fastq major version name
-   * @throws AozanException if an error occurs during reading sample sheet file
-   * @throws IOException if an error occurs during reading sample sheet file
-   * @throws FileNotFoundException if sample sheet file not exist
-   */
-  private ManagerQCPath(final File samplesheet, final String bcl2fastqVersion,
-      final String bcl2fastqMajorVersion, final int laneCount)
-      throws FileNotFoundException, IOException, AozanException {
+  private String buildFastqSampleName(final FastqSample fastqSample) {
 
-    this(samplesheet, bcl2fastqVersion, bcl2fastqMajorVersion, samplesheet
-        .getParentFile(), laneCount);
-  }
+    switch (this.version) {
 
-  /**
-   * Instantiates a new manager qc path.
-   * @param samplesheet the samplesheet
-   * @param bcl2fastqVersion the bcl2fastq full version name
-   * @param bcl2fastqMajorVersion the bcl2fastq major version name
-   * @param fastq the fastq
-   * @throws AozanException if an error occurs during reading sample sheet file
-   * @throws IOException if an error occurs during reading sample sheet file
-   * @throws FileNotFoundException if sample sheet file not exist
-   */
-  private ManagerQCPath(final File samplesheet, final String bcl2fastqVersion,
-      final String bcl2fastqMajorVersion, final File fastq, final int laneCount)
-      throws FileNotFoundException, IOException, AozanException {
-
-    checkExistingStandardFile(samplesheet, "sample sheet");
-    checkExistingDirectoryFile(fastq, "fastq directory");
-
-    this.samplesheet =
-        SampleSheetUtils.getSampleSheet(samplesheet, bcl2fastqMajorVersion,
-            laneCount);
-
-    this.bcl2fastqVersion = bcl2fastqVersion;
-    this.bcl2fastqMajorVersion = bcl2fastqMajorVersion;
-    this.fastqDirectory = fastq;
-    this.laneCount = laneCount;
-  }
-
-  /**
-   * Instantiates a new manager qc path.
-   * @param samplesheet the samplesheet
-   * @param fastq the fastq
-   */
-  private ManagerQCPath(final SampleSheet samplesheet, final File fastq,
-      final int laneCount) {
-
-    this.samplesheet = samplesheet;
-    this.bcl2fastqVersion = this.samplesheet.getSampleSheetVersion();
-    this.bcl2fastqMajorVersion =
-        SampleSheetUtils.findBcl2fastqMajorVersion(this.bcl2fastqVersion);
-
-    this.fastqDirectory = fastq;
-    this.laneCount = laneCount;
-  }
-
-  //
-  // Internal class
-  //
-
-  /**
-   * The class instance a instance on ManagerQCPath which manage sample sheet
-   * and fastq directory from version 1.
-   * @author Sandrine Perrin
-   * @since 2.0
-   */
-  final static class ManagerQCPathVersion1 extends ManagerQCPath {
-
-    /**
-     * Set the directory to the fastq files for this fastqSample.
-     * @return directory of fastq files for a fastqSample
-     */
-    public File casavaOutputDir(final FastqSample fastSample) {
-
-      if (fastSample.isIndeterminedIndices()) {
-        return new File(getFastqDirectory()
-            + "/" + UNDETERMINED_DIR_NAME + "/" + UNDETERMINED_PREFIX
-            + fastSample.getLane());
-      }
-
-      return new File(getFastqDirectory()
-          + "/" + PROJECT_PREFIX + fastSample.getProjectName() + "/"
-          + SAMPLE_PREFIX + fastSample.getSampleName());
-    }
-
-    /**
-     * Set the prefix of the fastq file of read1 for this fastqSample.
-     * @return prefix fastq files for this fastqSample
-     */
-    public String prefixFileName(final FastqSample fastqSample, final int read) {
-
-      if (fastqSample.isIndeterminedIndices()) {
-
-        return String.format("lane%d_Undetermined%s", fastqSample.getLane(),
-            getConstantFastqSuffix(fastqSample.getLane(), read));
-      }
-
-      return String.format("%s_%s%s", fastqSample.getSampleName(),
-          fastqSample.getIndex(),
-          getConstantFastqSuffix(fastqSample.getLane(), read));
-    }
-
-    //
-    // Private constructor
-    //
-
-    /**
-     * Private constructor a new manager qc path.
-     * @param samplesheet the sample sheet file
-     * @param bcl2fastqVersion the bcl2fastq full version name
-     * @param bcl2fastqMajorVersion the bcl2fastq major version name
-     * @param fastqDir the fastq directory
-     * @param laneCount the lane count
-     * @throws FileNotFoundException the file not found exception
-     * @throws IOException Signals that an I/O exception has occurred.
-     * @throws AozanException the aozan exception
-     */
-    private ManagerQCPathVersion1(final File samplesheet,
-        final String bcl2fastqVersion, final String bcl2fastqMajorVersion,
-        final File fastqDir, final int laneCount) throws FileNotFoundException,
-        IOException, AozanException {
-
-      super(samplesheet, bcl2fastqVersion, bcl2fastqMajorVersion, fastqDir,
-          laneCount);
-
-    }
-
-    /**
-     * Private constructor a new manager qc path version1.
-     * @param samplesheet the sample sheet file
-     * @param fastq the fastq directory
-     */
-    private ManagerQCPathVersion1(final SampleSheet samplesheet,
-        final File fastq, final int laneCount) {
-      super(samplesheet, fastq, laneCount);
-    }
-  }
-
-  /**
-   * The class instance a instance on ManagerQCPath which manage sample sheet
-   * and fastq directory from version 2.
-   * @author Sandrine Perrin
-   * @since 2.0
-   */
-  final static class ManagerQCPathVersion2 extends ManagerQCPath {
-
-    /** The sample sheet version2. */
-    private final SampleSheetVersion2 sampleSheetV2;
-
-    /**
-     * Set the directory to the fastq files for this fastqSample.
-     * @return directory of fastq files for a fastqSample
-     */
-    public File casavaOutputDir(final FastqSample fastSample) {
-
-      if (fastSample.isIndeterminedIndices()) {
-        return getFastqDirectory();
-      }
-
-      return new File(getFastqDirectory() + "/" + fastSample.getProjectName());
-    }
-
-    /**
-     * Set the prefix of the fastq file of read1 for this fastqSample.
-     * @return prefix fastq files for this fastqSample
-     */
-    public String prefixFileName(final FastqSample fastqSample, final int read) {
-
-      if (fastqSample.isIndeterminedIndices()) {
-
-        return String.format("Undetermined_S0%s",
-            getConstantFastqSuffix(fastqSample.getLane(), read));
-      }
-
-      checkNotNull(this.sampleSheetV2,
-          "sample sheet on version 2 instance not initialize.");
-
-      // Build sample name on fastq file according to version used
-      final String fastqSampleName = buildFastqSampleName(fastqSample);
-
-      return String.format("%s_S%d%s", fastqSampleName,
-          this.sampleSheetV2.extractOrderNumberSample(fastqSample),
-          getConstantFastqSuffix(fastqSample.getLane(), read));
-
-    }
-
-    private String buildFastqSampleName(final FastqSample fastqSample) {
-
-      // With bcl2fastq version 2.15 and 2.16, in sample name
-      if (sampleSheetV2.getSampleSheetVersion().startsWith("2.15")
-          || sampleSheetV2.getSampleSheetVersion().startsWith("2.16")) {
-
-        return fastqSample.getSampleName().replace("_", "-");
-      }
-
+    case BCL2FASTQ_2:
       return fastqSample.getSampleName();
+
+    case BCL2FASTQ_2_15:
+      return fastqSample.getSampleName().replace("_", "-");
+
+    default:
+      throw new IllegalStateException(
+          "Unhandled Bcl2FastqVersion enum value: " + this.version);
+    }
+  }
+
+  /**
+   * Gets the constant fastq suffix.
+   * @param lane the lane
+   * @param read the read
+   * @return the constant fastq suffix
+   */
+  private static String getConstantFastqSuffix(final int lane, final int read) {
+
+    return String.format("_L%03d_R%d_001", lane, read);
+  }
+
+  /**
+   * Extract order number sample.
+   * @param fastqSample the fastq sample
+   * @return the int
+   */
+  private int extractOrderNumberSample(final SampleSheet samplesheet,
+      final FastqSample fastqSample) {
+
+    if (samplesheet == null) {
+      throw new NullPointerException("samplesheet argument cannot be null");
     }
 
-    //
-    // Private constructor
-    //
-
-    /**
-     * Private constructor a new manager qc path.
-     * @param samplesheet the sample sheet file
-     * @param bcl2fastqVersion the bcl2fastq full version name
-     * @param bcl2fastqMajorVersion the bcl2fastq major version name
-     * @param fastqDir the fastq directory
-     * @param laneCount the lane count
-     * @throws FileNotFoundException the file not found exception
-     * @throws IOException Signals that an I/O exception has occurred.
-     * @throws AozanException the Aozan exception
-     */
-    private ManagerQCPathVersion2(final File samplesheet,
-        final String bcl2fastqVersion, final String bcl2fastqMajorVersion,
-        final File fastqDir, final int laneCount) throws FileNotFoundException,
-        IOException, AozanException {
-
-      super(samplesheet, bcl2fastqVersion, bcl2fastqMajorVersion, fastqDir,
-          laneCount);
-
-      this.sampleSheetV2 =
-          (SampleSheetVersion2) SampleSheetUtils.getSampleSheet(samplesheet,
-              bcl2fastqVersion, laneCount);
-
+    if (fastqSample == null) {
+      throw new NullPointerException("fastqSample argument cannot be null");
     }
 
-    /**
-     * Private constructor a new manager qc path version2.
-     * @param samplesheet the sample sheet file
-     * @param fastqDir the fastq directory
-     * @param laneCount the lane count
-     */
-    private ManagerQCPathVersion2(final SampleSheet samplesheet,
-        final File fastqDir, final int laneCount) {
+    final int lane = fastqSample.getLane();
+    final String sampleName = fastqSample.getSampleName();
 
-      super(samplesheet, fastqDir, laneCount);
-
-      this.sampleSheetV2 = (SampleSheetVersion2) samplesheet;
+    // Undetermined cases always return 0
+    if (fastqSample.isIndeterminedIndices()) {
+      return 0;
     }
+
+    int i = 0;
+
+    for (Sample sample : samplesheet) {
+
+      i++;
+
+      if (lane > 0 && sample.getLane() != lane) {
+        continue;
+      }
+
+      if (sampleName.equals(sample.getSampleName())) {
+        return i;
+      }
+    }
+
+    return -1;
+  }
+
+  //
+  // Constructor
+  //
+
+  private ManagerQCPath(final File samplesheetFile,
+      final String bcl2fastqVersion, final File fastqDir)
+          throws FileNotFoundException, IOException {
+
+    if (samplesheetFile == null) {
+      throw new NullPointerException("samplesheetFile argument cannot be null");
+    }
+
+    if (bcl2fastqVersion == null) {
+      throw new NullPointerException(
+          "bcl2fastqVersion argument cannot be null");
+    }
+
+    if (fastqDir == null) {
+      throw new NullPointerException("fastqDir argument cannot be null");
+    }
+
+    checkExistingStandardFile(samplesheetFile, "sample sheet");
+    checkExistingDirectoryFile(fastqDir, "fastq directory");
+
+    this.version = Bcl2FastqVersion.parseVersion(bcl2fastqVersion);
+
+    // TODO implements this
+    this.fastqDirectory = fastqDir;
+    this.samplesheet = new SampleSheetCSVReader(samplesheetFile).read();
   }
 
 }

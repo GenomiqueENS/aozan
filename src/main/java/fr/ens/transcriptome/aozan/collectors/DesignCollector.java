@@ -41,12 +41,9 @@ import com.google.common.collect.Lists;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.Sample;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleV1;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleV2;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.Sample;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 
 /**
  * This class define a Casava design Collector.
@@ -58,13 +55,11 @@ public class DesignCollector implements Collector {
   /** The collector name. */
   public static final String COLLECTOR_NAME = "design";
 
-  public static final List<String> FASTQ_COLLECTOR_NAMES = Arrays.asList(
-      "tmppartialfastq", "undeterminedindexes", "fastqc", "globalstats",
-      "fastqscreen", "projectstats");
+  public static final List<String> FASTQ_COLLECTOR_NAMES =
+      Arrays.asList("tmppartialfastq", "undeterminedindexes", "fastqc",
+          "globalstats", "fastqscreen", "projectstats");
 
   private File casavaDesignFile;
-
-  private String bcl2fastqVersion;
 
   @Override
   public String getName() {
@@ -92,8 +87,6 @@ public class DesignCollector implements Collector {
 
     this.casavaDesignFile =
         new File(properties.getProperty(QC.CASAVA_DESIGN_PATH));
-    this.bcl2fastqVersion = properties.getProperty(QC.BCL2FASTQ_VERSION);
-
   }
 
   @Override
@@ -116,40 +109,45 @@ public class DesignCollector implements Collector {
             "design.lane" + s.getLane() + "." + s.getSampleId();
 
         data.put(prefix + ".sample.ref", s.getSampleRef());
-        data.put(prefix + ".indexed", s.isIndex());
-        data.put(prefix + ".index", s.getIndex());
+        data.put(prefix + ".indexed", s.isIndexed());
+        data.put(prefix + ".index", s.getIndex1());
         data.put(prefix + ".description", s.getDescription());
-        data.put(prefix + ".sample.project", s.getSampleProject());
+        data.put(prefix + ".sample.project", s.getProject());
 
-        if (s.isDualIndex()) {
+        if (s.isDualIndexed()) {
           data.put(prefix + ".index2", s.getIndex2());
         }
 
         // Extract data exist only with first version
-        if (SampleSheetUtils.isBcl2fastqVersion1(this.bcl2fastqVersion)) {
+        switch (s.getSampleSheet().getVersion()) {
 
-          final SampleV1 v1 = (SampleV1) s;
+        case 1:
 
-          data.put(prefix + ".flow.cell.id", v1.getFlowCellId());
-          data.put(prefix + ".control", v1.isControl());
-          data.put(prefix + ".recipe", v1.getRecipe());
-          data.put(prefix + ".operator", v1.getOperator());
+          data.put(prefix + ".flow.cell.id", s.get("FCID"));
+          data.put(prefix + ".control", s.get("Control"));
+          data.put(prefix + ".recipe", s.get("Recipe"));
+          data.put(prefix + ".operator", s.get("Operator"));
+          break;
 
-        } else if (SampleSheetUtils.isBcl2fastqVersion2(this.bcl2fastqVersion)) {
-
-          final SampleV2 v2 = (SampleV2) s;
+        case 2:
 
           // Include additional columns
-          for (Map.Entry<String, String> e : v2.getAdditionalColumns()
-              .entrySet()) {
-            data.put(prefix + "." + e.getKey().replaceAll(" _-", "."),
-                e.getValue());
+          for (String fieldName : s.getFieldNames()) {
+
+            if (!Sample.isInternalField(fieldName)) {
+              data.put(
+                  prefix + "." + fieldName.replaceAll(" _-", ".").toLowerCase(),
+                  s.get(fieldName));
+            }
           }
-        } else {
+
+          break;
+
+        default:
 
           throw new AozanException(
-              "Design collector bcl2fastq version is invalid "
-                  + this.bcl2fastqVersion);
+              "Design collector bcl2fastq version is invalid: "
+                  + s.getSampleSheet().getVersion());
         }
 
         final List<String> samplesInLane;
@@ -162,7 +160,7 @@ public class DesignCollector implements Collector {
         samplesInLane.add(s.getSampleId());
 
         // List projects in run
-        projectsName.add(s.getSampleProject());
+        projectsName.add(s.getProject());
       }
 
       // List samples by lane
@@ -183,16 +181,12 @@ public class DesignCollector implements Collector {
     }
   }
 
-  private SampleSheet createSampleSheet(final RunData data) throws IOException,
-      AozanException {
-
-    final String majorVersion =
-        SampleSheetUtils.findBcl2fastqMajorVersion(this.bcl2fastqVersion);
+  private SampleSheet createSampleSheet(final RunData data)
+      throws IOException, AozanException {
 
     Preconditions.checkNotNull(data, "run data instance");
 
-    return new CasavaDesignCSVReader(this.casavaDesignFile).readForQCReport(
-        majorVersion, data.getLaneCount());
+    return new SampleSheetCSVReader(this.casavaDesignFile).read();
   }
 
   @Override

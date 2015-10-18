@@ -21,7 +21,7 @@
  *
  */
 
-package fr.ens.transcriptome.aozan.illumina.io;
+package fr.ens.transcriptome.aozan.illumina.samplesheet.io;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,20 +34,57 @@ import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
 /**
- * This class define a writer for Casava design CSV files.
- * @since 1.1
+ * This class define a writer for bcl2fastq CSV samplesheet files.
+ * @since 2.0
  * @author Laurent Jourdren
  */
-public class CasavaDesignCSVWriter implements CasavaDesignWriter {
+public class SampleSheetCSVWriter implements SampleSheetWriter {
 
   private final Writer writer;
+  private int version = 2;
 
   @Override
-  public void writer(final SampleSheet design) throws IOException {
+  public void writer(final SampleSheet samplesheet) throws IOException {
 
-    this.writer.write(SampleSheetUtils.toCSV(design));
+    final String text;
+
+    switch (this.version) {
+
+    case 1:
+      text = SampleSheetUtils.toSampleSheetV1CSV(samplesheet);
+
+      break;
+
+    case 2:
+      text = SampleSheetUtils.toSampleSheetV2CSV(samplesheet);
+      break;
+
+    default:
+      throw new IOException(
+          "Unknown bcl2fastq samplesheet format version: " + this.version);
+    }
+
+    this.writer.write(text);
 
     this.writer.close();
+  }
+
+  /**
+   * Set the version of the samplesheet file to read.
+   * @param version the version of the samplesheet file to read
+   */
+  public void setVersion(final int version) {
+
+    this.version = version;
+  }
+
+  /**
+   * Get the version of the samplesheet file to read.
+   * @return the version of the samplesheet file to read
+   */
+  public int getVersion() {
+
+    return this.version;
   }
 
   //
@@ -58,7 +95,7 @@ public class CasavaDesignCSVWriter implements CasavaDesignWriter {
    * Public constructor.
    * @param writer Writer to use
    */
-  public CasavaDesignCSVWriter(final Writer writer) {
+  public SampleSheetCSVWriter(final Writer writer) {
 
     if (writer == null) {
       throw new NullPointerException("The writer is null.");
@@ -71,7 +108,7 @@ public class CasavaDesignCSVWriter implements CasavaDesignWriter {
    * Public constructor.
    * @param os OutputStream to use
    */
-  public CasavaDesignCSVWriter(final OutputStream os)
+  public SampleSheetCSVWriter(final OutputStream os)
       throws FileNotFoundException {
 
     this.writer = FileUtils.createFastBufferedWriter(os);
@@ -81,7 +118,7 @@ public class CasavaDesignCSVWriter implements CasavaDesignWriter {
    * Public constructor.
    * @param outputFile file to use
    */
-  public CasavaDesignCSVWriter(final File outputFile) throws IOException {
+  public SampleSheetCSVWriter(final File outputFile) throws IOException {
 
     this.writer = FileUtils.createFastBufferedWriter(outputFile);
   }
@@ -90,7 +127,7 @@ public class CasavaDesignCSVWriter implements CasavaDesignWriter {
    * Public constructor.
    * @param outputFilename name of the file to use
    */
-  public CasavaDesignCSVWriter(final String outputFilename) throws IOException {
+  public SampleSheetCSVWriter(final String outputFilename) throws IOException {
 
     this.writer = FileUtils.createFastBufferedWriter(outputFilename);
   }
