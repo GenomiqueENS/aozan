@@ -150,7 +150,7 @@ def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_major_version, con
     """
 
     flow_cell_id = hiseq_run.get_flow_cell(run_id)
-    lane_count = common.get_flowcell_lane_count(run_id, conf)
+    lane_count = hiseq_run.get_lane_count(run_id, conf)
 
     input_design_xls_path = conf[CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + samplesheet_filename + '.xls'
     input_design_csv_path = conf[CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + samplesheet_filename + '.csv'
@@ -182,7 +182,6 @@ def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_major_version, con
             SampleSheetUtils.replaceIndexShortcutsBySequences(design, load_index_sequences(conf))
 
             # Set the lane field if does not set
-            lane_count = hiseq_run.get_lanes_number(run_id, conf)
             SampleSheetUtils.duplicateSamplesIfLaneFieldNotSet(lane_count, design)
 
             # Write CSV design file

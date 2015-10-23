@@ -121,10 +121,9 @@ def qc(run_id, conf):
     qc_output_dir = qc_output_dir + tmp_extension
 
     try:
-        lane_count = common.get_flowcell_lane_count(run_id, conf)
 
         # Initialize the QC object
-        qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id, bcl2fastq_version, lane_count)
+        qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id, bcl2fastq_version)
 
         # Compute the report
         report = qc.computeReport()

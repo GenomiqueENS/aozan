@@ -69,7 +69,7 @@ def get_reads_number(run_id, conf):
 
     return len(reads)
 
-def get_lanes_number(run_id, conf):
+def get_lane_count(run_id, conf):
     """Get the number of lanes of a run.
 
         Arguments:

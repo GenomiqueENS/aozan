@@ -238,20 +238,6 @@ def get_input_run_data_path(run_id, conf):
 
     return path + '/' + run_id
 
-def get_flowcell_lane_count(run_id, conf):
-
-	# Find lane count
-	run_info_path = hiseq_run.get_runinfos_file(run_id, conf)
-
-	if run_info_path is None:
-		error("error to find RunInfo.xml file " + run_id + ".",
-			  "error to find RunInfo.xml file " + run_id + ".", get_last_error_file(conf), conf)
-
-	run_info = RunInfo()
-	run_info.parse(run_info_path)
-
-	return run_info.getFlowCellLaneCount()
-
 def send_msg(subject, message, is_error, conf):
     """Send a message to the user about the data extraction.
 
