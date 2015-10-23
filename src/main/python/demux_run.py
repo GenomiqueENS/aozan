@@ -14,8 +14,6 @@ from java.lang import Runtime, Throwable, Exception
 from java.util import HashMap
 
 from fr.ens.transcriptome.aozan import AozanException
-from fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils import VERSION_1
-from fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils import VERSION_2 
 from fr.ens.transcriptome.aozan.io import CasavaDesignXLSReader
 from fr.ens.transcriptome.aozan.util import DockerUtils
 from fr.ens.transcriptome.aozan.illumina.io import CasavaDesignCSVReader
@@ -313,11 +311,10 @@ def get_bcl2fastq_version(run_id, conf):
     if not (version.startswith('1') or version.startswith('2') or version == 'latest'):
         raise Exception('Invalid bcl2fastq version set ' + str(version) + ". Except: " + BCL2FASTQ_VERSION_1 or BCL2FASTQ_VERSION_2)
     
-    if version.startswith('1'):
-        major = VERSION_1
-
-    if version.startswith('2') or version == 'latest':
-        major = VERSION_2
+    if version == 'latest':
+        major = 2
+    else:
+        major = int(version.split('.')[0])
     
     return major, version
 
@@ -329,7 +326,7 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
     nb_threads = str(get_cpu_count(conf)) 
     tmp_local = conf[TMP_PATH_KEY]
     
-    if bcl2fastq_major_version == VERSION_1:
+    if bcl2fastq_major_version == 1:
         
         # Create casava makefile
         makefile_args = []
@@ -402,7 +399,7 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
         # cmd += str(" ".join(args))
         cmd += '\n\n'
         
-    elif  bcl2fastq_major_version == VERSION_2:
+    elif  bcl2fastq_major_version == 2:
         #  List arg
         args = []
         args.extend(['bcl2fastq'])
@@ -436,7 +433,11 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
     
     
         # Build command line for bcl2fast version 2.X
-        cmd = str(" ".join(args)) 
+        cmd = str(" ".join(args))
+
+    else:
+        error("error unknown major version of bcl2fastq", "Error, unknown major version of bcl2fastq: " + bcl2fastq_major_version, conf)
+        return False
 
     # Log command line
     common.log("INFO", "exec: " + cmd, conf)
@@ -798,7 +799,7 @@ def demux(run_id, conf):
     common.log("WARNING", "Demux step: output disk free: " + str(output_df), conf)
     common.log("WARNING", "Demux step: space needed: " + str(space_needed), conf)
     
-    common.log("CONFIG", "bcl2fastq version used " + bcl2fastq_major_version, conf)
+    common.log("CONFIG", "bcl2fastq version used " + bcl2fastq_version, conf)
     common.log("CONFIG", "bcl2fastq mode docker ? " + str(common.is_conf_value_equals_true(Settings.DEMUX_USE_DOCKER_ENABLE_KEY, conf)), conf)
     
 
