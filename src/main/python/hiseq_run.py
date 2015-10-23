@@ -69,6 +69,24 @@ def get_reads_number(run_id, conf):
 
 	return len(reads)
 
+def get_lanes_number(run_id, conf):
+	"""Get the number of lanes of a run.
+
+	    Arguments:
+		    runtId: the run id
+		    conf: configuration dictionary
+	"""
+
+	file_src = get_runinfos_file(run_id, conf)
+
+
+	if not file_src:
+		return -1
+
+	tree = ElementTree()
+	tree.parse(file_src)
+
+	return tree.find("Run/Reads").attrib['LaneCount']
 
 def check_run_id(run_id, conf):
 	"""Check if the run id is valid.

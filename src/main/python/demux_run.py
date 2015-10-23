@@ -14,11 +14,9 @@ from java.lang import Runtime, Throwable, Exception
 from java.util import HashMap
 
 from fr.ens.transcriptome.aozan import AozanException
-from fr.ens.transcriptome.aozan.io import CasavaDesignXLSReader
 from fr.ens.transcriptome.aozan.util import DockerUtils
-from fr.ens.transcriptome.aozan.illumina.io import CasavaDesignCSVReader
-from fr.ens.transcriptome.aozan.illumina.io import CasavaDesignCSVWriter
-from fr.ens.transcriptome.aozan.illumina.samplesheet import SampleSheetUtils
+from fr.ens.transcriptome.aozan.illumina.samplesheet import SampleSheetUtils,\
+    SampleSheetCheck
 
 from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import TMP_PATH_KEY
@@ -46,6 +44,8 @@ from fr.ens.transcriptome.aozan.Settings import CASAVA_DESIGN_GENERATOR_COMMAND_
 from fr.ens.transcriptome.aozan import Settings
 
 from fr.ens.transcriptome.eoulsan.util import StringUtils
+from fr.ens.transcriptome.aozan.illumina.samplesheet.io import SampleSheetXLSReader,\
+    SampleSheetCSVWriter, SampleSheetCSVReader
 
 BCL2FASTQ_VERSION_1 = "1.8.4"
 BCL2FASTQ_VERSION_2 = "latest"
@@ -176,14 +176,19 @@ def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_major_version, con
         try:
             
             # Load XLS design file
-            design = CasavaDesignXLSReader(input_design_xls_path).read(str(bcl2fastq_major_version))
-            # design = CasavaDesignXLSReader(input_design_xls_path).read(bcl2fastq_major_version)
+            design = SampleSheetXLSReader(input_design_xls_path).read()
 
             # Replace index sequence shortcuts by sequences
             SampleSheetUtils.replaceIndexShortcutsBySequences(design, load_index_sequences(conf))
 
+            # Set the lane field if does not set
+            lane_count = hiseq_run.get_lanes_number(run_id, conf)
+            SampleSheetUtils.duplicateSamplesIfLaneFieldNotSet(lane_count, design)
+
             # Write CSV design file
-            CasavaDesignCSVWriter(design_csv_path).writer(design)
+            writer = SampleSheetCSVWriter(design_csv_path)
+            writer.setVersion(bcl2fastq_major_version)
+            writer.writer(design)
 
         except AozanException, exp:
             print str(StringUtils.join(exp.getStackTrace(), '\n\t'))
@@ -249,10 +254,10 @@ def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_major_version, con
     # Check Casava CSV design file
     try:
         # Load CSV design file
-        design = CasavaDesignCSVReader(design_csv_path).read(str(bcl2fastq_major_version))
+        design = SampleSheetCSVReader(design_csv_path).read()
 
         # Check values of design file
-        design_warnings = SampleSheetUtils.checkCasavaDesign(design, flow_cell_id)
+        design_warnings = SampleSheetCheck.checkCasavaDesign(design, flow_cell_id)
 
 
     # TODO: remove lock
