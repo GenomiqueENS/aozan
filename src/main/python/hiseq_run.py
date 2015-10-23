@@ -48,7 +48,7 @@ def get_runinfos_file(run_id, conf):
 
     return path
 
-def get_reads_number(run_id, conf):
+def get_read_count(run_id, conf):
     """Get the number of read of a run.
 
         Arguments:

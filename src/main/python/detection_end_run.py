@@ -75,7 +75,7 @@ def check_end_run(run_id, conf):
     """
 
     hiseq_data_path = hiseq_run.find_hiseq_run_path(run_id, conf)
-    reads_number = hiseq_run.get_reads_number(run_id, conf)
+    reads_number = hiseq_run.get_read_count(run_id, conf)
 
     # TODO
     if hiseq_data_path == False:
@@ -112,7 +112,7 @@ def check_end_run_since(run_id, secs, conf):
     if hiseq_data_path == False:
         return -1
 
-    reads_number = hiseq_run.get_reads_number(run_id, conf)
+    reads_number = hiseq_run.get_read_count(run_id, conf)
     last = 0
 
     for i in range(reads_number):
