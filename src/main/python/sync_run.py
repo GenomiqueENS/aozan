@@ -179,7 +179,7 @@ def partial_sync(run_id, last_sync, conf):
         rsync_params = '--files-from=' + rsync_manifest_path
 
     # Copy data from hiseq path to bcl path
-    cmd = 'rsync  -a ' + rsync_params + ' ' + input_path + '/ ' + output_path
+    cmd = 'rsync  -a --no-owner --no-group ' + rsync_params + ' ' + input_path + '/ ' + output_path
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while executing rsync for run " + run_id, 'Error while executing rsync.\nCommand line:\n' + cmd, conf)
