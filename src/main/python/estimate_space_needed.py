@@ -15,10 +15,10 @@ from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
 
 def estimate(run_id, conf):
     """Estimate space needed in directories : hiseq, bcl and fastq
-    if it has not enough space free send a warning mail 
+    if it has not enough space free send a warning mail
 
     Arguments:
-        run_id: the run id 
+        run_id: the run id
         conf: configuration dictionary
     """
 
@@ -44,8 +44,8 @@ def estimate(run_id, conf):
     #
     # Estimate space needed +10%
     #
-    
-    # Set factor and ratio util   
+
+    # Set factor and ratio util
     run_factor = lane_count * cycle_count * 1.10
     # bcl file : compressed or not, info in runParameters.xml
     ratio_bcl = ratio_bcl_compressed(run_param_path)
@@ -55,10 +55,10 @@ def estimate(run_id, conf):
 
     # for hiseq data
     check_space_needed_and_free(run_id, 'hiseq', run_factor, conf)
-    
+
     # for bcl files
     check_space_needed_and_free(run_id, 'bcl', run_factor * ratio_bcl * ratio_quality, conf)
-    
+
     # for fastq files
     check_space_needed_and_free(run_id, 'fastq', run_factor, conf)
 
@@ -67,15 +67,15 @@ def check_space_needed_and_free(run_id, type_file, run_factor, conf):
     """Compute free and needed space for type file and send warning mail if not enough.
 
     Arguments:
-        run_id: the run id 
+        run_id: the run id
         type_file: type file concerned
         factor: factor to estimate space needed by current run
         conf: configuration dictionary
     """
-    
+
     space_unit = int(conf[type_file + '.space.factor'])
     data_path = conf[type_file + '.data.path']
-        
+
     space_needed = space_unit * run_factor
     space_free = common.df(data_path)
 
@@ -87,13 +87,13 @@ def check_space_needed_and_free(run_id, type_file, run_factor, conf):
         error(run_id, type_file + ' files', space_needed, space_free, data_path, conf)
     else:
         log_message(run_id, type_file + ' files', space_needed, space_free, conf)
-    
+
 
 def error(run_id, type_file, space_needed, space_free, dir_path, conf):
     """Error handling.
 
     Arguments:
-        run_id: the run id 
+        run_id: the run id
         type_file: type file concerned
         space_needed: space needed for the run for a type of data
         space_free: space free for the run for a type of data
@@ -114,7 +114,7 @@ def log_message(run_id, type_file, space_needed, space_free, conf):
     """log message.
 
     Arguments:
-        run_id: the run id 
+        run_id: the run id
         type_file: files concerned
         space_needed: space needed for the run id for a type of data
         space_free: space free for the run id for a type of data

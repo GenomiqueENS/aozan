@@ -59,7 +59,7 @@ def get_available_run_ids(conf):
 
 def send_report(run_id, conf):
     """Send a mail with the first base report.
-    
+
     Arguments:
         run_id: the run id
         conf: configuration dictionary

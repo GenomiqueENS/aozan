@@ -4,7 +4,7 @@
 Created on 6 avril 2015
 
 With include NextSeq management, replace old first_base_report.py
- 
+
 @author: Laurent Jourdren
 @author: Sandrine Perrin
 '''
@@ -56,15 +56,15 @@ def get_available_run_ids(conf):
 
         files = os.listdir(hiseq_data_path)
         for f in files:
-            
+
             if not (os.path.isdir(hiseq_data_path + '/' + f) and hiseq_run.check_run_id(f, conf)):
                 # No valid entry
                 continue
-            
+
             # NextSeq sequencer create this file after clusterisation step
             if not os.path.exists(hiseq_data_path + '/' + f + '/RunInfo.xml'):
                 continue
-            
+
             if not detection_end_run.check_end_run(f, conf):
                 # TODO
                 # os.path.exists(hiseq_data_path + '/' + f + '/First_Base_Report.htm'):
@@ -76,7 +76,7 @@ def discover_new_run(conf):
     """Discover new runs.
 
     Arguments:
-        conf: configuration object  
+        conf: configuration object
     """
 
     #
@@ -95,7 +95,7 @@ def discover_new_run(conf):
 
             # Verify space needed during the first base report
             estimate_space_needed.estimate(run_id, conf)
-            
+
 
     #
     # Discover hiseq run done
@@ -106,7 +106,7 @@ def discover_new_run(conf):
 
 def send_report(run_id, conf):
     """Send a mail with the first base report.
-    
+
     Arguments:
         run_id: the run id
         conf: configuration dictionary
@@ -117,10 +117,10 @@ def send_report(run_id, conf):
     #
 
     run_info_path = hiseq_run.get_runinfos_file(run_id, conf)
-    
+
     if run_info_path is None:
         return
-    
+
     run_info = RunInfo()
     run_info.parse(File(run_info_path))
 

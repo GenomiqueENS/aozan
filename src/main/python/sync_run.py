@@ -18,25 +18,25 @@ def is_sync_step_enable(conf):
     """Check if all parameters useful for synchronization step are defined
 
     Arguments:
-        conf: configuration dictionary        
+        conf: configuration dictionary
     """
-    
+
     # Synchronization step: True
     if common.is_conf_value_equals_true(SYNC_STEP_KEY, conf):
-        
+
         # Check bcl path must be defined
         if common.is_conf_key_exists(BCL_DATA_PATH_KEY, conf):
             bcl_path = conf[BCL_DATA_PATH_KEY]
-             
+
             # Check bcl not same hiseq output path
             for path in hiseq_run.get_hiseq_data_paths(conf):
                 if path == bcl_path:
                     error('error configuration.' ,
-                          'Basecalling path and hiseq output data path are the same: ' + bcl_path , conf) 
+                          'Basecalling path and hiseq output data path are the same: ' + bcl_path , conf)
                     return False
-                
+
             return True
-        
+
     return False
 
 def load_processed_run_ids(conf):
@@ -73,26 +73,26 @@ def error(short_message, message, conf):
 
 def get_exclude_files_list(run_id, conf):
     """ Build list of excluded extension file from sequencer type.
-    
+
     Arguments:
         run_id: the run id
         conf: configuration dictionary
-    
+
     Return:
         excluded extension files list
     """
-    
+
     # Check if excluded file is required
     if not common.is_conf_value_equals_true(SYNC_EXCLUDE_CIF_KEY, conf):
         return []
-    
+
     if common.is_sequencer_hiseq(run_id, conf):
         return ['*.cif', '*_pos.txt', '*.errorMap', '*.FWHMMap']
-    
+
     if common.is_sequencer_nextseq(run_id, conf):
         # TODO to identify "*bcl.bgzf.bci"
         return []
-        
+
     return []
 
 def partial_sync(run_id, last_sync, conf):
@@ -129,10 +129,10 @@ def partial_sync(run_id, last_sync, conf):
 
     input_path = hiseq_data_path + '/' + run_id
     output_path = bcl_data_path + '/' + run_id + '.tmp'
-    
+
     # Create output path for run if not exists
     if not os.path.exists(output_path):
-        os.mkdir(output_path)    
+        os.mkdir(output_path)
 
     input_path_du = common.du(input_path)
     output_path_du = common.du(output_path)
@@ -146,7 +146,7 @@ def partial_sync(run_id, last_sync, conf):
 
     # Check if free space is available on
     if output_path_df < space_needed:
-        error("Not enough disk space to perform synchronization for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id + 
+        error("Not enough disk space to perform synchronization for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id +
               '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + bcl_data_path + '.', conf)
         return False
 
@@ -157,8 +157,8 @@ def partial_sync(run_id, last_sync, conf):
 #         exclude_files = []
 
     # Extract exclude file from sequencer type and configuration
-    exclude_files = get_exclude_files_list(run_id, conf) 
-    
+    exclude_files = get_exclude_files_list(run_id, conf)
+
     rsync_manifest_path = conf[TMP_PATH_KEY] + '/' + run_id + '.rsync.manifest'
     rsync_params = ''
 
@@ -213,7 +213,7 @@ def sync(run_id, conf):
 
     # Check if enough space to store reports
     if common.df(reports_data_base_path) < 10 * 1024 * 1024 * 1024:
-        error("Not enough disk space to store aozan reports for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id + 
+        error("Not enough disk space to store aozan reports for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
               '.\nNeed more than 10 Gb on ' + reports_data_base_path + '.', conf)
         return False
 
