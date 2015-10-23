@@ -14,8 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.NullArgumentException;
-
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
 
@@ -131,8 +129,7 @@ public class SampleSheetUtils {
   public static final String toSampleSheetV2CSV(final SampleSheet samplesheet) {
 
     if (samplesheet == null) {
-      throw new NullArgumentException(
-          "the samplesheet argument cannot be null");
+      throw new NullPointerException("the samplesheet argument cannot be null");
     }
 
     final StringBuilder sb = new StringBuilder();
