@@ -47,7 +47,7 @@ import fr.ens.transcriptome.aozan.illumina.samplesheet.io.SampleSheetXLSReader;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 import junit.framework.TestCase;
 
-public class CasavaDesignReaderTest extends TestCase {
+public class SampleSheetReaderTest extends TestCase {
 
   // TODO Use Junit 4.11 instead of 3.8
   
