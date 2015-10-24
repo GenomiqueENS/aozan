@@ -35,14 +35,15 @@ def get_runinfos_file(run_id, conf):
         runtId: the run id
         conf: configuration dictionary
     """
-
+    print "get_runinfos_file, run_id: ", run_id
     sequencer_path = find_hiseq_run_path(run_id, conf)
-
+    print "get_runinfos_file, sequencer_path: ", sequencer_path
     if type(sequencer_path) is bool:
         return None
 
     path = sequencer_path + '/' + run_id + '/RunInfo.xml'
-
+    print "get_runinfos_file, path: ", path
+    print "get_runinfos_file, os.path.exists(path): ", os.path.exists(path)
     if not os.path.exists(path):
         return None
 
@@ -57,7 +58,7 @@ def get_run_info(run_id, conf):
     """
 
     file_src = get_runinfos_file(run_id, conf)
-
+    print "get_run_info, file_src: ", file_src
     if file_src == None:
         return None
 
@@ -72,10 +73,10 @@ def get_read_count(run_id, conf):
     """
 
     run_info = get_run_info(run_id, conf)
-
+    print "get_read_count, run_info: ", run_info
     if run_info == None:
         return -1
-
+    print "get_read_count, run_info.getReads().size(): ", run_info.getReads().size()
     return run_info.getReads().size()
 
 
