@@ -12,8 +12,6 @@ With include NextSeq management, replace old first_base_report.py
 import common, aozan, hiseq_run, detection_end_run
 import estimate_space_needed
 import os
-from java.io import File
-from fr.ens.transcriptome.aozan.illumina import RunInfo
 
 from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import HISEQ_DATA_PATH_KEY
@@ -116,13 +114,10 @@ def send_report(run_id, conf):
     # Retrieve features the current run in RunInfos.xml file
     #
 
-    run_info_path = hiseq_run.get_runinfos_file(run_id, conf)
+    run_info = hiseq_run.get_run_info(run_id, conf)
 
-    if run_info_path is None:
+    if run_info is None:
         return
-
-    run_info = RunInfo.parse(File(run_info_path))
-
 
     # TODO ?? add check sample-sheet if demux step enable
     # add warning in report if useful

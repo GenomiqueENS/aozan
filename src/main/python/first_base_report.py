@@ -69,10 +69,7 @@ def send_report(run_id, conf):
     # Retrieve features the current run in RunInfos.xml file
     #
 
-    hiseq_run_path = conf[HISEQ_DATA_PATH_KEY] + '/' + run_id
-
-    run_info_path = hiseq_run_path + "/RunInfo.xml"
-    run_info = RunInfo.parse(File(run_info_path))
+    run_info = hiseq_run.get_run_info(run_id, conf)
 
     reads = run_info.getReads()
     error_cycles_per_reads_not_indexes_count = 0

@@ -2,7 +2,6 @@
 
 import os, time
 import stat, detection_end_run
-from xml.etree.ElementTree import ElementTree
 import common
 
 from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
@@ -11,6 +10,7 @@ from fr.ens.transcriptome.aozan.Settings import HISEQ_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import HISEQ_STEP_KEY
 from fr.ens.transcriptome.aozan.Settings import TMP_PATH_KEY
+from fr.ens.transcriptome.aozan.illumina import RunInfo
 
 
 # from pickle import FALSE
@@ -48,6 +48,21 @@ def get_runinfos_file(run_id, conf):
 
     return path
 
+def get_run_info(run_id, conf):
+    """Get the RunInfo object.
+
+    Arguments:
+        runtId: the run id
+        conf: configuration dictionary
+    """
+
+    file_src = get_runinfos_file(run_id, conf)
+
+    if not file_src:
+        return None
+
+    return RunInfo.parse(file_src)
+
 def get_read_count(run_id, conf):
     """Get the number of read of a run.
 
@@ -56,18 +71,13 @@ def get_read_count(run_id, conf):
             conf: configuration dictionary
     """
 
-    file_src = get_runinfos_file(run_id, conf)
+    run_info = get_run_info(run_id, conf)
 
-
-    if not file_src:
+    if not run_info:
         return -1
 
-    tree = ElementTree()
-    tree.parse(file_src)
+    return run_info.getReads().size()
 
-    reads = tree.find("Run/Reads")
-
-    return len(reads)
 
 def get_lane_count(run_id, conf):
     """Get the number of lanes of a run.
@@ -77,16 +87,13 @@ def get_lane_count(run_id, conf):
             conf: configuration dictionary
     """
 
-    file_src = get_runinfos_file(run_id, conf)
+    run_info = get_run_info(run_id, conf)
 
-
-    if not file_src:
+    if not run_info:
         return -1
 
-    tree = ElementTree()
-    tree.parse(file_src)
+    return run_info.getFlowCellLaneCount()
 
-    return tree.find("Run/Reads").attrib['LaneCount']
 
 def check_run_id(run_id, conf):
     """Check if the run id is valid.

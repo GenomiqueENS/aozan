@@ -7,7 +7,6 @@ Created on 15 avril 2012
 
 import common
 from java.io import File
-from fr.ens.transcriptome.aozan.illumina import RunInfo
 from xml.dom.minidom import parse
 
 from fr.ens.transcriptome.aozan.Settings import HISEQ_DATA_PATH_KEY
@@ -22,12 +21,8 @@ def estimate(run_id, conf):
         conf: configuration dictionary
     """
 
-    # ratio space by cycle by informations type
-    hiseq_run_path = conf[HISEQ_DATA_PATH_KEY] + '/' + run_id
-
     # retrieve data from RunInfo.xml
-    run_info_path = hiseq_run_path + "/RunInfo.xml"
-    run_info = RunInfo.parse(File(run_info_path))
+    run_info = hiseq.get_run_info(run_id, conf)
 
     # retrieve count lane
     lane_count = run_info.getFlowCellLaneCount()
