@@ -58,7 +58,7 @@ def get_run_info(run_id, conf):
 
     file_src = get_runinfos_file(run_id, conf)
 
-    if not file_src:
+    if file_src == None:
         return None
 
     return RunInfo.parse(file_src)
