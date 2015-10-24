@@ -137,7 +137,7 @@ def build_samplesheet_filename(run_id, conf):
 
     return conf[CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + '_' + instrument_sn + '_%04d' % run_number
 
-def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_major_version, conf):
+def check_samplesheet(run_id, input_run_data_path, samplesheet_filename, bcl2fastq_major_version, conf):
     """ Check sample sheet and convert in csv format if useful.
 
     Arguments:
@@ -149,8 +149,15 @@ def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_major_version, con
         true it's all ok otherwise false
     """
 
-    flow_cell_id = hiseq_run.get_flow_cell(run_id)
-    lane_count = hiseq_run.get_lane_count(run_id, conf)
+    run_info_path = input_run_data_path + '/RunInfo.xml'
+
+    if not os.path.isdir(run_info_path):
+        error("no RunInfo.xml file found for run " + run_id, "No RunInfo.xml file found for run " + run_id + '.\n', conf)
+        return False, []
+
+    run_info = RunInfo.parse(run_info_path)
+    flow_cell_id = run_info.getFlowCell()
+    lane_count = run_info.getLaneCount()
 
     input_design_xls_path = conf[CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + samplesheet_filename + '.xls'
     input_design_csv_path = conf[CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + samplesheet_filename + '.csv'
@@ -814,7 +821,7 @@ def demux(run_id, conf):
         return False
 
     # Check and convert if useful samplesheet
-    design_csv_path, design_warnings = check_samplesheet(run_id, design_filename, bcl2fastq_major_version, conf)
+    design_csv_path, design_warnings = check_samplesheet(run_id, input_run_data_path, design_filename, bcl2fastq_major_version, conf)
     if not design_csv_path:
         return False
 
