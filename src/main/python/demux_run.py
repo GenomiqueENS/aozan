@@ -158,13 +158,14 @@ def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_major_version, con
 
 
     common.log("INFO", "Flowcell id: " + flow_cell_id, conf)
-    common.log("INFO", "bcl2fastq major version : " + str(bcl2fastq_major_version) + ' with lane count ' + str(lane_count), conf)
-    common.log("INFO", "sample sheet format for bcl2fastq : " + str(conf[CASAVA_SAMPLESHEET_FORMAT_KEY]), conf)
+    common.log("INFO", "Flowcell lane count: " + str(lane_count), conf)
+    common.log("INFO", "Bcl2fastq major version: " + str(bcl2fastq_major_version), conf)
+    common.log("INFO", "Samplesheet format: " + str(conf[CASAVA_SAMPLESHEET_FORMAT_KEY]), conf)
 
     if common.is_conf_value_defined(CASAVA_SAMPLESHEET_FORMAT_KEY, 'xls', conf):
 
         # Convert design in XLS format to CSV format
-        common.log("INFO", "sample sheet filename : " + str(input_design_xls_path), conf)
+        common.log("INFO", "Samplesheet path: " + str(input_design_xls_path), conf)
 
         # Check if the xls design exists
         if not os.path.exists(input_design_xls_path):
@@ -192,12 +193,12 @@ def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_major_version, con
         except AozanException, exp:
             print str(StringUtils.join(exp.getStackTrace(), '\n\t'))
 
-            error("error Aozan while converting " + samplesheet_filename + ".xls to CSV format", exp.getMessage(), conf)
+            error("error while converting " + samplesheet_filename + ".xls to CSV format", exp.getMessage(), conf)
             return False, []
         except Exception, exp:
             print str(StringUtils.join(exp.getStackTrace(), '\n\t'))
 
-            error("error java while converting " + samplesheet_filename + ".xls to CSV format", exp.getMessage(), conf)
+            error("error while converting " + samplesheet_filename + ".xls to CSV format", exp.getMessage(), conf)
             return False, []
 
     elif common.is_conf_value_defined(CASAVA_SAMPLESHEET_FORMAT_KEY, 'csv', conf):
@@ -802,8 +803,8 @@ def demux(run_id, conf):
     common.log("WARNING", "Demux step: output disk free: " + str(output_df), conf)
     common.log("WARNING", "Demux step: space needed: " + str(space_needed), conf)
 
-    common.log("CONFIG", "bcl2fastq version used " + bcl2fastq_version, conf)
-    common.log("CONFIG", "bcl2fastq mode docker ? " + str(common.is_conf_value_equals_true(Settings.DEMUX_USE_DOCKER_ENABLE_KEY, conf)), conf)
+    common.log("CONFIG", "Bcl2fastq version required: " + bcl2fastq_version, conf)
+    common.log("CONFIG", "Bcl2fastq Docker mode: " + str(common.is_conf_value_equals_true(Settings.DEMUX_USE_DOCKER_ENABLE_KEY, conf)), conf)
 
 
     # Check if free space is available
