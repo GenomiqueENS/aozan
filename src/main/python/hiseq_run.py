@@ -35,15 +35,15 @@ def get_runinfos_file(run_id, conf):
         runtId: the run id
         conf: configuration dictionary
     """
-    common.log("finest", "get_runinfos_file, run_id: " + run_id, conf)
+    common.log("FINEST", "get_runinfos_file, run_id: " + run_id, conf)
     sequencer_path = find_hiseq_run_path(run_id, conf)
-    common.log("finest", "get_runinfos_file, sequencer_path: " + sequencer_path, conf)
+    common.log("FINEST", "get_runinfos_file, sequencer_path: " + sequencer_path, conf)
     if type(sequencer_path) is bool:
         return None
 
     path = sequencer_path + '/' + run_id + '/RunInfo.xml'
-    common.log("finest", "get_runinfos_file, path: " + path, conf)
-    common.log("finest", "get_runinfos_file, os.path.exists(path): " + str(os.path.exists(path)), conf)
+    common.log("FINEST", "get_runinfos_file, path: " + path, conf)
+    common.log("FINEST", "get_runinfos_file, os.path.exists(path): " + str(os.path.exists(path)), conf)
     if not os.path.exists(path):
         return None
 
@@ -58,7 +58,7 @@ def get_run_info(run_id, conf):
     """
 
     file_src = get_runinfos_file(run_id, conf)
-    common.log("finest", "get_run_info, file_src: " + str(file_src), conf)
+    common.log("FINEST", "get_run_info, file_src: " + str(file_src), conf)
     if file_src == None:
         return None
 
@@ -73,10 +73,10 @@ def get_read_count(run_id, conf):
     """
 
     run_info = get_run_info(run_id, conf)
-    common.log("finest", "get_read_count, run_info: " + str(run_info), conf)
+    common.log("FINEST", "get_read_count, run_info: " + str(run_info), conf)
     if run_info == None:
         return -1
-    common.log("finest", "get_read_count, run_info.getReads().size(): " + str(run_info.getReads().size()), conf)
+    common.log("FINEST", "get_read_count, run_info.getReads().size(): " + str(run_info.getReads().size()), conf)
     return run_info.getReads().size()
 
 
@@ -89,10 +89,10 @@ def get_lane_count(run_id, conf):
     """
 
     run_info = get_run_info(run_id, conf)
-    common.log("finest", "get_lane_count, run_info: " + str(run_info), conf)
+    common.log("FINEST", "get_lane_count, run_info: " + str(run_info), conf)
     if run_info == None:
         return -1
-    common.log("finest", "get_lane_count, run_info.getFlowCellLaneCount(): " + str(run_info.getFlowCellLaneCount()), conf)
+    common.log("FINEST", "get_lane_count, run_info.getFlowCellLaneCount(): " + str(run_info.getFlowCellLaneCount()), conf)
     return run_info.getFlowCellLaneCount()
 
 
