@@ -182,7 +182,7 @@ def check_samplesheet(run_id, samplesheet_filename, bcl2fastq_major_version, con
             SampleSheetUtils.replaceIndexShortcutsBySequences(design, load_index_sequences(conf))
 
             # Set the lane field if does not set
-            SampleSheetUtils.duplicateSamplesIfLaneFieldNotSet(lane_count, design)
+            SampleSheetUtils.duplicateSamplesIfLaneFieldNotSet(design, lane_count)
 
             # Write CSV design file
             writer = SampleSheetCSVWriter(design_csv_path)
