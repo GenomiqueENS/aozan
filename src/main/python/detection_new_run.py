@@ -121,8 +121,7 @@ def send_report(run_id, conf):
     if run_info_path is None:
         return
 
-    run_info = RunInfo()
-    run_info.parse(File(run_info_path))
+    run_info = RunInfo.parse(File(run_info_path))
 
 
     # TODO ?? add check sample-sheet if demux step enable

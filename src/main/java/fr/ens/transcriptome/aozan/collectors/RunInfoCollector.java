@@ -93,19 +93,20 @@ public class RunInfoCollector implements Collector {
 
     try {
       // Parse run info file
-      final RunInfo runInfo = new RunInfo();
-      runInfo.parse(this.runInfoFile);
+      final RunInfo runInfo = RunInfo.parse(this.runInfoFile);
 
       data.put(PREFIX + ".run.id", runInfo.getId());
       data.put(PREFIX + ".run.number", runInfo.getNumber());
       data.put(PREFIX + ".sequencer.type", runInfo.getSequencerType());
       data.put(PREFIX + ".flow.cell.id", runInfo.getFlowCell());
-      data.put(PREFIX + ".flow.cell.lane.count", runInfo.getFlowCellLaneCount());
+      data.put(PREFIX + ".flow.cell.lane.count",
+          runInfo.getFlowCellLaneCount());
       data.put(PREFIX + ".flow.cell.surface.count",
           runInfo.getFlowCellSurfaceCount());
       data.put(PREFIX + ".flow.cell.swath.count",
           runInfo.getFlowCellSwathCount());
-      data.put(PREFIX + ".flow.cell.tile.count", runInfo.getFlowCellTileCount());
+      data.put(PREFIX + ".flow.cell.tile.count",
+          runInfo.getFlowCellTileCount());
       data.put(PREFIX + ".instrument", runInfo.getInstrument());
       data.put(PREFIX + ".date", runInfo.getDate());
 

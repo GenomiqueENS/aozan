@@ -27,8 +27,7 @@ def estimate(run_id, conf):
 
     # retrieve data from RunInfo.xml
     run_info_path = hiseq_run_path + "/RunInfo.xml"
-    run_info = RunInfo()
-    run_info.parse(File(run_info_path))
+    run_info = RunInfo.parse(File(run_info_path))
 
     # retrieve count lane
     lane_count = run_info.getFlowCellLaneCount()

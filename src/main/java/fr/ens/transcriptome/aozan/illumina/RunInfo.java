@@ -24,6 +24,7 @@
 package fr.ens.transcriptome.aozan.illumina;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.transcriptome.eoulsan.util.XMLUtils.getAttributeNames;
 import static fr.ens.transcriptome.eoulsan.util.XMLUtils.getElementsByTagName;
 import static fr.ens.transcriptome.eoulsan.util.XMLUtils.getTagValue;
@@ -45,8 +46,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.google.common.base.Strings;
-
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
@@ -59,87 +58,215 @@ import fr.ens.transcriptome.eoulsan.util.XMLUtils;
  */
 public class RunInfo {
 
-  private String id;
-  private int number;
-  private String flowCell;
-  private String instrument;
-  private String date;
-  private final List<Read> reads = new ArrayList<>();
+  private final String id;
+  private final int number;
+  private final String flowCell;
+  private final String instrument;
+  private final String date;
+  private final List<Read> reads;
 
-  // FlowcellLayout
-  private int flowCellLaneCount;
-  private int flowCellSurfaceCount;
-  private int flowCellSwathCount;
-  private int flowCellTileCount;
+  private final FlowCellLayout flowCellLayout;
 
-  // FlowcellLayout specific to RTA version 2.X
-  private int flowCellSectionPerLane = -1;
-  private int flowCellLanePerSection = -1;
-
-  private final List<Integer> alignToPhix = new ArrayList<>();
+  private final List<Integer> alignToPhix;
 
   // Data specific to RTA version 2.X
-  private final List<String> imageChannels = new ArrayList<>();
+  private final List<String> imageChannels;
 
   //
-  // Parser
+  // Internal classes
   //
-
-  public void parse(final String filepath) throws ParserConfigurationException,
-      SAXException, IOException {
-
-    checkArgument(!Strings.isNullOrEmpty(filepath), "RunInfo.xml path");
-
-    parse(new File(filepath));
-  }
 
   /**
-   * Parses the run info file
-   * @param file the run info file
+   * Handle information about a read.
+   * @author Laurent Jourdren
+   */
+  public static class Read {
+
+    private final int number;
+    private final int numberCycles;
+    private final boolean indexedRead;
+
+    /**
+     * @return Returns the number
+     */
+    public int getNumber() {
+      return this.number;
+    }
+
+    /**
+     * @return Returns the numberCycles
+     */
+    public int getNumberCycles() {
+      return this.numberCycles;
+    }
+
+    /**
+     * @return Returns the indexedRead
+     */
+    public boolean isIndexedRead() {
+      return this.indexedRead;
+    }
+
+    @Override
+    public String toString() {
+      return this.getClass().getSimpleName()
+          + "{number=" + this.number + ", numberCycles=" + this.numberCycles
+          + ", indexedRead=" + this.indexedRead + "}";
+    }
+
+    //
+    // Constructor
+    //
+
+    private Read(final int number, final int numberCycles,
+        final boolean indexedRead) {
+
+      this.number = number;
+      this.numberCycles = numberCycles;
+      this.indexedRead = indexedRead;
+    }
+
+  }
+
+  /*
+   * TODO Merge getNextseqTilesCount() and getHiseqTilesCount()
+   */
+  private static class FlowCellLayout {
+
+    private final int laneCount;
+    private final int surfaceCount;
+    private final int swathCount;
+    private final int tileCount;
+
+    // FlowcellLayout specific to RTA version 2.X
+    private final int sectionPerLane;
+    private final int lanePerSection;
+
+    /**
+     * Gets the Nextseq tiles count per lane (surfaces × swaths × camera
+     * segments × tiles per swath per segment).
+     * @return the Nextseq tiles count
+     */
+    private int getNextseqTilesCount() {
+      return this.surfaceCount
+          * this.swathCount * this.tileCount * this.sectionPerLane;
+    }
+
+    /**
+     * Gets the Hiseq tiles count per lane (surfaces × swaths × tiles per swath
+     * per segment).
+     * @return the Hiseq tiles count
+     */
+    private int getHiseqTilesCount() {
+
+      return this.surfaceCount * this.swathCount * this.tileCount;
+    }
+
+    //
+    // Constructor
+    //
+
+    private FlowCellLayout(final int laneCount, final int surfaceCount,
+        final int swathCount, final int tileCount, final int sectionPerLane,
+        final int lanePerSection) {
+
+      checkArgument(laneCount > 0,
+          "laneCount has not been defined in RunInfo.xml");
+      checkArgument(surfaceCount > 0,
+          "surfaceCount has not been defined in RunInfo.xml");
+      checkArgument(swathCount > 0,
+          "swathCount has not been defined in RunInfo.xml");
+      checkArgument(tileCount > 0,
+          "tileCount has not been defined in RunInfo.xml");
+
+      this.laneCount = laneCount;
+      this.surfaceCount = surfaceCount;
+      this.swathCount = swathCount;
+      this.tileCount = tileCount;
+
+      this.sectionPerLane = sectionPerLane;
+      this.lanePerSection = lanePerSection;
+    }
+  }
+
+  //
+  // Parsers
+  //
+
+  /**
+   * Parses the run info file.
+   * @param filepath the path to the run info file
+   * @return a RunInfo object with the information of the parsed file
    * @throws ParserConfigurationException the parser configuration exception
    * @throws SAXException the SAX exception
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public void parse(final File file) throws ParserConfigurationException,
-      SAXException, IOException {
+  public static RunInfo parse(final String filepath)
+      throws ParserConfigurationException, SAXException, IOException {
 
-    checkArgument(file.exists(), "RunInfo.xml not exists");
+    checkNotNull(filepath, "RunInfo.xml path cannot be null");
 
-    parse(FileUtils.createInputStream(file));
+    return parse(new File(filepath));
+  }
+
+  /**
+   * Parses the run info file.
+   * @param file the run info file
+   * @return a RunInfo object with the information of the parsed file
+   * @throws ParserConfigurationException the parser configuration exception
+   * @throws SAXException the SAX exception
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public static RunInfo parse(final File file)
+      throws ParserConfigurationException, SAXException, IOException {
+
+    checkNotNull(file, "RunInfo.xml file cannot be null");
+
+    checkArgument(file.isFile(),
+        "RunInfo.xml does not exists or is not a file");
+
+    return parse(FileUtils.createInputStream(file));
   }
 
   /**
    * Parses the run info file.
    * @param is the input stream on run info file
+   * @return a RunInfo object with the information of the parsed file
    * @throws ParserConfigurationException the parser configuration exception
    * @throws SAXException the SAX exception
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public void parse(final InputStream is) throws ParserConfigurationException,
-      SAXException, IOException {
+  public static RunInfo parse(final InputStream is)
+      throws ParserConfigurationException, SAXException, IOException {
 
-    final Document doc;
+    checkNotNull(is, "RunInfo.xml input stream cannot be null");
 
-    final DocumentBuilderFactory dbFactory =
-        DocumentBuilderFactory.newInstance();
-    final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-    doc = dBuilder.parse(is);
-    doc.getDocumentElement().normalize();
+    try (InputStream in = is) {
 
-    parse(doc);
+      final Document doc;
 
-    is.close();
+      final DocumentBuilderFactory dbFactory =
+          DocumentBuilderFactory.newInstance();
+      final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+      doc = dBuilder.parse(in);
+      doc.getDocumentElement().normalize();
+
+      return parse(doc);
+    }
   }
 
   /**
    * Parses the run info file.
    * @param document the document from run info XML file
    */
-  private void parse(final Document document) {
+  private static RunInfo parse(final Document document) {
 
     for (Element e : XMLUtils.getElementsByTagName(document, "RunInfo")) {
 
       for (Element runElement : XMLUtils.getElementsByTagName(e, "Run")) {
+
+        String id = null;
+        int number = -1;
 
         // Parse attribute of the Run tag
         for (String name : XMLUtils.getAttributeNames(runElement)) {
@@ -148,10 +275,10 @@ public class RunInfo {
 
           switch (name) {
           case "Id":
-            this.id = value;
+            id = value;
             break;
           case "Number":
-            this.number = Integer.parseInt(value);
+            number = Integer.parseInt(value);
             break;
           default:
             throw new AozanRuntimeException(
@@ -159,36 +286,44 @@ public class RunInfo {
           }
         }
 
-        this.flowCell = getTagValue(runElement, "Flowcell");
-        this.instrument = getTagValue(runElement, "Instrument");
-        this.date = getTagValue(runElement, "Date");
+        final String flowCell = getTagValue(runElement, "Flowcell");
+        final String instrument = getTagValue(runElement, "Instrument");
+        final String date = getTagValue(runElement, "Date");
 
         // Extract read data
-        extractReadData(runElement);
+        final List<Read> readList = extractReadData(runElement);
 
         // Extract variable from Flowcell element
-        extractFlowcellElement(runElement);
+        final FlowCellLayout layout = extractFlowcellElement(runElement);
 
         // After extract lane with PhiX
-        extractAlignToPhiXElement(runElement);
+        final List<Integer> lanesWithPhiX =
+            extractAlignToPhiXElement(runElement, layout.laneCount);
 
         // Extract images channel data
-        extractImageChannels(runElement);
+        final List<String> imageChannels = extractImageChannels(runElement);
+
+        return new RunInfo(id, number, flowCell, instrument, date, readList,
+            layout, lanesWithPhiX, imageChannels);
       }
     }
 
+    throw new AozanRuntimeException("No \"Run\" tag found in RunInfo.xml");
   }
 
   /**
    * Extract image channels data.
    * @param runElement the run element
+   * @return a list
    */
-  private void extractImageChannels(final Element runElement) {
+  private static List<String> extractImageChannels(final Element runElement) {
+
+    final List<String> result = new ArrayList<>();
 
     // Check if element name exists
     if (XMLUtils.getElementsByTagName(runElement, "ImageChannels") == null) {
 
-      return;
+      return result;
     }
 
     // Parse element
@@ -196,23 +331,30 @@ public class RunInfo {
 
       // Extract content on name element
       for (Element name : getElementsByTagName(e2, "Name")) {
-        this.imageChannels.add(name.getTextContent());
+        result.add(name.getTextContent());
       }
     }
+
+    return result;
   }
 
   /**
    * Extract the read data.
    * @param runElement the run element
    */
-  private void extractReadData(final Element runElement) {
+  private static List<Read> extractReadData(final Element runElement) {
+
+    final List<Read> result = new ArrayList<>();
 
     int readCount = 0;
     // Parse Reads tag
     for (Element e2 : XMLUtils.getElementsByTagName(runElement, "Reads")) {
       for (Element e3 : XMLUtils.getElementsByTagName(e2, "Read")) {
 
-        final Read read = new Read();
+        int readNumber = 0;
+        int readNumberCycles = 0;
+        boolean readIndexedRead = false;
+
         readCount++;
 
         for (String name : XMLUtils.getAttributeNames(e3)) {
@@ -221,36 +363,46 @@ public class RunInfo {
 
           switch (name) {
           case "Number":
-            read.number = Integer.parseInt(value);
+            readNumber = Integer.parseInt(value);
             break;
           case "NumCycles":
-            read.numberCycles = Integer.parseInt(value);
+            readNumberCycles = Integer.parseInt(value);
             break;
           case "IsIndexedRead":
-            read.indexedRead = "Y".equals(value.toUpperCase().trim());
+            readIndexedRead = "Y".equals(value.toUpperCase().trim());
             break;
           default:
             throw new AozanRuntimeException(
                 "in RunInfo unvalid value for name attribute on read tag.");
 
           }
-
-          if (read.getNumber() == 0) {
-            read.number = readCount;
-          }
         }
 
-        this.reads.add(read);
+        final Read read = new Read(readNumber == 0 ? readCount : readNumber,
+            readNumberCycles, readIndexedRead);
+
+        result.add(read);
       }
     }
 
+    return result;
   }
 
   /**
    * Parses the flowcell element to set variable used to compute tile number.
    * @param runElement the element parent.
    */
-  private void extractFlowcellElement(final Element runElement) {
+  private static FlowCellLayout extractFlowcellElement(
+      final Element runElement) {
+
+    int laneCount = -1;
+    int surfaceCount = -1;
+    int swathCount = -1;
+    int tileCount = -1;
+
+    // FlowcellLayout specific to RTA version 2.X
+    int sectionPerLane = -1;
+    int lanePerSection = -1;
 
     // Parse FlowcellLayout tag
     for (Element e2 : getElementsByTagName(runElement, "FlowcellLayout")) {
@@ -261,24 +413,24 @@ public class RunInfo {
 
         switch (name) {
         case "LaneCount":
-          this.flowCellLaneCount = value;
+          laneCount = value;
           break;
         case "SurfaceCount":
-          this.flowCellSurfaceCount = value;
+          surfaceCount = value;
           break;
         case "SwathCount":
-          this.flowCellSwathCount = value;
+          swathCount = value;
           break;
         case "TileCount":
-          this.flowCellTileCount = value;
+          tileCount = value;
           break;
 
         // Value specific on RTA version 2.X
         case "SectionPerLane":
-          this.flowCellSectionPerLane = value;
+          sectionPerLane = value;
           break;
         case "LanePerSection":
-          this.flowCellLanePerSection = value;
+          lanePerSection = value;
           break;
         default:
           throw new AozanRuntimeException(
@@ -288,14 +440,20 @@ public class RunInfo {
       }
     }
 
+    return new FlowCellLayout(laneCount, surfaceCount, swathCount, tileCount,
+        sectionPerLane, lanePerSection);
   }
 
   /**
    * Set the lane with Phix. Per default all for a NextSeq, specified for an
    * HiSeq.
    * @param runElement the element parent
+   * @return a list with the lane number with PhiX
    */
-  private void extractAlignToPhiXElement(final Element runElement) {
+  private static List<Integer> extractAlignToPhiXElement(
+      final Element runElement, final int flowCellLaneCount) {
+
+    final List<Integer> result = new ArrayList<>();
 
     // Check if element name exists
     if (isElementExistsByTagName(runElement, "AlignToPhiX")) {
@@ -305,40 +463,20 @@ public class RunInfo {
         // Parse lane number
         for (Element e3 : getElementsByTagName(e2, "Lane")) {
 
-          this.alignToPhix.add(Integer.parseInt(e3.getTextContent()));
+          result.add(Integer.parseInt(e3.getTextContent()));
         }
       }
 
     } else {
 
       // Not found, aligned to PhiX in all lanes
-      for (int lane = 1; lane <= this.flowCellLaneCount; lane++) {
+      for (int lane = 1; lane <= flowCellLaneCount; lane++) {
 
-        this.alignToPhix.add(lane);
+        result.add(lane);
       }
     }
-  }
 
-  /**
-   * Gets the Nextseq tiles count per lane (surfaces × swaths × camera segments
-   * × tiles per swath per segment).
-   * @return the Nextseq tiles count
-   */
-  private int getNextseqTilesCount() {
-    return this.flowCellSurfaceCount
-        * this.flowCellSwathCount * this.flowCellTileCount
-        * this.flowCellSectionPerLane;
-  }
-
-  /**
-   * Gets the Hiseq tiles count per lane (surfaces × swaths × tiles per swath
-   * per segment).
-   * @return the Hiseq tiles count
-   */
-  private int getHiseqTilesCount() {
-
-    return this.flowCellSurfaceCount
-        * this.flowCellSwathCount * this.flowCellTileCount;
+    return result;
   }
 
   //
@@ -353,10 +491,10 @@ public class RunInfo {
 
     if (isHiseqSequencer())
       // Case Hiseq compute tile count
-      return getHiseqTilesCount();
+      return this.flowCellLayout.getHiseqTilesCount();
 
     // Case NextSeq compute tile count, add data from camera number
-    return getNextseqTilesCount();
+    return this.flowCellLayout.getNextseqTilesCount();
   }
 
   /**
@@ -364,7 +502,7 @@ public class RunInfo {
    * @return true, if is next seq sequencer
    */
   public boolean isNextSeqSequencer() {
-    return this.flowCellSectionPerLane > 0;
+    return this.flowCellLayout.sectionPerLane > 0;
   }
 
   /**
@@ -372,7 +510,7 @@ public class RunInfo {
    * @return true, if is hiseq sequencer
    */
   public boolean isHiseqSequencer() {
-    return this.flowCellSectionPerLane == -1;
+    return this.flowCellLayout.sectionPerLane == -1;
   }
 
   /**
@@ -430,42 +568,42 @@ public class RunInfo {
    * @return Returns the flowCellLaneCount
    */
   public int getFlowCellLaneCount() {
-    return this.flowCellLaneCount;
+    return this.flowCellLayout.laneCount;
   }
 
   /**
    * @return Returns the flowCellSurfaceCount
    */
   public int getFlowCellSurfaceCount() {
-    return this.flowCellSurfaceCount;
+    return this.flowCellLayout.surfaceCount;
   }
 
   /**
    * @return Returns the flowCellSwathCount
    */
   public int getFlowCellSwathCount() {
-    return this.flowCellSwathCount;
+    return this.flowCellLayout.swathCount;
   }
 
   /**
    * @return Returns the flowCellTileCount
    */
   public int getFlowCellTileCount() {
-    return this.flowCellTileCount;
+    return this.flowCellLayout.tileCount;
   }
 
   /**
    * @return Returns the flowCellSectionPerLane
    */
   public int getFlowCellSectionPerLane() {
-    return this.flowCellSectionPerLane;
+    return this.flowCellLayout.sectionPerLane;
   }
 
   /**
    * @return Returns the flowCellLanePerSection
    */
   public int getFlowCellLanePerSection() {
-    return this.flowCellLanePerSection;
+    return this.flowCellLayout.lanePerSection;
   }
 
   /**
@@ -493,54 +631,11 @@ public class RunInfo {
         + "{id=" + this.id + ", number=" + this.number + ", flowCell="
         + this.flowCell + ", instrument=" + this.instrument + ", date="
         + this.date + ", reads=" + this.reads + ", flowCellLaneCount="
-        + this.flowCellLaneCount + ", flowCellSurfaceCount="
-        + this.flowCellSurfaceCount + ", flowCellSwathCount="
-        + this.flowCellSwathCount + ", flowCellTileCount="
-        + this.flowCellTileCount + ", alignToPhix=" + this.alignToPhix + "}";
-
-  }
-
-  //
-  // Internal class
-  //
-
-  /**
-   * Handle information about a read.
-   * @author Laurent Jourdren
-   */
-  public static class Read {
-
-    private int number;
-    private int numberCycles;
-    private boolean indexedRead;
-
-    /**
-     * @return Returns the number
-     */
-    public int getNumber() {
-      return this.number;
-    }
-
-    /**
-     * @return Returns the numberCycles
-     */
-    public int getNumberCycles() {
-      return this.numberCycles;
-    }
-
-    /**
-     * @return Returns the indexedRead
-     */
-    public boolean isIndexedRead() {
-      return this.indexedRead;
-    }
-
-    @Override
-    public String toString() {
-      return this.getClass().getSimpleName()
-          + "{number=" + this.number + ", numberCycles=" + this.numberCycles
-          + ", indexedRead=" + this.indexedRead + "}";
-    }
+        + this.flowCellLayout.laneCount + ", flowCellSurfaceCount="
+        + this.flowCellLayout.surfaceCount + ", flowCellSwathCount="
+        + this.flowCellLayout.swathCount + ", flowCellTileCount="
+        + this.flowCellLayout.tileCount + ", alignToPhix=" + this.alignToPhix
+        + "}";
 
   }
 
@@ -577,4 +672,39 @@ public class RunInfo {
 
     return false;
   }
+
+  //
+  // Constructor
+  //
+
+  /**
+   * Private constructor.
+   */
+  private RunInfo(final String id, final int number, final String flowCell,
+      final String instrument, final String date, final List<Read> readList,
+      final FlowCellLayout layout, final List<Integer> alignToPhiX,
+      final List<String> imageChannels) {
+
+    checkNotNull(id, "Run id argument cannot be null");
+    checkArgument(number > 0, "Run number must be greater than 0: " + number);
+    checkNotNull(flowCell, "Flowcell id argument cannot be null");
+    checkNotNull(instrument, "Instrument id argument cannot be null");
+    checkNotNull(date, "date argument cannot be null");
+    checkNotNull(readList, "readList argument cannot be null");
+    checkNotNull(layout, "layout argument cannot be null");
+    checkNotNull(alignToPhiX, "alignToPhiX argument cannot be null");
+    checkNotNull(imageChannels, "imageChannels argument cannot be null");
+
+    this.id = id;
+    this.number = number;
+    this.flowCell = flowCell;
+    this.instrument = instrument;
+    this.date = date;
+    this.reads = readList;
+    this.flowCellLayout = layout;
+    this.alignToPhix = alignToPhiX;
+    this.imageChannels = imageChannels;
+
+  }
+
 }
