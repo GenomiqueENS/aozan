@@ -116,7 +116,7 @@ def send_report(run_id, conf):
 
     run_info = hiseq_run.get_run_info(run_id, conf)
 
-    if run_info is None:
+    if run_info == None:
         return
 
     # TODO ?? add check sample-sheet if demux step enable

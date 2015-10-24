@@ -73,7 +73,7 @@ def get_read_count(run_id, conf):
 
     run_info = get_run_info(run_id, conf)
 
-    if not run_info:
+    if run_info == None:
         return -1
 
     return run_info.getReads().size()
@@ -89,7 +89,7 @@ def get_lane_count(run_id, conf):
 
     run_info = get_run_info(run_id, conf)
 
-    if not run_info:
+    if run_info == None:
         return -1
 
     return run_info.getFlowCellLaneCount()

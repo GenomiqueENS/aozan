@@ -228,7 +228,7 @@ public class SampleSheetUtils {
 
     if (laneCount < 1) {
       throw new IllegalArgumentException(
-          "The lane count cannot be lower than 1");
+          "The lane count cannot be lower than 1: " + laneCount);
     }
 
     if (samplesheet.isLaneSampleField()) {
