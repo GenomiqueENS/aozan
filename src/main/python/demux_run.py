@@ -44,6 +44,7 @@ from fr.ens.transcriptome.aozan.Settings import CASAVA_DESIGN_GENERATOR_COMMAND_
 from fr.ens.transcriptome.aozan import Settings
 
 from fr.ens.transcriptome.eoulsan.util import StringUtils
+from fr.ens.transcriptome.aozan.illumina import RunInfo
 from fr.ens.transcriptome.aozan.illumina.samplesheet.io import SampleSheetXLSReader,\
     SampleSheetCSVWriter, SampleSheetCSVReader
 
@@ -151,13 +152,13 @@ def check_samplesheet(run_id, input_run_data_path, samplesheet_filename, bcl2fas
 
     run_info_path = input_run_data_path + '/RunInfo.xml'
 
-    if not os.path.isdir(run_info_path):
-        error("no RunInfo.xml file found for run " + run_id, "No RunInfo.xml file found for run " + run_id + '.\n', conf)
+    if not os.path.isfile(run_info_path):
+        error("no RunInfo.xml file found for run " + run_id, "No RunInfo.xml file found for run " + run_id + ': ' + run_info_path + '.\n', conf)
         return False, []
 
     run_info = RunInfo.parse(run_info_path)
     flow_cell_id = run_info.getFlowCell()
-    lane_count = run_info.getLaneCount()
+    lane_count = run_info.getFlowCellLaneCount()
 
     input_design_xls_path = conf[CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + samplesheet_filename + '.xls'
     input_design_csv_path = conf[CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + samplesheet_filename + '.csv'
