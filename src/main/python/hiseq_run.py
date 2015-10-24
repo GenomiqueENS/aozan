@@ -35,14 +35,14 @@ def get_runinfos_file(run_id, conf):
         runtId: the run id
         conf: configuration dictionary
     """
-    common.log("FINEST", "get_runinfos_file, run_id: " + run_id, conf)
+    common.log("FINEST", "get_runinfos_file, run_id: " + str(run_id), conf)
     sequencer_path = find_hiseq_run_path(run_id, conf)
-    common.log("FINEST", "get_runinfos_file, sequencer_path: " + sequencer_path, conf)
+    common.log("FINEST", "get_runinfos_file, sequencer_path: " + str(sequencer_path), conf)
     if type(sequencer_path) is bool:
         return None
 
     path = sequencer_path + '/' + run_id + '/RunInfo.xml'
-    common.log("FINEST", "get_runinfos_file, path: " + path, conf)
+    common.log("FINEST", "get_runinfos_file, path: " + str(path), conf)
     common.log("FINEST", "get_runinfos_file, os.path.exists(path): " + str(os.path.exists(path)), conf)
     if not os.path.exists(path):
         return None
@@ -228,17 +228,24 @@ def send_mail_if_recent_run(run_id, secs, conf):
 
 def get_hiseq_data_paths(conf):
 
+    common.log("FINEST", "get_hiseq_data_paths, conf[HISEQ_DATA_PATH_KEY]: " + str(conf[HISEQ_DATA_PATH_KEY]), conf)
+
     paths = conf[HISEQ_DATA_PATH_KEY].split(':')
+    common.log("FINEST", "get_hiseq_data_paths, paths: " + str(paths), conf)
     for i in range(len(paths)):
         paths[i] = paths[i].strip()
-
+    common.log("FINEST", "get_hiseq_data_paths, paths: " + str(paths), conf)
     return paths
 
 def find_hiseq_run_path(run_id, conf):
 
+    common.log("FINEST", "find_hiseq_run_path, get_hiseq_data_paths(conf): " + str(get_hiseq_data_paths(conf)), conf)
     for path in get_hiseq_data_paths(conf):
 
+        common.log("FINEST", "find_hiseq_run_path, path: " + str(path), conf)
         path_to_test = path.strip() + '/' + run_id
+        common.log("FINEST", "find_hiseq_run_path, path_to_test: " + str(path_to_test), conf)
+        common.log("FINEST", "find_hiseq_run_path, os.path.exists(path_to_test): " + str(os.path.exists(path_to_test)), conf)
 
         if (os.path.exists(path_to_test)):
             return path.strip()
