@@ -111,7 +111,7 @@ public class SampleSheetCheck {
         index = null;
       } else {
 
-        index = sample.getIndex2()
+        index = sample.getIndex1()
             + (sample.getIndex2() != null ? '-' + sample.getIndex2() : "");
       }
 
