@@ -449,7 +449,7 @@ def bcl2fastq_get_command(run_id, input_run_data_path, fastq_output_dir, samples
         cmd = str(" ".join(args))
 
     else:
-        error("error unknown major version of bcl2fastq", "Error, unknown major version of bcl2fastq: " + bcl2fastq_major_version, conf)
+        error("error unknown major version of bcl2fastq", "Error, unknown major version of bcl2fastq: " + str(bcl2fastq_major_version), conf)
         return False
 
     # Log command line

@@ -86,7 +86,7 @@ def discover_new_run(conf):
     if common.is_conf_value_equals_true(FIRST_BASE_REPORT_STEP_KEY, conf):
         for run_id in (get_available_run_ids(conf) - run_already_discovered):
             aozan.welcome(conf)
-            common.log('INFO', 'First base report ' + run_id + ' on sequencer ' + common.get_sequencer_type(run_id, conf), conf)
+            common.log('INFO', 'First base report ' + run_id + ' on sequencer ' + common.get_instrument_name(run_id, conf), conf)
             send_report(run_id, conf)
             add_run_id_to_processed_run_ids(run_id, conf)
             run_already_discovered.add(run_id)
@@ -161,9 +161,9 @@ def send_report(run_id, conf):
 
     description_run += "\t- " + "estimated run type : " + type_run_estimated + ".\n"
 
-    sequencer_type = common.get_sequencer_type(run_id, conf)
+    rta_major_version = common.get_rta_major_version(run_id, conf)
 
-    if sequencer_type == common.HISEQ_NAME:
+    if rta_major_version == 1:
         # With HiSeq send the first base report file
         attachment_file = str(hiseq_run.find_hiseq_run_path(run_id, conf)) + '/' + run_id + '/First_Base_Report.htm'
         message = 'You will find attached to this message the first base report on sequencer HiSeq for the run ' + run_id + '.\n\n' + description_run

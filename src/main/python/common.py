@@ -563,9 +563,8 @@ def add_run_id_to_processed_run_ids(run_id, done_file_path, conf):
         done_file_path: path of the done file
         conf: configuration dictionary
     """
-    sequencer_type = get_sequencer_type(run_id, conf)
 
-    log('INFO', 'Add ' + run_id + ' on sequencer ' + str(sequencer_type) + ' to ' + os.path.basename(done_file_path), conf)
+    log('INFO', 'Add ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(done_file_path), conf)
 
     f = open(done_file_path, 'a')
 
@@ -596,24 +595,20 @@ def get_runparameters_path(run_id, conf):
         path to the run parameters file related to the run_id
     """
 
-    sequencer_dir_path = hiseq_run.find_hiseq_run_path(run_id, conf)
+    run_dir_path = hiseq_run.find_hiseq_run_path(run_id, conf)
 
-    if sequencer_dir_path == False:
-        return None
+    if run_dir_path == False:
+        run_dir_path = conf[BCL_DATA_PATH_KEY]
 
     # Find file at the root of directory sequencer data
-    res = glob(sequencer_dir_path + '/' + run_id + "/*Parameters.xml")
-
-    if len(res) == 0:
-        # TODO throw exception ?
-        return None
+    res = glob(run_dir_path + '/' + run_id + "/*Parameters.xml")
 
     # Check result path
     for run_parameter_path in res:
-	    if os.path.basename(run_parameter_path).lower() == "runparameters.xml":
-	        return run_parameter_path
+        if os.path.basename(run_parameter_path).lower() == "runparameters.xml":
+            return run_parameter_path
 
-    return None
+    raise Exception('Unable to find the run parameters for run ' + run_id)
 
 
 def create_html_index_file(conf, run_id, sections):
@@ -707,13 +702,13 @@ def is_section_to_add_in_report(sections, section_name, version, run_id, conf):
         return True
 
 
-    sequencer_type = get_sequencer_type(run_id, conf)
-    if sequencer_type in version:
+    rta_major_version = get_rta_major_version(run_id, conf)
+    if version.endswith(str(rta_major_version)):
         return True
 
-    #  Check if version end with 1 or 2  bcl2fastq1 bcl2fastq2
+    #  Check if version end with 1 or 2 for bcl2fastq1 bcl2fastq2
     major, full = demux_run.get_bcl2fastq_version(run_id, conf)
-    if version.endswith(major):
+    if version.endswith(str(major)):
         return True
 
     # Section added in report html
@@ -855,14 +850,16 @@ def is_fastq_compression_format_valid(conf):
 
     return False
 
-def get_sequencer_type(run_id, conf):
-    """ Identify sequencer type from runParameter.xml file, from the version of RTA software
+def get_rta_major_version(run_id, conf):
+    """ Identify the RTA version used for the run from runParameter.xml file, from the version of RTA software
     Arguments:
         run_id: run id
         conf: configuration dictionary
 
     Returns:
-        nextseq if version start by 2.X and hiseq if version start by 1.X, other None
+        1 or 2
+    Raises:
+        Exception if the version of RTA is unknown/unsupported
     """
 
     if run_id == None:
@@ -874,13 +871,13 @@ def get_sequencer_type(run_id, conf):
     if rtaversion != None:
 
         if rtaversion.startswith("1."):
-            return HISEQ_NAME
+            return 1
 
         if rtaversion.startswith("2."):
-            return NEXTSEQ_NAME
+            return 2
 
     # TODO throw exception
-    return None
+    raise Exception('Unknown RTA version (' + rtaversion + ') for run ' + run_id)
 
 def is_sequencer_hiseq(run_id, conf):
     """ Check if sequencer is a HiSeq from the version of RTA software
@@ -892,7 +889,7 @@ def is_sequencer_hiseq(run_id, conf):
         true if sequencer is a HiSeq
     """
 
-    return get_sequencer_type(run_id, conf) == HISEQ_NAME
+    return get_rta_major_version(run_id, conf) == 1
 
 def is_sequencer_nextseq(run_id, conf):
     """ Check if sequencer is a NextSeq from the version of RTA software
@@ -904,10 +901,10 @@ def is_sequencer_nextseq(run_id, conf):
         true if sequencer is a NextSeq
     """
 
-    return get_sequencer_type(run_id, conf) == NEXTSEQ_NAME
+    return get_rta_major_version(run_id, conf) == 2
 
 def extract_rtaversion(run_id, conf):
-    """ Identify sequencer type from runParameter.xml file, from the version of RTA software
+    """ Extract RTA version from runParameter.xml file
     Arguments:
         run_id: run id
         conf: configuration dictionary
@@ -924,13 +921,12 @@ def extract_rtaversion(run_id, conf):
 
         # Extract version
         if len(rtaversion_element) == 0:
-            # TODO throw exception
-            return None
+            raise Exception('Unable to get RTA version in ' + runParameter_file + ' for run ' + run_id)
 
         # Extract major element version
         return rtaversion_element[0].text.strip()
 
-    return None
+    raise Exception('Unable to locate run parameter file to get RTA version for run ' + run_id)
 
 def is_RTA_1_version(run_id, conf):
     """ Identify sequencer type from runParameter.xml file, from the version of RTA software
@@ -965,6 +961,38 @@ def is_RTA_2_version(run_id, conf):
         return None
 
     return rta_version.startswith("2.")
+
+def get_instrument_name(run_id, conf):
+    """ Identify the sequencer model from runParameter.xml file
+    Arguments:
+        run_id: run id
+        conf: configuration dictionary
+
+    Return:
+        A string with the instrument name
+    """
+
+    runParameter_file = get_runparameters_path(run_id, conf)
+
+    tree = ElementTree()
+    tree.parse(runParameter_file)
+
+    application_tags = list(tree.iter('ApplicationName'))
+    scanner_tags = list(tree.iter('ScannerID'))
+    instrument_tags = list(tree.iter('InstrumentID'))
+
+    if len(application_tags) == 0:
+        return 'Unknown instrument'
+
+    sequencer_model = application_tags[0].text.split(' ')[0]
+
+    if len(scanner_tags) > 0:
+        sequencer_model += ' ' + scanner_tags[0].text
+    elif len(instrument_tags) > 0:
+        sequencer_model += ' ' + instrument_tags[0].text
+
+    return sequencer_model
+
 
 def extract_elements_by_tagname_from_xml(xmlpath, tagname):
     """ Extract an element from xml file path by tag name

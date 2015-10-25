@@ -54,7 +54,7 @@ def discovery_run(conf):
                 return []
 
             aozan.welcome(conf)
-            common.log('INFO', 'Discover end run ' + str(run_id) + ' on sequencer ' + str(common.get_sequencer_type(run_id, conf)), conf)
+            common.log('INFO', 'Discover end run ' + str(run_id) + ' on ' + common.get_instrument_name(run_id, conf), conf)
 
             if hiseq_run.create_run_summary_reports(run_id, conf):
                 hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
