@@ -497,10 +497,6 @@ def exception_msg(exp, conf):
     """
 
     if is_conf_value_equals_true(AOZAN_DEBUG_KEY, conf):
-
-        if isinstance(exp, AozanException) and exp.getWrappedException() != None:
-            exp = exp.getWrappedException()
-
         return ' withTrace \n\t' + str(exp.getClass().getName()) + ": " + str(exp.getMessage()) + '\n' + str(StringUtils.join(exp.getStackTrace(), '\n\t'))
     else:
         return str(exp.getMessage())
