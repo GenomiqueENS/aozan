@@ -111,11 +111,11 @@ public class Bcl2FastqOutput {
   }
 
   /**
-   * Find fastq output directory.
+   * Find fastq parent directory.
    * @param fastqSample the fast sample
    * @return the fastq output directory.
    */
-  public File casavaOutputDir(final FastqSample fastqSample) {
+  public File getFastqSampleParentDir(final FastqSample fastqSample) {
 
     if (fastqSample == null) {
       throw new NullPointerException("fastqSample argument cannot be null");
@@ -126,14 +126,18 @@ public class Bcl2FastqOutput {
     case BCL2FASTQ_1:
 
       if (fastqSample.isIndeterminedIndices()) {
-        return new File(getFastqDirectory()
-            + "/" + UNDETERMINED_DIR_NAME + "/" + UNDETERMINED_PREFIX
-            + fastqSample.getLane());
+
+        final File projectDir =
+            new File(getFastqDirectory(), UNDETERMINED_DIR_NAME);
+
+        return new File(projectDir,
+            UNDETERMINED_PREFIX + fastqSample.getLane());
       }
 
-      return new File(getFastqDirectory()
-          + "/" + PROJECT_PREFIX + fastqSample.getProjectName() + "/"
-          + SAMPLE_PREFIX + fastqSample.getSampleName());
+      final File projectDir = new File(getFastqDirectory(),
+          PROJECT_PREFIX + fastqSample.getProjectName());
+
+      return new File(projectDir, SAMPLE_PREFIX + fastqSample.getSampleName());
 
     case BCL2FASTQ_2:
     case BCL2FASTQ_2_15:
@@ -142,7 +146,7 @@ public class Bcl2FastqOutput {
         return getFastqDirectory();
       }
 
-      return new File(getFastqDirectory() + "/" + fastqSample.getProjectName());
+      return new File(getFastqDirectory(), fastqSample.getProjectName());
 
     default:
       throw new IllegalStateException(
@@ -187,7 +191,7 @@ public class Bcl2FastqOutput {
       final String fastqSampleName = buildFastqSampleName(fastqSample);
 
       return String.format("%s_S%d%s", fastqSampleName,
-          extractSamplePositionInSampleSheet(this.samplesheet, fastqSample),
+          extractSamplePositionInSampleSheetLane(this.samplesheet, fastqSample),
           getConstantFastqSuffix(fastqSample.getLane(), read));
 
     default:
@@ -238,16 +242,19 @@ public class Bcl2FastqOutput {
   public List<File> createListFastqFiles(final FastqSample fastqSample,
       final int read) {
 
-    return Arrays.asList(new File(casavaOutputDir(fastqSample) + "/")
-        .listFiles(new FileFilter() {
+    final String filePrefix = prefixFileName(fastqSample, read);
+
+    return Arrays.asList(
+        getFastqSampleParentDir(fastqSample).listFiles(new FileFilter() {
 
           @Override
-          public boolean accept(final File pathname) {
+          public boolean accept(final File file) {
 
-            return pathname.length() > 0
-                && pathname.getName()
-                    .startsWith(prefixFileName(fastqSample, read))
-                && pathname.getName().contains(FASTQ_EXTENSION);
+            final String filename = file.getName();
+
+            return file.length() > 0
+                && filename.startsWith(filePrefix)
+                && filename.contains(FASTQ_EXTENSION);
           }
         }));
   }
@@ -284,12 +291,12 @@ public class Bcl2FastqOutput {
   }
 
   /**
-   * Extract sample positio in samplesheet.
+   * Extract sample position in a lane of the samplesheet.
    * @param fastqSample the fastq sample
-   * @return the int
+   * @return the position of the sample in the samplesheet lane
    */
-  private static int extractSamplePositionInSampleSheet(
-      final SampleSheet samplesheet, final FastqSample fastqSample) {
+  private static int extractSamplePositionInSampleSheetLane(final SampleSheet samplesheet,
+      final FastqSample fastqSample) {
 
     if (samplesheet == null) {
       throw new NullPointerException("samplesheet argument cannot be null");
@@ -311,13 +318,17 @@ public class Bcl2FastqOutput {
 
     for (Sample sample : samplesheet) {
 
-      i++;
-
       if (lane > 0 && sample.getLane() != lane) {
         continue;
       }
 
-      if (sampleName.equals(sample.getSampleName())) {
+      i++;
+
+      // If sample id is not defined, use sample name
+      final String sname = sample.getSampleId() != null
+          ? sample.getSampleId() : sample.getSampleName();
+
+      if (sampleName.equals(sname)) {
         return i;
       }
     }
