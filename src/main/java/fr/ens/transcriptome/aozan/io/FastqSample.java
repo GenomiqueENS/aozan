@@ -354,14 +354,13 @@ public class FastqSample {
 
     this.runFastqPath = casavaOutputPath;
 
+    this.bcl2fastqOutput = new Bcl2FastqOutput(samplesheet, casavaOutputPath);
     this.fastqFiles = createListFastqFiles(this.read);
 
     this.compressionType = getCompressionExtension(this.fastqFiles);
     this.keyFastqSample = createKeyFastqSample();
 
     this.nameTemporaryFastqFiles = createNameTemporaryFastqFile();
-
-    this.bcl2fastqOutput = new Bcl2FastqOutput(samplesheet, casavaOutputPath);
   }
 
   /**
@@ -390,14 +389,13 @@ public class FastqSample {
 
     this.runFastqPath = casavaOutputPath;
 
+    this.bcl2fastqOutput = new Bcl2FastqOutput(samplesheet, casavaOutputPath);
     this.fastqFiles = createListFastqFiles(this.read);
 
     this.compressionType = getCompressionExtension(this.fastqFiles);
     this.keyFastqSample = createKeyFastqSample();
 
     this.nameTemporaryFastqFiles = createNameTemporaryFastqFile();
-
-    this.bcl2fastqOutput = new Bcl2FastqOutput(samplesheet, casavaOutputPath);
   }
 
 }
