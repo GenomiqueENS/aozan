@@ -23,6 +23,8 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
@@ -42,8 +44,9 @@ public class DemultiplexingCollector implements Collector {
   /** Prefix for run data */
   public static final String PREFIX = "demux";
 
-  private String casavaOutputPath;
-  private Collector subCollector;
+  private File casavaOutputPath;
+  private File samplesheetFile;
+  private Properties conf;
 
   //
   // Useful methods
@@ -73,23 +76,40 @@ public class DemultiplexingCollector implements Collector {
       return;
     }
 
-    this.casavaOutputPath = properties.getProperty(QC.CASAVA_OUTPUT_DIR);
+    this.casavaOutputPath =
+        new File(properties.getProperty(QC.CASAVA_OUTPUT_DIR));
+    this.samplesheetFile =
+        new File(properties.getProperty(QC.CASAVA_DESIGN_PATH));
+    this.conf = new Properties(properties);
+  }
 
-    final Bcl2FastqOutput manager = Bcl2FastqOutput.getInstance();
+  @Override
+  public void collect(final RunData data) throws AozanException {
+
+    final Collector subCollector;
+
+    final Bcl2FastqOutput manager;
+
+    try {
+      manager =
+          new Bcl2FastqOutput(this.samplesheetFile, this.casavaOutputPath);
+    } catch (IOException e) {
+      throw new AozanException(e);
+    }
 
     switch (manager.getVersion()) {
 
     case BCL2FASTQ_1:
 
       // Call flowcell collector
-      this.subCollector = new FlowcellDemuxSummaryCollector();
+      subCollector = new FlowcellDemuxSummaryCollector();
       break;
 
     case BCL2FASTQ_2:
     case BCL2FASTQ_2_15:
 
       // Conversion collector
-      this.subCollector = new ConversionStatsCollector();
+      subCollector = new ConversionStatsCollector();
       break;
 
     default:
@@ -100,19 +120,15 @@ public class DemultiplexingCollector implements Collector {
     }
 
     // Init collector
-    subCollector.configure(properties);
-  }
+    subCollector.configure(this.conf);
 
-  @Override
-  public void collect(final RunData data) throws AozanException {
-
+    // Collect data
     subCollector.collect(data);
   }
 
   @Override
   public void clear() {
     // TODO Auto-generated method stub
-
   }
 
   //
@@ -123,7 +139,7 @@ public class DemultiplexingCollector implements Collector {
    * Gets the casava output path.
    * @return the casava output path
    */
-  public String getCasavaOutputPath() {
+  public File getCasavaOutputPath() {
     return this.casavaOutputPath;
   }
 }

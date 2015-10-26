@@ -2,23 +2,18 @@ package fr.ens.transcriptome.aozan.illumina;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingDirectoryFile;
-import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingStandardFile;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 
-import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
-import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.Sample;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
@@ -48,8 +43,6 @@ public class Bcl2FastqOutput {
 
   /** The Constant UNDETERMINED_PREFIX. */
   public static final String UNDETERMINED_PREFIX = SAMPLE_PREFIX + "lane";
-
-  private static Bcl2FastqOutput singleton;
 
   private final Bcl2FastqVersion version;
 
@@ -94,47 +87,6 @@ public class Bcl2FastqOutput {
       }
     }
   };
-
-  //
-  // Singleton
-  //
-
-  /**
-   * Gets the single instance of ManagerQCPath.
-   * @param globalConf the global configuration
-   * @return single instance of ManagerQCPath
-   * @throws AozanException if an error occurs when create instance during
-   *           parsing sample sheet file
-   */
-  public static void initizalize(final Map<String, String> globalConf)
-      throws AozanException {
-
-    if (singleton != null) {
-      throw new IllegalStateException("Singleton has been already initialized");
-    }
-
-    // Extract sample sheet file
-    final File samplesheetFile =
-        new File(globalConf.get(QC.CASAVA_DESIGN_PATH));
-
-    // Extract fastq output directory
-    final File fastqDir = new File(globalConf.get(QC.CASAVA_OUTPUT_DIR));
-
-    try {
-      singleton = new Bcl2FastqOutput(samplesheetFile, fastqDir);
-    } catch (IOException e) {
-      throw new AozanException(e);
-    }
-  }
-
-  public static Bcl2FastqOutput getInstance() {
-
-    if (singleton == null) {
-      throw new IllegalStateException("Singleton has not been initialized");
-    }
-
-    return singleton;
-  }
 
   //
   // Other methods
@@ -203,7 +155,7 @@ public class Bcl2FastqOutput {
    * Set the prefix of the fastq file of read for a fastq on a sample.
    * @return prefix fastq files for this fastq on asample
    */
-  public String prefixFileName(final FastqSample fastqSample, final int read) {
+  private String prefixFileName(final FastqSample fastqSample, final int read) {
 
     switch (this.version) {
 
@@ -235,7 +187,7 @@ public class Bcl2FastqOutput {
       final String fastqSampleName = buildFastqSampleName(fastqSample);
 
       return String.format("%s_S%d%s", fastqSampleName,
-          extractOrderNumberSample(this.samplesheet, fastqSample),
+          extractSamplePositionInSampleSheet(this.samplesheet, fastqSample),
           getConstantFastqSuffix(fastqSample.getLane(), read));
 
     default:
@@ -294,7 +246,7 @@ public class Bcl2FastqOutput {
 
             return pathname.length() > 0
                 && pathname.getName()
-                    .startsWith(singleton.prefixFileName(fastqSample, read))
+                    .startsWith(prefixFileName(fastqSample, read))
                 && pathname.getName().contains(FASTQ_EXTENSION);
           }
         }));
@@ -332,12 +284,12 @@ public class Bcl2FastqOutput {
   }
 
   /**
-   * Extract order number sample.
+   * Extract sample positio in samplesheet.
    * @param fastqSample the fastq sample
    * @return the int
    */
-  private int extractOrderNumberSample(final SampleSheet samplesheet,
-      final FastqSample fastqSample) {
+  private static int extractSamplePositionInSampleSheet(
+      final SampleSheet samplesheet, final FastqSample fastqSample) {
 
     if (samplesheet == null) {
       throw new NullPointerException("samplesheet argument cannot be null");
@@ -522,29 +474,56 @@ public class Bcl2FastqOutput {
     return newMax;
   }
 
+  /**
+   * Read the samplesheet from a file.
+   * @param samplesheetFile the samplesheet file
+   * @return a SampleSheet object
+   * @throws IOException if an error occurs while reading the samplesheet
+   */
+  private static SampleSheet readSampleSheet(final File samplesheetFile)
+      throws IOException {
+
+    return new SampleSheetCSVReader(samplesheetFile).read();
+  }
+
   //
   // Constructor
   //
 
-  private Bcl2FastqOutput(final File samplesheetFile, final File fastqDir)
-      throws FileNotFoundException, IOException {
+  /**
+   * Constructor.
+   * @param samplesheetFile the samplesheet file
+   * @param fastqDir the output directory of bcl2fastq
+   * @throws IOException if an error occurs while reading bcl2fastq version
+   */
+  public Bcl2FastqOutput(final File samplesheetFile, final File fastqDir)
+      throws IOException {
 
-    if (samplesheetFile == null) {
-      throw new NullPointerException("samplesheetFile argument cannot be null");
+    this(readSampleSheet(samplesheetFile), fastqDir);
+  }
+
+  /**
+   * Constructor.
+   * @param samplesheet the samplesheet
+   * @param fastqDir the output directory of bcl2fastq
+   * @throws IOException if an error occurs while reading bcl2fastq version
+   */
+  public Bcl2FastqOutput(final SampleSheet samplesheet, final File fastqDir)
+      throws IOException {
+
+    if (samplesheet == null) {
+      throw new NullPointerException("samplesheet argument cannot be null");
     }
 
     if (fastqDir == null) {
       throw new NullPointerException("fastqDir argument cannot be null");
     }
 
-    checkExistingStandardFile(samplesheetFile, "sample sheet");
     checkExistingDirectoryFile(fastqDir, "fastq directory");
 
-    this.version = findBcl2FastqVersion(fastqDir);
-
-    // TODO implements this
     this.fastqDirectory = fastqDir;
-    this.samplesheet = new SampleSheetCSVReader(samplesheetFile).read();
+    this.version = findBcl2FastqVersion(fastqDir);
+    this.samplesheet = samplesheet;
   }
 
 }

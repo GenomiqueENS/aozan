@@ -46,6 +46,8 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.aozan.io.FastqStorage;
 
@@ -64,10 +66,13 @@ public abstract class AbstractFastqCollector implements Collector {
   private FastqStorage fastqStorage;
 
   /** The casava output path. */
-  private String casavaOutputPath;
+  private File casavaOutputPath;
+
+  /** The casava design file. */
+  private File casavaDesignFile;
 
   /** The qc report output path. */
-  private String qcReportOutputPath;
+  private File qcReportOutputPath;
 
   /** The tmp dir. */
   private File tmpDir;
@@ -199,8 +204,12 @@ public abstract class AbstractFastqCollector implements Collector {
   @Override
   public void configure(final Properties properties) {
 
-    this.casavaOutputPath = properties.getProperty(QC.CASAVA_OUTPUT_DIR);
-    this.qcReportOutputPath = properties.getProperty(QC.QC_OUTPUT_DIR);
+    this.casavaOutputPath =
+        new File(properties.getProperty(QC.CASAVA_OUTPUT_DIR));
+    this.qcReportOutputPath =
+        new File(properties.getProperty(QC.QC_OUTPUT_DIR));
+    this.casavaDesignFile =
+        new File(properties.getProperty(QC.CASAVA_DESIGN_PATH));
     this.tmpDir = new File(properties.getProperty(QC.TMP_DIR));
 
     this.fastqStorage = FastqStorage.getInstance();
@@ -225,7 +234,14 @@ public abstract class AbstractFastqCollector implements Collector {
   @Override
   public void collect(final RunData data) throws AozanException {
 
-    this.createListFastqSamples(data);
+    final SampleSheet samplesheet;
+
+    try {
+      samplesheet = new SampleSheetCSVReader(this.casavaDesignFile).read();
+      this.createListFastqSamples(data, samplesheet);
+    } catch (IOException e) {
+      throw new AozanException(e);
+    }
 
     final boolean isRunPE = data.getRunMode().toUpperCase().equals("PE");
 
@@ -246,11 +262,10 @@ public abstract class AbstractFastqCollector implements Collector {
 
             if (fs.isIndeterminedIndices()) {
               reportDir =
-                  new File(this.qcReportOutputPath + "/Undetermined_indices");
+                  new File(this.qcReportOutputPath, "Undetermined_indices");
             } else {
-              reportDir =
-                  new File(this.qcReportOutputPath
-                      + "/Project_" + fs.getProjectName());
+              reportDir = new File(this.qcReportOutputPath,
+                  "Project_" + fs.getProjectName());
             }
 
             if (!reportDir.exists()) {
@@ -272,12 +287,11 @@ public abstract class AbstractFastqCollector implements Collector {
         } else {
           // TODO
 
-          LOGGER
-              .severe("FASTQ Collect: fastq is null or empty, key fq is "
-                  + fs.getKeyFastqSample() + " tmp fq "
-                  + fs.getNameTemporaryFastqFiles() + " sample name "
-                  + fs.getSampleName() + " prefix rundata "
-                  + fs.getPrefixRundata());
+          LOGGER.severe("FASTQ Collect: fastq is null or empty, key fq is "
+              + fs.getKeyFastqSample() + " tmp fq "
+              + fs.getNameTemporaryFastqFiles() + " sample name "
+              + fs.getSampleName() + " prefix rundata "
+              + fs.getPrefixRundata());
         }
       }
 
@@ -308,11 +322,10 @@ public abstract class AbstractFastqCollector implements Collector {
 
             if (fs.isIndeterminedIndices()) {
               reportDir =
-                  new File(this.qcReportOutputPath + "/Undetermined_indices");
+                  new File(this.qcReportOutputPath, "Undetermined_indices");
             } else {
-              reportDir =
-                  new File(this.qcReportOutputPath
-                      + "/Project_" + fs.getProjectName());
+              reportDir = new File(this.qcReportOutputPath,
+                  "Project_" + fs.getProjectName());
             }
 
             if (!reportDir.exists()) {
@@ -378,8 +391,11 @@ public abstract class AbstractFastqCollector implements Collector {
   /**
    * Construct the map with all samples to treat.
    * @param data result data object
+   * @param samplesheet the samplesheet
+   * @throws IOException
    */
-  private void createListFastqSamples(final RunData data) {
+  private void createListFastqSamples(final RunData data,
+      final SampleSheet samplesheet) throws IOException {
 
     if (!this.fastqSamples.isEmpty()) {
       return;
@@ -421,9 +437,9 @@ public abstract class AbstractFastqCollector implements Collector {
             final String descriptionSample =
                 data.getSampleDescription(lane, sampleName);
 
-            this.fastqSamples.add(new FastqSample(this.casavaOutputPath,
-                readIndexedCount, lane, sampleName, projectName,
-                descriptionSample, index));
+            this.fastqSamples.add(new FastqSample(samplesheet,
+                this.casavaOutputPath, readIndexedCount, lane, sampleName,
+                projectName, descriptionSample, index));
 
           } // Sample
         }
@@ -432,13 +448,13 @@ public abstract class AbstractFastqCollector implements Collector {
         if (this.isProcessUndeterminedIndicesSamples()) {
 
           // Check Undetermined fastq exist for this lane
-          final String asBarcodeUndetermined =
-              data.get("demux.lane" + lane + ".sample.lane" + lane + ".barcode");
+          final String asBarcodeUndetermined = data
+              .get("demux.lane" + lane + ".sample.lane" + lane + ".barcode");
           if (asBarcodeUndetermined != null) {
 
             // Add undetermined sample
-            this.fastqSamples.add(new FastqSample(this.casavaOutputPath,
-                readIndexedCount, lane));
+            this.fastqSamples.add(new FastqSample(samplesheet,
+                this.casavaOutputPath, readIndexedCount, lane));
 
           }
         }
@@ -467,18 +483,14 @@ public abstract class AbstractFastqCollector implements Collector {
         "demux.lane" + lane + ".sample." + sampleName + ".read" + read;
 
     // Check value exist in rundata, if not then fastq is empty
-    final boolean valid =
-        !(data.get(prefix + ".pf.cluster.count") == null || data.get(prefix
-            + ".raw.cluster.count") == null);
+    final boolean valid = !(data.get(prefix + ".pf.cluster.count") == null
+        || data.get(prefix + ".raw.cluster.count") == null);
 
     if (!valid)
-      LOGGER
-          .warning("Sample "
-              + sampleName
-              + " lane "
-              + lane
-              + ": no demultiplexing data found, no quality control data. Use prefix in rundata "
-              + prefix);
+      LOGGER.warning("Sample "
+          + sampleName + " lane " + lane
+          + ": no demultiplexing data found, no quality control data. Use prefix in rundata "
+          + prefix);
 
     // Return true if sample valid
     return valid;
@@ -557,16 +569,15 @@ public abstract class AbstractFastqCollector implements Collector {
     // Define the part result directory
     final File dataFileDir;
     if (fastqSample.isIndeterminedIndices()) {
-      dataFileDir = new File(this.qcReportOutputPath + "/Undetermined_indices");
+      dataFileDir = new File(this.qcReportOutputPath, "Undetermined_indices");
     } else {
-      dataFileDir =
-          new File(this.qcReportOutputPath
-              + "/Project_" + fastqSample.getProjectName());
+      dataFileDir = new File(this.qcReportOutputPath,
+          "Project_" + fastqSample.getProjectName());
     }
 
     // Define the part result file
-    return new File(dataFileDir, this.getName()
-        + "_" + fastqSample.getKeyFastqSample() + ".data");
+    return new File(dataFileDir,
+        this.getName() + "_" + fastqSample.getKeyFastqSample() + ".data");
 
   }
 
@@ -609,8 +620,8 @@ public abstract class AbstractFastqCollector implements Collector {
               executor.shutdownNow();
 
               // Wait the termination of current running task
-              executor
-                  .awaitTermination(WAIT_SHUTDOWN_MINUTES, TimeUnit.MINUTES);
+              executor.awaitTermination(WAIT_SHUTDOWN_MINUTES,
+                  TimeUnit.MINUTES);
 
               // Return error Step Result
               throw new AozanException(st.getException());
@@ -628,11 +639,11 @@ public abstract class AbstractFastqCollector implements Collector {
           } catch (final ExecutionException e) {
 
             if (fst.cancel(interruptThreadIfRunning)) {
-              LOGGER
-                  .severe("Throw exception by thread execution, task could not be cancelled.");
+              LOGGER.severe(
+                  "Throw exception by thread execution, task could not be cancelled.");
             } else {
-              LOGGER
-                  .severe("Throw exception by thread execution, task is cancelled.");
+              LOGGER.severe(
+                  "Throw exception by thread execution, task is cancelled.");
             }
 
             // Throw exception
@@ -697,9 +708,8 @@ public abstract class AbstractFastqCollector implements Collector {
       final String suffix) {
 
     // Build subdirectory name
-    final String subdir =
-        (fs.isIndeterminedIndices() ? "/Undetermined_indices" : "/Project_"
-            + fs.getProjectName());
+    final String subdir = (fs.isIndeterminedIndices()
+        ? "Undetermined_indices" : "Project_" + fs.getProjectName());
 
     // Build subdirectory path
     final File projectDir = new File(this.qcReportOutputPath, subdir);

@@ -23,11 +23,16 @@
 
 package fr.ens.transcriptome.aozan.io;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.illumina.Bcl2FastqOutput;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
 
 /**
@@ -51,12 +56,14 @@ public class FastqSample {
 
   private final boolean undeterminedIndices;
 
-  private final String runFastqPath;
+  private final File runFastqPath;
   private final String keyFastqSample;
   private final String nameTemporaryFastqFiles;
 
   private final List<File> fastqFiles;
   private final CompressionType compressionType;
+
+  private final Bcl2FastqOutput bcl2fastqOutput;
 
   /**
    * Create a key unique for each fastq sample.
@@ -179,7 +186,7 @@ public class FastqSample {
    */
   private List<File> createListFastqFiles(final int read) {
 
-    return Bcl2FastqOutput.getInstance().createListFastqFiles(this, read);
+    return this.bcl2fastqOutput.createListFastqFiles(this, read);
 
   }
 
@@ -189,13 +196,13 @@ public class FastqSample {
    */
   public String getPrefixReport(final int read) {
 
-    return Bcl2FastqOutput.getInstance().buildPrefixReport(this, read);
+    return this.bcl2fastqOutput.buildPrefixReport(this, read);
 
   }
 
   public String getPrefixReport() {
 
-    return Bcl2FastqOutput.getInstance().buildPrefixReport(this);
+    return this.bcl2fastqOutput.buildPrefixReport(this);
 
   }
 
@@ -317,6 +324,7 @@ public class FastqSample {
   //
   /**
    * Public constructor corresponding of a technical replica sample.
+   * @param samplesheet the samplesheet
    * @param casavaOutputPath path to fastq files
    * @param read read number
    * @param lane lane number
@@ -324,10 +332,17 @@ public class FastqSample {
    * @param projectName name of the project
    * @param descriptionSample description of the sample
    * @param index value of index or if doesn't exists, NoIndex
+   * @throws IOException if an error occurs while reading bcl2fastq version
    */
-  public FastqSample(final String casavaOutputPath, final int read,
-      final int lane, final String sampleName, final String projectName,
-      final String descriptionSample, final String index) {
+  public FastqSample(final SampleSheet samplesheet, final File casavaOutputPath,
+      final int read, final int lane, final String sampleName,
+      final String projectName, final String descriptionSample,
+      final String index) throws IOException {
+
+    checkNotNull(samplesheet, "samplesheet argument cannot be null");
+    checkNotNull(casavaOutputPath, "casavaOutputPath argument cannot be null");
+    checkArgument(read > 0, "read value cannot be lower than 1");
+    checkArgument(lane > 0, "read value cannot be lower than 1");
 
     this.read = read;
     this.lane = lane;
@@ -346,16 +361,24 @@ public class FastqSample {
 
     this.nameTemporaryFastqFiles = createNameTemporaryFastqFile();
 
+    this.bcl2fastqOutput = new Bcl2FastqOutput(samplesheet, casavaOutputPath);
   }
 
   /**
    * Public constructor corresponding of a undetermined index sample.
+   * @param samplesheet the samplesheet
    * @param casavaOutputPath path to fastq files
    * @param read read number
    * @param lane lane number
+   * @throws IOException if an error occurs while reading bcl2fastq version
    */
-  public FastqSample(final String casavaOutputPath, final int read,
-      final int lane) {
+  public FastqSample(final SampleSheet samplesheet, final File casavaOutputPath,
+      final int read, final int lane) throws IOException {
+
+    checkNotNull(samplesheet, "samplesheet argument cannot be null");
+    checkNotNull(casavaOutputPath, "casavaOutputPath argument cannot be null");
+    checkArgument(read > 0, "read value cannot be lower than 1");
+    checkArgument(lane > 0, "read value cannot be lower than 1");
 
     this.read = read;
     this.lane = lane;
@@ -374,6 +397,7 @@ public class FastqSample {
 
     this.nameTemporaryFastqFiles = createNameTemporaryFastqFile();
 
+    this.bcl2fastqOutput = new Bcl2FastqOutput(samplesheet, casavaOutputPath);
   }
 
 }
