@@ -8,9 +8,13 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.base.Charsets;
+import com.google.common.base.Splitter;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
@@ -19,6 +23,7 @@ import fr.ens.transcriptome.aozan.illumina.samplesheet.Sample;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 import fr.ens.transcriptome.eoulsan.util.Version;
+import jersey.repackaged.com.google.common.collect.Lists;
 
 public class ManagerQCPath {
 
@@ -51,7 +56,11 @@ public class ManagerQCPath {
   // Enum
   //
 
-  private enum Bcl2FastqVersion {
+  /**
+   * This enum defined the versions of bcl2fastq.
+   * @author Laurent Jourdren
+   */
+  public enum Bcl2FastqVersion {
     BCL2FASTQ_1, BCL2FASTQ_2, BCL2FASTQ_2_15;
 
     public static Bcl2FastqVersion parseVersion(final String version) {
@@ -68,7 +77,8 @@ public class ManagerQCPath {
         return BCL2FASTQ_1;
 
       case 2:
-        return v.getMinor() >= 15 ? BCL2FASTQ_2_15 : BCL2FASTQ_2;
+        return v.getMinor() == 15 || v.getMinor() == 16
+            ? BCL2FASTQ_2_15 : BCL2FASTQ_2;
 
       default:
         throw new AozanRuntimeException(
@@ -100,15 +110,11 @@ public class ManagerQCPath {
     final File samplesheetFile =
         new File(globalConf.get(QC.CASAVA_DESIGN_PATH));
 
-    // Extract sample sheet version
-    final String samplesheetVersion = globalConf.get(QC.BCL2FASTQ_VERSION);
-
     // Extract fastq output directory
     final File fastqDir = new File(globalConf.get(QC.CASAVA_OUTPUT_DIR));
 
     try {
-      singleton =
-          new ManagerQCPath(samplesheetFile, samplesheetVersion, fastqDir);
+      singleton = new ManagerQCPath(samplesheetFile, fastqDir);
     } catch (IOException e) {
       throw new AozanException(e);
     }
@@ -128,9 +134,20 @@ public class ManagerQCPath {
   //
 
   /**
-   * @return the fastqDirectory
+   * Get the bcl2fastq version used to generate the FASTQ files.
+   * @return the bcl2fastq version used to generate the FASTQ files
+   */
+  public Bcl2FastqVersion getVersion() {
+
+    return this.version;
+  }
+
+  /**
+   * Get the bcl2fastq output directory of the run.
+   * @return the bcl2fastq output directory
    */
   public File getFastqDirectory() {
+
     return fastqDirectory;
   }
 
@@ -350,20 +367,163 @@ public class ManagerQCPath {
   }
 
   //
+  // Bcl2fastq version discovering methods
+  //
+
+  /**
+   * Find the version of bcl2fastq used to create FASTQ files.
+   * @param fastqDir the bcl2fastq output directory
+   * @return the bcl2fastq version
+   * @throws IOException
+   */
+  private static Bcl2FastqVersion findBcl2FastqVersion(final File fastqDir)
+      throws IOException {
+
+    for (String filename : Arrays.asList("DemultiplexedBustardConfig.xml",
+        "DemultiplexedBustardSummary.xml", "SampleSheet.mk", "support.txt",
+        "DemultiplexConfig.xml", "Makefile", "make.err", "make.out", "Temp")) {
+
+      if (new File(fastqDir, filename).exists()) {
+        return Bcl2FastqVersion.BCL2FASTQ_1;
+      }
+    }
+
+    // Check if the output directory is a bcl2fastq output
+    if (!new File(fastqDir, "InterOp").isDirectory()) {
+      throw new IOException("Unknown Bcl2fastq output directory tree");
+    }
+
+    // Find the bcl2fastq version in the log file
+    final Bcl2FastqVersion versionInLogFile =
+        extractBcl2FastqVersionFromLog(fastqDir);
+    if (versionInLogFile != null) {
+      return versionInLogFile;
+    }
+
+    // Find the bcl2fastq version from the number of the occurrences of the
+    // underscore character in FASTQ filenames
+    final int count = countUnderscoreInFastqFilename(fastqDir, 0);
+
+    if (count == 4) {
+      return Bcl2FastqVersion.BCL2FASTQ_2_15;
+    } else if (count > 4) {
+      return Bcl2FastqVersion.BCL2FASTQ_2;
+    }
+
+    throw new IOException("Unknown Bcl2fastq output directory tree");
+  }
+
+  /**
+   * Read the bcl2Fastq version used to create FASTQ files in the bcl2fastq2 log
+   * file.
+   * @param fastqDir the bcl2fastq output directory
+   * @return the bcl2fastq version or null if cannot be read in the log file
+   * @throws IOException if more than one log file was found
+   */
+  private static Bcl2FastqVersion extractBcl2FastqVersionFromLog(
+      final File fastqDir) throws IOException {
+
+    // Find log file
+    final File[] logFiles = fastqDir.listFiles(new FileFilter() {
+
+      @Override
+      public boolean accept(final File pathname) {
+
+        final String filename = pathname.getName();
+
+        return filename.startsWith("bcl2fastq_output_")
+            && filename.endsWith(".out");
+
+      }
+    });
+
+    // If no log found,
+    if (logFiles == null || logFiles.length == 0) {
+
+      return Bcl2FastqVersion.BCL2FASTQ_1;
+    }
+
+    if (logFiles.length > 1) {
+      throw new IOException(
+          "Found more than one bcl1fastq2 log file in " + fastqDir);
+    }
+
+    // Parse log file
+    for (String line : Files.readAllLines(logFiles[0].toPath(),
+        Charsets.UTF_8)) {
+
+      line = line.toLowerCase().trim();
+
+      if (line.startsWith("bcl2fastq v")) {
+
+        final List<String> fields =
+            Lists.newArrayList(Splitter.on('v').split(line));
+
+        if (fields.size() != 2) {
+          continue;
+        }
+
+        return Bcl2FastqVersion.parseVersion(fields.get(1));
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Count the number of underscore character in the fastq filenames.
+   * @param fastqDir the bcl2fastq output directory
+   * @param max last maximum of occurrences of underscore
+   * @return the number of underscore character in the fastq filenames
+   */
+  private static int countUnderscoreInFastqFilename(final File fastqDir,
+      final int max) {
+
+    int newMax = max;
+
+    for (File f : fastqDir.listFiles()) {
+
+      if (f.isFile()) {
+
+        final String filename = f.getName();
+
+        if (filename.contains(".fastq")) {
+
+          int count = 0;
+          for (int i = 0; i < filename.length(); i++) {
+            if (filename.charAt(i) == '_') {
+              count++;
+            }
+          }
+
+          if (count > newMax) {
+            newMax = count;
+          }
+        }
+      }
+
+      if (f.isDirectory()) {
+
+        final int count = countUnderscoreInFastqFilename(f, newMax);
+
+        if (count > newMax) {
+          newMax = count;
+        }
+      }
+    }
+
+    return newMax;
+  }
+
+  //
   // Constructor
   //
 
-  private ManagerQCPath(final File samplesheetFile,
-      final String bcl2fastqVersion, final File fastqDir)
-          throws FileNotFoundException, IOException {
+  private ManagerQCPath(final File samplesheetFile, final File fastqDir)
+      throws FileNotFoundException, IOException {
 
     if (samplesheetFile == null) {
       throw new NullPointerException("samplesheetFile argument cannot be null");
-    }
-
-    if (bcl2fastqVersion == null) {
-      throw new NullPointerException(
-          "bcl2fastqVersion argument cannot be null");
     }
 
     if (fastqDir == null) {
@@ -373,7 +533,7 @@ public class ManagerQCPath {
     checkExistingStandardFile(samplesheetFile, "sample sheet");
     checkExistingDirectoryFile(fastqDir, "fastq directory");
 
-    this.version = Bcl2FastqVersion.parseVersion(bcl2fastqVersion);
+    this.version = findBcl2FastqVersion(fastqDir);
 
     // TODO implements this
     this.fastqDirectory = fastqDir;

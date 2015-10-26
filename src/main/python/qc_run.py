@@ -70,15 +70,13 @@ def qc(run_id, conf):
     if input_run_data_path == None:
         return False
 
-    bcl2fastq_major_version, bcl2fastq_version = demux_run.get_bcl2fastq_version(run_id, conf)
-
     fastq_input_dir = conf[FASTQ_DATA_PATH_KEY] + '/' + run_id
     reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
     reports_data_path = reports_data_base_path + '/' + run_id
     qc_output_dir = reports_data_path + '/qc_' + run_id
     tmp_extension = '.tmp'
 
-    common.log('INFO', 'QC step: start with bcl2fastq version ' + str(bcl2fastq_version), conf)
+    common.log('INFO', 'QC step: start', conf)
 
     # Check if input run data data exists
     if input_run_data_path == None:
@@ -123,7 +121,7 @@ def qc(run_id, conf):
     try:
 
         # Initialize the QC object
-        qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id, bcl2fastq_version)
+        qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id)
 
         # Compute the report
         report = qc.computeReport()

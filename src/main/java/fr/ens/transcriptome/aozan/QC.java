@@ -85,9 +85,6 @@ public class QC {
 
   public static final String LANE_COUNT = "lane.count";
 
-  /** Bcl2fastq version to demultiplexing step. */
-  public static final String BCL2FASTQ_VERSION = "bcl2fast.version";
-
   private static final String TEST_KEY_ENABLED_SUFFIX = ".enable";
   private static final String TEST_KEY_PREFIX = "qc.test.";
 
@@ -105,9 +102,6 @@ public class QC {
   private final Map<String, String> globalConf = new HashMap<>();
 
   private final File tmpDir;
-
-  /** Bcl2fastq version to demultiplexing step. */
-  private final String bcl2fastqVersion;
 
   /**
    * Process data.
@@ -581,9 +575,6 @@ public class QC {
     this.globalConf.put(QC_OUTPUT_DIR, this.qcDir);
     this.globalConf.put(TMP_DIR, this.tmpDir.getAbsolutePath());
 
-    // Find bcl2fastq main version (1 or 2) from completed version name
-    this.globalConf.put(BCL2FASTQ_VERSION, this.bcl2fastqVersion);
-
     // Init manager qc path
     ManagerQCPath.initizalize(this.globalConf);
   }
@@ -722,16 +713,14 @@ public class QC {
    * @param qcDir the qc dir
    * @param tmpDirname temporary directory path
    * @param runId run id
-   * @param bcl2fastqVersion bcl2fastq version used
    * @throws AozanException if an error occurs while initialize the QC object
    */
   public QC(final Map<String, String> properties, final String bclDir,
       final String fastqDir, final String qcDir, final String tmpDirname,
-      final String runId, final String bcl2fastqVersion) throws AozanException {
+      final String runId) throws AozanException {
 
     this(properties, bclDir, fastqDir, qcDir,
-        tmpDirname == null ? null : new File(tmpDirname), runId,
-        bcl2fastqVersion);
+        tmpDirname == null ? null : new File(tmpDirname), runId);
   }
 
   /**
@@ -748,7 +737,7 @@ public class QC {
    */
   public QC(final Map<String, String> properties, final String bclDir,
       final String fastqDir, final String qcDir, final File tmpDir,
-      final String runId, final String bcl2fastqVersion) throws AozanException {
+      final String runId) throws AozanException {
 
     if (properties == null) {
       throw new NullPointerException("The properties object is null");
@@ -758,7 +747,6 @@ public class QC {
     this.fastqDir = fastqDir;
     this.qcDir = qcDir;
     this.runId = runId;
-    this.bcl2fastqVersion = bcl2fastqVersion;
 
     this.tmpDir = tmpDir == null
         ? new File(System.getProperty("java.io.tmpdir")) : tmpDir;
