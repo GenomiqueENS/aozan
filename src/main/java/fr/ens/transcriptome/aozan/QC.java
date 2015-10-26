@@ -46,7 +46,7 @@ import fr.ens.transcriptome.aozan.collectors.CollectorRegistry;
 import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.fastqc.RuntimePatchFastQC;
-import fr.ens.transcriptome.aozan.io.ManagerQCPath;
+import fr.ens.transcriptome.aozan.illumina.Bcl2FastqOutput;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.AozanTestRegistry;
 import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
@@ -576,7 +576,7 @@ public class QC {
     this.globalConf.put(TMP_DIR, this.tmpDir.getAbsolutePath());
 
     // Init manager qc path
-    ManagerQCPath.initizalize(this.globalConf);
+    Bcl2FastqOutput.initizalize(this.globalConf);
   }
 
   /**

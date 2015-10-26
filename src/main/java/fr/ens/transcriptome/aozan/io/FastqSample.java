@@ -27,6 +27,7 @@ import java.io.File;
 import java.util.List;
 
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
+import fr.ens.transcriptome.aozan.illumina.Bcl2FastqOutput;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
 
 /**
@@ -178,7 +179,7 @@ public class FastqSample {
    */
   private List<File> createListFastqFiles(final int read) {
 
-    return ManagerQCPath.getInstance().createListFastqFiles(this, read);
+    return Bcl2FastqOutput.getInstance().createListFastqFiles(this, read);
 
   }
 
@@ -188,13 +189,13 @@ public class FastqSample {
    */
   public String getPrefixReport(final int read) {
 
-    return ManagerQCPath.getInstance().buildPrefixReport(this, read);
+    return Bcl2FastqOutput.getInstance().buildPrefixReport(this, read);
 
   }
 
   public String getPrefixReport() {
 
-    return ManagerQCPath.getInstance().buildPrefixReport(this);
+    return Bcl2FastqOutput.getInstance().buildPrefixReport(this);
 
   }
 

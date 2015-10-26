@@ -1,4 +1,4 @@
-package fr.ens.transcriptome.aozan.io;
+package fr.ens.transcriptome.aozan.illumina;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingDirectoryFile;
@@ -22,10 +22,17 @@ import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.Sample;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
+import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.eoulsan.util.Version;
 import jersey.repackaged.com.google.common.collect.Lists;
 
-public class ManagerQCPath {
+/**
+ * This class define the output of bcl2fastq.
+ * @author Sandrine Perrin
+ * @author Laurent Jourdren
+ * @since 2.0
+ */
+public class Bcl2FastqOutput {
 
   /** The Constant FASTQ_EXTENSION. */
   public static final String FASTQ_EXTENSION = ".fastq";
@@ -42,7 +49,7 @@ public class ManagerQCPath {
   /** The Constant UNDETERMINED_PREFIX. */
   public static final String UNDETERMINED_PREFIX = SAMPLE_PREFIX + "lane";
 
-  private static ManagerQCPath singleton;
+  private static Bcl2FastqOutput singleton;
 
   private final Bcl2FastqVersion version;
 
@@ -114,13 +121,13 @@ public class ManagerQCPath {
     final File fastqDir = new File(globalConf.get(QC.CASAVA_OUTPUT_DIR));
 
     try {
-      singleton = new ManagerQCPath(samplesheetFile, fastqDir);
+      singleton = new Bcl2FastqOutput(samplesheetFile, fastqDir);
     } catch (IOException e) {
       throw new AozanException(e);
     }
   }
 
-  public static ManagerQCPath getInstance() {
+  public static Bcl2FastqOutput getInstance() {
 
     if (singleton == null) {
       throw new IllegalStateException("Singleton has not been initialized");
@@ -519,7 +526,7 @@ public class ManagerQCPath {
   // Constructor
   //
 
-  private ManagerQCPath(final File samplesheetFile, final File fastqDir)
+  private Bcl2FastqOutput(final File samplesheetFile, final File fastqDir)
       throws FileNotFoundException, IOException {
 
     if (samplesheetFile == null) {

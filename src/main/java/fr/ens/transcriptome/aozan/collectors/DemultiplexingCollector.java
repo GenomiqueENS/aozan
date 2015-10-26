@@ -32,7 +32,7 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.io.ManagerQCPath;
+import fr.ens.transcriptome.aozan.illumina.Bcl2FastqOutput;
 
 public class DemultiplexingCollector implements Collector {
 
@@ -75,7 +75,7 @@ public class DemultiplexingCollector implements Collector {
 
     this.casavaOutputPath = properties.getProperty(QC.CASAVA_OUTPUT_DIR);
 
-    final ManagerQCPath manager = ManagerQCPath.getInstance();
+    final Bcl2FastqOutput manager = Bcl2FastqOutput.getInstance();
 
     switch (manager.getVersion()) {
 
