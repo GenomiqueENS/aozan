@@ -23,6 +23,7 @@
 
 package fr.ens.transcriptome.aozan.fastqscreen;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.File;
@@ -51,7 +52,7 @@ public class FastqScreen {
   /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
-  private final String tmpDir;
+  private final File tmpDir;
   private int confThreads;
   private final String mapperName;
   private final String mapperArgument;
@@ -85,17 +86,24 @@ public class FastqScreen {
    *          true else false
    * @throws AozanException
    */
-  public FastqScreenResult execute(final File fastqRead1,
-      final File fastqRead2, final FastqSample fastqSample,
-      final List<String> genomes, final String genomeSample,
-      final boolean isPairedMode) throws AozanException {
+  public FastqScreenResult execute(final File fastqRead1, final File fastqRead2,
+      final FastqSample fastqSample, final List<String> genomes,
+      final String genomeSample, final boolean isPairedMode)
+          throws AozanException {
+
+    checkNotNull(fastqRead1, "fastqRead1 argument cannot be null");
+    checkNotNull(genomes, "genomes argument cannot be null");
+    checkNotNull(genomeSample, "genomeSample argument cannot be null");
+
+    if (isPairedMode) {
+      checkNotNull(fastqRead2, "fastqRead2 argument cannot be null");
+    }
 
     // Timer
     final Stopwatch timer = Stopwatch.createStarted();
 
-    final FastqScreenPseudoMapReduce pmr =
-        new FastqScreenPseudoMapReduce(this.tmpDir, isPairedMode,
-            this.mapperName, this.mapperArgument);
+    final FastqScreenPseudoMapReduce pmr = new FastqScreenPseudoMapReduce(
+        this.tmpDir, isPairedMode, this.mapperName, this.mapperArgument);
 
     try {
 
@@ -114,7 +122,10 @@ public class FastqScreen {
       timer.reset();
       timer.start();
 
-      pmr.doReduce(new File(this.tmpDir + "/outputDoReduce.txt"));
+      final File outputDoReduceFile =
+          new File(this.tmpDir, "outputDoReduce.txt");
+
+      pmr.doReduce(outputDoReduceFile);
 
       LOGGER.fine("FASTQSCREEN : step reduce for "
           + fastqSample.getKeyFastqSample() + " in mode "
@@ -122,10 +133,9 @@ public class FastqScreen {
           + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
       // Remove temporary output file use in map-reduce step
-      final File f = new File(this.tmpDir + "/outputDoReduce.txt");
-      if (!f.delete()) {
+      if (!outputDoReduceFile.delete()) {
         LOGGER.warning("Fastqscreen : fail to delete file "
-            + f.getAbsolutePath());
+            + outputDoReduceFile.getAbsolutePath());
       }
 
     } catch (final IOException e) {
@@ -149,13 +159,14 @@ public class FastqScreen {
    */
   public FastqScreen(final Properties properties) {
 
-    this.tmpDir = properties.getProperty(QC.TMP_DIR);
+    checkNotNull(properties, "properties argument cannot be null");
+
+    this.tmpDir = new File(properties.getProperty(QC.TMP_DIR));
 
     if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
       try {
-        this.confThreads =
-            Integer.parseInt(properties
-                .getProperty(Settings.QC_CONF_THREADS_KEY));
+        this.confThreads = Integer
+            .parseInt(properties.getProperty(Settings.QC_CONF_THREADS_KEY));
       } catch (final Exception e) {
       }
     }
@@ -163,19 +174,16 @@ public class FastqScreen {
     // Parameter mapper instead of default value
     this.mapperName =
         properties.getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPER_KEY);
-    this.mapperArgument =
-        properties
-            .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPER_ARGUMENT_KEY);
+    this.mapperArgument = properties
+        .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPER_ARGUMENT_KEY);
 
     final fr.ens.transcriptome.eoulsan.Settings settings =
         EoulsanRuntime.getSettings();
 
-    settings
-        .setGenomeDescStoragePath(properties
-            .getProperty(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
-    settings
-        .setGenomeMapperIndexStoragePath(properties
-            .getProperty(Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY));
+    settings.setGenomeDescStoragePath(properties.getProperty(
+        Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
+    settings.setGenomeMapperIndexStoragePath(properties.getProperty(
+        Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY));
     settings.setGenomeStoragePath(properties
         .getProperty(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY));
 
