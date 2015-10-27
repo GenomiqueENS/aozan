@@ -112,7 +112,7 @@ public class OverrepresentedSequencesBlast {
    */
   public void configure(final Properties properties) {
 
-    checkNotNull("properties argument cannot be null");
+    checkNotNull(properties, "properties argument cannot be null");
 
     if (this.configured) {
       return;
@@ -259,7 +259,7 @@ public class OverrepresentedSequencesBlast {
   public synchronized ContaminantHit blastSequence(final String sequence)
       throws IOException, AozanException {
 
-    checkNotNull("sequence argument cannot be null");
+    checkNotNull(sequence, "sequence argument cannot be null");
 
     // Test if the instance has been configured
     if (!this.configured) {
