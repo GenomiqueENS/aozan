@@ -23,6 +23,8 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
+import static fr.ens.transcriptome.aozan.util.StringUtils.stackTraceToString;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -634,16 +636,16 @@ public abstract class AbstractFastqCollector implements Collector {
               }
 
             }
-          } catch (final InterruptedException e) {
-            // LOGGER.warning("InterruptedException: " + e.getMessage());
-          } catch (final ExecutionException e) {
+          } catch (final InterruptedException | ExecutionException e) {
 
             if (fst.cancel(interruptThreadIfRunning)) {
               LOGGER.severe(
-                  "Throw exception by thread execution, task could not be cancelled.");
+                  "Throw exception by thread execution, task could not be cancelled. "
+                      + e.getMessage() + '\n' + stackTraceToString(e));
             } else {
               LOGGER.severe(
-                  "Throw exception by thread execution, task is cancelled.");
+                  "Throw exception by thread execution, task is cancelled."
+                      + e.getMessage() + '\n' + stackTraceToString(e));
             }
 
             // Throw exception

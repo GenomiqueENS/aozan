@@ -47,7 +47,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
   private final RunData results;
   private final FastqStorage fastqStorage;
 
-  private AozanException exception;
+  private Throwable exception;
   private boolean success;
   private boolean dataSaved;
 
@@ -65,7 +65,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
 
       setSuccess(true);
 
-    } catch (final AozanException e) {
+    } catch (final Throwable e) {
       setException(e);
     } finally {
 
@@ -119,7 +119,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
    * method.
    * @return a exception object or null if no Exception has been thrown
    */
-  public Exception getException() {
+  public Throwable getException() {
 
     return this.exception;
   }
@@ -175,7 +175,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
    * Set the exception if occurs.
    * @param exception the exception
    */
-  protected void setException(final AozanException exception) {
+  protected void setException(final Throwable exception) {
     this.exception = exception;
   }
 
