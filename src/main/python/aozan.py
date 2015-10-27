@@ -277,6 +277,8 @@ def launch_steps(conf):
 
     Arguments:
         conf: configuration object
+    Returns:
+        a boolean. True if launch_steps() is a success.
     """
 
     # Discover new runs
@@ -310,7 +312,7 @@ def launch_steps(conf):
                         unlock_sync_step(conf, run_id)
                     else:
                         unlock_sync_step(conf, run_id)
-                        return
+                        return False
                 else:
                     common.log('INFO', 'Synchronize ' + run_id + ' is locked.', conf)
 
@@ -325,8 +327,7 @@ def launch_steps(conf):
     # Check if new run appears while sync step
     if  sync_run.is_sync_step_enable(conf) and len(detection_new_run.discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
         #print 'DEBUG New run discovery relaunch steps at the start'
-        launch_steps(conf)
-        return
+        return launch_steps(conf)
 
     #
     # Demultiplexing
@@ -354,7 +355,7 @@ def launch_steps(conf):
                         unlock_demux_step(conf, run_id)
                     else:
                         unlock_demux_step(conf, run_id)
-                        return
+                        return False
                 else:
                     common.log('INFO', 'Demux ' + run_id + ' is locked.', conf)
 
@@ -369,8 +370,7 @@ def launch_steps(conf):
     # Check if new run appears while demux step
     if common.is_conf_value_equals_true(DEMUX_STEP_KEY, conf) and len(detection_new_run.discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
         #print 'DEBUG New run discovery relaunch steps at the start'
-        launch_steps(conf)
-        return
+        return launch_steps(conf)
 
     #
     # Quality control
@@ -395,7 +395,7 @@ def launch_steps(conf):
                         unlock_qc_step(conf, run_id)
                     else:
                         unlock_qc_step(conf, run_id)
-                        return
+                        return False
                 else:
                     common.log('INFO', 'Quality control ' + run_id + ' is locked.', conf)
 
@@ -410,8 +410,7 @@ def launch_steps(conf):
     if common.is_conf_value_equals_true(QC_STEP_KEY, conf) and len(detection_new_run.discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
         #print 'DEBUG New run discovery relaunch steps at the start'
         # TODO
-        launch_steps(conf)
-        return
+        return launch_steps(conf)
 
     #
     # Partial synchronization
@@ -426,10 +425,13 @@ def launch_steps(conf):
                 common.log('INFO', 'Partial synchronization of ' + run_id, conf)
                 if not sync_run.partial_sync(run_id, False, conf):
                     unlock_partial_sync_step(conf, run_id)
-                    return
+                    return False
                 unlock_partial_sync_step(conf, run_id)
             else:
                 common.log('INFO', 'Partial synchronization of ' + run_id + ' is locked.', conf)
+
+    # Everything is OK
+    return True
 
 def aozan_main():
     """Aozan main method.
@@ -443,6 +445,7 @@ def aozan_main():
     parser.add_option('-q', '--quiet', action='store_true', dest='quiet',
                 default=False, help='quiet')
     parser.add_option('-v', '--version', action='store_true', dest='version', help='Aozan version')
+    parser.add_option('-e', '--exit-code', action='store_true', dest='exit_code', help='Returns non zero exit code if a step fails')
     parser.add_option('-c', '--conf', action='store_true', dest='conf', help='Default Aozan configuration Aozan, load before configuration file.')
 
     # Parse command line arguments
@@ -487,7 +490,7 @@ def aozan_main():
 
     # Check main path file in configuration
     if not common.check_configuration(conf, args[0]):
-        common.log('SEVERE', 'Aozan can not be executed, configuration invalid or useful directories inaccessible. ', conf)
+        common.log('SEVERE', 'Aozan can not be executed. Configuration is invalid or missing, some useful directories may be inaccessible. ', conf)
         sys.exit(1)
 
 
@@ -504,7 +507,7 @@ def aozan_main():
             create_lock_file(lock_file_path)
 
             # Launch steps
-            launch_steps(conf)
+            result = launch_steps(conf)
 
             # Remove lock file
             delete_lock_file(lock_file_path)
@@ -516,6 +519,12 @@ def aozan_main():
 
                 # Cancel logger, in case not be cancel properly
                 Common.cancelLogger()
+
+            if result or not options.exit_code:
+                sys.exit(0)
+            else:
+                sys.exit(1)
+
         except:
                 # Get exception info
                 exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
