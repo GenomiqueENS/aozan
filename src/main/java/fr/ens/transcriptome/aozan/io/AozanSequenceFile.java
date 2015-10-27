@@ -104,7 +104,7 @@ public class AozanSequenceFile implements SequenceFile {
               + this.tmpFile.getAbsolutePath());
         }
 
-        LOGGER.fine("FASTQC : uncompress for "
+        LOGGER.fine("FASTQC: uncompress for "
             + this.fastqSample.getKeyFastqSample() + " "
             + +this.fastqSample.getFastqFiles().size()
             + " fastq file(s), type compression "

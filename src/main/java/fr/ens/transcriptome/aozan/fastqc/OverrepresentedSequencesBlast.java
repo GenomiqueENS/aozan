@@ -167,7 +167,7 @@ public class OverrepresentedSequencesBlast {
           // with no hit
           loadSequencesToIgnore();
 
-          LOGGER.info("FastQC-step blast : step is enable, command line = "
+          LOGGER.info("FastQC: blast is enabled, command line = "
               + this.blastCommonCommandLine);
 
         } catch (final IOException e) {
@@ -314,7 +314,7 @@ public class OverrepresentedSequencesBlast {
 
     // Check if the temporary file already exists
     checkExistingFile(resultXMLFile,
-        "FastQC-step blast : path to output file for the sequence " + sequence);
+        "FastQC: path of the Blast output file for the sequence " + sequence);
 
     // Set output file for this sequence
     this.blastCommonCommandLine.setOutputFile(resultXMLFile);
@@ -337,9 +337,8 @@ public class OverrepresentedSequencesBlast {
     // Remove XML file
     if (resultXMLFile.exists()) {
       if (!resultXMLFile.delete()) {
-        LOGGER.warning(
-            "FastQC-step blast : Can not delete xml file with result from blast : "
-                + resultXMLFile.getAbsolutePath());
+        LOGGER.warning("FastQC-step: Cannot delete the Blast xml output file "
+            + resultXMLFile.getAbsolutePath());
       }
     }
     return blastResult;
@@ -371,9 +370,8 @@ public class OverrepresentedSequencesBlast {
 
       final int exitValue = process.waitFor();
       if (exitValue > 0) {
-        LOGGER.warning(
-            "FastQC-step blast : fail of process to launch blastn with sequence "
-                + sequence + ", exit value is : " + exitValue);
+        LOGGER.warning("FastQC: fail of blastn process for sequence "
+            + sequence + ", exit value is : " + exitValue);
       }
 
     } catch (final IOException e) {
@@ -400,7 +398,7 @@ public class OverrepresentedSequencesBlast {
 
     InputStream is = null;
     try {
-      checkExistingFile(resultXML, "FastQC-step blast : query result xml");
+      checkExistingFile(resultXML, "FastQC: Blast xml query result");
 
       // Create the input stream
       is = new FileInputStream(resultXML);
@@ -445,8 +443,9 @@ public class OverrepresentedSequencesBlast {
 
       // Check version xml file
       if (!this.blastVersionExpected.equals(version)) {
-        LOGGER.warning("FastQC - step blast : version xml not expected "
-            + version + " instead of " + this.blastVersionExpected);
+        LOGGER.warning("FastQC: the blast  version in the xml output file ("
+            + version + ") is not the expected version ("
+            + this.blastVersionExpected + ")");
       } else {
         LOGGER.info("FastQC-step blastn : blast version " + version);
       }
@@ -640,7 +639,7 @@ public class OverrepresentedSequencesBlast {
 
         if (!param.startsWith("-")) {
           throw new AozanException(
-              "FastQC-step blast : parameters not conforme " + this.argBlast);
+              "FastQC: invalid Blast argument: " + this.argBlast);
         }
 
         // Parameters can not redefined
@@ -692,11 +691,10 @@ public class OverrepresentedSequencesBlast {
       this.blastPath = blastPath;
       this.blastDBPath = blastDBPath;
 
-      checkExistingFile(new File(blastPath),
-          "FastQC-step blast : path to blast ");
+      checkExistingFile(new File(blastPath), "FastQC: Blast path");
       // Check nt.nal file exists
       checkExistingFile(new File(blastDBPath + ".nal"),
-          " FastQC-step blast : path to database blast");
+          " FastQC: Blast database path");
 
       this.argBlast = checkBlastArguments(blastArguments);
     }
