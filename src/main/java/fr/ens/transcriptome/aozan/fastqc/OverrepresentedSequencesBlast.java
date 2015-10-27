@@ -27,6 +27,7 @@ import static fr.ens.transcriptome.aozan.util.StringUtils.stackTraceToString;
 import static fr.ens.transcriptome.aozan.util.XMLUtilsParser.extractFirstValueToInt;
 import static fr.ens.transcriptome.aozan.util.XMLUtilsParser.extractFirstValueToString;
 import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingFile;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -111,6 +112,8 @@ public class OverrepresentedSequencesBlast {
    */
   public void configure(final Properties properties) {
 
+    checkNotNull("properties argument cannot be null");
+
     if (this.configured) {
       return;
     }
@@ -185,15 +188,6 @@ public class OverrepresentedSequencesBlast {
   }
 
   /**
-   * Test if Blastn can be launched.
-   * @return true if Blastn can be launched else false
-   */
-  public boolean isStepBlastEnabled() {
-
-    return this.stepEnabled;
-  }
-
-  /**
    * Add in hashMap all sequences identified like to fail blastn analysis for
    * skipping them.
    */
@@ -265,6 +259,8 @@ public class OverrepresentedSequencesBlast {
   public synchronized ContaminantHit blastSequence(final String sequence)
       throws IOException, AozanException {
 
+    checkNotNull("sequence argument cannot be null");
+
     // Test if the instance has been configured
     if (!this.configured) {
       throw new AozanRuntimeException(
@@ -304,6 +300,8 @@ public class OverrepresentedSequencesBlast {
    */
   private BlastResultHit blastNewSequence(final String sequence)
       throws IOException, AozanException {
+
+    LOGGER.fine("FastQC: Blast sequence: " + sequence);
 
     File resultXMLFile = null;
     BlastResultHit blastResult = null;
