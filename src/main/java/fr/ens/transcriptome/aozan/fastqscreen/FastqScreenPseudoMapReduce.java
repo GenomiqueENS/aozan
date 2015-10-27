@@ -146,7 +146,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
       // Create instance of Mapper
       final SequenceReadsMapper mapper =
-          createInstanceMapper(mapperName, mapperArguments);
+          createInstanceMapper(this.mapperName, this.mapperArguments);
 
       try {
         final DataFile genomeFile = new DataFile("genome://" + genome);
@@ -422,7 +422,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     // Use default mapper if mapper name or arguments is null
     if (mapperName == null || mapperName.length() == 0) {
 
-      if (mapperArguments != null && mapperArguments.length() > 0) {
+      if (mapperArguments != null && !mapperArguments.isEmpty()) {
         this.newArgumentsMapper = mapperArguments;
       }
 
@@ -480,7 +480,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     checkNotNull(tmpDir, "tmpDir argument cannot be null");
     checkNotNull(mapperName, "mapperName argument cannot be null");
-    checkNotNull(mapperArguments, "mapperArguments argument cannot be null");
 
     checkArgument(tmpDir.isDirectory(),
         "temporary directory does not exists or is not a directory: " + tmpDir);
