@@ -91,10 +91,12 @@ public class ContaminantFinder {
       } catch (final IOException e) {
 
         LOGGER.warning("Error during find contaminant with blast : "
+            + e.getMessage() + "\n"
             + StringUtils.join(e.getStackTrace(), "\n\t"));
       } catch (final AozanException e) {
 
         LOGGER.warning("Error during find contaminant with blast : "
+            + e.getMessage() + "\n"
             + StringUtils.join(e.getStackTrace(), "\n\t"));
       }
     }
@@ -109,27 +111,24 @@ public class ContaminantFinder {
 
       final InputStream is;
 
-      if (System.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY) != null
+      if (System
+          .getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY) != null
           && System.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY)
               .length() > 0) {
-        is =
-            new FileInputStream(
-                System
-                    .getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY));
+        is = new FileInputStream(
+            System.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY));
       } else {
         // FastQC v0.11.2
-        is =
-            ClassLoader
-                .getSystemResourceAsStream("Configuration/contaminant_list.txt");
+        is = ClassLoader
+            .getSystemResourceAsStream("Configuration/contaminant_list.txt");
         // FastQC v0.10
         // ClassLoader
         // .getSystemResourceAsStream("Contaminants/contaminant_list.txt");
 
       }
 
-      final BufferedReader br =
-          new BufferedReader(new InputStreamReader(is,
-              Globals.DEFAULT_FILE_ENCODING));
+      final BufferedReader br = new BufferedReader(
+          new InputStreamReader(is, Globals.DEFAULT_FILE_ENCODING));
 
       String line;
       while ((line = br.readLine()) != null) {
@@ -142,10 +141,10 @@ public class ContaminantFinder {
         }
 
         final String[] sections = line.split("\\t+");
+
         if (sections.length != 2) {
-          System.err
-              .println("Expected 2 sections for contaminant line but got "
-                  + sections.length + " from " + line);
+          LOGGER.warning("Expected 2 sections for contaminant line but got "
+              + sections.length + " from " + line);
           continue;
         }
         final Contaminant con = new Contaminant(sections[0], sections[1]);
