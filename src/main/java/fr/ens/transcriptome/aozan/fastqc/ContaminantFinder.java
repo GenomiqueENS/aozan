@@ -23,6 +23,8 @@
 
 package fr.ens.transcriptome.aozan.fastqc;
 
+import static fr.ens.transcriptome.aozan.util.StringUtils.stackTraceToString;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,14 +34,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import uk.ac.babraham.FastQC.Sequence.Contaminant.Contaminant;
-import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.Settings;
-import fr.ens.transcriptome.eoulsan.util.StringUtils;
+import uk.ac.babraham.FastQC.Sequence.Contaminant.Contaminant;
+import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
 
 /**
  * Source FastQC version 0.10.0, not modify. The class version 0.10.1 doesn't
@@ -91,13 +92,11 @@ public class ContaminantFinder {
       } catch (final IOException e) {
 
         LOGGER.warning("Error during find contaminant with blast : "
-            + e.getMessage() + "\n"
-            + StringUtils.join(e.getStackTrace(), "\n\t"));
+            + e.getMessage() + "\n" + stackTraceToString(e));
       } catch (final AozanException e) {
 
         LOGGER.warning("Error during find contaminant with blast : "
-            + e.getMessage() + "\n"
-            + StringUtils.join(e.getStackTrace(), "\n\t"));
+            + e.getMessage() + "\n" + stackTraceToString(e));
       }
     }
 
@@ -159,4 +158,5 @@ public class ContaminantFinder {
 
     return c.toArray(new Contaminant[0]);
   }
+
 }

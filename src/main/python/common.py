@@ -57,7 +57,7 @@ from fr.ens.transcriptome.aozan.Settings import DEMUX_USE_DOCKER_ENABLE_KEY
 from fr.ens.transcriptome.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY
 
-from fr.ens.transcriptome.eoulsan.util import StringUtils
+from fr.ens.transcriptome.aozan.util import StringUtils
 
 HISEQ_NAME = 'hiseq'
 NEXTSEQ_NAME = 'nextseq'
@@ -497,7 +497,7 @@ def exception_msg(exp, conf):
     """
 
     if is_conf_value_equals_true(AOZAN_DEBUG_KEY, conf):
-        return ' withTrace \n\t' + str(exp.getClass().getName()) + ": " + str(exp.getMessage()) + '\n' + str(StringUtils.join(exp.getStackTrace(), '\n\t'))
+        return ' withTrace \n\t' + str(exp.getClass().getName()) + ': ' + str(exp.getMessage()) + '\n' + StringUtils.stackTraceToString(exp)
     else:
         return str(exp.getMessage())
 

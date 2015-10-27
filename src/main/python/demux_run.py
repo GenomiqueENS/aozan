@@ -43,7 +43,7 @@ from fr.ens.transcriptome.aozan.Settings import FASTQ_DATA_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import CASAVA_DESIGN_GENERATOR_COMMAND_KEY
 from fr.ens.transcriptome.aozan import Settings
 
-from fr.ens.transcriptome.eoulsan.util import StringUtils
+from fr.ens.transcriptome.aozan.util import StringUtils
 from fr.ens.transcriptome.aozan.illumina import RunInfo
 from fr.ens.transcriptome.aozan.illumina.samplesheet.io import SampleSheetXLSReader,\
     SampleSheetCSVWriter, SampleSheetCSVReader
@@ -199,12 +199,12 @@ def check_samplesheet(run_id, input_run_data_path, samplesheet_filename, bcl2fas
             writer.writer(design)
 
         except AozanException, exp:
-            print str(StringUtils.join(exp.getStackTrace(), '\n\t'))
+            print StringUtils.stackTraceToString(exp)
 
             error("error while converting " + samplesheet_filename + ".xls to CSV format", exp.getMessage(), conf)
             return False, []
         except Exception, exp:
-            print str(StringUtils.join(exp.getStackTrace(), '\n\t'))
+            print StringUtils.stackTraceToString(exp)
 
             error("error while converting " + samplesheet_filename + ".xls to CSV format", exp.getMessage(), conf)
             return False, []
