@@ -520,9 +520,7 @@ def aozan_main():
                 # Cancel logger, in case not be cancel properly
                 Common.cancelLogger()
 
-            if result or not options.exit_code:
-                sys.exit(0)
-            else:
+            if not result and options.exit_code:
                 sys.exit(1)
 
         except:
