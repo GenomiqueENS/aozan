@@ -26,7 +26,6 @@ package fr.ens.transcriptome.aozan.fastqscreen;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.File;
@@ -127,7 +126,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     checkNotNull(fastqRead1, "fastqRead1 argument cannot be null");
     checkNotNull(genomesForMapping,
         "genomesForMapping argument cannot be null");
-    checkNotNull(genomeSample, "genomeSample argument cannot be null");
 
     if (this.pairedMode) {
       checkNotNull(fastqRead2, "fastqRead2 argument cannot be null");

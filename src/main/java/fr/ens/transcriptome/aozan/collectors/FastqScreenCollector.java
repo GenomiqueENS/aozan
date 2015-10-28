@@ -90,10 +90,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     this.fastqscreen = new FastqScreen(properties);
 
     try {
-      this.ignorePairedMode =
-          Boolean
-              .parseBoolean(properties
-                  .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY));
+      this.ignorePairedMode = Boolean.parseBoolean(properties.getProperty(
+          Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY));
 
     } catch (final Exception e) {
       // Default value
@@ -101,10 +99,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     }
 
     try {
-      this.skipControlLane =
-          Boolean
-              .parseBoolean(properties
-                  .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY));
+      this.skipControlLane = Boolean.parseBoolean(properties.getProperty(
+          Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY));
     } catch (final Exception e) {
       // Default value
       this.skipControlLane = true;
@@ -124,15 +120,14 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     // Check if process undetermined indices samples specify in Aozan
     // configuration
     this.isProcessUndeterminedIndicesSamples =
-        Boolean
-            .parseBoolean(properties
-                .getProperty(Settings.QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY));
+        Boolean.parseBoolean(properties.getProperty(
+            Settings.QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY));
   }
 
   @Override
   public AbstractFastqProcessThread collectSample(final RunData data,
-      final FastqSample fastqSample, final File reportDir, final boolean isRunPE)
-      throws AozanException {
+      final FastqSample fastqSample, final File reportDir,
+      final boolean isRunPE) throws AozanException {
 
     if (fastqSample.getFastqFiles() == null
         || fastqSample.getFastqFiles().isEmpty()) {
@@ -146,10 +141,9 @@ public class FastqScreenCollector extends AbstractFastqCollector {
       return null;
     }
 
-    final boolean controlLane =
-        data.getBoolean("design.lane"
-            + fastqSample.getLane() + "." + fastqSample.getSampleName()
-            + ".control");
+    final boolean controlLane = data.getBoolean("design.lane"
+        + fastqSample.getLane() + "." + fastqSample.getSampleName()
+        + ".control");
 
     // Skip the control lane
     if (controlLane && this.skipControlLane) {
@@ -187,21 +181,18 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     final boolean isPairedMode = isRunPE && !this.ignorePairedMode;
 
     // Retrieve genome sample from run data
-    final String genomeSample =
-        data.get("design.lane"
-            + fastqSample.getLane() + "." + fastqSample.getSampleName()
-            + ".sample.ref");
+    final String genomeSample = data.get("design.lane"
+        + fastqSample.getLane() + "." + fastqSample.getSampleName()
+        + ".sample.ref");
 
     // Get corresponding valid genome name for mapping
-    final String genomeReferenceSample =
-        FastqScreenGenomeMapper.getInstance().getGenomeReferenceCorresponding(
-            genomeSample);
+    final String genomeReferenceSample = FastqScreenGenomeMapper.getInstance()
+        .getGenomeReferenceCorresponding(genomeSample);
 
-    Common.getLogger().info(
-        "FQS-extract genomeRef for sample "
-            + fastqSample.getSampleName() + " find name " + genomeSample
-            + " search related name in genome available on mapping "
-            + (genomeReferenceSample == null ? "NoFOUND" : genomeReferenceSample));
+    Common.getLogger().info("FQS-extract genomeRef for sample "
+        + fastqSample.getSampleName() + " find name " + genomeSample
+        + " search related name in genome available on mapping "
+        + (genomeReferenceSample == null ? "NoFOUND" : genomeReferenceSample));
 
     // Genome can be use for mapping
     if (genomeReferenceSample != null) {
@@ -248,7 +239,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
         FastqScreenGenomeMapper.getInstance().getGenomesToMapping();
 
     return new FastqScreenProcessThread(fastqSample, this.fastqscreen, data,
-        genomesToSampleTest, reportDir, isRunPE, this.fastqscreenXSLFile);
+        genomesToSampleTest, null, reportDir, false, isRunPE,
+        this.fastqscreenXSLFile);
   }
 
   //

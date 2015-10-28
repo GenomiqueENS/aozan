@@ -59,7 +59,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   private final FastqScreen fastqscreen;
   private final List<String> genomes;
   private final String genomeSample;
-  private final boolean isPairedMode;
+  private final boolean isPairedEndMode;
   private final boolean isRunPE;
   private FastqSample fastqSampleR2;
   private final RunData data;
@@ -84,7 +84,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     LOGGER.fine("FASTQSCREEN : end for "
         + getFastqSample().getKeyFastqSample() + " in mode "
-        + (this.isPairedMode ? "paired" : "single")
+        + (this.isPairedEndMode ? "paired" : "single")
         + (isSuccess()
             ? " on genome(s) " + this.genomes + " in " + duration
             : " with fail."));
@@ -183,7 +183,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     File read2 = null;
     // mode paired
-    if (this.isPairedMode) {
+    if (this.isPairedEndMode) {
       read2 = getFastqStorage().getTemporaryFile(this.fastqSampleR2);
 
       if (!read2.exists()) {
@@ -192,8 +192,9 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     }
 
     // Add read2 in command line
-    this.resultsFastqscreen = this.fastqscreen.execute(read1, read2,
-        getFastqSample(), this.genomes, this.genomeSample, this.isPairedMode);
+    this.resultsFastqscreen =
+        this.fastqscreen.execute(read1, read2, getFastqSample(), this.genomes,
+            this.genomeSample, this.isPairedEndMode);
 
     if (this.resultsFastqscreen == null) {
       throw new AozanException("Fastqscreen returns no result for sample "
@@ -229,30 +230,6 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   //
 
   /**
-   * Public constructor for a thread object collector for FastqScreen for
-   * Indetermined indexed sample.
-   * @param fastqSampleR1 fastqSample corresponding to the read 1
-   * @param fastqscreen instance of fastqscreen
-   * @param data object rundata on the run
-   * @param genomes list of references genomes for FastqScreen
-   * @param isRunPE true if the run is PE else false
-   * @param reportDir path for the directory who save the FastqScreen report
-   * @param isRunPE true if the run is PE else false
-   * @param fastqscreenXSLFile xsl file needed to create report html
-   * @throws AozanException if an error occurs during create thread, if no fastq
-   *           file was found
-   */
-  public FastqScreenProcessThread(final FastqSample fastqSample,
-      final FastqScreen fastqscreen, final RunData data,
-      final Set<String> genomesToMapping, final File reportDir,
-      final boolean isRunPE, final File fastqscreenXSLFile)
-          throws AozanException {
-
-    this(fastqSample, null, fastqscreen, data, genomesToMapping, null,
-        reportDir, false, isRunPE, fastqscreenXSLFile);
-  }
-
-  /**
    * Public constructor for a thread object collector for FastqScreen in
    * pair-end mode.
    * @param fastqSampleR1 fastqSample corresponding to the read 1
@@ -262,7 +239,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @param genomes list of references genomes for FastqScreen
    * @param genomeSample genome reference corresponding to sample
    * @param reportDir path for the directory who save the FastqScreen report
-   * @param isPairedMode true if a pair-end run and option paired mode equals
+   * @param isPairedEndMode true if a pair-end run and option paired mode equals
    *          true else false
    * @param isRunPE true if the run is PE else false
    * @param fastqscreenXSLFile xsl file needed to create report html
@@ -273,13 +250,15 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
       final FastqSample fastqSampleR2, final FastqScreen fastqscreen,
       final RunData data, final Set<String> genomesToMapping,
       final String genomeSample, final File reportDir,
-      final boolean isPairedMode, final boolean isRunPE,
+      final boolean isPairedEndMode, final boolean isRunPE,
       final File fastqscreenXSLFile) throws AozanException {
 
     this(fastqSampleR1, fastqscreen, data, genomesToMapping, genomeSample,
-        reportDir, isPairedMode, isRunPE, fastqscreenXSLFile);
+        reportDir, isPairedEndMode, isRunPE, fastqscreenXSLFile);
 
-    checkNotNull(fastqSampleR2, "fastqSampleR2 argument cannot be null");
+    if (isPairedEndMode) {
+      checkNotNull(fastqSampleR2, "fastqSampleR2 argument cannot be null");
+    }
 
     this.fastqSampleR2 = fastqSampleR2;
   }
@@ -293,8 +272,8 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @param genomesToMapping list of references genomes for FastqScreen
    * @param genomeSample genome reference corresponding to sample
    * @param reportDir path for the directory who save the FastqScreen report
-   * @param isPairedMode true if a pair-end run and option paired mode equals
-   *          true else false
+   * @param isPairedEndMode true if a paired-end run and option paired mode
+   *          equals true else false
    * @param isRunPE true if the run is PE else false
    * @param fastqscreenXSLFile xsl file needed to create report html
    * @throws AozanException if an error occurs during create thread, if no fastq
@@ -303,8 +282,9 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   public FastqScreenProcessThread(final FastqSample fastqSample,
       final FastqScreen fastqscreen, final RunData data,
       final Set<String> genomesToMapping, final String genomeSample,
-      final File reportDir, final boolean isPairedMode, final boolean isRunPE,
-      final File fastqscreenXSLFile) throws AozanException {
+      final File reportDir, final boolean isPairedEndMode,
+      final boolean isRunPE, final File fastqscreenXSLFile)
+          throws AozanException {
 
     super(fastqSample);
 
@@ -317,7 +297,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     this.fastqscreen = fastqscreen;
     this.genomeSample = genomeSample;
     this.reportDir = reportDir;
-    this.isPairedMode = isPairedMode;
+    this.isPairedEndMode = isPairedEndMode;
     this.isRunPE = isRunPE;
     this.data = data;
 
