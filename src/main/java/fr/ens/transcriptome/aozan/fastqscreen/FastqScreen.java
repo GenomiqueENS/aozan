@@ -93,7 +93,6 @@ public class FastqScreen {
 
     checkNotNull(fastqRead1, "fastqRead1 argument cannot be null");
     checkNotNull(genomes, "genomes argument cannot be null");
-    checkNotNull(genomeSample, "genomeSample argument cannot be null");
 
     if (isPairedMode) {
       checkNotNull(fastqRead2, "fastqRead2 argument cannot be null");
