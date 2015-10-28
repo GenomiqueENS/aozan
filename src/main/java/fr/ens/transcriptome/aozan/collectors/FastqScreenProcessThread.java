@@ -312,7 +312,6 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     checkNotNull(data, "data argument cannot be null");
     checkNotNull(genomesToMapping, "genomesToMapping argument cannot be null");
     checkNotNull(reportDir, "reportDir argument cannot be null");
-    checkNotNull(fastqscreenXSLFile, "fastqSampleR2 argument cannot be null");
 
     this.fastqSampleR2 = null;
     this.fastqscreen = fastqscreen;
