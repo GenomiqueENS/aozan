@@ -468,6 +468,18 @@
 			</action>
 		</release>
 
+		<release version="2.0-rc2" description="Aozan 2.0-rc2 release"  date="2015-10-29">
+			<action dev="jourdren" type="update">
+				Replace the implementation of the SampleSheet classes by a new one.
+			</action>
+			<action dev="jourdren" type="fixes">
+				Many refactoring in Java and Python code.
+			</action>
+			<action dev="jourdren" type="fixes">
+				Many small fixes.
+			</action>
+		</release>
+
 	</release>
 
 	</body>

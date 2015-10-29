@@ -3,7 +3,7 @@
 # Based on CentOS with bcl2fastq-1.8.4 images made by Laurent Jourdren
 ############################################################
 
-# Set the base image to bcl2fastq2:2.17.1.14
+# Use Bcl2fastq2 as base image
 FROM genomicpariscentre/bcl2fastq2:2.17.1.14
 
 # File Author / Maintainer
