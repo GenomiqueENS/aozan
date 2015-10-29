@@ -68,7 +68,8 @@ def delete_lock_file(lock_file_path):
         lock_file_path path of the lock file
     """
 
-    os.unlink(lock_file_path)
+    if os.path.exists(lock_file_path):
+        os.unlink(lock_file_path)
 
 
 def load_pid_in_lock_file(lock_file_path):
