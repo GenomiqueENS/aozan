@@ -489,5 +489,11 @@
 			</action>
 		</release>
 
+		<release version="2.0-rc4" description="Aozan 2.0-rc4 release"  date="2015-10-29">
+			<action dev="jourdren" type="fix">
+				In estimate_space_needed.py, Python hiseq_run module was not loaded (not hiseq module !!!).
+			</action>
+		</release>
+
 	</body>
 </document>
