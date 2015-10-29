@@ -472,11 +472,20 @@
 			<action dev="jourdren" type="update">
 				Replace the implementation of the SampleSheet classes by a new one.
 			</action>
-			<action dev="jourdren" type="fixes">
+			<action dev="jourdren" type="fix">
 				Many refactoring in Java and Python code.
 			</action>
-			<action dev="jourdren" type="fixes">
+			<action dev="jourdren" type="fix">
 				Many small fixes.
+			</action>
+		</release>
+
+		<release version="2.0-rc3" description="Aozan 2.0-rc3 release"  date="2015-10-29">
+			<action dev="jourdren" type="fix">
+				In estimate_space_needed.py, Python hiseq module was not loaded.
+			</action>
+			<action dev="jourdren" type="fix">
+				Fix changes.xml XML.
 			</action>
 		</release>
 
