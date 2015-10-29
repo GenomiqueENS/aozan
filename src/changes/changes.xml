@@ -73,7 +73,7 @@
 				Don't show Aozan welcome message when there is nothing to do.
 			</action>
 			<action dev="jourdren" type="fix">
-				Change Eoulsan version dependency. Prevent errors with Casava design CSV 
+				Change Eoulsan version dependency. Prevent errors with Casava design CSV
 				file with comma in cell value.
 			</action>
 		</release>
@@ -86,7 +86,7 @@
 				Now use Eoulsan 1.2-SNAPSHOT as dependency. New Casava sample sheet check:
 				1) Allow the use of a sample in several lanes; 2) new error if a
 				sample is used by more than one project; 3) new warning if a sample
-				exists in more than one lane; 4) new warning with the list of line 
+				exists in more than one lane; 4) new warning with the list of line
 				where is a sample (if the number of lanes >1); 5) new errors if a sample
 				is defined several time by with not the same sequence index.
 			</action>
@@ -375,98 +375,100 @@
 				QC global report, now button project filter by lane.
 			</action>
 			<action dev="sperrin" type="update">
-				Update dependancies in pom.xml : 1) now use Eoulsan-2.0-alpha3, 2) remove dependency to aws-java-sdk 
-				only usefully with Eoulsan version 2.0-alpha1  
+				Update dependancies in pom.xml : 1) now use Eoulsan-2.0-alpha3, 2) remove dependency to aws-java-sdk
+				only usefully with Eoulsan version 2.0-alpha1
 			</action>
 		</release>
-		
+
 		<release version="1.3.2" description="Aozan 1.3.2 release" date="2014-12-30">
 			<action dev="sperrin" type="fix">
 				Global test UndeterminedClustersPercentGlobalTest, fix compute percent.
 			</action>
 		</release>
 
-        <release version="1.4" description="Aozan 1.4 release"  date="2015-03-05">
-            <action dev="jourdren" type="add">
-                Add lock file for each run at each step in context with several instance of Aozan running.
-            </action>
-            <action dev="sperrin" type="add">
-                Add detection contamination project report in HTML, compile data from samples.
-            </action>
-            <action dev="sperrin" type="fix">
-                Fix read collector on InterOp, now it can treat run with multindexes or run without index.
-            </action>
-            <action dev="sperrin" type="update">
-                Archive on run, now is create after the detection run step instead of synchronization step.
-            </action>
-            <action dev="sperrin" type="add">
-                 Aozan now use Eoulsan 2.0-alpha5 as dependency.
-            </action>
-            <action dev="sperrin" type="add">
-                 Add project tests to the QC step. This new type of test comes with some project tests.
-            </action>
-        </release>
-        
-        <release version="1.4.1" description="Aozan 1.4.1 release"  date="2015-03-19">
-            <action dev="jourdren" type="fix">
-                Fix action to create of lock file on each step.
-            </action>
-            <action dev="sperrin" type="update">
-                Example on final quality control report, add table on project.
-            </action>
-            <action dev="sperrin" type="add">
-                Change default logger level, replace INFO by CONF.
-            </action>
-            <action dev="sperrin" type="update">
-                 In detection contamination project report, add lane number with sample name (case technical replicates), 
-            	can be manage project with several genome.
-            </action>
-            <action dev="sperrin" type="fix">
-                Now ProjectStatsCollector don't require UndeterminedIndexesCollector and FastqScreenCollector. 
-            	Only if they are required for QC step, it can use data to compute related statistics.
-            </action>
-            <action dev="jourdren" type="update">
-                The official Aozan Git repository is now GitHub instead of Google code.
-            </action>
-        </release>
+		<release version="1.4" description="Aozan 1.4 release"  date="2015-03-05">
+			<action dev="jourdren" type="add">
+				Add lock file for each run at each step in context with several instance of Aozan running.
+			</action>
+			<action dev="sperrin" type="add">
+				Add detection contamination project report in HTML, compile data from samples.
+			</action>
+			<action dev="sperrin" type="fix">
+				Fix read collector on InterOp, now it can treat run with multindexes or run without index.
+			</action>
+			<action dev="sperrin" type="update">
+				Archive on run, now is create after the detection run step instead of synchronization step.
+			</action>
+			<action dev="sperrin" type="add">
+				Aozan now use Eoulsan 2.0-alpha5 as dependency.
+			</action>
+			<action dev="sperrin" type="add">
+				Add project tests to the QC step. This new type of test comes with some project tests.
+			</action>
+		</release>
 
-        <release version="1.4.2" description="Aozan 1.4.2 release"  date="2015-04-14">
-            <action dev="jourdren" type="add">
-                New dependency for errorprone static code analysis tool execution each time mvn compile is called.
-            </action>
-            <action dev="sperrin" type="update">
-                Update detection contaminant project report.
-            </action>
-            <action dev="sperrin" type="fix">
-                With PE run, now all statistical data in quality control report are display, no more NA.
-            </action>
-	</release>				
-    <release version="1.5" description="Aozan 1.5 release"  date="2015-04-29">
-            <action dev="sperrin" type="add">
-                New dependency on FastQC version 0.11.3, publish 25/03/2015.
-            </action>
-            <action dev="sperrin" type="fix">
-                The ProjectStatCollector can now collect data on recovery on undetermined reads when a lane is no indexed, 
-		the control quality report displays NA for this lane.
-            </action>
+		<release version="1.4.1" description="Aozan 1.4.1 release"  date="2015-03-19">
+			<action dev="jourdren" type="fix">
+				Fix action to create of lock file on each step.
+			</action>
+			<action dev="sperrin" type="update">
+				Example on final quality control report, add table on project.
+			</action>
+			<action dev="sperrin" type="add">
+				Change default logger level, replace INFO by CONF.
+			</action>
+			<action dev="sperrin" type="update">
+				In detection contamination project report, add lane number with sample name (case technical replicates),
+				can be manage project with several genome.
+			</action>
+			<action dev="sperrin" type="fix">
+				Now ProjectStatsCollector don't require UndeterminedIndexesCollector and FastqScreenCollector.
+				Only if they are required for QC step, it can use data to compute related statistics.
+			</action>
+			<action dev="jourdren" type="update">
+				The official Aozan Git repository is now GitHub instead of Google code.
+			</action>
+		</release>
+
+		<release version="1.4.2" description="Aozan 1.4.2 release"  date="2015-04-14">
+			<action dev="jourdren" type="add">
+				New dependency for errorprone static code analysis tool execution each time mvn compile is called.
+			</action>
+			<action dev="sperrin" type="update">
+				Update detection contaminant project report.
+			</action>
+			<action dev="sperrin" type="fix">
+				With PE run, now all statistical data in quality control report are display, no more NA.
+			</action>
+		</release>
+
+		<release version="1.5" description="Aozan 1.5 release"  date="2015-04-29">
+			<action dev="sperrin" type="add">
+				New dependency on FastQC version 0.11.3, publish 25/03/2015.
+			</action>
+			<action dev="sperrin" type="fix">
+				The ProjectStatCollector can now collect data on recovery on undetermined reads when a lane is no indexed,
+				the control quality report displays NA for this lane.
+			</action>
+		</release>
+
+		<release version="2.0-rc1" description="Aozan 2.0-rc1 release"  date="2015-10-01">
+			<action dev="sperrin" type="add">
+				Now Aozan can manager HiSeq and NextSeq sequencer at the same time.
+			</action>
+			<action dev="sperrin" type="add">
+				Now Aozan can manager futhermore bcl2fastq2 and new version on sample sheet file.
+			</action>
+			<action dev="sperrin" type="add">
+				Now Aozan can run the demultiplexing step with Docker images on bcl2fastq 1 or 2.
+			</action>
+			<action dev="sperrin" type="add">
+				The final quality control report includes a sample statistic table to compile data on technical replica
+				if the run contains only one project name.
+			</action>
+		</release>
+
 	</release>
-  
-	<release version="2.0-rc1" description="Aozan 2.0-rc1 release"  date="2015-10-01">
-            <action dev="sperrin" type="add">
-                Now Aozan can manager HiSeq and NextSeq sequencer at the same time.
-            </action>
-            <action dev="sperrin" type="add">
-                Now Aozan can manager futhermore bcl2fastq2 and new version on sample sheet file.
-            </action>
-            <action dev="sperrin" type="add">
-                Now Aozan can run the demultiplexing step with Docker images on bcl2fastq 1 or 2.
-            </action>
-            <action dev="sperrin" type="add">
-                The final quality control report includes a sample statistic table to compile data on technical replica
-            	if the run contains only one project name.
-            </action>
-            
-	</release>
-	
+
 	</body>
 </document>
