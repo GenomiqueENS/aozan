@@ -5,7 +5,7 @@ Created on 15 avril 2012
 @author: Sandrine Perrin
 '''
 
-import common, hiseq
+import common, hiseq_run
 from java.io import File
 from xml.dom.minidom import parse
 
@@ -22,7 +22,7 @@ def estimate(run_id, conf):
     """
 
     # retrieve data from RunInfo.xml
-    run_info = hiseq.get_run_info(run_id, conf)
+    run_info = hiseq_run.get_run_info(run_id, conf)
 
     # retrieve count lane
     lane_count = run_info.getFlowCellLaneCount()
