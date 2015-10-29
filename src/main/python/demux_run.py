@@ -265,7 +265,7 @@ def check_samplesheet(run_id, input_run_data_path, samplesheet_filename, bcl2fas
         design = SampleSheetCSVReader(design_csv_path).read()
 
         # Check values of design file
-        design_warnings = SampleSheetCheck.checkCasavaDesign(design, flow_cell_id)
+        design_warnings = SampleSheetCheck.checkSampleSheet(design, flow_cell_id)
 
 
     # TODO: remove lock

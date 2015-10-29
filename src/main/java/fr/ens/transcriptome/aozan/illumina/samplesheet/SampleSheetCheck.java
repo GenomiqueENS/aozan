@@ -13,40 +13,40 @@ import fr.ens.transcriptome.aozan.AozanException;
 public class SampleSheetCheck {
 
   /**
-   * Check a Casava design object.
-   * @param design Casava design object to check
+   * Check a samplesheet.
+   * @param samplesheet Casava design object to check
    * @return a list of warnings
    * @throws AozanException if the design is not valid
    */
-  public static List<String> checkCasavaDesign(final SampleSheet design)
+  public static List<String> checkSampleSheet(final SampleSheet samplesheet)
       throws AozanException {
 
-    return checkCasavaDesign(design, null);
+    return checkSampleSheet(samplesheet, null);
   }
 
   /**
-   * Check casava design v1.
-   * @param design the design
+   * Check a samplesheet.
+   * @param samplesheet the samplesheet
    * @param flowCellId the flow cell id
    * @return the list
    * @throws AozanException the aozan exception
    */
-  public static List<String> checkCasavaDesign(final SampleSheet design,
+  public static List<String> checkSampleSheet(final SampleSheet samplesheet,
       final String flowCellId) throws AozanException {
 
-    if (design == null) {
-      throw new NullPointerException("The design object is null");
+    if (samplesheet == null) {
+      throw new NullPointerException("The samplesheet object is null");
     }
 
-    if (design.size() == 0) {
+    if (samplesheet.size() == 0) {
 
       // Allow empty samplesheet for bcl2fastq 2 samplesheets
-      if (design.getVersion() == 2) {
+      if (samplesheet.getVersion() == 2) {
         return Collections
             .singletonList("No samples found in the samplesheet.");
       }
 
-      throw new AozanException("No samples found in the design.");
+      throw new AozanException("No samples found in the samplesheet.");
     }
 
     // checkSampleSheet(flowCellId);
@@ -61,7 +61,7 @@ public class SampleSheetCheck {
     final Map<String, String> samplesProjects = new HashMap<>();
     final Map<String, String> samplesIndex = new HashMap<>();
 
-    for (Sample sample : design) {
+    for (Sample sample : samplesheet) {
 
       // Check Flow cell id
       if (sample.isField("FCID")) {
@@ -183,8 +183,8 @@ public class SampleSheetCheck {
   }
 
   /**
-   * Check charset.
-   * @param s the s
+   * Check charset of a string.
+   * @param s the string to check
    * @throws AozanException the aozan exception
    */
   private static void checkCharset(final String s) throws AozanException {
