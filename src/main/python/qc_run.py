@@ -9,7 +9,6 @@ import demux_run, hiseq_run
 
 from fr.ens.transcriptome.aozan import QC, Settings
 from fr.ens.transcriptome.aozan import AozanException
-from fr.ens.transcriptome.aozan.io import ManagerQCPath
 
 from java.lang import Throwable
 
@@ -66,25 +65,23 @@ def qc(run_id, conf):
     start_time = time.time()
 
     input_run_data_path = common.get_input_run_data_path(run_id, conf)
-    
+
     if input_run_data_path == None:
         return False
-    
-    bcl2fastq_major_version, bcl2fastq_version = demux_run.get_bcl2fastq_version(run_id, conf)
-    
+
     fastq_input_dir = conf[FASTQ_DATA_PATH_KEY] + '/' + run_id
     reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
     reports_data_path = reports_data_base_path + '/' + run_id
     qc_output_dir = reports_data_path + '/qc_' + run_id
     tmp_extension = '.tmp'
 
-    common.log('INFO', 'QC step: start with bcl2fastq version ' + str(bcl2fastq_version), conf)
+    common.log('INFO', 'QC step: start', conf)
 
     # Check if input run data data exists
     if input_run_data_path == None:
         error("Basecalling data directory does not exists", "Basecalling data directory does not exists." , conf)
         return False
-    
+
     # Check if input root fastq root data exists
     if not common.is_dir_exists(FASTQ_DATA_PATH_KEY, conf):
         error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf[FASTQ_DATA_PATH_KEY], conf)
@@ -113,7 +110,7 @@ def qc(run_id, conf):
 
     # Check if enough free space is available
     if common.df(conf[REPORTS_DATA_PATH_KEY]) < 1 * 1024 * 1024 * 1024:
-        error("Not enough disk space to store aozan quality control for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id + 
+        error("Not enough disk space to store aozan quality control for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
               '.\nNeed more than 10 Gb on ' + conf[REPORTS_DATA_PATH_KEY] + '.', conf)
         return False
 
@@ -121,10 +118,9 @@ def qc(run_id, conf):
     qc_output_dir = qc_output_dir + tmp_extension
 
     try:
-        lane_count = common.get_flowcell_lane_count(run_id, conf)
-        
+
         # Initialize the QC object
-        qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id, bcl2fastq_version, lane_count)
+        qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id)
 
         # Compute the report
         report = qc.computeReport()
@@ -172,9 +168,7 @@ def qc(run_id, conf):
     except Throwable, exp:
         error("error while computing qc report HTML for run " + run_id + ".", common.exception_msg(exp, conf), conf)
         return False
-    
-    # Clean Manager Quality Control path for next run
-    ManagerQCPath.destroyInstance()
+
 
     # Check if the report has been generated
     if not os.path.exists(html_report_file):

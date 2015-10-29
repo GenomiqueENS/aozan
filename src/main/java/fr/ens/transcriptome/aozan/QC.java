@@ -46,7 +46,6 @@ import fr.ens.transcriptome.aozan.collectors.CollectorRegistry;
 import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.fastqc.RuntimePatchFastQC;
-import fr.ens.transcriptome.aozan.io.ManagerQCPath;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.AozanTestRegistry;
 import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
@@ -85,9 +84,6 @@ public class QC {
 
   public static final String LANE_COUNT = "lane.count";
 
-  /** Bcl2fastq version to demultiplexing step. */
-  public static final String BCL2FASTQ_VERSION = "bcl2fast.version";
-
   private static final String TEST_KEY_ENABLED_SUFFIX = ".enable";
   private static final String TEST_KEY_PREFIX = "qc.test.";
 
@@ -105,11 +101,6 @@ public class QC {
   private final Map<String, String> globalConf = new HashMap<>();
 
   private final File tmpDir;
-
-  /** Bcl2fastq version to demultiplexing step. */
-  private final String bcl2fastqVersion;
-
-  private final int laneCount;
 
   /**
    * Process data.
@@ -158,8 +149,8 @@ public class QC {
 
       if (!QCOutputDir.exists()) {
         if (!QCOutputDir.mkdirs()) {
-          throw new AozanException("Cannot create QC directory : "
-              + QCOutputDir);
+          throw new AozanException(
+              "Cannot create QC directory : " + QCOutputDir);
         }
       } else {
         LOGGER.info("Temporary QC directory already exists");
@@ -234,7 +225,7 @@ public class QC {
    */
   public void writeReport(final QCReport report,
       final String stylesheetFilename, final String outputFilename)
-      throws AozanException {
+          throws AozanException {
 
     if (outputFilename == null) {
       throw new AozanException("The filename for the qc report is null");
@@ -343,9 +334,8 @@ public class QC {
           && key.endsWith(TEST_KEY_ENABLED_SUFFIX) && value != null
           && "true".equals(value.trim().toLowerCase())) {
 
-        final String testName =
-            key.substring(TEST_KEY_PREFIX.length(), key.length()
-                - TEST_KEY_ENABLED_SUFFIX.length());
+        final String testName = key.substring(TEST_KEY_PREFIX.length(),
+            key.length() - TEST_KEY_ENABLED_SUFFIX.length());
 
         final AozanTest test = registry.get(testName);
 
@@ -423,7 +413,7 @@ public class QC {
    */
   private final List<AozanTest> configureTest(final AozanTest test,
       final Map<String, String> properties, final String prefix)
-      throws AozanException {
+          throws AozanException {
 
     final Map<String, String> conf = new HashMap<>();
 
@@ -572,8 +562,8 @@ public class QC {
         });
 
     if (designFiles == null || designFiles.length == 0) {
-      throw new AozanException("No Casava design file found in "
-          + this.fastqDir);
+      throw new AozanException(
+          "No Casava design file found in " + this.fastqDir);
     }
 
     final File casavaDesignFile = designFiles[0];
@@ -583,14 +573,6 @@ public class QC {
     this.globalConf.put(CASAVA_OUTPUT_DIR, this.fastqDir);
     this.globalConf.put(QC_OUTPUT_DIR, this.qcDir);
     this.globalConf.put(TMP_DIR, this.tmpDir.getAbsolutePath());
-
-    // Find bcl2fastq main version (1 or 2) from completed version name
-    this.globalConf.put(BCL2FASTQ_VERSION, this.bcl2fastqVersion);
-    this.globalConf.put(LANE_COUNT, "" + laneCount);
-
-    // Init manager qc path
-    ManagerQCPath.getInstance(this.globalConf);
-
   }
 
   /**
@@ -644,8 +626,8 @@ public class QC {
         "fastqc.nano");
 
     // Patch FastQC classes
-    RuntimePatchFastQC.runPatchFastQC(Boolean.valueOf(properties
-        .get(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY)));
+    RuntimePatchFastQC.runPatchFastQC(Boolean.valueOf(
+        properties.get(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY)));
   }
 
   /**
@@ -727,17 +709,14 @@ public class QC {
    * @param qcDir the qc dir
    * @param tmpDirname temporary directory path
    * @param runId run id
-   * @param bcl2fastqVersion bcl2fastq version used
-   * @param laneCount the lane count
    * @throws AozanException if an error occurs while initialize the QC object
    */
   public QC(final Map<String, String> properties, final String bclDir,
       final String fastqDir, final String qcDir, final String tmpDirname,
-      final String runId, final String bcl2fastqVersion, final int laneCount)
-      throws AozanException {
+      final String runId) throws AozanException {
 
-    this(properties, bclDir, fastqDir, qcDir, tmpDirname == null
-        ? null : new File(tmpDirname), runId, bcl2fastqVersion, laneCount);
+    this(properties, bclDir, fastqDir, qcDir,
+        tmpDirname == null ? null : new File(tmpDirname), runId);
   }
 
   /**
@@ -754,8 +733,7 @@ public class QC {
    */
   public QC(final Map<String, String> properties, final String bclDir,
       final String fastqDir, final String qcDir, final File tmpDir,
-      final String runId, final String bcl2fastqVersion, final int laneCount)
-      throws AozanException {
+      final String runId) throws AozanException {
 
     if (properties == null) {
       throw new NullPointerException("The properties object is null");
@@ -765,12 +743,9 @@ public class QC {
     this.fastqDir = fastqDir;
     this.qcDir = qcDir;
     this.runId = runId;
-    this.laneCount = laneCount;
-    this.bcl2fastqVersion = bcl2fastqVersion;
 
-    this.tmpDir =
-        tmpDir == null
-            ? new File(System.getProperty("java.io.tmpdir")) : tmpDir;
+    this.tmpDir = tmpDir == null
+        ? new File(System.getProperty("java.io.tmpdir")) : tmpDir;
 
     initGlobalConf(properties);
 

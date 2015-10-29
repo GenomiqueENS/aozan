@@ -9,7 +9,7 @@ Created on 25 oct. 2011
 import hiseq_run, sync_run, demux_run
 import smtplib, os.path, time, sys
 import mimetypes
-from email.utils import formatdate 
+from email.utils import formatdate
 from glob import glob
 from xml.etree.ElementTree import ElementTree
 
@@ -57,7 +57,7 @@ from fr.ens.transcriptome.aozan.Settings import DEMUX_USE_DOCKER_ENABLE_KEY
 from fr.ens.transcriptome.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY
 
-from fr.ens.transcriptome.eoulsan.util import StringUtils
+from fr.ens.transcriptome.aozan.util import StringUtils
 
 HISEQ_NAME = 'hiseq'
 NEXTSEQ_NAME = 'nextseq'
@@ -81,6 +81,10 @@ def du(path):
     Arguments:
         path: path of the directory
     """
+
+    if not os.path.exists(path):
+        return 0L
+
     cmd = 'du -b --max-depth=0 ' + path
     child_stdin, child_stdout = os.popen2(cmd)
     lines = child_stdout.readlines()
@@ -91,7 +95,7 @@ def du(path):
 
 def is_conf_value_equals_true(settings_key, conf):
     """Check a property exists in configuration object and value equals 'true'
-    
+
     Arguments:
         settings_key: key in configuration for the property
         conf: configuration dictionary
@@ -100,8 +104,8 @@ def is_conf_value_equals_true(settings_key, conf):
     return is_conf_value_defined(settings_key, 'true', conf)
 
 def is_conf_key_exists(settings_key, conf):
-    """Check a property exists in configuration object 
-    
+    """Check a property exists in configuration object
+
     Arguments:
         settings_key: key in configuration for the property
         conf: configuration dictionary
@@ -113,13 +117,13 @@ def is_conf_key_exists(settings_key, conf):
 
 def is_dir_exists(settings_key, conf):
     """Check a directory path corresponding to a property in configuration exists
-    
+
     Arguments:
         settings_key: key in configuration for the property
         conf: configuration dictionary
         return boolean
     """
-    
+
     exist = is_conf_key_exists(settings_key, conf)
 
     if not exist:
@@ -131,7 +135,7 @@ def is_dir_exists(settings_key, conf):
 
 def is_file_exists(settings_key, conf):
     """Check a file path corresponding to a property in configuration exists
-    
+
     Arguments:
         settings_key: key in configuration for the property
         conf: configuration dictionary
@@ -145,10 +149,10 @@ def is_file_exists(settings_key, conf):
     path = conf[settings_key].strip()
     return os.path.exists(path) and os.path.isfile(path)
 
-    
+
 def is_conf_value_defined(settings_key, expected_value, conf):
     """Check a property exists in configuration object with a specific expected_value (if it's different None or empty
-    
+
     Arguments:
         settings_key: key in configuration for the property
         expected_value: expected_value of property wanted
@@ -157,7 +161,7 @@ def is_conf_value_defined(settings_key, expected_value, conf):
     """
 
     value = None
-    
+
     # Get value
     try:
         value = conf[settings_key]
@@ -186,8 +190,8 @@ def is_conf_value_defined(settings_key, expected_value, conf):
 
 
 def list_existing_files(path, files_array):
-    """Return string with existing files from array  
-    
+    """Return string with existing files from array
+
     Arguments:
         path: path to directory
         files_array: all files to check
@@ -204,8 +208,8 @@ def list_existing_files(path, files_array):
     return s + ' '
 
 def get_input_run_data_path(run_id, conf):
-    """Return the path to input run data according to hiseq and synchronization step parameters  
-    
+    """Return the path to input run data according to hiseq and synchronization step parameters
+
     Arguments:
         run_id: run id
         conf: configuration dictionary
@@ -233,24 +237,10 @@ def get_input_run_data_path(run_id, conf):
         return None
 
     return path + '/' + run_id
-   
-def get_flowcell_lane_count(run_id, conf):
-	
-	# Find lane count 
-	run_info_path = hiseq_run.get_runinfos_file(run_id, conf)
-	
-	if run_info_path is None:
-		error("error to find RunInfo.xml file " + run_id + ".",
-			  "error to find RunInfo.xml file " + run_id + ".", get_last_error_file(conf), conf)
-	
-	run_info = RunInfo()
-	run_info.parse(run_info_path)
-
-	return run_info.getFlowCellLaneCount()
 
 def send_msg(subject, message, is_error, conf):
     """Send a message to the user about the data extraction.
-    
+
     Arguments:
         subject: subject of message
         message: text mail
@@ -265,35 +255,35 @@ def send_msg(subject, message, is_error, conf):
     # Specific receiver for error message
     if is_error:
         mail_to = conf[MAIL_ERROR_TO_KEY]
- 
+
         # Mail error not define
         if mail_to == None or mail_to == '':
             mail_to = conf[MAIL_TO_KEY]
     else:
         mail_to = conf[MAIL_TO_KEY]
- 
+
     mail_from = conf[MAIL_FROM_KEY]
     mail_cc = None
     mail_bcc = None
-    
+
     if mail_to != None :
         if type(mail_to) == str or type(mail_to) == unicode:
             mail_to = [mail_to]
-         
+
     if mail_cc != None :
         if type(mail_cc) == str or type(mail_cc) == unicode:
             mail_cc = [mail_cc]
- 
+
     if mail_bcc != None :
         if type(mail_bcc) == str or type(mail_bcc) == unicode:
             mail_bcc = [mail_bcc]
- 
+
     # Create object msg
     msg = create_msg(mail_from, mail_to, mail_cc, mail_bcc, subject, message, conf)
 
     # Now send or store the message
     composed = msg.as_string()
-    
+
     if send_mail:
         server = smtplib.SMTP(smtp_server)
         dests = []
@@ -318,15 +308,15 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
     mail_from = conf[MAIL_FROM_KEY]
     mail_cc = None
     mail_bcc = None
-    
+
     if mail_to != None :
         if type(mail_to) == str or type(mail_to) == unicode:
             mail_to = [mail_to]
-    
+
     if mail_cc != None :
         if type(mail_cc) == str or type(mail_cc) == unicode:
             mail_cc = [mail_cc]
-    
+
     if mail_bcc != None :
         if type(mail_bcc) == str or type(mail_bcc) == unicode:
             mail_bcc = [mail_bcc]
@@ -388,44 +378,44 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
 
 def create_msg(mail_from, mail_to, mail_cc, mail_bcc, subject, message, conf):
     """Create a message to send.
-    
+
     Arguments:
         mail_from : senders
         mail_to : receivers
-        mail_cc : other receivers 
+        mail_cc : other receivers
         mail_bcc : masked receivers
         subject: subject of message
         message: text mail
         is_error: true if it is a error message
         conf: configuration object
     """
-    
+
     COMMASPACE = ', '
     message = conf[MAIL_HEADER_KEY].replace('\\n', '\n') + message + conf[MAIL_FOOTER_KEY].replace('\\n', '\n')
     message = message.replace('\n', '\r\n')
-    
+
     msg = MIMEMultipart()
     msg['From'] = mail_from
-    
+
     if mail_to != None:
         msg['To'] = COMMASPACE.join(mail_to)
-    
+
     if mail_cc != None:
         msg['Cc'] = COMMASPACE.join(mail_cc)
-        
-    if mail_bcc != None: 
+
+    if mail_bcc != None:
         msg['Bcc'] = COMMASPACE.join(mail_bcc)
-    
+
     msg['Subject'] = subject
     msg['Date'] = formatdate()
 
     # Not seen
     msg.preamble = message
-    
+
     # The message
     part1 = MIMEText(message, 'plain')
     msg.attach(part1)
-    
+
     return msg
 
 def get_last_error_file(conf):
@@ -434,10 +424,10 @@ def get_last_error_file(conf):
     Arguments:
         conf: configuration dictionary
     """
-    
+
     if is_dir_exists(AOZAN_VAR_PATH_KEY, conf):
         return conf[AOZAN_VAR_PATH_KEY].strip() + '/aozan.lasterr'
-    
+
     return False
 
 
@@ -449,18 +439,26 @@ def error(short_message, message, last_error_file_path, conf):
         message: message
         conf: configuration dictionary
     """
-    
+
     # No write in last error file, directory does not exists
     if last_error_file_path == False:
         return
 
-    new_error = short_message + ' ' + message
+    new_error = ''
+    if short_message != None:
+        new_error = short_message
+    if message != None:
+        new_error += ' ' + message
+
+    if len(new_error) == 0:
+        new_error = 'Error without description'
+
     new_error.replace('\n', ' ')
     log('SEVERE', new_error, conf)
 
     if os.path.exists(last_error_file_path):
         f = open(last_error_file_path, 'r')
-        
+
         # Extract content file and convert list in string
         last_error = ''.join(f.readlines())
         f.close()
@@ -479,7 +477,7 @@ def error(short_message, message, last_error_file_path, conf):
 
 def log(level, message, conf):
     """Log message.
-    
+
     Arguments:
         level: log level
         message: message to log
@@ -492,24 +490,20 @@ def log(level, message, conf):
 
 def exception_msg(exp, conf):
     """Create error message when an AozanException is thrown.
-    
+
     Arguments:
         exp: exception
         conf: configuration dictionary
     """
 
     if is_conf_value_equals_true(AOZAN_DEBUG_KEY, conf):
-
-        if isinstance(exp, AozanException) and exp.getWrappedException() != None:
-            exp = exp.getWrappedException()
-
-        return ' withTrace \n\t' + str(exp.getClass().getName()) + ": " + str(exp.getMessage()) + '\n' + str(StringUtils.join(exp.getStackTrace(), '\n\t'))
+        return ' withTrace \n\t' + str(exp.getClass().getName()) + ': ' + str(exp.getMessage()) + '\n' + StringUtils.stackTraceToString(exp)
     else:
         return str(exp.getMessage())
 
 def duration_to_human_readable(time):
     """Convert a number of seconds in human readable string.
-    
+
     Arguments:
         time: the number of seconds
     """
@@ -549,7 +543,7 @@ def load_processed_run_ids(done_file_path):
         run_id = l[:-1]
         if len(run_id) == 0:
             continue
-        # Extract first field 
+        # Extract first field
         result.add(run_id.strip())
 
     f.close()
@@ -565,16 +559,15 @@ def add_run_id_to_processed_run_ids(run_id, done_file_path, conf):
         done_file_path: path of the done file
         conf: configuration dictionary
     """
-    sequencer_type = get_sequencer_type(run_id, conf)
-    
-    log('INFO', 'Add ' + run_id + ' on sequencer ' + str(sequencer_type) + ' to ' + os.path.basename(done_file_path), conf)
+
+    log('INFO', 'Add ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(done_file_path), conf)
 
     f = open(done_file_path, 'a')
 
     f.write(run_id + '\n')
 
     f.close()
-    
+
 def get_report_run_data_path(run_id, conf):
     """ Build report run data path from run id
 
@@ -584,7 +577,7 @@ def get_report_run_data_path(run_id, conf):
     Return:
         path to report_run_data
     """
-    
+
     return conf[REPORTS_DATA_PATH_KEY] + '/' + run_id
 
 def get_runparameters_path(run_id, conf):
@@ -598,26 +591,22 @@ def get_runparameters_path(run_id, conf):
         path to the run parameters file related to the run_id
     """
 
-    sequencer_dir_path = hiseq_run.find_hiseq_run_path(run_id, conf)
-    
-    if sequencer_dir_path == False:
-        return None
-    
+    run_dir_path = hiseq_run.find_hiseq_run_path(run_id, conf)
+
+    if run_dir_path == False:
+        run_dir_path = conf[BCL_DATA_PATH_KEY]
+
     # Find file at the root of directory sequencer data
-    res = glob(sequencer_dir_path + '/' + run_id + "/*Parameters.xml")
-    
-    if len(res) == 0:
-        # TODO throw exception ?
-        return None
-        
+    res = glob(run_dir_path + '/' + run_id + "/*Parameters.xml")
+
     # Check result path
     for run_parameter_path in res:
-	    if os.path.basename(run_parameter_path).lower() == "runparameters.xml":
-	        return run_parameter_path
-    
-    return None
+        if os.path.basename(run_parameter_path).lower() == "runparameters.xml":
+            return run_parameter_path
 
-    
+    raise Exception('Unable to find the run parameters for run ' + run_id)
+
+
 def create_html_index_file(conf, run_id, sections):
     """Create an index.html file that contains links to all the generated reports.
 
@@ -649,24 +638,24 @@ def create_html_index_file(conf, run_id, sections):
     # NOT necessary to test step sync if Settings.SYNC_STEP_KEY in sections and os.path.exists(report_path + '/report_' + run_id):
     if os.path.exists(report_path + '/report_' + run_id):
         sections.append('optional2')
-        
+
         if os.path.exists(report_path + '/report_' + run_id + '/Status.htm'):
             sections.append('optional1')
 
     write_lines = True
     result = ''
-  
+
     for line in lines:
-        
+
         if line.startswith('<!--START_SECTION'):
             tokens = line.split(' ')
-            #  Extract step name in start section 
+            #  Extract step name in start section
             section_name = tokens[1]
-            # Extraction version 
+            # Extraction version
             version = tokens[2]
-            
+
             write_lines = is_section_to_add_in_report(sections, section_name, version, run_id, conf)
-            
+
         elif line.startswith('<!--END_SECTION'):
             write_lines = True
 
@@ -681,12 +670,12 @@ def create_html_index_file(conf, run_id, sections):
     f_out = open(output_file_path, 'w')
     f_out.write(result)
     f_out.close()
-   
-   
+
+
 def is_section_to_add_in_report(sections, section_name, version, run_id, conf):
     """
     Check if the section is required in report
-    
+
     Arguments:
         sections: The list of section to write, use step key from configuration
         section_name: section name checked
@@ -695,35 +684,35 @@ def is_section_to_add_in_report(sections, section_name, version, run_id, conf):
 
     True if test pass
     """
-    
+
     # Check the current section name is included in sections required
-    if section_name not in sections: 
+    if section_name not in sections:
         return False
-    
+
     # Check the section name related to a step name required or it is an optional section
     if not (is_conf_value_equals_true(section_name, conf) or section_name.startswith('optional')):
         return False
-        
-    # Check if version on the section 
+
+    # Check if version on the section
     if version == 'all':
         return True
-    
-    
-    sequencer_type = get_sequencer_type(run_id, conf)
-    if sequencer_type in version:
+
+
+    rta_major_version = get_rta_major_version(run_id, conf)
+    if version.endswith(str(rta_major_version)):
         return True
-    
-    #  Check if version end with 1 or 2  bcl2fastq1 bcl2fastq2
+
+    #  Check if version end with 1 or 2 for bcl2fastq1 bcl2fastq2
     major, full = demux_run.get_bcl2fastq_version(run_id, conf)
-    if version.endswith(major): 
+    if version.endswith(str(major)):
         return True
-    
+
     # Section added in report html
     return False
 
 def check_configuration(conf, configuration_file_path):
     """ Check if path useful exists
-    
+
     Arguments:
         conf: configuration dictionary
         configuration_file_path: path of the configuration file
@@ -731,13 +720,13 @@ def check_configuration(conf, configuration_file_path):
     Returns:
         True if the configuration is valid
     """
-    
+
     steps_to_launch = extract_steps_to_launch(False, conf)
-    
+
     msg = ''
 
     # # Path common on all steps
-    
+
     # Check log path
     if not is_file_exists(AOZAN_LOG_PATH_KEY, conf):
         msg += '\n\t* Aozan log file path does not exists : ' + conf[AOZAN_LOG_PATH_KEY]
@@ -745,10 +734,10 @@ def check_configuration(conf, configuration_file_path):
     # Check if temporary directory exists
     if not is_dir_exists(TMP_PATH_KEY, conf):
         msg += '\n\t* Temporary directory does not exists: ' + conf[TMP_PATH_KEY]
-        
+
     if not is_dir_exists(REPORTS_DATA_PATH_KEY, conf):
         msg += '\n\t* Report run data directory does not exists: ' + conf[REPORTS_DATA_PATH_KEY]
-        
+
     # # Step First_base_report and HiSeq
     if Settings.HISEQ_STEP_KEY in steps_to_launch:
         # Check if hiseq_data_path exists
@@ -767,11 +756,11 @@ def check_configuration(conf, configuration_file_path):
         # Check if casava designs path exists
         if not is_dir_exists(CASAVA_SAMPLESHEETS_PATH_KEY, conf):
             msg += '\n\t* Casava sample sheets directory does not exists: ' + conf[CASAVA_SAMPLESHEETS_PATH_KEY]
-    
+
         # Check if root input fastq data directory exists
         if not is_dir_exists(FASTQ_DATA_PATH_KEY, conf):
             msg += '\n\t* Fastq data directory does not exists: ' + conf[FASTQ_DATA_PATH_KEY]
-    
+
         # Check if casava designs path exists
         if is_conf_value_equals_true(DEMUX_USE_DOCKER_ENABLE_KEY, conf):
             pass
@@ -799,8 +788,8 @@ def check_configuration(conf, configuration_file_path):
     return True
 
 def extract_steps_to_launch(update_logger, conf):
-    """ List steps to launch 
-    
+    """ List steps to launch
+
     Arguments:
         conf: configuration dictionary
         update_logger: boolean to add data in logger
@@ -808,19 +797,19 @@ def extract_steps_to_launch(update_logger, conf):
     Returns:
         list steps name
     """
-    
+
     steps = []
     for key in [Settings.FIRST_BASE_REPORT_STEP_KEY, Settings.HISEQ_STEP_KEY, Settings.SYNC_STEP_KEY,
                 Settings.DEMUX_STEP_KEY, Settings.QC_STEP_KEY]:
-        
-        if is_conf_value_equals_true(key, conf):    
+
+        if is_conf_value_equals_true(key, conf):
             steps.append(key)
 
     # Add data in logger
     if update_logger:
         txt = ", ".join(steps)
         log("CONFIG", "Step(s) " + txt + " is setting.", conf)
-    
+
     # Return list steps setting
     return steps
 
@@ -857,32 +846,34 @@ def is_fastq_compression_format_valid(conf):
 
     return False
 
-def get_sequencer_type(run_id, conf):
-    """ Identify sequencer type from runParameter.xml file, from the version of RTA software
+def get_rta_major_version(run_id, conf):
+    """ Identify the RTA version used for the run from runParameter.xml file, from the version of RTA software
     Arguments:
         run_id: run id
         conf: configuration dictionary
 
     Returns:
-        nextseq if version start by 2.X and hiseq if version start by 1.X, other None
+        1 or 2
+    Raises:
+        Exception if the version of RTA is unknown/unsupported
     """
 
     if run_id == None:
         return None
-    
-    # Extract RTA version 
+
+    # Extract RTA version
     rtaversion = extract_rtaversion(run_id, conf)
-    
-    if rtaversion != None:    
-        
+
+    if rtaversion != None:
+
         if rtaversion.startswith("1."):
-            return HISEQ_NAME
-        
+            return 1
+
         if rtaversion.startswith("2."):
-            return NEXTSEQ_NAME
-        
+            return 2
+
     # TODO throw exception
-    return None
+    raise Exception('Unknown RTA version (' + rtaversion + ') for run ' + run_id)
 
 def is_sequencer_hiseq(run_id, conf):
     """ Check if sequencer is a HiSeq from the version of RTA software
@@ -891,12 +882,11 @@ def is_sequencer_hiseq(run_id, conf):
         conf: configuration dictionary
 
     Returns:
-        true if sequencer is a HiSeq 
+        true if sequencer is a HiSeq
     """
-    
-    return get_sequencer_type(run_id, conf) == HISEQ_NAME
-    
-    
+
+    return get_rta_major_version(run_id, conf) == 1
+
 def is_sequencer_nextseq(run_id, conf):
     """ Check if sequencer is a NextSeq from the version of RTA software
     Arguments:
@@ -904,37 +894,35 @@ def is_sequencer_nextseq(run_id, conf):
         conf: configuration dictionary
 
     Returns:
-        true if sequencer is a NextSeq 
+        true if sequencer is a NextSeq
     """
 
-    return get_sequencer_type(run_id, conf) == NEXTSEQ_NAME
+    return get_rta_major_version(run_id, conf) == 2
 
-        
 def extract_rtaversion(run_id, conf):
-    """ Identify sequencer type from runParameter.xml file, from the version of RTA software
+    """ Extract RTA version from runParameter.xml file
     Arguments:
         run_id: run id
         conf: configuration dictionary
 
     Returns:
-        RTA version of the run or None 
+        RTA version of the run or None
     """
     # Find file at the root of directory sequencer data
     runParameter_file = get_runparameters_path(run_id, conf)
-    
+
     if runParameter_file != None:
         # Extract element
         rtaversion_element = extract_elements_by_tagname_from_xml(runParameter_file, "RTAVersion")
 
         # Extract version
         if len(rtaversion_element) == 0:
-            # TODO throw exception
-            return None
-            
+            raise Exception('Unable to get RTA version in ' + runParameter_file + ' for run ' + run_id)
+
         # Extract major element version
         return rtaversion_element[0].text.strip()
 
-    return None
+    raise Exception('Unable to locate run parameter file to get RTA version for run ' + run_id)
 
 def is_RTA_1_version(run_id, conf):
     """ Identify sequencer type from runParameter.xml file, from the version of RTA software
@@ -943,16 +931,16 @@ def is_RTA_1_version(run_id, conf):
         conf: configuration dictionary
 
     Return:
-        True is RTA version is 1.X 
+        True is RTA version is 1.X
     """
-    
+
     rta_version = extract_rtaversion(run_id, conf)
-    
+
     if rta_version is None:
         return None
-    
+
     return rta_version.startswith("1.")
-    
+
 def is_RTA_2_version(run_id, conf):
     """ Identify sequencer type from runParameter.xml file, from the version of RTA software
     Arguments:
@@ -960,17 +948,48 @@ def is_RTA_2_version(run_id, conf):
         conf: configuration dictionary
 
     Return:
-        True is RTA version is 2.X 
+        True is RTA version is 2.X
     """
-    
+
     rta_version = extract_rtaversion(run_id, conf)
-    
+
     if rta_version is None:
         return None
-            
+
     return rta_version.startswith("2.")
 
-        
+def get_instrument_name(run_id, conf):
+    """ Identify the sequencer model from runParameter.xml file
+    Arguments:
+        run_id: run id
+        conf: configuration dictionary
+
+    Return:
+        A string with the instrument name
+    """
+
+    runParameter_file = get_runparameters_path(run_id, conf)
+
+    tree = ElementTree()
+    tree.parse(runParameter_file)
+
+    application_tags = list(tree.iter('ApplicationName'))
+    scanner_tags = list(tree.iter('ScannerID'))
+    instrument_tags = list(tree.iter('InstrumentID'))
+
+    if len(application_tags) == 0:
+        return 'Unknown instrument'
+
+    sequencer_model = application_tags[0].text.split(' ')[0]
+
+    if len(scanner_tags) > 0:
+        sequencer_model += ' ' + scanner_tags[0].text
+    elif len(instrument_tags) > 0:
+        sequencer_model += ' ' + instrument_tags[0].text
+
+    return sequencer_model
+
+
 def extract_elements_by_tagname_from_xml(xmlpath, tagname):
     """ Extract an element from xml file path by tag name
     Arguments:
@@ -980,36 +999,36 @@ def extract_elements_by_tagname_from_xml(xmlpath, tagname):
     Returns:
         list elements founded
     """
-    
+
     # Check file exits and tagname not empty
     if os.path.exists(xmlpath) and os.path.isfile(xmlpath) and len(tagname) > 0:
         # Read file
         tree = ElementTree()
         tree.parse(xmlpath)
-        
+
         # Find tag from name
         res = tree.findall(tagname)
-        
+
         # Check result found
         if len(res) == 0:
             # Search in children nodes
             res = tree.findall('*/' + tagname)
-            
+
         # Return result
         return res
-    
+
     # Default return empty list
     return []
 
 def print_default_configuration():
     """ Print default parameter in configuration.
-    
+
     """
     conf = LinkedHashMap()
-    
+
     # Load default configuration
     set_default_conf(conf)
-    
+
     # Convert in test
     return ('\n'.join(str(x + '=' + conf[x]) for x in conf))
 
@@ -1047,48 +1066,48 @@ def load_conf(conf, conf_file_path):
         if len(s) == 0 or l[0] == '#' :
             continue
 
-        # Search other configuration file  
+        # Search other configuration file
         if s.startswith('include'):
             # Path to the other configuration file
             other_configuration_path = s.split('=')[1].strip()
-            
+
             if len(other_configuration_path) == 0:
                 continue
-            
+
             # Check file exists
             if not(os.path.exists(other_configuration_path) or os.path.isfile(other_configuration_path)):
                 sys.exit(1)
-            
-            # Check different path 
+
+            # Check different path
             if other_configuration_path == conf_file_path:
                 continue
-            
-            # Load other configuration file, 
-            load_conf(conf, other_configuration_path)  
+
+            # Load other configuration file,
+            load_conf(conf, other_configuration_path)
 
         else:
             fields = s.split('=')
-            
+
             if len(fields) == 2:
                 conf[fields[0].strip()] = fields[1].strip()
-    
+
                 # Check if needed to converting key for design fields
                 if fields[0].strip() in converting_table_key:
                     conf[converting_table_key[fields[0].strip()]] = fields[1].strip()
     f.close()
-    
+
     # Save configuration file path
     conf[Settings.AOZAN_CONF_FILE_PATH] = conf_file_path
-    
+
     # Put configuration in code Java
     Settings.setGlobalsConfiguration(conf)
-    
+
     # Save completed configuration file
     f = open(conf[TMP_PATH_KEY] + '/full_aozan.conf', 'w')
     f.write('\n'.join(str(x + '=' + str(conf[x])) for x in conf))
     f.flush()
     f.close()
-    
+
     return conf
 
 
@@ -1133,7 +1152,7 @@ def set_default_conf(conf):
     conf[Settings.BCL2FASTQ_VERSION_FOR_HISEQ_KEY] = demux_run.BCL2FASTQ_VERSION_1
     conf[Settings.BCL2FASTQ_VERSION_FOR_NEXTSEQ_KEY] = demux_run.BCL2FASTQ_VERSION_2
 
-    # Data path 
+    # Data path
     conf[Settings.TMP_PATH_KEY] = '/tmp'
     conf[Settings.INDEX_SEQUENCES_KEY] = ''
     conf[Settings.INDEX_HTML_TEMPLATE_KEY] = ''

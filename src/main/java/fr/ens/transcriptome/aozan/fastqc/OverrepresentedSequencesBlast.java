@@ -23,9 +23,11 @@
 
 package fr.ens.transcriptome.aozan.fastqc;
 
+import static fr.ens.transcriptome.aozan.util.StringUtils.stackTraceToString;
 import static fr.ens.transcriptome.aozan.util.XMLUtilsParser.extractFirstValueToInt;
 import static fr.ens.transcriptome.aozan.util.XMLUtilsParser.extractFirstValueToString;
 import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingFile;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -52,8 +54,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
-
 import com.google.common.base.Joiner;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -63,8 +63,8 @@ import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
-import fr.ens.transcriptome.eoulsan.util.StringUtils;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
+import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
 
 /**
  * This class launches blastn on one sequence query and parses xml result file
@@ -112,35 +112,32 @@ public class OverrepresentedSequencesBlast {
    */
   public void configure(final Properties properties) {
 
+    checkNotNull(properties, "properties argument cannot be null");
+
     if (this.configured) {
       return;
     }
 
-    this.stepEnabled =
-        Boolean.parseBoolean(properties
-            .getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY).trim()
-            .toLowerCase());
+    this.stepEnabled = Boolean.parseBoolean(
+        properties.getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY)
+            .trim().toLowerCase());
 
     if (this.stepEnabled) {
 
       // Check parameters
-      this.blastVersionExpected =
-          properties
-              .getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_VERSION_EXPECTED_KEY);
+      this.blastVersionExpected = properties
+          .getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_VERSION_EXPECTED_KEY);
 
       this.tmpPath = properties.getProperty(QC.TMP_DIR);
 
       // Path to blast executable
-      final String blastPath =
-          properties.getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_PATH_KEY)
-              .trim();
+      final String blastPath = properties
+          .getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_PATH_KEY).trim();
 
       // Path to database for blast, need to add prefix filename used "nt"
       final String blastDBPath =
-          properties
-              .getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_DB_PATH_KEY)
-              .trim()
-              + PREFIX_FILENAME_DATABASE;
+          properties.getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_DB_PATH_KEY)
+              .trim() + PREFIX_FILENAME_DATABASE;
 
       // Check paths needed in configuration aozan
       if (blastPath == null
@@ -163,9 +160,8 @@ public class OverrepresentedSequencesBlast {
 
         try {
           // Add arguments from configuration Aozan
-          final String blastArguments =
-              properties
-                  .getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_ARGUMENTS_KEY);
+          final String blastArguments = properties
+              .getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_ARGUMENTS_KEY);
 
           this.blastCommonCommandLine =
               createBlastCommandLine(blastPath, blastDBPath, blastArguments);
@@ -174,32 +170,21 @@ public class OverrepresentedSequencesBlast {
           // with no hit
           loadSequencesToIgnore();
 
-          LOGGER.info("FastQC-step blast : step is enable, command line = "
+          LOGGER.info("FastQC: blast is enabled, command line = "
               + this.blastCommonCommandLine);
 
         } catch (final IOException e) {
-          LOGGER.warning(e.getMessage()
-              + "\n\t" + StringUtils.join(e.getStackTrace(), "\n\t"));
+          LOGGER.warning(e.getMessage() + '\n' + stackTraceToString(e));
           this.stepEnabled = false;
 
         } catch (final AozanException e) {
-          LOGGER.warning(e.getMessage()
-              + "\n\t" + StringUtils.join(e.getStackTrace(), "\n\t"));
+          LOGGER.warning(e.getMessage() + '\n' + stackTraceToString(e));
           this.stepEnabled = false;
         }
       }
     }
 
     this.configured = true;
-  }
-
-  /**
-   * Test if Blastn can be launched.
-   * @return true if Blastn can be launched else false
-   */
-  public boolean isStepBlastEnabled() {
-
-    return this.stepEnabled;
   }
 
   /**
@@ -210,10 +195,9 @@ public class OverrepresentedSequencesBlast {
 
     BufferedReader br = null;
     try {
-      br =
-          new BufferedReader(new InputStreamReader(this.getClass()
-              .getResourceAsStream(SEQUENCES_NOT_USE_FILE),
-              Globals.DEFAULT_FILE_ENCODING));
+      br = new BufferedReader(new InputStreamReader(
+          this.getClass().getResourceAsStream(SEQUENCES_NOT_USE_FILE),
+          Globals.DEFAULT_FILE_ENCODING));
 
       String sequence = "";
 
@@ -221,8 +205,8 @@ public class OverrepresentedSequencesBlast {
 
         if (!sequence.startsWith("#")) {
           if (!sequence.isEmpty()) {
-            this.sequencesAlreadyAnalysis.put(sequence, new BlastResultHit(
-                sequence));
+            this.sequencesAlreadyAnalysis.put(sequence,
+                new BlastResultHit(sequence));
           }
         }
 
@@ -248,7 +232,7 @@ public class OverrepresentedSequencesBlast {
 
   private CommandLine createBlastCommandLine(final String blastPath,
       final String blastDBPath, final String blastArguments)
-      throws IOException, AozanException {
+          throws IOException, AozanException {
 
     if (blastPath.endsWith("blastall")) {
       return new BlastallCommandLine(blastPath, blastDBPath, blastArguments);
@@ -274,6 +258,8 @@ public class OverrepresentedSequencesBlast {
    */
   public synchronized ContaminantHit blastSequence(final String sequence)
       throws IOException, AozanException {
+
+    checkNotNull(sequence, "sequence argument cannot be null");
 
     // Test if the instance has been configured
     if (!this.configured) {
@@ -315,17 +301,18 @@ public class OverrepresentedSequencesBlast {
   private BlastResultHit blastNewSequence(final String sequence)
       throws IOException, AozanException {
 
+    LOGGER.fine("FastQC: Blast sequence: " + sequence);
+
     File resultXMLFile = null;
     BlastResultHit blastResult = null;
 
     // Create temporary file
-    resultXMLFile =
-        FileUtils.createTempFile(new File(this.tmpPath), "blast_",
-            "_result.xml");
+    resultXMLFile = FileUtils.createTempFile(new File(this.tmpPath), "blast_",
+        "_result.xml");
 
     // Check if the temporary file already exists
     checkExistingFile(resultXMLFile,
-        "FastQC-step blast : path to output file for the sequence " + sequence);
+        "FastQC: path of the Blast output file for the sequence " + sequence);
 
     // Set output file for this sequence
     this.blastCommonCommandLine.setOutputFile(resultXMLFile);
@@ -348,9 +335,8 @@ public class OverrepresentedSequencesBlast {
     // Remove XML file
     if (resultXMLFile.exists()) {
       if (!resultXMLFile.delete()) {
-        LOGGER
-            .warning("FastQC-step blast : Can not delete xml file with result from blast : "
-                + resultXMLFile.getAbsolutePath());
+        LOGGER.warning("FastQC-step: Cannot delete the Blast xml output file "
+            + resultXMLFile.getAbsolutePath());
       }
     }
     return blastResult;
@@ -374,18 +360,16 @@ public class OverrepresentedSequencesBlast {
       process = builder.start();
 
       // Writing on standard input
-      final Writer os =
-          new OutputStreamWriter(process.getOutputStream(),
-              Globals.DEFAULT_FILE_ENCODING);
+      final Writer os = new OutputStreamWriter(process.getOutputStream(),
+          Globals.DEFAULT_FILE_ENCODING);
       os.write(sequence);
       os.flush();
       os.close();
 
       final int exitValue = process.waitFor();
       if (exitValue > 0) {
-        LOGGER
-            .warning("FastQC-step blast : fail of process to launch blastn with sequence "
-                + sequence + ", exit value is : " + exitValue);
+        LOGGER.warning("FastQC: fail of blastn process for sequence "
+            + sequence + ", exit value is : " + exitValue);
       }
 
     } catch (final IOException e) {
@@ -412,7 +396,7 @@ public class OverrepresentedSequencesBlast {
 
     InputStream is = null;
     try {
-      checkExistingFile(resultXML, "FastQC-step blast : query result xml");
+      checkExistingFile(resultXML, "FastQC: Blast xml query result");
 
       // Create the input stream
       is = new FileInputStream(resultXML);
@@ -457,8 +441,9 @@ public class OverrepresentedSequencesBlast {
 
       // Check version xml file
       if (!this.blastVersionExpected.equals(version)) {
-        LOGGER.warning("FastQC - step blast : version xml not expected "
-            + version + " instead of " + this.blastVersionExpected);
+        LOGGER.warning("FastQC: the blast  version in the xml output file ("
+            + version + ") is not the expected version ("
+            + this.blastVersionExpected + ")");
       } else {
         LOGGER.info("FastQC-step blastn : blast version " + version);
       }
@@ -652,7 +637,7 @@ public class OverrepresentedSequencesBlast {
 
         if (!param.startsWith("-")) {
           throw new AozanException(
-              "FastQC-step blast : parameters not conforme " + this.argBlast);
+              "FastQC: invalid Blast argument: " + this.argBlast);
         }
 
         // Parameters can not redefined
@@ -704,11 +689,10 @@ public class OverrepresentedSequencesBlast {
       this.blastPath = blastPath;
       this.blastDBPath = blastDBPath;
 
-      checkExistingFile(new File(blastPath),
-          "FastQC-step blast : path to blast ");
+      checkExistingFile(new File(blastPath), "FastQC: Blast path");
       // Check nt.nal file exists
       checkExistingFile(new File(blastDBPath + ".nal"),
-          " FastQC-step blast : path to database blast");
+          " FastQC: Blast database path");
 
       this.argBlast = checkBlastArguments(blastArguments);
     }

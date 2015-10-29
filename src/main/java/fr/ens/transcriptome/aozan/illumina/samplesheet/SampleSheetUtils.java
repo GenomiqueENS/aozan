@@ -1,867 +1,206 @@
-/*
- *                  Aozan development code
- *
- * This code may be freely distributed and modified under the
- * terms of the GNU General Public License version 3 or later 
- * and CeCILL. This should be distributed with the code. If you 
- * do not have a copy, see:
- *
- *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
- *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
- *
- * Copyright for this code is held jointly by the Genomic platform
- * of the Institut de Biologie de l'École Normale Supérieure and
- * the individual authors. These should be listed in @author doc
- * comments.
- *
- * For more information on the Aozan project and its aims,
- * or to join the Aozan Google group, visit the home page at:
- *
- *      http://www.transcriptome.ens.fr/aozan
- *
- */
-
 package fr.ens.transcriptome.aozan.illumina.samplesheet;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingStandardFile;
+import static fr.ens.transcriptome.aozan.illumina.samplesheet.Sample.DESCRIPTION_FIELD_NAME;
+import static fr.ens.transcriptome.aozan.illumina.samplesheet.Sample.INDEX1_FIELD_NAME;
+import static fr.ens.transcriptome.aozan.illumina.samplesheet.Sample.INDEX2_FIELD_NAME;
+import static fr.ens.transcriptome.aozan.illumina.samplesheet.Sample.LANE_FIELD_NAME;
+import static fr.ens.transcriptome.aozan.illumina.samplesheet.Sample.PROJECT_FIELD_NAME;
+import static fr.ens.transcriptome.aozan.illumina.samplesheet.Sample.SAMPLE_ID_FIELD_NAME;
+import static fr.ens.transcriptome.aozan.illumina.samplesheet.Sample.SAMPLE_NAME_FIELD_NAME;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
-import fr.ens.transcriptome.aozan.Common;
-import fr.ens.transcriptome.aozan.illumina.io.AbstractCasavaDesignTextReader;
-import fr.ens.transcriptome.aozan.illumina.io.CasavaDesignCSVReader;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.Sample;
-import fr.ens.transcriptome.aozan.illumina.sampleentry.SampleV1;
-import fr.ens.transcriptome.aozan.io.CasavaDesignXLSReader;
-import fr.ens.transcriptome.eoulsan.util.StringUtils;
 
 /**
- * This abstract class contains common utility methods for sample sheet.
+ * This class define samplesheet useful methods.
  * @author Laurent Jourdren
- * @since 1.1
+ * @since 2.0
  */
 public class SampleSheetUtils {
 
-  /** The Constant LATEST_VERSION_NAME. */
-  public static final String LATEST_VERSION_NAME = "latest";
-
-  /** The Constant SEP. */
-  public static final String SEP = ",";
-
-  /** The Constant VERSION_1. */
-  public static final String VERSION_1 = "1";
-  
-  /** The Constant VERSION_2. */
-  public static final String VERSION_2 = "2";
+  private static final char SEPARATOR = ',';
 
   /**
-   * Gets the sample sheet.
-   * @param sampleSheetFile the sample sheet file
-   * @param sampleSheetVersion the sample sheet version
-   * @param laneCount the lane count
-   * @return the sample sheet
-   * @throws FileNotFoundException the file not found exception
-   * @throws IOException Signals that an I/O exception has occurred.
-   * @throws AozanException the aozan exception
-   */
-  public static SampleSheet getSampleSheet(final File sampleSheetFile,
-      String sampleSheetVersion, final int laneCount)
-      throws FileNotFoundException, IOException, AozanException {
-
-    checkArgument(!Strings.isNullOrEmpty(sampleSheetVersion),
-        "sample sheet version");
-    checkExistingStandardFile(sampleSheetFile, "sample sheet");
-
-    final String majorVersion =
-        SampleSheetUtils.findBcl2fastqMajorVersion(sampleSheetVersion);
-
-    final String extension = StringUtils.extension(sampleSheetFile.getName());
-
-    Common.getLogger().warning(
-        "DEBUG: sample sheet utils reads file "
-            + sampleSheetFile.getAbsolutePath() + "\nfrom version "
-            + majorVersion + " lane count set at " + laneCount);
-
-    switch (extension) {
-    case ".csv":
-      if (laneCount < 1)
-        return new CasavaDesignCSVReader(sampleSheetFile).read(majorVersion);
-      return new CasavaDesignCSVReader(sampleSheetFile).readForQCReport(
-          majorVersion, laneCount);
-
-    case ".xls":
-      if (laneCount < 1)
-        return new CasavaDesignXLSReader(sampleSheetFile).read(majorVersion);
-
-      return new CasavaDesignXLSReader(sampleSheetFile).readForQCReport(
-          majorVersion, laneCount);
-
-    default:
-      throw new AozanException(
-          "Sample sheet: create instance from file fail, extension ("
-              + extension + ") invalid " + sampleSheetFile
-              + " version setting: " + majorVersion);
-    }
-
-  }
-
-  /**
-   * Gets the sample sheet.
-   * @param sampleSheetFilename the sample sheet filename
-   * @param sampleSheetVersion the sample sheet version
-   * @param laneCount the lane count
-   * @return the sample sheet
-   * @throws FileNotFoundException the file not found exception
-   * @throws IOException Signals that an I/O exception has occurred.
-   * @throws AozanException the aozan exception
-   */
-  public static SampleSheet getSampleSheet(final String sampleSheetFilename,
-      String sampleSheetVersion, final int laneCount)
-      throws FileNotFoundException, IOException, AozanException {
-
-    return getSampleSheet(new File(sampleSheetFilename), sampleSheetVersion,
-        laneCount);
-
-  }
-
-  /**
-   * Check a Casava design object.
-   * @param design Casava design object to check
-   * @return a list of warnings
-   * @throws AozanException if the design is not valid
-   */
-  public static List<String> checkCasavaDesign(final SampleSheet design)
-      throws AozanException {
-
-    return checkCasavaDesign(design, null);
-  }
-
-  /**
-   * Check a Casava design object.
-   * @param design Casava design object to check
-   * @param flowCellId flow cell id
-   * @return a list of warnings
-   * @throws AozanException if the design is not valid
-   */
-  public static List<String> checkCasavaDesign(final SampleSheet design,
-      final String flowCellId) throws AozanException {
-
-    if (design.isVersion1()) {
-
-      Preconditions.checkArgument(!Strings.isNullOrEmpty(flowCellId),
-          "flowCellId is not define for a sample sheet version 1");
-      return checkCasavaDesignV1(design, flowCellId);
-
-    } else if (design.isVersion2()) {
-      return checkCasavaDesignV2(design);
-    } else {
-
-      throw new AozanException("Sample sheet instance has invalid version.");
-    }
-
-  }
-
-  /**
-   * Check casava design v2.
-   * @param design the design
-   * @return the list
-   * @throws AozanException the aozan exception
-   */
-  public static List<String> checkCasavaDesignV2(final SampleSheet design)
-      throws AozanException {
-
-    return Collections.emptyList();
-  }
-
-  /**
-   * Check casava design v1.
-   * @param design the design
-   * @param flowCellId the flow cell id
-   * @return the list
-   * @throws AozanException the aozan exception
-   */
-  public static List<String> checkCasavaDesignV1(final SampleSheet design,
-      final String flowCellId) throws AozanException {
-
-    if (design == null) {
-      throw new NullPointerException("The design object is null");
-    }
-
-    if (design.size() == 0) {
-      throw new AozanException("No samples found in the design.");
-    }
-
-    checkSampleSheet(design, flowCellId);
-
-    final List<String> warnings = new ArrayList<>();
-
-    final Map<Integer, Set<String>> indexes = new HashMap<>();
-    final Set<String> sampleIds = new HashSet<>();
-    final Set<Integer> laneWithIndexes = new HashSet<>();
-    final Set<Integer> laneWithoutIndexes = new HashSet<>();
-    final Map<String, Set<Integer>> sampleInLanes = new HashMap<>();
-    final Map<String, String> samplesProjects = new HashMap<>();
-    final Map<String, String> samplesIndex = new HashMap<>();
-
-    for (Sample sample : design) {
-
-      // Check if the sample is null or empty
-      checkSampleId(sample.getSampleId(), sampleIds);
-
-      // Check sample reference
-      checkSampleRef(sample.getSampleId(), sample.getSampleRef());
-
-      // Check index
-      checkIndex(sample.getIndex());
-
-      // Check sample Index
-      checkSampleIndex(sample.getSampleId(), sample.getIndex(), samplesIndex);
-
-      // Check the description
-      checkSampleDescription(sample.getSampleId(), sample.getDescription());
-
-      // Check sample project
-      checkSampleProject(sample.getSampleProject());
-      checkCharset(sample.getSampleProject());
-
-      final String index = sample.getIndex();
-      final int lane = sample.getLane();
-
-      // Check if mixing lane with index and lanes without index
-      if (index == null || "".equals(index.trim())) {
-
-        if (laneWithoutIndexes.contains(lane)) {
-          throw new AozanException(
-              "Found two samples without index for the same lane: "
-                  + lane + ".");
-        }
-
-        if (laneWithIndexes.contains(lane)) {
-          throw new AozanException(
-              "Found a lane with indexed and non indexed samples: "
-                  + lane + ".");
-        }
-
-        laneWithoutIndexes.add(lane);
-      } else {
-
-        if (laneWithoutIndexes.contains(lane)) {
-          throw new AozanException(
-              "Found a lane with indexed and non indexed samples: "
-                  + lane + ".");
-        }
-        laneWithIndexes.add(lane);
-      }
-
-      // check if a lane has not two or more same indexes
-      if (indexes.containsKey(lane)) {
-
-        if (indexes.get(lane).contains(index)) {
-          throw new AozanException(
-              "Found a lane with two time the same index: "
-                  + lane + " (" + index + ").");
-        }
-
-      } else {
-        indexes.put(lane, new HashSet<String>());
-      }
-
-      // Check sample and project
-      checkSampleAndProject(sample.getSampleId(), sample.getSampleProject(),
-          sample.getLane(), sampleInLanes, samplesProjects, warnings);
-
-      indexes.get(lane).add(index);
-    }
-
-    // Add warnings for samples in several lanes
-    checkSampleInLanes(sampleInLanes, warnings);
-
-    // Return unique warnings
-    final List<String> result = new ArrayList<>(new HashSet<>(warnings));
-    Collections.sort(result);
-
-    return result;
-
-  }
-
-  /**
-   * Check charset.
-   * @param s the s
-   * @throws AozanException the aozan exception
-   */
-  private static void checkCharset(final String s) throws AozanException {
-
-    if (s == null) {
-      return;
-    }
-
-    for (int i = 0; i < s.length(); i++) {
-
-      final int c = s.codePointAt(i);
-
-      if (c < ' ' || c >= 127) {
-        throw new AozanException("Found invalid character '"
-            + (char) c + "' in \"" + s + "\".");
-      }
-    }
-
-  }
-
-  /**
-   * Check fcid.
-   * @param fcid the fcid
-   * @throws AozanException the aozan exception
-   */
-  private static void checkFCID(final String fcid) throws AozanException {
-
-    if (isNullOrEmpty(fcid)) {
-      throw new AozanException("Flow cell id is null or empty.");
-    }
-
-    // Check charset
-    checkCharset(fcid);
-
-    for (int i = 0; i < fcid.length(); i++) {
-
-      final char c = fcid.charAt(i);
-      if (!(Character.isLetterOrDigit(c))) {
-        throw new AozanException(
-            "Invalid flow cell id, only letters or digits are allowed : "
-                + fcid + ".");
-      }
-    }
-
-  }
-
-  /**
-   * Check sample id.
-   * @param sampleId the sample id
-   * @param sampleIds the sample ids
-   * @throws AozanException the aozan exception
-   */
-  private static void checkSampleId(final String sampleId,
-      final Set<String> sampleIds) throws AozanException {
-
-    // Check if null of empty
-    if (isNullOrEmpty(sampleId)) {
-      throw new AozanException("Found a null or empty sample id.");
-    }
-
-    // Check charset
-    checkCharset(sampleId);
-
-    // Check for forbidden characters
-    for (int i = 0; i < sampleId.length(); i++) {
-
-      final char c = sampleId.charAt(i);
-      if (!(Character.isLetterOrDigit(c) || c == '_' || c == '-')) {
-        throw new AozanException(
-            "Invalid sample id, only letters, digits, '-' or '_' characters are allowed : "
-                + sampleId + ".");
-      }
-    }
-
-    sampleIds.add(sampleId);
-  }
-
-  /**
-   * Check sample ref.
-   * @param sampleId the sample id
-   * @param sampleRef the sample ref
-   * @throws AozanException the aozan exception
-   */
-  private static void checkSampleRef(final String sampleId,
-      final String sampleRef) throws AozanException {
-
-    // Check if null of empty
-    if (isNullOrEmpty(sampleRef)) {
-      throw new AozanException(
-          "Found a null or empty sample reference for sample: "
-              + sampleId + ".");
-    }
-
-    // Check charset
-    checkCharset(sampleRef);
-
-    // Check for forbidden characters
-    for (int i = 0; i < sampleRef.length(); i++) {
-      final char c = sampleRef.charAt(i);
-      if (!(Character.isLetterOrDigit(c) || c == ' ' || c == '-' || c == '_')) {
-        throw new AozanException(
-            "Invalid sample reference, only letters, digits, ' ', '-' or '_' characters are allowed: "
-                + sampleRef + ".");
-      }
-    }
-  }
-
-  /**
-   * Check index.
-   * @param index the index
-   * @throws AozanException the aozan exception
-   */
-  private static void checkIndex(final String index) throws AozanException {
-
-    if (index == null) {
-      return;
-    }
-
-    for (String subIndex : index.split("-")) {
-
-      for (int i = 0; i < subIndex.length(); i++) {
-        switch (subIndex.codePointAt(i)) {
-
-        case 'A':
-        case 'a':
-        case 'T':
-        case 't':
-        case 'G':
-        case 'g':
-        case 'C':
-        case 'c':
-          break;
-
-        default:
-          throw new AozanException("Invalid index found: " + index + ".");
-        }
-      }
-    }
-  }
-
-  /**
-   * Check sample description.
-   * @param sampleId the sample id
-   * @param sampleDescription the sample description
-   * @throws AozanException the aozan exception
-   */
-  private static void checkSampleDescription(final String sampleId,
-      final String sampleDescription) throws AozanException {
-
-    // Check if null of empty
-    if (isNullOrEmpty(sampleDescription)) {
-      throw new AozanException("Found a null or empty description for sample: "
-          + sampleId);
-    }
-
-    // Check charset
-    checkCharset(sampleDescription);
-
-    // Check for forbidden characters
-    for (int i = 0; i < sampleDescription.length(); i++) {
-      final char c = sampleDescription.charAt(i);
-      if (c == '\'' || c == '\"') {
-        throw new AozanException("Invalid sample description, '"
-            + c + "' character is not allowed: " + sampleDescription + ".");
-      }
-    }
-  }
-
-  /**
-   * Check sample project.
-   * @param sampleProject the sample project
-   * @throws AozanException the aozan exception
-   */
-  private static void checkSampleProject(final String sampleProject)
-      throws AozanException {
-
-    // Check if null of empty
-    if (isNullOrEmpty(sampleProject)) {
-      throw new AozanException("Found a null or sample project.");
-    }
-
-    // Check for forbidden characters
-    for (int i = 0; i < sampleProject.length(); i++) {
-      final char c = sampleProject.charAt(i);
-      if (!(Character.isLetterOrDigit(c) || c == '-' || c == '_')) {
-        throw new AozanException(
-            "Invalid sample project, only letters, digits, '-' or '_' characters are allowed: "
-                + sampleProject + ".");
-      }
-    }
-  }
-
-  /**
-   * Check sample and project.
-   * @param sampleId the sample id
-   * @param projectName the project name
-   * @param lane the lane
-   * @param sampleInLanes the sample in lanes
-   * @param samplesProjects the samples projects
-   * @param warnings the warnings
-   * @throws AozanException the aozan exception
-   */
-  private static void checkSampleAndProject(final String sampleId,
-      final String projectName, final int lane,
-      final Map<String, Set<Integer>> sampleInLanes,
-      final Map<String, String> samplesProjects, final List<String> warnings)
-      throws AozanException {
-
-    // Check if two or more project use the same sample
-    if (samplesProjects.containsKey(sampleId)
-        && !samplesProjects.get(sampleId).equals(projectName)) {
-      throw new AozanException("The sample \""
-          + sampleId + "\" is used by two or more projects.");
-    }
-
-    samplesProjects.put(sampleId, projectName);
-
-    final Set<Integer> lanes;
-    if (!sampleInLanes.containsKey(sampleId)) {
-      lanes = new HashSet<>();
-      sampleInLanes.put(sampleId, lanes);
-    } else {
-      lanes = sampleInLanes.get(sampleId);
-    }
-
-    if (lanes.contains(lane)) {
-      warnings.add("The sample \""
-          + sampleId + "\" exists two or more times in the lane " + lane + ".");
-    }
-
-    lanes.add(lane);
-  }
-
-  /**
-   * Check sample in lanes.
-   * @param sampleInLanes the sample in lanes
-   * @param warnings the warnings
-   */
-  private static void checkSampleInLanes(
-      final Map<String, Set<Integer>> sampleInLanes, final List<String> warnings) {
-
-    for (Map.Entry<String, Set<Integer>> e : sampleInLanes.entrySet()) {
-
-      final Set<Integer> lanes = e.getValue();
-      if (lanes.size() > 1) {
-
-        final StringBuilder sb = new StringBuilder();
-        sb.append("The sample \"");
-        sb.append(e.getKey());
-        sb.append("\" exists in lanes: ");
-
-        final List<Integer> laneSorted = new ArrayList<>(lanes);
-        Collections.sort(laneSorted);
-
-        boolean first = true;
-        for (int lane : laneSorted) {
-
-          if (first) {
-            first = false;
-          } else {
-            sb.append(", ");
-          }
-          sb.append(lane);
-        }
-        sb.append('.');
-
-        warnings.add(sb.toString());
-      }
-    }
-  }
-
-  /**
-   * Check sample index.
-   * @param sampleName the sample name
-   * @param index the index
-   * @param samplesIndex the samples index
-   * @throws AozanException the aozan exception
-   */
-  private static final void checkSampleIndex(final String sampleName,
-      final String index, final Map<String, String> samplesIndex)
-      throws AozanException {
-
-    if (samplesIndex.containsKey(sampleName)
-        && !samplesIndex.get(sampleName).equals(index)) {
-      throw new AozanException("The sample \""
-          + sampleName
-          + "\" is defined in several lanes but without the same index.");
-    }
-
-    samplesIndex.put(sampleName, index);
-  }
-
-  //
-  // Other methods
-  //
-
-  /**
-   * Replace index shortcuts in a design object by index sequences.
-   * @param design Casava design object
-   * @param sequences map for the sequences
-   * @throws AozanException if the shortcut is unknown
-   */
-  public static void replaceIndexShortcutsBySequences(final SampleSheet design,
-      final Map<String, String> sequences) throws AozanException {
-
-    if (design == null || sequences == null) {
-      return;
-    }
-
-    for (final Sample sample : design) {
-
-      if (sample.getIndex() == null) {
-        throw new NullPointerException("Sample index is null for sample: "
-            + sample);
-      }
-
-      final String index = sample.getIndex().trim();
-
-      try {
-        checkIndex(index);
-      } catch (AozanException e) {
-
-        final StringBuilder sb = new StringBuilder();
-
-        for (String subIndex : index.split("-")) {
-
-          if (!sequences.containsKey(subIndex.toLowerCase())) {
-            throw new AozanException("Unknown index sequence shortcut ("
-                + index + ") for sample: " + sample);
-          }
-
-          if (sb.length() > 0) {
-            sb.append('-');
-          }
-          sb.append(sequences.get(subIndex.toLowerCase()));
-        }
-
-        sample.setIndex(sb.toString());
-      }
-    }
-  }
-
-  //
-  // Parsing methods
-  //
-
-  /**
-   * Convert a Casava design to CSV.
-   * @param design Casava design object to convert
+   * Convert a SampleSheet object to CSV.
+   * @param samplesheet SampleSheet design object to convert
    * @return a String with the converted design
    */
-  public static final String toCSV(final SampleSheet design) {
+  public static final String toSampleSheetV1CSV(final SampleSheet samplesheet) {
 
-    return design.toCSV();
-  }
-
-  /**
-   * Parse a design in a tabulated format from a String.
-   * @param s string to parse
-   * @param version the version
-   * @return a Casava Design object
-   * @throws AozanException the aozan exception
-   */
-  public static SampleSheet parseTabulatedDesign(final String s,
-      final String version) throws AozanException {
-
-    if (s == null) {
-      return null;
-    }
-
-    return new AbstractCasavaDesignTextReader() {
-
-      @Override
-      public SampleSheet read(final String version) throws AozanException {
-
-        final String[] lines = s.split("\n");
-
-        for (final String line : lines) {
-
-          if ("".equals(line.trim())) {
-            continue;
-          }
-
-          parseLine(parseTabulatedDesignLine(line), version);
-        }
-
-        return getDesign();
-      }
-    }.read(version);
-  }
-
-  /**
-   * Parse a design in a tabulated format from a String.
-   * @param s string to parse
-   * @param version the version
-   * @return a Casava Design object
-   * @throws AozanException the aozan exception
-   */
-  public static SampleSheet parseCSVDesign(final String s, final String version)
-      throws AozanException {
-
-    if (s == null) {
-      return null;
-    }
-
-    return new AbstractCasavaDesignTextReader() {
-
-      @Override
-      public SampleSheet read(final String version) throws AozanException {
-
-        final String[] lines = s.split("\n");
-
-        for (final String line : lines) {
-
-          if ("".equals(line.trim())) {
-            continue;
-          }
-
-          parseLine(parseCSVDesignLine(line), version);
-        }
-
-        return getDesign();
-      }
-    }.read(version);
-  }
-
-  /**
-   * Custom splitter for Casava tabulated file.
-   * @param line line to parse
-   * @return a list of String with the contents of each cell without unnecessary
-   *         quotes
-   */
-  public static List<String> parseTabulatedDesignLine(final String line) {
-
-    if (line == null) {
-      return null;
-    }
-
-    return Arrays.asList(line.split("\t"));
-  }
-
-  /**
-   * Custom splitter for Casava CSV file.
-   * @param line line to parse
-   * @return a list of String with the contents of each cell without unnecessary
-   *         quotes
-   */
-  public static final List<String> parseCSVDesignLine(final String line) {
-
-    final List<String> result = new ArrayList<>();
-
-    if (line == null) {
-      return null;
-    }
-
-    final int len = line.length();
-    boolean openQuote = false;
     final StringBuilder sb = new StringBuilder();
 
-    for (int i = 0; i < len; i++) {
+    sb.append(
+        "\"FCID\",\"Lane\",\"SampleID\",\"SampleRef\",\"Index\",\"Description\","
+            + "\"Control\",\"Recipe\",\"Operator\",\"SampleProject\"\n");
 
-      final char c = line.charAt(i);
+    if (samplesheet == null) {
+      return sb.toString();
+    }
 
-      if (!openQuote && c == ',') {
-        result.add(sb.toString());
-        sb.setLength(0);
-      } else {
-        if (c == '"') {
-          openQuote = !openQuote;
-        } else {
-          sb.append(c);
+    for (Sample s : samplesheet) {
+
+      sb.append(samplesheet.getFlowCellId().toUpperCase());
+      sb.append(SEPARATOR);
+      sb.append(s.getLane());
+      sb.append(SEPARATOR);
+      sb.append(quote(s.getSampleId().trim()));
+      sb.append(SEPARATOR);
+      sb.append(quote(s.getSampleRef().trim()));
+      sb.append(SEPARATOR);
+
+      String index = s.getIndex1();
+      if (!s.getIndex2().isEmpty()) {
+        index += '-' + s.getIndex2();
+      }
+
+      sb.append(quote(index));
+      sb.append(SEPARATOR);
+      sb.append(quote(s.getDescription().trim()));
+      sb.append(SEPARATOR);
+      sb.append(Boolean.parseBoolean(s.get("Control")) ? 'Y' : 'N');
+      sb.append(SEPARATOR);
+      sb.append(quote(s.get("Recipe").trim()));
+      sb.append(SEPARATOR);
+      sb.append(quote(s.get("Operator").trim()));
+      sb.append(SEPARATOR);
+      sb.append(quote(s.getProject()));
+
+      sb.append('\n');
+
+    }
+
+    return sb.toString();
+  }
+
+  /**
+   * Convert the name of a field of the design model to the bcl2fastq 2
+   * samplesheet field name.
+   * @param fieldName the field name to convert
+   * @return the converted field name
+   */
+  private static final String convertFieldNameV2(final String fieldName) {
+
+    if (fieldName == null) {
+      return null;
+    }
+
+    switch (fieldName) {
+
+    case LANE_FIELD_NAME:
+      return "Lane";
+
+    case SAMPLE_ID_FIELD_NAME:
+      return "Sample_ID";
+
+    case SAMPLE_NAME_FIELD_NAME:
+      return "Sample_Name";
+
+    case DESCRIPTION_FIELD_NAME:
+      return "Description";
+
+    case PROJECT_FIELD_NAME:
+      return "Sample_Project";
+
+    case INDEX1_FIELD_NAME:
+      return "index";
+
+    case INDEX2_FIELD_NAME:
+      return "index2";
+
+    case Sample.SAMPLE_REF_FIELD_NAME:
+      return "Sample_Ref";
+
+    default:
+      return fieldName;
+    }
+  }
+
+  /**
+   * Convert a SampleSheet object to CSV.
+   * @param samplesheet SampleSheet design object to convert
+   * @return a String with the converted design
+   */
+  public static final String toSampleSheetV2CSV(final SampleSheet samplesheet) {
+
+    if (samplesheet == null) {
+      throw new NullPointerException("the samplesheet argument cannot be null");
+    }
+
+    final StringBuilder sb = new StringBuilder();
+
+    // Write sections
+    for (String section : samplesheet.getSections()) {
+
+      sb.append('[');
+      sb.append(section);
+      sb.append("]\n");
+
+      for (Map.Entry<String, List<String>> e : samplesheet
+          .getSectionMetadata(section).entrySet()) {
+
+        final String key = e.getKey();
+        for (String value : e.getValue()) {
+
+          sb.append(key);
+
+          if (!value.isEmpty()) {
+            sb.append(SEPARATOR);
+            sb.append(value);
+          }
+
+          sb.append('\n');
         }
       }
 
+      sb.append('\n');
     }
-    result.add(sb.toString());
 
-    return result;
+    // Write data
+    sb.append("[Data]\n");
+
+    final List<String> fieldNames = samplesheet.getSamplesFieldNames();
+
+    // Write header
+    boolean firstHeader = true;
+    for (String fieldName : fieldNames) {
+
+      if (firstHeader) {
+        firstHeader = false;
+      } else {
+        sb.append(SEPARATOR);
+      }
+
+      sb.append(convertFieldNameV2(fieldName));
+    }
+    sb.append('\n');
+
+    for (Sample s : samplesheet) {
+
+      boolean first = true;
+
+      for (String fieldName : fieldNames) {
+
+        if (first) {
+          first = false;
+        } else {
+          sb.append(SEPARATOR);
+        }
+
+        sb.append(s.get(fieldName));
+      }
+      sb.append('\n');
+    }
+
+    return sb.toString();
   }
 
-  //
-  // Static method
-  //
-  /**
-   * Find bcl2fastq version.
-   * @param fullVersion the full version
-   * @return the string
-   */
-  public static String findBcl2fastqMajorVersion(final String fullVersion) {
-
-    checkArgument(!Strings.isNullOrEmpty(fullVersion),
-        "bcl2fastq full version name: " + fullVersion);
-
-    if (fullVersion.startsWith(VERSION_1))
-      return VERSION_1;
-
-    if (fullVersion.startsWith(VERSION_2)
-        || fullVersion.startsWith(LATEST_VERSION_NAME))
-
-      return VERSION_2;
-
-    // Throw an exception version invalid for pipeline
-    throw new AozanRuntimeException(
-        "Demultiplexing collector, can be recognize bcl2fastq version (not start with 1 or 2 or latest) : "
-            + fullVersion);
-  }
-
-  /**
-   * Checks if is bcl2fastq version1.
-   * @param version the version
-   * @return true, if is bcl2fastq version1
-   */
-  public static boolean isBcl2fastqVersion1(final String version) {
-
-    // Check it is a full version name or major
-    final String majorVersion =
-        (version.indexOf(".") > 0
-            ? findBcl2fastqMajorVersion(version) : version);
-
-    return majorVersion.equals(VERSION_1);
-  }
-
-  /**
-   * Checks if is bcl2fastq version2.
-   * @param version the version
-   * @return true, if is bcl2fastq version2
-   */
-  public static boolean isBcl2fastqVersion2(final String version) {
-
-    // Check it is a full version name or major
-    final String majorVersion =
-        (version.indexOf(".") > 0
-            ? findBcl2fastqMajorVersion(version) : version);
-
-    return majorVersion.equals(VERSION_2)
-        || majorVersion.equals(LATEST_VERSION_NAME);
-
-  }
-
-  //
-  // Private utility methods
-  //
-
-  /**
-   * Test if a string is null or empty.
-   * @param s string to test
-   * @return true if the input string is null or empty
-   */
-  private static boolean isNullOrEmpty(final String s) {
-
-    return s == null || s.isEmpty();
-  }
-
-  /**
-   * Quote.
-   * @param s the s
-   * @return the string
-   */
-  static String quote(final String s) {
+  private static String quote(final String s) {
 
     if (s == null) {
       return "";
@@ -876,114 +215,148 @@ public class SampleSheetUtils {
   }
 
   /**
-   * Check sample sheet.
-   * @param design the design
-   * @throws AozanException the aozan exception
+   * Duplicate sample for all lanes if lane field does not exists.
+   * @param samplesheet the samplesheet
+   * @param laneCount the number of lanes
    */
-  public static void checkSampleSheet(final SampleSheet design)
-      throws AozanException {
-    checkSampleSheet(design, null);
-  }
+  public static void duplicateSamplesIfLaneFieldNotSet(
+      final SampleSheet samplesheet, final int laneCount) {
 
-  /**
-   * Check sample sheet.
-   * @param design the design
-   * @param flowCellId the flow cell id
-   * @throws AozanException the aozan exception
-   */
-  public static void checkSampleSheet(final SampleSheet design,
-      final String flowCellId) throws AozanException {
-
-    if (design.isVersion1()) {
-
-      Preconditions.checkArgument(!Strings.isNullOrEmpty(flowCellId),
-          "flowCellId is not define for a sample sheet version 1");
-      checkSampleSheetV1(design, flowCellId);
-
-    } else if (design.isVersion2()) {
-      checkSampleSheetV2(design);
-    } else {
-
-      throw new AozanException("Sample sheet instance has invalid version.");
+    if (samplesheet == null) {
+      throw new NullPointerException("The samplesheet argument cannot be null");
     }
 
+    if (laneCount < 1) {
+      throw new IllegalArgumentException(
+          "The lane count cannot be lower than 1: " + laneCount);
+    }
+
+    if (samplesheet.isLaneSampleField()) {
+      return;
+    }
+
+    List<Sample> samples = new ArrayList<>();
+
+    // Copy to avoid iterator modification
+    for (Sample s : samplesheet) {
+      samples.add(s);
+    }
+
+    final List<Map<String, String>> samplesToDuplicate = new ArrayList<>();
+
+    for (Sample s : samples) {
+
+      // Set the Lane field for the first line
+      s.set(Sample.LANE_FIELD_NAME, "1");
+
+      final Map<String, String> s2 = new LinkedHashMap<>();
+      samplesToDuplicate.add(s2);
+      for (String fieldName : s.getFieldNames()) {
+        s2.put(fieldName, s.get(fieldName));
+      }
+    }
+
+    // Duplicate the sample for all the other lanes
+    for (int i = 2; i <= laneCount; i++) {
+      for (Map<String, String> s2Entries : samplesToDuplicate) {
+        final Sample s2 = samplesheet.addSample();
+        for (Map.Entry<String, String> e : s2Entries.entrySet()) {
+          s2.set(e.getKey(), e.getValue());
+        }
+
+        // Overwrite the Lane field
+        s2.set(Sample.LANE_FIELD_NAME, "" + i);
+      }
+    }
   }
 
   /**
-   * Check sample sheet v2.
-   * @param design the design
+   * Check if the required field for creating the QC report exists in the
+   * samplesheet.
+   * @param samplesheet the samplesheet
    */
-  public static void checkSampleSheetV2(SampleSheet design) {
-    // TODO Auto-generated method stub
+  public static void checkRequiredQCSampleFields(
+      final SampleSheet samplesheet) {
 
+    if (samplesheet == null) {
+      throw new NullPointerException("The samplesheet argument cannot be null");
+    }
+
+    for (String fieldName : Arrays.asList("sampleref", INDEX1_FIELD_NAME,
+        DESCRIPTION_FIELD_NAME, PROJECT_FIELD_NAME)) {
+
+      if (samplesheet.isSampleFieldName(fieldName)) {
+        throw new AozanRuntimeException(
+            "A required field is Missing in the samplesheet to create thr quality control report: "
+                + convertFieldNameV2(fieldName));
+      }
+    }
   }
 
+  //
+  // Other methods
+  //
+
   /**
-   * Check sample sheet v1.
-   * @param design the design
-   * @param flowCellId the flow cell id
-   * @throws AozanException the aozan exception
+   * Replace index shortcuts in a design object by index sequences.
+   * @param design Casava design object
+   * @param sequences map for the sequences
+   * @throws EoulsanException if the shortcut is unknown
    */
-  public static void checkSampleSheetV1(final SampleSheet design,
-      final String flowCellId) throws AozanException {
+  public static void replaceIndexShortcutsBySequences(final SampleSheet design,
+      final Map<String, String> sequences) throws AozanException {
 
-    String fcid = null;
-    boolean first = true;
+    if (design == null || sequences == null) {
+      return;
+    }
 
-    for (Sample s : design) {
+    for (final Sample sample : design) {
 
-      final SampleV1 sample = (SampleV1) s;
-      // Check if all the fields are not empty
-      checkFCID(sample.getFlowCellId());
+      if (sample.isIndex1Field()) {
 
-      if (flowCellId != null) {
+        String index1 = sample.getIndex1();
 
-        // Check if the flow cell id is the flow cell id expected
-        if (!flowCellId.trim().toUpperCase()
-            .equals(sample.getFlowCellId().toUpperCase())) {
-          throw new AozanException("Bad flowcell name found: "
-              + sample.getFlowCellId() + " (" + flowCellId + " expected).");
+        if (index1 == null) {
+          throw new NullPointerException(
+              "Sample index1 is null for sample: " + sample);
         }
 
-        // Use the case of the flowCellId parameter as case for the flow cell
-        // id
-        // of sample
-        sample.setFlowCellId(flowCellId);
-      }
+        index1 = index1.trim().toLowerCase();
 
-      // Check if all the samples had the same flow cell id
-      if (first) {
-        fcid = sample.getFlowCellId();
-        first = false;
-      } else {
+        try {
+          SampleSheetCheck.checkIndex(index1);
+        } catch (AozanException e) {
 
-        if (!fcid.equals(sample.getFlowCellId())) {
-          throw new AozanException("Two differents flow cell id found: "
-              + fcid + " and " + sample.getFlowCellId() + ".");
+          if (!sequences.containsKey(index1)) {
+            throw new AozanException("Unknown index 1 sequence shortcut ("
+                + index1 + ") for sample: " + sample);
+          }
+          sample.setIndex1(sequences.get(index1));
         }
       }
 
-      // Check the lane number
-      if (sample.getLane() < 1 || sample.getLane() > 8) {
-        throw new AozanException("Invalid lane number found: "
-            + sample.getLane() + ".");
+      if (sample.isIndex2Field()) {
+
+        String index2 = sample.getIndex1();
+
+        if (index2 == null) {
+          throw new NullPointerException(
+              "Sample index2 is null for sample: " + sample);
+        }
+
+        index2 = index2.trim().toLowerCase();
+
+        try {
+          SampleSheetCheck.checkIndex(index2);
+        } catch (AozanException e) {
+
+          if (!sequences.containsKey(index2)) {
+            throw new AozanException("Unknown index 2 sequence shortcut ("
+                + index2 + ") for sample: " + sample);
+          }
+          sample.setIndex2(sequences.get(index2));
+        }
       }
-
-      // Check recipe
-      if (isNullOrEmpty(sample.getRecipe())) {
-        throw new AozanException("Found a null or empty recipe for sample: "
-            + sample.getSampleId() + ".");
-      }
-      checkCharset(sample.getRecipe());
-
-      // Check operator
-      if (isNullOrEmpty(sample.getOperator())) {
-        throw new AozanException("Found a null or empty operator for sample: "
-            + sample.getSampleId() + ".");
-      }
-
-      checkCharset(sample.getOperator());
-
     }
   }
 
@@ -992,10 +365,9 @@ public class SampleSheetUtils {
   //
 
   /**
-   * Instantiates a new sample sheet utils.
+   * Private constructor.
    */
-  SampleSheetUtils() {
-
+  private SampleSheetUtils() {
   }
 
 }

@@ -24,6 +24,8 @@
 
 package fr.ens.transcriptome.aozan.fastqscreen;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.File;
@@ -77,7 +79,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   // private final SequenceReadsMapper mapper;
   private GenomeDescription desc = null;
   private final FastqScreenResult fastqScreenResult;
-  private final String tmpDir;
+  private final File tmpDir;
 
   private String newArgumentsMapper;
   private final Pattern pattern = Pattern.compile("\t");
@@ -101,7 +103,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @throws AozanException if an error occurs while mapping
    */
   public void doMap(final File fastqRead, final List<String> genomesForMapping,
-      final String genomeSample, final int numberThreads) throws AozanException {
+      final String genomeSample, final int numberThreads)
+          throws AozanException {
 
     this.doMap(fastqRead, null, genomesForMapping, genomeSample, numberThreads);
   }
@@ -120,6 +123,14 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       final List<String> genomesForMapping, final String genomeSample,
       final int numberThreads) throws AozanException {
 
+    checkNotNull(fastqRead1, "fastqRead1 argument cannot be null");
+    checkNotNull(genomesForMapping,
+        "genomesForMapping argument cannot be null");
+
+    if (this.pairedMode) {
+      checkNotNull(fastqRead2, "fastqRead2 argument cannot be null");
+    }
+
     if (numberThreads > 0) {
       this.mapperThreads = numberThreads;
     }
@@ -137,7 +148,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
       // Create instance of Mapper
       final SequenceReadsMapper mapper =
-          createInstanceMapper(mapperName, mapperArguments);
+          createInstanceMapper(this.mapperName, this.mapperArguments);
 
       try {
         final DataFile genomeFile = new DataFile("genome://" + genome);
@@ -146,20 +157,18 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         final File archiveIndexFile = createIndex(mapper, genomeFile);
 
         if (archiveIndexFile == null) {
-          LOGGER.warning("FASTQSCREEN : archive index file not found for "
-              + genome);
+          LOGGER.warning(
+              "FASTQSCREEN : archive index file not found for " + genome);
           continue;
         }
 
-        final FastqScreenSAMParser parser =
-            new FastqScreenSAMParser(this.getMapOutputTempFile(), genome,
-                this.pairedMode, this.desc);
+        final FastqScreenSAMParser parser = new FastqScreenSAMParser(
+            this.getMapOutputTempFile(), genome, this.pairedMode, this.desc);
 
         this.setGenomeReference(genome, genomeSample);
 
-        final File indexDir =
-            new File(StringUtils.filenameWithoutExtension(archiveIndexFile
-                .getPath()));
+        final File indexDir = new File(
+            StringUtils.filenameWithoutExtension(archiveIndexFile.getPath()));
 
         mapper.init(archiveIndexFile, indexDir, this.reporter, COUNTER_GROUP);
 
@@ -216,16 +225,16 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     // Timer :
     final Stopwatch timer = Stopwatch.createStarted();
 
-    final DataFile result =
-        new DataFile(this.tmpDir
-            + "/aozan-" + bowtie.getMapperName().toLowerCase() + "-index-"
+    final DataFile tempDir = new DataFile(this.tmpDir);
+    final DataFile result = new DataFile(tempDir,
+        "aozan-"
+            + bowtie.getMapperName().toLowerCase() + "-index-"
             + genomeDataFile.getName() + ".zip");
 
     // Create genome description
     try {
-      this.desc =
-          FastqScreenGenomeMapper.getInstance().createGenomeDescription(
-              genomeDataFile);
+      this.desc = FastqScreenGenomeMapper.getInstance()
+          .createGenomeDescription(genomeDataFile);
     } catch (final BadBioEntryException e) {
       throw new AozanException(e);
     }
@@ -262,6 +271,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   public void map(final String value, final List<String> output,
       final Reporter reporter) throws IOException {
 
+    checkNotNull(output, "output argument cannot be null");
+
     if (value == null || value.length() == 0 || value.charAt(0) == '@') {
       return;
     }
@@ -295,6 +306,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   public void reduce(final String key, final Iterator<String> values,
       final List<String> output, final Reporter reporter) throws IOException {
 
+    checkNotNull(values, "values argument cannot be null");
+
     boolean oneHit = true;
     boolean oneGenome = true;
     String currentGenome = null;
@@ -314,8 +327,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         oneGenome = false;
       }
 
-      this.fastqScreenResult
-          .countHitPerGenome(currentGenome, oneHit, oneGenome);
+      this.fastqScreenResult.countHitPerGenome(currentGenome, oneHit,
+          oneGenome);
     }
   }
 
@@ -324,7 +337,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @param genome name of the new genome
    * @param genomeSample genome reference corresponding to sample
    */
-  public void setGenomeReference(final String genome, final String genomeSample) {
+  public void setGenomeReference(final String genome,
+      final String genomeSample) {
     this.genomeReference = genome;
 
     this.fastqScreenResult.addGenome(genome, genomeSample);
@@ -410,7 +424,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     // Use default mapper if mapper name or arguments is null
     if (mapperName == null || mapperName.length() == 0) {
 
-      if (mapperArguments != null && mapperArguments.length() > 0) {
+      if (mapperArguments != null && !mapperArguments.isEmpty()) {
         this.newArgumentsMapper = mapperArguments;
       }
 
@@ -427,6 +441,9 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
       this.newArgumentsMapper = mapperArguments;
     }
+
+    // Set temporary directory
+    mapper.setTempDirectory(this.tmpDir);
 
     // remove default argument
     mapper.setMapperArguments("");
@@ -459,9 +476,15 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @param mapperArguments mapper arguments can be null
    * @throws AozanException occurs when the instantiation of mapper fails
    */
-  public FastqScreenPseudoMapReduce(final String tmpDir,
-      final boolean pairedMode, final String mapperName,
-      final String mapperArguments) throws AozanException {
+  public FastqScreenPseudoMapReduce(final File tmpDir, final boolean pairedMode,
+      final String mapperName, final String mapperArguments)
+          throws AozanException {
+
+    checkNotNull(tmpDir, "tmpDir argument cannot be null");
+    checkNotNull(mapperName, "mapperName argument cannot be null");
+
+    checkArgument(tmpDir.isDirectory(),
+        "temporary directory does not exists or is not a directory: " + tmpDir);
 
     this.pairedMode = pairedMode;
     this.tmpDir = tmpDir;
@@ -469,7 +492,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     this.mapperArguments = mapperArguments;
 
     // Define temporary directory
-    this.setMapReduceTemporaryDirectory(new File(this.tmpDir));
+    this.setMapReduceTemporaryDirectory(this.tmpDir);
 
     this.reporter = new LocalReporter();
     this.fastqScreenResult = new FastqScreenResult();

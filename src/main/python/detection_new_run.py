@@ -4,7 +4,7 @@
 Created on 6 avril 2015
 
 With include NextSeq management, replace old first_base_report.py
- 
+
 @author: Laurent Jourdren
 @author: Sandrine Perrin
 '''
@@ -12,8 +12,6 @@ With include NextSeq management, replace old first_base_report.py
 import common, aozan, hiseq_run, detection_end_run
 import estimate_space_needed
 import os
-from java.io import File
-from fr.ens.transcriptome.aozan.illumina import RunInfo
 
 from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import HISEQ_DATA_PATH_KEY
@@ -56,15 +54,15 @@ def get_available_run_ids(conf):
 
         files = os.listdir(hiseq_data_path)
         for f in files:
-            
+
             if not (os.path.isdir(hiseq_data_path + '/' + f) and hiseq_run.check_run_id(f, conf)):
                 # No valid entry
                 continue
-            
+
             # NextSeq sequencer create this file after clusterisation step
             if not os.path.exists(hiseq_data_path + '/' + f + '/RunInfo.xml'):
                 continue
-            
+
             if not detection_end_run.check_end_run(f, conf):
                 # TODO
                 # os.path.exists(hiseq_data_path + '/' + f + '/First_Base_Report.htm'):
@@ -76,7 +74,7 @@ def discover_new_run(conf):
     """Discover new runs.
 
     Arguments:
-        conf: configuration object  
+        conf: configuration object
     """
 
     #
@@ -88,14 +86,14 @@ def discover_new_run(conf):
     if common.is_conf_value_equals_true(FIRST_BASE_REPORT_STEP_KEY, conf):
         for run_id in (get_available_run_ids(conf) - run_already_discovered):
             aozan.welcome(conf)
-            common.log('INFO', 'First base report ' + run_id + ' on sequencer ' + common.get_sequencer_type(run_id, conf), conf)
+            common.log('INFO', 'First base report ' + run_id + ' on sequencer ' + common.get_instrument_name(run_id, conf), conf)
             send_report(run_id, conf)
             add_run_id_to_processed_run_ids(run_id, conf)
             run_already_discovered.add(run_id)
 
             # Verify space needed during the first base report
             estimate_space_needed.estimate(run_id, conf)
-            
+
 
     #
     # Discover hiseq run done
@@ -106,7 +104,7 @@ def discover_new_run(conf):
 
 def send_report(run_id, conf):
     """Send a mail with the first base report.
-    
+
     Arguments:
         run_id: the run id
         conf: configuration dictionary
@@ -116,14 +114,10 @@ def send_report(run_id, conf):
     # Retrieve features the current run in RunInfos.xml file
     #
 
-    run_info_path = hiseq_run.get_runinfos_file(run_id, conf)
-    
-    if run_info_path is None:
-        return
-    
-    run_info = RunInfo()
-    run_info.parse(File(run_info_path))
+    run_info = hiseq_run.get_run_info(run_id, conf)
 
+    if run_info == None:
+        return
 
     # TODO ?? add check sample-sheet if demux step enable
     # add warning in report if useful
@@ -167,9 +161,9 @@ def send_report(run_id, conf):
 
     description_run += "\t- " + "estimated run type : " + type_run_estimated + ".\n"
 
-    sequencer_type = common.get_sequencer_type(run_id, conf)
+    rta_major_version = common.get_rta_major_version(run_id, conf)
 
-    if sequencer_type == common.HISEQ_NAME:
+    if rta_major_version == 1:
         # With HiSeq send the first base report file
         attachment_file = str(hiseq_run.find_hiseq_run_path(run_id, conf)) + '/' + run_id + '/First_Base_Report.htm'
         message = 'You will find attached to this message the first base report on sequencer HiSeq for the run ' + run_id + '.\n\n' + description_run

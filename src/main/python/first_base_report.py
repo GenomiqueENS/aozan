@@ -9,7 +9,6 @@ Created on 8 déc. 2011
 import common, hiseq_run, detection_end_run
 import os
 from java.io import File
-from fr.ens.transcriptome.aozan.illumina import RunInfo
 
 from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.transcriptome.aozan.Settings import HISEQ_DATA_PATH_KEY
@@ -59,7 +58,7 @@ def get_available_run_ids(conf):
 
 def send_report(run_id, conf):
     """Send a mail with the first base report.
-    
+
     Arguments:
         run_id: the run id
         conf: configuration dictionary
@@ -69,12 +68,7 @@ def send_report(run_id, conf):
     # Retrieve features the current run in RunInfos.xml file
     #
 
-    hiseq_run_path = conf[HISEQ_DATA_PATH_KEY] + '/' + run_id
-
-    run_info_path = hiseq_run_path + "/RunInfo.xml"
-    run_info = RunInfo()
-    run_info.parse(File(run_info_path))
-
+    run_info = hiseq_run.get_run_info(run_id, conf)
 
     reads = run_info.getReads()
     error_cycles_per_reads_not_indexes_count = 0

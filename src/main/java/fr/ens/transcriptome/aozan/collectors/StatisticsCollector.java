@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -36,7 +37,6 @@ import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.collectors.stats.EntityStat;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreenProjectReport;
-import fr.ens.transcriptome.aozan.util.StringUtils;
 
 /**
  * The class define a abstract statistics collector.
@@ -84,9 +84,8 @@ public abstract class StatisticsCollector implements Collector {
 
     // Set stylesheet file to build project report
     try {
-      final String filename =
-          properties
-              .getProperty(Settings.QC_CONF_FASTQSCREEN_PROJECT_XSL_FILE_KEY);
+      final String filename = properties
+          .getProperty(Settings.QC_CONF_FASTQSCREEN_PROJECT_XSL_FILE_KEY);
       if (new File(filename).exists()) {
         this.fastqscreenXSLFile = new File(filename);
       }
@@ -96,9 +95,8 @@ public abstract class StatisticsCollector implements Collector {
     }
 
     // Extract threshold from property
-    final String threshod =
-        properties
-            .getProperty(Settings.QC_CONF_FASTQSCREEN_PERCENT_CONTAMINATION_THRESHOLD_KEY);
+    final String threshod = properties.getProperty(
+        Settings.QC_CONF_FASTQSCREEN_PERCENT_CONTAMINATION_THRESHOLD_KEY);
 
     // Set the contaminant threshold
     if (threshod == null || threshod.isEmpty()) {
@@ -114,8 +112,8 @@ public abstract class StatisticsCollector implements Collector {
 
     // Check optional collector selected
     final List<String> collectorNames =
-        StringUtils.COMMA_SPLITTER.splitToList(properties
-            .getProperty(QC.QC_COLLECTOR_NAMES));
+        Splitter.on(',').trimResults().omitEmptyStrings()
+            .splitToList(properties.getProperty(QC.QC_COLLECTOR_NAMES));
 
     undeterminedIndexesCollectorSelected =
         collectorNames.contains(UndeterminedIndexesCollector.COLLECTOR_NAME);
@@ -132,7 +130,6 @@ public abstract class StatisticsCollector implements Collector {
 
   @Override
   public void collect(RunData data) throws AozanException {
-
 
     // Parse FastqSample to build list Project
     final List<EntityStat> stats = extractEntityStats(data);

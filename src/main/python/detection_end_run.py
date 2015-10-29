@@ -15,7 +15,7 @@ import cmd
 from pickle import FALSE
 
 DONE_FILE = 'detection_end_run.done'
- 
+
 
 def load_processed_run_ids(conf):
     """Load the list of the processed run ids.
@@ -38,12 +38,12 @@ def add_run_id_to_processed_run_ids(run_id, conf):
     common.add_run_id_to_processed_run_ids(run_id, conf[AOZAN_VAR_PATH_KEY] + '/hiseq.done', conf)
 
 def discovery_run(conf):
-    """Discover new ended runs  
+    """Discover new ended runs
 
     Arguments:
-        conf: configuration object  
+        conf: configuration object
     """
-    
+
     run_ids_done = load_processed_run_ids(conf)
 
     if common.is_conf_value_equals_true(HISEQ_STEP_KEY, conf):
@@ -52,10 +52,10 @@ def discovery_run(conf):
             if run_id == None or len(run_id) == 0:
                 # No run id found
                 return []
-            
+
             aozan.welcome(conf)
-            common.log('INFO', 'Discover end run ' + str(run_id) + ' on sequencer ' + str(common.get_sequencer_type(run_id, conf)), conf)
-            
+            common.log('INFO', 'Discover end run ' + str(run_id) + ' on ' + common.get_instrument_name(run_id, conf), conf)
+
             if hiseq_run.create_run_summary_reports(run_id, conf):
                 hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
                 add_run_id_to_processed_run_ids(run_id, conf)
@@ -75,8 +75,8 @@ def check_end_run(run_id, conf):
     """
 
     hiseq_data_path = hiseq_run.find_hiseq_run_path(run_id, conf)
-    reads_number = hiseq_run.get_reads_number(run_id, conf)
-    
+    reads_number = hiseq_run.get_read_count(run_id, conf)
+
     # TODO
     if hiseq_data_path == False:
         return False
@@ -90,7 +90,7 @@ def check_end_run(run_id, conf):
     # File generate only by HiSeq sequencer
     for i in range(reads_number):
         filename = prefix + str(i + 1) + suffix
-        
+
         if not os.path.exists(hiseq_data_path + '/' + run_id + '/' + filename):
             return False
 
@@ -112,7 +112,7 @@ def check_end_run_since(run_id, secs, conf):
     if hiseq_data_path == False:
         return -1
 
-    reads_number = hiseq_run.get_reads_number(run_id, conf)
+    reads_number = hiseq_run.get_read_count(run_id, conf)
     last = 0
 
     for i in range(reads_number):
@@ -127,14 +127,14 @@ def check_end_run_since(run_id, secs, conf):
 
     if (time.time() - last) < secs:
         return last
-    
+
     return 0
 
 def build_read_complete(run_id, i, conf):
-    
+
     if common.is_sequencer_hiseq(run_id, conf):
         return  'Basecalling_Netcopy_complete_Read' + str(i + 1) + '.txt'
-    
+
     else:
         return  'RTARead'+ str(i + 1) + 'Complete.txt'
 

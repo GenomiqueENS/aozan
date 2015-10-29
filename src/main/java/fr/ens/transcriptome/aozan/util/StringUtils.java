@@ -22,7 +22,8 @@
  */
 package fr.ens.transcriptome.aozan.util;
 
-import com.google.common.base.Splitter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * The Class StringUtils.
@@ -31,7 +32,23 @@ import com.google.common.base.Splitter;
  */
 public class StringUtils {
 
-  /** Splitter. */
-  public static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults()
-      .omitEmptyStrings();
+  /**
+   * Convert a stack trace of an exception into a string. TODO Remove this
+   * method once Eoulsan 2.0-alpha7 will be used, and replace by
+   * StringUtils.stackTraceToString()
+   * @param t the throwable exception
+   * @return a string with the stack trace
+   */
+  public static String stackTraceToString(final Throwable t) {
+
+    if (t == null) {
+      return null;
+    }
+
+    final StringWriter sw = new StringWriter();
+    t.printStackTrace(new PrintWriter(sw));
+
+    return sw.toString();
+  }
+
 }

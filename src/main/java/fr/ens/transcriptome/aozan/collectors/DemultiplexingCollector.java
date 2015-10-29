@@ -24,6 +24,7 @@
 package fr.ens.transcriptome.aozan.collectors;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
@@ -33,7 +34,7 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
+import fr.ens.transcriptome.aozan.illumina.Bcl2FastqOutput;
 
 public class DemultiplexingCollector implements Collector {
 
@@ -43,8 +44,9 @@ public class DemultiplexingCollector implements Collector {
   /** Prefix for run data */
   public static final String PREFIX = "demux";
 
-  private String casavaOutputPath;
-  private Collector subCollector;
+  private File casavaOutputPath;
+  private File samplesheetFile;
+  private Properties conf;
 
   //
   // Useful methods
@@ -74,38 +76,59 @@ public class DemultiplexingCollector implements Collector {
       return;
     }
 
-    this.casavaOutputPath = properties.getProperty(QC.CASAVA_OUTPUT_DIR);
-
-    final String bcl2fastqVersion =
-        properties.getProperty(QC.BCL2FASTQ_VERSION);
-
-    if (SampleSheetUtils.isBcl2fastqVersion1(bcl2fastqVersion)) {
-      // Call flowcell collector
-      this.subCollector = new FlowcellDemuxSummaryCollector();
-
-    } else if (SampleSheetUtils.isBcl2fastqVersion2(bcl2fastqVersion)) {
-      // Conversion collector
-      this.subCollector = new ConversionStatsCollector();
-
-    } else {
-      throw new AozanRuntimeException("bcl2fastq version is invalid "
-          + bcl2fastqVersion + " to identify required Demux collector.");
-    }
-
-    // Init collector
-    subCollector.configure(properties);
+    this.casavaOutputPath =
+        new File(properties.getProperty(QC.CASAVA_OUTPUT_DIR));
+    this.samplesheetFile =
+        new File(properties.getProperty(QC.CASAVA_DESIGN_PATH));
+    this.conf = new Properties(properties);
   }
 
   @Override
   public void collect(final RunData data) throws AozanException {
 
+    final Collector subCollector;
+
+    final Bcl2FastqOutput manager;
+
+    try {
+      manager =
+          new Bcl2FastqOutput(this.samplesheetFile, this.casavaOutputPath);
+    } catch (IOException e) {
+      throw new AozanException(e);
+    }
+
+    switch (manager.getVersion()) {
+
+    case BCL2FASTQ_1:
+
+      // Call flowcell collector
+      subCollector = new FlowcellDemuxSummaryCollector();
+      break;
+
+    case BCL2FASTQ_2:
+    case BCL2FASTQ_2_15:
+
+      // Conversion collector
+      subCollector = new ConversionStatsCollector();
+      break;
+
+    default:
+
+      throw new AozanRuntimeException(
+          "Unable to detect the version of bcl2fastq used to generate data");
+
+    }
+
+    // Init collector
+    subCollector.configure(this.conf);
+
+    // Collect data
     subCollector.collect(data);
   }
 
   @Override
   public void clear() {
     // TODO Auto-generated method stub
-
   }
 
   //
@@ -116,7 +139,7 @@ public class DemultiplexingCollector implements Collector {
    * Gets the casava output path.
    * @return the casava output path
    */
-  public String getCasavaOutputPath() {
+  public File getCasavaOutputPath() {
     return this.casavaOutputPath;
   }
 }

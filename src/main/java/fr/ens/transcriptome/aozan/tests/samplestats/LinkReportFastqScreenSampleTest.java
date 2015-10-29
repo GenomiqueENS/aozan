@@ -24,7 +24,7 @@
 package fr.ens.transcriptome.aozan.tests.samplestats;
 
 import static fr.ens.transcriptome.aozan.collectors.stats.SampleStatistics.UNDETERMINED_SAMPLE;
-import static fr.ens.transcriptome.aozan.io.ManagerQCPath.UNDETERMINED_DIR_NAME;
+import static fr.ens.transcriptome.aozan.illumina.Bcl2FastqOutput.UNDETERMINED_DIR_NAME;
 
 import java.util.Collections;
 import java.util.List;

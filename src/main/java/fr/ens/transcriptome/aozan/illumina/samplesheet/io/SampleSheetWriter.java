@@ -20,34 +20,25 @@
  *      http://www.transcriptome.ens.fr/aozan
  *
  */
-package fr.ens.transcriptome.aozan.illumina.io;
+
+package fr.ens.transcriptome.aozan.illumina.samplesheet.io;
 
 import java.io.IOException;
-import java.util.List;
 
-import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 
 /**
- * The Class SampleSheetLineReader.
- * @author Sandrine Perrin
- * @since 2.4
+ * This interface define a writer for bcl2fastq samplesheet.
+ * @since 1.1
+ * @author Laurent Jourdren
  */
-public abstract class SampleSheetLineReader extends
-    AbstractCasavaDesignTextReader {
-
-  @Override
-  public SampleSheet read(String version) throws AozanException, IOException {
-    return null;
-  }
+public interface SampleSheetWriter {
 
   /**
-   * Parses the line.
-   * @param design the design
-   * @param fields the fields
-   * @throws AozanException the aozan exception
+   * Write a samplesheet.
+   * @param samplesheet design to write
+   * @throws IOException if an error occurs while writing the samplesheet
    */
-  public abstract void parseLine(final SampleSheet design,
-      final List<String> fields) throws AozanException;
+  void writer(SampleSheet samplesheet) throws IOException;
 
 }

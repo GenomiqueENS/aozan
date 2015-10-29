@@ -33,29 +33,17 @@ public class AozanException extends Exception {
 
   private static final long serialVersionUID = -749903788412172296L;
 
-  private Exception exception;
-
-  /**
-   * Get the wrapped exception.
-   * @return the wrapped exception
-   */
-  public Exception getWrappedException() {
-
-    return exception;
-  }
-
   //
   // Constructors
   //
 
   /**
    * Create a new AozanException from the message of another exception.
-   * @param e exception with the message to use
+   * @param t exception with the message to use
    */
-  public AozanException(final Exception e) {
+  public AozanException(final Throwable t) {
 
-    this(e.getMessage());
-    this.exception = e;
+    super(t);
   }
 
   /**

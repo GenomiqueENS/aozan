@@ -21,25 +21,8 @@
  *
  */
 
-package fr.ens.transcriptome.aozan.illumina.io;
-
-import java.io.IOException;
-
-import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
-
 /**
- * This interface define a reader for Casava designs.
- * @since 1.1
- * @author Laurent Jourdren
+ * This package contains classes to read and write bcl2fastq samplesheet files.
+ * @since 2.0
  */
-public interface CasavaDesignReader {
-
-  /**
-   * Read a design.
-   * @return a CasavaDesign object
-   * @throws AozanException if an error occurs while reading the design
-   * @throws IOException
-   */
-  SampleSheet read(final String version) throws AozanException, IOException;
-}
+package fr.ens.transcriptome.aozan.illumina.samplesheet.io;

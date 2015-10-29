@@ -23,7 +23,7 @@
 
 package fr.ens.transcriptome.aozan.collectors.stats;
 
-import static fr.ens.transcriptome.aozan.io.ManagerQCPath.UNDETERMINED_DIR_NAME;
+import static fr.ens.transcriptome.aozan.illumina.Bcl2FastqOutput.UNDETERMINED_DIR_NAME;
 
 import java.io.File;
 import java.util.ArrayList;

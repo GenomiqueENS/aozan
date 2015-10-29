@@ -225,8 +225,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
   protected void createReportFile() throws AozanException, IOException {
 
     // Set the name of the prefix of the report file
-    final String filename =
-        getFastqSample().getPrefixReport() + "-fastqc.html";
+    final String filename = getFastqSample().getPrefixReport() + "-fastqc.html";
 
     final File reportFile = new File(this.reportDir, filename);
 
@@ -238,15 +237,15 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
       throw new AozanException(e);
     }
 
-    LOGGER.fine("FASTQC : "
-        + getFastqSample().getPrefixReport() + " creation qc report html");
+    LOGGER.fine("FASTQC: create the html QC report for "
+        + getFastqSample().getPrefixReport());
 
     // Keep only the uncompressed data
     if (reportFile.exists()) {
 
       if (!reportFile.delete()) {
-        LOGGER.warning("FastQC : fail delete report "
-            + reportFile.getAbsolutePath());
+        LOGGER.warning(
+            "FastQC: fail to delete report " + reportFile.getAbsolutePath());
       }
     }
 
@@ -256,8 +255,8 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
     if (reportZip.exists()) {
 
       if (!reportZip.delete()) {
-        LOGGER.warning("FastQC : fail delete report "
-            + reportZip.getAbsolutePath());
+        LOGGER.warning(
+            "FastQC: fail to delete report " + reportZip.getAbsolutePath());
       }
     }
   }
@@ -273,7 +272,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
    */
   public FastQCProcessThread(final FastqSample fastqSample,
       final boolean ignoreFilteredSequences, final File reportDir)
-      throws AozanException {
+          throws AozanException {
 
     super(fastqSample);
 
@@ -281,9 +280,8 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
     this.reportDir = reportDir;
 
     try {
-      this.seqFile =
-          SequenceFactory.getSequenceFile(fastqSample.getFastqFiles().toArray(
-              new File[fastqSample.getFastqFiles().size()]));
+      this.seqFile = SequenceFactory.getSequenceFile(fastqSample.getFastqFiles()
+          .toArray(new File[fastqSample.getFastqFiles().size()]));
 
     } catch (final IOException io) {
       throw new AozanException(io);
@@ -295,13 +293,12 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
     // Define modules list
     final OverRepresentedSeqs os = new OverRepresentedSeqs();
 
-    this.moduleList =
-        Lists.newArrayList(new BasicStats(), new PerBaseQualityScores(),
-            new PerTileQualityScores(), new PerSequenceQualityScores(),
-            new PerBaseSequenceContent(), new PerSequenceGCContent(),
-            new NContent(), new SequenceLengthDistribution(),
-            os.duplicationLevelModule(), os, new AdapterContent(),
-            new KmerContent(), new BadTiles());
+    this.moduleList = Lists.newArrayList(new BasicStats(),
+        new PerBaseQualityScores(), new PerTileQualityScores(),
+        new PerSequenceQualityScores(), new PerBaseSequenceContent(),
+        new PerSequenceGCContent(), new NContent(),
+        new SequenceLengthDistribution(), os.duplicationLevelModule(), os,
+        new AdapterContent(), new KmerContent(), new BadTiles());
   }
 
 }

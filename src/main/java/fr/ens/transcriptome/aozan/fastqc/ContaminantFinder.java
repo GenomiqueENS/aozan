@@ -23,6 +23,8 @@
 
 package fr.ens.transcriptome.aozan.fastqc;
 
+import static fr.ens.transcriptome.aozan.util.StringUtils.stackTraceToString;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,14 +34,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import uk.ac.babraham.FastQC.Sequence.Contaminant.Contaminant;
-import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.Settings;
-import fr.ens.transcriptome.eoulsan.util.StringUtils;
+import uk.ac.babraham.FastQC.Sequence.Contaminant.Contaminant;
+import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
 
 /**
  * Source FastQC version 0.10.0, not modify. The class version 0.10.1 doesn't
@@ -91,11 +92,11 @@ public class ContaminantFinder {
       } catch (final IOException e) {
 
         LOGGER.warning("Error during find contaminant with blast : "
-            + StringUtils.join(e.getStackTrace(), "\n\t"));
+            + e.getMessage() + "\n" + stackTraceToString(e));
       } catch (final AozanException e) {
 
         LOGGER.warning("Error during find contaminant with blast : "
-            + StringUtils.join(e.getStackTrace(), "\n\t"));
+            + e.getMessage() + "\n" + stackTraceToString(e));
       }
     }
 
@@ -109,27 +110,24 @@ public class ContaminantFinder {
 
       final InputStream is;
 
-      if (System.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY) != null
+      if (System
+          .getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY) != null
           && System.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY)
               .length() > 0) {
-        is =
-            new FileInputStream(
-                System
-                    .getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY));
+        is = new FileInputStream(
+            System.getProperty(Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY));
       } else {
         // FastQC v0.11.2
-        is =
-            ClassLoader
-                .getSystemResourceAsStream("Configuration/contaminant_list.txt");
+        is = ClassLoader
+            .getSystemResourceAsStream("Configuration/contaminant_list.txt");
         // FastQC v0.10
         // ClassLoader
         // .getSystemResourceAsStream("Contaminants/contaminant_list.txt");
 
       }
 
-      final BufferedReader br =
-          new BufferedReader(new InputStreamReader(is,
-              Globals.DEFAULT_FILE_ENCODING));
+      final BufferedReader br = new BufferedReader(
+          new InputStreamReader(is, Globals.DEFAULT_FILE_ENCODING));
 
       String line;
       while ((line = br.readLine()) != null) {
@@ -142,10 +140,10 @@ public class ContaminantFinder {
         }
 
         final String[] sections = line.split("\\t+");
+
         if (sections.length != 2) {
-          System.err
-              .println("Expected 2 sections for contaminant line but got "
-                  + sections.length + " from " + line);
+          LOGGER.warning("Expected 2 sections for contaminant line but got "
+              + sections.length + " from " + line);
           continue;
         }
         final Contaminant con = new Contaminant(sections[0], sections[1]);
@@ -160,4 +158,5 @@ public class ContaminantFinder {
 
     return c.toArray(new Contaminant[0]);
   }
+
 }
