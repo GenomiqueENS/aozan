@@ -5,7 +5,7 @@ Created on 15 avril 2012
 @author: Sandrine Perrin
 '''
 
-import common
+import common, hiseq
 from java.io import File
 from xml.dom.minidom import parse
 
