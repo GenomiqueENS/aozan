@@ -48,8 +48,8 @@ import com.google.common.io.Files;
 public class RunData {
 
   /** Splitter. */
-  private static final Splitter COMMA_SPLITTER = Splitter.on(",").trimResults()
-      .omitEmptyStrings();
+  private static final Splitter COMMA_SPLITTER =
+      Splitter.on(",").trimResults().omitEmptyStrings();
 
   /** The map. */
   private final Map<String, String> map = new LinkedHashMap<>();
@@ -108,8 +108,9 @@ public class RunData {
     final String res =
         this.get("demux.lane" + lane + ".sample.lane" + lane + ".barcode");
 
-    return (res == null ? false : res.trim()
-        .toLowerCase(Globals.DEFAULT_LOCALE).equals("undetermined"));
+    return (res == null
+        ? false : res.trim().toLowerCase(Globals.DEFAULT_LOCALE)
+            .equals("undetermined"));
   }
 
   /**
@@ -126,8 +127,8 @@ public class RunData {
    * @return a list with the sample names related to the lane
    */
   public List<String> getSamplesNameListInLane(final int lane) {
-    return COMMA_SPLITTER.splitToList(this.get("design.lane"
-        + lane + ".samples.names"));
+    return COMMA_SPLITTER
+        .splitToList(this.get("design.lane" + lane + ".samples.names"));
   }
 
   /**
@@ -204,10 +205,9 @@ public class RunData {
   public int getSamplePFClusterCount(final int lane, final int read,
       final String sampleName) {
 
-    return this
-        .getInt("demux.lane"
-            + lane + ".sample." + sampleName + ".read" + read
-            + ".pf.cluster.count");
+    return this.getInt("demux.lane"
+        + lane + ".sample." + sampleName + ".read" + read
+        + ".pf.cluster.count");
   }
 
   /**
@@ -220,8 +220,8 @@ public class RunData {
       final String sampleName) {
 
     if (sampleName == null)
-      return this.getInt("undeterminedindices.lane"
-          + lane + ".recoverable.raw.cluster.count");
+      return this.getInt(
+          "undeterminedindices.lane" + lane + ".recoverable.raw.cluster.count");
 
     return this.getInt("undeterminedindices.lane"
         + lane + ".sample." + sampleName + ".recoverable.raw.cluster.count");
@@ -237,8 +237,8 @@ public class RunData {
       final String sampleName) {
 
     if (sampleName == null)
-      return this.getInt("undeterminedindices.lane"
-          + lane + ".recoverable.pf.cluster.count");
+      return this.getInt(
+          "undeterminedindices.lane" + lane + ".recoverable.pf.cluster.count");
 
     return this.getInt("undeterminedindices.lane"
         + lane + ".sample." + sampleName + ".recoverable.pf.cluster.count");
@@ -382,12 +382,19 @@ public class RunData {
    */
   public int getInt(final String key) {
 
-    try {
-      return Integer.parseInt(get(key));
+    final String value = get(key);
 
+    if (value == null) {
+      throw new AozanRuntimeException(
+          "DataRun getInt throw NullPointerException on this key " + key);
+    }
+
+    try {
+      return Integer.parseInt(value);
     } catch (NumberFormatException e) {
       throw new AozanRuntimeException(
-          "DataRun getInt throw NumberFormatException on this key " + key);
+          "DataRun getInt throw NumberFormatException on this key "
+              + key + " (value is " + value + ")");
     }
   }
 
@@ -398,12 +405,19 @@ public class RunData {
    */
   public long getLong(final String key) {
 
-    try {
-      return Long.parseLong(get(key));
+    final String value = get(key);
 
+    if (value == null) {
+      throw new AozanRuntimeException(
+          "DataRun getInt throw NullPointerException on this key " + key);
+    }
+
+    try {
+      return Long.parseLong(value);
     } catch (NumberFormatException e) {
       throw new AozanRuntimeException(
-          "DataRun getLong throw NumberFormatException on this key " + key);
+          "DataRun getLong throw NumberFormatException on this key "
+              + key + " (value is " + value + ")");
     }
   }
 
@@ -413,12 +427,20 @@ public class RunData {
    * @return the value of the data for the key
    */
   public float getFloat(final String key) {
-    try {
-      return Float.parseFloat(get(key));
 
+    final String value = get(key);
+
+    if (value == null) {
+      throw new AozanRuntimeException(
+          "DataRun getInt throw NullPointerException on this key " + key);
+    }
+
+    try {
+      return Float.parseFloat(value);
     } catch (NumberFormatException e) {
       throw new AozanRuntimeException(
-          "DataRun getFloat throw NumberFormatException on this key " + key);
+          "DataRun getFloat throw NumberFormatException on this key "
+              + key + " (value is " + value + ")");
     }
   }
 
@@ -428,12 +450,20 @@ public class RunData {
    * @return the value of the data for the key
    */
   public double getDouble(final String key) {
-    try {
-      return Double.parseDouble(get(key));
 
+    final String value = get(key);
+
+    if (value == null) {
+      throw new AozanRuntimeException(
+          "DataRun getInt throw NullPointerException on this key " + key);
+    }
+
+    try {
+      return Double.parseDouble(value);
     } catch (NumberFormatException e) {
       throw new AozanRuntimeException(
-          "DataRun getDouble throw NumberFormatException on this key " + key);
+          "DataRun getDouble throw NumberFormatException on this key "
+              + key + " (value is " + value + ")");
     }
   }
 
