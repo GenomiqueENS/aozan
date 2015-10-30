@@ -82,9 +82,9 @@ public class SampleStatistics extends StatisticsCollector {
     // Initialization ProjectStats with the project name
     final Map<String, EntityStat> samples = new HashMap<>();
 
-    samples.put(UNDETERMINED_SAMPLE, new EntityStat(data, UNDETERMINED_SAMPLE,
-        UNDETERMINED_SAMPLE, this,
-        extractFastqscreenReportForUndeterminedSample()));
+    samples.put(UNDETERMINED_SAMPLE,
+        new EntityStat(data, UNDETERMINED_SAMPLE, UNDETERMINED_SAMPLE, this,
+            extractFastqscreenReportForUndeterminedSample()));
 
     // Add projects name
     for (int lane = 1; lane <= laneCount; lane++) {
@@ -148,8 +148,8 @@ public class SampleStatistics extends StatisticsCollector {
    * @param sampleName the sample name
    * @return the list
    */
-  private List<File> extractFastqscreenReportOnProject(
-      final String projectName, final String sampleName) {
+  private List<File> extractFastqscreenReportOnProject(final String projectName,
+      final String sampleName) {
 
     List<File> reports;
     final File projectDir =
@@ -178,8 +178,12 @@ public class SampleStatistics extends StatisticsCollector {
 
     final File dir = new File(this.getReportDirectory(), UNDETERMINED_DIR_NAME);
 
+    if (!dir.isDirectory()) {
+      return Collections.emptyList();
+    }
+
     // Extract in project directy all fastqscreen report xml
-    return Arrays.asList(dir.listFiles(new FileFilter() {
+    final File[] files = dir.listFiles(new FileFilter() {
 
       @Override
       public boolean accept(final File pathname) {
@@ -187,8 +191,13 @@ public class SampleStatistics extends StatisticsCollector {
         return pathname.length() > 0
             && pathname.getName().endsWith("-fastqscreen.xml");
       }
-    }));
+    });
 
+    if (files == null) {
+      return Collections.emptyList();
+    }
+
+    return Arrays.asList();
   }
 
   //
