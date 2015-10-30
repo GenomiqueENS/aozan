@@ -181,6 +181,17 @@ public class RunData {
   }
 
   /**
+   * Get the index of a sample
+   * @param lane lane
+   * @param sampleName the sample name
+   * @return the index of the sample
+   */
+  public String getSampleIndex(final int lane, final String sampleName) {
+
+    return this.get("design.lane" + lane + '.' + sampleName + ".index");
+  }
+
+  /**
    * Get the raw cluster count for a sample.
    * @param lane the lane
    * @param read the read
