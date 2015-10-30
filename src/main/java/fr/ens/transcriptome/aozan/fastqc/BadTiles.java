@@ -48,7 +48,7 @@ import uk.ac.babraham.FastQC.Report.HTMLReportArchive;
 import uk.ac.babraham.FastQC.Sequence.Sequence;
 import uk.ac.babraham.FastQC.Sequence.QualityEncoding.PhredEncoding;
 import fr.ens.transcriptome.eoulsan.EoulsanException;
-import fr.ens.transcriptome.eoulsan.bio.IlluminaReadId;
+import fr.ens.transcriptome.aozan.illumina.IlluminaReadId;
 
 /**
  * This class define a QCModule for FastQC that list the bad tiles in a fastq

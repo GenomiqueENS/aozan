@@ -68,7 +68,7 @@ import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.aozan.util.XMLUtilsWriter;
 import fr.ens.transcriptome.eoulsan.EoulsanException;
-import fr.ens.transcriptome.eoulsan.bio.IlluminaReadId;
+import fr.ens.transcriptome.aozan.illumina.IlluminaReadId;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
 
 /**
