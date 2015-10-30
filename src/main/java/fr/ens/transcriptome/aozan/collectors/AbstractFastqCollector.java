@@ -42,6 +42,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -450,9 +451,15 @@ public abstract class AbstractFastqCollector implements Collector {
         if (this.isProcessUndeterminedIndicesSamples()) {
 
           // Check Undetermined fastq exist for this lane
-          final String asBarcodeUndetermined = data
+          final String laneBarcode = data
               .get("demux.lane" + lane + ".sample.lane" + lane + ".barcode");
-          if (asBarcodeUndetermined != null) {
+
+          final List<String> samplesInLane = getSampleNames(data, lane);
+          final String sampleIndex = samplesInLane.size() == 1
+              ? getSampleIndex(data, lane, samplesInLane.get(0)) : "";
+
+          if (laneBarcode != null
+              && !(samplesInLane.size() == 1 && "".equals(sampleIndex))) {
 
             // Add undetermined sample
             this.fastqSamples.add(new FastqSample(samplesheet,
@@ -732,4 +739,43 @@ public abstract class AbstractFastqCollector implements Collector {
 
     return Collections.unmodifiableList(Arrays.asList(dataFiles));
   }
+
+  /**
+   * Get the samples in a lane.
+   * @param data run data
+   * @param lane the lane
+   * @return a list with the samples
+   */
+  private static List<String> getSampleNames(final RunData data, int lane) {
+
+    final String laneSamples =
+        data.get("design.lane" + lane + ".samples.names");
+
+    if (laneSamples == null) {
+      return Collections.emptyList();
+    }
+
+    return Splitter.on(',').trimResults().splitToList(laneSamples);
+  }
+
+  /**
+   * Get the index of a sample
+   * @param data run data
+   * @param lane lane
+   * @param sampleName sample name
+   * @return the index of the sample
+   */
+  private static String getSampleIndex(final RunData data, final int lane,
+      final String sampleName) {
+
+    String sampleIndex =
+        data.get("design.lane" + lane + '.' + sampleName + ".index");
+
+    if (sampleIndex == null) {
+      return "";
+    }
+
+    return sampleIndex.trim();
+  }
+
 }
