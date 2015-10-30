@@ -88,7 +88,14 @@ public class RecoverableRawClusterPercentSampleTest extends AbstractSampleTest {
     }
 
     try {
-      final long recoveryCount = data.getLong(recoveryCountKey);
+      final long recoveryCount;
+
+      if (data.get(recoveryCountKey) == null) {
+        recoveryCount = 0;
+      } else {
+        recoveryCount = data.getLong(recoveryCountKey);
+      }
+
       final long sampleCount = data.getLong(sampleCountKey);
       final double percent = (double) recoveryCount / (double) sampleCount;
 

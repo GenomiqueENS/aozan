@@ -31,6 +31,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.collectors.UndeterminedIndexesCollector;
 import fr.ens.transcriptome.aozan.collectors.stats.ProjectStatistics;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.TestResult;
@@ -49,7 +50,8 @@ public class PercentRecoverablePFClusterProjectTest extends AbstractProjectTest 
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(ProjectStatistics.COLLECTOR_NAME);
+    return ImmutableList.of(UndeterminedIndexesCollector.COLLECTOR_NAME,
+        ProjectStatistics.COLLECTOR_NAME);
   }
 
   @Override
@@ -72,7 +74,13 @@ public class PercentRecoverablePFClusterProjectTest extends AbstractProjectTest 
       final long pfClusterCount = data.getLong(pfClusterSumKey);
 
       // Set recoverable raw cluster sum for a project
-      final long recoveryCount = data.getLong(recoveryCountKey);
+      final long recoveryCount;
+
+      if (data.get(recoveryCountKey)==null) {
+        recoveryCount = 0;
+      } else {
+        recoveryCount = data.getLong(recoveryCountKey);
+      }
 
       // Compute percent
       final double percent = (double) recoveryCount / (double) pfClusterCount;
