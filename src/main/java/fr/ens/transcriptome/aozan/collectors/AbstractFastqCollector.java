@@ -453,18 +453,11 @@ public abstract class AbstractFastqCollector implements Collector {
           final String laneBarcode = data
               .get("demux.lane" + lane + ".sample.lane" + lane + ".barcode");
 
-          final List<String> samplesInLane =
-              data.getSamplesNameListInLane(lane);
-          final String sampleIndex = samplesInLane.size() == 1
-              ? data.getSampleIndex(lane, samplesInLane.get(0)) : "";
-
-          if (laneBarcode != null
-              && !(samplesInLane.size() == 1 && "".equals(sampleIndex))) {
+          if (laneBarcode != null && data.isUndeterminedInLane(lane)) {
 
             // Add undetermined sample
             this.fastqSamples.add(new FastqSample(samplesheet,
                 this.casavaOutputPath, readIndexedCount, lane));
-
           }
         }
       } // Lane

@@ -24,6 +24,7 @@
 package fr.ens.transcriptome.aozan;
 
 import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingFile;
+import static com.google.common.base.Strings.nullToEmpty;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -111,6 +112,31 @@ public class RunData {
     return (res == null
         ? false : res.trim().toLowerCase(Globals.DEFAULT_LOCALE)
             .equals("undetermined"));
+  }
+
+  /**
+   * Check if undetermined FASTQ file exist for a lane.
+   * @param lane the lane
+   * @return true if if undetermined FASTQ file exist for a lane
+   */
+  public boolean isUndeterminedInLane(final int lane) {
+
+    final List<String> samplesInLane = this.getSamplesNameListInLane(lane);
+
+    switch (samplesInLane.size()) {
+
+    case 0:
+      return true;
+
+    case 1:
+      final String sampleIndex =
+          nullToEmpty(getSampleIndex(lane, samplesInLane.get(0)));
+
+      return !"".equals(sampleIndex.trim());
+
+    default:
+      return true;
+    }
   }
 
   /**

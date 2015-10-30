@@ -106,7 +106,9 @@ public class SampleStatistics extends StatisticsCollector {
       }
 
       // Update Statistics on undetermined sample on each lane
-      samples.get(UNDETERMINED_SAMPLE).addEntity(lane, "lane" + lane);
+      if (data.isUndeterminedInLane(lane)) {
+        samples.get(UNDETERMINED_SAMPLE).addEntity(lane, "lane" + lane);
+      }
     }
 
     // Sorted list project
