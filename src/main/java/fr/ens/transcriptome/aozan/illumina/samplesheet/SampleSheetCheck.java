@@ -40,12 +40,6 @@ public class SampleSheetCheck {
 
     if (samplesheet.size() == 0) {
 
-      // Allow empty samplesheet for bcl2fastq 2 samplesheets
-      if (samplesheet.getVersion() == 2) {
-        return Collections
-            .singletonList("No samples found in the samplesheet.");
-      }
-
       throw new AozanException("No samples found in the samplesheet.");
     }
 
