@@ -151,9 +151,8 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
 
             // Create Tile stats for new group tiles related tuple
             // sample/barecode/lane
-            final GroupTilesStats stats =
-                new GroupTilesStats(projectName, sampleName, laneNumber,
-                    readIndexedCount);
+            final GroupTilesStats stats = new GroupTilesStats(projectName,
+                sampleName, laneNumber, readIndexedCount);
 
             // Add tiles data
             stats.addTilesStats(lane, checkBarcodeSeq(barcodeSeq));
@@ -237,17 +236,27 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
     private long yieldQ30Sum = 0;
     private long qualityScoreSum = 0;
 
+    // public void add(final Element data, final long clusterCount) {
+    //
+    // this.yieldSum += Long.parseLong(getTagValue(data, "Yield"));
+    // this.yieldQ30Sum += Long.parseLong(getTagValue(data, "YieldQ30"));
+    // this.qualityScoreSum +=
+    // Long.parseLong(getTagValue(data, "QualityScoreSum"));
+    //
+    // this.clusterSum += clusterCount;
+    // }
+
     /**
      * Adds a tile statistics data.
      * @param data the tiles elements.
      * @param clusterCount the cluster count for a tile.
      */
-    public void add(final Element data, final long clusterCount) {
+    public void add(final long yield, final long yieldQ30,
+        final long qualityScore, final long clusterCount) {
 
-      this.yieldSum += Long.parseLong(getTagValue(data, "Yield"));
-      this.yieldQ30Sum += Long.parseLong(getTagValue(data, "YieldQ30"));
-      this.qualityScoreSum +=
-          Long.parseLong(getTagValue(data, "QualityScoreSum"));
+      this.yieldSum += yield;
+      this.yieldQ30Sum += yieldQ30;
+      this.qualityScoreSum += qualityScore;
 
       this.clusterSum += clusterCount;
     }
@@ -260,32 +269,32 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
      * Gets the yield sum.
      * @return the yield sum
      */
-    public String getYieldSum() {
-      return this.yieldSum + "";
+    public long getYieldSum() {
+      return this.yieldSum;
     }
 
     /**
      * Gets the yield q30 sum.
      * @return the yield q30 sum
      */
-    public String getYieldQ30Sum() {
-      return this.yieldQ30Sum + "";
+    public long getYieldQ30Sum() {
+      return this.yieldQ30Sum;
     }
 
     /**
      * Gets the quality score sum.
      * @return the quality score sum
      */
-    public String getQualityScoreSum() {
-      return this.qualityScoreSum + "";
+    public long getQualityScoreSum() {
+      return this.qualityScoreSum;
     }
 
     /**
      * Gets the cluster sum.
      * @return the cluster sum
      */
-    public String getClusterSum() {
-      return this.clusterSum + "";
+    public long getClusterSum() {
+      return this.clusterSum;
     }
 
     //
@@ -395,10 +404,11 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
         readStats.put(key, new ReadStats(type, read));
       }
 
-      // Add value
-      final Element e = t.getElementRead(type, read);
-      readStats.get(key).add(e, clusterCount);
+      final long yield = t.getYield(type, read);
+      final long yieldQ30 = t.getYieldQ30(type, read);
+      final long qualityScoreSum = t.getQualityScoreSum(type, read);
 
+      readStats.get(key).add(yield, yieldQ30, qualityScoreSum, clusterCount);
     }
 
     //
@@ -494,16 +504,6 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
       runData.put(prefix + ".yield", stats.getYieldSum());
       runData.put(prefix + ".yield.q30", stats.getYieldQ30Sum());
       runData.put(prefix + ".quality.score.sum", stats.getQualityScoreSum());
-
-      // TODO to remove after test
-      // final String debug =
-      // String.format("%s;%s;%s;%s;lane%s;read%s;%s", "debug", projectName,
-      // sampleName, barcodeSeq, lane, stats.readNumber, stats.type);
-      // runData.put(debug + ".cluster.count", stats.getClusterSum());
-      // runData.put(debug + ".yield", stats.getYieldSum());
-      // runData.put(debug + ".yield.q30", stats.getYieldQ30Sum());
-      // runData.put(debug + ".quality.score.sum", stats.getQualityScoreSum());
-
     }
 
     //
@@ -540,6 +540,30 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
     private final long clusterCountPF;
     private final long clusterCountRaw;
 
+    public long getYield(final String type, final int readNumber)
+        throws AozanException {
+
+      final Element e = getElementRead(type, readNumber);
+
+      return Long.parseLong(getTagValue(e, "Yield"));
+    }
+
+    public long getYieldQ30(final String type, final int readNumber)
+        throws AozanException {
+
+      final Element e = getElementRead(type, readNumber);
+
+      return Long.parseLong(getTagValue(e, "YieldQ30"));
+    }
+
+    public long getQualityScoreSum(final String type, final int readNumber)
+        throws AozanException {
+
+      final Element e = getElementRead(type, readNumber);
+
+      return Long.parseLong(getTagValue(e, "QualityScoreSum"));
+    }
+
     /**
      * Gets the element read according to the type (raw pr pf) and read number.
      * @param type the type
@@ -547,7 +571,7 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
      * @return the element read
      * @throws AozanException the aozan exception
      */
-    public Element getElementRead(final String type, final int readNumber)
+    private Element getElementRead(final String type, final int readNumber)
         throws AozanException {
 
       // Extract element related to the required type
@@ -556,6 +580,12 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
       // Find element read to the required read number
       for (Element readElem : getElementsByTagName(typeElem, "Read")) {
         final String readAtt = readElem.getAttribute("number").trim();
+
+        // Patch for bc2fastq2 when no index is set
+        // TODO Remove this when bcl2fastq will be fixed
+        if (readAtt.length() > 1 && readNumber == 1) {
+          return readElem;
+        }
 
         if (readAtt.equals(readNumber + "")) {
 
