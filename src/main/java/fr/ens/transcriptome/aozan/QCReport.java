@@ -628,12 +628,12 @@ public class QCReport {
     for (int lane = 1; lane <= laneCount; lane++) {
       // Add all samples names by lane and ignore replica
       names.addAll(this.data.getSamplesNameListInLane(lane));
+
+      // Add Undetermined sample
+      if (this.data.isUndeterminedInLane(lane)) {
+        names.add(SampleStatistics.UNDETERMINED_SAMPLE);
+      }
     }
-
-    // Add Undetermined sample
-    names.add(SampleStatistics.UNDETERMINED_SAMPLE);
-
-    // Sorted samples set
 
     return Collections.unmodifiableList(new ArrayList<>(names));
   }

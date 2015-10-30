@@ -242,7 +242,8 @@ public class EntityStat implements Comparable<EntityStat> {
     final String name = (isUndeterminedSample() ? null : sample);
 
     // Check collector is selected
-    if (this.statisticsCollector.isUndeterminedIndexesCollectorSelected()) {
+    if (this.statisticsCollector.isUndeterminedIndexesCollectorSelected()
+        && this.data.isUndeterminedInLane(lane) ) {
 
       // Check if lane is indexed
       if (this.data.isLaneIndexed(lane)) {
