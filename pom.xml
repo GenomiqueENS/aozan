@@ -4,7 +4,7 @@
 
   <groupId>fr.ens.transcriptome</groupId>
   <artifactId>aozan</artifactId>
-  <version>2.0-rc5-SNAPSHOT</version>
+  <version>2.0-rc5</version>
   <packaging>jar</packaging>
 
   <name>Aozan</name>

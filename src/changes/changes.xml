@@ -495,5 +495,20 @@
 			</action>
 		</release>
 
+		<release version="2.0-rc5" description="Aozan 2.0-rc5 release"  date="2015-10-31">
+			<action dev="jourdren" type="fix">
+				Do not search for undetermined fastq files in lanes where there is only one sample without index.
+			</action>
+			<action dev="jourdren" type="fix">
+				Bcl2fastq 2 output is bugged: Read number attritute in ConversionStats.xml is random for the first read when no index is set in the lane.
+			</action>
+			<action dev="jourdren" type="fix">
+				Update Illumina FASTQ header parser to allow headers with index that are not a nucleotide sequence.
+			</action>
+			<action dev="jourdren" type="fix">
+				Several fixes to avoid craches when no undetermined FASTQ exists when collect data or process tests in the QC step.
+			</action>
+		</release>
+
 	</body>
 </document>

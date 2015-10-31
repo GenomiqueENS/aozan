@@ -20,7 +20,7 @@ RUN yum install -y tar.x86_64
 RUN mkdir /aozan_data
 
 # Install Aozan public version
-ADD https://github.com/GenomicParisCentre/aozan/releases/download/v2.0-rc4/aozan-2.0-rc4.tar.gz /tmp/
+ADD https://github.com/GenomicParisCentre/aozan/releases/download/v2.0-rc5/aozan-2.0-rc5.tar.gz /tmp/
 
 RUN cd /usr/local && tar xvzf /tmp/aozan-*.tar.gz && rm /tmp/aozan-*.tar.gz
 
