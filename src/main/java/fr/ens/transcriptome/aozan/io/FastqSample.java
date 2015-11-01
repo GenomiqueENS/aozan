@@ -125,8 +125,7 @@ public class FastqSample {
       final List<File> fastqFiles) {
 
     if (fastqFiles.isEmpty()) {
-      throw new AozanRuntimeException(
-          "Fastq Sample, no fastq file found for sample ");
+      throw new IllegalArgumentException("fastqFiles argument cannot be empty");
     }
 
     if (fastqFiles.get(0).getName().endsWith(FASTQ_EXTENSION)) {
@@ -186,8 +185,15 @@ public class FastqSample {
    */
   private List<File> createListFastqFiles(final int read) {
 
-    return this.bcl2fastqOutput.createListFastqFiles(this, read);
+    final List<File> result =
+        this.bcl2fastqOutput.createListFastqFiles(this, read);
 
+    if (result.isEmpty()) {
+      throw new AozanRuntimeException(
+          "No fastq file found for sample: " + this);
+    }
+
+    return result;
   }
 
   /**
