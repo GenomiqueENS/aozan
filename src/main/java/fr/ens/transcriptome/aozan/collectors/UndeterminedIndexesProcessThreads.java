@@ -615,9 +615,17 @@ public class UndeterminedIndexesProcessThreads extends
           return;
         }
 
-        this.rawUndeterminedIndices.add(irid.getSequenceIndex());
+        final String index = irid.getSequenceIndex();
+
+        // Process only nucleotides sequences
+        if (index == null
+            || index.isEmpty() || Character.isDigit(index.charAt(0))) {
+          continue;
+        }
+
+        this.rawUndeterminedIndices.add(index);
         if (!irid.isFiltered()) {
-          this.pfUndeterminedIndices.add(irid.getSequenceIndex());
+          this.pfUndeterminedIndices.add(index);
         }
       }
 
@@ -1168,7 +1176,8 @@ public class UndeterminedIndexesProcessThreads extends
     Preconditions.checkNotNull(a, "a cannot be null");
     Preconditions.checkNotNull(b, "b cannot be null");
     Preconditions.checkArgument(a.length() == b.length(),
-        "The length of the 2 String must be equals");
+        "The length of the 2 String must be equals (a=" + a + ", b=" + b + ")");
+
 
     final int len = a.length();
     int result = 0;
