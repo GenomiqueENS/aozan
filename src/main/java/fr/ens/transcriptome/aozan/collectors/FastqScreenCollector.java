@@ -181,22 +181,29 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     final boolean isPairedMode = isRunPE && !this.ignorePairedMode;
 
     // Retrieve genome sample from run data
-    final String genomeSample = data.get("design.lane"
+    final String sampleRef = data.get("design.lane"
         + fastqSample.getLane() + "." + fastqSample.getSampleName()
         + ".sample.ref");
 
-    // Get corresponding valid genome name for mapping
-    final String genomeReferenceSample = FastqScreenGenomeMapper.getInstance()
-        .getGenomeReferenceCorresponding(genomeSample);
+    final String sampleGenomeName;
+    if (sampleRef != null) {
 
-    Common.getLogger().info("FQS-extract genomeRef for sample "
-        + fastqSample.getSampleName() + " find name " + genomeSample
-        + " search related name in genome available on mapping "
-        + (genomeReferenceSample == null ? "NoFOUND" : genomeReferenceSample));
+      // Get corresponding valid genome name for mapping
+      sampleGenomeName = FastqScreenGenomeMapper.getInstance()
+          .getGenomeNameFromAlias(sampleRef);
 
-    // Genome can be use for mapping
-    if (genomeReferenceSample != null) {
-      genomesForMapping.add(genomeReferenceSample);
+      Common.getLogger()
+          .info("FQS-extract genomeRef for sample "
+              + fastqSample.getSampleName() + " find name " + sampleRef
+              + " search related name in genome available on mapping "
+              + (sampleGenomeName == null ? "NoFOUND" : sampleGenomeName));
+
+      // Genome can be use for mapping
+      if (sampleGenomeName != null) {
+        genomesForMapping.add(sampleGenomeName);
+      }
+    } else {
+      sampleGenomeName = null;
     }
 
     // In mode paired FastqScreen should be launched with R1 and R2
@@ -210,7 +217,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
         if (fastqSampleR2.getKeyFastqSample().equals(prefixRead2)) {
 
           return new FastqScreenProcessThread(fastqSample, fastqSampleR2,
-              this.fastqscreen, data, genomesForMapping, genomeReferenceSample,
+              this.fastqscreen, data, genomesForMapping, sampleGenomeName,
               reportDir, isPairedMode, isRunPE, this.fastqscreenXSLFile);
         }
       }
@@ -218,8 +225,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
     // Call with a mode single-end for mapping
     return new FastqScreenProcessThread(fastqSample, this.fastqscreen, data,
-        genomesForMapping, genomeReferenceSample, reportDir, isPairedMode,
-        isRunPE, this.fastqscreenXSLFile);
+        genomesForMapping, sampleGenomeName, reportDir, isPairedMode, isRunPE,
+        this.fastqscreenXSLFile);
   }
 
   /**

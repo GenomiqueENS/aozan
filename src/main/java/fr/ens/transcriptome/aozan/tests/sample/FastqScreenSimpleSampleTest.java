@@ -107,7 +107,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     try {
       genomeSampleReference =
           FastqScreenGenomeMapper.getInstance()
-              .getGenomeReferenceCorresponding(genomeSample);
+              .getGenomeNameFromAlias(genomeSample);
     } catch (final AozanException e) {
     }
 

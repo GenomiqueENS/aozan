@@ -24,6 +24,7 @@
 package fr.ens.transcriptome.aozan.fastqscreen;
 
 import static fr.ens.transcriptome.eoulsan.EoulsanRuntime.getSettings;
+import static jersey.repackaged.com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -89,7 +90,7 @@ public class FastqScreenGenomeMapper {
   private final Map<String, String> genomesNamesConvertor;
 
   // Associated genome name from design file with valid genome call for mapping
-  private final Map<String, String> genomesReferencesSampleRenamed;
+  private final Map<String, String> genomesAliases;
 
   private final Set<String> genomesToMapping;
 
@@ -124,7 +125,7 @@ public class FastqScreenGenomeMapper {
       if (gdesc != null) {
         // Genome description exist for the genome
         genomes.add(genome);
-        this.genomesReferencesSampleRenamed.put(genome, genome);
+        this.genomesAliases.put(genome, genome);
 
       } else {
         // Parse alias file to find a valid genome name
@@ -137,7 +138,7 @@ public class FastqScreenGenomeMapper {
         } else {
           // Replace genome name from design file by valid name
           genomes.add(aliasGenomeName);
-          this.genomesReferencesSampleRenamed.put(genome, aliasGenomeName);
+          this.genomesAliases.put(genome, aliasGenomeName);
         }
       }
     }
@@ -164,10 +165,7 @@ public class FastqScreenGenomeMapper {
   public GenomeDescription createGenomeDescription(final DataFile genomeFile)
       throws BadBioEntryException, IOException {
 
-    // if (!genomeFile.exists()) {
-    // LOGGER
-    // .warning("Fastqscreen " + genomeFile.getBasename() + " not exists.");
-    // }
+    checkNotNull(genomeFile, "genomeFile argument cannot be null");
 
     GenomeDescription desc = null;
 
@@ -390,12 +388,14 @@ public class FastqScreenGenomeMapper {
    * @return reference genome corresponding to genome if it exists or empty
    *         string or null if no genome exist.
    */
-  public String getGenomeReferenceCorresponding(final String genome) {
+  public String getGenomeNameFromAlias(final String genome) {
+
+    checkNotNull(genome, "genome argument cannot be null");
 
     final String genomeTrimmed =
         genome.replaceAll("\"", "").trim().toLowerCase();
 
-    return this.genomesReferencesSampleRenamed.get(genomeTrimmed);
+    return this.genomesAliases.get(genomeTrimmed);
 
   }
 
@@ -413,6 +413,9 @@ public class FastqScreenGenomeMapper {
    * @return true if is a genome contaminant otherwise false
    */
   public boolean isGenomeContamination(final String genome) {
+
+    checkNotNull(genome, "genome argument cannot be null");
+
     return this.genomesContaminants.contains(genome);
   }
 
@@ -433,6 +436,8 @@ public class FastqScreenGenomeMapper {
    */
   public static FastqScreenGenomeMapper getInstance(
       final Map<String, String> props) throws AozanException {
+
+    checkNotNull(props, "props argument cannot be null");
 
     if (singleton == null) {
       singleton = new FastqScreenGenomeMapper(props);
@@ -466,7 +471,10 @@ public class FastqScreenGenomeMapper {
    */
   private FastqScreenGenomeMapper(final Map<String, String> props)
       throws AozanException {
-    this.properties = props;
+
+    checkNotNull(props, "props argument cannot be null");
+
+    this.properties = new HashMap<>(props);
 
     // Init setting of eoulsan to access on storage genome objects
     final fr.ens.transcriptome.eoulsan.Settings settings = getSettings();
@@ -500,7 +508,7 @@ public class FastqScreenGenomeMapper {
 
     // Correspondance between initial genome name and valid genome name for
     // mapping
-    this.genomesReferencesSampleRenamed = new HashMap<>();
+    this.genomesAliases = new HashMap<>();
 
     // Collect genomes useful to contaminant detection
     this.genomesToMapping = this.collectGenomesForMapping();
