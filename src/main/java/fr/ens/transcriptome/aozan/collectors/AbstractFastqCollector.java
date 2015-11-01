@@ -23,6 +23,7 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.transcriptome.aozan.util.StringUtils.stackTraceToString;
 
 import java.io.File;
@@ -206,6 +207,8 @@ public abstract class AbstractFastqCollector implements Collector {
   @Override
   public void configure(final Properties properties) {
 
+    checkNotNull(properties, "properties argument cannot be null");
+
     this.casavaOutputPath =
         new File(properties.getProperty(QC.CASAVA_OUTPUT_DIR));
     this.qcReportOutputPath =
@@ -235,6 +238,8 @@ public abstract class AbstractFastqCollector implements Collector {
    */
   @Override
   public void collect(final RunData data) throws AozanException {
+
+    checkNotNull(data, "data argument cannot be null");
 
     final SampleSheet samplesheet;
 
