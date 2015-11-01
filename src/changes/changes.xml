@@ -510,5 +510,17 @@
 			</action>
 		</release>
 
+		<release version="2.0-rc6" description="Aozan 2.0-rc6 release"  date="2015-11-01">
+			<action dev="jourdren" type="fix">
+				Fix FASTQ filename creation from samplesheet for bcl2fastq 2 output.
+			</action>
+			<action dev="jourdren" type="fix">
+				Fix NullPointerException when no genome reference is defined for sample..
+			</action>
+			<action dev="jourdren" type="fix">
+				For clusting recovering, do not process undetermined Illumina sequences without index nucleotide sequence in FASTQ header.
+			</action>
+		</release>
+
 	</body>
 </document>
