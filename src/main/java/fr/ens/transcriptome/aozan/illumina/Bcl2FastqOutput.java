@@ -14,6 +14,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
+import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.Sample;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
@@ -295,32 +296,41 @@ public class Bcl2FastqOutput {
    * @param fastqSample the fastq sample
    * @return the position of the sample in the samplesheet lane
    */
-  private static int extractSamplePositionInSampleSheetLane(final SampleSheet samplesheet,
-      final FastqSample fastqSample) {
-
-    if (samplesheet == null) {
-      throw new NullPointerException("samplesheet argument cannot be null");
-    }
+  private static int extractSamplePositionInSampleSheetLane(
+      final SampleSheet samplesheet, final FastqSample fastqSample) {
 
     if (fastqSample == null) {
       throw new NullPointerException("fastqSample argument cannot be null");
     }
-
-    final int lane = fastqSample.getLane();
-    final String sampleName = fastqSample.getSampleName();
 
     // Undetermined cases always return 0
     if (fastqSample.isIndeterminedIndices()) {
       return 0;
     }
 
+    return extractSamplePositionInSampleSheetLane(samplesheet,
+        fastqSample.getSampleName());
+  }
+
+  /**
+   * Extract sample position in a lane of the samplesheet.
+   * @param sampleName the sample sample
+   * @return the position of the sample in the samplesheet lane
+   */
+  private static int extractSamplePositionInSampleSheetLane(
+      final SampleSheet samplesheet, final String sampleName) {
+
+    if (samplesheet == null) {
+      throw new NullPointerException("samplesheet argument cannot be null");
+    }
+
+    if (sampleName == null) {
+      throw new NullPointerException("sampleName argument cannot be null");
+    }
+
     int i = 0;
 
     for (Sample sample : samplesheet) {
-
-      if (lane > 0 && sample.getLane() != lane) {
-        continue;
-      }
 
       i++;
 
