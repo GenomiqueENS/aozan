@@ -497,7 +497,7 @@ def exception_msg(exp, conf):
     """
 
     if is_conf_value_equals_true(AOZAN_DEBUG_KEY, conf):
-        return ' withTrace \n\t' + str(exp.getClass().getName()) + ': ' + str(exp.getMessage()) + '\n' + StringUtils.stackTraceToString(exp)
+        return str(exp.getClass().getName()) + ': ' + str(exp.getMessage()) + '\n' + StringUtils.stackTraceToString(exp)
     else:
         return str(exp.getMessage())
 
