@@ -522,5 +522,14 @@
 			</action>
 		</release>
 
+		<release version="2.0-rc7" description="Aozan 2.0-rc7 release"  date="2015-11-03">
+			<action dev="jourdren" type="update">
+				In the Sample class, rename getProject() to getSampleProject() and isProjectField() to isSampleProjectField().
+			</action>
+			<action dev="jourdren" type="update">
+				For debugging, save a snapshot of the run data information after the end of each collector.
+			</action>
+		</release>
+
 	</body>
 </document>
