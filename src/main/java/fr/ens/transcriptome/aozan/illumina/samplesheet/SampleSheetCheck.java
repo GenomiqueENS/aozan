@@ -101,9 +101,9 @@ public class SampleSheetCheck {
       }
 
       // Check sample project
-      if (sample.isProjectField()) {
-        checkSampleProject(sample.getProject());
-        checkCharset(sample.getProject());
+      if (sample.isSampleProjectField()) {
+        checkSampleProject(sample.getSampleProject());
+        checkCharset(sample.getSampleProject());
       }
 
       final String index;
@@ -157,8 +157,8 @@ public class SampleSheetCheck {
       }
 
       // Check sample and project
-      if (sample.isProjectField()) {
-        checkSampleAndProject(sample.getSampleId(), sample.getProject(),
+      if (sample.isSampleProjectField()) {
+        checkSampleAndProject(sample.getSampleId(), sample.getSampleProject(),
             sample.getLane(), sampleInLanes, samplesProjects, warnings);
       }
 

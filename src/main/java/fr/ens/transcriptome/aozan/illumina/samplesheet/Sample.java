@@ -88,7 +88,7 @@ public class Sample {
    * Get the project related to the sample.
    * @return the project related to the sample
    */
-  public String getProject() {
+  public String getSampleProject() {
 
     return this.map.get(PROJECT_FIELD_NAME);
   }
@@ -280,7 +280,7 @@ public class Sample {
    * Test if the project field exists for the sample.
    * @return true if the field exists
    */
-  public boolean isProjectField() {
+  public boolean isSampleProjectField() {
 
     return isField(PROJECT_FIELD_NAME);
   }

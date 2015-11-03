@@ -112,7 +112,7 @@ public class DesignCollector implements Collector {
         data.put(prefix + ".indexed", s.isIndexed());
         data.put(prefix + ".index", s.getIndex1());
         data.put(prefix + ".description", s.getDescription());
-        data.put(prefix + ".sample.project", s.getProject());
+        data.put(prefix + ".sample.project", s.getSampleProject());
 
         if (s.isDualIndexed()) {
           data.put(prefix + ".index2", s.getIndex2());
@@ -160,7 +160,7 @@ public class DesignCollector implements Collector {
         samplesInLane.add(s.getSampleId());
 
         // List projects in run
-        projectsName.add(s.getProject());
+        projectsName.add(s.getSampleProject());
       }
 
       // List samples by lane

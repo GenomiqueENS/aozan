@@ -69,7 +69,7 @@ public class SampleSheetUtils {
       sb.append(SEPARATOR);
       sb.append(quote(s.get("Operator").trim()));
       sb.append(SEPARATOR);
-      sb.append(quote(s.getProject()));
+      sb.append(quote(s.getSampleProject()));
 
       sb.append('\n');
 

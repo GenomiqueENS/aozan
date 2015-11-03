@@ -291,7 +291,7 @@ public class SampleSheetReaderTest extends TestCase {
     assertEquals("Sample description", expected.getDescription(),
         tested.getDescription());
     assertEquals("Sample project", expected.getSampleProject(),
-        tested.getProject());
+        tested.getSampleProject());
     assertEquals("Sample index", expected.getIndex(),
         Strings.nullToEmpty(tested.getIndex1()));
 
@@ -322,7 +322,7 @@ public class SampleSheetReaderTest extends TestCase {
       assertEquals("Sample description", expected.getDescription(),
           s.getDescription());
       assertEquals("Sample project", expected.getSampleProject(),
-          s.getProject());
+          s.getSampleProject());
       assertEquals("Sample index", expected.getIndex(), s.getIndex1());
 
       assertEquals("Sample lane", expected.getLane(), s.getLane());

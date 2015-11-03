@@ -355,7 +355,7 @@ public class ReDemux {
 
       for (Map.Entry<Pattern, Sample> e : this.newIndexes.entrySet()) {
 
-        final String sampleProject = e.getValue().getProject();
+        final String sampleProject = e.getValue().getSampleProject();
         final String sampleName = e.getValue().getSampleId();
         final String sampleIndex = e.getValue().getIndex1();
 
@@ -394,7 +394,7 @@ public class ReDemux {
 
       for (Map.Entry<Pattern, Sample> e : this.newIndexes.entrySet()) {
 
-        final String sampleProject = e.getValue().getProject();
+        final String sampleProject = e.getValue().getSampleProject();
         final String sampleName = e.getValue().getSampleId();
         final String sampleIndex = e.getValue().getIndex1();
 
