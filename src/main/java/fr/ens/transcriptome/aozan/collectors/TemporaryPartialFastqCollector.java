@@ -203,6 +203,13 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
             + fastqSample.getLane() + ".sample." + fastqSample.getSampleName()
             + ".read" + fastqSample.getRead();
 
+    LOGGER.fine("In "
+        + COLLECTOR_NAME + " collector found: " + prefix + ".pf.cluster.count="
+        + data.get(prefix + ".pf.cluster.count"));
+    LOGGER.fine("In "
+        + COLLECTOR_NAME + " collector found: " + prefix + ".raw.cluster.count="
+        + data.get(prefix + ".raw.cluster.count"));
+
     // Check value exist in rundata, if not then fastq is empty
     if (data.get(prefix + ".pf.cluster.count") == null
         || data.get(prefix + ".raw.cluster.count") == null) {

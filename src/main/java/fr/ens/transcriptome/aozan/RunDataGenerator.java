@@ -26,6 +26,8 @@ package fr.ens.transcriptome.aozan;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -132,6 +134,19 @@ public class RunDataGenerator {
           + " end for run " + this.runId + " in "
           + toTimeHumanReadable(timerCollector.elapsed(TimeUnit.MILLISECONDS)));
 
+      final File qcDir =
+          new File(this.properties.getProperty(QC.QC_OUTPUT_DIR));
+      final File dataFile = new File(qcDir, collector.getName()
+          + '-' + System.currentTimeMillis() + ".snapshot.data");
+
+      LOGGER.fine("Write rundata to " + dataFile);
+
+      try {
+        data.createRunDataFile(dataFile);
+      } catch (IOException e) {
+        throw new AozanException(e);
+      }
+
     }
 
     for (final Collector collector : this.collectors) {
@@ -213,7 +228,8 @@ public class RunDataGenerator {
    * Public constructor.
    * @param runId
    */
-  public RunDataGenerator(final List<Collector> collectors, final String runId) {
+  public RunDataGenerator(final List<Collector> collectors,
+      final String runId) {
 
     checkNotNull(collectors, "The list of collectors is null");
 
