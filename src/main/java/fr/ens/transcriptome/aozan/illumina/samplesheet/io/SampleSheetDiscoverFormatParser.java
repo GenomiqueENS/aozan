@@ -10,16 +10,22 @@ import java.util.List;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 
+/**
+ * This class allow to discover the format of a samplesheet.
+ * @author Laurent Jourdren
+ * @since 2.0
+ */
 public class SampleSheetDiscoverFormatParser implements SampleSheetParser {
 
-  private static String[] SAMPLESHEET_V1_FIELDS =
-      {"FCID", "Lane", "SampleID", "SampleRef", "Index", "Description",
-          "Control", "Recipe", "Operator", "SampleProject"};
-
   private SampleSheetParser parser;
-  private final List<String> sampleSheetV1HearderFields =
-      Arrays.asList(SAMPLESHEET_V1_FIELDS);
   private final List<List<String>> cache = new ArrayList<>();
+
+  private final List<String> sampleSheetV1Hearder =
+      Arrays.asList("FCID", "Lane", "SampleID", "SampleRef", "Index",
+          "Description", "Control", "Recipe", "Operator", "SampleProject");
+
+  private final List<String> normalizedSampleSheetV1Hearder =
+      normalizeHeader(this.sampleSheetV1Hearder);
 
   @Override
   public void parseLine(final List<String> fields) throws IOException {
@@ -36,9 +42,15 @@ public class SampleSheetDiscoverFormatParser implements SampleSheetParser {
     }
 
     if (fields.get(0).startsWith("[")) {
+
       this.parser = new SampleSheetV2Parser();
-    } else if (this.sampleSheetV1HearderFields.equals(fields)) {
-      this.parser = new SampleSheetV1Parser();
+      this.parser.parseLine(fields);
+    } else {
+
+      if (this.normalizedSampleSheetV1Hearder.equals(normalizeHeader(fields))) {
+        this.parser = new SampleSheetV1Parser();
+        this.parser.parseLine(this.sampleSheetV1Hearder);
+      }
     }
 
     if (this.parser != null) {
@@ -50,9 +62,6 @@ public class SampleSheetDiscoverFormatParser implements SampleSheetParser {
 
       // Clear the cache
       this.cache.clear();
-
-      // Parse current fields
-      this.parser.parseLine(fields);
 
       return;
     }
@@ -69,6 +78,36 @@ public class SampleSheetDiscoverFormatParser implements SampleSheetParser {
     }
 
     return this.parser.getSampleSheet();
+  }
+
+  //
+  // Other methods
+  //
+
+  /**
+   * Normalize the header of a samplesheet.
+   * @param list a list with the field names of a samplesheet
+   * @return a list with the normalized field names
+   */
+  private static List<String> normalizeHeader(final List<String> list) {
+
+    if (list == null) {
+      throw new NullPointerException("list argument cannot be null");
+    }
+
+    final List<String> result = new ArrayList<>(list);
+
+    // Convert the bcl2fastq 1 samplesheet header to lower case
+    for (int i = 0; i < result.size(); i++) {
+
+      final String value = result.get(i);
+
+      if (value != null) {
+        result.set(i, value.trim().replaceAll("_", "").toLowerCase());
+      }
+    }
+
+    return result;
   }
 
 }
