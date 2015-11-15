@@ -86,14 +86,9 @@ def get_exclude_files_list(run_id, conf):
     if not common.is_conf_value_equals_true(SYNC_EXCLUDE_CIF_KEY, conf):
         return []
 
-    if common.is_sequencer_hiseq(run_id, conf):
-        return ['*.cif', '*_pos.txt', '*.errorMap', '*.FWHMMap']
+    # TODO exclude *bcl.bgzf.bci  with RTA 2 ?
+    return ['*.cif', '*_pos.txt', '*.errorMap', '*.FWHMMap']
 
-    if common.is_sequencer_nextseq(run_id, conf):
-        # TODO to identify "*bcl.bgzf.bci"
-        return []
-
-    return []
 
 def partial_sync(run_id, last_sync, conf):
     """Partial synchronization of a run.
