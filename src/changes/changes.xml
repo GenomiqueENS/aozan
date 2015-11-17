@@ -531,5 +531,14 @@
 			</action>
 		</release>
 
+		<release version="2.0-rc8" description="Aozan 2.0-rc8 release"  date="2015-11-17">
+			<action dev="jourdren" type="update">
+				The detection of the samplesheet V1 header is now case insensible and existing '_' characters are removed for the detection.
+			</action>
+			<action dev="jourdren" type="fix">
+				Now don't check RTA version of the run to avoid reading the runParameter.xml file when it has not been created while synchronizing runs.
+			</action>
+		</release>
+
 	</body>
 </document>
