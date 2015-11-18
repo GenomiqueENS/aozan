@@ -229,50 +229,6 @@ def unlock_partial_sync_step(conf, run_id):
     return unlock_sync_step(conf, run_id)
 
 
-def discover_new_run_TOREMOVE(conf):
-    """Discover new runs.
-
-    Arguments:
-        conf: configuration object
-    """
-
-    #
-    # Discover new run
-    #
-#
-#     first_base_report_sent = first_base_report.load_processed_run_ids(conf)
-#
-#     if common.is_conf_value_equals_true(FIRST_BASE_REPORT_STEP_KEY, conf):
-#         for run_id in (first_base_report.get_available_run_ids(conf) - first_base_report_sent):
-#             welcome(conf)
-#             common.log('INFO', 'First base report ' + run_id, conf)
-#             first_base_report.send_report(run_id, conf)
-#             first_base_report.add_run_id_to_processed_run_ids(run_id, conf)
-#             first_base_report_sent.add(run_id)
-#
-#             # Verify space needed during the first base report
-#             estimate_space_needed.estimate(run_id, conf)
-#
-#     #
-#     # Discover hiseq run done
-#     #
-#
-#     hiseq_run_ids_done = hiseq_run.load_processed_run_ids(conf)
-#
-#     if common.is_conf_value_equals_true(HISEQ_STEP_KEY, conf):
-#         for run_id in (hiseq_run.get_available_run_ids(conf) - hiseq_run_ids_done):
-#             welcome(conf)
-#             common.log('INFO', 'Discover ' + run_id, conf)
-#
-#             if hiseq_run.create_run_summary_reports(run_id, conf):
-#                 hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
-#                 hiseq_run.add_run_id_to_processed_run_ids(run_id, conf)
-#                 hiseq_run_ids_done.add(run_id)
-#             else:
-#                 raise Exception('Create run summary report for new discovery run ' + run_id)
-#
-#     return hiseq_run_ids_done
-
 def launch_steps(conf):
     """Launch steps.
 
@@ -284,17 +240,15 @@ def launch_steps(conf):
 
     # Discover new runs
     hiseq_run_ids_done = detection_new_run.discover_new_run(conf)
-    #print 'DEBUG launchStep run done '+ str(hiseq_run_ids_done)
 
     # Load run do not process
     hiseq_run_ids_do_not_process = hiseq_run.load_deny_run_ids(conf)
-    #print 'DEBUG launchStep run deny '+ str(hiseq_run_ids_do_not_process)
+
     #
     # Sync hiseq and storage
     #
 
     sync_run_ids_done = sync_run.load_processed_run_ids(conf)
-    #print 'DEBUG launchStep sync done '+ str(sync_run_ids_done)
 
     # Get the list of run available on HiSeq output
     if sync_run.is_sync_step_enable(conf):
@@ -323,12 +277,6 @@ def launch_steps(conf):
 
             sync_run.error("Fail synchronization for run " + run_id + ", catch exception " + exception_msg,
                            "Fail synchronization for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg, conf)
-
-
-    # Check if new run appears while sync step
-    if  sync_run.is_sync_step_enable(conf) and len(detection_new_run.discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
-        #print 'DEBUG New run discovery relaunch steps at the start'
-        return launch_steps(conf)
 
     #
     # Demultiplexing
@@ -367,19 +315,11 @@ def launch_steps(conf):
             demux_run.error("Fail demultiplexing for run " + run_id + ", catch exception " + exception_msg,
                             "Fail demultiplexing for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg, conf)
 
-
-    # Check if new run appears while demux step
-    if common.is_conf_value_equals_true(DEMUX_STEP_KEY, conf) and len(detection_new_run.discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
-        #print 'DEBUG New run discovery relaunch steps at the start'
-        return launch_steps(conf)
-
     #
     # Quality control
     #
 
     qc_run_ids_done = qc_run.load_processed_run_ids(conf)
-    #print 'DEBUG launchStep qc done '+ str(qc_run_ids_done)
-    #print 'DEBUG runs to qc '+ str(demux_run_ids_done - qc_run_ids_done)
 
     if common.is_conf_value_equals_true(QC_STEP_KEY, conf):
 
@@ -405,13 +345,6 @@ def launch_steps(conf):
             traceback_msg = traceback.format_exc(sys.exc_info()[2])
             qc_run.error("Fail quality control for run " + run_id + ", catch exception " + exception_msg,
                            "Fail quality control for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg, conf)
-
-
-    # Check if new run appears while quality control step
-    if common.is_conf_value_equals_true(QC_STEP_KEY, conf) and len(detection_new_run.discover_new_run(conf) - sync_run_ids_done - hiseq_run.load_deny_run_ids(conf)) > 0:
-        #print 'DEBUG New run discovery relaunch steps at the start'
-        # TODO
-        return launch_steps(conf)
 
     #
     # Partial synchronization
