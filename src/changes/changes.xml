@@ -540,5 +540,11 @@
 			</action>
 		</release>
 
+		<release version="2.0-rc9" description="Aozan 2.0-rc9 release"  date="2015-11-18">
+			<action dev="jourdren" type="update">
+				Remove synchronization of runs that had just finished after the end of each step. This feature is now unnecessary with the partial synchronization feature.
+			</action>
+		</release>
+
 	</body>
 </document>
