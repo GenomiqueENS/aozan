@@ -27,14 +27,11 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
-import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.illumina.Bcl2FastqOutput;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
@@ -53,9 +50,6 @@ public class FastqSample {
   public static final String FASTQ_EXTENSION = ".fastq";
 
   private static final String NO_INDEX = "NoIndex";
-
-  /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
 
   private final int read;
   private final int lane;
