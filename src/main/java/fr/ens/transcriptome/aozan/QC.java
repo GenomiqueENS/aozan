@@ -128,7 +128,7 @@ public class QC {
    * @return the FASTQ directory of the run
    */
   public File getFastqDir() {
-    return this.bclDir;
+    return this.fastqDir;
   }
 
   /**
