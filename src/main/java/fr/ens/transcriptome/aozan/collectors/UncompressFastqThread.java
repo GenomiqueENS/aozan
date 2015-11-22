@@ -34,7 +34,6 @@ import java.util.logging.Logger;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.io.FastqSample;
-import fr.ens.transcriptome.aozan.io.FastqStorage;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
@@ -86,10 +85,9 @@ class UncompressFastqThread extends AbstractFastqProcessThread {
   protected void processResults() throws AozanException {
 
     final File tmpFastqFile = new File(
-        getFastqStorage().getTemporaryFile(getFastqSample()).getAbsolutePath()
-            + ".tmp");
+        getFastqSample().getPartialFile().getAbsolutePath() + ".tmp");
 
-    if (!getFastqStorage().getTemporaryFile(getFastqSample()).exists()) {
+    if (!getFastqSample().getPartialFile().exists()) {
       // Uncompresses and compiles files of array in new temporary files
 
       try {
@@ -122,8 +120,7 @@ class UncompressFastqThread extends AbstractFastqProcessThread {
     this.sizeFile = this.sizeFile / (1024 * 1024 * 1024);
 
     // Rename file for remove '.tmp' final
-    if (!tmpFastqFile
-        .renameTo(getFastqStorage().getTemporaryFile(getFastqSample()))) {
+    if (!tmpFastqFile.renameTo(getFastqSample().getPartialFile())) {
       LOGGER.warning("Uncompress Fastq : fail to rename tmp fastq file "
           + getFastqSample());
     }
@@ -145,10 +142,10 @@ class UncompressFastqThread extends AbstractFastqProcessThread {
    * @throws AozanException if an error occurs while creating sequence file for
    *           FastQC
    */
-  public UncompressFastqThread(final FastqSample fastqSample,
-      final FastqStorage fastqStorage) throws AozanException {
+  public UncompressFastqThread(final FastqSample fastqSample)
+      throws AozanException {
 
-    super(fastqSample, fastqStorage);
+    super(fastqSample);
   }
 
 }

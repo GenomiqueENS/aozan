@@ -59,7 +59,6 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.fastqc.BadTiles;
 import fr.ens.transcriptome.aozan.io.FastqSample;
-import fr.ens.transcriptome.aozan.io.FastqStorage;
 
 /**
  * This private class define a class for a thread that read fastq file for
@@ -272,10 +271,10 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
    *           FastQC
    */
   public FastQCProcessThread(final FastqSample fastqSample,
-      final FastqStorage fastqStorage, final boolean ignoreFilteredSequences,
-      final File reportDir) throws AozanException {
+      final boolean ignoreFilteredSequences, final File reportDir)
+          throws AozanException {
 
-    super(fastqSample, fastqStorage);
+    super(fastqSample);
 
     this.ignoreFilteredSequences = ignoreFilteredSequences;
     this.reportDir = reportDir;

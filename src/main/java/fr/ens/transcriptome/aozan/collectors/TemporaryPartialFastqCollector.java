@@ -184,7 +184,7 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
     }
 
     // Check if the temporary partial fastq file exists
-    if (getFastqStorage().tmpFileExists(fastqSample)) {
+    if (fastqSample.isPartialFileExists()) {
       return null;
     }
 
@@ -217,9 +217,8 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
     final int rawClusterCount = data.getInt(prefix + ".raw.cluster.count");
 
     // Create the thread object
-    return new TemporaryPartialFastqThread(fastqSample, getFastqStorage(),
-        rawClusterCount, pfClusterCount, this.countReadsPFtoCopy,
-        this.maxReadsPFtoParse);
+    return new TemporaryPartialFastqThread(fastqSample, rawClusterCount,
+        pfClusterCount, this.countReadsPFtoCopy, this.maxReadsPFtoParse);
   }
 
   /**

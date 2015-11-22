@@ -95,9 +95,8 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
 
       try {
-        final int confThreads =
-            Integer.parseInt(properties.getProperty(
-                Settings.QC_CONF_THREADS_KEY).trim());
+        final int confThreads = Integer.parseInt(
+            properties.getProperty(Settings.QC_CONF_THREADS_KEY).trim());
         if (confThreads > 0) {
           this.numberThreads = confThreads;
         }
@@ -109,9 +108,8 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     // Check if process undetermined indices samples specify in Aozan
     // configuration
     this.isProcessUndeterminedIndicesSamples =
-        Boolean
-            .parseBoolean(properties
-                .getProperty(Settings.QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY));
+        Boolean.parseBoolean(properties.getProperty(
+            Settings.QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY));
 
   }
 
@@ -125,7 +123,7 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
   @Override
   public AbstractFastqProcessThread collectSample(final RunData data,
       final FastqSample fastqSample, final File reportDir, final boolean runPE)
-      throws AozanException {
+          throws AozanException {
 
     if (fastqSample == null
         || fastqSample.getFastqFiles() == null
@@ -134,12 +132,12 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     }
 
     // Check if the uncompressed fastq file exists
-    if (getFastqStorage().tmpFileExists(fastqSample)) {
+    if (fastqSample.isPartialFileExists()) {
       return null;
     }
 
     // Create the thread object
-    return new UncompressFastqThread(fastqSample, getFastqStorage());
+    return new UncompressFastqThread(fastqSample);
   }
 
   /**
@@ -175,7 +173,8 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
 
     for (final FastqSample fastqSample : getFastqSamples()) {
       // Check temporary fastq files exists
-      if (!(new File(tmpDir, fastqSample.getNameTemporaryFastqFiles()).exists())) {
+      if (!(new File(tmpDir, fastqSample.getNamePartialFastqFiles())
+          .exists())) {
         this.uncompressedSizeFiles += fastqSample.getUncompressedSize();
       }
 
@@ -188,17 +187,13 @@ public class UncompressFastqCollector extends AbstractFastqCollector {
     if (uncompressedSizeNeeded > freeSpace) {
       throw new AozanException(
           "Not enough disk space to store uncompressed fastq files for step fastqScreen. We are "
-              + freeSpace
-              + " Go in directory "
-              + tmpDir.getAbsolutePath()
+              + freeSpace + " Go in directory " + tmpDir.getAbsolutePath()
               + ", and we need " + uncompressedSizeNeeded + " Go. Fail Aozan");
     }
 
-    LOGGER
-        .fine("Enough disk space to store uncompressed fastq files for step fastqScreen. We are "
-            + freeSpace
-            + " Go in directory "
-            + tmpDir.getAbsolutePath()
+    LOGGER.fine(
+        "Enough disk space to store uncompressed fastq files for step fastqScreen. We are "
+            + freeSpace + " Go in directory " + tmpDir.getAbsolutePath()
             + ", and we need " + uncompressedSizeNeeded + " Go.");
 
   }

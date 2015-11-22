@@ -46,11 +46,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import uk.ac.babraham.FastQC.Sequence.Sequence;
-import uk.ac.babraham.FastQC.Sequence.SequenceFactory;
-import uk.ac.babraham.FastQC.Sequence.SequenceFile;
-import uk.ac.babraham.FastQC.Sequence.SequenceFormatException;
-
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -65,12 +60,15 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
+import fr.ens.transcriptome.aozan.illumina.IlluminaReadId;
 import fr.ens.transcriptome.aozan.io.FastqSample;
-import fr.ens.transcriptome.aozan.io.FastqStorage;
 import fr.ens.transcriptome.aozan.util.XMLUtilsWriter;
 import fr.ens.transcriptome.eoulsan.EoulsanException;
-import fr.ens.transcriptome.aozan.illumina.IlluminaReadId;
 import fr.ens.transcriptome.eoulsan.util.XMLUtils;
+import uk.ac.babraham.FastQC.Sequence.Sequence;
+import uk.ac.babraham.FastQC.Sequence.SequenceFactory;
+import uk.ac.babraham.FastQC.Sequence.SequenceFile;
+import uk.ac.babraham.FastQC.Sequence.SequenceFormatException;
 
 /**
  * This class allow to process the undetermined fastq file of a lane to extract
@@ -1256,11 +1254,10 @@ public class UndeterminedIndexesProcessThreads
    * @throws AozanException if sample cannot be processed
    */
   public UndeterminedIndexesProcessThreads(final RunData data,
-      final FastqSample fastqSample, final FastqStorage fastqStorage,
-      final File reportDir, final File undeterminedIndexedXSLFile)
-          throws AozanException {
+      final FastqSample fastqSample, final File reportDir,
+      final File undeterminedIndexedXSLFile) throws AozanException {
 
-    super(fastqSample, fastqStorage);
+    super(fastqSample);
 
     checkNotNull(data, "data argument cannot be null");
     checkNotNull(reportDir, "reportDir argument cannot be null");

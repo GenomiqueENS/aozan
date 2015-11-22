@@ -46,7 +46,6 @@ import fr.ens.transcriptome.aozan.collectors.CollectorRegistry;
 import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.fastqc.RuntimePatchFastQC;
-import fr.ens.transcriptome.aozan.io.FastqStorage;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.AozanTestRegistry;
 import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
@@ -102,7 +101,6 @@ public class QC {
   private final Map<String, String> globalConf = new HashMap<>();
 
   private final File tmpDir;
-  private final FastqStorage fastqStorage;
   private final File sampleSheetFile;
 
   //
@@ -155,14 +153,6 @@ public class QC {
    */
   public File getTmpDir() {
     return this.tmpDir;
-  }
-
-  /**
-   * Get the FASTQ storage for the run.
-   * @return the FASTQ storage for the run
-   */
-  public FastqStorage getFastqStorage() {
-    return this.fastqStorage;
   }
 
   //
@@ -848,7 +838,6 @@ public class QC {
     this.tmpDir = tmpDir == null
         ? new File(System.getProperty("java.io.tmpdir")) : tmpDir;
 
-    this.fastqStorage = new FastqStorage(this.tmpDir);
     this.sampleSheetFile = getSampleSheetFile(this.fastqDir);
 
     initGlobalConf(properties);

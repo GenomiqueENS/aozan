@@ -100,8 +100,8 @@ public class FastQCCollector extends AbstractFastqCollector {
     }
 
     // Create the thread object
-    return new FastQCProcessThread(fastqSample, getFastqStorage(),
-        INGORE_FILTERED_SEQUENCES, reportDir);
+    return new FastQCProcessThread(fastqSample, INGORE_FILTERED_SEQUENCES,
+        reportDir);
   }
 
   //

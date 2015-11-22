@@ -38,11 +38,10 @@ import com.google.common.io.Files;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
+import fr.ens.transcriptome.aozan.illumina.IlluminaReadId;
 import fr.ens.transcriptome.aozan.io.FastqSample;
-import fr.ens.transcriptome.aozan.io.FastqStorage;
 import fr.ens.transcriptome.eoulsan.EoulsanException;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
-import fr.ens.transcriptome.aozan.illumina.IlluminaReadId;
 import fr.ens.transcriptome.eoulsan.bio.ReadSequence;
 import fr.ens.transcriptome.eoulsan.bio.io.FastqReader;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
@@ -102,7 +101,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
   @Override
   protected void processResults() throws AozanException {
 
-    if (!getFastqStorage().getTemporaryFile(getFastqSample()).exists()) {
+    if (!getFastqSample().getPartialFile().exists()) {
 
       if (this.countReadsPFtoCopy > this.rawClusterCount) {
         uncompressedFastqFile();
@@ -117,8 +116,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
       }
 
       // Rename file: remove '.tmp' final
-      if (!this.tmpFastqFile
-          .renameTo(getFastqStorage().getTemporaryFile(getFastqSample()))) {
+      if (!this.tmpFastqFile.renameTo(getFastqSample().getPartialFile())) {
         LOGGER.warning("FastQC: fail to rename tmp fastq file "
             + this.tmpFastqFile.getAbsolutePath());
       }
@@ -379,11 +377,11 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
    *           FastQC
    */
   public TemporaryPartialFastqThread(final FastqSample fastqSample,
-      final FastqStorage fastqStorage, final int rawClusterCount,
-      final int pfClusterCount, final int numberReadsToCopy,
-      final int maxReadsToParse) throws AozanException {
+      final int rawClusterCount, final int pfClusterCount,
+      final int numberReadsToCopy, final int maxReadsToParse)
+          throws AozanException {
 
-    super(fastqSample, fastqStorage);
+    super(fastqSample);
 
     final int maxReadsPFtoParse = maxReadsToParse;
     this.countReadsPFtoCopy = numberReadsToCopy;
@@ -392,7 +390,6 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
     this.pfClusterCountParsed =
         maxReadsPFtoParse > pfClusterCount ? pfClusterCount : maxReadsPFtoParse;
 
-    this.tmpFastqFile =
-        new File(getFastqStorage().getTemporaryFile(fastqSample) + ".tmp");
+    this.tmpFastqFile = new File(fastqSample.getPartialFile() + ".tmp");
   }
 }

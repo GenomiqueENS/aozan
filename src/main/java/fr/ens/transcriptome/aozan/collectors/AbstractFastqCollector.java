@@ -52,7 +52,6 @@ import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 import fr.ens.transcriptome.aozan.io.FastqSample;
-import fr.ens.transcriptome.aozan.io.FastqStorage;
 
 /**
  * The abstract class define commons methods for the Collectors which treats
@@ -65,11 +64,7 @@ public abstract class AbstractFastqCollector implements Collector {
   /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
-  /** The fastq storage. */
-  private FastqStorage fastqStorage;
-
-  /** The casava output path. */
-  private File casavaOutputPath;
+  private QC qc;
 
   /** The casava design file. */
   private File casavaDesignFile;
@@ -163,15 +158,6 @@ public abstract class AbstractFastqCollector implements Collector {
   //
 
   /**
-   * Get the fastq storage.
-   * @return the instance of the FastqStorage of the collector
-   */
-  protected FastqStorage getFastqStorage() {
-
-    return this.fastqStorage;
-  }
-
-  /**
    * Get the FASTQ samples.
    * @return a set with the FASTQ samples
    */
@@ -201,12 +187,10 @@ public abstract class AbstractFastqCollector implements Collector {
 
     checkNotNull(properties, "properties argument cannot be null");
 
-    this.casavaOutputPath = qc.getFastqDir();
     this.qcReportOutputPath = qc.getQcDir();
     this.casavaDesignFile = qc.getSampleSheetFile();
     this.tmpDir = qc.getTmpDir();
-
-    this.fastqStorage = qc.getFastqStorage();
+    this.qc = qc;
 
     if (this.getThreadsNumber() > 1) {
 
@@ -284,7 +268,7 @@ public abstract class AbstractFastqCollector implements Collector {
 
           LOGGER.severe("FASTQ Collect: fastq is null or empty, key fq is "
               + fs.getKeyFastqSample() + " tmp fq "
-              + fs.getNameTemporaryFastqFiles() + " sample name "
+              + fs.getNamePartialFastqFiles() + " sample name "
               + fs.getSampleName() + " prefix rundata "
               + fs.getPrefixRundata());
         }
@@ -357,13 +341,44 @@ public abstract class AbstractFastqCollector implements Collector {
   }
 
   /**
+   * Delete all temporaries files (fastq tmp files and map files).
+   * @throws IOException
+   */
+  public void clearTemporaryFiles() {
+
+    LOGGER.info("Delete temporaries fastq and map files");
+
+    final File[] files = this.tmpDir.listFiles(new FileFilter() {
+
+      @Override
+      public boolean accept(final File pathname) {
+        return (pathname.getName().startsWith("aozan_fastq_")
+            && (pathname.getName().endsWith(".fastq")
+                || pathname.getName().endsWith(".fastq.tmp")))
+            || (pathname.getName().startsWith("map-")
+                && (pathname.getName().endsWith(".txt")));
+      }
+    });
+
+    // Delete temporary files
+    for (final File f : files) {
+      if (f.exists()) {
+        if (!f.delete()) {
+          LOGGER.warning(
+              "Can not delete the temporary file : " + f.getAbsolutePath());
+        }
+      }
+    }
+  }
+
+  /**
    * Clear qc directory after successfully all FastqCollector.
    */
   @Override
   public void clear() {
 
     // Delete temporary uncompress fastq file
-    this.fastqStorage.clear();
+    clearTemporaryFiles();
 
     // Delete all data files fastqSample per fastqSample
     for (final FastqSample fs : this.fastqSamples) {
@@ -432,9 +447,8 @@ public abstract class AbstractFastqCollector implements Collector {
             final String descriptionSample =
                 data.getSampleDescription(lane, sampleName);
 
-            this.fastqSamples.add(new FastqSample(samplesheet,
-                this.casavaOutputPath, readIndexedCount, lane, sampleName,
-                projectName, descriptionSample, index));
+            this.fastqSamples.add(new FastqSample(this.qc, readIndexedCount,
+                lane, sampleName, projectName, descriptionSample, index));
 
           } // Sample
         }
@@ -449,8 +463,8 @@ public abstract class AbstractFastqCollector implements Collector {
           if (laneBarcode != null && data.isUndeterminedInLane(lane)) {
 
             // Add undetermined sample
-            this.fastqSamples.add(new FastqSample(samplesheet,
-                this.casavaOutputPath, readIndexedCount, lane));
+            this.fastqSamples
+                .add(new FastqSample(this.qc, readIndexedCount, lane));
           }
         }
       } // Lane

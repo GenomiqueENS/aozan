@@ -33,7 +33,6 @@ import com.google.common.base.Stopwatch;
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.io.FastqSample;
-import fr.ens.transcriptome.aozan.io.FastqStorage;
 
 /**
  * The abstract class define a thread, it calls by AbstractFastqCollector.
@@ -45,7 +44,6 @@ abstract class AbstractFastqProcessThread implements Runnable {
 
   private final FastqSample fastqSample;
   private final RunData results;
-  private final FastqStorage fastqStorage;
 
   private Throwable exception;
   private boolean success;
@@ -158,15 +156,6 @@ abstract class AbstractFastqProcessThread implements Runnable {
     return this.fastqSample;
   }
 
-  /**
-   * Get the Fastq storage.
-   * @return a FastqStorage object
-   */
-  protected FastqStorage getFastqStorage() {
-
-    return this.fastqStorage;
-  }
-
   //
   // Setters
   //
@@ -196,17 +185,12 @@ abstract class AbstractFastqProcessThread implements Runnable {
    * @param fastqSample, object which represent a sample to treat
    * @throws AozanException if the fastqSample return none fastq file.
    */
-  public AbstractFastqProcessThread(final FastqSample fastqSample,
-      final FastqStorage fastqStorrage) throws AozanException {
+  public AbstractFastqProcessThread(final FastqSample fastqSample)
+      throws AozanException {
 
     // Check if fastqSample is null
     if (fastqSample == null) {
       throw new AozanException("No fastqSample defined");
-    }
-
-    // Check if fastqSample is null
-    if (fastqStorrage == null) {
-      throw new AozanException("No fastqStorrage defined");
     }
 
     this.fastqSample = fastqSample;
@@ -219,7 +203,5 @@ abstract class AbstractFastqProcessThread implements Runnable {
 
     this.results = new RunData();
     this.dataSaved = false;
-    this.fastqStorage = fastqStorrage;
-
   }
 }

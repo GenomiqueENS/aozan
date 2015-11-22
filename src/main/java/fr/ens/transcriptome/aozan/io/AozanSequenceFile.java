@@ -58,8 +58,8 @@ public class AozanSequenceFile implements SequenceFile {
   /** Timer. **/
   private Stopwatch timer;
 
-  final FastqStorage fastqStorage;
   private final File tmpFile;
+  private final File tmpFileWithExtension;
   private final SequenceFile seqFile;
   private final FastqSample fastqSample;
   private final Writer fw;
@@ -95,15 +95,16 @@ public class AozanSequenceFile implements SequenceFile {
       if (!this.seqFile.hasNext()) {
         this.fw.close();
 
-        long sizeFile = this.tmpFile.length();
+        long sizeFile = this.tmpFileWithExtension.length();
         sizeFile /= (1024 * 1024 * 1024);
 
         // Rename file for remove '.tmp' final
-        if (!this.tmpFile.renameTo(this.fastqStorage.getTemporaryFile(
-            this.fastqSample))) {
+        if (!this.tmpFileWithExtension.renameTo(this.tmpFile)) {
           LOGGER.warning("Aozan sequence : fail to rename file "
               + this.tmpFile.getAbsolutePath());
         }
+
+        this.timer.stop();
 
         LOGGER.fine("FASTQC: uncompress for "
             + this.fastqSample.getKeyFastqSample() + " "
@@ -113,8 +114,6 @@ public class AozanSequenceFile implements SequenceFile {
             + toTimeHumanReadable(this.timer.elapsed(TimeUnit.MILLISECONDS))
             + "(tmp fastq file size " + sizeFile + "Go / estimated size "
             + this.fastqSample.getUncompressedSize() + ")");
-        this.timer.stop();
-
       }
 
     } catch (final IOException io) {
@@ -161,14 +160,15 @@ public class AozanSequenceFile implements SequenceFile {
    * @throws AozanException the aozan exception
    */
   public AozanSequenceFile(final File[] files, final File tmpFile,
-      final FastqSample fastqSample, final FastqStorage fastqStrorage) throws AozanException {
+      final FastqSample fastqSample) throws AozanException {
 
+    this.tmpFileWithExtension = new File(tmpFile + ".tmp");
     this.tmpFile = tmpFile;
     this.fastqSample = fastqSample;
-    this.fastqStorage = fastqStrorage;
 
     try {
-      this.fw = Files.newWriter(this.tmpFile, Globals.DEFAULT_FILE_ENCODING);
+      this.fw = Files.newWriter(this.tmpFileWithExtension,
+          Globals.DEFAULT_FILE_ENCODING);
 
       this.seqFile = SequenceFactory.getSequenceFile(files);
 

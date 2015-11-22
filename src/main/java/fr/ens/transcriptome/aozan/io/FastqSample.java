@@ -27,13 +27,20 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
 
+import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
+import fr.ens.transcriptome.aozan.Common;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.illumina.Bcl2FastqOutput;
-import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
+import uk.ac.babraham.FastQC.Sequence.SequenceFactory;
+import uk.ac.babraham.FastQC.Sequence.SequenceFile;
+import uk.ac.babraham.FastQC.Sequence.SequenceFormatException;
 
 /**
  * The class correspond of one entity to treat by AbstractFastqCollector, so a
@@ -46,6 +53,9 @@ public class FastqSample {
   public static final String FASTQ_EXTENSION = ".fastq";
 
   private static final String NO_INDEX = "NoIndex";
+
+  /** Logger. */
+  private static final Logger LOGGER = Common.getLogger();
 
   private final int read;
   private final int lane;
@@ -64,6 +74,8 @@ public class FastqSample {
   private final CompressionType compressionType;
 
   private final Bcl2FastqOutput bcl2fastqOutput;
+
+  private final File tmpDir;
 
   /**
    * Create a key unique for each fastq sample.
@@ -189,8 +201,8 @@ public class FastqSample {
         this.bcl2fastqOutput.createListFastqFiles(this, read);
 
     if (result.isEmpty()) {
-      throw new AozanRuntimeException(
-          "No fastq file found for sample: " + this);
+      throw new AozanRuntimeException("No fastq file found for sample: "
+          + this + " in " + this.bcl2fastqOutput.getFastqDirectory());
     }
 
     return result;
@@ -293,7 +305,7 @@ public class FastqSample {
    * Get the name for temporary fastq files uncompressed.
    * @return temporary fastq file name
    */
-  public String getNameTemporaryFastqFiles() {
+  public String getNamePartialFastqFiles() {
     return this.nameTemporaryFastqFiles;
   }
 
@@ -313,6 +325,75 @@ public class FastqSample {
     return this.compressionType;
   }
 
+  //
+  // Partial FASTQ file methods
+  //
+
+  /**
+   * Return the temporary if exists which correspond to the key.
+   * @return File temporary file or null if it not exists
+   */
+  public File getPartialFile() {
+
+    return new File(this.tmpDir, getNamePartialFastqFiles());
+  }
+
+  /**
+   * Check if a temporary file corresponding with fastq files has already
+   * created.
+   * @return true if map of files contains a entry with the same key or false
+   */
+  public boolean isPartialFileExists() {
+
+    if (this.getFastqFiles().isEmpty()) {
+      return false;
+    }
+
+    return getPartialFile().exists();
+
+  }
+
+  //
+  // SequenceFile methods
+  //
+
+  /**
+   * Return a sequenceFile for all fastq files present to treat in the sample.
+   * If the temporary file doesn't existed, it is created.
+   * @param fastqSample sample to treat
+   * @return SequenceFile an structure which allow to browse a fastq file
+   *         sequence per sequence
+   * @throws AozanException if an error occurs during writing file
+   */
+  public SequenceFile getSequenceFile() throws AozanException {
+
+    final File[] fastq = getFastqFiles().toArray(new File[0]);
+    final SequenceFile seqFile;
+
+    try {
+
+      if (getPartialFile().exists()) {
+        seqFile = SequenceFactory.getSequenceFile(fastq);
+
+      } else {
+        // Create temporary fastq file
+        seqFile = new AozanSequenceFile(fastq, getPartialFile(), this);
+      }
+
+    } catch (final IOException io) {
+      throw new AozanException(io);
+
+    } catch (final SequenceFormatException e) {
+      throw new AozanException(e);
+    }
+
+    return seqFile;
+  }
+
+  //
+  // Object methods
+  //
+
   @Override
   public String toString() {
     return "FastqSample [read="
@@ -328,6 +409,7 @@ public class FastqSample {
   //
   // Constructor
   //
+
   /**
    * Public constructor corresponding of a technical replica sample.
    * @param samplesheet the samplesheet
@@ -340,13 +422,11 @@ public class FastqSample {
    * @param index value of index or if doesn't exists, NoIndex
    * @throws IOException if an error occurs while reading bcl2fastq version
    */
-  public FastqSample(final SampleSheet samplesheet, final File casavaOutputPath,
-      final int read, final int lane, final String sampleName,
-      final String projectName, final String descriptionSample,
-      final String index) throws IOException {
+  public FastqSample(final QC qc, final int read, final int lane,
+      final String sampleName, final String projectName,
+      final String descriptionSample, final String index) throws IOException {
 
-    checkNotNull(samplesheet, "samplesheet argument cannot be null");
-    checkNotNull(casavaOutputPath, "casavaOutputPath argument cannot be null");
+    checkNotNull(qc, "qc argument cannot be null");
     checkArgument(read > 0, "read value cannot be lower than 1");
     checkArgument(lane > 0, "read value cannot be lower than 1");
 
@@ -358,9 +438,11 @@ public class FastqSample {
     this.index = (index == null || index.isEmpty()) ? NO_INDEX : index;
     this.undeterminedIndices = false;
 
-    this.runFastqPath = casavaOutputPath;
+    this.runFastqPath = qc.getFastqDir();
+    this.bcl2fastqOutput =
+        new Bcl2FastqOutput(qc.getSampleSheetFile(), qc.getFastqDir());
+    this.tmpDir = qc.getTmpDir();
 
-    this.bcl2fastqOutput = new Bcl2FastqOutput(samplesheet, casavaOutputPath);
     this.fastqFiles = createListFastqFiles(this.read);
 
     this.compressionType = getCompressionExtension(this.fastqFiles);
@@ -377,11 +459,10 @@ public class FastqSample {
    * @param lane lane number
    * @throws IOException if an error occurs while reading bcl2fastq version
    */
-  public FastqSample(final SampleSheet samplesheet, final File casavaOutputPath,
-      final int read, final int lane) throws IOException {
+  public FastqSample(final QC qc, final int read, final int lane)
+      throws IOException {
 
-    checkNotNull(samplesheet, "samplesheet argument cannot be null");
-    checkNotNull(casavaOutputPath, "casavaOutputPath argument cannot be null");
+    checkNotNull(qc, "qc argument cannot be null");
     checkArgument(read > 0, "read value cannot be lower than 1");
     checkArgument(lane > 0, "read value cannot be lower than 1");
 
@@ -393,9 +474,11 @@ public class FastqSample {
     this.index = NO_INDEX;
     this.undeterminedIndices = true;
 
-    this.runFastqPath = casavaOutputPath;
+    this.runFastqPath = qc.getFastqDir();
+    this.bcl2fastqOutput =
+        new Bcl2FastqOutput(qc.getSampleSheetFile(), qc.getFastqDir());
+    this.tmpDir = qc.getTmpDir();
 
-    this.bcl2fastqOutput = new Bcl2FastqOutput(samplesheet, casavaOutputPath);
     this.fastqFiles = createListFastqFiles(this.read);
 
     this.compressionType = getCompressionExtension(this.fastqFiles);
