@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Globals;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.eoulsan.util.SystemUtils;
@@ -58,7 +59,7 @@ public class AozanCollector implements Collector {
   }
 
   @Override
-  public void configure(final Properties properties) {
+  public void configure(final QC qc, final Properties properties) {
     // Nothing to do
 
     this.properties = properties;

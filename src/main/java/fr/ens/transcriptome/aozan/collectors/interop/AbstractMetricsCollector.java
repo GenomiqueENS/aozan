@@ -23,6 +23,7 @@
 
 package fr.ens.transcriptome.aozan.collectors.interop;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -35,7 +36,6 @@ import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.Collector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.collectors.interop.ReadsData.ReadData;
-import fr.ens.transcriptome.eoulsan.EoulsanRuntimeException;
 
 /**
  * The abstract class define same action on all metric collector.
@@ -45,10 +45,10 @@ import fr.ens.transcriptome.eoulsan.EoulsanRuntimeException;
 abstract class AbstractMetricsCollector implements Collector {
 
   /** The dir inter op path. */
-  private String dirInterOpPath = null;
+  private File interOpDir;
 
   /** The reads data. */
-  private ReadsData readsData = null;
+  private ReadsData readsData;
 
   /** The lanes count. */
   private int lanesCount;
@@ -67,14 +67,19 @@ abstract class AbstractMetricsCollector implements Collector {
    */
   @Override
   public List<String> getCollectorsNamesRequiered() {
-    return Collections.unmodifiableList(Lists
-        .newArrayList(RunInfoCollector.COLLECTOR_NAME));
+    return Collections
+        .unmodifiableList(Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME));
   }
 
   @Override
-  public void configure(Properties properties) {
-    final String RTAOutputDirPath = properties.getProperty(QC.RTA_OUTPUT_DIR);
-    this.dirInterOpPath = RTAOutputDirPath + "/InterOp/";
+  public void configure(final QC qc, final Properties properties) {
+
+    if (qc == null) {
+      this.interOpDir =
+          new File(properties.getProperty(QC.RTA_OUTPUT_DIR), "InterOp");
+    } else {
+      this.interOpDir = new File(qc.getBclDir(), "InterOp");
+    }
   }
 
   @Override
@@ -115,13 +120,8 @@ abstract class AbstractMetricsCollector implements Collector {
    * Gets the directory interOp file path.
    * @return the directory interOp file path.
    */
-  public String getInterOpDirPath() {
-    if (this.dirInterOpPath == null) {
-      throw new EoulsanRuntimeException(
-          "Run metrics collector, path to binary file is not define. Configuration skipping.");
-    }
-
-    return this.dirInterOpPath;
+  public File getInterOpDir() {
+    return this.interOpDir;
   }
 
   /**

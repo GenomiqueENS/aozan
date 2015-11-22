@@ -33,6 +33,7 @@ import java.util.TreeMap;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.util.StatisticsUtils;
@@ -57,14 +58,10 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
     return NAME_COLLECTOR;
   }
 
-  /**
-   * Configure the collector with the path of the run data.
-   * @param properties object with the collector configuration
-   */
   @Override
-  public void configure(final Properties properties) {
+  public void configure(final QC qc, final Properties properties) {
 
-    super.configure(properties);
+    super.configure(qc, properties);
 
     this.densityRatio =
         Double.parseDouble(properties
@@ -80,7 +77,7 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
 
     super.collect(data);
 
-    final TileMetricsReader reader = new TileMetricsReader(getInterOpDirPath());
+    final TileMetricsReader reader = new TileMetricsReader(getInterOpDir());
     initMetricsMap(data);
 
     // Distribution of metrics between lane and code

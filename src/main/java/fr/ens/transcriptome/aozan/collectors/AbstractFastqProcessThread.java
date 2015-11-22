@@ -196,12 +196,17 @@ abstract class AbstractFastqProcessThread implements Runnable {
    * @param fastqSample, object which represent a sample to treat
    * @throws AozanException if the fastqSample return none fastq file.
    */
-  public AbstractFastqProcessThread(final FastqSample fastqSample)
-      throws AozanException {
+  public AbstractFastqProcessThread(final FastqSample fastqSample,
+      final FastqStorage fastqStorrage) throws AozanException {
 
     // Check if fastqSample is null
     if (fastqSample == null) {
       throw new AozanException("No fastqSample defined");
+    }
+
+    // Check if fastqSample is null
+    if (fastqStorrage == null) {
+      throw new AozanException("No fastqStorrage defined");
     }
 
     this.fastqSample = fastqSample;
@@ -214,7 +219,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
 
     this.results = new RunData();
     this.dataSaved = false;
-    this.fastqStorage = FastqStorage.getInstance();
+    this.fastqStorage = fastqStorrage;
 
   }
 }

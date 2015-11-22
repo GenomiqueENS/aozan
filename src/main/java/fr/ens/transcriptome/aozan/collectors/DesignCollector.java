@@ -79,14 +79,13 @@ public class DesignCollector implements Collector {
   }
 
   @Override
-  public void configure(final Properties properties) {
+  public void configure(final QC qc, final Properties properties) {
 
     if (properties == null) {
       return;
     }
 
-    this.casavaDesignFile =
-        new File(properties.getProperty(QC.CASAVA_DESIGN_PATH));
+    this.casavaDesignFile = qc.getSampleSheetFile();
   }
 
   @Override

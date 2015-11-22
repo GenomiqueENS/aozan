@@ -39,6 +39,7 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.io.FastqSample;
+import fr.ens.transcriptome.aozan.io.FastqStorage;
 import fr.ens.transcriptome.eoulsan.EoulsanException;
 import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.aozan.illumina.IlluminaReadId;
@@ -378,10 +379,11 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
    *           FastQC
    */
   public TemporaryPartialFastqThread(final FastqSample fastqSample,
-      final int rawClusterCount, final int pfClusterCount,
-      final int numberReadsToCopy, final int maxReadsToParse)
-          throws AozanException {
-    super(fastqSample);
+      final FastqStorage fastqStorage, final int rawClusterCount,
+      final int pfClusterCount, final int numberReadsToCopy,
+      final int maxReadsToParse) throws AozanException {
+
+    super(fastqSample, fastqStorage);
 
     final int maxReadsPFtoParse = maxReadsToParse;
     this.countReadsPFtoCopy = numberReadsToCopy;

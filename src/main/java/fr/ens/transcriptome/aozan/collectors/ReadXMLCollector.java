@@ -263,12 +263,12 @@ public class ReadXMLCollector implements Collector {
   }
 
   @Override
-  public void configure(final Properties properties) {
+  public void configure(final QC qc, final Properties properties) {
     if (properties == null) {
       return;
     }
 
-    this.RTAOutputDirPath = properties.getProperty(QC.RTA_OUTPUT_DIR);
+    this.RTAOutputDirPath = qc.getBclDir().getAbsolutePath();
   }
 
   @Override

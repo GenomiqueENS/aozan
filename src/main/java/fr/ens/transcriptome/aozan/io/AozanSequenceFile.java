@@ -58,6 +58,7 @@ public class AozanSequenceFile implements SequenceFile {
   /** Timer. **/
   private Stopwatch timer;
 
+  final FastqStorage fastqStorage;
   private final File tmpFile;
   private final SequenceFile seqFile;
   private final FastqSample fastqSample;
@@ -98,7 +99,7 @@ public class AozanSequenceFile implements SequenceFile {
         sizeFile /= (1024 * 1024 * 1024);
 
         // Rename file for remove '.tmp' final
-        if (!this.tmpFile.renameTo(FastqStorage.getInstance().getTemporaryFile(
+        if (!this.tmpFile.renameTo(this.fastqStorage.getTemporaryFile(
             this.fastqSample))) {
           LOGGER.warning("Aozan sequence : fail to rename file "
               + this.tmpFile.getAbsolutePath());
@@ -160,10 +161,11 @@ public class AozanSequenceFile implements SequenceFile {
    * @throws AozanException the aozan exception
    */
   public AozanSequenceFile(final File[] files, final File tmpFile,
-      final FastqSample fastqSample) throws AozanException {
+      final FastqSample fastqSample, final FastqStorage fastqStrorage) throws AozanException {
 
     this.tmpFile = tmpFile;
     this.fastqSample = fastqSample;
+    this.fastqStorage = fastqStrorage;
 
     try {
       this.fw = Files.newWriter(this.tmpFile, Globals.DEFAULT_FILE_ENCODING);

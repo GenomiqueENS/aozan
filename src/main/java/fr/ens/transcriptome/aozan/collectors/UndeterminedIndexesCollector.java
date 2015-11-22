@@ -31,6 +31,7 @@ import java.util.Properties;
 import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.io.FastqSample;
@@ -84,17 +85,16 @@ public class UndeterminedIndexesCollector extends AbstractFastqCollector {
   }
 
   @Override
-  public void configure(final Properties properties) {
+  public void configure(final QC qc, final Properties properties) {
 
-    super.configure(properties);
+    super.configure(qc, properties);
 
     // Set the number of threads
     if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
 
       try {
-        int confThreads =
-            Integer.parseInt(properties.getProperty(
-                Settings.QC_CONF_THREADS_KEY).trim());
+        int confThreads = Integer.parseInt(
+            properties.getProperty(Settings.QC_CONF_THREADS_KEY).trim());
         if (confThreads > 0)
           this.numberThreads = confThreads;
 
@@ -104,9 +104,8 @@ public class UndeterminedIndexesCollector extends AbstractFastqCollector {
 
     // Set external xsl file to write report html instead of default version
     try {
-      String filename =
-          properties
-              .getProperty(Settings.QC_CONF_UNDETERMINED_INDEXED_XSL_FILE_KEY);
+      String filename = properties
+          .getProperty(Settings.QC_CONF_UNDETERMINED_INDEXED_XSL_FILE_KEY);
       if (new File(filename).exists())
         this.undeterminedIndexedXSLFile = new File(filename);
     } catch (Exception e) {
@@ -124,14 +123,14 @@ public class UndeterminedIndexesCollector extends AbstractFastqCollector {
   @Override
   protected AbstractFastqProcessThread collectSample(final RunData data,
       final FastqSample fastqSample, final File reportDir, boolean runPE)
-      throws AozanException {
+          throws AozanException {
 
     if (fastqSample.getFastqFiles().isEmpty()) {
       return null;
     }
 
-    return new UndeterminedIndexesProcessThreads(data, fastqSample, reportDir,
-        this.undeterminedIndexedXSLFile);
+    return new UndeterminedIndexesProcessThreads(data, fastqSample,
+        getFastqStorage(), reportDir, this.undeterminedIndexedXSLFile);
   }
 
 }

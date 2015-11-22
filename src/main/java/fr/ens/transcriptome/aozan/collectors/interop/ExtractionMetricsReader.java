@@ -53,7 +53,7 @@ public class ExtractionMetricsReader extends
 
   @Override
   protected File getMetricsFile() {
-    return new File(getDirPathInterOP() + EXTRACTION_METRICS_FILE);
+    return new File(getDirPathInterOP(), EXTRACTION_METRICS_FILE);
   }
 
   @Override
@@ -77,7 +77,7 @@ public class ExtractionMetricsReader extends
   // Constructor
   //
 
-  ExtractionMetricsReader(final String dirPath) throws AozanException {
+  ExtractionMetricsReader(final File dirPath) throws AozanException {
     super(dirPath);
   }
 

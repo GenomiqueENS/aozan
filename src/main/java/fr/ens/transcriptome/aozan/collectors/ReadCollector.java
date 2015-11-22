@@ -30,6 +30,7 @@ import java.util.Properties;
 import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.collectors.interop.ErrorMetricsCollector;
@@ -66,7 +67,7 @@ public class ReadCollector implements Collector {
   }
 
   @Override
-  public void configure(final Properties properties) {
+  public void configure(final QC qc, final Properties properties) {
 
     if (properties == null) {
       return;
@@ -92,7 +93,7 @@ public class ReadCollector implements Collector {
 
     // Configure sub-collector
     for (final Collector collector : this.subCollectionList) {
-      collector.configure(properties);
+      collector.configure(qc, properties);
     }
   }
 

@@ -70,7 +70,7 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
   private String casavaOutputPath;
 
   @Override
-  public void configure(final Properties properties) {
+  public void configure(final QC qc, final Properties properties) {
 
     if (properties == null) {
       return;

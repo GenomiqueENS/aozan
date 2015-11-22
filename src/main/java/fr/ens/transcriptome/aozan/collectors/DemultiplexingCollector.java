@@ -44,6 +44,7 @@ public class DemultiplexingCollector implements Collector {
   /** Prefix for run data */
   public static final String PREFIX = "demux";
 
+  private QC qc;
   private File casavaOutputPath;
   private File samplesheetFile;
   private Properties conf;
@@ -70,16 +71,15 @@ public class DemultiplexingCollector implements Collector {
   }
 
   @Override
-  public void configure(final Properties properties) {
+  public void configure(final QC qc, final Properties properties) {
 
     if (properties == null) {
       return;
     }
 
-    this.casavaOutputPath =
-        new File(properties.getProperty(QC.CASAVA_OUTPUT_DIR));
-    this.samplesheetFile =
-        new File(properties.getProperty(QC.CASAVA_DESIGN_PATH));
+    this.qc = qc;
+    this.casavaOutputPath = qc.getFastqDir();
+    this.samplesheetFile = qc.getSampleSheetFile();
     this.conf = new Properties(properties);
   }
 
@@ -120,7 +120,7 @@ public class DemultiplexingCollector implements Collector {
     }
 
     // Init collector
-    subCollector.configure(this.conf);
+    subCollector.configure(qc, this.conf);
 
     // Collect data
     subCollector.collect(data);

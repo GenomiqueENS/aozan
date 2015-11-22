@@ -66,6 +66,7 @@ import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.io.FastqSample;
+import fr.ens.transcriptome.aozan.io.FastqStorage;
 import fr.ens.transcriptome.aozan.util.XMLUtilsWriter;
 import fr.ens.transcriptome.eoulsan.EoulsanException;
 import fr.ens.transcriptome.aozan.illumina.IlluminaReadId;
@@ -78,16 +79,16 @@ import fr.ens.transcriptome.eoulsan.util.XMLUtils;
  * @author Laurent Jourdren
  * @author Sandrine Perrin
  */
-public class UndeterminedIndexesProcessThreads extends
-    AbstractFastqProcessThread {
+public class UndeterminedIndexesProcessThreads
+    extends AbstractFastqProcessThread {
 
   /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
-  private static final Splitter TAB_SPLITTER = Splitter.on("\t").trimResults()
-      .omitEmptyStrings();
-  private static final Splitter COMMA_SPLITTER = Splitter.on(",").trimResults()
-      .omitEmptyStrings();
+  private static final Splitter TAB_SPLITTER =
+      Splitter.on("\t").trimResults().omitEmptyStrings();
+  private static final Splitter COMMA_SPLITTER =
+      Splitter.on(",").trimResults().omitEmptyStrings();
 
   private static final Joiner JOINER = Joiner.on(", ");
 
@@ -102,10 +103,10 @@ public class UndeterminedIndexesProcessThreads extends
   private final Map<String, String> reverseSampleIndexes;
   private final Multiset<String> rawUndeterminedIndices = HashMultiset.create();
   private final Multiset<String> pfUndeterminedIndices = HashMultiset.create();
-  private final Multimap<String, String> newSamplesIndexes = ArrayListMultimap
-      .create();
-  private final Multimap<String, String> newIndexes = ArrayListMultimap
-      .create();
+  private final Multimap<String, String> newSamplesIndexes =
+      ArrayListMultimap.create();
+  private final Multimap<String, String> newIndexes =
+      ArrayListMultimap.create();
 
   private int maxMismatches = 1;
   private boolean isSkipProcessResult = false;
@@ -113,19 +114,17 @@ public class UndeterminedIndexesProcessThreads extends
   /**
    * This class store a result entry for the whole lane.
    */
-  private static final class LaneResultEntry extends ResultEntry implements
-      Comparable<LaneResultEntry> {
+  private static final class LaneResultEntry extends ResultEntry
+      implements Comparable<LaneResultEntry> {
 
     static {
-      headerType =
-          Lists.newArrayList("string", "int", "int", "string", "string",
-              "string", "string");
+      headerType = Lists.newArrayList("string", "int", "int", "string",
+          "string", "string", "string");
 
-      headerNames =
-          Lists.newArrayList("Index", "Raw cluster count", "PF cluster count",
-              "PF %", "Raw cluster in undetermined %",
-              "PF cluster count in undetermined %",
-              "Recovery possible for sample(s)");
+      headerNames = Lists.newArrayList("Index", "Raw cluster count",
+          "PF cluster count", "PF %", "Raw cluster in undetermined %",
+          "PF cluster count in undetermined %",
+          "Recovery possible for sample(s)");
     }
 
     private final String index;
@@ -144,8 +143,8 @@ public class UndeterminedIndexesProcessThreads extends
     public String toCSV() {
 
       return String.format("%s\t%d\t%d\t%.02f%%\t%.02f%%\t%.02f%%\t%s%n",
-          this.index, this.rawClusterCount, this.pfClusterCount,
-          this.pfPercent, this.inRawUndeterminedIndicePercent,
+          this.index, this.rawClusterCount, this.pfClusterCount, this.pfPercent,
+          this.inRawUndeterminedIndicePercent,
           this.inPFUndeterminedIndicePercent, this.comment);
     }
 
@@ -159,9 +158,8 @@ public class UndeterminedIndexesProcessThreads extends
     public int hashCode() {
       final int prime = 31;
       int result = 1;
-      result =
-          prime
-              * result + ((this.comment == null) ? 0 : this.comment.hashCode());
+      result = prime * result
+          + ((this.comment == null) ? 0 : this.comment.hashCode());
       long temp;
       temp = Double.doubleToLongBits(this.inPFUndeterminedIndicePercent);
       result = prime * result + (int) (temp ^ (temp >>> 32));
@@ -258,8 +256,8 @@ public class UndeterminedIndexesProcessThreads extends
       final List<String> samplesName = new ArrayList<>();
 
       // Extract all samples names per lane
-      samplesName.addAll(COMMA_SPLITTER.splitToList(data
-          .getSamplesNameInLane(lane)));
+      samplesName
+          .addAll(COMMA_SPLITTER.splitToList(data.getSamplesNameInLane(lane)));
 
       Collections.sort(samplesName);
 
@@ -321,18 +319,16 @@ public class UndeterminedIndexesProcessThreads extends
   /**
    * This class store a result entry for a sample.
    */
-  private static final class SampleResultEntry extends ResultEntry implements
-      Comparable<SampleResultEntry> {
+  private static final class SampleResultEntry extends ResultEntry
+      implements Comparable<SampleResultEntry> {
 
     static {
-      headerType =
-          Lists.newArrayList("string", "int", "int", "string", "string",
-              "string", "string");
+      headerType = Lists.newArrayList("string", "int", "int", "string",
+          "string", "string", "string");
 
-      headerNames =
-          Lists.newArrayList("Index", "Raw cluster count", "PF cluster count",
-              "PF %", "Raw cluster in sample %",
-              "PF cluster count in sample %", "Comment");
+      headerNames = Lists.newArrayList("Index", "Raw cluster count",
+          "PF cluster count", "PF %", "Raw cluster in sample %",
+          "PF cluster count in sample %", "Comment");
     }
 
     private final String index;
@@ -351,18 +347,16 @@ public class UndeterminedIndexesProcessThreads extends
     public String toCSV() {
 
       return String.format("%s\t%d\t%d\t%.02f%%\t%.02f%%\t%.02f%%\t%s%n",
-          this.index, this.rawClusterCount, this.pfClusterCount,
-          this.pfPercent, this.rawClusterPercent, this.pfClusterPercent,
-          this.comment);
+          this.index, this.rawClusterCount, this.pfClusterCount, this.pfPercent,
+          this.rawClusterPercent, this.pfClusterPercent, this.comment);
     }
 
     @Override
     public int hashCode() {
       final int prime = 31;
       int result = 1;
-      result =
-          prime
-              * result + ((this.comment == null) ? 0 : this.comment.hashCode());
+      result = prime * result
+          + ((this.comment == null) ? 0 : this.comment.hashCode());
       result =
           prime * result + ((this.index == null) ? 0 : this.index.hashCode());
       result = prime * result + this.pfClusterCount;
@@ -438,8 +432,8 @@ public class UndeterminedIndexesProcessThreads extends
     @Override
     public String getAttributeClass() {
       // Data entry
-      if (this.comment.toLowerCase(Globals.DEFAULT_LOCALE).startsWith(
-          "conflict")) {
+      if (this.comment.toLowerCase(Globals.DEFAULT_LOCALE)
+          .startsWith("conflict")) {
         return CONFLICT_TAG;
       }
       return "";
@@ -672,11 +666,9 @@ public class UndeterminedIndexesProcessThreads extends
       this.maxMismatches = -1;
     } else {
       this.maxMismatches = minMismatchFound;
-      getResults()
-          .put(
-              "undeterminedindices.lane"
-                  + this.lane + ".mismatch.recovery.cluster",
-              this.maxMismatches);
+      getResults().put(
+          "undeterminedindices.lane" + this.lane + ".mismatch.recovery.cluster",
+          this.maxMismatches);
     }
   }
 
@@ -791,8 +783,8 @@ public class UndeterminedIndexesProcessThreads extends
 
     // Test if demultiplexing with mismatches is possible
     boolean oneMismatcheDemuxPossible = true;
-    for (final Map.Entry<String, Collection<String>> e : this.newIndexes
-        .asMap().entrySet()) {
+    for (final Map.Entry<String, Collection<String>> e : this.newIndexes.asMap()
+        .entrySet()) {
       if (e.getValue().size() > 1) {
         oneMismatcheDemuxPossible = false;
       }
@@ -805,16 +797,12 @@ public class UndeterminedIndexesProcessThreads extends
     final List<LaneResultEntry> entries = new ArrayList<>();
 
     // Total entry
-    final LaneResultEntry totalEntry =
-        new LaneResultEntry(
-            "Total",
-            totalRawClusterCount,
-            totalPFClusterCount,
-            totalRawClusterCount,
-            totalPFClusterCount,
-            oneMismatcheDemuxPossible
-                ? ""
-                : "Demultiplexing with one mismatche is not possible due to indexes conflicts");
+    final LaneResultEntry totalEntry = new LaneResultEntry("Total",
+        totalRawClusterCount, totalPFClusterCount, totalRawClusterCount,
+        totalPFClusterCount,
+        oneMismatcheDemuxPossible
+            ? ""
+            : "Demultiplexing with one mismatche is not possible due to indexes conflicts");
 
     for (final Multiset.Entry<String> e : this.rawUndeterminedIndices
         .entrySet()) {
@@ -862,9 +850,8 @@ public class UndeterminedIndexesProcessThreads extends
    */
   private File createLaneResultFile(final String extension) throws IOException {
 
-    final File reportFile =
-        new File(this.reportDir, getFastqSample().getPrefixReport()
-            + "-potentialindices" + extension);
+    final File reportFile = new File(this.reportDir,
+        getFastqSample().getPrefixReport() + "-potentialindices" + extension);
 
     // Create parent directory if necessary
     final File parentDir = reportFile.getParentFile();
@@ -912,7 +899,7 @@ public class UndeterminedIndexesProcessThreads extends
    */
   private void writeHTML(final List<LaneResultEntry> entries,
       final LaneResultEntry totalEntry, final boolean asConflictDemultiplexing)
-      throws IOException, AozanException {
+          throws IOException, AozanException {
 
     final File reportHtml = createLaneResultFile(".html");
 
@@ -953,16 +940,16 @@ public class UndeterminedIndexesProcessThreads extends
             this.rawUndeterminedIndices.count(newIndex);
         final int newIndexPFClusterCount =
             this.pfUndeterminedIndices.count(newIndex);
-        final String comment =
-            this.newIndexes.get(newIndex).size() > 1
-                ? "Conflict if run demultiplexing with "
-                    + this.maxMismatches + " mismatch(es) : "
-                    + JOINER.join(this.newIndexes.get(newIndex)) : "";
+        final String comment = this.newIndexes.get(newIndex).size() > 1
+            ? "Conflict if run demultiplexing with "
+                + this.maxMismatches + " mismatch(es) : "
+                + JOINER.join(this.newIndexes.get(newIndex))
+            : "";
 
         // Add the entry
         entries.add(new SampleResultEntry(newIndex, newIndexRawClusterCount,
-            newIndexPFClusterCount, sampleRawClusterCount,
-            samplePFClusterCount, comment));
+            newIndexPFClusterCount, sampleRawClusterCount, samplePFClusterCount,
+            comment));
 
         newIndexesRawClusterCount += newIndexRawClusterCount;
         newIndexesPFClusterCount += newIndexPFClusterCount;
@@ -1014,13 +1001,11 @@ public class UndeterminedIndexesProcessThreads extends
    * @throws IOException if an error occurs while writing the file
    */
   private void writeCSV(final String sampleName,
-      final SampleResultEntry demuxEntry,
-      final List<SampleResultEntry> entries, final SampleResultEntry totalEntry)
-      throws IOException {
+      final SampleResultEntry demuxEntry, final List<SampleResultEntry> entries,
+      final SampleResultEntry totalEntry) throws IOException {
 
-    final BufferedWriter br =
-        Files.newWriter(createSampleResultFile(sampleName, ".csv"),
-            StandardCharsets.UTF_8);
+    final BufferedWriter br = Files.newWriter(
+        createSampleResultFile(sampleName, ".csv"), StandardCharsets.UTF_8);
 
     // Header
     br.write(ResultEntry.headerCSV());
@@ -1050,9 +1035,8 @@ public class UndeterminedIndexesProcessThreads extends
    *           occurs during transforming document.
    */
   private void writeHTML(final String sampleName,
-      final SampleResultEntry demuxEntry,
-      final List<SampleResultEntry> entries, final SampleResultEntry totalEntry)
-      throws IOException, AozanException {
+      final SampleResultEntry demuxEntry, final List<SampleResultEntry> entries,
+      final SampleResultEntry totalEntry) throws IOException, AozanException {
 
     final File reportHtml = createSampleResultFile(sampleName, ".html");
 
@@ -1077,8 +1061,8 @@ public class UndeterminedIndexesProcessThreads extends
   private void toXML(final String sampleName, final ResultEntry demuxEntry,
       final List<? extends ResultEntry> entries, final ResultEntry totalEntry,
       final File reportHtml, final boolean isSampleData,
-      final boolean asConflictDemultiplexing) throws IOException,
-      AozanException {
+      final boolean asConflictDemultiplexing)
+          throws IOException, AozanException {
 
     Document doc = null;
 
@@ -1150,9 +1134,8 @@ public class UndeterminedIndexesProcessThreads extends
     // Set xsl file to write report HTML file
     InputStream is = null;
     if (this.xslFile == null) {
-      is =
-          this.getClass()
-              .getResourceAsStream(Globals.EMBEDDED_UNDETERMINED_XSL);
+      is = this.getClass()
+          .getResourceAsStream(Globals.EMBEDDED_UNDETERMINED_XSL);
     } else {
       is = new FileInputStream(this.xslFile);
     }
@@ -1177,7 +1160,6 @@ public class UndeterminedIndexesProcessThreads extends
     Preconditions.checkNotNull(b, "b cannot be null");
     Preconditions.checkArgument(a.length() == b.length(),
         "The length of the 2 String must be equals (a=" + a + ", b=" + b + ")");
-
 
     final int len = a.length();
     int result = 0;
@@ -1274,10 +1256,11 @@ public class UndeterminedIndexesProcessThreads extends
    * @throws AozanException if sample cannot be processed
    */
   public UndeterminedIndexesProcessThreads(final RunData data,
-      final FastqSample fastqSample, final File reportDir,
-      final File undeterminedIndexedXSLFile) throws AozanException {
+      final FastqSample fastqSample, final FastqStorage fastqStorage,
+      final File reportDir, final File undeterminedIndexedXSLFile)
+          throws AozanException {
 
-    super(fastqSample);
+    super(fastqSample, fastqStorage);
 
     checkNotNull(data, "data argument cannot be null");
     checkNotNull(reportDir, "reportDir argument cannot be null");
@@ -1293,9 +1276,8 @@ public class UndeterminedIndexesProcessThreads extends
 
     try {
 
-      this.seqFile =
-          SequenceFactory.getSequenceFile(fastqSample.getFastqFiles().toArray(
-              new File[fastqSample.getFastqFiles().size()]));
+      this.seqFile = SequenceFactory.getSequenceFile(fastqSample.getFastqFiles()
+          .toArray(new File[fastqSample.getFastqFiles().size()]));
 
     } catch (final IOException io) {
       throw new AozanException(io);

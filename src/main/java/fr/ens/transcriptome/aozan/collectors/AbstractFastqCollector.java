@@ -189,10 +189,6 @@ public abstract class AbstractFastqCollector implements Collector {
     return false;
   }
 
-  /**
-   * Get the name of the collectors required to run this collector.
-   * @return a list of String with the name of the required collectors
-   */
   @Override
   public List<String> getCollectorsNamesRequiered() {
     return Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME,
@@ -200,25 +196,17 @@ public abstract class AbstractFastqCollector implements Collector {
         FlowcellDemuxSummaryCollector.COLLECTOR_NAME);
   }
 
-  /**
-   * Configure the collector with the path of the run data.
-   * @param properties object with the collector configuration
-   */
   @Override
-  public void configure(final Properties properties) {
+  public void configure(final QC qc, final Properties properties) {
 
     checkNotNull(properties, "properties argument cannot be null");
 
-    this.casavaOutputPath =
-        new File(properties.getProperty(QC.CASAVA_OUTPUT_DIR));
-    this.qcReportOutputPath =
-        new File(properties.getProperty(QC.QC_OUTPUT_DIR));
-    this.casavaDesignFile =
-        new File(properties.getProperty(QC.CASAVA_DESIGN_PATH));
-    this.tmpDir = new File(properties.getProperty(QC.TMP_DIR));
+    this.casavaOutputPath = qc.getFastqDir();
+    this.qcReportOutputPath = qc.getQcDir();
+    this.casavaDesignFile = qc.getSampleSheetFile();
+    this.tmpDir = qc.getTmpDir();
 
-    this.fastqStorage = FastqStorage.getInstance();
-    this.fastqStorage.setTmpDir(this.tmpDir);
+    this.fastqStorage = qc.getFastqStorage();
 
     if (this.getThreadsNumber() > 1) {
 

@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.io.FastqSample;
@@ -91,16 +92,16 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
   }
 
   @Override
-  public void configure(final Properties properties) {
-    super.configure(properties);
+  public void configure(final QC qc, final Properties properties) {
+
+    super.configure(qc, properties);
 
     // Set the number of threads
     if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
 
       try {
-        final int confThreads =
-            Integer.parseInt(properties.getProperty(
-                Settings.QC_CONF_THREADS_KEY).trim());
+        final int confThreads = Integer.parseInt(
+            properties.getProperty(Settings.QC_CONF_THREADS_KEY).trim());
         if (confThreads > 0) {
           this.numberThreads = confThreads;
         }
@@ -110,29 +111,24 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
     }
 
     try {
-      this.skipControlLane =
-          Boolean
-              .parseBoolean(properties
-                  .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY));
+      this.skipControlLane = Boolean.parseBoolean(properties.getProperty(
+          Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY));
     } catch (final Exception e) {
       // Default value
       this.skipControlLane = true;
     }
 
     try {
-      this.ignorePairedMode =
-          Boolean
-              .parseBoolean(properties
-                  .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY));
+      this.ignorePairedMode = Boolean.parseBoolean(properties.getProperty(
+          Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY));
 
     } catch (final Exception e) {
       // Default value
       this.ignorePairedMode = false;
     }
 
-    final int readsToCopy =
-        Integer.parseInt(properties
-            .getProperty(Settings.QC_CONF_FASTQSCREEN_FASTQ_READS_PF_USED_KEY));
+    final int readsToCopy = Integer.parseInt(properties
+        .getProperty(Settings.QC_CONF_FASTQSCREEN_FASTQ_READS_PF_USED_KEY));
     if (readsToCopy == -1) {
       // Use a fully fastq file, force uncompress fastq file independently
       // number reads
@@ -141,10 +137,8 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
       this.countReadsPFtoCopy = readsToCopy;
     }
 
-    final int countReads =
-        Integer
-            .parseInt(properties
-                .getProperty(Settings.QC_CONF_FASTQSCREEN_FASTQ_MAX_READS_PARSED_KEY));
+    final int countReads = Integer.parseInt(properties
+        .getProperty(Settings.QC_CONF_FASTQSCREEN_FASTQ_MAX_READS_PARSED_KEY));
     if (countReads == -1) {
       // Parsing fully fastq file
       this.maxReadsPFtoParse = Integer.MAX_VALUE;
@@ -155,15 +149,14 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
     // Check if process undetermined indices samples specify in Aozan
     // configuration
     this.isProcessUndeterminedIndicesSamples =
-        Boolean
-            .parseBoolean(properties
-                .getProperty(Settings.QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY));
+        Boolean.parseBoolean(properties.getProperty(
+            Settings.QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY));
   }
 
   @Override
   public AbstractFastqProcessThread collectSample(final RunData data,
       final FastqSample fastqSample, final File reportDir, final boolean runPE)
-      throws AozanException {
+          throws AozanException {
 
     if (fastqSample == null) {
       return null;
@@ -175,10 +168,9 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
           + fastqSample.getSampleName() + " no FastQ file exist");
     }
 
-    final boolean controlLane =
-        data.getBoolean("design.lane"
-            + fastqSample.getLane() + "." + fastqSample.getSampleName()
-            + ".control");
+    final boolean controlLane = data.getBoolean("design.lane"
+        + fastqSample.getLane() + "." + fastqSample.getSampleName()
+        + ".control");
 
     // Skip control lane
     if (controlLane && this.skipControlLane) {
@@ -198,10 +190,9 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
 
     // Retrieve number of passing filter Illumina reads for this fastq
     // files
-    final String prefix =
-        "demux.lane"
-            + fastqSample.getLane() + ".sample." + fastqSample.getSampleName()
-            + ".read" + fastqSample.getRead();
+    final String prefix = "demux.lane"
+        + fastqSample.getLane() + ".sample." + fastqSample.getSampleName()
+        + ".read" + fastqSample.getRead();
 
     LOGGER.fine("In "
         + COLLECTOR_NAME + " collector found: " + prefix + ".pf.cluster.count="
@@ -226,8 +217,9 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
     final int rawClusterCount = data.getInt(prefix + ".raw.cluster.count");
 
     // Create the thread object
-    return new TemporaryPartialFastqThread(fastqSample, rawClusterCount,
-        pfClusterCount, this.countReadsPFtoCopy, this.maxReadsPFtoParse);
+    return new TemporaryPartialFastqThread(fastqSample, getFastqStorage(),
+        rawClusterCount, pfClusterCount, this.countReadsPFtoCopy,
+        this.maxReadsPFtoParse);
   }
 
   /**

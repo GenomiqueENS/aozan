@@ -40,9 +40,6 @@ public class ReadingInteropBinaryFileTest extends TestCase {
   private static final String SR50_FILE = "SR50.data";
   private static final String PE100_FILE = "PE100.data";
 
-  private final ReadCollector readCollector = new ReadCollector();
-  private final RunInfoCollector runInfoCollector = new RunInfoCollector();
-
   private final Properties props = new Properties();
   private String path;
 
@@ -57,13 +54,21 @@ public class ReadingInteropBinaryFileTest extends TestCase {
   private void compareRunData(String runName, String dir, String runDataFile)
       throws AozanException, IOException {
 
+    // Reading binary files
+    props.put(Settings.QC_CONF_READ_XML_COLLECTOR_USED_KEY, "false");
+    // Constant
+    props.put("qc.conf.cluster.density.ratio", "0.3472222");
+
     // Define path to file utils
     props.put("rta.output.dir", path + "/" + dir);
     props.put("casava.output.dir", path + "/" + dir);
 
+    final ReadCollector readCollector = new ReadCollector();
+    final RunInfoCollector runInfoCollector = new RunInfoCollector();
+
     // Path to save rundata
-    runInfoCollector.configure(props);
-    readCollector.configure(props);
+    runInfoCollector.configure(null, props);
+    readCollector.configure(null, props);
 
     // Create runData from binary files
     RunData dataTest = new RunData();
@@ -71,9 +76,8 @@ public class ReadingInteropBinaryFileTest extends TestCase {
     readCollector.collect(dataTest);
 
     // Read source rundata
-    BufferedReader br =
-        new BufferedReader(new FileReader(new File(path + "/" + dir,
-            runDataFile)));
+    BufferedReader br = new BufferedReader(
+        new FileReader(new File(path + "/" + dir, runDataFile)));
     String line;
 
     while ((line = br.readLine()) != null) {
@@ -88,21 +92,15 @@ public class ReadingInteropBinaryFileTest extends TestCase {
       // Compare runData test and original for each line
       assertEquals("For " + runName + " : " + key + " must be same ? ", value,
           dataTest.get(key));
-
     }
     br.close();
   }
 
   public void setUp() {
 
-    // Reading binary files
-    props.put(Settings.QC_CONF_READ_XML_COLLECTOR_USED_KEY, "false");
-    // Constant
-    props.put("qc.conf.cluster.density.ratio", "0.3472222");
     // Path to directory InterOP
-    path =
-        new File(new File(".").getAbsolutePath() + "/src/test/java/files")
-            .getAbsolutePath();
+    path = new File(new File(".").getAbsolutePath() + "/src/test/java/files")
+        .getAbsolutePath();
 
   }
 

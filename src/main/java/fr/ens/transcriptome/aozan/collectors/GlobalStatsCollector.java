@@ -29,6 +29,7 @@ import java.util.Properties;
 import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.util.StatisticsUtils;
 
@@ -64,7 +65,7 @@ public class GlobalStatsCollector implements Collector {
   }
 
   @Override
-  public void configure(final Properties properties) {
+  public void configure(final QC qc, final Properties properties) {
     // Nothing to do
   }
 

@@ -77,13 +77,13 @@ public class PhasingCollector implements Collector {
   }
 
   @Override
-  public void configure(final Properties properties) {
+  public void configure(final QC qc, final Properties properties) {
 
     if (properties == null) {
       return;
     }
 
-    this.casavaOutputPath = properties.getProperty(QC.CASAVA_OUTPUT_DIR);
+    this.casavaOutputPath = qc.getFastqDir().getAbsolutePath();
   }
 
   @Override

@@ -42,6 +42,7 @@ import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreen;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreenResult;
 import fr.ens.transcriptome.aozan.io.FastqSample;
+import fr.ens.transcriptome.aozan.io.FastqStorage;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
 /**
@@ -247,13 +248,14 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    *           file was found
    */
   public FastqScreenProcessThread(final FastqSample fastqSampleR1,
-      final FastqSample fastqSampleR2, final FastqScreen fastqscreen,
-      final RunData data, final Set<String> genomesToMapping,
-      final String genomeSample, final File reportDir,
-      final boolean isPairedEndMode, final boolean isRunPE,
-      final File fastqscreenXSLFile) throws AozanException {
+      final FastqSample fastqSampleR2, final FastqStorage fastqStorage,
+      final FastqScreen fastqscreen, final RunData data,
+      final Set<String> genomesToMapping, final String genomeSample,
+      final File reportDir, final boolean isPairedEndMode,
+      final boolean isRunPE, final File fastqscreenXSLFile)
+          throws AozanException {
 
-    this(fastqSampleR1, fastqscreen, data, genomesToMapping, genomeSample,
+    this(fastqSampleR1, fastqStorage, fastqscreen, data, genomesToMapping, genomeSample,
         reportDir, isPairedEndMode, isRunPE, fastqscreenXSLFile);
 
     if (isPairedEndMode) {
@@ -280,13 +282,13 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    *           file was found
    */
   public FastqScreenProcessThread(final FastqSample fastqSample,
-      final FastqScreen fastqscreen, final RunData data,
-      final Set<String> genomesToMapping, final String genomeSample,
-      final File reportDir, final boolean isPairedEndMode,
-      final boolean isRunPE, final File fastqscreenXSLFile)
-          throws AozanException {
+      final FastqStorage fastqStorage, final FastqScreen fastqscreen,
+      final RunData data, final Set<String> genomesToMapping,
+      final String genomeSample, final File reportDir,
+      final boolean isPairedEndMode, final boolean isRunPE,
+      final File fastqscreenXSLFile) throws AozanException {
 
-    super(fastqSample);
+    super(fastqSample, fastqStorage);
 
     checkNotNull(fastqscreen, "fastqscreen argument cannot be null");
     checkNotNull(data, "data argument cannot be null");

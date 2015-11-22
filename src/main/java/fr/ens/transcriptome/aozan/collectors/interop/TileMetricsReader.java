@@ -47,7 +47,7 @@ public class TileMetricsReader extends
 
   @Override
   protected File getMetricsFile() {
-    return new File(getDirPathInterOP() + TILE_METRICS_FILE);
+    return new File(getDirPathInterOP(), TILE_METRICS_FILE);
   }
 
   @Override
@@ -77,7 +77,7 @@ public class TileMetricsReader extends
   // Constructor
   //
 
-  TileMetricsReader(final String dirPath) throws AozanException {
+  TileMetricsReader(final File dirPath) throws AozanException {
     super(dirPath);
   }
 

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Properties;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 
 /**
@@ -50,9 +51,10 @@ public interface Collector {
 
   /**
    * Configure the collector with the path of the run data.
+   * @param QC QC object for the run
    * @param properties object with the collector configuration
    */
-  public void configure(Properties properties);
+  public void configure(QC qc, Properties properties);
 
   /**
    * Collect data.

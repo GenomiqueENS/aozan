@@ -43,7 +43,7 @@ import fr.ens.transcriptome.eoulsan.util.FileUtils;
  */
 abstract class AbstractBinaryFileReader<M> {
 
-  private final String dirInterOpPath;
+  private final File dirInterOpPath;
 
   // 2 bytes: 1 for file version number and 1 for length for each record
   private static final int HEADER_SIZE = 2;
@@ -76,7 +76,7 @@ abstract class AbstractBinaryFileReader<M> {
    * Gets the dir path inter op.
    * @return the dir path inter op
    */
-  public String getDirPathInterOP() {
+  public File getDirPathInterOP() {
     return this.dirInterOpPath;
   }
 
@@ -180,17 +180,18 @@ abstract class AbstractBinaryFileReader<M> {
    * @param dirPath path to the interop directory for a run
    * @throws AozanException
    */
-  AbstractBinaryFileReader(final String dirPath) throws AozanException {
-    this.dirInterOpPath = dirPath;
+  AbstractBinaryFileReader(final File dirPath) throws AozanException {
 
-    if (this.dirInterOpPath == null) {
-      throw new AozanException("None path to InterOp directory provided");
+    if (dirPath == null) {
+      throw new AozanException("No path to the InterOp directory has been provided");
     }
 
-    if (!new File(this.dirInterOpPath).exists()) {
+    if (!dirPath.exists()) {
       throw new AozanException("Path to interOp directory doesn't exists "
-          + this.dirInterOpPath);
+          + dirPath);
     }
+
+    this.dirInterOpPath = dirPath;
   }
 
   /** Convert an unsigned byte to a signed int. */

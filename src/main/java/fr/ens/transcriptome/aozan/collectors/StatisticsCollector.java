@@ -49,7 +49,7 @@ public abstract class StatisticsCollector implements Collector {
   private static final double DEFAULT_CONTAMINATION_PERCENT_THRESHOLD = 0.10;
 
   /** Report directory. */
-  private String reportDir;
+  private File reportDir;
 
   /** Stylesheet xsl file. */
   private File fastqscreenXSLFile;
@@ -77,10 +77,10 @@ public abstract class StatisticsCollector implements Collector {
   }
 
   @Override
-  public void configure(final Properties properties) {
+  public void configure(final QC qc, final Properties properties) {
 
     // Set control quality directory
-    this.reportDir = properties.getProperty(QC.QC_OUTPUT_DIR);
+    this.reportDir = qc.getQcDir();
 
     // Set stylesheet file to build project report
     try {
@@ -227,7 +227,7 @@ public abstract class StatisticsCollector implements Collector {
    * @return the report directory
    */
   public File getReportDirectory() {
-    return new File(this.reportDir);
+    return this.reportDir;
   }
 
   /**

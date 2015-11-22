@@ -67,7 +67,7 @@ public class ExtractionMetricsCollector extends AbstractMetricsCollector {
     int keyMap;
 
     final ExtractionMetricsReader reader =
-        new ExtractionMetricsReader(getInterOpDirPath());
+        new ExtractionMetricsReader(getInterOpDir());
     initMetricsMap();
 
     // Distribution of metrics between lane and code

@@ -76,13 +76,18 @@ public class RunInfoCollector implements Collector {
   }
 
   @Override
-  public void configure(final Properties properties) {
+  public void configure(final QC qc, final Properties properties) {
 
     if (properties == null)
       return;
 
-    this.runInfoFile =
-        new File(properties.getProperty(QC.RTA_OUTPUT_DIR), "RunInfo.xml");
+    if (qc == null) {
+      // Unit Test
+      this.runInfoFile =
+          new File(properties.getProperty(QC.RTA_OUTPUT_DIR), "RunInfo.xml");
+    } else {
+      this.runInfoFile = new File(qc.getBclDir(), "RunInfo.xml");
+    }
   }
 
   @Override

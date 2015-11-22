@@ -33,6 +33,7 @@ import com.google.common.collect.Sets;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreen;
@@ -78,14 +79,10 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
   }
 
-  /**
-   * Configure fastqScreen with properties from file aozan.conf.
-   * @param properties object with the collector configuration
-   */
   @Override
-  public void configure(final Properties properties) {
+  public void configure(final QC qc, final Properties properties) {
 
-    super.configure(properties);
+    super.configure(qc, properties);
 
     this.fastqscreen = new FastqScreen(properties);
 
@@ -217,16 +214,17 @@ public class FastqScreenCollector extends AbstractFastqCollector {
         if (fastqSampleR2.getKeyFastqSample().equals(prefixRead2)) {
 
           return new FastqScreenProcessThread(fastqSample, fastqSampleR2,
-              this.fastqscreen, data, genomesForMapping, sampleGenomeName,
-              reportDir, isPairedMode, isRunPE, this.fastqscreenXSLFile);
+              getFastqStorage(), this.fastqscreen, data, genomesForMapping,
+              sampleGenomeName, reportDir, isPairedMode, isRunPE,
+              this.fastqscreenXSLFile);
         }
       }
     }
 
     // Call with a mode single-end for mapping
-    return new FastqScreenProcessThread(fastqSample, this.fastqscreen, data,
-        genomesForMapping, sampleGenomeName, reportDir, isPairedMode, isRunPE,
-        this.fastqscreenXSLFile);
+    return new FastqScreenProcessThread(fastqSample, getFastqStorage(),
+        this.fastqscreen, data, genomesForMapping, sampleGenomeName, reportDir,
+        isPairedMode, isRunPE, this.fastqscreenXSLFile);
   }
 
   /**
@@ -245,9 +243,9 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     final Set<String> genomesToSampleTest =
         FastqScreenGenomeMapper.getInstance().getGenomesToMapping();
 
-    return new FastqScreenProcessThread(fastqSample, this.fastqscreen, data,
-        genomesToSampleTest, null, reportDir, false, isRunPE,
-        this.fastqscreenXSLFile);
+    return new FastqScreenProcessThread(fastqSample, getFastqStorage(),
+        this.fastqscreen, data, genomesToSampleTest, null, reportDir, false,
+        isRunPE, this.fastqscreenXSLFile);
   }
 
   //

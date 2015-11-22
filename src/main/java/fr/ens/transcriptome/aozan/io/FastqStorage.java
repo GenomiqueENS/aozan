@@ -45,9 +45,7 @@ public final class FastqStorage {
   /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
-  private static FastqStorage singleton;
-
-  private File tmpPath;
+  private final File tmpDir;
 
   /**
    * Return a sequenceFile for all fastq files present to treat in the sample.
@@ -71,7 +69,7 @@ public final class FastqStorage {
       } else {
         // Create temporary fastq file
         final File tmpFile = new File(getTemporaryFile(fastqSample) + ".tmp");
-        seqFile = new AozanSequenceFile(fastq, tmpFile, fastqSample);
+        seqFile = new AozanSequenceFile(fastq, tmpFile, fastqSample, this);
 
       }
 
@@ -108,15 +106,15 @@ public final class FastqStorage {
   public void clear() {
     LOGGER.info("Delete temporaries fastq and map files");
 
-    final File[] files = this.tmpPath.listFiles(new FileFilter() {
+    final File[] files = this.tmpDir.listFiles(new FileFilter() {
 
       @Override
       public boolean accept(final File pathname) {
-        return (pathname.getName().startsWith("aozan_fastq_") && (pathname
-            .getName().endsWith(".fastq") || pathname.getName().endsWith(
-            ".fastq.tmp")))
-            || (pathname.getName().startsWith("map-") && (pathname.getName()
-                .endsWith(".txt")));
+        return (pathname.getName().startsWith("aozan_fastq_")
+            && (pathname.getName().endsWith(".fastq")
+                || pathname.getName().endsWith(".fastq.tmp")))
+            || (pathname.getName().startsWith("map-")
+                && (pathname.getName().endsWith(".txt")));
       }
     });
 
@@ -124,8 +122,8 @@ public final class FastqStorage {
     for (final File f : files) {
       if (f.exists()) {
         if (!f.delete()) {
-          LOGGER.warning("Can not delete the temporary file : "
-              + f.getAbsolutePath());
+          LOGGER.warning(
+              "Can not delete the temporary file : " + f.getAbsolutePath());
         }
       }
     }
@@ -138,36 +136,7 @@ public final class FastqStorage {
    */
   public File getTemporaryFile(final FastqSample fastqSample) {
 
-    return new File(this.tmpPath, fastqSample.getNameTemporaryFastqFiles());
-  }
-
-  //
-  // Setter
-  //
-
-  /**
-   * Define the path used for FastqStorage.
-   * @param tmpDir of the temporary directory
-   */
-  public void setTmpDir(final File tmpDir) {
-
-    this.tmpPath = tmpDir;
-  }
-
-  //
-  // Getter
-  //
-
-  /**
-   * Create a instance of fastqStorage or if it exists return instance.
-   * @return instance of fastqStorage
-   */
-  public static FastqStorage getInstance() {
-
-    if (singleton == null) {
-      singleton = new FastqStorage();
-    }
-    return singleton;
+    return new File(this.tmpDir, fastqSample.getNameTemporaryFastqFiles());
   }
 
   /**
@@ -175,7 +144,7 @@ public final class FastqStorage {
    * @return path of the temporary directory
    */
   public File getTmpDir() {
-    return this.tmpPath;
+    return this.tmpDir;
   }
 
   //
@@ -183,9 +152,28 @@ public final class FastqStorage {
   //
 
   /**
-   * Private constructor of FastqStorage.
+   * Constructor of FastqStorage.
+   * @param tmpDir temporary directory
+   * @throws AozanException if the temporary directory does not exists
    */
-  private FastqStorage() {
+  public FastqStorage(final File tmpDir) throws AozanException {
+
+    if (tmpDir == null) {
+      throw new NullPointerException("tmpDir argument cannot be null");
+    }
+
+    if (!tmpDir.isDirectory()) {
+      throw new AozanException(
+          "The temprary directory does not exists or is not a directory: "
+              + tmpDir);
+    }
+
+    if (tmpDir.canWrite()) {
+      throw new AozanException(
+          "The temprary directory is not writtable: " + tmpDir);
+    }
+
+    this.tmpDir = tmpDir;
   }
 
 }

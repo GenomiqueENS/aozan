@@ -46,6 +46,7 @@ import fr.ens.transcriptome.aozan.collectors.CollectorRegistry;
 import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.fastqc.RuntimePatchFastQC;
+import fr.ens.transcriptome.aozan.io.FastqStorage;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.AozanTestRegistry;
 import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
@@ -87,9 +88,9 @@ public class QC {
   private static final String TEST_KEY_ENABLED_SUFFIX = ".enable";
   private static final String TEST_KEY_PREFIX = "qc.test.";
 
-  private final String bclDir;
-  private final String fastqDir;
-  private final String qcDir;
+  private final File bclDir;
+  private final File fastqDir;
+  private final File qcDir;
   private final String runId;
 
   private final List<Collector> collectors = new ArrayList<>();
@@ -101,6 +102,72 @@ public class QC {
   private final Map<String, String> globalConf = new HashMap<>();
 
   private final File tmpDir;
+  private final FastqStorage fastqStorage;
+  private final File sampleSheetFile;
+
+  //
+  // Getters
+  //
+
+  /**
+   * Get the run id.
+   * @return the run id as a String
+   */
+  public String getRunId() {
+    return this.runId;
+  }
+
+  /**
+   * Get the BCL directory of the run.
+   * @return the BCL directory of the run
+   */
+  public File getBclDir() {
+    return this.bclDir;
+  }
+
+  /**
+   * Get the FASTQ directory of the run.
+   * @return the FASTQ directory of the run
+   */
+  public File getFastqDir() {
+    return this.bclDir;
+  }
+
+  /**
+   * Get the QC directory of the run.
+   * @return the QC directory of the run
+   */
+  public File getQcDir() {
+    return this.qcDir;
+  }
+
+  /**
+   * Get the samplesheet file.
+   * @return the samplesheet file
+   */
+  public File getSampleSheetFile() {
+    return this.sampleSheetFile;
+  }
+
+  /**
+   * Get the temporary directory.
+   * @return the temporary directory
+   */
+  public File getTmpDir() {
+    return this.tmpDir;
+  }
+
+  /**
+   * Get the FASTQ storage for the run.
+   * @return the FASTQ storage for the run
+   */
+  public FastqStorage getFastqStorage() {
+    return this.fastqStorage;
+  }
+
+  //
+  // Report methods
+  //
 
   /**
    * Process data.
@@ -108,9 +175,9 @@ public class QC {
    */
   public final QCReport computeReport() throws AozanException {
 
-    final File RTAOutputDir = new File(this.bclDir);
-    final File casavaOutputDir = new File(this.fastqDir);
-    final File QCOutputDir = new File(this.qcDir);
+    final File RTAOutputDir = this.bclDir;
+    final File casavaOutputDir = this.fastqDir;
+    final File QCOutputDir = this.qcDir;
 
     final File dataFile = new File(this.qcDir + "/data-" + this.runId + ".txt");
 
@@ -164,7 +231,7 @@ public class QC {
       rdg.setGlobalConf(this.globalConf);
 
       // Create the run data object
-      data = rdg.collect();
+      data = rdg.collect(this);
     }
 
     if (data.size() == 0) {
@@ -312,6 +379,10 @@ public class QC {
       throw new AozanException(e);
     }
   }
+
+  //
+  // Initialization methods
+  //
 
   /**
    * Init the QC.
@@ -551,27 +622,11 @@ public class QC {
       }
     }
 
-    final File[] designFiles =
-        new File(this.fastqDir).listFiles(new FilenameFilter() {
-
-          @Override
-          public boolean accept(final File dir, final String name) {
-
-            return name.endsWith(".csv");
-          }
-        });
-
-    if (designFiles == null || designFiles.length == 0) {
-      throw new AozanException(
-          "No Casava design file found in " + this.fastqDir);
-    }
-
-    final File casavaDesignFile = designFiles[0];
-
-    this.globalConf.put(RTA_OUTPUT_DIR, this.bclDir);
-    this.globalConf.put(CASAVA_DESIGN_PATH, casavaDesignFile.getAbsolutePath());
-    this.globalConf.put(CASAVA_OUTPUT_DIR, this.fastqDir);
-    this.globalConf.put(QC_OUTPUT_DIR, this.qcDir);
+    this.globalConf.put(RTA_OUTPUT_DIR, this.bclDir.getPath());
+    this.globalConf.put(CASAVA_DESIGN_PATH,
+        this.sampleSheetFile.getAbsolutePath());
+    this.globalConf.put(CASAVA_OUTPUT_DIR, this.fastqDir.getPath());
+    this.globalConf.put(QC_OUTPUT_DIR, this.qcDir.getPath());
     this.globalConf.put(TMP_DIR, this.tmpDir.getAbsolutePath());
   }
 
@@ -698,6 +753,52 @@ public class QC {
   }
 
   //
+  // Other methods
+  //
+
+  /**
+   * Create a File object for a directory path and check if the directory
+   * exists.
+   * @param dirPath the path of the directory
+   * @return a File object with the directory path
+   * @throws AozanException if the directory does not exists
+   */
+  private static File checkDir(final String dirPath) throws AozanException {
+
+    if (dirPath == null) {
+      throw new NullPointerException("dirPath argument cannot be null");
+    }
+
+    final File dir = new File(dirPath);
+
+    if (!dir.isDirectory()) {
+      throw new AozanException(
+          "The directory does not exits or is not a directory: " + dir);
+    }
+
+    return dir;
+  }
+
+  private static File getSampleSheetFile(final File fastqDir)
+      throws AozanException {
+
+    final File[] designFiles = fastqDir.listFiles(new FilenameFilter() {
+
+      @Override
+      public boolean accept(final File dir, final String name) {
+
+        return name.endsWith(".csv");
+      }
+    });
+
+    if (designFiles == null || designFiles.length == 0) {
+      throw new AozanException("No Casava design file found in " + fastqDir);
+    }
+
+    return designFiles[0];
+  }
+
+  //
   // Constructor
   //
 
@@ -739,13 +840,16 @@ public class QC {
       throw new NullPointerException("The properties object is null");
     }
 
-    this.bclDir = bclDir;
-    this.fastqDir = fastqDir;
-    this.qcDir = qcDir;
+    this.bclDir = checkDir(bclDir);
+    this.fastqDir = checkDir(fastqDir);
+    this.qcDir = checkDir(qcDir);
     this.runId = runId;
 
     this.tmpDir = tmpDir == null
         ? new File(System.getProperty("java.io.tmpdir")) : tmpDir;
+
+    this.fastqStorage = new FastqStorage(this.tmpDir);
+    this.sampleSheetFile = getSampleSheetFile(this.fastqDir);
 
     initGlobalConf(properties);
 

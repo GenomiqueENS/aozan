@@ -70,7 +70,7 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
 
     try {
       final ErrorMetricsReader reader =
-          new ErrorMetricsReader(getInterOpDirPath());
+          new ErrorMetricsReader(getInterOpDir());
       initMetricsMap(data);
 
       int keyMap;

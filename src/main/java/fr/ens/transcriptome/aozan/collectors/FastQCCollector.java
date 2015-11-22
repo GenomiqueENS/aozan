@@ -27,6 +27,7 @@ import java.io.File;
 import java.util.Properties;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.fastqc.OverrepresentedSequencesBlast;
@@ -55,17 +56,16 @@ public class FastQCCollector extends AbstractFastqCollector {
   }
 
   @Override
-  public void configure(final Properties properties) {
+  public void configure(final QC qc, final Properties properties) {
 
-    super.configure(properties);
+    super.configure(qc, properties);
 
     // Set the number of threads
     if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
 
       try {
-        final int confThreads =
-            Integer.parseInt(properties.getProperty(
-                Settings.QC_CONF_THREADS_KEY).trim());
+        final int confThreads = Integer.parseInt(
+            properties.getProperty(Settings.QC_CONF_THREADS_KEY).trim());
 
         if (confThreads > 0) {
           this.numberThreads = confThreads;
@@ -76,10 +76,8 @@ public class FastQCCollector extends AbstractFastqCollector {
 
     // Check if process undetermined indices samples specify in Aozan
     // configuration
-    this.isProcessUndeterminedIndicesSamples =
-        Boolean
-            .parseBoolean(properties
-                .getProperty(Settings.QC_CONF_FASTQC_PROCESS_UNDETERMINED_SAMPLES_KEY));
+    this.isProcessUndeterminedIndicesSamples = Boolean.parseBoolean(properties
+        .getProperty(Settings.QC_CONF_FASTQC_PROCESS_UNDETERMINED_SAMPLES_KEY));
 
     // Check if step blast needed and configure
     OverrepresentedSequencesBlast.getInstance().configure(properties);
@@ -95,15 +93,15 @@ public class FastQCCollector extends AbstractFastqCollector {
   @Override
   public AbstractFastqProcessThread collectSample(final RunData data,
       final FastqSample fastqSample, final File reportDir, final boolean runPE)
-      throws AozanException {
+          throws AozanException {
 
     if (fastqSample.getFastqFiles().isEmpty()) {
       return null;
     }
 
     // Create the thread object
-    return new FastQCProcessThread(fastqSample, INGORE_FILTERED_SEQUENCES,
-        reportDir);
+    return new FastQCProcessThread(fastqSample, getFastqStorage(),
+        INGORE_FILTERED_SEQUENCES, reportDir);
   }
 
   //

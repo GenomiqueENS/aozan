@@ -84,7 +84,11 @@ public class RunDataGenerator {
    * @return a RunData object with all data about the run
    * @throws AozanException if an error occurs while collecting data
    */
-  public RunData collect() throws AozanException {
+  public RunData collect(final QC qc) throws AozanException {
+
+    if (qc == null) {
+      throw new NullPointerException("qc argument cannot be null");
+    }
 
     final RunData data = new RunData();
 
@@ -121,11 +125,11 @@ public class RunDataGenerator {
     for (final Collector collector : this.collectors) {
 
       final Stopwatch timerCollector = Stopwatch.createStarted();
-      LOGGER.info(collector.getName().toUpperCase()
-          + " start on run " + this.runId);
+      LOGGER.info(
+          collector.getName().toUpperCase() + " start on run " + this.runId);
 
       // Configure
-      collector.configure(new Properties(this.properties));
+      collector.configure(qc, new Properties(this.properties));
 
       // And collect data
       collector.collect(data);
