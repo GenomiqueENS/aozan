@@ -116,6 +116,8 @@ def qc(run_id, conf):
 
     # Create temporary temporary directory
     qc_output_dir = qc_output_dir + tmp_extension
+    if not os.path.exists(qc_output_dir):
+        os.mkdir(qc_output_dir)
 
     try:
 
