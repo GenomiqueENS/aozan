@@ -83,11 +83,13 @@ public class OverrepresentedSequencesBlast {
 
   private static final boolean BLAST_RESULT_HTML_TYPE = true;
 
+  private static final Object LOCK = new Object();
+
   // Tag configuration general of blast
   private static final String tag_queryLength = "Iteration_query-len";
   private static final String tag_blastVersion = "BlastOutput_version";
 
-  private static OverrepresentedSequencesBlast singleton;
+  private static volatile OverrepresentedSequencesBlast singleton;
 
   // Save sequence and result blast for the run
   private final Map<String, BlastResultHit> sequencesAlreadyAnalysis =
@@ -512,7 +514,9 @@ public class OverrepresentedSequencesBlast {
   public static final synchronized OverrepresentedSequencesBlast getInstance() {
 
     if (singleton == null) {
-      singleton = new OverrepresentedSequencesBlast();
+      synchronized (LOCK) {
+        singleton = new OverrepresentedSequencesBlast();
+      }
     }
 
     return singleton;
