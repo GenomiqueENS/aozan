@@ -23,8 +23,8 @@
 
 package fr.ens.transcriptome.aozan.fastqscreen;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.transcriptome.eoulsan.EoulsanRuntime.getSettings;
-import static jersey.repackaged.com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.BufferedReader;
 import java.io.File;

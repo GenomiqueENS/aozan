@@ -12,15 +12,14 @@ import java.util.List;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
-import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.Sample;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.eoulsan.util.Version;
-import jersey.repackaged.com.google.common.collect.Lists;
 
 /**
  * This class define the output of bcl2fastq.
