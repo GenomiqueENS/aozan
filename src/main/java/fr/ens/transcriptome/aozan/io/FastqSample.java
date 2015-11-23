@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.util.List;
 
 import fr.ens.transcriptome.aozan.AozanException;
-import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.illumina.Bcl2FastqOutput;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
@@ -182,24 +181,6 @@ public class FastqSample {
     }
 
     return (long) (sizeFastqFiles * ratioCommpression());
-  }
-
-  /**
-   * Keep files that satisfy the specified filter in this directory and
-   * beginning with this prefix.
-   * @return an array of abstract pathnames
-   */
-  private List<File> createListFastqFiles(final int read) {
-
-    final List<File> result =
-        this.bcl2fastqOutput.createListFastqFiles(this, read);
-
-    if (result.isEmpty()) {
-      throw new AozanRuntimeException("No fastq file found for sample: "
-          + this + " in " + this.bcl2fastqOutput.getFastqDirectory());
-    }
-
-    return result;
   }
 
   /**
@@ -437,7 +418,8 @@ public class FastqSample {
         new Bcl2FastqOutput(qc.getSampleSheetFile(), qc.getFastqDir());
     this.tmpDir = qc.getTmpDir();
 
-    this.fastqFiles = createListFastqFiles(this.read);
+    this.fastqFiles =
+        this.bcl2fastqOutput.createListFastqFiles(this, this.read);
 
     this.compressionType = getCompressionExtension(this.fastqFiles);
     this.keyFastqSample = createKeyFastqSample();
@@ -473,7 +455,8 @@ public class FastqSample {
         new Bcl2FastqOutput(qc.getSampleSheetFile(), qc.getFastqDir());
     this.tmpDir = qc.getTmpDir();
 
-    this.fastqFiles = createListFastqFiles(this.read);
+    this.fastqFiles =
+        this.bcl2fastqOutput.createListFastqFiles(this, this.read);
 
     this.compressionType = getCompressionExtension(this.fastqFiles);
     this.keyFastqSample = createKeyFastqSample();

@@ -243,9 +243,10 @@ public class Bcl2FastqOutput {
       final int read) {
 
     final String filePrefix = prefixFileName(fastqSample, read);
+    final File fastqSampleDir = getFastqSampleParentDir(fastqSample);
 
-    return Arrays.asList(
-        getFastqSampleParentDir(fastqSample).listFiles(new FileFilter() {
+    final List<File> result =
+        Arrays.asList(fastqSampleDir.listFiles(new FileFilter() {
 
           @Override
           public boolean accept(final File file) {
@@ -257,6 +258,14 @@ public class Bcl2FastqOutput {
                 && filename.contains(FASTQ_EXTENSION);
           }
         }));
+
+    if (result.isEmpty()) {
+      throw new AozanRuntimeException("No fastq file found for sample: "
+          + fastqSample + " in " + fastqSampleDir + "(filePrefix: " + filePrefix
+          + ", fastqDirectory: " + this.fastqDirectory + ")");
+    }
+
+    return result;
   }
 
   //
