@@ -28,9 +28,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import fr.ens.transcriptome.aozan.AozanException;
+import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.illumina.Bcl2FastqOutput;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
@@ -181,6 +183,43 @@ public class FastqSample {
     }
 
     return (long) (sizeFastqFiles * ratioCommpression());
+  }
+
+  /**
+   * Keep files that satisfy the specified filter in this directory and
+   * beginning with this prefix.
+   * @return an array of abstract pathnames
+   */
+  private List<File> createListFastqFiles(final int read) {
+
+    final List<File> result =
+        this.bcl2fastqOutput.createListFastqFiles(this, read);
+
+    // Empty FASTQ files are not created by bcl2fastq 2
+    if (result.isEmpty()) {
+
+      final String filenamePrefix =
+          this.bcl2fastqOutput.getFilenamePrefix(this, read);
+
+      final File emptyFile =
+          new File(this.tmpDir, filenamePrefix + "_empty.fastq");
+
+      // Create empty file
+      if (!emptyFile.exists()) {
+        try {
+          if (!emptyFile.createNewFile()) {
+            throw new IOException(
+                "Unable to create empty FASTQ file: " + emptyFile);
+          }
+        } catch (IOException e) {
+          throw new AozanRuntimeException(e);
+        }
+      }
+
+      return Collections.singletonList(emptyFile);
+    }
+
+    return result;
   }
 
   /**
@@ -418,8 +457,7 @@ public class FastqSample {
         new Bcl2FastqOutput(qc.getSampleSheetFile(), qc.getFastqDir());
     this.tmpDir = qc.getTmpDir();
 
-    this.fastqFiles =
-        this.bcl2fastqOutput.createListFastqFiles(this, this.read);
+    this.fastqFiles = createListFastqFiles(this.read);
 
     this.compressionType = getCompressionExtension(this.fastqFiles);
     this.keyFastqSample = createKeyFastqSample();
@@ -455,8 +493,7 @@ public class FastqSample {
         new Bcl2FastqOutput(qc.getSampleSheetFile(), qc.getFastqDir());
     this.tmpDir = qc.getTmpDir();
 
-    this.fastqFiles =
-        this.bcl2fastqOutput.createListFastqFiles(this, this.read);
+    this.fastqFiles = createListFastqFiles(this.read);
 
     this.compressionType = getCompressionExtension(this.fastqFiles);
     this.keyFastqSample = createKeyFastqSample();

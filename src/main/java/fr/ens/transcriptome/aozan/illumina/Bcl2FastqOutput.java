@@ -159,7 +159,8 @@ public class Bcl2FastqOutput {
    * Set the prefix of the fastq file of read for a fastq on a sample.
    * @return prefix fastq files for this fastq on asample
    */
-  private String prefixFileName(final FastqSample fastqSample, final int read) {
+  public String getFilenamePrefix(final FastqSample fastqSample,
+      final int read) {
 
     switch (this.version) {
 
@@ -242,30 +243,21 @@ public class Bcl2FastqOutput {
   public List<File> createListFastqFiles(final FastqSample fastqSample,
       final int read) {
 
-    final String filePrefix = prefixFileName(fastqSample, read);
+    final String filePrefix = getFilenamePrefix(fastqSample, read);
     final File fastqSampleDir = getFastqSampleParentDir(fastqSample);
 
-    final List<File> result =
-        Arrays.asList(fastqSampleDir.listFiles(new FileFilter() {
+    return Arrays.asList(fastqSampleDir.listFiles(new FileFilter() {
 
-          @Override
-          public boolean accept(final File file) {
+      @Override
+      public boolean accept(final File file) {
 
-            final String filename = file.getName();
+        final String filename = file.getName();
 
-            return file.length() > 0
-                && filename.startsWith(filePrefix)
-                && filename.contains(FASTQ_EXTENSION);
-          }
-        }));
-
-    if (result.isEmpty()) {
-      throw new AozanRuntimeException("No fastq file found for sample: "
-          + fastqSample + " in " + fastqSampleDir + "(filePrefix: " + filePrefix
-          + ", fastqDirectory: " + this.fastqDirectory + ")");
-    }
-
-    return result;
+        return file.length() > 0
+            && filename.startsWith(filePrefix)
+            && filename.contains(FASTQ_EXTENSION);
+      }
+    }));
   }
 
   //
