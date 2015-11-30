@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
@@ -41,6 +42,7 @@ import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
+import fr.ens.transcriptome.eoulsan.data.protocols.DataProtocolService;
 
 /**
  * This class execute fastqscreen pair-end mode or single-end.
@@ -186,5 +188,15 @@ public class FastqScreen {
     settings.setGenomeStoragePath(properties
         .getProperty(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY));
 
+    // Set data protocol from Eoulsan not load for Aozan because it needs to add
+    // dependencies
+    DataProtocolService.getInstance()
+        .addClassesToNotLoad(Lists.newArrayList(
+            "fr.ens.transcriptome.eoulsan.data.protocols.S3DataProtocol",
+            "fr.ens.transcriptome.eoulsan.data.protocols.S3NDataProtocol"));
+
+    // Initialize GenomeDescriptionCreator
+    GenomeDescriptionCreator.initialize(properties.getProperty(
+        Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
   }
 }

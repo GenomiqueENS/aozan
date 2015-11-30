@@ -24,7 +24,6 @@
 package fr.ens.transcriptome.aozan.fastqscreen;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static fr.ens.transcriptome.eoulsan.EoulsanRuntime.getSettings;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +38,6 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
@@ -52,12 +50,8 @@ import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.Sample;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.transcriptome.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
-import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
 import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
 import fr.ens.transcriptome.eoulsan.data.DataFile;
-import fr.ens.transcriptome.eoulsan.data.protocols.DataProtocolService;
-import fr.ens.transcriptome.eoulsan.data.storages.GenomeDescStorage;
-import fr.ens.transcriptome.eoulsan.data.storages.SimpleGenomeDescStorage;
 
 /**
  * This class read the alias genome file. It make correspondence between genome
@@ -90,8 +84,6 @@ public class FastqScreenGenomeMapper {
 
   private final Set<String> genomesToMapping;
 
-  private final GenomeDescStorage storage;
-
   /**
    * Set reference genomes for the samples of a run. Retrieve list of genomes
    * sample from casava design file and filtered them compared to alias genome
@@ -114,7 +106,8 @@ public class FastqScreenGenomeMapper {
       // Retrieve genome description if it exists
       GenomeDescription gdesc = null;
       try {
-        gdesc = this.createGenomeDescription(genomeFile);
+        gdesc = GenomeDescriptionCreator.getInstance()
+            .createGenomeDescription(genomeFile);
       } catch (final Exception isIgnored) {
         // Do nothing
       }
@@ -151,38 +144,6 @@ public class FastqScreenGenomeMapper {
     genomesToMapping.addAll(genomes);
 
     return Collections.unmodifiableSet(genomesToMapping);
-  }
-
-  /**
-   * Create a GenomeDescription object from a Fasta file.
-   * @param genomeFile file used for create index
-   * @return genomeDescription description of the genome
-   * @throws BadBioEntryException if an error occurs during create genome
-   *           description object
-   * @throws IOException if an error occurs during access genome file
-   */
-  public GenomeDescription createGenomeDescription(final DataFile genomeFile)
-      throws BadBioEntryException, IOException {
-
-    checkNotNull(genomeFile, "genomeFile argument cannot be null");
-
-    GenomeDescription desc = null;
-
-    if (this.storage != null) {
-      desc = this.storage.get(genomeFile);
-    }
-
-    // Compute the genome description
-    if (desc == null) {
-      desc = GenomeDescription.createGenomeDescFromFasta(genomeFile.open(),
-          genomeFile.getName());
-
-      if (this.storage != null) {
-        this.storage.put(genomeFile, desc);
-      }
-    }
-
-    return desc;
   }
 
   /**
@@ -298,7 +259,8 @@ public class FastqScreenGenomeMapper {
       // Retrieve genome description if it exists
       GenomeDescription gdesc = null;
       try {
-        gdesc = this.createGenomeDescription(genomeFile);
+        gdesc = GenomeDescriptionCreator.getInstance()
+            .createGenomeDescription(genomeFile);
       } catch (final Exception isIgnored) {
         // Do nothing
       }
@@ -375,7 +337,8 @@ public class FastqScreenGenomeMapper {
 
     if (singleton == null) {
       throw new AozanException(
-          "FastqScreenGenomeMapper instance doesn't exist. It should be initialize with congfiguration Aozan properties.");
+          "FastqScreenGenomeMapper instance doesn't exist. "
+              + "It should be initialize with congfiguration Aozan properties.");
     }
     return singleton;
   }
@@ -394,27 +357,6 @@ public class FastqScreenGenomeMapper {
     checkNotNull(props, "props argument cannot be null");
 
     this.properties = new HashMap<>(props);
-
-    // Init setting of eoulsan to access on storage genome objects
-    final fr.ens.transcriptome.eoulsan.Settings settings = getSettings();
-
-    settings.setGenomeDescStoragePath(this.properties
-        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
-    settings.setGenomeMapperIndexStoragePath(this.properties
-        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY));
-    settings.setGenomeStoragePath(
-        this.properties.get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY));
-
-    // Set data protocol from Eoulsan not load for Aozan because it needs to add
-    // dependencies
-    DataProtocolService.getInstance()
-        .addClassesToNotLoad(Lists.newArrayList(
-            "fr.ens.transcriptome.eoulsan.data.protocols.S3DataProtocol",
-            "fr.ens.transcriptome.eoulsan.data.protocols.S3NDataProtocol"));
-
-    final DataFile genomeDescStoragePath =
-        new DataFile(settings.getGenomeDescStoragePath());
-    this.storage = SimpleGenomeDescStorage.getInstance(genomeDescStoragePath);
 
     // Collect genomes references list sample from design file
     this.genomesReferencesSample = this.initGenomesReferencesSample();

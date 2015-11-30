@@ -233,7 +233,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     // Create genome description
     try {
-      this.desc = FastqScreenGenomeMapper.getInstance()
+      this.desc = GenomeDescriptionCreator.getInstance()
           .createGenomeDescription(genomeDataFile);
     } catch (final BadBioEntryException e) {
       throw new AozanException(e);
