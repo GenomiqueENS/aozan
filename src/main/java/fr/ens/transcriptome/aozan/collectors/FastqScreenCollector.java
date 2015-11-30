@@ -38,6 +38,7 @@ import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreen;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreenGenomeMapper;
+import fr.ens.transcriptome.aozan.fastqscreen.GenomeAliases;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
 /**
@@ -186,8 +187,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     if (sampleRef != null) {
 
       // Get corresponding valid genome name for mapping
-      sampleGenomeName = FastqScreenGenomeMapper.getInstance()
-          .getGenomeNameFromAlias(sampleRef);
+      sampleGenomeName =
+          GenomeAliases.getInstance().getGenomeNameFromAlias(sampleRef);
 
       Common.getLogger()
           .info("FQS-extract genomeRef for sample "

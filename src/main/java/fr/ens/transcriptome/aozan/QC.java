@@ -46,6 +46,7 @@ import fr.ens.transcriptome.aozan.collectors.CollectorRegistry;
 import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.fastqc.RuntimePatchFastQC;
+import fr.ens.transcriptome.aozan.fastqscreen.GenomeAliases;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.AozanTestRegistry;
 import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
@@ -841,6 +842,7 @@ public class QC {
     this.sampleSheetFile = getSampleSheetFile(this.fastqDir);
 
     initGlobalConf(properties);
+    GenomeAliases.initialize(properties);
 
     initFastQC(properties);
     init(properties);

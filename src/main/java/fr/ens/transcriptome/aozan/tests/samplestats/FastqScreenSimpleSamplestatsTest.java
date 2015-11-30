@@ -35,6 +35,7 @@ import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
 import fr.ens.transcriptome.aozan.collectors.stats.SampleStatistics;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreenGenomeMapper;
+import fr.ens.transcriptome.aozan.fastqscreen.GenomeAliases;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.TestResult;
 
@@ -142,8 +143,7 @@ public class FastqScreenSimpleSamplestatsTest extends AbstractSimpleSampleTest {
     String genomeSampleReference = null;
     try {
       genomeSampleReference =
-          FastqScreenGenomeMapper.getInstance()
-              .getGenomeNameFromAlias(genomeSample);
+          GenomeAliases.getInstance().getGenomeNameFromAlias(genomeSample);
     } catch (final AozanException e) {
     }
 
