@@ -37,7 +37,6 @@ import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.fastqscreen.FastqScreen;
-import fr.ens.transcriptome.aozan.fastqscreen.FastqScreenGenomeMapper;
 import fr.ens.transcriptome.aozan.fastqscreen.GenomeAliases;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
@@ -154,7 +153,6 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     }
 
     return createStandardSampleProcess(data, fastqSample, reportDir, isRunPE);
-
   }
 
   /**
@@ -171,7 +169,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
       final boolean isRunPE) throws AozanException {
 
     final Set<String> genomesContaminants =
-        FastqScreenGenomeMapper.getInstance().getGenomesContaminants();
+        this.fastqscreen.getFastqScreenGenomes().getContaminantGenomes();
 
     final Set<String> genomesForMapping = Sets.newHashSet(genomesContaminants);
 
@@ -241,7 +239,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
     // Retrieve all genomes used by mapping for Undetermined Indexed sample
     final Set<String> genomesToSampleTest =
-        FastqScreenGenomeMapper.getInstance().getGenomesToMapping();
+        this.fastqscreen.getFastqScreenGenomes().getGenomesToMap();
 
     return new FastqScreenProcessThread(fastqSample, this.fastqscreen, data,
         genomesToSampleTest, null, reportDir, false, isRunPE,

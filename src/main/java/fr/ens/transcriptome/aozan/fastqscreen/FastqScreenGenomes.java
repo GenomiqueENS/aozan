@@ -29,9 +29,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -60,7 +60,7 @@ import fr.ens.transcriptome.eoulsan.data.DataFile;
  * @since 1.3
  * @author Sandrine Perrin
  */
-public class FastqScreenGenomeMapper {
+public class FastqScreenGenomes {
 
   /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
@@ -72,17 +72,14 @@ public class FastqScreenGenomeMapper {
   /** Pattern. */
   private static final Pattern PATTERN = Pattern.compile(".,;:/-_'");
 
-  private static FastqScreenGenomeMapper singleton;
-  private final Map<String, String> properties;
-
-  // Correspondence between genome name in casava design file
+  // Map between genome name in bcl2fastq design file
   private final Set<String> genomesReferencesSample;
-  private final Set<String> genomesContaminants;
+  private final Set<String> contaminantGenomes;
 
   // Correspondence between genome sample in run and genome name reference
   // private final Map<String, String> genomesNamesConvertor;
 
-  private final Set<String> genomesToMapping;
+  private final Set<String> genomesToMap;
 
   /**
    * Set reference genomes for the samples of a run. Retrieve list of genomes
@@ -92,7 +89,8 @@ public class FastqScreenGenomeMapper {
    * @throws AozanException if an error occurs during updating alias genomes
    *           file
    */
-  private Set<String> collectGenomesForMapping() throws AozanException {
+  private Set<String> collectGenomesForMapping(final File aliasGenomesFile)
+      throws AozanException {
 
     // Identify genomes can be use for mapping
     final Set<String> genomes = new HashSet<>();
@@ -136,11 +134,12 @@ public class FastqScreenGenomeMapper {
     }
 
     // Update alias genomes file
-    this.updateAliasGenomeFile(Collections.unmodifiableSet(newGenomes));
+    this.updateAliasGenomeFile(aliasGenomesFile,
+        Collections.unmodifiableSet(newGenomes));
 
     // Union genomes contaminants and genomes references
     final Set<String> genomesToMapping =
-        Sets.newLinkedHashSet(this.genomesContaminants);
+        Sets.newLinkedHashSet(this.contaminantGenomes);
     genomesToMapping.addAll(genomes);
 
     return Collections.unmodifiableSet(genomesToMapping);
@@ -151,15 +150,13 @@ public class FastqScreenGenomeMapper {
    * reference genome.
    * @param genomesToAdd genomes must be added in alias genomes file
    */
-  private void updateAliasGenomeFile(final Set<String> genomesToAdd) {
+  private void updateAliasGenomeFile(final File aliasGenomesFile,
+      final Set<String> genomesToAdd) {
 
     // None genome to add
     if (genomesToAdd.isEmpty()) {
       return;
     }
-
-    final File aliasGenomesFile = new File(this.properties
-        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
 
     try {
       if (aliasGenomesFile.exists()) {
@@ -185,11 +182,7 @@ public class FastqScreenGenomeMapper {
    * sequencing.
    * @return collection on genomes reference names for the samples
    */
-  private Set<String> initGenomesReferencesSample() {
-
-    // Samplesheet file for demultiplexing
-    final File designFile =
-        new File(this.properties.get(QC.CASAVA_DESIGN_PATH));
+  private Set<String> initGenomesReferencesSample(final File designFile) {
 
     final Set<String> genomesFromDesign = new HashSet<>();
 
@@ -240,20 +233,17 @@ public class FastqScreenGenomeMapper {
    * @return genomes list
    * @throws AozanException
    */
-  private Set<String> initGenomesContaminant() throws AozanException {
+  private Set<String> initGenomesContaminant(
+      final String contaminantGenomeNames) throws AozanException {
 
     // Set genomes in configuration file
-    final String val =
-        this.properties.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
-
     final Set<String> genomes = new HashSet<>();
 
-    if (val == null || val.isEmpty()) {
-      throw new AozanException(
-          "FastqScreen : none genomes contaminant define.");
+    if (contaminantGenomeNames == null || contaminantGenomeNames.isEmpty()) {
+      throw new AozanException("FastqScreen : no contaminant genome defined.");
     }
 
-    for (final String genome : COMMA_SPLITTER.split(val)) {
+    for (final String genome : COMMA_SPLITTER.split(contaminantGenomeNames)) {
       final DataFile genomeFile = new DataFile("genome://" + genome);
 
       // Retrieve genome description if it exists
@@ -274,7 +264,8 @@ public class FastqScreenGenomeMapper {
     if (genomes.isEmpty()) {
       throw new AozanException(
           "FastqScreen : none genomes contaminant can be use from configuration file: "
-              + val + " found: " + Joiner.on("-").join(genomes));
+              + contaminantGenomeNames + " found: "
+              + Joiner.on("-").join(genomes));
     }
 
     return Collections.unmodifiableSet(genomes);
@@ -284,8 +275,8 @@ public class FastqScreenGenomeMapper {
    * Get the collection genomes name can be used for the mapping.
    * @return collection genomes name for mapping
    */
-  public Set<String> getGenomesToMapping() {
-    return this.genomesToMapping;
+  public Set<String> getGenomesToMap() {
+    return Collections.unmodifiableSet(this.genomesToMap);
   }
 
   /**
@@ -293,54 +284,66 @@ public class FastqScreenGenomeMapper {
    * @param genome genome name
    * @return true if is a genome contaminant otherwise false
    */
-  public boolean isGenomeContamination(final String genome) {
+  public boolean isContaminantGenome(final String genome) {
 
     checkNotNull(genome, "genome argument cannot be null");
 
-    return this.genomesContaminants.contains(genome);
+    return this.contaminantGenomes.contains(genome);
   }
 
   /**
    * Get the collection of genomes contaminants can be used for mapping.
    * @return collection of genomes contaminans
    */
-  public Set<String> getGenomesContaminants() {
-    return this.genomesContaminants;
+  public Set<String> getContaminantGenomes() {
+    return Collections.unmodifiableSet(this.contaminantGenomes);
   }
 
+  //
+  // Static constructors
+  //
+
   /**
-   * Create a instance of FastqScreenGenomeMapper or if it exists return
-   * instance.
-   * @param props the props
-   * @return instance of FastqScreenGenomeMapper
+   * Private constructor of FastqScreenGenomeMapper.
+   * @param properties configuration properties
+   * @return a new instance of FastqScreenGenomes
    * @throws AozanException if the initialization of instance fail.
    */
-  public static FastqScreenGenomeMapper getInstance(
-      final Map<String, String> props) throws AozanException {
+  public static FastqScreenGenomes newInstance(
+      final Map<String, String> properties) throws AozanException {
 
-    checkNotNull(props, "props argument cannot be null");
+    checkNotNull(properties, "props argument cannot be null");
 
-    if (singleton == null) {
-      singleton = new FastqScreenGenomeMapper(props);
+    final File aliasGenomesFile = new File(properties
+        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
+    final File designFile = new File(properties.get(QC.CASAVA_DESIGN_PATH));
+    final String contaminantGenomeNames =
+        properties.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
 
-    }
-    return singleton;
+    return new FastqScreenGenomes(aliasGenomesFile, designFile,
+        contaminantGenomeNames);
   }
 
   /**
-   * Create a instance of FastqScreenGenomeMapper or if it exists return
-   * instance.
-   * @return instance of FastqScreenGenomeMapper
-   * @throws AozanException if the instance doesn't exist
+   * Private constructor of FastqScreenGenomeMapper.
+   * @param properties configuration properties
+   * @return a new instance of FastqScreenGenomes
+   * @throws AozanException if the initialization of instance fail.
    */
-  public static FastqScreenGenomeMapper getInstance() throws AozanException {
+  public static FastqScreenGenomes newInstance(final Properties properties)
+      throws AozanException {
 
-    if (singleton == null) {
-      throw new AozanException(
-          "FastqScreenGenomeMapper instance doesn't exist. "
-              + "It should be initialize with congfiguration Aozan properties.");
-    }
-    return singleton;
+    checkNotNull(properties, "properties argument cannot be null");
+
+    final File aliasGenomesFile = new File(properties.getProperty(
+        Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
+    final File designFile =
+        new File(properties.getProperty(QC.CASAVA_DESIGN_PATH));
+    final String contaminantGenomeNames =
+        properties.getProperty(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
+
+    return new FastqScreenGenomes(aliasGenomesFile, designFile,
+        contaminantGenomeNames);
   }
 
   //
@@ -348,24 +351,29 @@ public class FastqScreenGenomeMapper {
   //
 
   /**
-   * Private constructor of FastqScreenGenomeMapper.
-   * @throws AozanException if the initialization of instance fail.
+   * Public constructor.
+   * @param aliasGenomesFile alias genomes file
+   * @param designFile design file
+   * @param contaminantGenomeNames a string with the list of the contaminant
+   *          genomes
+   * @throws AozanException if an error occurs while creating the object
    */
-  private FastqScreenGenomeMapper(final Map<String, String> props)
-      throws AozanException {
+  public FastqScreenGenomes(final File aliasGenomesFile, final File designFile,
+      final String contaminantGenomeNames) throws AozanException {
 
-    checkNotNull(props, "props argument cannot be null");
-
-    this.properties = new HashMap<>(props);
+    checkNotNull(aliasGenomesFile, "aliasGenomesFile argument cannot be null");
+    checkNotNull(designFile, "designFile argument cannot be null");
+    checkNotNull(contaminantGenomeNames,
+        "contaminantGenomeNames argument cannot be null");
 
     // Collect genomes references list sample from design file
-    this.genomesReferencesSample = this.initGenomesReferencesSample();
+    this.genomesReferencesSample = initGenomesReferencesSample(designFile);
 
     // Collect genomes contaminant list
-    this.genomesContaminants = this.initGenomesContaminant();
+    this.contaminantGenomes = initGenomesContaminant(contaminantGenomeNames);
 
     // Collect genomes useful to contaminant detection
-    this.genomesToMapping = this.collectGenomesForMapping();
+    this.genomesToMap = collectGenomesForMapping(aliasGenomesFile);
   }
 
 }

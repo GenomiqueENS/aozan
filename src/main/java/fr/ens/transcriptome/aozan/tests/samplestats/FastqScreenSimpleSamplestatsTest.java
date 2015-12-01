@@ -34,7 +34,7 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.RunData;
 import fr.ens.transcriptome.aozan.collectors.FastqScreenCollector;
 import fr.ens.transcriptome.aozan.collectors.stats.SampleStatistics;
-import fr.ens.transcriptome.aozan.fastqscreen.FastqScreenGenomeMapper;
+import fr.ens.transcriptome.aozan.fastqscreen.FastqScreenGenomes;
 import fr.ens.transcriptome.aozan.fastqscreen.GenomeAliases;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.TestResult;
@@ -165,11 +165,11 @@ public class FastqScreenSimpleSamplestatsTest extends AbstractSimpleSampleTest {
     }
 
     // Initialization fastqScreenGenomeMapper object
-    final FastqScreenGenomeMapper fqsm =
-        FastqScreenGenomeMapper.getInstance(properties);
+    final FastqScreenGenomes fqsm =
+        FastqScreenGenomes.newInstance(properties);
 
     //
-    final Set<String> genomes = fqsm.getGenomesToMapping();
+    final Set<String> genomes = fqsm.getGenomesToMap();
 
     final List<AozanTest> list = new ArrayList<AozanTest>();
 
@@ -178,7 +178,7 @@ public class FastqScreenSimpleSamplestatsTest extends AbstractSimpleSampleTest {
       // Create an new AozanTest for each reference genome
       final FastqScreenSimpleSamplestatsTest testGenome =
           new FastqScreenSimpleSamplestatsTest(genome,
-              fqsm.isGenomeContamination(genome));
+              fqsm.isContaminantGenome(genome));
 
       testGenome.internalConfigure(properties);
 

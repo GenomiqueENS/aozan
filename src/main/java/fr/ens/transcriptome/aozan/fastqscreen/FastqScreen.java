@@ -55,9 +55,26 @@ public class FastqScreen {
   private static final Logger LOGGER = Common.getLogger();
 
   private final File tmpDir;
-  private int confThreads;
+  private final int confThreads;
   private final String mapperName;
   private final String mapperArgument;
+
+  // Fields for delayed initialization of fastqScreenGenomes
+  private FastqScreenGenomes fastqScreenGenomes;
+  private final File aliasGenomesFile;
+  private final File designFile;
+  private final String contaminantGenomeNames;
+
+  public FastqScreenGenomes getFastqScreenGenomes()
+      throws AozanException {
+
+    if (this.fastqScreenGenomes == null) {
+      this.fastqScreenGenomes = new FastqScreenGenomes(this.aliasGenomesFile,
+          this.designFile, this.contaminantGenomeNames);
+    }
+
+    return this.fastqScreenGenomes;
+  }
 
   /**
    * Mode pair-end : execute fastqscreen.
@@ -165,12 +182,23 @@ public class FastqScreen {
     this.tmpDir = new File(properties.getProperty(QC.TMP_DIR));
 
     if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
+      int threads = 1;
       try {
-        this.confThreads = Integer
+        threads = Integer
             .parseInt(properties.getProperty(Settings.QC_CONF_THREADS_KEY));
-      } catch (final Exception e) {
+      } catch (final NumberFormatException e) {
       }
+      this.confThreads = threads;
+    } else {
+      this.confThreads = 1;
     }
+
+    // Fields required to initialize fastqScreenGenomes
+    this.aliasGenomesFile = new File(properties.getProperty(
+        Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
+    this.designFile = new File(properties.getProperty(QC.CASAVA_DESIGN_PATH));
+    this.contaminantGenomeNames =
+        properties.getProperty(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
 
     // Parameter mapper instead of default value
     this.mapperName =
