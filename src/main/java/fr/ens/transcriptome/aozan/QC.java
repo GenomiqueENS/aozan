@@ -47,6 +47,7 @@ import fr.ens.transcriptome.aozan.collectors.DesignCollector;
 import fr.ens.transcriptome.aozan.collectors.RunInfoCollector;
 import fr.ens.transcriptome.aozan.fastqc.RuntimePatchFastQC;
 import fr.ens.transcriptome.aozan.fastqscreen.GenomeAliases;
+import fr.ens.transcriptome.aozan.fastqscreen.GenomeDescriptionCreator;
 import fr.ens.transcriptome.aozan.tests.AozanTest;
 import fr.ens.transcriptome.aozan.tests.AozanTestRegistry;
 import fr.ens.transcriptome.aozan.tests.global.GlobalTest;
@@ -54,6 +55,8 @@ import fr.ens.transcriptome.aozan.tests.lane.LaneTest;
 import fr.ens.transcriptome.aozan.tests.projectstats.ProjectTest;
 import fr.ens.transcriptome.aozan.tests.sample.SampleTest;
 import fr.ens.transcriptome.aozan.tests.samplestats.SampleStatsTest;
+import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
+import fr.ens.transcriptome.eoulsan.data.protocols.DataProtocolService;
 
 /**
  * This class is the main QC class.
@@ -677,6 +680,35 @@ public class QC {
   }
 
   /**
+   * Initialize initGenomeDescriptionCreator.
+   * @param properties Aozan properties
+   */
+  private void initGenomeDescriptionCreator(
+      final Map<String, String> properties) {
+
+    final fr.ens.transcriptome.eoulsan.Settings settings =
+        EoulsanRuntime.getSettings();
+
+    settings.setGenomeDescStoragePath(properties
+        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
+    settings.setGenomeMapperIndexStoragePath(properties
+        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY));
+    settings.setGenomeStoragePath(
+        properties.get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY));
+
+    // Set data protocol from Eoulsan not load for Aozan because it needs to add
+    // dependencies
+    DataProtocolService.getInstance()
+        .addClassesToNotLoad(Lists.newArrayList(
+            "fr.ens.transcriptome.eoulsan.data.protocols.S3DataProtocol",
+            "fr.ens.transcriptome.eoulsan.data.protocols.S3NDataProtocol"));
+
+    // Initialize GenomeDescriptionCreator
+    GenomeDescriptionCreator.initialize(properties
+        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
+  }
+
+  /**
    * Add a system properties from Aozan properties.
    * @param properties Aozan properties
    * @param keyAozan key in Aozan properties
@@ -843,6 +875,7 @@ public class QC {
 
     initGlobalConf(properties);
     GenomeAliases.initialize(properties);
+    initGenomeDescriptionCreator(properties);
 
     initFastQC(properties);
     init(properties);

@@ -34,15 +34,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.collect.Lists;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.io.FastqSample;
-import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
-import fr.ens.transcriptome.eoulsan.data.protocols.DataProtocolService;
 
 /**
  * This class execute fastqscreen pair-end mode or single-end.
@@ -65,8 +62,7 @@ public class FastqScreen {
   private final File designFile;
   private final String contaminantGenomeNames;
 
-  public FastqScreenGenomes getFastqScreenGenomes()
-      throws AozanException {
+  public FastqScreenGenomes getFastqScreenGenomes() throws AozanException {
 
     if (this.fastqScreenGenomes == null) {
       this.fastqScreenGenomes = new FastqScreenGenomes(this.aliasGenomesFile,
@@ -206,25 +202,5 @@ public class FastqScreen {
     this.mapperArgument = properties
         .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPER_ARGUMENT_KEY);
 
-    final fr.ens.transcriptome.eoulsan.Settings settings =
-        EoulsanRuntime.getSettings();
-
-    settings.setGenomeDescStoragePath(properties.getProperty(
-        Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
-    settings.setGenomeMapperIndexStoragePath(properties.getProperty(
-        Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY));
-    settings.setGenomeStoragePath(properties
-        .getProperty(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY));
-
-    // Set data protocol from Eoulsan not load for Aozan because it needs to add
-    // dependencies
-    DataProtocolService.getInstance()
-        .addClassesToNotLoad(Lists.newArrayList(
-            "fr.ens.transcriptome.eoulsan.data.protocols.S3DataProtocol",
-            "fr.ens.transcriptome.eoulsan.data.protocols.S3NDataProtocol"));
-
-    // Initialize GenomeDescriptionCreator
-    GenomeDescriptionCreator.initialize(properties.getProperty(
-        Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
   }
 }
