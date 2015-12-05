@@ -646,7 +646,8 @@ def archive_demux_stat(run_id, bcl2fastq_version, fastq_output_dir, reports_data
         conf: configuration dictionary
     """
 
-    archive_run_dir = reports_data_path + '/' + basecall_stats_prefix + run_id
+    archive_run_dirname = basecall_stats_prefix + run_id
+    archive_run_dir = reports_data_path + '/' + archive_run_dirname
     archive_run_tar_file = reports_data_path + '/' + basecall_stats_file
 
     if bcl2fastq_version == BCL2FASTQ_VERSION_1:
@@ -655,7 +656,7 @@ def archive_demux_stat(run_id, bcl2fastq_version, fastq_output_dir, reports_data
         cmd_list = []
         cmd_list.extend(['cd', fastq_output_dir, '&&'])
         cmd_list.extend(['mv', 'Basecall_Stats_' + flow_cell_id_in_conf_xml, archive_run_dir, '&&'])
-        cmd_list.extend(['tar', 'cjf', archive_run_tar_file, archive_run_dir, '&&'])
+        cmd_list.extend(['tar', 'cjf', archive_run_tar_file, '-C', reports_data_path, archive_run_dirname, '&&'])
         cmd_list.extend(['cp', '-rp', archive_run_dir, reports_data_path, '&&'])
         cmd_list.extend(['mv', archive_run_dir, 'Basecall_Stats_' + flow_cell_id_in_conf_xml])
 
@@ -666,7 +667,7 @@ def archive_demux_stat(run_id, bcl2fastq_version, fastq_output_dir, reports_data
         cmd_list.extend(['cd', fastq_output_dir, '&&'])
         cmd_list.extend(['mkdir', archive_run_dir, '&&' ])
         cmd_list.extend(['cp', '-r', 'Reports', 'Stats', 'InterOp', design_csv_path, archive_run_dir, '&&'])
-        cmd_list.extend(['tar cjf', archive_run_tar_file, archive_run_dir])
+        cmd_list.extend(['tar cjf', archive_run_tar_file, '-C', reports_data_path, archive_run_dirname])
 
         cmd = " ".join(cmd_list)
 
