@@ -68,19 +68,22 @@ def check_space_needed_and_free(run_id, type_file, run_factor, conf):
     """
 
     space_unit = int(conf[type_file + '.space.factor'])
-    data_path = conf[type_file + '.data.path']
+    data_paths = conf[type_file + '.data.path']
 
-    space_needed = space_unit * run_factor
-    space_free = common.df(data_path)
+    for data_path in data_paths.split(':'):
 
-    # check if the remaining space on the directory is inferior at 5 percent
-    space_remaining_not_enough = (space_free - space_needed) < (long(File(data_path).getTotalSpace()) * 0.05)
+        data_path = data_path.strip()
+        space_needed = space_unit * run_factor
+        space_free = common.df(data_path)
 
-    # check if free space is available
-    if (space_needed > space_free) or (space_remaining_not_enough):
-        error(run_id, type_file + ' files', space_needed, space_free, data_path, conf)
-    else:
-        log_message(run_id, type_file + ' files', space_needed, space_free, conf)
+        # check if the remaining space on the directory is inferior at 5 percent
+        space_remaining_not_enough = (space_free - space_needed) < (long(File(data_path).getTotalSpace()) * 0.05)
+
+        # check if free space is available
+        if (space_needed > space_free) or (space_remaining_not_enough):
+            error(run_id, type_file + ' files', space_needed, space_free, data_path, conf)
+        else:
+            log_message(run_id, type_file + ' files', space_needed, space_free, conf)
 
 
 def error(run_id, type_file, space_needed, space_free, dir_path, conf):
