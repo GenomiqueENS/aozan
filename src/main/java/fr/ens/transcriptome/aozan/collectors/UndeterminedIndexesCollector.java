@@ -129,7 +129,7 @@ public class UndeterminedIndexesCollector extends AbstractFastqCollector {
       return null;
     }
 
-    return new UndeterminedIndexesProcessThreads(data, fastqSample, reportDir,
+    return new UndeterminedIndexesProcessThread(data, fastqSample, reportDir,
         this.undeterminedIndexedXSLFile);
   }
 

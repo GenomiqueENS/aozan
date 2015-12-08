@@ -77,7 +77,7 @@ import uk.ac.babraham.FastQC.Sequence.SequenceFormatException;
  * @author Laurent Jourdren
  * @author Sandrine Perrin
  */
-public class UndeterminedIndexesProcessThreads
+public class UndeterminedIndexesProcessThread
     extends AbstractFastqProcessThread {
 
   /** Logger. */
@@ -1253,7 +1253,7 @@ public class UndeterminedIndexesProcessThreads
    * @param undeterminedIndexedXSLFile xsl file use to create report html
    * @throws AozanException if sample cannot be processed
    */
-  public UndeterminedIndexesProcessThreads(final RunData data,
+  public UndeterminedIndexesProcessThread(final RunData data,
       final FastqSample fastqSample, final File reportDir,
       final File undeterminedIndexedXSLFile) throws AozanException {
 
