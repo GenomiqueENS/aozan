@@ -178,6 +178,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     final File read1 = getFastqSample().getPartialFile();
 
     if (!read1.exists()) {
+      LOGGER.warning("No partial file for " + getFastqSample() + ": " + read1);
       return;
     }
 
@@ -210,11 +211,10 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     // run paired : same values for fastqSample R2
     if (this.isRunPE) {
 
-      final String prefixR2 =
-          getFastqSample().getPrefixRundata().replace(".read1.", ".read2.");
+      final String prefixR2 = "fastqscreen"
+          + getFastqSample().getPrefixRundata().replace(".read1.", ".read2.");
 
-      getResults()
-          .put(this.resultsFastqscreen.createRundata("fastqscreen" + prefixR2));
+      getResults().put(this.resultsFastqscreen.createRundata(prefixR2));
     }
 
     try {
