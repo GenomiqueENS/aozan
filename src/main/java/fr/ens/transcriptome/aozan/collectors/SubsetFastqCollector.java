@@ -24,6 +24,8 @@
 
 package fr.ens.transcriptome.aozan.collectors;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -158,9 +160,9 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
       final FastqSample fastqSample, final File reportDir, final boolean runPE)
           throws AozanException {
 
-    if (fastqSample == null) {
-      return null;
-    }
+    checkNotNull(data, "data argument cannot be null");
+    checkNotNull(fastqSample, "fastqSample argument cannot be null");
+    checkNotNull(reportDir, "reportDir argument cannot be null");
 
     if (fastqSample.getFastqFiles() == null
         || fastqSample.getFastqFiles().isEmpty()) {
@@ -174,18 +176,27 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
 
     // Skip control lane
     if (controlLane && this.skipControlLane) {
+      LOGGER.fine("In "
+          + COLLECTOR_NAME + ": " + fastqSample.getSampleName()
+          + " is a control lane. Skip it.");
       return null;
     }
 
     // Ignore fastq from reads R2 in run PE if the mapping mode is not paired
     final boolean isPairedMode = runPE && !this.ignorePairedMode;
     if (!isPairedMode && fastqSample.getRead() == 2) {
+      LOGGER.fine("In "
+          + COLLECTOR_NAME + ": " + fastqSample.getSampleName()
+          + " do not process second end.");
       return null;
     }
 
     // Check if the temporary partial fastq file exists
     if (fastqSample.getFastqFiles().isEmpty()
         || !fastqSample.getSubsetFastqFile().exists()) {
+      LOGGER.fine("In "
+          + COLLECTOR_NAME + ": " + fastqSample.getSampleName()
+          + " subset FASTQ file already exists.");
       return null;
     }
 
@@ -207,7 +218,8 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
         || data.get(prefix + ".raw.cluster.count") == null) {
 
       // No demultiplexing data exist
-      LOGGER.warning("Can not create partial FastQ for sample "
+      LOGGER.warning("In "
+          + COLLECTOR_NAME + ": Cannot create subset FASTQ file for sample "
           + fastqSample.getSampleName() + " no demultiplexing data found.");
 
       // Return no thread
