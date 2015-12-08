@@ -353,24 +353,9 @@ public class FastqSample {
    * Return the temporary if exists which correspond to the key.
    * @return File temporary file or null if it not exists
    */
-  public File getPartialFile() {
+  public File getSubsetFastqFile() {
 
     return new File(this.tmpDir, getSubsetFastqFilename());
-  }
-
-  /**
-   * Check if a temporary file corresponding with fastq files has already
-   * created.
-   * @return true if map of files contains a entry with the same key or false
-   */
-  public boolean isPartialFileExists() {
-
-    if (this.getFastqFiles().isEmpty()) {
-      return false;
-    }
-
-    return getPartialFile().exists();
-
   }
 
   //
@@ -392,12 +377,12 @@ public class FastqSample {
 
     try {
 
-      if (getPartialFile().exists()) {
+      if (getSubsetFastqFile().exists()) {
         seqFile = SequenceFactory.getSequenceFile(fastq);
 
       } else {
         // Create temporary fastq file
-        seqFile = new AozanSequenceFile(fastq, getPartialFile(), this);
+        seqFile = new AozanSequenceFile(fastq, getSubsetFastqFile(), this);
       }
 
     } catch (final IOException io) {

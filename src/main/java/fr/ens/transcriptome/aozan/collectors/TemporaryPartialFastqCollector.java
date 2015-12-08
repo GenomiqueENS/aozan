@@ -184,7 +184,8 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
     }
 
     // Check if the temporary partial fastq file exists
-    if (fastqSample.isPartialFileExists()) {
+    if (fastqSample.getFastqFiles().isEmpty()
+        || !fastqSample.getSubsetFastqFile().exists()) {
       return null;
     }
 

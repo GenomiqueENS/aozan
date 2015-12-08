@@ -175,7 +175,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   @Override
   protected void processResults() throws AozanException {
 
-    final File read1 = getFastqSample().getPartialFile();
+    final File read1 = getFastqSample().getSubsetFastqFile();
 
     if (!read1.exists()) {
       LOGGER.warning("No partial file for " + getFastqSample() + ": " + read1);
@@ -185,7 +185,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     File read2 = null;
     // mode paired
     if (this.isPairedEndMode) {
-      read2 = this.fastqSampleR2.getPartialFile();
+      read2 = this.fastqSampleR2.getSubsetFastqFile();
 
       if (!read2.exists()) {
         return;

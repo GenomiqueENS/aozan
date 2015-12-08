@@ -101,7 +101,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
   @Override
   protected void processResults() throws AozanException {
 
-    if (!getFastqSample().getPartialFile().exists()) {
+    if (!getFastqSample().getSubsetFastqFile().exists()) {
 
       if (this.countReadsPFtoCopy > this.rawClusterCount) {
         uncompressedFastqFile();
@@ -116,7 +116,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
       }
 
       // Rename file: remove '.tmp' final
-      if (!this.tmpFastqFile.renameTo(getFastqSample().getPartialFile())) {
+      if (!this.tmpFastqFile.renameTo(getFastqSample().getSubsetFastqFile())) {
         LOGGER.warning("FastQC: fail to rename tmp fastq file "
             + this.tmpFastqFile.getAbsolutePath());
       }
@@ -390,6 +390,6 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
     this.pfClusterCountParsed =
         maxReadsPFtoParse > pfClusterCount ? pfClusterCount : maxReadsPFtoParse;
 
-    this.tmpFastqFile = new File(fastqSample.getPartialFile() + ".tmp");
+    this.tmpFastqFile = new File(fastqSample.getSubsetFastqFile() + ".tmp");
   }
 }
