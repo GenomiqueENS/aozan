@@ -239,7 +239,7 @@ public abstract class AbstractFastqCollector implements Collector {
             // Create directory for the sample
             final File reportDir;
 
-            if (fs.isIndeterminedIndices()) {
+            if (fs.isUndeterminedIndex()) {
               reportDir =
                   new File(this.qcReportOutputPath, "Undetermined_indices");
             } else {
@@ -268,7 +268,7 @@ public abstract class AbstractFastqCollector implements Collector {
 
           LOGGER.severe("FASTQ Collect: fastq is null or empty, key fq is "
               + fs.getKeyFastqSample() + " tmp fq "
-              + fs.getNamePartialFastqFiles() + " sample name "
+              + fs.getSubsetFastqFilename() + " sample name "
               + fs.getSampleName() + " prefix rundata "
               + fs.getPrefixRundata());
         }
@@ -299,7 +299,7 @@ public abstract class AbstractFastqCollector implements Collector {
             // Create directory for the sample
             final File reportDir;
 
-            if (fs.isIndeterminedIndices()) {
+            if (fs.isUndeterminedIndex()) {
               reportDir =
                   new File(this.qcReportOutputPath, "Undetermined_indices");
             } else {
@@ -577,7 +577,7 @@ public abstract class AbstractFastqCollector implements Collector {
 
     // Define the part result directory
     final File dataFileDir;
-    if (fastqSample.isIndeterminedIndices()) {
+    if (fastqSample.isUndeterminedIndex()) {
       dataFileDir = new File(this.qcReportOutputPath, "Undetermined_indices");
     } else {
       dataFileDir = new File(this.qcReportOutputPath,
@@ -717,7 +717,7 @@ public abstract class AbstractFastqCollector implements Collector {
       final String suffix) {
 
     // Build subdirectory name
-    final String subdir = (fs.isIndeterminedIndices()
+    final String subdir = (fs.isUndeterminedIndex()
         ? "Undetermined_indices" : "Project_" + fs.getProjectName());
 
     // Build subdirectory path

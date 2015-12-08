@@ -31,8 +31,11 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.base.Objects;
+
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
+import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.illumina.Bcl2FastqOutput;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
@@ -50,20 +53,21 @@ public class FastqSample {
 
   public static final String FASTQ_EXTENSION = ".fastq";
 
+  private static final String SUBSET_FASTQ_FILENAME_PREFIX =
+      Globals.APP_NAME_LOWER_CASE + "_subset_fastq_";
   private static final String NO_INDEX = "NoIndex";
 
   private final int read;
   private final int lane;
   private final String sampleName;
   private final String projectName;
-  private final String descriptionSample;
+  private final String description;
   private final String index;
 
-  private final boolean undeterminedIndices;
+  private final boolean undeterminedIndex;
 
-  private final File runFastqPath;
   private final String keyFastqSample;
-  private final String nameTemporaryFastqFiles;
+  private final String subsetFastqFilename;
 
   private final List<File> fastqFiles;
   private final CompressionType compressionType;
@@ -89,15 +93,17 @@ public class FastqSample {
         firstFastqFileName.length()
             - FASTQ_EXTENSION.length()
             - this.compressionType.getExtension().length());
-
   }
 
   /**
    * Create name for temporary fastq file uncompressed.
+   * @param runId run id
+   * @param key
    * @return name fastq file
    */
-  private String createNameTemporaryFastqFile() {
-    return "aozan_fastq_" + this.keyFastqSample + FASTQ_EXTENSION;
+  private static String createSubsetFastqFilename(final String runId,
+      final String key) {
+    return SUBSET_FASTQ_FILENAME_PREFIX + key + FASTQ_EXTENSION;
   }
 
   /**
@@ -150,7 +156,7 @@ public class FastqSample {
    */
   public String getPrefixRundata() {
 
-    if (isIndeterminedIndices()) {
+    if (isUndeterminedIndex()) {
       return ".lane" + this.lane + ".undetermined.read" + this.read;
     }
 
@@ -278,16 +284,16 @@ public class FastqSample {
    * Get the description of the sample in run.
    * @return description of the sample
    */
-  public String getDescriptionSample() {
-    return this.descriptionSample;
+  public String getDescription() {
+    return this.description;
   }
 
   /**
-   * Test if the sample is an undetermined indices sample.
-   * @return true if the sample is an undetermined indices sample
+   * Test if the sample is an undetermined index sample.
+   * @return true if the sample has an undetermined index
    */
-  public boolean isIndeterminedIndices() {
-    return this.undeterminedIndices;
+  public boolean isUndeterminedIndex() {
+    return this.undeterminedIndex;
   }
 
   /**
@@ -319,8 +325,8 @@ public class FastqSample {
    * Get the name for temporary fastq files uncompressed.
    * @return temporary fastq file name
    */
-  public String getNamePartialFastqFiles() {
-    return this.nameTemporaryFastqFiles;
+  public String getSubsetFastqFilename() {
+    return this.subsetFastqFilename;
   }
 
   /**
@@ -349,7 +355,7 @@ public class FastqSample {
    */
   public File getPartialFile() {
 
-    return new File(this.tmpDir, getNamePartialFastqFiles());
+    return new File(this.tmpDir, getSubsetFastqFilename());
   }
 
   /**
@@ -410,14 +416,15 @@ public class FastqSample {
 
   @Override
   public String toString() {
-    return "FastqSample [read="
-        + read + ", lane=" + lane + ", sampleName=" + sampleName
-        + ", projectName=" + projectName + ", descriptionSample="
-        + descriptionSample + ", index=" + index + ", undeterminedIndices="
-        + undeterminedIndices + ", runFastqPath=" + runFastqPath
-        + ", keyFastqSample=" + keyFastqSample + ", nameTemporaryFastqFiles="
-        + nameTemporaryFastqFiles + ", fastqFiles=" + fastqFiles
-        + ", compressionType=" + compressionType + "]";
+
+    return Objects.toStringHelper(this).add("read", read).add("lane", lane)
+        .add("sampleName", sampleName).add("projectName", projectName)
+        .add("descriptionSample", description).add("index", index)
+        .add("undeterminedIndex", undeterminedIndex)
+        .add("keyFastqSample", keyFastqSample)
+        .add("subsetFastqFilename", subsetFastqFilename)
+        .add("fastqFiles", fastqFiles).add("compressionType", compressionType)
+        .toString();
   }
 
   //
@@ -448,11 +455,10 @@ public class FastqSample {
     this.lane = lane;
     this.sampleName = sampleName;
     this.projectName = projectName;
-    this.descriptionSample = descriptionSample;
+    this.description = descriptionSample;
     this.index = (index == null || index.isEmpty()) ? NO_INDEX : index;
-    this.undeterminedIndices = false;
+    this.undeterminedIndex = false;
 
-    this.runFastqPath = qc.getFastqDir();
     this.bcl2fastqOutput =
         new Bcl2FastqOutput(qc.getSampleSheetFile(), qc.getFastqDir());
     this.tmpDir = qc.getTmpDir();
@@ -462,7 +468,8 @@ public class FastqSample {
     this.compressionType = getCompressionExtension(this.fastqFiles);
     this.keyFastqSample = createKeyFastqSample();
 
-    this.nameTemporaryFastqFiles = createNameTemporaryFastqFile();
+    this.subsetFastqFilename =
+        createSubsetFastqFilename(qc.getRunId(), this.keyFastqSample);
   }
 
   /**
@@ -484,11 +491,10 @@ public class FastqSample {
     this.lane = lane;
     this.sampleName = "lane" + lane;
     this.projectName = "";
-    this.descriptionSample = "";
+    this.description = "";
     this.index = NO_INDEX;
-    this.undeterminedIndices = true;
+    this.undeterminedIndex = true;
 
-    this.runFastqPath = qc.getFastqDir();
     this.bcl2fastqOutput =
         new Bcl2FastqOutput(qc.getSampleSheetFile(), qc.getFastqDir());
     this.tmpDir = qc.getTmpDir();
@@ -498,7 +504,8 @@ public class FastqSample {
     this.compressionType = getCompressionExtension(this.fastqFiles);
     this.keyFastqSample = createKeyFastqSample();
 
-    this.nameTemporaryFastqFiles = createNameTemporaryFastqFile();
+    this.subsetFastqFilename =
+        createSubsetFastqFilename(qc.getRunId(), this.keyFastqSample);
   }
 
 }

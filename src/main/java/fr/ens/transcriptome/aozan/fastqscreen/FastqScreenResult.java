@@ -97,7 +97,7 @@ public class FastqScreenResult {
         + genomeSample + ").");
     s.append("\nresult for sample : "
         + fastqSample.getSampleName() + " on lane " + fastqSample.getLane());
-    s.append("\ndescription of sample : " + fastqSample.getDescriptionSample());
+    s.append("\ndescription of sample : " + fastqSample.getDescription());
 
     s.append('\n');
     s.append("\n" + HEADER_COLUMNS_TEXT + "\n");
@@ -220,7 +220,7 @@ public class FastqScreenResult {
         ? "no genome" : genomeSample));
     XMLUtils.addTagValue(doc, root, "sampleName", fastqSample.getSampleName());
     XMLUtils.addTagValue(doc, root, "descriptionSample",
-        fastqSample.getDescriptionSample());
+        fastqSample.getDescription());
     XMLUtils.addTagValue(doc, root, "lane", "" + fastqSample.getLane());
 
     final Element report = doc.createElement("Report");

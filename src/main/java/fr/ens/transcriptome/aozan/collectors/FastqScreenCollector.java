@@ -147,7 +147,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
       return null;
     }
 
-    if (fastqSample.isIndeterminedIndices()) {
+    if (fastqSample.isUndeterminedIndex()) {
       return createInterminedIndicesSampleProcess(data, fastqSample, reportDir,
           isRunPE);
     }

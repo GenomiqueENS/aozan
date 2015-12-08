@@ -125,7 +125,7 @@ public class Bcl2FastqOutput {
 
     case BCL2FASTQ_1:
 
-      if (fastqSample.isIndeterminedIndices()) {
+      if (fastqSample.isUndeterminedIndex()) {
 
         final File projectDir =
             new File(getFastqDirectory(), UNDETERMINED_DIR_NAME);
@@ -142,7 +142,7 @@ public class Bcl2FastqOutput {
     case BCL2FASTQ_2:
     case BCL2FASTQ_2_15:
 
-      if (fastqSample.isIndeterminedIndices()) {
+      if (fastqSample.isUndeterminedIndex()) {
         return getFastqDirectory();
       }
 
@@ -166,7 +166,7 @@ public class Bcl2FastqOutput {
 
     case BCL2FASTQ_1:
 
-      if (fastqSample.isIndeterminedIndices()) {
+      if (fastqSample.isUndeterminedIndex()) {
 
         return String.format("lane%d_Undetermined%s", fastqSample.getLane(),
             getConstantFastqSuffix(fastqSample.getLane(), read));
@@ -179,7 +179,7 @@ public class Bcl2FastqOutput {
     case BCL2FASTQ_2:
     case BCL2FASTQ_2_15:
 
-      if (fastqSample.isIndeterminedIndices()) {
+      if (fastqSample.isUndeterminedIndex()) {
 
         return String.format("Undetermined_S0%s",
             getConstantFastqSuffix(fastqSample.getLane(), read));
@@ -210,7 +210,7 @@ public class Bcl2FastqOutput {
   public String buildPrefixReport(final FastqSample fastqSample,
       final int read) {
 
-    if (fastqSample.isIndeterminedIndices()) {
+    if (fastqSample.isUndeterminedIndex()) {
       return String.format("lane%s_Undetermined%s", fastqSample.getLane(),
           getConstantFastqSuffix(fastqSample.getLane(), read));
     }
@@ -304,7 +304,7 @@ public class Bcl2FastqOutput {
     }
 
     // Undetermined cases always return 0
-    if (fastqSample.isIndeterminedIndices()) {
+    if (fastqSample.isUndeterminedIndex()) {
       return 0;
     }
 
