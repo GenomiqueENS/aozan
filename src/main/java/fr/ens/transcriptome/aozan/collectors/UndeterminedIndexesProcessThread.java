@@ -24,6 +24,7 @@
 package fr.ens.transcriptome.aozan.collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static fr.ens.transcriptome.aozan.collectors.UndeterminedIndexesCollector.COLLECTOR_NAME;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -560,8 +561,8 @@ public class UndeterminedIndexesProcessThread
 
   @Override
   protected void notifyStartLogger() {
-    LOGGER.fine("Undetermined indexes: start for "
-        + getFastqSample().getKeyFastqSample());
+    LOGGER.fine(COLLECTOR_NAME.toUpperCase()
+        + ": start for " + getFastqSample().getKeyFastqSample());
   }
 
   @Override
@@ -573,9 +574,9 @@ public class UndeterminedIndexesProcessThread
   @Override
   protected void notifyEndLogger(final String duration) {
 
-    LOGGER.fine("Undetermined indexes: end for "
-        + getFastqSample().getKeyFastqSample() + " in " + duration);
-
+    LOGGER.fine(COLLECTOR_NAME.toUpperCase()
+        + ": end for " + getFastqSample().getKeyFastqSample() + " in "
+        + duration);
   }
 
   /**

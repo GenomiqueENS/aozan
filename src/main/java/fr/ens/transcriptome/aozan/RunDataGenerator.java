@@ -125,8 +125,8 @@ public class RunDataGenerator {
     for (final Collector collector : this.collectors) {
 
       final Stopwatch timerCollector = Stopwatch.createStarted();
-      LOGGER.info(
-          collector.getName().toUpperCase() + " start on run " + this.runId);
+      LOGGER.info(collector.getName().toUpperCase()
+          + " collector start for run " + this.runId);
 
       // Configure
       collector.configure(qc, new Properties(this.properties));
@@ -135,7 +135,7 @@ public class RunDataGenerator {
       collector.collect(data);
 
       LOGGER.info(collector.getName().toUpperCase()
-          + " end for run " + this.runId + " in "
+          + " collector end for run " + this.runId + " in "
           + toTimeHumanReadable(timerCollector.elapsed(TimeUnit.MILLISECONDS)));
 
       final File qcDir =
