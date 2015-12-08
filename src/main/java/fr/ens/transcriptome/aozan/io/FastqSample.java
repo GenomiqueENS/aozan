@@ -382,7 +382,7 @@ public class FastqSample {
 
       } else {
         // Create temporary fastq file
-        seqFile = new AozanSequenceFile(fastq, getSubsetFastqFile(), this);
+        seqFile = new SubsetSequenceFile(fastq, getSubsetFastqFile(), this);
       }
 
     } catch (final IOException io) {

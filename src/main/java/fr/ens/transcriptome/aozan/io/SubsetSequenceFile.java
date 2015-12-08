@@ -49,9 +49,7 @@ import fr.ens.transcriptome.aozan.Globals;
  * @since 1.0
  * @author Sandrine Perrin
  */
-
-// this class is used with UncompressFastqCollector not used in aozan 1.1
-public class AozanSequenceFile implements SequenceFile {
+public class SubsetSequenceFile implements SequenceFile {
   /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
@@ -159,7 +157,7 @@ public class AozanSequenceFile implements SequenceFile {
    * @param fastqSample the fastq sample
    * @throws AozanException the aozan exception
    */
-  public AozanSequenceFile(final File[] files, final File tmpFile,
+  public SubsetSequenceFile(final File[] files, final File tmpFile,
       final FastqSample fastqSample) throws AozanException {
 
     this.tmpFileWithExtension = new File(tmpFile + ".tmp");
