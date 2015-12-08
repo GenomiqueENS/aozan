@@ -54,7 +54,7 @@ import fr.ens.transcriptome.eoulsan.util.FileUtils;
  * @since 1.1
  * @author Sandrine Perrin
  */
-public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
+public class SubsetFastqThread extends AbstractFastqProcessThread {
 
   /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
@@ -202,7 +202,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
             } catch (final IOException io) {
               LOGGER.warning(
                   "Exception occuring during the closing of FastqReader. Step collector "
-                      + TemporaryPartialFastqCollector.COLLECTOR_NAME
+                      + SubsetFastqCollector.COLLECTOR_NAME
                       + " for the sample "
                       + getFastqSample().getKeyFastqSample());
             }
@@ -217,7 +217,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
     } catch (final IOException io) {
       LOGGER.warning("Exception occuring during creating tmp file : "
           + this.tmpFastqFile.getAbsolutePath() + ". Step collector "
-          + TemporaryPartialFastqCollector.COLLECTOR_NAME + " for the sample "
+          + SubsetFastqCollector.COLLECTOR_NAME + " for the sample "
           + getFastqSample().getKeyFastqSample());
 
     } finally {
@@ -300,7 +300,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
             } catch (final IOException io) {
               LOGGER.warning(
                   "Exception occurred during the closing of FastqReader. Step collector "
-                      + TemporaryPartialFastqCollector.COLLECTOR_NAME
+                      + SubsetFastqCollector.COLLECTOR_NAME
                       + " for the sample "
                       + getFastqSample().getKeyFastqSample());
             }
@@ -311,7 +311,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
     } catch (final IOException io) {
       LOGGER.warning("Exception occurred during creating tmp file : "
           + this.tmpFastqFile.getAbsolutePath() + ". Step collector "
-          + TemporaryPartialFastqCollector.COLLECTOR_NAME + " for the sample "
+          + SubsetFastqCollector.COLLECTOR_NAME + " for the sample "
           + getFastqSample().getKeyFastqSample());
 
     } finally {
@@ -376,7 +376,7 @@ public class TemporaryPartialFastqThread extends AbstractFastqProcessThread {
    * @throws AozanException if an error occurs while creating sequence file for
    *           FastQC
    */
-  public TemporaryPartialFastqThread(final FastqSample fastqSample,
+  public SubsetFastqThread(final FastqSample fastqSample,
       final int rawClusterCount, final int pfClusterCount,
       final int numberReadsToCopy, final int maxReadsToParse)
           throws AozanException {

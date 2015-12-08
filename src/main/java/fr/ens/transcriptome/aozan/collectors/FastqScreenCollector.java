@@ -73,7 +73,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
   public List<String> getCollectorsNamesRequiered() {
 
     final List<String> result = super.getCollectorsNamesRequiered();
-    result.add(TemporaryPartialFastqCollector.COLLECTOR_NAME);
+    result.add(SubsetFastqCollector.COLLECTOR_NAME);
 
     return Collections.unmodifiableList(result);
 

@@ -38,17 +38,17 @@ import fr.ens.transcriptome.aozan.Settings;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
 /**
- * This class manages the creation of temporary partial fastq file for
- * contamination research.
+ * This class manages the creation of subset fastq files for contamination
+ * research.
  * @since 1.1
  * @author Sandrine Perrin
  */
-public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
+public class SubsetFastqCollector extends AbstractFastqCollector {
 
   /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
-  public static final String COLLECTOR_NAME = "tmppartialfastq";
+  public static final String COLLECTOR_NAME = "subsetfastq";
 
   /** Parameters configuration. */
   private boolean skipControlLane;
@@ -218,8 +218,8 @@ public class TemporaryPartialFastqCollector extends AbstractFastqCollector {
     final int rawClusterCount = data.getInt(prefix + ".raw.cluster.count");
 
     // Create the thread object
-    return new TemporaryPartialFastqThread(fastqSample, rawClusterCount,
-        pfClusterCount, this.countReadsPFtoCopy, this.maxReadsPFtoParse);
+    return new SubsetFastqThread(fastqSample, rawClusterCount, pfClusterCount,
+        this.countReadsPFtoCopy, this.maxReadsPFtoParse);
   }
 
   /**
