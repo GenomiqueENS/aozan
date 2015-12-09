@@ -557,7 +557,7 @@ public abstract class AbstractFastqCollector implements Collector {
       data.createRunDataFile(dataFile);
 
       LOGGER.fine(this.getName().toUpperCase()
-          + " : " + fastqSample.getKeyFastqSample() + " save data file");
+          + ": " + fastqSample.getKeyFastqSample() + " save data file");
 
     } catch (final IOException ae) {
 
