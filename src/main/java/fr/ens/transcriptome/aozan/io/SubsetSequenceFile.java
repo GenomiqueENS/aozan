@@ -56,8 +56,8 @@ public class SubsetSequenceFile implements SequenceFile {
   /** Timer. **/
   private Stopwatch timer;
 
+  private final File subsetFile;
   private final File tmpFile;
-  private final File tmpFileWithExtension;
   private final SequenceFile seqFile;
   private final FastqSample fastqSample;
   private final Writer fw;
@@ -89,17 +89,19 @@ public class SubsetSequenceFile implements SequenceFile {
 
       this.fw.write(seq.getQualityString() + "\n");
 
-      // End of file, close the new file
+      // End of file
       if (!this.seqFile.hasNext()) {
+
+        // close the temporary file
         this.fw.close();
 
-        long sizeFile = this.tmpFileWithExtension.length();
-        sizeFile /= (1024 * 1024 * 1024);
+        // Get the size in GB
+        long sizeFile = this.tmpFile.length() / (1024 * 1024 * 1024);
 
         // Rename file for remove '.tmp' final
-        if (!this.tmpFileWithExtension.renameTo(this.tmpFile)) {
+        if (!this.tmpFile.renameTo(this.subsetFile)) {
           LOGGER.warning("Aozan sequence : fail to rename file "
-              + this.tmpFile.getAbsolutePath());
+              + this.subsetFile.getAbsolutePath());
         }
 
         this.timer.stop();
@@ -110,7 +112,7 @@ public class SubsetSequenceFile implements SequenceFile {
             + " fastq file(s), type compression "
             + this.fastqSample.getCompressionType() + " in "
             + toTimeHumanReadable(this.timer.elapsed(TimeUnit.MILLISECONDS))
-            + "(tmp fastq file size " + sizeFile + "Go / estimated size "
+            + "(tmp fastq file size " + sizeFile + "GB / estimated size "
             + this.fastqSample.getUncompressedSize() + ")");
       }
 
@@ -153,20 +155,21 @@ public class SubsetSequenceFile implements SequenceFile {
   /**
    * Instantiates a new aozan sequence file.
    * @param files the files
-   * @param tmpFile the tmp file
+   * @param subsetFile the tmp file
    * @param fastqSample the fastq sample
    * @throws AozanException the aozan exception
    */
-  public SubsetSequenceFile(final File[] files, final File tmpFile,
+  public SubsetSequenceFile(final File[] files, final File subsetFile,
       final FastqSample fastqSample) throws AozanException {
 
-    this.tmpFileWithExtension = new File(tmpFile + ".tmp");
-    this.tmpFile = tmpFile;
+    this.tmpFile = new File(subsetFile.getPath() + ".tmp");
+    this.subsetFile = subsetFile;
     this.fastqSample = fastqSample;
 
+    LOGGER.fine("FASTQC: create temporary file: " + this.tmpFile.getAbsolutePath());
+
     try {
-      this.fw = Files.newWriter(this.tmpFileWithExtension,
-          Globals.DEFAULT_FILE_ENCODING);
+      this.fw = Files.newWriter(this.tmpFile, Globals.DEFAULT_FILE_ENCODING);
 
       this.seqFile = SequenceFactory.getSequenceFile(files);
 
