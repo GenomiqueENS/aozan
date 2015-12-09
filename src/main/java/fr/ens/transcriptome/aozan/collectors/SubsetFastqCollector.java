@@ -176,8 +176,8 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
 
     // Skip control lane
     if (controlLane && this.skipControlLane) {
-      LOGGER.fine("In "
-          + COLLECTOR_NAME + ": " + fastqSample.getSampleName()
+      LOGGER.fine(COLLECTOR_NAME.toUpperCase()
+          + ": " + fastqSample.getSampleName()
           + " is a control lane. Skip it.");
       return null;
     }
@@ -185,17 +185,16 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
     // Ignore fastq from reads R2 in run PE if the mapping mode is not paired
     final boolean isPairedMode = runPE && !this.ignorePairedMode;
     if (!isPairedMode && fastqSample.getRead() == 2) {
-      LOGGER.fine("In "
-          + COLLECTOR_NAME + ": " + fastqSample.getSampleName()
-          + " do not process second end.");
+      LOGGER.fine(COLLECTOR_NAME.toUpperCase()
+          + ": " + fastqSample.getSampleName() + " do not process second end.");
       return null;
     }
 
     // Check if the temporary partial fastq file exists
     if (fastqSample.getFastqFiles().isEmpty()
         || !fastqSample.getSubsetFastqFile().exists()) {
-      LOGGER.fine("In "
-          + COLLECTOR_NAME + ": " + fastqSample.getSampleName()
+      LOGGER.fine(COLLECTOR_NAME.toUpperCase()
+          + ": " + fastqSample.getSampleName()
           + " subset FASTQ file already exists.");
       return null;
     }
@@ -206,11 +205,11 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
         + fastqSample.getLane() + ".sample." + fastqSample.getSampleName()
         + ".read" + fastqSample.getRead();
 
-    LOGGER.fine("In "
-        + COLLECTOR_NAME + " collector found: " + prefix + ".pf.cluster.count="
+    LOGGER.fine(COLLECTOR_NAME.toUpperCase()
+        + " collector found: " + prefix + ".pf.cluster.count="
         + data.get(prefix + ".pf.cluster.count"));
-    LOGGER.fine("In "
-        + COLLECTOR_NAME + " collector found: " + prefix + ".raw.cluster.count="
+    LOGGER.fine(COLLECTOR_NAME.toUpperCase()
+        + " collector found: " + prefix + ".raw.cluster.count="
         + data.get(prefix + ".raw.cluster.count"));
 
     // Check value exist in rundata, if not then fastq is empty
@@ -218,8 +217,8 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
         || data.get(prefix + ".raw.cluster.count") == null) {
 
       // No demultiplexing data exist
-      LOGGER.warning("In "
-          + COLLECTOR_NAME + ": Cannot create subset FASTQ file for sample "
+      LOGGER.warning(COLLECTOR_NAME.toUpperCase()
+          + ": Cannot create subset FASTQ file for sample "
           + fastqSample.getSampleName() + " no demultiplexing data found.");
 
       // Return no thread
