@@ -190,12 +190,19 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
       return null;
     }
 
-    // Check if the temporary partial fastq file exists
-    if (fastqSample.getFastqFiles().isEmpty()
-        || !fastqSample.getSubsetFastqFile().exists()) {
+    // Check if FASTQ file(s) exists for sample
+    if (fastqSample.getFastqFiles().isEmpty()) {
       LOGGER.fine(COLLECTOR_NAME.toUpperCase()
-          + ": " + fastqSample.getSampleName()
-          + " subset FASTQ file already exists.");
+          + ": No FASTQ file exists for " + fastqSample.getSampleName()
+          + " sample.");
+      return null;
+    }
+
+    // Check if the subset FASTQ file exists
+    if (fastqSample.getSubsetFastqFile().exists()) {
+      LOGGER.fine(COLLECTOR_NAME.toUpperCase()
+          + ": subset FASTQ file already exists for "
+          + fastqSample.getSampleName() + " sample.");
       return null;
     }
 
