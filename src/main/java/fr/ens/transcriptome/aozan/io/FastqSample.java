@@ -99,7 +99,7 @@ public class FastqSample {
    */
   private static String createSubsetFastqFilename(final String runId,
       final String key) {
-    return SUBSET_FASTQ_FILENAME_PREFIX + key + FASTQ_EXTENSION;
+    return SUBSET_FASTQ_FILENAME_PREFIX + runId + '_' + key + FASTQ_EXTENSION;
   }
 
   /**

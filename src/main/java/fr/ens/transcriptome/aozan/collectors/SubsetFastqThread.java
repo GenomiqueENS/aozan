@@ -390,6 +390,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
     this.pfClusterCountParsed =
         maxReadsPFtoParse > pfClusterCount ? pfClusterCount : maxReadsPFtoParse;
 
-    this.tmpFastqFile = new File(fastqSample.getSubsetFastqFile() + ".tmp");
+    this.tmpFastqFile =
+        new File(fastqSample.getSubsetFastqFile().getPath() + ".tmp");
   }
 }
