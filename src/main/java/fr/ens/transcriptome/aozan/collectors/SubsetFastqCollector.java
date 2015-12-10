@@ -202,7 +202,8 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
     if (fastqSample.getSubsetFastqFile().exists()) {
       LOGGER.fine(COLLECTOR_NAME.toUpperCase()
           + ": subset FASTQ file already exists for "
-          + fastqSample.getSampleName() + " sample.");
+          + fastqSample.getSampleName() + " sample: "
+          + fastqSample.getSubsetFastqFile());
       return null;
     }
 
