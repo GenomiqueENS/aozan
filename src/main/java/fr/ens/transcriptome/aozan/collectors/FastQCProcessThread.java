@@ -181,7 +181,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
   protected void processResults() throws AozanException {
 
     // Set the prefix for the run data entries
-    final String prefix = "fastqc" + getFastqSample().getPrefixRundata();
+    final String prefix = "fastqc" + getFastqSample().getRundataPrefix();
 
     int nClusters = -1;
 

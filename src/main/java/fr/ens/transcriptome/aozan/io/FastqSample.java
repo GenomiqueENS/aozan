@@ -49,7 +49,7 @@ public class FastqSample {
 
   public static final String FASTQ_EXTENSION = ".fastq";
 
-  private static final String SUBSET_FASTQ_FILENAME_PREFIX =
+  public static final String SUBSET_FASTQ_FILENAME_PREFIX =
       Globals.APP_NAME_LOWER_CASE + "_subset_fastq_";
   private static final String NO_INDEX = "NoIndex";
 
@@ -150,7 +150,7 @@ public class FastqSample {
    * Create the prefix used for add data in a RunData for each FastqSample.
    * @return prefix
    */
-  public String getPrefixRundata() {
+  public String getRundataPrefix() {
 
     if (isUndeterminedIndex()) {
       return ".lane" + this.lane + ".undetermined.read" + this.read;

@@ -49,8 +49,6 @@ import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.Common;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.RunData;
-import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.transcriptome.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 import fr.ens.transcriptome.aozan.io.FastqSample;
 
 /**
@@ -65,9 +63,6 @@ public abstract class AbstractFastqCollector implements Collector {
   private static final Logger LOGGER = Common.getLogger();
 
   private QC qc;
-
-  /** The casava design file. */
-  private File casavaDesignFile;
 
   /** The qc report output path. */
   private File qcReportOutputPath;
@@ -185,10 +180,10 @@ public abstract class AbstractFastqCollector implements Collector {
   @Override
   public void configure(final QC qc, final Properties properties) {
 
+    checkNotNull(qc, "qc argument cannot be null");
     checkNotNull(properties, "properties argument cannot be null");
 
     this.qcReportOutputPath = qc.getQcDir();
-    this.casavaDesignFile = qc.getSampleSheetFile();
     this.tmpDir = qc.getTmpDir();
     this.qc = qc;
 
@@ -213,11 +208,8 @@ public abstract class AbstractFastqCollector implements Collector {
 
     checkNotNull(data, "data argument cannot be null");
 
-    final SampleSheet samplesheet;
-
     try {
-      samplesheet = new SampleSheetCSVReader(this.casavaDesignFile).read();
-      this.createListFastqSamples(data, samplesheet);
+      createListFastqSamples(data);
     } catch (IOException e) {
       throw new AozanException(e);
     }
@@ -270,7 +262,7 @@ public abstract class AbstractFastqCollector implements Collector {
               + fs.getKeyFastqSample() + " tmp fq "
               + fs.getSubsetFastqFilename() + " sample name "
               + fs.getSampleName() + " prefix rundata "
-              + fs.getPrefixRundata());
+              + fs.getRundataPrefix());
         }
       }
 
@@ -352,9 +344,11 @@ public abstract class AbstractFastqCollector implements Collector {
 
       @Override
       public boolean accept(final File pathname) {
-        return (pathname.getName().startsWith("aozan_fastq_")
-            && (pathname.getName().endsWith(".fastq")
-                || pathname.getName().endsWith(".fastq.tmp")))
+        return (pathname.getName()
+            .startsWith(FastqSample.SUBSET_FASTQ_FILENAME_PREFIX)
+            && (pathname.getName().endsWith(FastqSample.FASTQ_EXTENSION)
+                || pathname.getName()
+                    .endsWith(FastqSample.FASTQ_EXTENSION + ".tmp")))
             || (pathname.getName().startsWith("map-")
                 && (pathname.getName().endsWith(".txt")));
       }
@@ -404,8 +398,7 @@ public abstract class AbstractFastqCollector implements Collector {
    * @param samplesheet the samplesheet
    * @throws IOException
    */
-  private void createListFastqSamples(final RunData data,
-      final SampleSheet samplesheet) throws IOException {
+  private void createListFastqSamples(final RunData data) throws IOException {
 
     if (!this.fastqSamples.isEmpty()) {
       return;

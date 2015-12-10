@@ -205,14 +205,14 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     }
 
     // Create rundata for the sample
-    final String prefixR1 = "fastqscreen" + getFastqSample().getPrefixRundata();
+    final String prefixR1 = "fastqscreen" + getFastqSample().getRundataPrefix();
     getResults().put(this.resultsFastqscreen.createRundata(prefixR1));
 
     // run paired : same values for fastqSample R2
     if (this.isRunPE) {
 
       final String prefixR2 = "fastqscreen"
-          + getFastqSample().getPrefixRundata().replace(".read1.", ".read2.");
+          + getFastqSample().getRundataPrefix().replace(".read1.", ".read2.");
 
       getResults().put(this.resultsFastqscreen.createRundata(prefixR2));
     }
