@@ -107,6 +107,8 @@ public class QC {
   private final File tmpDir;
   private final File sampleSheetFile;
 
+  private final CollectorRegistry collectorRegistry = new CollectorRegistry();
+
   //
   // Getters
   //
@@ -738,7 +740,6 @@ public class QC {
       return Collections.emptySet();
     }
 
-    final CollectorRegistry registry = new CollectorRegistry();
     final Set<Collector> result = new HashSet<>();
 
     for (final String collectorName : collectorNames) {
@@ -746,7 +747,7 @@ public class QC {
       if (collectorName == null) {
         continue;
       }
-      final Collector c = registry.get(collectorName);
+      final Collector c = this.collectorRegistry.get(collectorName);
 
       if (c == null) {
         throw new AozanException("Unable to found collector: " + collectorName);
