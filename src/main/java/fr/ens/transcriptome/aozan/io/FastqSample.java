@@ -33,15 +33,11 @@ import java.util.List;
 
 import com.google.common.base.Objects;
 
-import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
 import fr.ens.transcriptome.aozan.Globals;
 import fr.ens.transcriptome.aozan.QC;
 import fr.ens.transcriptome.aozan.illumina.Bcl2FastqOutput;
 import fr.ens.transcriptome.eoulsan.io.CompressionType;
-import uk.ac.babraham.FastQC.Sequence.SequenceFactory;
-import uk.ac.babraham.FastQC.Sequence.SequenceFile;
-import uk.ac.babraham.FastQC.Sequence.SequenceFormatException;
 
 /**
  * The class correspond of one entity to treat by AbstractFastqCollector, so a
@@ -356,43 +352,6 @@ public class FastqSample {
   public File getSubsetFastqFile() {
 
     return new File(this.tmpDir, getSubsetFastqFilename());
-  }
-
-  //
-  // SequenceFile methods
-  //
-
-  /**
-   * Return a sequenceFile for all fastq files present to treat in the sample.
-   * If the temporary file doesn't existed, it is created.
-   * @param fastqSample sample to treat
-   * @return SequenceFile an structure which allow to browse a fastq file
-   *         sequence per sequence
-   * @throws AozanException if an error occurs during writing file
-   */
-  public SequenceFile getSequenceFile() throws AozanException {
-
-    final File[] fastq = getFastqFiles().toArray(new File[0]);
-    final SequenceFile seqFile;
-
-    try {
-
-      if (getSubsetFastqFile().exists()) {
-        seqFile = SequenceFactory.getSequenceFile(fastq);
-
-      } else {
-        // Create temporary fastq file
-        seqFile = new SubsetSequenceFile(fastq, getSubsetFastqFile(), this);
-      }
-
-    } catch (final IOException io) {
-      throw new AozanException(io);
-
-    } catch (final SequenceFormatException e) {
-      throw new AozanException(e);
-    }
-
-    return seqFile;
   }
 
   //
