@@ -36,7 +36,6 @@ import fr.ens.transcriptome.aozan.AozanRuntimeException;
  */
 public class CollectorRegistry {
 
-  private static CollectorRegistry instance;
   private final Map<String, Collector> collectors = new HashMap<>();
 
   /**
@@ -65,28 +64,11 @@ public class CollectorRegistry {
     }
 
     if (this.collectors.containsKey(test.getName())) {
-      throw new AozanRuntimeException("The Collector ("
-          + test.getName() + ") is already registred");
+      throw new AozanRuntimeException(
+          "The Collector (" + test.getName() + ") is already registred");
     }
 
     this.collectors.put(test.getName(), test);
-  }
-
-  //
-  // Static method
-  //
-
-  /**
-   * Get the singleton instance of CollectorRegistry.
-   * @return the CollectorRegistry singleton
-   */
-  public static CollectorRegistry getInstance() {
-
-    if (instance == null) {
-      instance = new CollectorRegistry();
-    }
-
-    return instance;
   }
 
   //
@@ -94,9 +76,9 @@ public class CollectorRegistry {
   //
 
   /**
-   * Private constructor.
+   * Public constructor.
    */
-  private CollectorRegistry() {
+  public CollectorRegistry() {
 
     for (final Collector collector : ServiceLoader.load(Collector.class)) {
 

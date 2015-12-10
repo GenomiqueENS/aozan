@@ -37,7 +37,6 @@ import fr.ens.transcriptome.aozan.AozanRuntimeException;
  */
 public class AozanTestRegistry {
 
-  private static AozanTestRegistry instance;
   private final Map<String, AozanTest> tests = new HashMap<>();
 
   /**
@@ -73,31 +72,15 @@ public class AozanTestRegistry {
     this.tests.put(test.getName(), test);
   }
 
-  //
-  // Static method
-  //
-
-  /**
-   * Get the singleton instance of AozanTestRegistry.
-   * @return the AozanTestRegistry singleton
-   */
-  public static AozanTestRegistry getInstance() {
-
-    if (instance == null) {
-      instance = new AozanTestRegistry();
-    }
-
-    return instance;
-  }
 
   //
   // Constructor
   //
 
   /**
-   * Private constructor.
+   * Public constructor.
    */
-  private AozanTestRegistry() {
+  public AozanTestRegistry() {
 
     final Iterator<AozanTest> it =
         ServiceLoader.load(AozanTest.class).iterator();
@@ -106,7 +89,6 @@ public class AozanTestRegistry {
 
       register(it.next());
     }
-
   }
 
 }

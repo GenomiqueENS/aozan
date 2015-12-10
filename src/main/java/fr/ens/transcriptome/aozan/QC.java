@@ -386,7 +386,7 @@ public class QC {
   private final void init(final Map<String, String> properties)
       throws AozanException {
 
-    final AozanTestRegistry registry = AozanTestRegistry.getInstance();
+    final AozanTestRegistry registry = new AozanTestRegistry();
     final Map<String, AozanTest> mapTests = new HashMap<>();
     List<AozanTest> tests;
 
@@ -738,7 +738,7 @@ public class QC {
       return Collections.emptySet();
     }
 
-    final CollectorRegistry registry = CollectorRegistry.getInstance();
+    final CollectorRegistry registry = new CollectorRegistry();
     final Set<Collector> result = new HashSet<>();
 
     for (final String collectorName : collectorNames) {
