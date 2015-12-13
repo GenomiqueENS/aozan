@@ -395,10 +395,15 @@ public class QCReport {
         final List<String> sampleNames =
             this.data.getSamplesNameListInLane(lane);
 
-        final String firstIndex =
-            this.data.getIndexSample(lane, sampleNames.get(0));
-        final boolean noIndex =
-            sampleNames.size() == 1 && "".equals(firstIndex);
+        final boolean noIndex;
+
+        if (sampleNames.isEmpty()) {
+          noIndex = true;
+        } else {
+          final String firstIndex =
+              this.data.getIndexSample(lane, sampleNames.get(0));
+          noIndex = sampleNames.size() == 1 && "".equals(firstIndex);
+        }
 
         for (final String sampleName : sampleNames) {
 

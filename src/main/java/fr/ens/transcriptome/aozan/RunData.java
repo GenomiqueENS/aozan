@@ -153,8 +153,14 @@ public class RunData {
    * @return a list with the sample names related to the lane
    */
   public List<String> getSamplesNameListInLane(final int lane) {
-    return COMMA_SPLITTER
-        .splitToList(this.get("design.lane" + lane + ".samples.names"));
+
+    final String value = this.get("design.lane" + lane + ".samples.names");
+
+    if (value == null) {
+      return Collections.emptyList();
+    }
+
+    return COMMA_SPLITTER.splitToList(value);
   }
 
   /**
@@ -162,7 +168,14 @@ public class RunData {
    * @return a list projects names
    */
   public List<String> getProjectsNameList() {
-    return COMMA_SPLITTER.splitToList(this.get("design.projects.names"));
+
+    final String value = this.get("design.projects.names");
+
+    if (value == null) {
+      return Collections.emptyList();
+    }
+
+    return COMMA_SPLITTER.splitToList(value);
   }
 
   /**
