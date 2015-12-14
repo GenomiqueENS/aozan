@@ -67,12 +67,19 @@ public class RunData {
   }
 
   /**
-   * Get all samples names related to the lane, separated by comma.
+   * Get all samples names related to the lane as a list.
    * @param lane the lane number
    * @return all samples related to the lane
    */
-  public String getSamplesNameInLane(final int lane) {
-    return this.get("design.lane" + lane + ".samples.names");
+  public List<String> getSamplesNameInLane(final int lane) {
+
+    final String value = this.get("design.lane" + lane + ".samples.names");
+
+    if (value == null) {
+      return Collections.emptyList();
+    }
+
+    return COMMA_SPLITTER.splitToList(value);
   }
 
   /**

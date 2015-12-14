@@ -86,8 +86,6 @@ public class UndeterminedIndexesProcessThread
 
   private static final Splitter TAB_SPLITTER =
       Splitter.on("\t").trimResults().omitEmptyStrings();
-  private static final Splitter COMMA_SPLITTER =
-      Splitter.on(",").trimResults().omitEmptyStrings();
 
   private static final Joiner JOINER = Joiner.on(", ");
 
@@ -246,27 +244,24 @@ public class UndeterminedIndexesProcessThread
      * @param parent the parent element
      * @param data the data run object
      * @param lane the lane number
-     * @param asConflictDemultiplexing as conflict demultiplexing
+     * @param demultiplexingConflict true if demultiplexing conflict exist
      */
     public static void samplesNameXML(final Document doc, final Element parent,
         final RunData data, final int lane,
-        final boolean asConflictDemultiplexing) {
-
-      final List<String> samplesName = new ArrayList<>();
+        final boolean demultiplexingConflict) {
 
       // Extract all samples names per lane
-      samplesName
-          .addAll(COMMA_SPLITTER.splitToList(data.getSamplesNameInLane(lane)));
+      final List<String> sampleNames = data.getSamplesNameInLane(lane);
 
-      Collections.sort(samplesName);
+      Collections.sort(sampleNames);
 
       // Add link on filter for conflict at the end of list
-      if (asConflictDemultiplexing) {
-        samplesName.add(samplesName.size(), CONFLICT_TAG);
+      if (demultiplexingConflict) {
+        sampleNames.add(sampleNames.size(), CONFLICT_TAG);
       }
 
       // Write all samples name with correct syntax
-      final String txt = "'" + Joiner.on("','").join(samplesName) + "'";
+      final String txt = "'" + Joiner.on("','").join(sampleNames) + "'";
 
       // Add list sample for lane undetermined sample
       final Element samples = doc.createElement("Samples");
@@ -275,7 +270,7 @@ public class UndeterminedIndexesProcessThread
       parent.appendChild(samples);
 
       // Add tag XML per sample name
-      for (final String sampleName : samplesName) {
+      for (final String sampleName : sampleNames) {
         final Element sample = doc.createElement("Sample");
         sample.setAttribute("classValue", "sample");
         sample.setAttribute("cmdJS", "'" + sampleName + "'");

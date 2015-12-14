@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 
 import fr.ens.transcriptome.aozan.AozanException;
@@ -43,10 +42,6 @@ import fr.ens.transcriptome.aozan.util.ScoreInterval;
  * @author Sandrine Perrin
  */
 public class SamplesCountGlobalTest extends AbstractGlobalTest {
-
-  /** Splitter. */
-  private static final Splitter COMMA_SPLITTER = Splitter.on(",").trimResults()
-      .omitEmptyStrings();
 
   private final ScoreInterval interval = new ScoreInterval();
 
@@ -66,9 +61,8 @@ public class SamplesCountGlobalTest extends AbstractGlobalTest {
       int samplesCount = 0;
 
       for (int lane = 1; lane <= laneCount; lane++) {
-        final String samples = data.getSamplesNameInLane(lane);
 
-        samplesCount += COMMA_SPLITTER.splitToList(samples).size();
+        samplesCount += data.getSamplesNameInLane(lane).size();
       }
 
       return new TestResult(this.interval.getScore(samplesCount), samplesCount,
