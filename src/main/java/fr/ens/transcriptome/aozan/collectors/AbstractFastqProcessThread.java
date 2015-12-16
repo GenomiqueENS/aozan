@@ -55,7 +55,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
     // Timer
     final Stopwatch timer = Stopwatch.createStarted();
 
-    notifyStartLogger();
+    logThreadStart();
 
     try {
       // Launch process treatment related to each collector
@@ -71,7 +71,7 @@ abstract class AbstractFastqProcessThread implements Runnable {
           toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS));
       timer.stop();
 
-      notifyEndLogger(duration);
+      logThreadEnd(duration);
     }
 
   }
@@ -80,9 +80,9 @@ abstract class AbstractFastqProcessThread implements Runnable {
   // Abstract methods
   //
 
-  protected abstract void notifyEndLogger(final String duration);
+  protected abstract void logThreadEnd(final String duration);
 
-  protected abstract void notifyStartLogger();
+  protected abstract void logThreadStart();
 
   protected abstract void process() throws AozanException;
 

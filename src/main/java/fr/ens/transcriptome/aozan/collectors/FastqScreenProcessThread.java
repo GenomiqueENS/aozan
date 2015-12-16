@@ -68,7 +68,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   private File fastqscreenXSLFile = null;
 
   @Override
-  protected void notifyStartLogger() {
+  protected void logThreadStart() {
     LOGGER.fine(
         "FASTQSCREEN : start for " + getFastqSample().getKeyFastqSample());
   }
@@ -80,7 +80,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   }
 
   @Override
-  protected void notifyEndLogger(final String duration) {
+  protected void logThreadEnd(final String duration) {
 
     LOGGER.fine("FASTQSCREEN : end for "
         + getFastqSample().getKeyFastqSample() + " in mode "

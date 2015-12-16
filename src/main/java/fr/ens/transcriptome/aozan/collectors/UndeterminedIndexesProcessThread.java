@@ -555,7 +555,7 @@ public class UndeterminedIndexesProcessThread
   }
 
   @Override
-  protected void notifyStartLogger() {
+  protected void logThreadStart() {
     LOGGER.fine(COLLECTOR_NAME.toUpperCase()
         + ": start for " + getFastqSample().getKeyFastqSample());
   }
@@ -567,7 +567,7 @@ public class UndeterminedIndexesProcessThread
   }
 
   @Override
-  protected void notifyEndLogger(final String duration) {
+  protected void logThreadEnd(final String duration) {
 
     LOGGER.fine(COLLECTOR_NAME.toUpperCase()
         + ": end for " + getFastqSample().getKeyFastqSample() + " in "

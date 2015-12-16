@@ -69,7 +69,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
   private boolean uncompressFastqFile = false;
 
   @Override
-  protected void notifyStartLogger() {
+  protected void logThreadStart() {
     // Nothing to log
   }
 
@@ -80,7 +80,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
   }
 
   @Override
-  protected void notifyEndLogger(final String duration) {
+  protected void logThreadEnd(final String duration) {
 
     final String txt = this.uncompressFastqFile
         ? " by uncompressed fastq file "

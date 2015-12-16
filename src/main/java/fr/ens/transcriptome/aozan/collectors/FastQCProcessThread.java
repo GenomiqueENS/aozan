@@ -77,7 +77,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
   private final File reportDir;
 
   @Override
-  protected void notifyStartLogger() {
+  protected void logThreadStart() {
     LOGGER.fine("FASTQC: start for " + getFastqSample().getKeyFastqSample());
   }
 
@@ -88,7 +88,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
   }
 
   @Override
-  protected void notifyEndLogger(final String duration) {
+  protected void logThreadEnd(final String duration) {
 
     LOGGER.fine("FASTQC: end for "
         + getFastqSample().getKeyFastqSample() + " in " + duration);
