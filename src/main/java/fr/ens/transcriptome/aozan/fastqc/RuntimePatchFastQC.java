@@ -44,19 +44,18 @@ public class RuntimePatchFastQC {
    * Add code at the beginning on the method.
    * ContaminentFinder.findContaminantHit to call the version Aozan of this
    * method which had access to the contaminant list in fastqc jar.
-   * @param asBlastToUse the as blast to use
+   * @param useBlast the as blast to use
    * @throws CannotCompileException thrown when bytecode transformation has
    *           failed.
    */
-  public static void rewriteContaminantFinderMethod(final boolean asBlastToUse)
+  public static void rewriteContaminantFinderMethod(final boolean useBlast)
       throws CannotCompileException {
 
     try {
 
       // Get the class to modify
-      final CtClass cc =
-          ClassPool.getDefault().get(
-              "uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminentFinder");
+      final CtClass cc = ClassPool.getDefault()
+          .get("uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminentFinder");
 
       // Check class not frozen
       if (cc != null && !cc.isFrozen()) {
@@ -66,14 +65,13 @@ public class RuntimePatchFastQC {
         // Add code at the beginning of the method
         final String codeToAdd;
 
-        if (asBlastToUse) {
+        if (useBlast) {
           codeToAdd =
               "return fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.findContaminantHit(sequence);";
 
         } else {
-          codeToAdd =
-              "if (contaminants == null) {\n contaminants = "
-                  + "fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.makeContaminantList();\n}";
+          codeToAdd = "if (contaminants == null) {\n contaminants = "
+              + "fr.ens.transcriptome.aozan.fastqc.ContaminantFinder.makeContaminantList();\n}";
         }
         cb.insertBefore(codeToAdd);
 
@@ -98,9 +96,8 @@ public class RuntimePatchFastQC {
       throws CannotCompileException {
     try {
       // Get the class to modify
-      final CtClass cc =
-          ClassPool.getDefault().get(
-              "uk.ac.babraham.FastQC.Report.HTMLReportArchive");
+      final CtClass cc = ClassPool.getDefault()
+          .get("uk.ac.babraham.FastQC.Report.HTMLReportArchive");
 
       // Check class not frozen
       if (cc != null && !cc.isFrozen()) {
@@ -123,30 +120,28 @@ public class RuntimePatchFastQC {
   /**
    * Change superclass of Overrepresented Module from FastQC v0.11.2 to replace
    * a new class, it add a link html to ncbi website in result table.
-   * @param asBlastToUse true if use blast to search source on overepresented
+   * @param useBlast true if use blast to search source on overepresented
    *          sequences
    * @throws CannotCompileException thrown when bytecode transformation has
    *           failed.
    */
   public static void changeSuperClassOverrepresentedModule(
-      final boolean asBlastToUse) throws CannotCompileException {
+      final boolean useBlast) throws CannotCompileException {
 
-    if (!asBlastToUse) {
+    if (!useBlast) {
       return;
     }
 
     try {
       // Get the class to modify
-      final CtClass cc =
-          ClassPool.getDefault().get(
-              "uk.ac.babraham.FastQC.Modules.OverRepresentedSeqs");
+      final CtClass cc = ClassPool.getDefault()
+          .get("uk.ac.babraham.FastQC.Modules.OverRepresentedSeqs");
 
       // Check class not frozen
       if (cc != null && !cc.isFrozen()) {
 
-        final CtClass newSuperClazz =
-            ClassPool.getDefault().get(
-                "fr.ens.transcriptome.aozan.fastqc.AbstractQCModuleAozan");
+        final CtClass newSuperClazz = ClassPool.getDefault()
+            .get("fr.ens.transcriptome.aozan.fastqc.AbstractQCModuleAozan");
         cc.setSuperclass(newSuperClazz);
 
         // cc.writeFile();
@@ -171,17 +166,17 @@ public class RuntimePatchFastQC {
 
   /**
    * Execute method who patch code from FastQC before call in Aozan.
-   * @param asBlastToUse if blast will be used else false
+   * @param useBlast if blast will be used else false
    * @throws AozanException throw an error occurs during modification bytecode
    *           fastqc
    */
-  public static void runPatchFastQC(final boolean asBlastToUse)
+  public static void runPatchFastQC(final boolean useBlast)
       throws AozanException {
 
     try {
-      rewriteContaminantFinderMethod(asBlastToUse);
+      rewriteContaminantFinderMethod(useBlast);
 
-      changeSuperClassOverrepresentedModule(asBlastToUse);
+      changeSuperClassOverrepresentedModule(useBlast);
 
       // Not necessary with FastQC v0.11.2
       // modifyConstructorHtmlReportArchive();

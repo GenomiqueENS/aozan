@@ -69,16 +69,16 @@ public class UndeterminedClustersPercentGlobalTest extends AbstractGlobalTest {
       for (int lane = 1; lane <= laneCount; lane++) {
 
         // Check Undetermined fastq exist for this lane
-        final String asBarcodeUndetermined =
+        final String undeterminedBarcode =
             data.get("demux.lane" + lane + ".sample.lane" + lane + ".barcode");
-        if (asBarcodeUndetermined != null) {
+        if (undeterminedBarcode != null) {
 
           // Sum raw cluster undetermined
-          undeterminedClusterSum +=
-              data.getLong("demux.lane"
-                  + lane + ".sample.lane" + lane + ".read1.raw.cluster.count");
-          
-          rawClusterLaneIndexedSum += data.getReadRawClusterCount(lane, 1) * tiles; 
+          undeterminedClusterSum += data.getLong("demux.lane"
+              + lane + ".sample.lane" + lane + ".read1.raw.cluster.count");
+
+          rawClusterLaneIndexedSum +=
+              data.getReadRawClusterCount(lane, 1) * tiles;
         }
       }
 

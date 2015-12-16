@@ -112,7 +112,7 @@ public class EntityStat implements Comparable<EntityStat> {
   private File projectDir;
 
   /** Data compile in run data. */
-  private boolean asCompiledData = false;
+  private boolean compiledData = false;
 
   private final boolean undeterminedSample;
 
@@ -131,7 +131,7 @@ public class EntityStat implements Comparable<EntityStat> {
    */
   public RunData createRunDataProject() throws AozanException {
 
-    if (asCompiledData) {
+    if (compiledData) {
       throw new AozanException("Run data always updated for project "
           + projectName + ".");
     }
@@ -165,7 +165,7 @@ public class EntityStat implements Comparable<EntityStat> {
 
     addConditionalRundata(data, prefix);
 
-    asCompiledData = true;
+    compiledData = true;
 
     return data;
   }
@@ -201,7 +201,7 @@ public class EntityStat implements Comparable<EntityStat> {
   public void addEntity(final int lane, final String sample)
       throws AozanException {
 
-    if (asCompiledData) {
+    if (compiledData) {
       throw new AozanException("Can not add new sample ("
           + sample + ")for projet " + projectName
           + ".Data always compile to updata run data.");
@@ -406,7 +406,7 @@ public class EntityStat implements Comparable<EntityStat> {
         + ", isIndexed=" + isIndexed + ", rawClusterRecoverySum="
         + rawClusterRecoverySum + ", pfClusterRecoverySum="
         + pfClusterRecoverySum + ", projectDir=" + projectDir
-        + ", asCompiledData=" + asCompiledData + "]";
+        + ", compiledData=" + compiledData + "]";
   }
 
   

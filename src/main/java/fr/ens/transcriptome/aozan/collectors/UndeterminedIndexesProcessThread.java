@@ -244,11 +244,11 @@ public class UndeterminedIndexesProcessThread
      * @param parent the parent element
      * @param data the data run object
      * @param lane the lane number
-     * @param demultiplexingConflict true if demultiplexing conflict exist
+     * @param demultiplexingWithConflict true if demultiplexing conflict exist
      */
     public static void samplesNameXML(final Document doc, final Element parent,
         final RunData data, final int lane,
-        final boolean demultiplexingConflict) {
+        final boolean demultiplexingWithConflict) {
 
       // Extract all samples names per lane
       final List<String> sampleNames = data.getSamplesNameInLane(lane);
@@ -256,7 +256,7 @@ public class UndeterminedIndexesProcessThread
       Collections.sort(sampleNames);
 
       // Add link on filter for conflict at the end of list
-      if (demultiplexingConflict) {
+      if (demultiplexingWithConflict) {
         sampleNames.add(sampleNames.size(), CONFLICT_TAG);
       }
 
@@ -886,19 +886,20 @@ public class UndeterminedIndexesProcessThread
    * Write the lane result file in CSV format.
    * @param entries entries to write
    * @param totalEntry total entries summary
-   * @param asConflictDemultiplexing true if conflict occurs during recovering
+   * @param demultiplexingWithConflict true if conflict occurs during recovering
    *          cluster
    * @throws IOException if an error occurs while writing the file
    * @throws AozanException if an error occurs while building xml file
    */
   private void writeHTML(final List<LaneResultEntry> entries,
-      final LaneResultEntry totalEntry, final boolean asConflictDemultiplexing)
+      final LaneResultEntry totalEntry,
+      final boolean demultiplexingWithConflict)
           throws IOException, AozanException {
 
     final File reportHtml = createLaneResultFile(".html");
 
     toXML("lane" + this.lane + "_undetermined", null, entries, totalEntry,
-        reportHtml, false, asConflictDemultiplexing);
+        reportHtml, false, demultiplexingWithConflict);
 
   }
 
@@ -1046,7 +1047,7 @@ public class UndeterminedIndexesProcessThread
    * @param totalEntry total entries summary
    * @param reportHtml report output file in HTML
    * @param isSampleData true if it is a demultiplexed sample
-   * @param asConflictDemultiplexing true if conflict occurs during recovering
+   * @param demultiplexingWithConflict true if conflict occurs during recovering
    *          cluster
    * @throws IOException if an error occurs while writing the file
    * @throws AozanException if an usefull file are not define or if an error
@@ -1055,7 +1056,7 @@ public class UndeterminedIndexesProcessThread
   private void toXML(final String sampleName, final ResultEntry demuxEntry,
       final List<? extends ResultEntry> entries, final ResultEntry totalEntry,
       final File reportHtml, final boolean isSampleData,
-      final boolean asConflictDemultiplexing)
+      final boolean demultiplexingWithConflict)
           throws IOException, AozanException {
 
     Document doc = null;
@@ -1099,7 +1100,7 @@ public class UndeterminedIndexesProcessThread
     if (!isSampleData) {
       // Add sample name in this lane
       LaneResultEntry.samplesNameXML(doc, root, this.data, this.lane,
-          asConflictDemultiplexing);
+          demultiplexingWithConflict);
     }
 
     // Table - column

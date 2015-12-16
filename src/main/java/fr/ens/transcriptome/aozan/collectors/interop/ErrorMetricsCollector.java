@@ -362,15 +362,15 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
      * Constructor.
      * @param lane lane number
      * @param read read number
-     * @param asEmpty if true, all values are default values (0.0),
+     * @param empty if true, all values are default values (0.0),
      *          corresponding to a control lane or without skipping Phix
      */
-    public ErrorRatesPerLane(final int lane, final int read, boolean asEmpty,
+    public ErrorRatesPerLane(final int lane, final int read, boolean empty,
         final ReadData readData) {
       this.laneNumber = lane;
       this.readNumber = read;
 
-      if (!asEmpty) {
+      if (!empty) {
 
         // Compute error rate on not indexed read
         if (!readData.isIndexedRead()) {
