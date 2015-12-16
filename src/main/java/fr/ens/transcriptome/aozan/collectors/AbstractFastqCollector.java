@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
@@ -606,6 +607,7 @@ public abstract class AbstractFastqCollector implements Collector {
         // LOGGER.warning("InterruptedException: " + e.getMessage());
       }
 
+      final Set<AbstractFastqProcessThread> threadDataSaved = new HashSet<>();
       samplesNotProcessed = 0;
 
       for (final Future<? extends AbstractFastqProcessThread> fst : threads) {
@@ -630,9 +632,9 @@ public abstract class AbstractFastqCollector implements Collector {
 
             } else {
               // if success, save results
-              if (!st.isDataSaved()) {
+              if (!threadDataSaved.contains(st)) {
                 this.saveResultPart(st.getFastqSample(), st.getResults());
-                st.setDataSave();
+                threadDataSaved.add(st);
               }
 
             }

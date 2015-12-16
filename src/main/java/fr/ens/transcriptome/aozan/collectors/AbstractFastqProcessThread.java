@@ -47,7 +47,6 @@ abstract class AbstractFastqProcessThread implements Runnable {
 
   private Throwable exception;
   private boolean success;
-  private boolean dataSaved;
 
   @Override
   public void run() {
@@ -132,23 +131,6 @@ abstract class AbstractFastqProcessThread implements Runnable {
   }
 
   /**
-   * Test if the data file is saving.
-   * @return true if the data file is saving else false
-   */
-  public boolean isDataSaved() {
-
-    return this.dataSaved;
-  }
-
-  /**
-   * Set the data file is saving.
-   */
-  public void setDataSave() {
-
-    this.dataSaved = true;
-  }
-
-  /**
    * Return the fastqSample which represent a sample to treat.
    * @return fastqSample, object which represent a sample to treat
    */
@@ -202,6 +184,5 @@ abstract class AbstractFastqProcessThread implements Runnable {
     }
 
     this.results = new RunData();
-    this.dataSaved = false;
   }
 }
