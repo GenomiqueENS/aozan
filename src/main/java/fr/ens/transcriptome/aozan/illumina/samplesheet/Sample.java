@@ -18,7 +18,7 @@ public class Sample {
 
   private final SampleSheet samplesheet;
 
-  private final Map<String, String> map = new LinkedHashMap<>();
+  private final Map<String, String> map = new LinkedHashMap<String, String>();
 
   //
   // Getters
@@ -126,7 +126,7 @@ public class Sample {
    */
   public List<String> getFieldNames() {
 
-    final List<String> result = new ArrayList<>();
+    final List<String> result = new ArrayList<String>();
 
     for (String key : this.map.keySet()) {
       result.add(key);
@@ -322,22 +322,19 @@ public class Sample {
       throw new NullPointerException("fieldName argument cannot be null");
     }
 
-    switch (fieldName) {
-
-    case LANE_FIELD_NAME:
-    case SAMPLE_ID_FIELD_NAME:
-    case SAMPLE_NAME_FIELD_NAME:
-    case DESCRIPTION_FIELD_NAME:
-    case PROJECT_FIELD_NAME:
-    case INDEX1_FIELD_NAME:
-    case INDEX2_FIELD_NAME:
-    case SAMPLE_REF_FIELD_NAME:
+    // Do no use switch for string for GWT dependency
+    if (LANE_FIELD_NAME.equals(fieldName)
+        || SAMPLE_ID_FIELD_NAME.equals(fieldName)
+        || SAMPLE_NAME_FIELD_NAME.equals(fieldName)
+        || DESCRIPTION_FIELD_NAME.equals(fieldName)
+        || PROJECT_FIELD_NAME.equals(fieldName)
+        || INDEX1_FIELD_NAME.equals(fieldName)
+        || INDEX2_FIELD_NAME.equals(fieldName)
+        || SAMPLE_REF_FIELD_NAME.equals(fieldName)) {
       return true;
-
-    default:
-      return false;
     }
 
+    return false;
   }
 
   //
@@ -347,7 +344,7 @@ public class Sample {
   @Override
   public String toString() {
 
-    return this.getClass().getSimpleName() + "{map=" + this.map + "}";
+    return this.getClass().getName() + "{map=" + this.map + "}";
   }
 
   //

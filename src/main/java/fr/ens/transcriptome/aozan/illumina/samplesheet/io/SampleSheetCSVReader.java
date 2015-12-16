@@ -32,8 +32,8 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
 import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.transcriptome.eoulsan.Globals;
-import fr.ens.transcriptome.eoulsan.illumina.CasavaDesignUtil;
 import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
 /**
@@ -86,7 +86,7 @@ public class SampleSheetCSVReader implements SampleSheetReader {
       try {
 
         // Parse the line
-        parser.parseLine(CasavaDesignUtil.parseCSVDesignLine(line));
+        parser.parseLine(SampleSheetUtils.parseCSVDesignLine(line));
       } catch (IOException e) {
 
         // If an error occurs while parsing add the line to the exception

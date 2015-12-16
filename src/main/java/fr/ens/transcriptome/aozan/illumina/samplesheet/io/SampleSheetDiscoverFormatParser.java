@@ -18,7 +18,7 @@ import fr.ens.transcriptome.aozan.illumina.samplesheet.SampleSheet;
 public class SampleSheetDiscoverFormatParser implements SampleSheetParser {
 
   private SampleSheetParser parser;
-  private final List<List<String>> cache = new ArrayList<>();
+  private final List<List<String>> cache = new ArrayList<List<String>>();
 
   private final List<String> sampleSheetV1Hearder =
       Arrays.asList("FCID", "Lane", "SampleID", "SampleRef", "Index",
@@ -95,7 +95,7 @@ public class SampleSheetDiscoverFormatParser implements SampleSheetParser {
       throw new NullPointerException("list argument cannot be null");
     }
 
-    final List<String> result = new ArrayList<>(list);
+    final List<String> result = new ArrayList<String>(list);
 
     // Convert the bcl2fastq 1 samplesheet header to lower case
     for (int i = 0; i < result.size(); i++) {

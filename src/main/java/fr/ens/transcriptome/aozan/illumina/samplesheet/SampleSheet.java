@@ -11,8 +11,9 @@ import fr.ens.transcriptome.aozan.AozanRuntimeException;
 
 public class SampleSheet implements Iterable<Sample> {
 
-  private Map<String, List<String>> metadata = new LinkedHashMap<>();
-  private List<Sample> samples = new ArrayList<>();
+  private Map<String, List<String>> metadata =
+      new LinkedHashMap<String, List<String>>();
+  private List<Sample> samples = new ArrayList<Sample>();
 
   private int version = 2;
   private String flowCellId;
@@ -64,7 +65,7 @@ public class SampleSheet implements Iterable<Sample> {
    */
   public List<String> getSections() {
 
-    final List<String> result = new ArrayList<>();
+    final List<String> result = new ArrayList<String>();
 
     for (String key : this.metadata.keySet()) {
 
@@ -90,7 +91,8 @@ public class SampleSheet implements Iterable<Sample> {
       throw new NullPointerException("section argument cannot be null");
     }
 
-    final Map<String, List<String>> result = new LinkedHashMap<>();
+    final Map<String, List<String>> result =
+        new LinkedHashMap<String, List<String>>();
 
     for (Map.Entry<String, List<String>> e : this.metadata.entrySet()) {
 
@@ -149,7 +151,7 @@ public class SampleSheet implements Iterable<Sample> {
     if (this.metadata.containsKey(mapKey)) {
       values = this.metadata.get(mapKey);
     } else {
-      values = new ArrayList<>();
+      values = new ArrayList<String>();
       this.metadata.put(mapKey, values);
     }
 
@@ -236,7 +238,7 @@ public class SampleSheet implements Iterable<Sample> {
    */
   public List<String> getSamplesFieldNames() {
 
-    final List<String> result = new ArrayList<>();
+    final List<String> result = new ArrayList<String>();
 
     for (Sample s : this) {
 
@@ -312,7 +314,7 @@ public class SampleSheet implements Iterable<Sample> {
       return Collections.emptyList();
     }
 
-    final List<Sample> result = new ArrayList<>();
+    final List<Sample> result = new ArrayList<Sample>();
 
     for (Sample s : this) {
       if (s.getLane() == lane) {

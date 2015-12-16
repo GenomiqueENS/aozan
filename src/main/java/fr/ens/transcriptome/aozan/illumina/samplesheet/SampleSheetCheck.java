@@ -45,15 +45,17 @@ public class SampleSheetCheck {
 
     // checkSampleSheet(flowCellId);
 
-    final List<String> warnings = new ArrayList<>();
+    final List<String> warnings = new ArrayList<String>();
 
-    final Map<Integer, Set<String>> indexes = new HashMap<>();
-    final Set<String> sampleIds = new HashSet<>();
-    final Set<Integer> laneWithIndexes = new HashSet<>();
-    final Set<Integer> laneWithoutIndexes = new HashSet<>();
-    final Map<String, Set<Integer>> sampleInLanes = new HashMap<>();
-    final Map<String, String> samplesProjects = new HashMap<>();
-    final Map<String, String> samplesIndex = new HashMap<>();
+    final Map<Integer, Set<String>> indexes =
+        new HashMap<Integer, Set<String>>();
+    final Set<String> sampleIds = new HashSet<String>();
+    final Set<Integer> laneWithIndexes = new HashSet<Integer>();
+    final Set<Integer> laneWithoutIndexes = new HashSet<Integer>();
+    final Map<String, Set<Integer>> sampleInLanes =
+        new HashMap<String, Set<Integer>>();
+    final Map<String, String> samplesProjects = new HashMap<String, String>();
+    final Map<String, String> samplesIndex = new HashMap<String, String>();
 
     for (Sample sample : samplesheet) {
 
@@ -169,7 +171,7 @@ public class SampleSheetCheck {
     checkSampleInLanes(sampleInLanes, warnings);
 
     // Return unique warnings
-    final List<String> result = new ArrayList<>(new HashSet<>(warnings));
+    final List<String> result = new ArrayList<String>(new HashSet<String>(warnings));
     Collections.sort(result);
 
     return result;
@@ -396,7 +398,7 @@ public class SampleSheetCheck {
 
     final Set<Integer> lanes;
     if (!sampleInLanes.containsKey(sampleId)) {
-      lanes = new HashSet<>();
+      lanes = new HashSet<Integer>();
       sampleInLanes.put(sampleId, lanes);
     } else {
       lanes = sampleInLanes.get(sampleId);
@@ -429,7 +431,7 @@ public class SampleSheetCheck {
         sb.append(e.getKey());
         sb.append("\" exists in lanes: ");
 
-        final List<Integer> laneSorted = new ArrayList<>(lanes);
+        final List<Integer> laneSorted = new ArrayList<Integer>(lanes);
         Collections.sort(laneSorted);
 
         boolean first = true;

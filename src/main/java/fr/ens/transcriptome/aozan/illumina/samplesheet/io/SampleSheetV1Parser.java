@@ -59,27 +59,27 @@ public class SampleSheetV1Parser implements SampleSheetParser {
       return null;
     }
 
-    switch (fieldName) {
-
-    case "Lane":
+    if ("Lane".equals(fieldName)) {
       return Sample.LANE_FIELD_NAME;
-
-    case "SampleID":
-      return Sample.SAMPLE_ID_FIELD_NAME;
-
-    case "Description":
-      return Sample.DESCRIPTION_FIELD_NAME;
-
-    case "SampleProject":
-      return Sample.PROJECT_FIELD_NAME;
-
-    case "SampleRef":
-      return Sample.SAMPLE_REF_FIELD_NAME;
-
-    default:
-      return fieldName;
     }
 
+    if ("SampleID".equals(fieldName)) {
+      return Sample.SAMPLE_ID_FIELD_NAME;
+    }
+
+    if ("Description".equals(fieldName)) {
+      return Sample.DESCRIPTION_FIELD_NAME;
+    }
+
+    if ("SampleProject".equals(fieldName)) {
+      return Sample.PROJECT_FIELD_NAME;
+    }
+
+    if ("SampleRef".equals(fieldName)) {
+      return Sample.SAMPLE_REF_FIELD_NAME;
+    }
+
+    return fieldName;
   }
 
   @Override

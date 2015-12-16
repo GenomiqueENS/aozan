@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Script can be used with GWT 2.4 or 2.5
-PROJECT_NAME=DesignValidator
-GIT_REVISION=`git log -n 1 --pretty='%h (%ad)' --date=short `
+PROJECT_NAME=SamplesheetValidator
+GIT_REVISION=$(git log -n 1 --pretty='%h (%ad)' --date=short )
 
 # Check environment variable
 if [ -z "$GWT_HOME" ]; then
@@ -10,7 +10,7 @@ if [ -z "$GWT_HOME" ]; then
   exit 1
 fi
 
-BASEDIR=`dirname $0`
+BASEDIR=$(dirname $0)
 if [ ! -d $BASEDIR/target ]; then
   mkdir $BASEDIR/target
 fi
@@ -18,9 +18,9 @@ cd $BASEDIR/target
 
 AOZAN_DIR=..
 AOZAN_PACKAGE=fr.ens.transcriptome.aozan
-AOZAN_PACKAGE_PATH=`echo $AOZAN_PACKAGE | sed 's/\./\//g'`
+AOZAN_PACKAGE_PATH=$(echo $AOZAN_PACKAGE | sed 's/\./\//g')
 PACKAGE=fr.ens.transcriptome.cdv
-PACKAGE_PATH=`echo $PACKAGE | sed 's/\./\//g'`
+PACKAGE_PATH=$(echo $PACKAGE | sed 's/\./\//g')
 
 HELP_TEXT_PATH=design-validator-help-page.txt
 
@@ -43,48 +43,20 @@ tail -n +21 $PROJECT_NAME/src/fr/ens/transcriptome/cdv/$PROJECT_NAME.gwt.xml >> 
 rm $PROJECT_NAME/src/fr/ens/transcriptome/cdv/$PROJECT_NAME.gwt.xml
 mv $PROJECT_NAME/src/fr/ens/transcriptome/cdv/$PROJECT_NAME.gwt.xml.tmp $PROJECT_NAME/src/fr/ens/transcriptome/cdv/$PROJECT_NAME.gwt.xml
 
-
-JAVA_FILES="AozanException.java SampleSheet.java SampleSheetUtils.java Sample.java CasavaDesignReader.java AbstractCasavaDesignTextReader.java"
-
-DIR=$(pwd -P)
-for f in $JAVA_FILES
+for f in $(echo AozanException.java AozanRuntimeException.java)
 do
-	echo Search $f in $DIR
-	PATH=$(find $DIR -name "$f")
-
-	if [ "X$PATH" == "X" ]; then echo Nothing found; exit 1 ; fi
-
-	sed -e "s/$AOZAN_PACKAGE/$PACKAGE/g" $PATH > $PROJECT_NAME/src/$PACKAGE_PATH/client/$f
-
+    sed "s/package $AOZAN_PACKAGE/package $PACKAGE.client/" $AOZAN_DIR/src/main/java/$AOZAN_PACKAGE_PATH/$f > $PROJECT_NAME/src/$PACKAGE_PATH/client/$f
 done
 
+for f in $(echo SampleSheet.java Sample.java SampleSheetUtils.java SampleSheetCheck.java)
+do
+    sed "s/package $AOZAN_PACKAGE.illumina.samplesheet/package $PACKAGE.client/" $AOZAN_DIR/src/main/java/$AOZAN_PACKAGE_PATH/illumina/samplesheet/$f | sed "s/import $AOZAN_PACKAGE.illumina.samplesheet.io/import $PACKAGE.client/" | sed "s/import $AOZAN_PACKAGE.illumina.samplesheet/import $PACKAGE.client/" |  sed "s/import $AOZAN_PACKAGE/import $PACKAGE.client/" |  sed "s/import static $AOZAN_PACKAGE.illumina.samplesheet/import static $PACKAGE.client/"  > $PROJECT_NAME/src/$PACKAGE_PATH/client/$f
+done
 
-# for f in `echo AozanException.java`
-# do
-# 	sed "s/package $AOZAN_PACKAGE/package $PACKAGE.client/" $AOZAN_DIR/src/main/java/$AOZAN_PACKAGE_PATH/$f > $PROJECT_NAME/src/$PACKAGE_PATH/client/$f
-# done
-#
-# # Classes from package illumina.samplesheet
-# for f in `echo SampleSheet.java SampleSheetUtils.java`
-# do
-#
-# 	sed -e "s/package $AOZAN_PACKAGE.illumina/package $PACKAGE.client/" -e "s/import $AOZAN_PACKAGE.illumina.io/import $PACKAGE.client/" -e "s/import $AOZAN_PACKAGE.illumina/import $PACKAGE.client/" -e "s/import $AOZAN_PACKAGE/import $PACKAGE.client/"  $AOZAN_DIR/src/main/java/$AOZAN_PACKAGE_PATH/illumina/$f > $PROJECT_NAME/src/$PACKAGE_PATH/client/$f
-#
-# #	sed "s/package $AOZAN_PACKAGE.illumina/package $PACKAGE.client/" $AOZAN_DIR/src/main/java/$AOZAN_PACKAGE_PATH/illumina/$f | sed "s/import $AOZAN_PACKAGE.illumina.io/import $PACKAGE.client/" | sed "s/import $AOZAN_PACKAGE.illumina/import $PACKAGE.client/" |  sed "s/import $AOZAN_PACKAGE/import $PACKAGE.client/"  > $PROJECT_NAME/src/$PACKAGE_PATH/client/$f
-# done
-#
-# # Classes from package illumina.sampleentry
-# for f in `echo Sample.java`
-# do
-# 	sed -e "s/package $AOZAN_PACKAGE.illumina.sampleentry/package $PACKAGE.client/" -e "s/import $AOZAN_PACKAGE.illumina.io/import $PACKAGE.client/" -e "s/import $AOZAN_PACKAGE.illumina/import $PACKAGE.client/" -e "s/import $AOZAN_PACKAGE/import $PACKAGE.client/"  $AOZAN_DIR/src/main/java/$AOZAN_PACKAGE_PATH/illumina/$f > $PROJECT_NAME/src/$PACKAGE_PATH/client/$f
-#
-# done
-#
-# # Classes from package illumina.io
-# for f in `echo CasavaDesignReader.java AbstractCasavaDesignTextReader.java`
-# do
-# 	sed "s/package $AOZAN_PACKAGE.illumina.io/package $PACKAGE.client/" $AOZAN_DIR/src/main/java/$AOZAN_PACKAGE_PATH/illumina/io/$f | sed "s/import $AOZAN_PACKAGE.illumina.io/import $PACKAGE.client/" | sed "s/import $AOZAN_PACKAGE.illumina/import $PACKAGE.client/" |  sed "s/import $AOZAN_PACKAGE/import $PACKAGE.client/" > $PROJECT_NAME/src/$PACKAGE_PATH/client/$f
-# done
+for f in $(echo SampleSheetReader.java SampleSheetDiscoverFormatParser.java SampleSheetReaderUtils.java SampleSheetParser.java SampleSheetV1Parser.java SampleSheetV2Parser.java)
+do
+    sed "s/package $AOZAN_PACKAGE.illumina.samplesheet.io/package $PACKAGE.client/" $AOZAN_DIR/src/main/java/$AOZAN_PACKAGE_PATH/illumina/samplesheet/io/$f | sed "s/import $AOZAN_PACKAGE.illumina.samplesheet.io/import $PACKAGE.client/" | sed "s/import $AOZAN_PACKAGE.illumina.samplesheet/import $PACKAGE.client/" |  sed "s/import $AOZAN_PACKAGE/import $PACKAGE.client/" | sed "s/import static $AOZAN_PACKAGE.illumina.samplesheet.io/import static $PACKAGE.client/"  > $PROJECT_NAME/src/$PACKAGE_PATH/client/$f
+done
 
 cat > $PROJECT_NAME/war/$HELP_TEXT_PATH << EOF
 Help page for validator sample-sheet for bcl2fastq-1.8.x tool (Illumina: http://support.illumina.com/downloads/bcl2fastq_conversion_software_184.ilmn):
@@ -237,7 +209,7 @@ public class $PROJECT_NAME implements EntryPoint {
 
   private boolean first = true;
 
-  public static final void updateDesignWithIndexes(final CasavaDesign design,
+  public static final void updateDesignWithIndexes(final SampleSheet design,
       final String indexesAvailable) {
 
     if (design == null || indexesAvailable == null)
@@ -258,8 +230,24 @@ public class $PROJECT_NAME implements EntryPoint {
       map.put(fields[0].trim(), fields[1].trim());
     }
 
-    for (CasavaSample sample : design) {
+    for (Sample sample : design) {
 
+      final String index1 = sample.getIndex1();
+      final String index2 = sample.getIndex2();
+
+      if (index1 != null) {
+        if (map.containsKey(index1)) {
+          sample.setIndex1(map.get(index1));
+        }
+      }
+
+      if (index2 != null) {
+        if (map.containsKey(index2)) {
+          sample.setIndex1(map.get(index2));
+        }
+      }
+
+      /*
       // Case multi-indexes
       final String[] indexes = sample.getIndex().split("-");
       String res = null;
@@ -279,7 +267,7 @@ public class $PROJECT_NAME implements EntryPoint {
       // Update sample index
       if (res != null){
         sample.setIndex(res);
-      }
+      }*/
     }
 
   }
@@ -308,7 +296,7 @@ public class $PROJECT_NAME implements EntryPoint {
     return flowcellId.substring(1);
   }
 
-  public final List<String> checkProjectCasavaDesign(final CasavaDesign design) {
+  public final List<String> checkProjectCasavaDesign(final SampleSheet design) {
 
     if (currentProjects.isEmpty())
       return Collections.EMPTY_LIST;
@@ -327,7 +315,7 @@ public class $PROJECT_NAME implements EntryPoint {
 
     // Build projects list from sample sheet
     Set<String> projectsDesign = new HashSet<String>();
-    for (CasavaSample sample : design) {
+    for (Sample sample : design) {
       projectsDesign.add(sample.getSampleProject());
     }
 
@@ -358,7 +346,7 @@ public class $PROJECT_NAME implements EntryPoint {
     return project.replaceAll("-","_").trim().toLowerCase();
   }
 
-  public final List<String> checkGenomesCasavaDesign(final CasavaDesign design, final String genomesList) {
+  public final List<String> checkGenomesCasavaDesign(final SampleSheet design, final String genomesList) {
 
     if (genomesList == null){
       return Collections.emptyList();
@@ -377,7 +365,7 @@ public class $PROJECT_NAME implements EntryPoint {
     }
 
     Set<String> genomesDesign = new HashSet<String>();
-    for (CasavaSample sample : design) {
+    for (Sample sample : design) {
       genomesDesign.add(sample.getSampleRef());
     }
 
@@ -527,7 +515,7 @@ public class $PROJECT_NAME implements EntryPoint {
 
   private void loadProjectList(final String url) throws Exception {
 
-  	RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(url));
+    RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(url));
     final String responseText;
 
     Request request = builder.sendRequest(null, new RequestCallback() {
@@ -555,10 +543,10 @@ public class $PROJECT_NAME implements EntryPoint {
   // Load help text file from url
   public void loadTextHelp() {
 
-  	final String defaultTxt = "Help for the validator samplesheet coming soon.";
-	final String url = "$HELP_TEXT_PATH";
+    final String defaultTxt = "Help for the validator samplesheet coming soon.";
+    final String url = "$HELP_TEXT_PATH";
 
-	try {
+    try {
       RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(url));
 
       Request request = builder.sendRequest(null, new RequestCallback() {
@@ -577,9 +565,9 @@ public class $PROJECT_NAME implements EntryPoint {
           }
         }
       });
-	} catch (Exception e){
-	  helpTextarea.setText(defaultTxt+" 3");
-	}
+    } catch (Exception e){
+      helpTextarea.setText(defaultTxt+" 3");
+    }
   }
 
 
@@ -647,12 +635,12 @@ public class $PROJECT_NAME implements EntryPoint {
         tp.selectTab(0);
 
         try {
-          final CasavaDesign design;
+          final SampleSheet design;
 
           if (inputText.indexOf('\t')!=-1)
-            design = CasavaDesignUtil.parseTabulatedDesign(inputText);
+            design = SampleSheetUtils.parseTabulatedDesign(inputText);
           else
-            design = CasavaDesignUtil.parseCSVDesign(inputText);
+            design = SampleSheetUtils.parseCSVDesign(inputText);
 
           updateDesignWithIndexes(design,
               indexesTextarea.getText());
@@ -664,7 +652,7 @@ public class $PROJECT_NAME implements EntryPoint {
 
           // Check Casava design
           final List<String> warnings =
-            CasavaDesignUtil.checkCasavaDesign(design, flowcellId);
+            SampleSheetCheck.checkSampleSheet(design, flowcellId);
 
           // Check genomes Casava design
           warnings.addAll(checkGenomesCasavaDesign(design, genomesTextarea.getText()));
@@ -675,12 +663,12 @@ public class $PROJECT_NAME implements EntryPoint {
           if (warnings.size()==0 || Window.confirm(createWarningMessage(warnings))) {
 
             outputHTML.setHTML("<pre>"
-                + CasavaDesignUtil.toCSV(design) + "</pre>");
+                + SampleSheetUtils.toSampleSheetV2CSV(design) + "</pre>");
             tp.selectTab(1);
           }
         } catch (IOException e) {
           Window.alert("Invalid samplesheet: " + e.getMessage());
-        } catch (EoulsanException e) {
+        } catch (AozanException e) {
           Window.alert("Invalid samplesheet: " + e.getMessage());
         }
 
@@ -795,9 +783,9 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
 EOF
 
 if [ -z "$GIT_REVISION" ]; then
-	GIT_REVISION=""
+    GIT_REVISION=""
 else
-	GIT_REVISION="Revision $GIT_REVISION"
+    GIT_REVISION="Revision $GIT_REVISION"
 fi
 sed "s/__VERSION__/$GIT_REVISION/" $PROJECT_NAME/war/$PROJECT_NAME.html.tmp   > $PROJECT_NAME/war/$PROJECT_NAME.html
 rm $PROJECT_NAME/war/$PROJECT_NAME.html.tmp

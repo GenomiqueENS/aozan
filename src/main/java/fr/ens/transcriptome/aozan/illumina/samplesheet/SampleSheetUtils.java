@@ -8,6 +8,7 @@ import static fr.ens.transcriptome.aozan.illumina.samplesheet.Sample.PROJECT_FIE
 import static fr.ens.transcriptome.aozan.illumina.samplesheet.Sample.SAMPLE_ID_FIELD_NAME;
 import static fr.ens.transcriptome.aozan.illumina.samplesheet.Sample.SAMPLE_NAME_FIELD_NAME;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -16,6 +17,8 @@ import java.util.Map;
 
 import fr.ens.transcriptome.aozan.AozanException;
 import fr.ens.transcriptome.aozan.AozanRuntimeException;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.io.SampleSheetDiscoverFormatParser;
+import fr.ens.transcriptome.aozan.illumina.samplesheet.io.SampleSheetReader;
 
 /**
  * This class define samplesheet useful methods.
@@ -90,35 +93,39 @@ public class SampleSheetUtils {
       return null;
     }
 
-    switch (fieldName) {
-
-    case LANE_FIELD_NAME:
+    if (LANE_FIELD_NAME.equals(fieldName)) {
       return "Lane";
-
-    case SAMPLE_ID_FIELD_NAME:
-      return "Sample_ID";
-
-    case SAMPLE_NAME_FIELD_NAME:
-      return "Sample_Name";
-
-    case DESCRIPTION_FIELD_NAME:
-      return "Description";
-
-    case PROJECT_FIELD_NAME:
-      return "Sample_Project";
-
-    case INDEX1_FIELD_NAME:
-      return "index";
-
-    case INDEX2_FIELD_NAME:
-      return "index2";
-
-    case Sample.SAMPLE_REF_FIELD_NAME:
-      return "Sample_Ref";
-
-    default:
-      return fieldName;
     }
+
+    if (SAMPLE_ID_FIELD_NAME.equals(fieldName)) {
+      return "Sample_ID";
+    }
+
+    if (SAMPLE_NAME_FIELD_NAME.equals(fieldName)) {
+      return "Sample_Name";
+    }
+
+    if (DESCRIPTION_FIELD_NAME.equals(fieldName)) {
+      return "Description";
+    }
+
+    if (PROJECT_FIELD_NAME.equals(fieldName)) {
+      return "Sample_Project";
+    }
+
+    if (INDEX1_FIELD_NAME.equals(fieldName)) {
+      return "index";
+    }
+
+    if (INDEX2_FIELD_NAME.equals(fieldName)) {
+      return "index2";
+    }
+
+    if (Sample.SAMPLE_REF_FIELD_NAME.equals(fieldName)) {
+      return "Sample_Ref";
+    }
+
+    return fieldName;
   }
 
   /**
@@ -235,21 +242,22 @@ public class SampleSheetUtils {
       return;
     }
 
-    List<Sample> samples = new ArrayList<>();
+    List<Sample> samples = new ArrayList<Sample>();
 
     // Copy to avoid iterator modification
     for (Sample s : samplesheet) {
       samples.add(s);
     }
 
-    final List<Map<String, String>> samplesToDuplicate = new ArrayList<>();
+    final List<Map<String, String>> samplesToDuplicate =
+        new ArrayList<Map<String, String>>();
 
     for (Sample s : samples) {
 
       // Set the Lane field for the first line
       s.set(Sample.LANE_FIELD_NAME, "1");
 
-      final Map<String, String> s2 = new LinkedHashMap<>();
+      final Map<String, String> s2 = new LinkedHashMap<String, String>();
       samplesToDuplicate.add(s2);
       for (String fieldName : s.getFieldNames()) {
         s2.put(fieldName, s.get(fieldName));
@@ -294,6 +302,137 @@ public class SampleSheetUtils {
   }
 
   //
+  // Parse methods
+  //
+
+  /**
+   * Parse a design in a tabulated format from a String
+   * @param s string to parse
+   * @return a Casava Design object
+   * @throws IOException if an error occurs
+   */
+  public static SampleSheet parseCSVDesign(final String s) throws IOException {
+
+    if (s == null) {
+      return null;
+    }
+
+    return new SampleSheetReader() {
+
+      @Override
+      public SampleSheet read() throws IOException {
+
+        final String[] lines = s.split("\n");
+        final SampleSheetDiscoverFormatParser parser =
+            new SampleSheetDiscoverFormatParser();
+
+        for (final String line : lines) {
+
+          if ("".equals(line.trim())) {
+            continue;
+          }
+
+          // Parse the line
+          parser.parseLine(parseCSVDesignLine(line));
+        }
+
+        return parser.getSampleSheet();
+      }
+    }.read();
+  }
+
+  /**
+   * Parse a design in a tabulated format from a String
+   * @param s string to parse
+   * @return a Casava Design object
+   * @throws IOException if an error occurs
+   */
+  public static SampleSheet parseTabulatedDesign(final String s)
+      throws IOException {
+
+    if (s == null) {
+      return null;
+    }
+
+    return new SampleSheetReader() {
+
+      @Override
+      public SampleSheet read() throws IOException {
+
+        final String[] lines = s.split("\n");
+        final SampleSheetDiscoverFormatParser parser =
+            new SampleSheetDiscoverFormatParser();
+
+        for (final String line : lines) {
+
+          if ("".equals(line.trim())) {
+            continue;
+          }
+
+          // Parse the line
+          parser.parseLine(parseTabulatedDesignLine(line));
+        }
+
+        return parser.getSampleSheet();
+      }
+    }.read();
+  }
+
+  /**
+   * Custom splitter for Casava CSV file.
+   * @param line line to parse
+   * @return a list of String with the contents of each cell without unnecessary
+   *         quotes
+   */
+  public static final List<String> parseCSVDesignLine(final String line) {
+
+    final List<String> result = new ArrayList<String>();
+
+    if (line == null) {
+      return null;
+    }
+
+    final int len = line.length();
+    boolean openQuote = false;
+    final StringBuilder sb = new StringBuilder();
+
+    for (int i = 0; i < len; i++) {
+
+      final char c = line.charAt(i);
+
+      if (!openQuote && c == ',') {
+        result.add(sb.toString());
+        sb.setLength(0);
+      } else {
+        if (c == '"') {
+          openQuote = !openQuote;
+        } else {
+          sb.append(c);
+        }
+      }
+
+    }
+    result.add(sb.toString());
+
+    return result;
+  }
+
+  /**
+   * Custom splitter for Casava tabulated file.
+   * @param line line to parse
+   * @return a list of String with the contents of each cell without unnecessary
+   *         quotes
+   */
+  public static List<String> parseTabulatedDesignLine(final String line) {
+
+    if (line == null) {
+      return null;
+    }
+
+    return Arrays.asList(line.split("\t"));
+  }
+
+  //
   // Other methods
   //
 
@@ -301,7 +440,7 @@ public class SampleSheetUtils {
    * Replace index shortcuts in a design object by index sequences.
    * @param design Casava design object
    * @param sequences map for the sequences
-   * @throws EoulsanException if the shortcut is unknown
+   * @throws AozanException if the shortcut is unknown
    */
   public static void replaceIndexShortcutsBySequences(final SampleSheet design,
       final Map<String, String> sequences) throws AozanException {

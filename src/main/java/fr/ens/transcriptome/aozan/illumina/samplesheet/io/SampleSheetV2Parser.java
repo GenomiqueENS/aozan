@@ -18,7 +18,7 @@ public class SampleSheetV2Parser implements SampleSheetParser {
 
   private String currentSection;
   private boolean dataSection;
-  private List<String> header = new ArrayList<>();
+  private List<String> header = new ArrayList<String>();
 
   /**
    * Convert a field name to internal field name.
@@ -31,36 +31,39 @@ public class SampleSheetV2Parser implements SampleSheetParser {
       return null;
     }
 
-    switch (fieldName) {
-
-    case "Sample_Project":
+    if ("Sample_Project".equals(fieldName)) {
       return Sample.PROJECT_FIELD_NAME;
-
-    case "Lane":
-      return Sample.LANE_FIELD_NAME;
-
-    case "Sample_ID":
-      return Sample.SAMPLE_ID_FIELD_NAME;
-
-    case "Sample_Name":
-      return Sample.SAMPLE_NAME_FIELD_NAME;
-
-    case "index":
-      return Sample.INDEX1_FIELD_NAME;
-
-    case "index2":
-      return Sample.INDEX2_FIELD_NAME;
-
-    case "Description":
-      return Sample.DESCRIPTION_FIELD_NAME;
-
-    case "Sample_Ref":
-      return Sample.SAMPLE_REF_FIELD_NAME;
-
-    default:
-      return fieldName;
     }
 
+    if ("Lane".equals(fieldName)) {
+      return Sample.LANE_FIELD_NAME;
+    }
+
+    if ("Sample_ID".equals(fieldName)) {
+      return Sample.SAMPLE_ID_FIELD_NAME;
+    }
+
+    if ("Sample_Name".equals(fieldName)) {
+      return Sample.SAMPLE_NAME_FIELD_NAME;
+    }
+
+    if ("index".equals(fieldName)) {
+      return Sample.INDEX1_FIELD_NAME;
+    }
+
+    if ("index2".equals(fieldName)) {
+      return Sample.INDEX2_FIELD_NAME;
+    }
+
+    if ("Description".equals(fieldName)) {
+      return Sample.DESCRIPTION_FIELD_NAME;
+    }
+
+    if ("Sample_Ref".equals(fieldName)) {
+      return Sample.SAMPLE_REF_FIELD_NAME;
+    }
+
+    return fieldName;
   }
 
   @Override
