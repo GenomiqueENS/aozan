@@ -14,24 +14,24 @@ from java.util import Locale
 # import first_base_report
 import detection_new_run, detection_end_run
 from java.util import LinkedHashMap
-from fr.ens.transcriptome.aozan import Globals
-from fr.ens.transcriptome.aozan import Common
-from fr.ens.transcriptome.aozan import AozanException
+from fr.ens.biologie.genomique.aozan import Globals
+from fr.ens.biologie.genomique.aozan import Common
+from fr.ens.biologie.genomique.aozan import AozanException
 
-from fr.ens.transcriptome.aozan.Settings import HISEQ_STEP_KEY
-from fr.ens.transcriptome.aozan.Settings import FIRST_BASE_REPORT_STEP_KEY
-from fr.ens.transcriptome.aozan.Settings import DEMUX_STEP_KEY
-from fr.ens.transcriptome.aozan.Settings import QC_STEP_KEY
-from fr.ens.transcriptome.aozan.Settings import DEMUX_USE_HISEQ_OUTPUT_KEY
-from fr.ens.transcriptome.aozan.Settings import AOZAN_LOG_LEVEL_KEY
-from fr.ens.transcriptome.aozan.Settings import AOZAN_LOG_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import AOZAN_ENABLE_KEY
-from fr.ens.transcriptome.aozan.Settings import SYNC_CONTINUOUS_SYNC_KEY
-from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import LOCK_FILE_KEY
-from fr.ens.transcriptome.aozan.Settings import BCL_DATA_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import FASTQ_DATA_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import HISEQ_STEP_KEY
+from fr.ens.biologie.genomique.aozan.Settings import FIRST_BASE_REPORT_STEP_KEY
+from fr.ens.biologie.genomique.aozan.Settings import DEMUX_STEP_KEY
+from fr.ens.biologie.genomique.aozan.Settings import QC_STEP_KEY
+from fr.ens.biologie.genomique.aozan.Settings import DEMUX_USE_HISEQ_OUTPUT_KEY
+from fr.ens.biologie.genomique.aozan.Settings import AOZAN_LOG_LEVEL_KEY
+from fr.ens.biologie.genomique.aozan.Settings import AOZAN_LOG_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import AOZAN_ENABLE_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SYNC_CONTINUOUS_SYNC_KEY
+from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import LOCK_FILE_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL_DATA_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import FASTQ_DATA_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
 
 def create_lock_file(lock_file_path):
     """Create the lock file.

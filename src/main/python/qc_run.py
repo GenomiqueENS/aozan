@@ -7,19 +7,19 @@ import os.path, stat
 import common, time
 import demux_run, hiseq_run
 
-from fr.ens.transcriptome.aozan import QC, Settings
-from fr.ens.transcriptome.aozan import AozanException
+from fr.ens.biologie.genomique.aozan import QC, Settings
+from fr.ens.biologie.genomique.aozan import AozanException
 
 from java.lang import Throwable
 
-from fr.ens.transcriptome.aozan.Settings import FASTQ_DATA_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import REPORTS_URL_KEY
-from fr.ens.transcriptome.aozan.Settings import QC_REPORT_SAVE_RAW_DATA_KEY
-from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import QC_REPORT_STYLESHEET_KEY
-from fr.ens.transcriptome.aozan.Settings import QC_REPORT_SAVE_REPORT_DATA_KEY
-from fr.ens.transcriptome.aozan.Settings import TMP_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import FASTQ_DATA_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import REPORTS_URL_KEY
+from fr.ens.biologie.genomique.aozan.Settings import QC_REPORT_SAVE_RAW_DATA_KEY
+from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import QC_REPORT_STYLESHEET_KEY
+from fr.ens.biologie.genomique.aozan.Settings import QC_REPORT_SAVE_REPORT_DATA_KEY
+from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
 
 
 def load_processed_run_ids(conf):

@@ -24,40 +24,40 @@ from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
 from email import encoders
 
-from fr.ens.transcriptome.aozan import Common
-from fr.ens.transcriptome.aozan import Globals
-from fr.ens.transcriptome.aozan import Settings
-from fr.ens.transcriptome.aozan import AozanException
-from fr.ens.transcriptome.aozan.util import FileUtils
-from fr.ens.transcriptome.aozan.illumina import RunInfo
+from fr.ens.biologie.genomique.aozan import Common
+from fr.ens.biologie.genomique.aozan import Globals
+from fr.ens.biologie.genomique.aozan import Settings
+from fr.ens.biologie.genomique.aozan import AozanException
+from fr.ens.biologie.genomique.aozan.util import FileUtils
+from fr.ens.biologie.genomique.aozan.illumina import RunInfo
 
-from fr.ens.transcriptome.aozan.Settings import AOZAN_DEBUG_KEY
-from fr.ens.transcriptome.aozan.Settings import SEND_MAIL_KEY
-from fr.ens.transcriptome.aozan.Settings import SMTP_SERVER_KEY
-from fr.ens.transcriptome.aozan.Settings import MAIL_ERROR_TO_KEY
-from fr.ens.transcriptome.aozan.Settings import MAIL_FOOTER_KEY
-from fr.ens.transcriptome.aozan.Settings import MAIL_FROM_KEY
-from fr.ens.transcriptome.aozan.Settings import MAIL_HEADER_KEY
-from fr.ens.transcriptome.aozan.Settings import MAIL_TO_KEY
-from fr.ens.transcriptome.aozan.Settings import SYNC_STEP_KEY
-from fr.ens.transcriptome.aozan.Settings import INDEX_HTML_TEMPLATE_KEY
-from fr.ens.transcriptome.aozan.Settings import DEMUX_USE_HISEQ_OUTPUT_KEY
-from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import BCL_DATA_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import AOZAN_LOG_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import FASTQ_DATA_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import TMP_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import CASAVA_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import CASAVA_SAMPLESHEETS_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import CASAVA_COMPRESSION_KEY
-from fr.ens.transcriptome.aozan.Settings import BCL2FASTQ_VERSION_FOR_HISEQ_KEY
-from fr.ens.transcriptome.aozan.Settings import BCL2FASTQ_VERSION_FOR_NEXTSEQ_KEY
-from fr.ens.transcriptome.aozan.Settings import DEMUX_USE_DOCKER_ENABLE_KEY
-from fr.ens.transcriptome.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY
+from fr.ens.biologie.genomique.aozan.Settings import AOZAN_DEBUG_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SEND_MAIL_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SMTP_SERVER_KEY
+from fr.ens.biologie.genomique.aozan.Settings import MAIL_ERROR_TO_KEY
+from fr.ens.biologie.genomique.aozan.Settings import MAIL_FOOTER_KEY
+from fr.ens.biologie.genomique.aozan.Settings import MAIL_FROM_KEY
+from fr.ens.biologie.genomique.aozan.Settings import MAIL_HEADER_KEY
+from fr.ens.biologie.genomique.aozan.Settings import MAIL_TO_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SYNC_STEP_KEY
+from fr.ens.biologie.genomique.aozan.Settings import INDEX_HTML_TEMPLATE_KEY
+from fr.ens.biologie.genomique.aozan.Settings import DEMUX_USE_HISEQ_OUTPUT_KEY
+from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL_DATA_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import AOZAN_LOG_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import FASTQ_DATA_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import CASAVA_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import CASAVA_SAMPLESHEETS_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import CASAVA_COMPRESSION_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_VERSION_FOR_HISEQ_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_VERSION_FOR_NEXTSEQ_KEY
+from fr.ens.biologie.genomique.aozan.Settings import DEMUX_USE_DOCKER_ENABLE_KEY
+from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY
 
-from fr.ens.transcriptome.aozan.util import StringUtils
+from fr.ens.biologie.genomique.aozan.util import StringUtils
 
 HISEQ_NAME = 'hiseq'
 NEXTSEQ_NAME = 'nextseq'

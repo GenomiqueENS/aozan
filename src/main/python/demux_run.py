@@ -13,39 +13,39 @@ from java.io import IOException
 from java.lang import Runtime, Throwable, Exception
 from java.util import HashMap
 
-from fr.ens.transcriptome.aozan import AozanException
-from fr.ens.transcriptome.aozan.util import DockerUtils
-from fr.ens.transcriptome.aozan.illumina.samplesheet import SampleSheetUtils,\
+from fr.ens.biologie.genomique.aozan import AozanException
+from fr.ens.biologie.genomique.aozan.util import DockerUtils
+from fr.ens.biologie.genomique.aozan.illumina.samplesheet import SampleSheetUtils,\
     SampleSheetCheck
 
-from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import TMP_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import REPORTS_DATA_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import REPORTS_URL_KEY
-from fr.ens.transcriptome.aozan.Settings import DEMUX_SPACE_FACTOR_KEY
-from fr.ens.transcriptome.aozan.Settings import CASAVA_ADAPTER_FASTA_FILE_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import CASAVA_ADDITIONNAL_ARGUMENTS_KEY
-from fr.ens.transcriptome.aozan.Settings import CASAVA_COMPRESSION_KEY
-from fr.ens.transcriptome.aozan.Settings import CASAVA_COMPRESSION_LEVEL_KEY
-from fr.ens.transcriptome.aozan.Settings import CASAVA_FASTQ_CLUSTER_COUNT_KEY
-from fr.ens.transcriptome.aozan.Settings import CASAVA_MISMATCHES_KEY
-from fr.ens.transcriptome.aozan.Settings import CASAVA_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import CASAVA_SAMPLESHEET_FORMAT_KEY
-from fr.ens.transcriptome.aozan.Settings import CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY
-from fr.ens.transcriptome.aozan.Settings import CASAVA_SAMPLESHEETS_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import CASAVA_THREADS_KEY
-from fr.ens.transcriptome.aozan.Settings import CASAVA_WITH_FAILED_READS_KEY
-from fr.ens.transcriptome.aozan.Settings import BCL2FASTQ_VERSION_FOR_HISEQ_KEY
-from fr.ens.transcriptome.aozan.Settings import BCL2FASTQ_VERSION_FOR_NEXTSEQ_KEY
-from fr.ens.transcriptome.aozan.Settings import DEMUX_USE_DOCKER_ENABLE_KEY
-from fr.ens.transcriptome.aozan.Settings import INDEX_SEQUENCES_KEY
-from fr.ens.transcriptome.aozan.Settings import FASTQ_DATA_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import CASAVA_DESIGN_GENERATOR_COMMAND_KEY
-from fr.ens.transcriptome.aozan import Settings
+from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import REPORTS_URL_KEY
+from fr.ens.biologie.genomique.aozan.Settings import DEMUX_SPACE_FACTOR_KEY
+from fr.ens.biologie.genomique.aozan.Settings import CASAVA_ADAPTER_FASTA_FILE_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import CASAVA_ADDITIONNAL_ARGUMENTS_KEY
+from fr.ens.biologie.genomique.aozan.Settings import CASAVA_COMPRESSION_KEY
+from fr.ens.biologie.genomique.aozan.Settings import CASAVA_COMPRESSION_LEVEL_KEY
+from fr.ens.biologie.genomique.aozan.Settings import CASAVA_FASTQ_CLUSTER_COUNT_KEY
+from fr.ens.biologie.genomique.aozan.Settings import CASAVA_MISMATCHES_KEY
+from fr.ens.biologie.genomique.aozan.Settings import CASAVA_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import CASAVA_SAMPLESHEET_FORMAT_KEY
+from fr.ens.biologie.genomique.aozan.Settings import CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY
+from fr.ens.biologie.genomique.aozan.Settings import CASAVA_SAMPLESHEETS_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import CASAVA_THREADS_KEY
+from fr.ens.biologie.genomique.aozan.Settings import CASAVA_WITH_FAILED_READS_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_VERSION_FOR_HISEQ_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_VERSION_FOR_NEXTSEQ_KEY
+from fr.ens.biologie.genomique.aozan.Settings import DEMUX_USE_DOCKER_ENABLE_KEY
+from fr.ens.biologie.genomique.aozan.Settings import INDEX_SEQUENCES_KEY
+from fr.ens.biologie.genomique.aozan.Settings import FASTQ_DATA_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import CASAVA_DESIGN_GENERATOR_COMMAND_KEY
+from fr.ens.biologie.genomique.aozan import Settings
 
-from fr.ens.transcriptome.aozan.util import StringUtils
-from fr.ens.transcriptome.aozan.illumina import RunInfo
-from fr.ens.transcriptome.aozan.illumina.samplesheet.io import SampleSheetXLSReader,\
+from fr.ens.biologie.genomique.aozan.util import StringUtils
+from fr.ens.biologie.genomique.aozan.illumina import RunInfo
+from fr.ens.biologie.genomique.aozan.illumina.samplesheet.io import SampleSheetXLSReader,\
     SampleSheetCSVWriter, SampleSheetCSVReader
 
 BCL2FASTQ_VERSION_1 = "1.8.4"

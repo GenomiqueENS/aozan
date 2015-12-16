@@ -14,12 +14,18 @@ BASEDIR=$(dirname $0)
 if [ ! -d $BASEDIR/target ]; then
   mkdir $BASEDIR/target
 fi
-cd $BASEDIR/target
+
+if [ -d "$BASEDIR/target" ]; then
+  rm -rf "$BASEDIR/target"
+fi
+
+mkdir "$BASEDIR/target"
+cd "$BASEDIR/target"
 
 AOZAN_DIR=..
-AOZAN_PACKAGE=fr.ens.transcriptome.aozan
+AOZAN_PACKAGE=fr.ens.biologie.genomique.aozan
 AOZAN_PACKAGE_PATH=$(echo $AOZAN_PACKAGE | sed 's/\./\//g')
-PACKAGE=fr.ens.transcriptome.cdv
+PACKAGE=fr.ens.biologie.genomique.samplesheetvalidator
 PACKAGE_PATH=$(echo $PACKAGE | sed 's/\./\//g')
 
 HELP_TEXT_PATH=design-validator-help-page.txt
@@ -27,21 +33,21 @@ HELP_TEXT_PATH=design-validator-help-page.txt
 
 rm -rf $PROJECT_NAME
 $GWT_HOME/webAppCreator -out $PROJECT_NAME $PACKAGE.$PROJECT_NAME
-rm  $PROJECT_NAME/src/fr/ens/transcriptome/cdv/client/*
-rm  $PROJECT_NAME/src/fr/ens/transcriptome/cdv/server/*
-rm  $PROJECT_NAME/src/fr/ens/transcriptome/cdv/shared/*
+rm  $PROJECT_NAME/src/$PACKAGE_PATH/client/*
+rm  $PROJECT_NAME/src/$PACKAGE_PATH/server/*
+rm  $PROJECT_NAME/src/$PACKAGE_PATH/shared/*
 
-cp $PROJECT_NAME/src/fr/ens/transcriptome/cdv/$PROJECT_NAME.gwt.xml $PROJECT_NAME/src/fr/ens/transcriptome/cdv/$PROJECT_NAME.gwt.xml.ori
-head -n 20 $PROJECT_NAME/src/fr/ens/transcriptome/cdv/$PROJECT_NAME.gwt.xml > $PROJECT_NAME/src/fr/ens/transcriptome/cdv/$PROJECT_NAME.gwt.xml.tmp
+cp $PROJECT_NAME/src/$PACKAGE_PATH/$PROJECT_NAME.gwt.xml $PROJECT_NAME/src/$PACKAGE_PATH/$PROJECT_NAME.gwt.xml.ori
+head -n 20 $PROJECT_NAME/src/$PACKAGE_PATH/$PROJECT_NAME.gwt.xml > $PROJECT_NAME/src/$PACKAGE_PATH/$PROJECT_NAME.gwt.xml.tmp
 
-cat >> $PROJECT_NAME/src/fr/ens/transcriptome/cdv/$PROJECT_NAME.gwt.xml.tmp << EOF
+cat >> $PROJECT_NAME/src/$PACKAGE_PATH/$PROJECT_NAME.gwt.xml.tmp << EOF
   <inherits name='com.google.gwt.http.HTTP' />
 EOF
 
-tail -n +21 $PROJECT_NAME/src/fr/ens/transcriptome/cdv/$PROJECT_NAME.gwt.xml >> $PROJECT_NAME/src/fr/ens/transcriptome/cdv/$PROJECT_NAME.gwt.xml.tmp
+tail -n +21 $PROJECT_NAME/src/$PACKAGE_PATH/$PROJECT_NAME.gwt.xml >> $PROJECT_NAME/src/$PACKAGE_PATH/$PROJECT_NAME.gwt.xml.tmp
 
-rm $PROJECT_NAME/src/fr/ens/transcriptome/cdv/$PROJECT_NAME.gwt.xml
-mv $PROJECT_NAME/src/fr/ens/transcriptome/cdv/$PROJECT_NAME.gwt.xml.tmp $PROJECT_NAME/src/fr/ens/transcriptome/cdv/$PROJECT_NAME.gwt.xml
+rm $PROJECT_NAME/src/$PACKAGE_PATH/$PROJECT_NAME.gwt.xml
+mv $PROJECT_NAME/src/$PACKAGE_PATH/$PROJECT_NAME.gwt.xml.tmp $PROJECT_NAME/src/$PACKAGE_PATH/$PROJECT_NAME.gwt.xml
 
 for f in $(echo AozanException.java AozanRuntimeException.java)
 do
@@ -794,6 +800,9 @@ rm $PROJECT_NAME/war/$PROJECT_NAME.html.tmp
 
 cd $PROJECT_NAME
 ant build
+if [ $? -ne 0 ]; then
+  exit 1
+fi
 
 mv war/$PROJECT_NAME.html war/index.html
 mv war ../$PROJECT_NAME-tmp

@@ -1,0 +1,13 @@
+fr.ens.biologie.genomique.aozan.collectors.DesignCollector
+fr.ens.biologie.genomique.aozan.collectors.PhasingCollector
+fr.ens.biologie.genomique.aozan.collectors.ReadCollector
+fr.ens.biologie.genomique.aozan.collectors.RunInfoCollector
+fr.ens.biologie.genomique.aozan.collectors.FastQCCollector
+fr.ens.biologie.genomique.aozan.collectors.FastqScreenCollector
+fr.ens.biologie.genomique.aozan.collectors.SubsetFastqCollector
+fr.ens.biologie.genomique.aozan.collectors.UndeterminedIndexesCollector
+fr.ens.biologie.genomique.aozan.collectors.GlobalStatsCollector
+fr.ens.biologie.genomique.aozan.collectors.AozanCollector
+fr.ens.biologie.genomique.aozan.collectors.DemultiplexingCollector
+fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatistics
+fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatistics

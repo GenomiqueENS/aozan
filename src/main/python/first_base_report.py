@@ -10,8 +10,8 @@ import common, hiseq_run, detection_end_run
 import os
 from java.io import File
 
-from fr.ens.transcriptome.aozan.Settings import AOZAN_VAR_PATH_KEY
-from fr.ens.transcriptome.aozan.Settings import HISEQ_DATA_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import HISEQ_DATA_PATH_KEY
 
 def load_processed_run_ids(conf):
     """Load the list of the processed run ids.
