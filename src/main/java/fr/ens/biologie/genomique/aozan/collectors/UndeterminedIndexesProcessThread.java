@@ -251,7 +251,8 @@ public class UndeterminedIndexesProcessThread
         final boolean demultiplexingWithConflict) {
 
       // Extract all samples names per lane
-      final List<String> sampleNames = data.getSamplesNameInLane(lane);
+      final List<String> sampleNames =
+          new ArrayList<>(data.getSamplesNameInLane(lane));
 
       Collections.sort(sampleNames);
 
