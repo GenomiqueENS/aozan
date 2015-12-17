@@ -71,7 +71,7 @@ The CASAVA/bcl2fastq version 1.8 sample sheet validator helps users to check the
 This tool generates a sample sheet only in csv format with a very strict syntax.
 It ensures you that the demultiplexing will not fail because the sample sheet is no correct.
 
-You can use the validator in association with Aozan, a tool that automatically handles data transfer, demultiplexing conversion and quality control once a HiSeq run is over (developed by Genomic Paris Centre and available at http://www.transcriptome.ens.fr/aozan/).
+You can use the validator in association with Aozan, a tool that automatically handles data transfer, demultiplexing conversion and quality control once a HiSeq run is over (developed by Genomic Paris Centre and available at http://tools.genomique.biologie.ens.fr/aozan/).
 
 The validator is very simple to use:
 1/ copy the sample sheet from your spreadsheet or csv/tsv format in the first tab with the column headers;
@@ -752,7 +752,7 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
 
 <h4 align="right">__VERSION__</h4>
     <div>
-      <a href="http://www.transcriptome.ens.fr" ><img src="http://www.transcriptome.ens.fr/aozan/images/logo_genomicpariscentre-90pxh.png" alt="logo genomic paris centre" align="left"/></a>
+      <a href="http://genomique.biologie.ens.fr" ><img src="http://tools.genomique.biologie.ens.fr/aozan/images/logo_genomicpariscentre-90pxh.png" alt="logo genomic paris centre" align="left"/></a>
       <h1>CASAVA/BCL2FASTQ version 1.8 samplesheet validator</h1>
     </div>
     <table align="center">

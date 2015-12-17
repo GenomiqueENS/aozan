@@ -17,7 +17,7 @@
  * For more information on the Aozan project and its aims,
  * or to join the Aozan Google group, visit the home page at:
  *
- *      http://www.transcriptome.ens.fr/aozan
+ *      http://tools.genomique.biologie.ens.fr/aozan
  *
  */
 package fr.ens.biologie.genomique.aozan.tests.global;

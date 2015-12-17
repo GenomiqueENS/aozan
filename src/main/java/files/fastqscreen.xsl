@@ -118,7 +118,7 @@ doctype-system="about:legacy-compat"/>
 <body>
   <div class="header">
   	<div id="header_title">
-		<img src="http://www.transcriptome.ens.fr/aozan/images/logo_aozan_qc.png" alt="Aozan"/>  
+		<img src="http://tools.genomique.biologie.ens.fr/aozan/images/logo_aozan_qc.png" alt="Aozan"/>
 		Detection contamination report
 	</div>   
   </div>	
@@ -187,7 +187,7 @@ doctype-system="about:legacy-compat"/>
        <xsl:value-of select="/ReportFastqScreen/Report/ReadsProcessed/@name"/>  </li>
    </ul>
 
-   <p><a href="http://www.transcriptome.ens.fr/aozan/qc-samples-tests.html#contamination" target="_blank">Contamination detection detail report</a></p>
+   <p><a href="http://tools.genomique.biologie.ens.fr/aozan/qc-samples-tests.html#contamination" target="_blank">Contamination detection detail report</a></p>
    <p>-</p>
    </div>
    

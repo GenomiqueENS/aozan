@@ -19,7 +19,7 @@
  * or to join the Eoulsan Google group, visit the home page
  * at:
  *
- *      http://www.transcriptome.ens.fr/eoulsan
+ *      http://tools.genomique.biologie.ens.fr/eoulsan
  *
  */
 
