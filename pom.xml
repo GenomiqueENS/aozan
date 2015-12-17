@@ -283,7 +283,7 @@
          <version>3.4</version>
          <configuration>
 			<templateFile>${basedir}/src/site/site.vm</templateFile>
-			<outputEncoding>iso-8859-1</outputEncoding>
+			<outputEncoding>utf-8</outputEncoding>
 		 </configuration>
 		 <executions>
 			<execution>
