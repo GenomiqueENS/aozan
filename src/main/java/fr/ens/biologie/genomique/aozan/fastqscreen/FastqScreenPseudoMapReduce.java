@@ -176,9 +176,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
           // mode pair-end
           final InputStream outputSAM =
               mapper.mapPE(fastqRead1, fastqRead2, this.desc);
-          parser.parseLine(outputSAM);
+          parser.parseLines(outputSAM);
 
-          parser.closeMapOutputFile();
           this.readsprocessed = parser.getReadsprocessed();
 
         } else {
@@ -189,9 +188,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
           }
 
           final InputStream outputSAM = mapper.mapSE(fastqRead1, this.desc);
-          parser.parseLine(outputSAM);
+          parser.parseLines(outputSAM);
 
-          parser.closeMapOutputFile();
           this.readsprocessed = parser.getReadsprocessed();
         }
 

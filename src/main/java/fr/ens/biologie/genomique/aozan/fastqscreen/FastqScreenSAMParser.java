@@ -74,7 +74,7 @@ public class FastqScreenSAMParser {
    * @param SAMline parse SAM line
    * @throws IOException if an error occurs while writing in mapOutputFile
    */
-  public void parseLine(final String SAMline) throws IOException {
+  private void parseLine(final String SAMline) throws IOException {
 
     if (SAMline == null || SAMline.length() == 0) {
       return;
@@ -135,25 +135,24 @@ public class FastqScreenSAMParser {
    * represent the number of hits for a read : 1 or 2 (for several hits) and the
    * end represent the name of reference genome.
    * @param is inputStream to parse
-   * @return number lines read
    * @throws IOException
    */
-  public long parseLine(final InputStream is) throws IOException {
+  public void parseLines(final InputStream is) throws IOException {
 
     final BufferedReader br =
         new BufferedReader(new InputStreamReader(is,
             StandardCharsets.ISO_8859_1));
+
     String line = null;
-    long compt = 0;
+
     while ((line = br.readLine()) != null) {
       parseLine(line);
-      compt++;
     }
 
     br.close();
     is.close();
 
-    return compt;
+    closeMapOutputFile();
   }
 
   /**
@@ -183,7 +182,7 @@ public class FastqScreenSAMParser {
   /**
    * Write last record and close file mapOutputFile.
    */
-  public void closeMapOutputFile() throws IOException {
+  private void closeMapOutputFile() throws IOException {
     // processing read buffer - end of input stream bowtie execution
     this.readsprocessed++;
     final List<SAMRecord> records = this.buffer.getFilteredAlignments();
