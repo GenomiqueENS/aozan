@@ -38,6 +38,6 @@ public interface ProjectTest extends AozanTest {
    * @param data result object
    * @return a TestResult object with the result of the test
    */
-  public TestResult test(RunData data, String projectName);
+  TestResult test(RunData data, String projectName);
 
 }

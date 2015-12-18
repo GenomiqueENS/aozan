@@ -126,14 +126,18 @@ class BlastResultHit {
    */
   private String contaminantHitToTextType() {
 
-    final StringBuilder name = new StringBuilder(100);
-    name.append("Search with Blastall+");
-    name.append(" First hit on "
-        + (this.countHits > 100 ? "+100" : this.countHits) + " : ");
-    name.append(this.result);
-    name.append(" Evalue=" + this.hspEValue + ", ");
-    name.append(" Ident=" + this.prcIdentity + "%,");
-    name.append(" QueryCovergap=" + this.queryCover + "%");
+    String name = "Search with Blastall+" +
+            " First hit on " +
+            (this.countHits > 100 ? "+100" : this.countHits) +
+            " : " +
+            this.result +
+            " Evalue=" +
+            this.hspEValue +
+            ", " +
+            " Ident=" + this.prcIdentity +
+            "%," +
+            " QueryCovergap=" +
+            this.queryCover + "%";
 
     // Return only the best hit
     if (this.prcIdentity < MIN_IDENTITY_EXPECTED
@@ -141,7 +145,7 @@ class BlastResultHit {
       return "No hit";
     }
 
-    return name.toString();
+    return name;
 
   }
 
@@ -152,18 +156,14 @@ class BlastResultHit {
    */
   private String contaminantHitToHtmlType() {
 
-    final StringBuilder name = new StringBuilder(200);
-    name.append("Search with Blastn, <a href="
-        + LINK_NCBI_BLASTN + this.sequence + "\""
-        + " target=\"_blank\">more detail</a>");
-    name.append(" First hit on "
-        + (this.countHits > 100 ? "+100" : this.countHits) + " : ");
-    name.append(" <br/>");
-    name.append(this.result);
-    name.append(" <br/>");
-    name.append(" Evalue=" + this.hspEValue + ", ");
-    name.append(" Ident=" + this.prcIdentity + "%,");
-    name.append(" QueryCovergap=" + this.queryCover + "%");
+    final String name = ("Search with Blastn, <a href=" + LINK_NCBI_BLASTN) + this.sequence + "\"" + " target=\"_blank\">more detail</a>" +
+            " First hit on " + (this.countHits > 100 ? "+100" : this.countHits) + " : " +
+            " <br/>" +
+            this.result +
+            " <br/>" +
+            " Evalue=" + this.hspEValue + ", " +
+            " Ident=" + this.prcIdentity + "%," +
+            " QueryCovergap=" + this.queryCover + "%";
 
     // Return only the best hit
     if (this.prcIdentity < MIN_IDENTITY_EXPECTED
@@ -171,7 +171,7 @@ class BlastResultHit {
       return "No hit";
     }
 
-    return name.toString();
+    return name;
   }
 
   public boolean isNull() {

@@ -304,7 +304,7 @@ public class SampleSheet implements Iterable<Sample> {
 
   /**
    * Get all the samples of a lane.
-   * @param laneId the lane of the samples
+   * @param lane the lane of the samples
    * @return a list of the samples in the lane in the same order as the
    *         samplesheet
    */

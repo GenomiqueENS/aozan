@@ -209,12 +209,6 @@ public class FastqScreenSAMParser {
 
   }
 
-  public void cleanup() {
-  }
-
-  public void setup() {
-  }
-
   //
   // Getters
   //

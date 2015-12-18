@@ -385,11 +385,10 @@ public class QC {
    * @param properties Aozan configuration
    * @throws AozanException if an error occurs while initialize the QC
    */
-  private final void init(final Map<String, String> properties)
+  private void init(final Map<String, String> properties)
       throws AozanException {
 
     final AozanTestRegistry registry = new AozanTestRegistry();
-    final Map<String, AozanTest> mapTests = new HashMap<>();
     List<AozanTest> tests;
 
     for (final Map.Entry<String, String> e : properties.entrySet()) {
@@ -416,30 +415,25 @@ public class QC {
           if (test instanceof GlobalTest) {
             for (final AozanTest t : tests) {
               this.globalTests.add((GlobalTest) t);
-              mapTests.put(key, t);
             }
           } else if (test instanceof LaneTest) {
             for (final AozanTest t : tests) {
               this.laneTests.add((LaneTest) t);
-              mapTests.put(key, t);
             }
 
           } else if (test instanceof SampleTest) {
             for (final AozanTest t : tests) {
               this.sampleTests.add((SampleTest) t);
-              mapTests.put(key, t);
             }
 
           } else if (test instanceof ProjectTest) {
             for (final AozanTest t : tests) {
               this.projectStatsTests.add((ProjectTest) t);
-              mapTests.put(key, t);
             }
 
           } else if (test instanceof SampleStatsTest) {
             for (final AozanTest t : tests) {
               this.samplesStatsTests.add((SampleStatsTest) t);
-              mapTests.put(key, t);
             }
           }
 
@@ -478,7 +472,7 @@ public class QC {
    * @return list of Aozan tests
    * @throws AozanException if an error occurs while configuring the test
    */
-  private final List<AozanTest> configureTest(final AozanTest test,
+  private List<AozanTest> configureTest(final AozanTest test,
       final Map<String, String> properties, final String prefix)
           throws AozanException {
 
@@ -508,7 +502,7 @@ public class QC {
    * Initialize the collectors.
    * @throws AozanException if an error occurs while initialize a collector
    */
-  private final void initCollectors() throws AozanException {
+  private void initCollectors() throws AozanException {
 
     final Set<Collector> collectors = new HashSet<>();
 
@@ -608,7 +602,7 @@ public class QC {
    * @param properties aozan configuration file
    * @throws AozanException if an error occurs while searching paths
    */
-  private final void initGlobalConf(final Map<String, String> properties)
+  private void initGlobalConf(final Map<String, String> properties)
       throws AozanException {
 
     for (final Map.Entry<String, String> e : properties.entrySet()) {
@@ -852,8 +846,6 @@ public class QC {
    * @param qcDir the qc dir
    * @param tmpDir temporary directory
    * @param runId run id
-   * @param bcl2fastqVersion bcl2fastq version used
-   * @param laneCount the lane count
    * @throws AozanException if an error occurs while initialize the QC object
    */
   public QC(final Map<String, String> properties, final String bclDir,

@@ -107,14 +107,7 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
       // Parse document to update run data
       parse(doc, data);
 
-    } catch (final IOException e) {
-
-      throw new AozanException(e);
-
-    } catch (final SAXException e) {
-
-      throw new AozanException(e);
-    } catch (final ParserConfigurationException e) {
+    } catch (final IOException | SAXException | ParserConfigurationException e) {
 
       throw new AozanException(e);
     }
@@ -212,7 +205,6 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
 
   @Override
   public void clear() {
-    return;
   }
 
   //
@@ -248,7 +240,6 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
 
     /**
      * Adds a tile statistics data.
-     * @param data the tiles elements.
      * @param clusterCount the cluster count for a tile.
      */
     public void add(final long yield, final long yieldQ30,

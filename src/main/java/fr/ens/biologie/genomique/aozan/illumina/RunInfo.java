@@ -263,8 +263,10 @@ public class RunInfo {
 
     for (Element e : XMLUtils.getElementsByTagName(document, "RunInfo")) {
 
-      for (Element runElement : XMLUtils.getElementsByTagName(e, "Run")) {
+      final List<Element> elements = XMLUtils.getElementsByTagName(e, "Run");
+      if (!elements.isEmpty()) {
 
+        final Element runElement = elements.get(0);
         String id = null;
         int number = -1;
 

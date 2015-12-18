@@ -83,6 +83,7 @@ public abstract class AbstractQCModuleAozan extends AbstractQCModule {
   @Override
   protected void writeTextTable(final HTMLReportArchive report, final TableModel table)
       throws IOException {
+
     final StringBuffer d = report.dataDocument();
     d.append('#');
 

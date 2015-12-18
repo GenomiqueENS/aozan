@@ -207,7 +207,7 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
         }
 
       } else {
-        final Map<Integer, Double> m = new TreeMap<Integer, Double>();
+        final Map<Integer, Double> m = new TreeMap<>();
         m.put(tileNumber, value);
         this.metricsPerTilePerCode.put(code, m);
       }
@@ -414,7 +414,7 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
       this.densityRatio = densityRatio;
 
       this.metricsPerTilePerCode = new HashMap<>();
-      this.listReads = new LinkedList<ReadTileMetrics>();
+      this.listReads = new LinkedList<>();
 
       for (int read = 1; read <= readsCount; read++) {
         this.listReads.add(new ReadTileMetrics(read));

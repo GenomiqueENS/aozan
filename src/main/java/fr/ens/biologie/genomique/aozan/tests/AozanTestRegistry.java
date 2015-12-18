@@ -82,12 +82,8 @@ public class AozanTestRegistry {
    */
   public AozanTestRegistry() {
 
-    final Iterator<AozanTest> it =
-        ServiceLoader.load(AozanTest.class).iterator();
-
-    while (it.hasNext()) {
-
-      register(it.next());
+    for (AozanTest aozanTest : ServiceLoader.load(AozanTest.class)) {
+      register(aozanTest);
     }
   }
 

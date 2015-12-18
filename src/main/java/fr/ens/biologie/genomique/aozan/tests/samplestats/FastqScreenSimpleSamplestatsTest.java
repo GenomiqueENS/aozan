@@ -171,7 +171,7 @@ public class FastqScreenSimpleSamplestatsTest extends AbstractSimpleSampleTest {
     //
     final Set<String> genomes = fqsm.getGenomesToMap();
 
-    final List<AozanTest> list = new ArrayList<AozanTest>();
+    final List<AozanTest> list = new ArrayList<>();
 
     for (final String genome : genomes) {
 

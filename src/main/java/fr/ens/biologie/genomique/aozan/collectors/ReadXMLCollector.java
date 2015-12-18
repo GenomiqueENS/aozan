@@ -107,15 +107,7 @@ public class ReadXMLCollector implements Collector {
       parse(doc, data);
 
       is.close();
-    } catch (final IOException e) {
-
-      throw new AozanException(e);
-
-    } catch (final SAXException e) {
-
-      throw new AozanException(e);
-    } catch (final ParserConfigurationException e) {
-
+    } catch (final IOException | SAXException | ParserConfigurationException e) {
       throw new AozanException(e);
     }
   }

@@ -44,7 +44,7 @@ public interface SampleTest extends AozanTest {
    *          undetermined indexes reads
    * @return a TestResult object with the result of the test
    */
-  public TestResult test(RunData data, int read, int readSample, int lane,
+  TestResult test(RunData data, int read, int readSample, int lane,
       String sampleName);
 
 }

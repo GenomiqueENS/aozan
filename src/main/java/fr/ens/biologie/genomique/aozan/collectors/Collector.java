@@ -41,37 +41,37 @@ public interface Collector {
    * Get the name of the collector.
    * @return the name of the collector
    */
-  public String getName();
+  String getName();
 
   /**
    * Get the name of the collectors required to run this collector.
    * @return a list of String with the name of the required collectors
    */
-  public List<String> getCollectorsNamesRequiered();
+  List<String> getCollectorsNamesRequiered();
 
   /**
    * Configure the collector with the path of the run data.
-   * @param QC QC object for the run
+   * @param qc QC object for the run
    * @param properties object with the collector configuration
    */
-  public void configure(QC qc, Properties properties);
+  void configure(QC qc, Properties properties);
 
   /**
    * Collect data.
    * @param data result data object
    * @throws AozanException if an error occurs while collecting data
    */
-  public void collect(RunData data) throws AozanException;
+  void collect(RunData data) throws AozanException;
 
   /**
    * Remove temporary files.
    */
-  public void clear();
+  void clear();
 
   /**
    * Checks if is statistic collector, if it's true, should be executed at the
    * end.
    * @return true, if is statistic collector
    */
-  public boolean isStatisticCollector();
+  boolean isStatisticCollector();
 }

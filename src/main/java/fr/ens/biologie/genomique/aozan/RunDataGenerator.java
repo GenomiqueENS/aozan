@@ -230,7 +230,7 @@ public class RunDataGenerator {
 
   /**
    * Public constructor.
-   * @param runId
+   * @param runId run id
    */
   public RunDataGenerator(final List<Collector> collectors,
       final String runId) {

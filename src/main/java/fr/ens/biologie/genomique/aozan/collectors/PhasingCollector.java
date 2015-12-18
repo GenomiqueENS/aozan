@@ -119,20 +119,12 @@ public class PhasingCollector implements Collector {
         }
       }
 
-    } catch (final IOException e) {
-
-      throw new AozanException(e);
-
-    } catch (final SAXException e) {
-
-      throw new AozanException(e);
-    } catch (final ParserConfigurationException e) {
-
+    } catch (final IOException | SAXException | ParserConfigurationException e) {
       throw new AozanException(e);
     }
   }
 
-  private static final void parse(final File file, final int read,
+  private static void parse(final File file, final int read,
       final int lane, final RunData data) throws ParserConfigurationException,
       SAXException, IOException {
 
@@ -179,6 +171,5 @@ public class PhasingCollector implements Collector {
 
   @Override
   public void clear() {
-    return;
   }
 }

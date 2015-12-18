@@ -177,7 +177,7 @@ public class HTMLReportArchiveAozan extends HTMLReportArchive {
 
     html.append("<h2>Summary</h2>\n<ul>\n");
 
-    StringBuffer summaryText = new StringBuffer();
+    StringBuilder summaryText = new StringBuilder();
 
     for (int m = 0; m < modules.length; m++) {
       html.append("<li>");
@@ -219,7 +219,7 @@ public class HTMLReportArchiveAozan extends HTMLReportArchive {
       return null;
     }
 
-    final List<String> result = new ArrayList<String>();
+    final List<String> result = new ArrayList<>();
 
     try {
 

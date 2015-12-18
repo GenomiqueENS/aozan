@@ -91,15 +91,7 @@ public class FlowcellDemuxSummaryCollector extends DemultiplexingCollector {
 
       parse(doc, data);
 
-    } catch (final IOException e) {
-
-      throw new AozanException(e);
-
-    } catch (final SAXException e) {
-
-      throw new AozanException(e);
-    } catch (final ParserConfigurationException e) {
-
+    } catch (final IOException | SAXException | ParserConfigurationException e) {
       throw new AozanException(e);
     }
   }
@@ -206,7 +198,6 @@ public class FlowcellDemuxSummaryCollector extends DemultiplexingCollector {
 
   @Override
   public void clear() {
-    return;
   }
 
   //

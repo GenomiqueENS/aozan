@@ -55,7 +55,7 @@ final class ReadsData {
 
   /**
    * Define the readNumber corresponding to the cycle.
-   * @param cycle number cycle in the run
+   * @param cycleNumber number cycle in the run
    * @return readNumber
    */
   public int getReadFromCycleNumber(final int cycleNumber)

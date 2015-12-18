@@ -95,7 +95,7 @@ public class ProjectStatistics extends StatisticsCollector {
 
     // Sorted list project
     final List<EntityStat> projectsSorted =
-        new ArrayList<EntityStat>(projects.values());
+        new ArrayList<>(projects.values());
 
     Collections.sort(projectsSorted);
 

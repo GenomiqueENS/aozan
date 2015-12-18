@@ -102,22 +102,22 @@ public class ReDemux {
 
       final char[] array = upperIndex.toCharArray();
 
-      for (int i = 0; i < array.length; i++) {
+      for (char anArray : array) {
 
-        switch (array[i]) {
+        switch (anArray) {
 
-        case 'A':
-        case 'T':
-        case 'G':
-        case 'C':
-        case 'N':
-        case '.':
-          break;
+          case 'A':
+          case 'T':
+          case 'G':
+          case 'C':
+          case 'N':
+          case '.':
+            break;
 
-        default:
-          throw new IllegalArgumentException(
-              "Invalid character found for index, 'A', 'T', 'G', 'C', 'N' and '.' are only allowed: "
-                  + index);
+          default:
+            throw new IllegalArgumentException(
+                    "Invalid character found for index, 'A', 'T', 'G', 'C', 'N' and '.' are only allowed: "
+                            + index);
         }
       }
 
@@ -246,7 +246,7 @@ public class ReDemux {
 
     /**
      * Re-demultiplex a read.
-     * @param read
+     * @param read read index
      * @throws IOException
      * @throws BadBioEntryException
      */
@@ -572,7 +572,8 @@ public class ReDemux {
    * Launch the re-demultiplexing.
    * @throws IOException if an IO error occurs while re-demultiplexing
    * @throws BadBioEntryException if an FASTQ entry read is invald
-   * @throws EoulsanException
+   * @throws IOException
+   * @throws BadBioEntryException
    */
   public void redmux() throws IOException, BadBioEntryException {
 
@@ -586,7 +587,7 @@ public class ReDemux {
    * @param b the second string
    * @return the number of mismatches
    */
-  private static final int mismatches(final String a, final String b) {
+  private static int mismatches(final String a, final String b) {
 
     Preconditions.checkNotNull(a, "a cannot be null");
     Preconditions.checkNotNull(b, "b cannot be null");

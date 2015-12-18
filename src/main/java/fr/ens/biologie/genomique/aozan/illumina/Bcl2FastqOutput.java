@@ -86,7 +86,7 @@ public class Bcl2FastqOutput {
 
       }
     }
-  };
+  }
 
   //
   // Other methods
@@ -224,7 +224,6 @@ public class Bcl2FastqOutput {
   /**
    * Build the prefix report filename.
    * @param fastqSample the fastq sample
-   * @param read the read number
    * @return the prefix report filename
    */
   public String buildPrefixReport(final FastqSample fastqSample) {

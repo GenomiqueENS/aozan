@@ -489,7 +489,7 @@ public class UndeterminedIndexesProcessThread
 
     /**
      * Add tag XML header in document.
-     * @param document document XML
+     * @param doc XML document
      * @param parent parent element in document XML
      */
     public static void headerXML(final Document doc, final Element parent) {
@@ -508,7 +508,7 @@ public class UndeterminedIndexesProcessThread
 
     /**
      * Add tag XML header in document.
-     * @param document document XML
+     * @param doc XML document
      * @param parent parent element in document XML
      * @param defaultAttributeValue value for desc attribute
      */
@@ -1274,11 +1274,9 @@ public class UndeterminedIndexesProcessThread
       this.seqFile = SequenceFactory.getSequenceFile(fastqSample.getFastqFiles()
           .toArray(new File[fastqSample.getFastqFiles().size()]));
 
-    } catch (final IOException io) {
-      throw new AozanException(io);
-
-    } catch (final SequenceFormatException e) {
+    } catch (final IOException | SequenceFormatException e) {
       throw new AozanException(e);
+
     }
 
   }

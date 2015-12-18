@@ -42,6 +42,6 @@ public interface LaneTest extends AozanTest {
    * @param lane the index of the lane
    * @return a TestResult object with the result of the test
    */
-  public TestResult test(RunData data, int read, boolean indexedRead, int lane);
+  TestResult test(RunData data, int read, boolean indexedRead, int lane);
 
 }

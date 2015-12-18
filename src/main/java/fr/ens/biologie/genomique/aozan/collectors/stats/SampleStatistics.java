@@ -113,7 +113,7 @@ public class SampleStatistics extends StatisticsCollector {
 
     // Sorted list project
     final List<EntityStat> samplesSorted =
-        new ArrayList<EntityStat>(samples.values());
+        new ArrayList<>(samples.values());
 
     Collections.sort(samplesSorted);
 
@@ -199,7 +199,7 @@ public class SampleStatistics extends StatisticsCollector {
       return Collections.emptyList();
     }
 
-    return Arrays.asList();
+    return Collections.emptyList();
   }
 
   //

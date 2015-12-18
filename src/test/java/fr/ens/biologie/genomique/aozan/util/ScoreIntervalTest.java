@@ -97,7 +97,7 @@ public class ScoreIntervalTest extends TestCase {
 
   public void testSetIntervalConstructor() {
 
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     map.put("score9.interval", "[10,20]");
     map.put("score5.interval", "[8,22]");
     map.put("score8.interval", "[12,18]");
@@ -119,7 +119,7 @@ public class ScoreIntervalTest extends TestCase {
     assertEquals(5, si.getScore(21));
     assertEquals(1, si.getScore(25));
 
-    map = new HashMap<String, String>();
+    map = new HashMap<>();
     map.put("interval", "[10,20]");
 
     si = new ScoreInterval();
@@ -136,7 +136,7 @@ public class ScoreIntervalTest extends TestCase {
     assertEquals(0, si.getScore(21));
     assertEquals(0, si.getScore(25));
 
-    map = new HashMap<String, String>();
+    map = new HashMap<>();
     map.put("toto", "[10,20]");
 
     si = new ScoreInterval();

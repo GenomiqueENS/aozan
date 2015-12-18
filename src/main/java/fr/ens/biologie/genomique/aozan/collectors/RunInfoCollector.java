@@ -152,11 +152,7 @@ public class RunInfoCollector implements Collector {
       data.put(PREFIX + ".run.mode", (readIndexedCount == 1
           ? "SR" : (readIndexedCount == 2 ? "PE" : "other")));
 
-    } catch (IOException e) {
-      throw new AozanException(e);
-    } catch (ParserConfigurationException e) {
-      throw new AozanException(e);
-    } catch (SAXException e) {
+    } catch (IOException | ParserConfigurationException | SAXException e) {
       throw new AozanException(e);
     }
   }

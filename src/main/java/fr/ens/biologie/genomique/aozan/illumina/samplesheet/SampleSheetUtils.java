@@ -87,7 +87,7 @@ public class SampleSheetUtils {
    * @param fieldName the field name to convert
    * @return the converted field name
    */
-  private static final String convertFieldNameV2(final String fieldName) {
+  private static String convertFieldNameV2(final String fieldName) {
 
     if (fieldName == null) {
       return null;

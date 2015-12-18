@@ -63,16 +63,16 @@ public class BadTiles extends AbstractQCModule {
 
   // public QualityCount[] qualityCounts = new QualityCount[0];
   private final Map<Integer, QualityCount[]> tiles =
-      new HashMap<Integer, QualityCount[]>();
-  private final List<BadTile> badTiles = new ArrayList<BadTile>();
-  private final Set<Integer> tilesWithOneOrMoreDefect = new HashSet<Integer>();
+      new HashMap<>();
+  private final List<BadTile> badTiles = new ArrayList<>();
+  private final Set<Integer> tilesWithOneOrMoreDefect = new HashSet<>();
 
   private IlluminaReadId irid;
   private boolean calculated = false;
 
   private static class QualityCount {
     private final HashMap<Character, Long> counts =
-        new HashMap<Character, Long>();
+        new HashMap<>();
 
     private long totalCounts = 0;
 
@@ -126,7 +126,7 @@ public class BadTiles extends AbstractQCModule {
     }
 
     public double getPercentile(int offset, int percentile) {
-      Character[] chars = counts.keySet().toArray(new Character[0]);
+      Character[] chars = counts.keySet().toArray(new Character[counts.size()]);
       Arrays.sort(chars);
       long total = 0;
       for (Character aChar : chars) {

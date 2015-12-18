@@ -74,7 +74,7 @@ public abstract class AbstractFastqCollector implements Collector {
   // Set samples to treat
   /** The fastq samples. */
   private final Set<FastqSample> fastqSamples =
-      new LinkedHashSet<FastqSample>();
+      new LinkedHashSet<>();
 
   // mode threaded
   /** The Constant CHECKING_DELAY_MS. */
@@ -217,7 +217,7 @@ public abstract class AbstractFastqCollector implements Collector {
 
     final boolean isRunPE = data.getRunMode().toUpperCase().equals("PE");
 
-    RunData resultPart = null;
+    RunData resultPart;
     if (this.getThreadsNumber() > 1) {
 
       for (final FastqSample fs : this.fastqSamples) {
@@ -335,7 +335,6 @@ public abstract class AbstractFastqCollector implements Collector {
 
   /**
    * Delete all temporaries files (fastq tmp files and map files).
-   * @throws IOException
    */
   public void clearTemporaryFiles() {
 
@@ -396,7 +395,6 @@ public abstract class AbstractFastqCollector implements Collector {
   /**
    * Construct the map with all samples to treat.
    * @param data result data object
-   * @param samplesheet the samplesheet
    * @throws IOException
    */
   private void createListFastqSamples(final RunData data) throws IOException {
@@ -515,7 +513,7 @@ public abstract class AbstractFastqCollector implements Collector {
     }
 
     // Restore results in data
-    RunData data = null;
+    RunData data;
     try {
       data = new RunData(dataFile);
 
@@ -596,7 +594,7 @@ public abstract class AbstractFastqCollector implements Collector {
 
     final boolean interruptThreadIfRunning = true;
 
-    int samplesNotProcessed = 0;
+    int samplesNotProcessed;
 
     // Wait until all samples are processed
     do {
@@ -668,7 +666,7 @@ public abstract class AbstractFastqCollector implements Collector {
 
   /**
    * Delete the fastq screen sample report xml.
-   * @param fastqSample the fastq sample
+   * @param fs the fastq sample
    */
   private void deleteFastqScreenSampleReportXML(final FastqSample fs) {
     // Collect all data file
@@ -686,7 +684,7 @@ public abstract class AbstractFastqCollector implements Collector {
 
   /**
    * Delete the temporary data file.
-   * @param fastqSample the fastq sample
+   * @param fs the fastq sample
    */
   private void deleteTemporaryDatafile(final FastqSample fs) {
 

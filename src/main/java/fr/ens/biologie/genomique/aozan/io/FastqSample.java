@@ -94,7 +94,7 @@ public class FastqSample {
   /**
    * Create name for temporary fastq file uncompressed.
    * @param runId run id
-   * @param key
+   * @param key sample key
    * @return name fastq file
    */
   private static String createSubsetFastqFilename(final String runId,
@@ -377,8 +377,6 @@ public class FastqSample {
 
   /**
    * Public constructor corresponding of a technical replica sample.
-   * @param samplesheet the samplesheet
-   * @param casavaOutputPath path to fastq files
    * @param read read number
    * @param lane lane number
    * @param sampleName name of the sample
@@ -418,8 +416,6 @@ public class FastqSample {
 
   /**
    * Public constructor corresponding of a undetermined index sample.
-   * @param samplesheet the samplesheet
-   * @param casavaOutputPath path to fastq files
    * @param read read number
    * @param lane lane number
    * @throws IOException if an error occurs while reading bcl2fastq version

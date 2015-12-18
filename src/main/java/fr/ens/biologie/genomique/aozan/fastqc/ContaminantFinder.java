@@ -89,11 +89,7 @@ public class ContaminantFinder {
           bestHit = contaminantBlast;
         }
 
-      } catch (final IOException e) {
-
-        LOGGER.warning("Error during find contaminant with blast : "
-            + e.getMessage() + "\n" + stackTraceToString(e));
-      } catch (final AozanException e) {
+      } catch (final IOException | AozanException e) {
 
         LOGGER.warning("Error during find contaminant with blast : "
             + e.getMessage() + "\n" + stackTraceToString(e));
@@ -156,7 +152,7 @@ public class ContaminantFinder {
           "In contaminant finder class, fail to reads contaminant list.");
     }
 
-    return c.toArray(new Contaminant[0]);
+    return c.toArray(new Contaminant[c.size()]);
   }
 
 }

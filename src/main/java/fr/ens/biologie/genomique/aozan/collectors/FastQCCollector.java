@@ -85,12 +85,6 @@ public class FastQCCollector extends AbstractFastqCollector {
   }
 
   @Override
-  public void collect(final RunData data) throws AozanException {
-
-    super.collect(data);
-  }
-
-  @Override
   public AbstractFastqProcessThread collectSample(final RunData data,
       final FastqSample fastqSample, final File reportDir, final boolean runPE)
           throws AozanException {

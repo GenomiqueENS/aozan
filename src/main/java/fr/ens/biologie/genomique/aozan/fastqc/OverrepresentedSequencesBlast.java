@@ -99,7 +99,6 @@ public class OverrepresentedSequencesBlast {
   private String tmpPath;
 
   private boolean firstCall = true;
-  private boolean stepEnabled = false;
 
   private CommandLine blastCommonCommandLine;
   private String blastVersionExpected;
@@ -120,11 +119,11 @@ public class OverrepresentedSequencesBlast {
       return;
     }
 
-    this.stepEnabled = Boolean.parseBoolean(
-        properties.getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY)
-            .trim().toLowerCase());
+    boolean stepEnabled = Boolean.parseBoolean(
+            properties.getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY)
+                    .trim().toLowerCase());
 
-    if (this.stepEnabled) {
+    if (stepEnabled) {
 
       // Check parameters
       this.blastVersionExpected = properties
@@ -147,7 +146,7 @@ public class OverrepresentedSequencesBlast {
           || blastDBPath.isEmpty()) {
         LOGGER.warning("Empty or incompleted configuration for Blast detected."
             + " Blast will not be used");
-        this.stepEnabled = false;
+        stepEnabled = false;
       }
 
       // Check if blast is installed
@@ -155,10 +154,10 @@ public class OverrepresentedSequencesBlast {
         LOGGER
             .warning("Blast executable is not installed at the following path: "
                 + blastPath);
-        this.stepEnabled = false;
+        stepEnabled = false;
       }
 
-      if (this.stepEnabled) {
+      if (stepEnabled) {
 
         try {
           // Add arguments from configuration Aozan
@@ -175,13 +174,10 @@ public class OverrepresentedSequencesBlast {
           LOGGER.info("FastQC: blast is enabled, command line = "
               + this.blastCommonCommandLine);
 
-        } catch (final IOException e) {
+        } catch (final IOException | AozanException e) {
           LOGGER.warning(e.getMessage() + '\n' + stackTraceToString(e));
-          this.stepEnabled = false;
+          stepEnabled = false;
 
-        } catch (final AozanException e) {
-          LOGGER.warning(e.getMessage() + '\n' + stackTraceToString(e));
-          this.stepEnabled = false;
         }
       }
     }
@@ -374,10 +370,7 @@ public class OverrepresentedSequencesBlast {
             + sequence + ", exit value is : " + exitValue);
       }
 
-    } catch (final IOException e) {
-      throw new AozanException(e);
-
-    } catch (final InterruptedException e) {
+    } catch (final IOException | InterruptedException e) {
       throw new AozanException(e);
     }
   }
@@ -416,13 +409,8 @@ public class OverrepresentedSequencesBlast {
       // Search the best hit
       return parseHit(doc, sequence);
 
-    } catch (final IOException e) {
+    } catch (final IOException | SAXException | ParserConfigurationException e) {
       throw new AozanException(e);
-    } catch (final SAXException e) {
-      throw new AozanException(e);
-    } catch (final ParserConfigurationException e) {
-      throw new AozanException(e);
-
     } finally {
       try {
         is.close();
@@ -450,24 +438,22 @@ public class OverrepresentedSequencesBlast {
         LOGGER.info("FastQC-step blastn : blast version " + version);
       }
 
-      final StringBuilder parameters = new StringBuilder();
+      final String parameters = "Parameters_expect=" +
+              extractFirstValueToString(doc, "Parameters_expect") +
+              ", Parameters_sc-match=" +
+              extractFirstValueToString(doc, "Parameters_sc-match") +
+              ", Parameters_sc-mismatch="
+              +
+              extractFirstValueToString(doc, "Parameters_sc-mismatch") +
+              ", Parameters_gap-open=" +
+              extractFirstValueToString(doc, "Parameters_gap-open") +
+              ", Parameters_gap-extend="
+              +
+              extractFirstValueToString(doc, "Parameters_gap-extend") +
+              ", Parameters_filter=" +
+              extractFirstValueToString(doc, "Parameters_filter");
 
-      parameters.append("Parameters_expect=");
-      parameters.append(extractFirstValueToString(doc, "Parameters_expect"));
-      parameters.append(", Parameters_sc-match=");
-      parameters.append(extractFirstValueToString(doc, "Parameters_sc-match"));
-      parameters.append(", Parameters_sc-mismatch=");
-      parameters
-          .append(extractFirstValueToString(doc, "Parameters_sc-mismatch"));
-      parameters.append(", Parameters_gap-open=");
-      parameters.append(extractFirstValueToString(doc, "Parameters_gap-open"));
-      parameters.append(", Parameters_gap-extend=");
-      parameters
-          .append(extractFirstValueToString(doc, "Parameters_gap-extend"));
-      parameters.append(", Parameters_filter=");
-      parameters.append(extractFirstValueToString(doc, "Parameters_filter"));
-
-      LOGGER.info("FastQC-step blast parameters : " + parameters.toString());
+      LOGGER.info("FastQC-step blast parameters : " + parameters);
 
       this.firstCall = false;
     }
@@ -577,10 +563,6 @@ public class OverrepresentedSequencesBlast {
 
     /**
      * Build the command line, part common to all sequences.
-     * @param blastPath path to application blast
-     * @param blastDBPath path to blastn database
-     * @param argBlast argument for blastn added in configuration Aozan,
-     *          optional
      */
     List<String> getComandLine() {
 
@@ -614,7 +596,7 @@ public class OverrepresentedSequencesBlast {
     /**
      * Check argument for blastn from configuration aozan. This parameters can't
      * been modified : -d, -m, -a. The parameters are returned in a list.
-     * @param argBlast parameters for blastn
+     * @param blastArguments parameters for blastn
      * @return parameters for blastn in a list
      * @throws AozanException occurs if the parameters syntax is invalid.
      */
@@ -681,7 +663,7 @@ public class OverrepresentedSequencesBlast {
      * Constructor.
      * @param blastPath path to application blast
      * @param blastDBPath path to blastn database
-     * @param argBlast argument for blastn added in configuration Aozan,
+     * @param blastArguments argument for blastn added in configuration Aozan,
      *          optional
      * @throws IOException an error occurs if application or database doesn't
      *           exist

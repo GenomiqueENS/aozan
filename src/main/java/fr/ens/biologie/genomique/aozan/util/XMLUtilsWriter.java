@@ -269,9 +269,7 @@ public final class XMLUtilsWriter {
 
       return writer.toString();
 
-    } catch (final TransformerException e) {
-      throw new AozanException(e);
-    } catch (final IOException e) {
+    } catch (final TransformerException | IOException e) {
       throw new AozanException(e);
     }
   }

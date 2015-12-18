@@ -558,7 +558,7 @@ public class QCReport {
 
   /**
    * Collect lanes number for each project name to run.
-   * @param typeFilter
+   * @param typeFilter filter type
    * @return map associate project name related lane number
    */
   private ListMultimap<String, Integer> extractLaneNumberRelatedProjectName(
@@ -609,7 +609,6 @@ public class QCReport {
 
   /**
    * State qc report.
-   * @param data the data
    * @return true, if successful
    */
   private boolean asToIgnoreSampleStatsTestsForQCReport() {

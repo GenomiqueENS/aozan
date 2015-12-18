@@ -160,12 +160,8 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
       return Integer.parseInt(value);
 
-    } catch (final ClassCastException e) {
+    } catch (final ClassCastException | NumberFormatException e) {
 
-      throw new AozanException(
-          "The results panel of Basic Stats FastQC module has changed."
-              + " Update Aozan code to handle this.");
-    } catch (final NumberFormatException e) {
       throw new AozanException(
           "The results panel of Basic Stats FastQC module has changed."
               + " Update Aozan code to handle this.");
@@ -231,7 +227,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
     try {
       new HTMLReportArchive(this.seqFile,
-          this.moduleList.toArray(new QCModule[] {}), reportFile);
+              this.moduleList.toArray(new QCModule[this.moduleList.size()]), reportFile);
 
     } catch (final XMLStreamException e) {
       throw new AozanException(e);
@@ -283,10 +279,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
       this.seqFile = SequenceFactory.getSequenceFile(fastqSample.getFastqFiles()
           .toArray(new File[fastqSample.getFastqFiles().size()]));
 
-    } catch (final IOException io) {
-      throw new AozanException(io);
-
-    } catch (final SequenceFormatException e) {
+    } catch (final IOException | SequenceFormatException e) {
       throw new AozanException(e);
     }
 

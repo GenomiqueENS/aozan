@@ -39,43 +39,43 @@ public interface AozanTest {
    * Get the name of the test.
    * @return the name of the test
    */
-  public String getName();
+  String getName();
 
   /**
    * Get the description of the test.
    * @return the description of the test
    */
-  public String getDescription();
+  String getDescription();
 
   /**
    * Get the column name of the test in the QC result file.
    * @return the coloumn name of the test
    */
-  public String getColumnName();
+  String getColumnName();
 
   /**
    * Get the unit of the result of the test.
    * @return the unit of the result of the test
    */
-  public String getUnit();
+  String getUnit();
 
   /**
    * Get the name of the collectors required for the test.
    * @return a list of String with the name of the required collectors
    */
-  public List<String> getCollectorsNamesRequiered();
+  List<String> getCollectorsNamesRequiered();
 
   /**
    * Configure the test.
    * @param properties a map with the configuration of the test
    * @return list of Aozan tests
    */
-  public List<AozanTest> configure(final Map<String, String> properties)
+  List<AozanTest> configure(final Map<String, String> properties)
       throws AozanException;
 
   /**
    * Initialize the test.
    * @throws AozanException if an error occurs while initialize the test.
    */
-  public void init() throws AozanException;
+  void init() throws AozanException;
 }

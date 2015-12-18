@@ -83,11 +83,9 @@ public class DockerUtils {
 
   public void run() {
     // Create connection
-    final DockerClient docker =
-        new DefaultDockerClient("unix:///var/run/docker.sock");
 
-    try {
-      // final String image = "genomicpariscentre/bcl2fastq2:latest";
+    try (DockerClient docker = new DefaultDockerClient("unix:///var/run/docker.sock")) {
+
       final String image = buildImageName();
       LOGGER.warning("BUILD docker image name " + image);
 
@@ -96,27 +94,24 @@ public class DockerUtils {
 
       // Create container
       final HostConfig hostConfig =
-          HostConfig.builder().binds(this.mountArgument).build();
+              HostConfig.builder().binds(this.mountArgument).build();
 
-      // String cmd = "/tmp/bcl2fastq.sh";
       List<String> cmd = this.commandLine;
-      // List<String> cmd =
-      // new ArrayList<>(Arrays.asList("/tmp/bcl2fastq2_copy.sh"));
 
       final String permission = this.permission;
       final String workDir = this.workDirectoryDocker;
 
       // // Create container
       LOGGER.warning("Docker create config "
-          + "\n\tdocker " + docker + "\n\t imagename " + image
-          + "\n\t host Configure is  " + hostConfig + "\n\tcommend line "
-          + Joiner.on(" ").join(cmd) + "\n\twork directory " + workDir
-          + "\n\tpermission " + permission);
+              + "\n\tdocker " + docker + "\n\t imagename " + image
+              + "\n\t host Configure is  " + hostConfig + "\n\tcommend line "
+              + Joiner.on(" ").join(cmd) + "\n\twork directory " + workDir
+              + "\n\tpermission " + permission);
 
       final ContainerConfig config =
-          ContainerConfig.builder().image(image).cmd(cmd)
-              .hostConfig(hostConfig).user(permission).workingDir(workDir)
-              .build();
+              ContainerConfig.builder().image(image).cmd(cmd)
+                      .hostConfig(hostConfig).user(permission).workingDir(workDir)
+                      .build();
 
       ContainerCreation creation;
       creation = docker.createContainer(config);
@@ -132,8 +127,8 @@ public class DockerUtils {
 
       // Redirect stdout and stderr
       final LogStream logStream =
-          docker.logs(id, LogsParameter.FOLLOW, LogsParameter.STDERR,
-              LogsParameter.STDOUT);
+              docker.logs(id, LogsParameter.FOLLOW, LogsParameter.STDERR,
+                      LogsParameter.STDOUT);
       redirect(logStream, this.stdoutFile, this.stderrFile);
 
       // Kill container
@@ -143,16 +138,15 @@ public class DockerUtils {
 
       // Remove container
       docker.removeContainer(id);
-      LOGGER.info("Docker succes remove container " + id);
+      LOGGER.info("Docker container successufully removed: " + id);
 
     } catch (DockerException | InterruptedException e) {
 
       e.printStackTrace();
 
-    } finally {
-      // Close connection
-      docker.close();
     }
+    // Close connection
+
 
   }
 
@@ -160,7 +154,6 @@ public class DockerUtils {
    * Adds the mount directory.
    * @param localDirectoryPath the local directory
    * @param dockerDirectoryPath the docker directory
-   * @return the string
    * @throws AozanException the Aozan exception
    */
   public void addMountDirectory(final String localDirectoryPath,
@@ -200,8 +193,6 @@ public class DockerUtils {
   //
 
   private void checkOSCompatibilityDocker() {
-    // TODO Auto-generated method stub
-
   }
 
   /**
@@ -270,8 +261,6 @@ public class DockerUtils {
    * @param imageName the image name
    * @return the string
    * @throws AozanException
-   * @throws DockerException the docker exception
-   * @throws InterruptedException the interrupted exception
    */
   private ContainerCreation buildContainerDocker(final DockerClient docker,
       final HostConfig hostConfig, final String imageName)
@@ -314,13 +303,10 @@ public class DockerUtils {
     try {
       return docker.createContainer(config);
 
-    } catch (DockerException e) {
+    } catch (DockerException | InterruptedException e) {
       System.out.println("Docker exception");
       e.printStackTrace();
 
-    } catch (InterruptedException e) {
-      System.out.println("Docker exception");
-      e.printStackTrace();
     }
 
     throw new AozanException("FAIL creation container Docker ");
@@ -490,7 +476,8 @@ public class DockerUtils {
 
   /**
    * Sets the permission.
-   * @param permissions the new permission
+   * @param user the user name
+   * @param group the user group
    */
   public void setPermission(final String user, final String group) {
     // TODO check syntax
@@ -556,7 +543,6 @@ public class DockerUtils {
    * @param commandLine the command line
    * @param softwareName the software name
    * @param softwareVersion the software version
-   * @param workDirectory the work directory
    * @throws AozanException
    */
   public DockerUtils(final String commandLine, final String softwareName,

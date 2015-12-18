@@ -186,13 +186,8 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
           // Throw an exception if an error has occurred while reading data
           fastqReader.throwException();
 
-        } catch (final IOException e) {
+        } catch (final IOException | EoulsanException | BadBioEntryException e) {
           throw new AozanException(e);
-        } catch (final EoulsanException ee) {
-          throw new AozanException(ee);
-        } catch (final BadBioEntryException bbe) {
-          throw new AozanException(bbe);
-
         } finally {
 
           if (fastqReader != null) {
@@ -287,11 +282,8 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
           // Throw an exception if an error has occurred while reading data
           fastqReader.throwException();
 
-        } catch (final IOException e) {
+        } catch (final IOException | BadBioEntryException e) {
           throw new AozanException(e);
-        } catch (final BadBioEntryException bbe) {
-          throw new AozanException(bbe);
-
         } finally {
 
           if (fastqReader != null) {
@@ -383,12 +375,11 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
 
     super(fastqSample);
 
-    final int maxReadsPFtoParse = maxReadsToParse;
     this.countReadsPFtoCopy = numberReadsToCopy;
 
     this.rawClusterCount = rawClusterCount;
     this.pfClusterCountParsed =
-        maxReadsPFtoParse > pfClusterCount ? pfClusterCount : maxReadsPFtoParse;
+            maxReadsToParse > pfClusterCount ? pfClusterCount : maxReadsToParse;
 
     this.tmpFastqFile =
         new File(fastqSample.getSubsetFastqFile().getPath() + ".tmp");

@@ -280,7 +280,7 @@ public class FastqScreenProjectReport {
 
   /**
    * Compile genomes in project.
-   * @param the document from xml file.
+   * @param doc the document from xml file.
    * @return all genomes or if none found no genome
    */
   private String compileGenomesInProject(final Document doc) {

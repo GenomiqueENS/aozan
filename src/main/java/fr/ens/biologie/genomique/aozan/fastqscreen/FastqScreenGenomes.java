@@ -203,11 +203,11 @@ public class FastqScreenGenomes {
 
       // Retrieve all genome sample included in casava design file
       for (final Sample casavaSample : samplesheet) {
-        final String genomeSample =
+        String genomeSample =
             casavaSample.getSampleRef().replaceAll("\"", "").toLowerCase();
 
         // Replace all symbols not letters or numbers by space
-        PATTERN.matcher(genomeSample).replaceAll(" ");
+        genomeSample = PATTERN.matcher(genomeSample).replaceAll(" ");
 
         genomesFromDesign.add(genomeSample.trim());
       }

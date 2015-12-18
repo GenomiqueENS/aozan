@@ -458,7 +458,7 @@ public class SampleSheetCheck {
    * @param samplesIndex the samples index
    * @throws AozanException the aozan exception
    */
-  private static final void checkSampleIndex(final String sampleName,
+  private static void checkSampleIndex(final String sampleName,
       final String index1, final String index2,
       final Map<String, String> samplesIndex) throws AozanException {
 

@@ -247,7 +247,6 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
   @Override
   protected void saveResultPart(final FastqSample fastqSample,
       final RunData data) {
-    return;
   }
 
   @Override

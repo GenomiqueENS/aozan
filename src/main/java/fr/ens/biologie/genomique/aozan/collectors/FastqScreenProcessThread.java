@@ -236,7 +236,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @param fastqSampleR2 fastqSample corresponding to the read 2
    * @param fastqscreen instance of fastqscreen
    * @param data object rundata on the run
-   * @param genomes list of references genomes for FastqScreen
+   * @param genomesToMap list of references genomes for FastqScreen
    * @param genomeSample genome reference corresponding to sample
    * @param reportDir path for the directory who save the FastqScreen report
    * @param isPairedEndMode true if a pair-end run and option paired mode equals
@@ -248,12 +248,12 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    */
   public FastqScreenProcessThread(final FastqSample fastqSampleR1,
       final FastqSample fastqSampleR2, final FastqScreen fastqscreen,
-      final RunData data, final Set<String> genomesToMapping,
+      final RunData data, final Set<String> genomesToMap,
       final String genomeSample, final File reportDir,
       final boolean isPairedEndMode, final boolean isRunPE,
       final File fastqscreenXSLFile) throws AozanException {
 
-    this(fastqSampleR1, fastqscreen, data, genomesToMapping, genomeSample,
+    this(fastqSampleR1, fastqscreen, data, genomesToMap, genomeSample,
         reportDir, isPairedEndMode, isRunPE, fastqscreenXSLFile);
 
     if (isPairedEndMode) {
@@ -269,7 +269,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @param fastqSample fastqSample corresponding to the read 1
    * @param fastqscreen instance of fastqscreen
    * @param data object rundata on the run
-   * @param genomesToMapping list of references genomes for FastqScreen
+   * @param genomesToMap list of references genomes for FastqScreen
    * @param genomeSample genome reference corresponding to sample
    * @param reportDir path for the directory who save the FastqScreen report
    * @param isPairedEndMode true if a paired-end run and option paired mode
@@ -281,7 +281,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    */
   public FastqScreenProcessThread(final FastqSample fastqSample,
       final FastqScreen fastqscreen, final RunData data,
-      final Set<String> genomesToMapping, final String genomeSample,
+      final Set<String> genomesToMap, final String genomeSample,
       final File reportDir, final boolean isPairedEndMode,
       final boolean isRunPE, final File fastqscreenXSLFile)
           throws AozanException {
@@ -290,7 +290,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     checkNotNull(fastqscreen, "fastqscreen argument cannot be null");
     checkNotNull(data, "data argument cannot be null");
-    checkNotNull(genomesToMapping, "genomesToMapping argument cannot be null");
+    checkNotNull(genomesToMap, "genomesToMapping argument cannot be null");
     checkNotNull(reportDir, "reportDir argument cannot be null");
 
     this.fastqSampleR2 = null;
@@ -308,7 +308,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     }
 
     // Copy list genomes names for fastqscreen
-    this.genomes = new ArrayList<>(genomesToMapping);
+    this.genomes = new ArrayList<>(genomesToMap);
 
   }
 

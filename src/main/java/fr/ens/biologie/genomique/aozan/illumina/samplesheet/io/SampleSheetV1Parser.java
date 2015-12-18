@@ -151,7 +151,7 @@ public class SampleSheetV1Parser implements SampleSheetParser {
     sample.set(convertFieldName(FIELDNAMES[9]), fields.get(9));
   }
 
-  private static final boolean parseControlField(final String value)
+  private static boolean parseControlField(final String value)
       throws IOException {
 
     if ("".equals(value)) {

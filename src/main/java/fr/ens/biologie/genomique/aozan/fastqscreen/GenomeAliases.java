@@ -76,8 +76,7 @@ public class GenomeAliases {
   /**
    * Create a map which does correspondence between genome of sample and
    * reference genome from a file, the path is in aozan configuration.
-   * @param map to correspondence between common genome name and valid call name
-   *          for mapping
+   * @param aliasFilePath alias file path
    * @throws AozanException if alias genomes file doesn't exist.
    */
   private static Map<String, String> loadAliasGenomesFile(
@@ -152,7 +151,6 @@ public class GenomeAliases {
   /**
    * Create a instance of GenomeAliases or if it exists return instance.
    * @param props the props
-   * @return instance of GenomeAliases
    * @throws AozanException if the initialization of instance fail.
    */
   public static void initialize(final Map<String, String> props)

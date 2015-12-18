@@ -68,7 +68,7 @@ public class FastqScreenResult {
           + "%Multiple_hits_multiple_libraries";
 
   private final Map<String, DataPerGenome> resultsPerGenome =
-      new HashMap<String, DataPerGenome>();
+      new HashMap<>();
   private double percentUnmappedNoneGenome = 0.0;
   private double percentMappedAtLeastOneGenome = 0.0;
   private double percentMappedExceptGenomeSample = 0.0;
@@ -92,12 +92,16 @@ public class FastqScreenResult {
 
     final StringBuilder s = new StringBuilder();
 
-    s.append("FastqScreen : for Projet " + fastqSample.getProjectName());
+    s.append("FastqScreen : for Projet ");
+    s.append(fastqSample.getProjectName());
     s.append(genomeSample == null ? "" : " (genome reference for sample "
         + genomeSample + ").");
-    s.append("\nresult for sample : "
-        + fastqSample.getSampleName() + " on lane " + fastqSample.getLane());
-    s.append("\ndescription of sample : " + fastqSample.getDescription());
+    s.append("\nresult for sample : ");
+    s.append(fastqSample.getSampleName());
+    s.append(" on lane ");
+    s.append(fastqSample.getLane());
+    s.append("\ndescription of sample : ");
+    s.append(fastqSample.getDescription());
 
     s.append('\n');
     s.append("\n" + HEADER_COLUMNS_TEXT + "\n");
@@ -107,23 +111,26 @@ public class FastqScreenResult {
 
     for (final Map.Entry<String, DataPerGenome> e : this.resultsPerGenome
         .entrySet()) {
-      s.append(e.getValue().getAllPercentValues(nameLength) + "\n");
+      s.append(e.getValue().getAllPercentValues(nameLength));
+      s.append("\n");
     }
 
     // add last lines for percentage of reads
     s.append('\n');
-    s.append("% reads_unmapped_none_genome : "
-        + DataPerGenome.roundDouble(this.percentUnmappedNoneGenome));
+    s.append("% reads_unmapped_none_genome : ");
+    s.append(DataPerGenome.roundDouble(this.percentUnmappedNoneGenome));
     s.append('\n');
-    s.append("% reads_mapped_at_least_one_genome : "
-        + DataPerGenome.roundDouble(this.percentMappedAtLeastOneGenome));
+    s.append("% reads_mapped_at_least_one_genome : ");
+    s.append(DataPerGenome.roundDouble(this.percentMappedAtLeastOneGenome));
     s.append('\n');
-    s.append("% reads_mapped_except_genome_sample : "
-        + DataPerGenome.roundDouble(this.percentMappedExceptGenomeSample));
+    s.append("% reads_mapped_except_genome_sample : ");
+    s.append(DataPerGenome.roundDouble(this.percentMappedExceptGenomeSample));
     s.append('\n');
 
-    s.append("reads mapped "
-        + this.readsMapped + " / reads processed " + this.readsprocessed);
+    s.append("reads mapped ");
+    s.append(this.readsMapped);
+    s.append(" / reads processed ");
+    s.append(this.readsprocessed);
     return s.toString();
   }
 
@@ -487,10 +494,10 @@ public class FastqScreenResult {
 
     /**
      * Convert values from fastqscreen in percentage.
-     * @param readsprocessed number reads total
+     * @param readCount number reads total
      */
-    void countPercentValue(final int readscount) {
-      final double readsprocessed = readscount * 1.0;
+    void countPercentValue(final int readCount) {
+      final double readsprocessed = readCount * 1.0;
       this.oneHitOneLibraryPercent =
           this.oneHitOneLibraryCount / readsprocessed;
       this.multipleHitsOneLibraryPercent =

@@ -159,7 +159,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
    * Collect data for a fastqSample for standard sample.
    * @param data result data object
    * @param fastqSample sample object
-   * @param reportDir
+   * @param reportDir report directory
    * @param isRunPE true if it is a run PE else false
    * @return process thread instance
    * @throws AozanException if an error occurs while execution

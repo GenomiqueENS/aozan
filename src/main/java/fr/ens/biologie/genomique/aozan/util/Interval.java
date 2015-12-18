@@ -35,6 +35,6 @@ public interface Interval {
    * @param value value to test
    * @return true if the number is in the interval
    */
-  public boolean isInInterval(Number value);
+  boolean isInInterval(Number value);
 
 }
