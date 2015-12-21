@@ -72,14 +72,8 @@ public class FastqScreenGenomes {
   /** Pattern. */
   private static final Pattern PATTERN = Pattern.compile(".,;:/-_'");
 
-  // Map between genome name in bcl2fastq design file
-  private final Set<String> genomesReferencesSample;
   private final Set<String> contaminantGenomes;
-
-  // Correspondence between genome sample in run and genome name reference
-  // private final Map<String, String> genomesNamesConvertor;
-
-  private final Set<String> genomesToMap;
+  private final Set<String> sampleGenomes;
 
   /**
    * Set reference genomes for the samples of a run. Retrieve list of genomes
@@ -89,8 +83,9 @@ public class FastqScreenGenomes {
    * @throws AozanException if an error occurs during updating alias genomes
    *           file
    */
-  private Set<String> collectGenomesForMapping(final File aliasGenomesFile)
-      throws AozanException {
+  private Set<String> initSampleGenomes(
+      final Set<String> genomesReferencesSample, final File aliasGenomesFile)
+          throws AozanException {
 
     // Identify genomes can be use for mapping
     final Set<String> genomes = new HashSet<>();
@@ -98,7 +93,7 @@ public class FastqScreenGenomes {
 
     final GenomeAliases genomesAliases = GenomeAliases.getInstance();
 
-    for (final String genome : this.genomesReferencesSample) {
+    for (final String genome : genomesReferencesSample) {
       final DataFile genomeFile = new DataFile("genome://" + genome);
 
       // Retrieve genome description if it exists
@@ -138,11 +133,11 @@ public class FastqScreenGenomes {
         Collections.unmodifiableSet(newGenomes));
 
     // Union genomes contaminants and genomes references
-    final Set<String> genomesToMapping =
+    final Set<String> genomesToMap =
         Sets.newLinkedHashSet(this.contaminantGenomes);
-    genomesToMapping.addAll(genomes);
+    genomesToMap.addAll(genomes);
 
-    return Collections.unmodifiableSet(genomesToMapping);
+    return Collections.unmodifiableSet(genomesToMap);
   }
 
   /**
@@ -182,7 +177,7 @@ public class FastqScreenGenomes {
    * sequencing.
    * @return collection on genomes reference names for the samples
    */
-  private Set<String> initGenomesReferencesSample(final File designFile) {
+  private Set<String> createSampleRefsFromDesignFile(final File designFile) {
 
     final Set<String> genomesFromDesign = new HashSet<>();
 
@@ -233,7 +228,7 @@ public class FastqScreenGenomes {
    * @return genomes list
    * @throws AozanException
    */
-  private Set<String> initGenomesContaminant(
+  private Set<String> initContaminantGenomes(
       final String contaminantGenomeNames) throws AozanException {
 
     // Set genomes in configuration file
@@ -275,20 +270,8 @@ public class FastqScreenGenomes {
    * Get the collection genomes name can be used for the mapping.
    * @return collection genomes name for mapping
    */
-  public Set<String> getGenomesToMap() {
-    return Collections.unmodifiableSet(this.genomesToMap);
-  }
-
-  /**
-   * Check genomes name included in collection genomes contaminants.
-   * @param genome genome name
-   * @return true if is a genome contaminant otherwise false
-   */
-  public boolean isContaminantGenome(final String genome) {
-
-    checkNotNull(genome, "genome argument cannot be null");
-
-    return this.contaminantGenomes.contains(genome);
+  public Set<String> getSampleGenomes() {
+    return Collections.unmodifiableSet(this.sampleGenomes);
   }
 
   /**
@@ -366,14 +349,12 @@ public class FastqScreenGenomes {
     checkNotNull(contaminantGenomeNames,
         "contaminantGenomeNames argument cannot be null");
 
-    // Collect genomes references list sample from design file
-    this.genomesReferencesSample = initGenomesReferencesSample(designFile);
-
     // Collect genomes contaminant list
-    this.contaminantGenomes = initGenomesContaminant(contaminantGenomeNames);
+    this.contaminantGenomes = initContaminantGenomes(contaminantGenomeNames);
 
     // Collect genomes useful to contaminant detection
-    this.genomesToMap = collectGenomesForMapping(aliasGenomesFile);
+    this.sampleGenomes = initSampleGenomes(
+        createSampleRefsFromDesignFile(designFile), aliasGenomesFile);
   }
 
 }

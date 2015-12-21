@@ -132,16 +132,17 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     final FastqScreenGenomes fqsm =
         FastqScreenGenomes.newInstance(properties);
 
-    final Set<String> genomes = fqsm.getGenomesToMap();
+    final Set<String> sampleGenomes = fqsm.getSampleGenomes();
+    final Set<String> contaminantGenomes = fqsm.getContaminantGenomes();
 
     final List<AozanTest> list = new ArrayList<>();
 
-    for (final String genome : genomes) {
+    for (final String genome : sampleGenomes) {
 
       // Create an new AozanTest for each reference genome
       final FastqScreenSimpleSampleTest testGenome =
           new FastqScreenSimpleSampleTest(genome,
-              fqsm.isContaminantGenome(genome));
+              contaminantGenomes.contains(genome));
 
       testGenome.internalConfigure(properties);
 
