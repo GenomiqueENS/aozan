@@ -97,16 +97,16 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * Mapper Receive value in SAM format, only the read mapped are added in
    * output with reference genome.
    * @param fastqRead fastq file
-   * @param genomesForMapping list of reference genome
-   * @param genomeSample genome reference corresponding to sample, can be null
-   * @param numberThreads number threads used for mapping
+   * @param genomes list of reference genome
+   * @param sampleGenome genome reference corresponding to sample, can be null
+   * @param threadNumber number threads used for mapping
    * @throws AozanException if an error occurs while mapping
    */
-  public void doMap(final File fastqRead, final List<String> genomesForMapping,
-      final String genomeSample, final int numberThreads)
+  public void doMap(final File fastqRead, final List<String> genomes,
+      final String sampleGenome, final int threadNumber)
           throws AozanException {
 
-    this.doMap(fastqRead, null, genomesForMapping, genomeSample, numberThreads);
+    this.doMap(fastqRead, null, genomes, sampleGenome, threadNumber);
   }
 
   /**
@@ -114,35 +114,35 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * output with reference genome.
    * @param fastqRead1 fastq file
    * @param fastqRead2 fastq file in mode paired
-   * @param genomesForMapping list of genome reference
-   * @param genomeSample genome reference corresponding to sample, can be null
-   * @param numberThreads number threads used for mapping
+   * @param genomes list of genome reference
+   * @param sampleGenome genome reference corresponding to sample, can be null
+   * @param threadNumber number threads used for mapping
    * @throws AozanException if an error occurs while mapping
    */
   public void doMap(final File fastqRead1, final File fastqRead2,
-      final List<String> genomesForMapping, final String genomeSample,
-      final int numberThreads) throws AozanException {
+      final List<String> genomes, final String sampleGenome,
+      final int threadNumber) throws AozanException {
 
     checkNotNull(fastqRead1, "fastqRead1 argument cannot be null");
-    checkNotNull(genomesForMapping,
+    checkNotNull(genomes,
         "genomesForMapping argument cannot be null");
 
     if (this.pairedMode) {
       checkNotNull(fastqRead2, "fastqRead2 argument cannot be null");
     }
 
-    if (numberThreads > 0) {
-      this.mapperThreads = numberThreads;
+    if (threadNumber > 0) {
+      this.mapperThreads = threadNumber;
     }
 
     if (firstDoMapRunning) {
       // Update logger at the first execution
       LOGGER.info("FASTQSCREEN mapping sample "
           + fastqRead1.getName() + " on genomes "
-          + Joiner.on(",").join(genomesForMapping));
+          + Joiner.on(",").join(genomes));
     }
 
-    for (final String genome : genomesForMapping) {
+    for (final String genome : genomes) {
       // Timer : for step mapping on genome
       final Stopwatch timer = Stopwatch.createStarted();
 
@@ -165,7 +165,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         final FastqScreenSAMParser parser = new FastqScreenSAMParser(
             this.getMapOutputTempFile(), genome, this.pairedMode, this.desc);
 
-        this.setGenomeReference(genome, genomeSample);
+        this.setGenomeReference(genome, sampleGenome);
 
         final File indexDir = new File(
             StringUtils.filenameWithoutExtension(archiveIndexFile.getPath()));

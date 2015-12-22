@@ -39,7 +39,6 @@ import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.Settings;
-import fr.ens.biologie.genomique.aozan.io.FastqSample;
 
 /**
  * This class execute fastqscreen pair-end mode or single-end.
@@ -75,17 +74,17 @@ public class FastqScreen {
   /**
    * Mode pair-end : execute fastqscreen.
    * @param fastqRead fastq file input for mapper
-   * @param fastqSample instance to describe fastq sample
+   * @param sampleDescription sample description
    * @param genomes list or reference genome, used by mapper
    * @param genomeSample genome reference corresponding to sample
    * @return FastqScreenResult object contains results for each reference genome
    * @throws AozanException
    */
   public FastqScreenResult execute(final File fastqRead,
-      final FastqSample fastqSample, final List<String> genomes,
+      final String sampleDescription, final List<String> genomes,
       final String genomeSample, final boolean paired) throws AozanException {
 
-    return this.execute(fastqRead, null, fastqSample, genomes, genomeSample,
+    return this.execute(fastqRead, null, sampleDescription, genomes, genomeSample,
         paired);
 
   }
@@ -94,20 +93,21 @@ public class FastqScreen {
    * Mode single-end : execute fastqscreen.
    * @param fastqRead1 fastq read1 file input for mapper
    * @param fastqRead2 fastq read2 file input for mapper
-   * @param fastqSample instance to describe fastq sample
+   * @param sampleDescription sample description
    * @param genomes list or reference genome, used by mapper
-   * @param genomeSample genome reference corresponding to sample
+   * @param sampleGenome genome reference corresponding to sample
    * @param isPairedMode true if a pair-end run and option paired mode equals
    *          true else false
    * @throws AozanException
    */
   public FastqScreenResult execute(final File fastqRead1, final File fastqRead2,
-      final FastqSample fastqSample, final List<String> genomes,
-      final String genomeSample, final boolean isPairedMode)
+      final String sampleDescription, final List<String> genomes,
+      final String sampleGenome, final boolean isPairedMode)
           throws AozanException {
 
     checkNotNull(fastqRead1, "fastqRead1 argument cannot be null");
     checkNotNull(genomes, "genomes argument cannot be null");
+    checkNotNull(sampleDescription, "sampleDescription argument cannot be null");
 
     if (isPairedMode) {
       checkNotNull(fastqRead2, "fastqRead2 argument cannot be null");
@@ -122,14 +122,14 @@ public class FastqScreen {
     try {
 
       if (isPairedMode) {
-        pmr.doMap(fastqRead1, fastqRead2, genomes, genomeSample,
+        pmr.doMap(fastqRead1, fastqRead2, genomes, sampleGenome,
             this.confThreads);
       } else {
-        pmr.doMap(fastqRead1, genomes, genomeSample, this.confThreads);
+        pmr.doMap(fastqRead1, genomes, sampleGenome, this.confThreads);
       }
 
       LOGGER.fine("FASTQSCREEN : step map for "
-          + fastqSample.getKeyFastqSample() + " in mode "
+          + sampleDescription + " in mode "
           + (isPairedMode ? "paired" : "single") + " on genome(s) " + genomes
           + " in " + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
@@ -142,7 +142,7 @@ public class FastqScreen {
       pmr.doReduce(outputDoReduceFile);
 
       LOGGER.fine("FASTQSCREEN : step reduce for "
-          + fastqSample.getKeyFastqSample() + " in mode "
+          + sampleDescription + " in mode "
           + (isPairedMode ? "paired" : "single") + " in "
           + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 

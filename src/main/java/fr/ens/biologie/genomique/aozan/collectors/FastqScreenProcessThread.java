@@ -58,7 +58,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   private final File reportDir;
   private final FastqScreen fastqscreen;
   private final List<String> genomes;
-  private final String genomeSample;
+  private final String sampleGenome;
   private final boolean isPairedEndMode;
   private final boolean isRunPE;
   private FastqSample fastqSampleR2;
@@ -66,6 +66,10 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
   private FastqScreenResult resultsFastqscreen = null;
   private File fastqscreenXSLFile = null;
+
+  //
+  // AbstractFastqProcessThread methods
+  //
 
   @Override
   protected void logThreadStart() {
@@ -103,8 +107,65 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     LOGGER.fine("FASTQSCREEN : save "
         + getFastqSample().getPrefixReport() + " report fastqscreen");
+  }
+
+  @Override
+  protected void processResults() throws AozanException {
+
+    final File read1 = getFastqSample().getSubsetFastqFile();
+    final String sampleDescription = getFastqSample().getKeyFastqSample();
+
+    if (!read1.exists()) {
+      LOGGER.warning("No partial file for " + getFastqSample() + ": " + read1);
+      return;
+    }
+
+    File read2 = null;
+    // mode paired
+    if (this.isPairedEndMode) {
+      read2 = this.fastqSampleR2.getSubsetFastqFile();
+
+      if (!read2.exists()) {
+        return;
+      }
+    }
+
+    // Add read2 in command line
+    this.resultsFastqscreen =
+        this.fastqscreen.execute(read1, read2, sampleDescription, this.genomes,
+            this.sampleGenome, this.isPairedEndMode);
+
+    if (this.resultsFastqscreen == null) {
+      throw new AozanException("Fastqscreen returns no result for sample "
+          + String.format("/Project_%s/Sample_%s",
+              getFastqSample().getProjectName(),
+              getFastqSample().getSampleName()));
+    }
+
+    // Create rundata for the sample
+    final String prefixR1 = "fastqscreen" + getFastqSample().getRundataPrefix();
+    getResults().put(this.resultsFastqscreen.createRundata(prefixR1));
+
+    // run paired : same values for fastqSample R2
+    if (this.isRunPE) {
+
+      final String prefixR2 = "fastqscreen"
+          + getFastqSample().getRundataPrefix().replace(".read1.", ".read2.");
+
+      getResults().put(this.resultsFastqscreen.createRundata(prefixR2));
+    }
+
+    try {
+      createReportFile();
+    } catch (final IOException e) {
+      throw new AozanException(e);
+    }
 
   }
+
+  //
+  // Other methods
+  //
 
   /**
    * Create a report fastqScreen for a sample in csv format.
@@ -118,7 +179,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     final BufferedWriter br = Files.newWriter(file, StandardCharsets.UTF_8);
     br.append(this.resultsFastqscreen.reportToCSV(getFastqSample(),
-        this.genomeSample));
+        this.sampleGenome));
 
     br.close();
 
@@ -151,7 +212,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     // BufferedWriter br = Files.newWriter(file, Charsets.UTF_8);
     this.resultsFastqscreen.reportToHtml(getFastqSample(), this.data,
-        this.genomeSample, outputReportR1, this.fastqscreenXSLFile);
+        this.sampleGenome, outputReportR1, this.fastqscreenXSLFile);
 
     // br.close();
 
@@ -171,59 +232,6 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     }
   }
-
-  @Override
-  protected void processResults() throws AozanException {
-
-    final File read1 = getFastqSample().getSubsetFastqFile();
-
-    if (!read1.exists()) {
-      LOGGER.warning("No partial file for " + getFastqSample() + ": " + read1);
-      return;
-    }
-
-    File read2 = null;
-    // mode paired
-    if (this.isPairedEndMode) {
-      read2 = this.fastqSampleR2.getSubsetFastqFile();
-
-      if (!read2.exists()) {
-        return;
-      }
-    }
-
-    // Add read2 in command line
-    this.resultsFastqscreen =
-        this.fastqscreen.execute(read1, read2, getFastqSample(), this.genomes,
-            this.genomeSample, this.isPairedEndMode);
-
-    if (this.resultsFastqscreen == null) {
-      throw new AozanException("Fastqscreen returns no result for sample "
-          + String.format("/Project_%s/Sample_%s",
-              getFastqSample().getProjectName(),
-              getFastqSample().getSampleName()));
-    }
-
-    // Create rundata for the sample
-    final String prefixR1 = "fastqscreen" + getFastqSample().getRundataPrefix();
-    getResults().put(this.resultsFastqscreen.createRundata(prefixR1));
-
-    // run paired : same values for fastqSample R2
-    if (this.isRunPE) {
-
-      final String prefixR2 = "fastqscreen"
-          + getFastqSample().getRundataPrefix().replace(".read1.", ".read2.");
-
-      getResults().put(this.resultsFastqscreen.createRundata(prefixR2));
-    }
-
-    try {
-      createReportFile();
-    } catch (final IOException e) {
-      throw new AozanException(e);
-    }
-
-  }// end method collect
 
   //
   // Constructor
@@ -269,8 +277,8 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    * @param fastqSample fastqSample corresponding to the read 1
    * @param fastqscreen instance of fastqscreen
    * @param data object rundata on the run
-   * @param genomesToMap list of references genomes for FastqScreen
-   * @param genomeSample genome reference corresponding to sample
+   * @param genomes list of references genomes for FastqScreen
+   * @param sampleGenome genome reference corresponding to sample
    * @param reportDir path for the directory who save the FastqScreen report
    * @param isPairedEndMode true if a paired-end run and option paired mode
    *          equals true else false
@@ -281,7 +289,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
    */
   public FastqScreenProcessThread(final FastqSample fastqSample,
       final FastqScreen fastqscreen, final RunData data,
-      final Set<String> genomesToMap, final String genomeSample,
+      final Set<String> genomes, final String sampleGenome,
       final File reportDir, final boolean isPairedEndMode,
       final boolean isRunPE, final File fastqscreenXSLFile)
           throws AozanException {
@@ -290,12 +298,12 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     checkNotNull(fastqscreen, "fastqscreen argument cannot be null");
     checkNotNull(data, "data argument cannot be null");
-    checkNotNull(genomesToMap, "genomesToMapping argument cannot be null");
+    checkNotNull(genomes, "genomes argument cannot be null");
     checkNotNull(reportDir, "reportDir argument cannot be null");
 
     this.fastqSampleR2 = null;
     this.fastqscreen = fastqscreen;
-    this.genomeSample = genomeSample;
+    this.sampleGenome = sampleGenome;
     this.reportDir = reportDir;
     this.isPairedEndMode = isPairedEndMode;
     this.isRunPE = isRunPE;
@@ -308,8 +316,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     }
 
     // Copy list genomes names for fastqscreen
-    this.genomes = new ArrayList<>(genomesToMap);
-
+    this.genomes = new ArrayList<>(genomes);
   }
 
 }
