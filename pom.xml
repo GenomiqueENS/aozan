@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>fr.ens.transcriptome</groupId>
+  <groupId>fr.ens.biologie.genomique</groupId>
   <artifactId>aozan</artifactId>
   <version>2.0-rc11-SNAPSHOT</version>
   <packaging>jar</packaging>
