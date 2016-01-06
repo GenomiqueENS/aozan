@@ -546,5 +546,30 @@
 			</action>
 		</release>
 
+		<release version="2.0-rc10" description="Aozan 2.0-rc10 release"  date="2016-01-06">
+			<action dev="jourdren" type="fix">
+                                When several qc analysis must be done, the configuration of the first qc when used for the other qc analysis.
+			</action>
+			<action dev="jourdren" type="fix">
+                                In FastQC blasts of overrepresented sequences, due to concurency issue, multiple blast instances could be executed at the same time.
+			</action>
+			<action dev="jourdren" type="fix">
+                                Fix tar warning message on stderr in the demux step.
+			</action>
+			<action dev="jourdren" type="update">
+                                Many Java code refactoring and dead code removing.
+			</action>
+			<action dev="jourdren" type="update">
+                                Rename packages fr.ens.transcriptome.aozan.* to fr.ens.biologie.genomique.aozan.* as the new website of the ENS genomic platform is https://genomique.biologie.ens.fr.
+                                Update the URL of the website to http://outils.genomique.biologie.ens.fr/aozan.
+			</action>
+			<action dev="jourdren" type="update">
+                                The encoding of the website is now UTF-8.
+			</action>
+			<action dev="jourdren" type="update">
+                                Many small code and javadoc fixes after running IDEA inspect tool.
+			</action>
+		</release>
+
 	</body>
 </document>
