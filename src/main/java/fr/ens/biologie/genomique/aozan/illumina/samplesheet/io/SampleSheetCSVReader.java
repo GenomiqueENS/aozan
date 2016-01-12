@@ -26,15 +26,16 @@ package fr.ens.biologie.genomique.aozan.illumina.samplesheet.io;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
+import com.google.common.base.Charsets;
+
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
-import fr.ens.transcriptome.eoulsan.Globals;
-import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
 /**
  * This class define a reader for bcl2fastq CSV samplesheet files.
@@ -44,8 +45,7 @@ import fr.ens.transcriptome.eoulsan.util.FileUtils;
 public class SampleSheetCSVReader implements SampleSheetReader {
 
   /* Default Charset. */
-  private static final Charset CHARSET =
-      Charset.forName(Globals.DEFAULT_FILE_ENCODING);
+  private static final Charset CHARSET = Charsets.UTF_8;
 
   private final BufferedReader reader;
   private int version = -1;
@@ -138,6 +138,7 @@ public class SampleSheetCSVReader implements SampleSheetReader {
   /**
    * Public constructor
    * @param file File to use
+   * @throws FileNotFoundException if the file does not exists
    */
   public SampleSheetCSVReader(final File file) throws FileNotFoundException {
 
@@ -150,7 +151,7 @@ public class SampleSheetCSVReader implements SampleSheetReader {
           "File not found: " + file.getAbsolutePath());
     }
 
-    this.reader = FileUtils.createBufferedReader(file);
+    this.reader = new BufferedReader(new FileReader(file));
   }
 
   /**
@@ -171,7 +172,7 @@ public class SampleSheetCSVReader implements SampleSheetReader {
           "File not found: " + file.getAbsolutePath());
     }
 
-    this.reader = FileUtils.createBufferedReader(file);
+    this.reader = new BufferedReader(new FileReader(file));
   }
 
 }

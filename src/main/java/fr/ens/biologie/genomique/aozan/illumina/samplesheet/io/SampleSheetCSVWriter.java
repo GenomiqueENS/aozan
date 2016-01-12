@@ -25,13 +25,14 @@ package fr.ens.biologie.genomique.aozan.illumina.samplesheet.io;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
-import fr.ens.transcriptome.eoulsan.util.FileUtils;
 
 /**
  * This class define a writer for bcl2fastq CSV samplesheet files.
@@ -111,7 +112,7 @@ public class SampleSheetCSVWriter implements SampleSheetWriter {
   public SampleSheetCSVWriter(final OutputStream os)
       throws FileNotFoundException {
 
-    this.writer = FileUtils.createFastBufferedWriter(os);
+    this.writer = new OutputStreamWriter(os);
   }
 
   /**
@@ -120,7 +121,7 @@ public class SampleSheetCSVWriter implements SampleSheetWriter {
    */
   public SampleSheetCSVWriter(final File outputFile) throws IOException {
 
-    this.writer = FileUtils.createFastBufferedWriter(outputFile);
+    this.writer = new FileWriter(outputFile);
   }
 
   /**
@@ -129,7 +130,7 @@ public class SampleSheetCSVWriter implements SampleSheetWriter {
    */
   public SampleSheetCSVWriter(final String outputFilename) throws IOException {
 
-    this.writer = FileUtils.createFastBufferedWriter(outputFilename);
+    this.writer = new FileWriter(outputFilename);
   }
 
 }
