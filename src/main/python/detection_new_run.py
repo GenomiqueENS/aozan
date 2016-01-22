@@ -87,9 +87,9 @@ def discover_new_run(conf):
         for run_id in (get_available_run_ids(conf) - run_already_discovered):
             aozan.welcome(conf)
             common.log('INFO', 'First base report ' + run_id + ' on sequencer ' + common.get_instrument_name(run_id, conf), conf)
-            send_report(run_id, conf)
-            add_run_id_to_processed_run_ids(run_id, conf)
-            run_already_discovered.add(run_id)
+            if send_report(run_id, conf):
+                add_run_id_to_processed_run_ids(run_id, conf)
+                run_already_discovered.add(run_id)
 
             # Verify space needed during the first base report
             estimate_space_needed.estimate(run_id, conf)
@@ -117,7 +117,7 @@ def send_report(run_id, conf):
     run_info = hiseq_run.get_run_info(run_id, conf)
 
     if run_info == None:
-        return
+        return False
 
     # TODO ?? add check sample-sheet if demux step enable
     # add warning in report if useful
@@ -166,6 +166,11 @@ def send_report(run_id, conf):
     if rta_major_version == 1:
         # With HiSeq send the first base report file
         attachment_file = str(hiseq_run.find_hiseq_run_path(run_id, conf)) + '/' + run_id + '/First_Base_Report.htm'
+
+        # Do not send a message if the First base report file does not exists
+        if not os.path.isfile(attachment_file):
+            return False
+
         message = 'You will find attached to this message the first base report on sequencer HiSeq for the run ' + run_id + '.\n\n' + description_run
         common.send_msg_with_attachment('[Aozan] First base report for HiSeq run ' + type_run_estimated + '  ' + run_id , message, attachment_file, conf)
 
@@ -173,3 +178,5 @@ def send_report(run_id, conf):
         # With other no attachment file
         message = 'You will find below features on new run on NextSeq ' + run_id + '.\n\n' + description_run
         common.send_msg('[Aozan] Detection new run on sequencer NextSeq ' + type_run_estimated + '  ' + run_id , message, False, conf)
+
+    return True
