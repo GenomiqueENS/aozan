@@ -640,6 +640,20 @@ public class RunData {
   //
 
   /**
+   * Test if the RunData contains  a key.
+   * @param key key name
+   * @return true if the RunData object contains the key
+   */
+  public boolean contains(final String key) {
+
+    if (key == null) {
+      return false;
+    }
+
+    return this.map.containsKey(key.toLowerCase().trim());
+  }
+
+  /**
    * Get the number of entries in RunData.
    * @return the number of entries
    */

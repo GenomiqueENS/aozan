@@ -70,8 +70,9 @@ public class PercentQ30BasePFSamplestatsTest extends AbstractSampleTest {
     try {
       for (int read = 1; read <= readCount; read++) {
 
-        if (data.isReadIndexed(read))
+        if (data.isReadIndexed(read)) {
           continue;
+        }
 
         readIndexedCount++;
 
@@ -79,9 +80,15 @@ public class PercentQ30BasePFSamplestatsTest extends AbstractSampleTest {
 
           final String prefix =
               buildPrefixRundata(sampleName, lane, readIndexedCount);
-          
-          q30Cumul += data.getLong(prefix + ".pf.yield.q30");
-          rawCumul += data.getLong(prefix + ".pf.yield");
+
+          final String q30Key = prefix + ".pf.yield.q30";
+          final String rawKey = prefix + ".pf.yield";
+
+          // Sample must exist in the lane
+          if (data.contains(q30Key) && data.contains(rawKey)) {
+            q30Cumul += data.getLong(q30Key);
+            rawCumul += data.getLong(rawKey);
+          }
         }
       }
 
