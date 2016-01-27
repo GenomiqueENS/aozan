@@ -571,5 +571,13 @@
 			</action>
 		</release>
 
+		<release version="2.0-rc11" description="Aozan 2.0-rc11 release"  date="2016-01-27">
+			<action dev="jourdren" type="fix">
+                                Do not send an email if the first base report does not yet exist for RTA 1 output.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 In the meanqualityscorepfsamplestats  and samplestatspercentq30basepf tests, a NullPointerException was thrown if a sample does not exists in all the lane of the run.
+			</action>
+		</release>
 	</body>
 </document>
