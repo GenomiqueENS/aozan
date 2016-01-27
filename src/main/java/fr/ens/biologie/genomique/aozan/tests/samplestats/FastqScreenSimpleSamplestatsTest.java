@@ -73,8 +73,10 @@ public class FastqScreenSimpleSamplestatsTest extends AbstractSimpleSampleTest {
     for (int lane = 1; lane <= laneCount; lane++) {
 
       final String key = getKey(sampleName, lane);
-      value += data.getDouble(key);
 
+      if (data.contains(key)) {
+        value += data.getDouble(key);
+      }
     }
 
     try {
@@ -96,7 +98,13 @@ public class FastqScreenSimpleSamplestatsTest extends AbstractSimpleSampleTest {
     throw new UnsupportedOperationException();
   }
 
-  public String getKey(final String sampleName, final int lane) {
+  /**
+   * Get the the key in the RunData object for the value to test.
+   * @param sampleName the sample name
+   * @param lane the lane
+   * @return a String with the required key
+   */
+  private String getKey(final String sampleName, final int lane) {
 
     final String value =
         this.isGenomeContamination
