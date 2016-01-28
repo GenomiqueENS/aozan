@@ -70,7 +70,11 @@ public class PercentSampleInProjectSamplestatsTest extends AbstractSampleTest {
 
     final long rawClusterSampleSum = data.getLong(rawClusterSumKey);
 
-    final String projectName = data.getProjectSample(1, sampleName);
+    final String projectName = getProjectName(data, sampleName);
+
+    if (projectName == null) {
+      return new TestResult("NA");
+    }
 
     try {
 
@@ -92,6 +96,28 @@ public class PercentSampleInProjectSamplestatsTest extends AbstractSampleTest {
 
       return new TestResult("NA");
     }
+  }
+
+  /**
+   * Get the project name of a Sample.
+   * @param data the data object
+   * @param sampleName the sample
+   * @return the project name or null if it is not been found.
+   */
+  private static String getProjectName(final RunData data, final String sampleName) {
+
+    final int laneCount = data.getLaneCount();
+
+    String projectName = null;
+    int lane = 0;
+
+    while (projectName == null && lane <= laneCount) {
+
+      lane++;
+      projectName = data.getProjectSample(lane, sampleName);
+    }
+
+    return projectName;
   }
 
   @Override
