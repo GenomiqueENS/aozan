@@ -576,7 +576,13 @@
                                 Do not send an email if the first base report does not yet exist for RTA 1 output.
 			</action>
 			<action dev="jourdren" type="fix">
-                                 In the meanqualityscorepfsamplestats  and samplestatspercentq30basepf tests, a NullPointerException was thrown if a sample does not exists in all the lane of the run.
+                                 In the meanqualityscorepfsamplestats and samplestatspercentq30basepf tests, a NullPointerException was thrown if a sample does not exists in all the lane of the run.
+			</action>
+		</release>
+
+		<release version="2.0-rc12" description="Aozan 2.0-rc12 release"  date="2016-02-01">
+			<action dev="jourdren" type="fix">
+                                 In the percentsampleinproject and samplestatsfsqmapped tests, a NullPointerException was thrown if a sample does not exists in all the lane of the run.
 			</action>
 		</release>
 	</body>
