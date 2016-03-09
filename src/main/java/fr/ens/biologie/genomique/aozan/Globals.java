@@ -99,7 +99,7 @@ public class Globals {
       || "UNKNOWN_VERSION".equals(APP_VERSION_STRING);
 
   private static final String WEBSITE_URL_DEFAULT =
-      "http://transcriptome.ens.fr/" + APP_NAME_LOWER_CASE;
+      "http://outils.genomique.biologie.ens.fr/" + APP_NAME_LOWER_CASE;
 
   /** Application Website url. */
   public static final String WEBSITE_URL = getWebSiteURL();
