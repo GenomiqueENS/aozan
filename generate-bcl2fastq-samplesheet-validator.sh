@@ -752,7 +752,7 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
 
 <h4 align="right">__VERSION__</h4>
     <div>
-      <a href="http://genomique.biologie.ens.fr" ><img src="http://tools.genomique.biologie.ens.fr/aozan/images/logo_genomicpariscentre-90pxh.png" alt="logo genomic paris centre" align="left"/></a>
+      <a href="https://www.genomique.biologie.ens.fr" ><img src="http://tools.genomique.biologie.ens.fr/aozan/images/logo_genomicpariscentre-90pxh.png" alt="logo genomic paris centre" align="left"/></a>
       <h1>CASAVA/BCL2FASTQ version 1.8 samplesheet validator</h1>
     </div>
     <table align="center">

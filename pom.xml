@@ -20,7 +20,7 @@
   
   <organization>
     <name>École normale supérieure genomic platform</name>
-    <url>https://genomique.biologie.ens.fr/</url>
+    <url>https://www.genomique.biologie.ens.fr/</url>
   </organization>
 
   <developers>
@@ -30,7 +30,7 @@
       <email>aozan 0 biologie ens fr</email>
       <url />
       <organization>École normale supérieure, IBENS, Genomic Paris Centre</organization>
-      <organizationUrl>https://genomique.biologie.ens.fr/</organizationUrl>
+      <organizationUrl>https://www.genomique.biologie.ens.fr/</organizationUrl>
       <roles>
         <role>Lead Developer</role>
       </roles>
@@ -43,7 +43,7 @@
       <email>aozan 0 biologie ens fr</email>
       <url />
       <organization>École normale supérieure, IBENS, Genomic Paris Centre</organization>
-      <organizationUrl>https://genomique.biologie.ens.fr/</organizationUrl>
+      <organizationUrl>https://www.genomique.biologie.ens.fr/</organizationUrl>
       <roles>
         <role>Developer</role>
       </roles>
@@ -56,7 +56,7 @@
       <email>aozan 0 biologie ens fr</email>
       <url />
       <organization>École normale supérieure, IBENS, Genomic Paris Centre</organization>
-      <organizationUrl>https://genomique.biologie.ens.fr/</organizationUrl>
+      <organizationUrl>https://www.genomique.biologie.ens.fr/</organizationUrl>
       <roles>
         <role>Project manager and documentation review</role>
       </roles>
