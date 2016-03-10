@@ -18,7 +18,7 @@
  * or to join the Aozan Google group, visit the home page
  * at:
  *
- *      http://tools.genomique.biologie.ens.fr/aozan
+ *      http://outils.genomique.biologie.ens.fr/aozan
  *
  */
 

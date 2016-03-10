@@ -272,7 +272,7 @@ doctype-system="about:legacy-compat"/>
 				<div class="header">
 					<div id="header_title">
 						<img
-							src="http://tools.genomique.biologie.ens.fr/aozan/images/logo_aozan_qc.png"
+							src="http://outils.genomique.biologie.ens.fr/aozan/images/logo_aozan_qc.png"
 							alt="Aozan" />
 						Clusters recoverable in
 						<xsl:value-of select="/RecoveryClusterReport/sampleName" />

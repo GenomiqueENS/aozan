@@ -18,7 +18,7 @@
   For more information on the Aozan project and its aims,
   or to join the Aozan Google group, visit the home page at:
 
-       http://tools.genomique.biologie.ens.fr/aozan
+       http://outils.genomique.biologie.ens.fr/aozan
 
 -->
 <document>
@@ -41,7 +41,7 @@
 
 	 <p>Alongside Aozan, we provide a standalone CASAVA samplesheet validator available on our website that allows you to check
 	 your run design and generate a valid CSV design file.
-	 The tool is available <a href="http://tools.genomique.biologie.ens.fr/designvalidator/" target="_blank">here.</a>
+	 The tool is available <a href="http://outils.genomique.biologie.ens.fr/designvalidator/" target="_blank">here.</a>
 	 </p>
 
      <h4>Configuration parameters</h4>

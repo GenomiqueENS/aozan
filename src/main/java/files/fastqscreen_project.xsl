@@ -191,7 +191,7 @@ doctype-system="about:legacy-compat"/>
 <body>
   <div class="header">
   	<div id="header_title">
-		<img src="http://tools.genomique.biologie.ens.fr/aozan/images/logo_aozan_qc.png" alt="Aozan"/>
+		<img src="http://outils.genomique.biologie.ens.fr/aozan/images/logo_aozan_qc.png" alt="Aozan"/>
 		Detection contamination report for project <b><xsl:value-of select="/ReportFastqScreen/projectName"/></b>
 	</div>   
   </div>

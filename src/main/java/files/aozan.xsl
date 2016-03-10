@@ -376,7 +376,7 @@ doctype-system="about:legacy-compat"/>
 
 <div class="header">
 	<div id="header_title">
-		<span><img src="http://tools.genomique.biologie.ens.fr/aozan/images/logo_aozan_qc.png" alt="Aozan"/></span>
+		<span><img src="http://outils.genomique.biologie.ens.fr/aozan/images/logo_aozan_qc.png" alt="Aozan"/></span>
 		<span>Quality report on run <xsl:value-of select="/QCReport/RunId"/></span>
 	</div>
 
