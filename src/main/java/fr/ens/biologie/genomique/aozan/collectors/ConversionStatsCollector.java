@@ -194,8 +194,8 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
           && c != 'T' && c != 'C' && c != 'G' && c != 'a' && c != 't'
           && c != 'c' && c != 'g')
 
-        throw new AozanRuntimeException(
-            "Demultiplexing Collector: in barcode sequence a base is invalid.");
+        throw new AozanRuntimeException("Demultiplexing Collector: "
+            + "a base is invalid in the barcode sequence: " + barcodeSeq);
     }
 
     // Return sequence
