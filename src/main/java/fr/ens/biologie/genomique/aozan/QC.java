@@ -55,8 +55,8 @@ import fr.ens.biologie.genomique.aozan.tests.lane.LaneTest;
 import fr.ens.biologie.genomique.aozan.tests.projectstats.ProjectTest;
 import fr.ens.biologie.genomique.aozan.tests.sample.SampleTest;
 import fr.ens.biologie.genomique.aozan.tests.samplestats.SampleStatsTest;
-import fr.ens.transcriptome.eoulsan.EoulsanRuntime;
-import fr.ens.transcriptome.eoulsan.data.protocols.DataProtocolService;
+import fr.ens.biologie.genomique.eoulsan.EoulsanRuntime;
+import fr.ens.biologie.genomique.eoulsan.data.protocols.DataProtocolService;
 
 /**
  * This class is the main QC class.
@@ -682,7 +682,7 @@ public class QC {
   private void initGenomeDescriptionCreator(
       final Map<String, String> properties) {
 
-    final fr.ens.transcriptome.eoulsan.Settings settings =
+    final fr.ens.biologie.genomique.eoulsan.Settings settings =
         EoulsanRuntime.getSettings();
 
     settings.setGenomeDescStoragePath(properties
@@ -696,8 +696,8 @@ public class QC {
     // dependencies
     DataProtocolService.getInstance()
         .addClassesToNotLoad(Lists.newArrayList(
-            "fr.ens.transcriptome.eoulsan.data.protocols.S3DataProtocol",
-            "fr.ens.transcriptome.eoulsan.data.protocols.S3NDataProtocol"));
+            "fr.ens.biologie.genomique.eoulsan.data.protocols.S3DataProtocol",
+            "fr.ens.biologie.genomique.eoulsan.data.protocols.S3NDataProtocol"));
 
     // Initialize GenomeDescriptionCreator
     GenomeDescriptionCreator.initialize(properties

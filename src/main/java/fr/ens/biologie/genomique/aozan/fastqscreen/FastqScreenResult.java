@@ -45,7 +45,7 @@ import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.io.FastqSample;
 import fr.ens.biologie.genomique.aozan.util.XMLUtilsWriter;
-import fr.ens.transcriptome.eoulsan.util.XMLUtils;
+import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
 
 /**
  * This class manages results from fastqscreen.

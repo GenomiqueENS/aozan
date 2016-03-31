@@ -26,11 +26,10 @@ package fr.ens.biologie.genomique.aozan.fastqscreen;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -45,18 +44,19 @@ import com.google.common.base.Stopwatch;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.Globals;
-import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
-import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
-import fr.ens.transcriptome.eoulsan.bio.readsmappers.Bowtie2ReadsMapper;
-import fr.ens.transcriptome.eoulsan.bio.readsmappers.BowtieReadsMapper;
-import fr.ens.transcriptome.eoulsan.bio.readsmappers.SequenceReadsMapper;
-import fr.ens.transcriptome.eoulsan.bio.readsmappers.SequenceReadsMapperService;
-import fr.ens.transcriptome.eoulsan.data.DataFile;
-import fr.ens.transcriptome.eoulsan.steps.generators.GenomeMapperIndexer;
-import fr.ens.transcriptome.eoulsan.util.LocalReporter;
-import fr.ens.transcriptome.eoulsan.util.PseudoMapReduce;
-import fr.ens.transcriptome.eoulsan.util.Reporter;
-import fr.ens.transcriptome.eoulsan.util.StringUtils;
+import fr.ens.biologie.genomique.eoulsan.bio.BadBioEntryException;
+import fr.ens.biologie.genomique.eoulsan.bio.GenomeDescription;
+import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.Bowtie2ReadsMapper;
+import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.BowtieReadsMapper;
+import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.MapperProcess;
+import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.SequenceReadsMapper;
+import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.SequenceReadsMapperService;
+import fr.ens.biologie.genomique.eoulsan.data.DataFile;
+import fr.ens.biologie.genomique.eoulsan.modules.generators.GenomeMapperIndexer;
+import fr.ens.biologie.genomique.eoulsan.util.LocalReporter;
+import fr.ens.biologie.genomique.eoulsan.util.PseudoMapReduce;
+import fr.ens.biologie.genomique.eoulsan.util.Reporter;
+import fr.ens.biologie.genomique.eoulsan.util.StringUtils;
 
 /**
  * This class account reads that map to each of the reference genome.
@@ -103,8 +103,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @throws AozanException if an error occurs while mapping
    */
   public void doMap(final File fastqRead, final List<String> genomes,
-      final String sampleGenome, final int threadNumber)
-          throws AozanException {
+      final String sampleGenome, final int threadNumber) throws AozanException {
 
     this.doMap(fastqRead, null, genomes, sampleGenome, threadNumber);
   }
@@ -124,8 +123,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       final int threadNumber) throws AozanException {
 
     checkNotNull(fastqRead1, "fastqRead1 argument cannot be null");
-    checkNotNull(genomes,
-        "genomesForMapping argument cannot be null");
+    checkNotNull(genomes, "genomesForMapping argument cannot be null");
 
     if (this.pairedMode) {
       checkNotNull(fastqRead2, "fastqRead2 argument cannot be null");
@@ -173,10 +171,18 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         mapper.init(archiveIndexFile, indexDir, this.reporter, COUNTER_GROUP);
 
         if (this.pairedMode) {
-          // mode pair-end
-          final InputStream outputSAM =
-              mapper.mapPE(fastqRead1, fastqRead2, this.desc);
-          parser.parseLines(outputSAM);
+
+          // Paired end mode
+          final MapperProcess process = mapper.mapPE(fastqRead1, fastqRead2);
+
+          // final InputStream outputSAM =
+          // mapper.mapPE(fastqRead1, fastqRead2).getStout();
+          // parser.parseLines(outputSAM);
+
+          parser.parseLines(process.getStout());
+
+          // Wait the end of the process and do cleanup
+          process.waitFor();
 
           this.readsprocessed = parser.getReadsprocessed();
 
@@ -187,8 +193,16 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
                 "Fastqscreen : genome description is null for bowtie");
           }
 
-          final InputStream outputSAM = mapper.mapSE(fastqRead1, this.desc);
-          parser.parseLines(outputSAM);
+          // Single read mapping
+          final MapperProcess process = mapper.mapSE(fastqRead1);
+
+          // final InputStream outputSAM = mapper.mapSE(fastqRead1).getStout();
+          // parser.parseLines(outputSAM);
+
+          parser.parseLines(process.getStout());
+
+          // Wait the end of the process and do cleanup
+          process.waitFor();
 
           this.readsprocessed = parser.getReadsprocessed();
         }
@@ -239,6 +253,11 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     if (this.desc == null) {
       return null;
+    }
+
+    // Check if the index has already been created/retrieved
+    if (result.exists()) {
+      return result.toFile();
     }
 
     final Map<String, String> additionnalArgument = Collections.emptyMap();
@@ -476,7 +495,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    */
   public FastqScreenPseudoMapReduce(final File tmpDir, final boolean pairedMode,
       final String mapperName, final String mapperArguments)
-          throws AozanException {
+      throws AozanException {
 
     checkNotNull(tmpDir, "tmpDir argument cannot be null");
     checkNotNull(mapperName, "mapperName argument cannot be null");

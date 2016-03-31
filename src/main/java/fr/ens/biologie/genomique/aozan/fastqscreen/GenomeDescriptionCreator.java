@@ -27,11 +27,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 
-import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
-import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
-import fr.ens.transcriptome.eoulsan.data.DataFile;
-import fr.ens.transcriptome.eoulsan.data.storages.GenomeDescStorage;
-import fr.ens.transcriptome.eoulsan.data.storages.SimpleGenomeDescStorage;
+import fr.ens.biologie.genomique.eoulsan.bio.BadBioEntryException;
+import fr.ens.biologie.genomique.eoulsan.bio.GenomeDescription;
+import fr.ens.biologie.genomique.eoulsan.data.DataFile;
+import fr.ens.biologie.genomique.eoulsan.data.storages.GenomeDescStorage;
+import fr.ens.biologie.genomique.eoulsan.data.storages.SimpleGenomeDescStorage;
 
 /**
  * This class allow to create genome descriptions.

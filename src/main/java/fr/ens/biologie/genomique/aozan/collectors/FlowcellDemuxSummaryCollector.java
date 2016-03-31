@@ -23,8 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.collectors;
 
-import static fr.ens.transcriptome.eoulsan.util.XMLUtils.getAttributeValue;
-import static fr.ens.transcriptome.eoulsan.util.XMLUtils.getTagValue;
+import static fr.ens.biologie.genomique.eoulsan.util.XMLUtils.getAttributeValue;
+import static fr.ens.biologie.genomique.eoulsan.util.XMLUtils.getTagValue;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,7 +46,7 @@ import com.google.common.base.Objects;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
-import fr.ens.transcriptome.eoulsan.util.XMLUtils;
+import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
 
 /**
  * This class define a collector for demux statistics data from bcl2fastq

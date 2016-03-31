@@ -37,7 +37,7 @@ import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
 import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput;
-import fr.ens.transcriptome.eoulsan.io.CompressionType;
+import fr.ens.biologie.genomique.eoulsan.io.CompressionType;
 
 /**
  * The class correspond of one entity to treat by AbstractFastqCollector, so a

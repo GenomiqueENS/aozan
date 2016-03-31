@@ -45,7 +45,7 @@ import com.google.common.collect.ImmutableList;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
-import fr.ens.transcriptome.eoulsan.util.XMLUtils;
+import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
 
 /**
  * This class define a collector for phasing/prephasing statistics data.

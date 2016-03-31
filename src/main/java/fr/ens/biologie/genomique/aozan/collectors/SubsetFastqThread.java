@@ -38,14 +38,14 @@ import com.google.common.io.Files;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.Globals;
-import fr.ens.biologie.genomique.aozan.illumina.IlluminaReadId;
 import fr.ens.biologie.genomique.aozan.io.FastqSample;
-import fr.ens.transcriptome.eoulsan.EoulsanException;
-import fr.ens.transcriptome.eoulsan.bio.BadBioEntryException;
-import fr.ens.transcriptome.eoulsan.bio.ReadSequence;
-import fr.ens.transcriptome.eoulsan.bio.io.FastqReader;
-import fr.ens.transcriptome.eoulsan.io.CompressionType;
-import fr.ens.transcriptome.eoulsan.util.FileUtils;
+import fr.ens.biologie.genomique.eoulsan.EoulsanException;
+import fr.ens.biologie.genomique.eoulsan.bio.BadBioEntryException;
+import fr.ens.biologie.genomique.eoulsan.bio.IlluminaReadId;
+import fr.ens.biologie.genomique.eoulsan.bio.ReadSequence;
+import fr.ens.biologie.genomique.eoulsan.bio.io.FastqReader;
+import fr.ens.biologie.genomique.eoulsan.io.CompressionType;
+import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
 
 /**
  * The class define a class for a thread that create a temporary partial fastq
@@ -171,7 +171,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
             if (!ill.isFiltered()) {
               if (comptReadsPF % step == 0) {
                 // Write in tmp fastq file
-                fwTmpFastq.write(seq.toFastQ());
+                fwTmpFastq.write(seq.toFastQ() + '\n');
                 fwTmpFastq.flush();
 
                 if (--countReadsToCopyByFastq <= 0) {
@@ -268,7 +268,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
 
             if (comptReadsPF % step == 0) {
               // Write in tmp fastq file
-              fwTmpFastq.write(seq.toFastQ());
+              fwTmpFastq.write(seq.toFastQ() + '\n');
               fwTmpFastq.flush();
 
               if (--countReadsToCopyByFastq <= 0) {

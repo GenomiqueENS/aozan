@@ -24,7 +24,7 @@
 package fr.ens.biologie.genomique.aozan;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.File;
 import java.io.IOException;

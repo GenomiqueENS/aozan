@@ -51,8 +51,8 @@ import com.spotify.docker.client.messages.HostConfig;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Common;
-import fr.ens.transcriptome.eoulsan.EoulsanLogger;
-import fr.ens.transcriptome.eoulsan.util.ProcessUtils;
+import fr.ens.biologie.genomique.eoulsan.EoulsanLogger;
+import fr.ens.biologie.genomique.eoulsan.util.ProcessUtils;
 
 public class DockerUtils {
 

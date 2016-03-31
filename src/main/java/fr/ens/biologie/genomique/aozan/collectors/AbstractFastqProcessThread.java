@@ -23,7 +23,7 @@
 
 package fr.ens.biologie.genomique.aozan.collectors;
 
-import static fr.ens.transcriptome.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;

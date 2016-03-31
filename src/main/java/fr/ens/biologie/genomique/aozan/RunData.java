@@ -23,7 +23,7 @@
 
 package fr.ens.biologie.genomique.aozan;
 
-import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingFile;
+import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.checkExistingFile;
 import static com.google.common.base.Strings.nullToEmpty;
 
 import java.io.BufferedReader;

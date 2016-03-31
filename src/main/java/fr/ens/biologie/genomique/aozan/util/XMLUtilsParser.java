@@ -28,7 +28,7 @@ import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import fr.ens.transcriptome.eoulsan.util.XMLUtils;
+import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
 
 /**
  * The class define utility methods to extract information to a xml with the

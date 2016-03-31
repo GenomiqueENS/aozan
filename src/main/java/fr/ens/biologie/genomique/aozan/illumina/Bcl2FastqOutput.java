@@ -1,7 +1,7 @@
 package fr.ens.biologie.genomique.aozan.illumina;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingDirectoryFile;
+import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.checkExistingDirectoryFile;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -19,7 +19,7 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 import fr.ens.biologie.genomique.aozan.io.FastqSample;
-import fr.ens.transcriptome.eoulsan.util.Version;
+import fr.ens.biologie.genomique.eoulsan.core.Version;
 
 /**
  * This class define the output of bcl2fastq.

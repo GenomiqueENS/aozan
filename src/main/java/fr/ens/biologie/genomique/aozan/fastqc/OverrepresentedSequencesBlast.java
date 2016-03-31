@@ -26,7 +26,7 @@ package fr.ens.biologie.genomique.aozan.fastqc;
 import static fr.ens.biologie.genomique.aozan.util.StringUtils.stackTraceToString;
 import static fr.ens.biologie.genomique.aozan.util.XMLUtilsParser.extractFirstValueToInt;
 import static fr.ens.biologie.genomique.aozan.util.XMLUtilsParser.extractFirstValueToString;
-import static fr.ens.transcriptome.eoulsan.util.FileUtils.checkExistingFile;
+import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.checkExistingFile;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.BufferedReader;
@@ -62,8 +62,8 @@ import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.Settings;
-import fr.ens.transcriptome.eoulsan.util.FileUtils;
-import fr.ens.transcriptome.eoulsan.util.XMLUtils;
+import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
+import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
 import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
 
 /**

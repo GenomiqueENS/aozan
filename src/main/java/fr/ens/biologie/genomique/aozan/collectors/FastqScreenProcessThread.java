@@ -42,7 +42,7 @@ import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.fastqscreen.FastqScreen;
 import fr.ens.biologie.genomique.aozan.fastqscreen.FastqScreenResult;
 import fr.ens.biologie.genomique.aozan.io.FastqSample;
-import fr.ens.transcriptome.eoulsan.util.FileUtils;
+import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
 
 /**
  * The private class define a class for a thread that execute fastqScreen for a

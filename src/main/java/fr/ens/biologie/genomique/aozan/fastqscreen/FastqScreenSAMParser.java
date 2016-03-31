@@ -33,18 +33,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.samtools.SAMLineParser;
-import net.sf.samtools.SAMRecord;
+import htsjdk.samtools.SAMLineParser;
+import htsjdk.samtools.SAMRecord;
 
 import com.google.common.io.Files;
 
 import fr.ens.biologie.genomique.aozan.Globals;
-import fr.ens.transcriptome.eoulsan.bio.GenomeDescription;
-import fr.ens.transcriptome.eoulsan.bio.SAMUtils;
-import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.MultiReadAlignmentsFilter;
-import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.ReadAlignmentsFilter;
-import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.ReadAlignmentsFilterBuffer;
-import fr.ens.transcriptome.eoulsan.bio.alignmentsfilters.RemoveUnmappedReadAlignmentsFilter;
+import fr.ens.biologie.genomique.eoulsan.bio.GenomeDescription;
+import fr.ens.biologie.genomique.eoulsan.bio.SAMUtils;
+import fr.ens.biologie.genomique.eoulsan.bio.alignmentsfilters.MultiReadAlignmentsFilter;
+import fr.ens.biologie.genomique.eoulsan.bio.alignmentsfilters.ReadAlignmentsFilter;
+import fr.ens.biologie.genomique.eoulsan.bio.alignmentsfilters.ReadAlignmentsFilterBuffer;
+import fr.ens.biologie.genomique.eoulsan.bio.alignmentsfilters.RemoveUnmappedReadAlignmentsFilter;
 
 /**
  * This class ensures alignment fastqScreen treating the output format BAM of

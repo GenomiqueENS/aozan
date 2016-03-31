@@ -44,7 +44,7 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVWriter;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetXLSReader;
-import fr.ens.transcriptome.eoulsan.util.FileUtils;
+import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
 import junit.framework.TestCase;
 
 public class SampleSheetReaderTest extends TestCase {

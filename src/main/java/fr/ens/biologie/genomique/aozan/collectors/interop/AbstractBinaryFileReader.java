@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.transcriptome.eoulsan.util.FileUtils;
+import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
 
 /**
  * This class define an iterator on Illumina Metrics for reading binary files

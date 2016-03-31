@@ -43,12 +43,12 @@ import javax.swing.table.TableModel;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import fr.ens.biologie.genomique.eoulsan.EoulsanException;
+import fr.ens.biologie.genomique.eoulsan.bio.IlluminaReadId;
 import uk.ac.babraham.FastQC.Modules.AbstractQCModule;
 import uk.ac.babraham.FastQC.Report.HTMLReportArchive;
 import uk.ac.babraham.FastQC.Sequence.Sequence;
 import uk.ac.babraham.FastQC.Sequence.QualityEncoding.PhredEncoding;
-import fr.ens.biologie.genomique.aozan.illumina.IlluminaReadId;
-import fr.ens.transcriptome.eoulsan.EoulsanException;
 
 /**
  * This class define a QCModule for FastQC that list the bad tiles in a fastq

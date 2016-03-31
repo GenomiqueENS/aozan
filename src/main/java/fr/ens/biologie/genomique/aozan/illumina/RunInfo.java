@@ -25,9 +25,9 @@ package fr.ens.biologie.genomique.aozan.illumina;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static fr.ens.transcriptome.eoulsan.util.XMLUtils.getAttributeNames;
-import static fr.ens.transcriptome.eoulsan.util.XMLUtils.getElementsByTagName;
-import static fr.ens.transcriptome.eoulsan.util.XMLUtils.getTagValue;
+import static fr.ens.biologie.genomique.eoulsan.util.XMLUtils.getAttributeNames;
+import static fr.ens.biologie.genomique.eoulsan.util.XMLUtils.getElementsByTagName;
+import static fr.ens.biologie.genomique.eoulsan.util.XMLUtils.getTagValue;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,8 +47,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
-import fr.ens.transcriptome.eoulsan.util.FileUtils;
-import fr.ens.transcriptome.eoulsan.util.XMLUtils;
+import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
+import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
 
 /**
  * This class handle RTA run info data. It is updated with new data related to

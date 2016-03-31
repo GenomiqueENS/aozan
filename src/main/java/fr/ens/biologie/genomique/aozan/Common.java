@@ -23,7 +23,7 @@
 
 package fr.ens.biologie.genomique.aozan;
 
-import static fr.ens.transcriptome.eoulsan.LocalEoulsanRuntime.initEoulsanRuntimeForExternalApp;
+import static fr.ens.biologie.genomique.eoulsan.LocalEoulsanRuntime.initEoulsanRuntimeForExternalApp;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -33,7 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import fr.ens.transcriptome.eoulsan.EoulsanException;
+import fr.ens.biologie.genomique.eoulsan.EoulsanException;
 
 /**
  * This class contains common methods like logger initialization.
@@ -43,7 +43,7 @@ import fr.ens.transcriptome.eoulsan.EoulsanException;
 public class Common {
 
   public static final Logger getLogger() {
-    return Logger.getLogger(fr.ens.transcriptome.eoulsan.Globals.APP_NAME);
+    return Logger.getLogger(fr.ens.biologie.genomique.eoulsan.Globals.APP_NAME);
   }
 
   /**
@@ -113,7 +113,7 @@ public class Common {
     eoulsanLogger.setLevel(logLevel);
 
     final Handler fh = new FileHandler(logPath, true);
-    fh.setFormatter(fr.ens.transcriptome.eoulsan.Globals.LOG_FORMATTER);
+    fh.setFormatter(fr.ens.biologie.genomique.eoulsan.Globals.LOG_FORMATTER);
 
     eoulsanLogger.setUseParentHandlers(false);
 
