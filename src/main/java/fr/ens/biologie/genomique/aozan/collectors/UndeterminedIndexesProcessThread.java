@@ -604,9 +604,17 @@ public class UndeterminedIndexesProcessThread
           return;
         }
 
-        final String index = irid.getSequenceIndex();
+        // Get the sequence indexes
+        final List<String> indexes = irid.getSequenceIndexList();
 
         // Process only nucleotides sequences
+        if (indexes.isEmpty()) {
+          continue;
+        }
+
+        // TODO Process the secondary indexes
+        final String index = indexes.get(0);
+
         if (index == null
             || index.isEmpty() || Character.isDigit(index.charAt(0))) {
           continue;
@@ -895,7 +903,7 @@ public class UndeterminedIndexesProcessThread
   private void writeHTML(final List<LaneResultEntry> entries,
       final LaneResultEntry totalEntry,
       final boolean demultiplexingWithConflict)
-          throws IOException, AozanException {
+      throws IOException, AozanException {
 
     final File reportHtml = createLaneResultFile(".html");
 
@@ -1058,7 +1066,7 @@ public class UndeterminedIndexesProcessThread
       final List<? extends ResultEntry> entries, final ResultEntry totalEntry,
       final File reportHtml, final boolean isSampleData,
       final boolean demultiplexingWithConflict)
-          throws IOException, AozanException {
+      throws IOException, AozanException {
 
     Document doc = null;
 

@@ -44,6 +44,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Splitter;
+
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
 import fr.ens.biologie.genomique.aozan.QC;
@@ -107,7 +109,8 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
       // Parse document to update run data
       parse(doc, data);
 
-    } catch (final IOException | SAXException | ParserConfigurationException e) {
+    } catch (final IOException | SAXException
+        | ParserConfigurationException e) {
 
       throw new AozanException(e);
     }
@@ -174,7 +177,7 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
    * @param barcodeSeq the barcode sequence
    * @return valid barcode sequence
    */
-  private String checkBarcodeSeq(String barcodeSeq) {
+  private static String checkBarcodeSeq(String barcodeSeq) {
 
     if (barcodeSeq.equals(ALL_NAME_KEY)) {
       return barcodeSeq;
@@ -185,22 +188,32 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
       return UNDETERMINED_NAME_KEY;
     }
 
-    // TODO parse
-    for (int i = 0; i < barcodeSeq.length(); i++) {
-      char c = barcodeSeq.charAt(i);
+    for (String s : Splitter.on('+').split(barcodeSeq)) {
 
-      // Check sequences corresponding to good bases
-      if (c != 'A'
-          && c != 'T' && c != 'C' && c != 'G' && c != 'a' && c != 't'
-          && c != 'c' && c != 'g')
+      for (int i = 0; i < s.length(); i++) {
+        char c = s.charAt(i);
 
-        throw new AozanRuntimeException("Demultiplexing Collector: "
-            + "a base is invalid in the barcode sequence: " + barcodeSeq);
+        switch (c) {
+
+        case 'A':
+        case 'a':
+        case 'T':
+        case 't':
+        case 'G':
+        case 'g':
+        case 'C':
+        case 'c':
+          break;
+
+        default:
+          throw new AozanRuntimeException("Demultiplexing Collector: "
+              + "a base is invalid in the barcode sequence: " + barcodeSeq);
+        }
+      }
     }
 
     // Return sequence
     return barcodeSeq;
-
   }
 
   @Override

@@ -186,7 +186,8 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
           // Throw an exception if an error has occurred while reading data
           fastqReader.throwException();
 
-        } catch (final IOException | EoulsanException | BadBioEntryException e) {
+        } catch (final IOException | EoulsanException
+            | BadBioEntryException e) {
           throw new AozanException(e);
         } finally {
 
@@ -197,8 +198,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
             } catch (final IOException io) {
               LOGGER.warning(
                   "Exception occuring during the closing of FastqReader. Step collector "
-                      + SubsetFastqCollector.COLLECTOR_NAME
-                      + " for the sample "
+                      + SubsetFastqCollector.COLLECTOR_NAME + " for the sample "
                       + getFastqSample().getKeyFastqSample());
             }
           }
@@ -292,8 +292,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
             } catch (final IOException io) {
               LOGGER.warning(
                   "Exception occurred during the closing of FastqReader. Step collector "
-                      + SubsetFastqCollector.COLLECTOR_NAME
-                      + " for the sample "
+                      + SubsetFastqCollector.COLLECTOR_NAME + " for the sample "
                       + getFastqSample().getKeyFastqSample());
             }
           }
@@ -371,7 +370,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
   public SubsetFastqThread(final FastqSample fastqSample,
       final int rawClusterCount, final int pfClusterCount,
       final int numberReadsToCopy, final int maxReadsToParse)
-          throws AozanException {
+      throws AozanException {
 
     super(fastqSample);
 
@@ -379,7 +378,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
 
     this.rawClusterCount = rawClusterCount;
     this.pfClusterCountParsed =
-            maxReadsToParse > pfClusterCount ? pfClusterCount : maxReadsToParse;
+        maxReadsToParse > pfClusterCount ? pfClusterCount : maxReadsToParse;
 
     this.tmpFastqFile =
         new File(fastqSample.getSubsetFastqFile().getPath() + ".tmp");
