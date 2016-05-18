@@ -54,17 +54,41 @@ import fr.ens.biologie.genomique.eoulsan.bio.alignmentsfilters.RemoveUnmappedRea
  */
 public class FastqScreenSAMParser {
 
-  private File mapOutputFile = null;
+  // private File mapOutputFile = null;
   private final String genome;
   private final Writer fw;
 
   private final SAMLineParser parser;
   private boolean headerParsed = false;
-  private boolean pairedMode = false;
+  private final boolean pairedMode;
 
   private final ReadAlignmentsFilterBuffer buffer;
 
   private int readsprocessed = 0;
+
+  /**
+   * Parse a SAM file and create a new file mapoutsamfile, it contains a line
+   * for each read mapped with her name and mapping data : first character
+   * represent the number of hits for a read : 1 or 2 (for several hits) and the
+   * end represent the name of reference genome.
+   * @param is inputStream to parse
+   * @throws IOException
+   */
+  public void parseLines(final InputStream is) throws IOException {
+
+    final BufferedReader br = new BufferedReader(
+        new InputStreamReader(is, StandardCharsets.ISO_8859_1));
+
+    String line = null;
+
+    while ((line = br.readLine()) != null) {
+      parseLine(line);
+    }
+
+    br.close();
+
+    closeMapOutputFile();
+  }
 
   /**
    * Call for each line of SAM file. Method create a new file, it contains a
@@ -89,102 +113,33 @@ public class FastqScreenSAMParser {
         // Set the chromosomes sizes in the parser
         this.headerParsed = true;
       }
-
     }
 
     final SAMRecord samRecord = this.parser.parseLine(SAMline);
     final boolean result = this.buffer.addAlignment(samRecord);
-    // new read
+
+    // Add a new read
     if (!result) {
-      this.readsprocessed++;
-
-      final List<SAMRecord> records = this.buffer.getFilteredAlignments();
-
-      if (records != null && records.size() > 0) {
-
-        final String nameRead = records.get(0).getReadName();
-
-        int nbHits;
-
-        // define number of hits 1 or 2 (over one)
-        if (this.pairedMode) {
-          // mode paired : records contains an event number of reads
-          nbHits = records.size() == 2 ? 1 : 2;
-        } else {
-          nbHits = records.size() == 1 ? 1 : 2;
-        }
-
-        // write in SAMmapOutputFile
-        if (nameRead != null) {
-          this.fw.write(nameRead + "\t" + nbHits + this.genome);
-          this.fw.write("\n");
-        }
-      }
+      parseBuffered();
       this.buffer.addAlignment(samRecord);
-
-      if (records != null) {
-        records.clear();
-      }
     }
-
-  }
-
-  /**
-   * Parse a SAM file and create a new file mapoutsamfile, it contains a line
-   * for each read mapped with her name and mapping data : first character
-   * represent the number of hits for a read : 1 or 2 (for several hits) and the
-   * end represent the name of reference genome.
-   * @param is inputStream to parse
-   * @throws IOException
-   */
-  public void parseLines(final InputStream is) throws IOException {
-
-    final BufferedReader br =
-        new BufferedReader(new InputStreamReader(is,
-            StandardCharsets.ISO_8859_1));
-
-    String line = null;
-
-    while ((line = br.readLine()) != null) {
-      parseLine(line);
-    }
-
-    br.close();
-    is.close();
-
-    closeMapOutputFile();
-  }
-
-  /**
-   * Parse a SAM file and create a new file, it contains a line for each read
-   * mapped with her name and mapping data : first character represent the
-   * number of hits for a read : 1 or 2 (for several hits) and the end represent
-   * the name of reference genome.
-   * @param SAMFile parse SAM file create by bowtie
-   * @throws IOException
-   */
-  public void parseLine(final File SAMFile) throws IOException {
-
-    final BufferedReader br =
-        Files.newReader(SAMFile, StandardCharsets.ISO_8859_1);
-    String line;
-
-    while ((line = br.readLine()) != null) {
-      parseLine(line);
-    }
-    br.close();
-  }
-
-  public File getSAMOutputFile() {
-    return this.mapOutputFile;
   }
 
   /**
    * Write last record and close file mapOutputFile.
    */
   private void closeMapOutputFile() throws IOException {
+
     // processing read buffer - end of input stream bowtie execution
-    this.readsprocessed++;
+    if (this.headerParsed) {
+      parseBuffered();
+    }
+
+    this.fw.close();
+  }
+
+  private void parseBuffered() throws IOException {
+
     final List<SAMRecord> records = this.buffer.getFilteredAlignments();
 
     if (records != null && records.size() > 0) {
@@ -204,8 +159,12 @@ public class FastqScreenSAMParser {
         this.fw.write("\n");
       }
     }
-    this.fw.close();
 
+    if (records != null) {
+      records.clear();
+    }
+
+    this.readsprocessed++;
   }
 
   //
@@ -250,8 +209,6 @@ public class FastqScreenSAMParser {
         new MultiReadAlignmentsFilter(listFilters);
     this.buffer = new ReadAlignmentsFilterBuffer(filter);
 
-    this.mapOutputFile = mapOutputFile;
-    this.fw =
-        Files.newWriter(this.mapOutputFile, Globals.DEFAULT_FILE_ENCODING);
+    this.fw = Files.newWriter(mapOutputFile, Globals.DEFAULT_FILE_ENCODING);
   }
 }

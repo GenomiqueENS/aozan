@@ -207,6 +207,9 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
           this.readsprocessed = parser.getReadsprocessed();
         }
 
+        // Throw an exception if an exception has occurred while mapping
+        mapper.throwMappingException();
+
         LOGGER.fine("FASTQSCREEN : "
             + mapper.getMapperName() + " mapping on genome " + genome
             + " in mode " + (this.pairedMode ? "paired" : "single") + ", in "
