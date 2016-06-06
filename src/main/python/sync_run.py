@@ -14,6 +14,7 @@ from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_URL_KEY
 
+
 def is_sync_step_enable(conf):
     """Check if all parameters useful for synchronization step are defined
 
@@ -31,13 +32,14 @@ def is_sync_step_enable(conf):
             # Check bcl not same hiseq output path
             for path in hiseq_run.get_hiseq_data_paths(conf):
                 if path == bcl_path:
-                    error('error configuration.' ,
-                          'Basecalling path and hiseq output data path are the same: ' + bcl_path , conf)
+                    error('error configuration.',
+                          'Basecalling path and hiseq output data path are the same: ' + bcl_path, conf)
                     return False
 
             return True
 
     return False
+
 
 def load_processed_run_ids(conf):
     """Load the list of the processed run ids.
@@ -47,6 +49,7 @@ def load_processed_run_ids(conf):
     """
 
     return common.load_processed_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/sync.done')
+
 
 def add_run_id_to_processed_run_ids(run_id, conf):
     """Add a processed run id to the list of the run ids.
@@ -104,7 +107,9 @@ def partial_sync(run_id, last_sync, conf):
 
     # Check if hiseq_data_path exists
     if hiseq_data_path == False:
-        error('HiSeq run data not found', 'HiSeq data for run ' + run_id + 'not found in HiSeq directories (' + conf[HISEQ_DATA_PATH_KEY] + ')', conf)
+        error('HiSeq run data not found',
+              'HiSeq data for run ' + run_id + 'not found in HiSeq directories (' + conf[HISEQ_DATA_PATH_KEY] + ')',
+              conf)
         return False
 
     # Check if hiseq_data_path exists
@@ -119,7 +124,8 @@ def partial_sync(run_id, last_sync, conf):
 
     # Check if final output path already exists
     if os.path.exists(final_output_path):
-        error("Basecalling directory for run " + run_id + " already exists", "Basecalling directory for run " + run_id + " already exists: " + final_output_path, conf)
+        error("Basecalling directory for run " + run_id + " already exists",
+              "Basecalling directory for run " + run_id + " already exists: " + final_output_path, conf)
         return False
 
     input_path = hiseq_data_path + '/' + run_id
@@ -141,15 +147,17 @@ def partial_sync(run_id, last_sync, conf):
 
     # Check if free space is available on
     if output_path_df < space_needed:
-        error("Not enough disk space to perform synchronization for run " + run_id, "Not enough disk space to perform synchronization for run " + run_id +
-              '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(du_factor) + ') on ' + bcl_data_path + '.', conf)
+        error("Not enough disk space to perform synchronization for run " + run_id,
+              "Not enough disk space to perform synchronization for run " + run_id +
+              '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024) + ' is needed (factor x' + str(
+                  du_factor) + ') on ' + bcl_data_path + '.', conf)
         return False
 
-    # exclude CIF files ?
-#     if common.is_conf_value_equals_true(SYNC_EXCLUDE_CIF_KEY, conf):
-#         exclude_files = ['*.cif', '*_pos.txt', '*.errorMap', '*.FWHMMap']
-#     else:
-#         exclude_files = []
+        # exclude CIF files ?
+    #     if common.is_conf_value_equals_true(SYNC_EXCLUDE_CIF_KEY, conf):
+    #         exclude_files = ['*.cif', '*_pos.txt', '*.errorMap', '*.FWHMMap']
+    #     else:
+    #         exclude_files = []
 
     # Extract exclude file from sequencer type and configuration
     exclude_files = get_exclude_files_list(run_id, conf)
@@ -169,7 +177,8 @@ def partial_sync(run_id, last_sync, conf):
         cmd += ' > ' + rsync_manifest_path
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
-            error("error while executing rsync for run " + run_id, 'Error while executing find.\nCommand line:\n' + cmd, conf)
+            error("error while executing rsync for run " + run_id, 'Error while executing find.\nCommand line:\n' + cmd,
+                  conf)
             return False
         rsync_params = '--files-from=' + rsync_manifest_path
 
@@ -177,7 +186,8 @@ def partial_sync(run_id, last_sync, conf):
     cmd = 'rsync  -a --no-owner --no-group ' + rsync_params + ' ' + input_path + '/ ' + output_path
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
-        error("error while executing rsync for run " + run_id, 'Error while executing rsync.\nCommand line:\n' + cmd, conf)
+        error("error while executing rsync for run " + run_id, 'Error while executing rsync.\nCommand line:\n' + cmd,
+              conf)
         return False
 
     if not last_sync:
@@ -208,7 +218,8 @@ def sync(run_id, conf):
 
     # Check if enough space to store reports
     if common.df(reports_data_base_path) < 10 * 1024 * 1024 * 1024:
-        error("Not enough disk space to store aozan reports for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
+        error("Not enough disk space to store aozan reports for run " + run_id,
+              "Not enough disk space to store aozan reports for run " + run_id +
               '.\nNeed more than 10 Gb on ' + reports_data_base_path + '.', conf)
         return False
 
@@ -232,9 +243,9 @@ def sync(run_id, conf):
     duration = time.time() - start_time
 
     msg = 'End of synchronization for run ' + run_id + '.\n' + \
-        'Job finished at ' + common.time_to_human_readable(time.time()) + \
-        ' with no error in ' + common.duration_to_human_readable(duration) + '.\n\n' + \
-        'Run output files (without .cif files) can be found in the following directory:\n  ' + output_path
+          'Job finished at ' + common.time_to_human_readable(time.time()) + \
+          ' with no error in ' + common.duration_to_human_readable(duration) + '.\n\n' + \
+          'Run output files (without .cif files) can be found in the following directory:\n  ' + output_path
 
     # Add path to report if reports.url exists
     if common.is_conf_key_exists(REPORTS_URL_KEY, conf):

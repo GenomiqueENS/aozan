@@ -37,6 +37,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
 
     common.add_run_id_to_processed_run_ids(run_id, conf[AOZAN_VAR_PATH_KEY] + '/hiseq.done', conf)
 
+
 def discovery_run(conf):
     """Discover new ended runs
 
@@ -54,7 +55,8 @@ def discovery_run(conf):
                 return []
 
             aozan.welcome(conf)
-            common.log('INFO', 'Discover end run ' + str(run_id) + ' on ' + common.get_instrument_name(run_id, conf), conf)
+            common.log('INFO', 'Discover end run ' + str(run_id) + ' on ' + common.get_instrument_name(run_id, conf),
+                       conf)
 
             if hiseq_run.create_run_summary_reports(run_id, conf):
                 hiseq_run.send_mail_if_recent_run(run_id, 12 * 3600, conf)
@@ -85,7 +87,8 @@ def check_end_run(run_id, conf):
     if reads_number == -1:
         return False
 
-    prefix, suffix = ('Basecalling_Netcopy_complete_Read', '.txt') if (common.is_sequencer_hiseq(run_id, conf)) else ('RTARead', 'Complete.txt')
+    prefix, suffix = ('Basecalling_Netcopy_complete_Read', '.txt') if (common.is_sequencer_hiseq(run_id, conf)) else (
+    'RTARead', 'Complete.txt')
 
     # File generate only by HiSeq sequencer
     for i in range(reads_number):
@@ -98,6 +101,7 @@ def check_end_run(run_id, conf):
         return False
 
     return True
+
 
 def check_end_run_since(run_id, secs, conf):
     """Check the end of a run data transfert since a number of seconds.
@@ -116,7 +120,7 @@ def check_end_run_since(run_id, secs, conf):
     last = 0
 
     for i in range(reads_number):
-        file_to_test = hiseq_data_path + '/' + run_id  + '/' + build_read_complete(run_id, i, conf)
+        file_to_test = hiseq_data_path + '/' + run_id + '/' + build_read_complete(run_id, i, conf)
         if not os.path.exists(file_to_test):
             print "DEBUG: check file on end run is not found " + str(file_to_test)
             return -2
@@ -130,11 +134,10 @@ def check_end_run_since(run_id, secs, conf):
 
     return 0
 
-def build_read_complete(run_id, i, conf):
 
+def build_read_complete(run_id, i, conf):
     if common.is_sequencer_hiseq(run_id, conf):
-        return  'Basecalling_Netcopy_complete_Read' + str(i + 1) + '.txt'
+        return 'Basecalling_Netcopy_complete_Read' + str(i + 1) + '.txt'
 
     else:
-        return  'RTARead'+ str(i + 1) + 'Complete.txt'
-
+        return 'RTARead' + str(i + 1) + 'Complete.txt'

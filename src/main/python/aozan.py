@@ -33,6 +33,7 @@ from fr.ens.biologie.genomique.aozan.Settings import BCL_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import FASTQ_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
 
+
 def create_lock_file(lock_file_path):
     """Create the lock file.
 
@@ -43,6 +44,7 @@ def create_lock_file(lock_file_path):
     f = open(lock_file_path, 'w')
     f.write(str(Common.getCurrentPid()))
     f.close()
+
 
 def lock_file_exists(lock_file_path):
     """Check if the lock file exists for the execute pid
@@ -60,6 +62,7 @@ def lock_file_exists(lock_file_path):
     # PID from a dead processus, lock to delete
     delete_lock_file(lock_file_path)
     return False
+
 
 def delete_lock_file(lock_file_path):
     """Delete the lock file.
@@ -98,6 +101,7 @@ def welcome(conf):
 
         # Add list step selected
         common.extract_steps_to_launch(True, conf)
+
 
 something_to_do = False
 is_error_message = True
@@ -158,6 +162,7 @@ def lock_sync_step(conf, run_id):
 
     return lock_step(conf[BCL_DATA_PATH_KEY] + '/' + run_id + '.lock', 'sync', conf)
 
+
 def lock_demux_step(conf, run_id):
     """Lock the demux step step.
 
@@ -167,6 +172,7 @@ def lock_demux_step(conf, run_id):
     """
 
     return lock_step(conf[FASTQ_DATA_PATH_KEY] + '/' + run_id + '.lock', 'demux', conf)
+
 
 def lock_qc_step(conf, run_id):
     """Lock the qc step step.
@@ -178,6 +184,7 @@ def lock_qc_step(conf, run_id):
 
     return lock_step(conf[REPORTS_DATA_PATH_KEY] + '/qc_' + run_id + '.lock', 'qc', conf)
 
+
 def lock_partial_sync_step(conf, run_id):
     """Lock the partial sync step.
 
@@ -187,6 +194,7 @@ def lock_partial_sync_step(conf, run_id):
     """
 
     return lock_sync_step(conf, run_id)
+
 
 def unlock_sync_step(conf, run_id):
     """Unlock the sync step.
@@ -198,6 +206,7 @@ def unlock_sync_step(conf, run_id):
 
     return unlock_step(conf[BCL_DATA_PATH_KEY] + '/' + run_id + '.lock')
 
+
 def unlock_demux_step(conf, run_id):
     """Unlock the demux step.
 
@@ -208,6 +217,7 @@ def unlock_demux_step(conf, run_id):
 
     return unlock_step(conf[FASTQ_DATA_PATH_KEY] + '/' + run_id + '.lock')
 
+
 def unlock_qc_step(conf, run_id):
     """Unlock the qc step.
 
@@ -217,6 +227,7 @@ def unlock_qc_step(conf, run_id):
     """
 
     return unlock_step(conf[REPORTS_DATA_PATH_KEY] + '/qc_' + run_id + '.lock')
+
 
 def unlock_partial_sync_step(conf, run_id):
     """Unlock the partial sync step.
@@ -256,7 +267,7 @@ def launch_steps(conf):
         try:
             for run_id in (hiseq_run_ids_done - sync_run_ids_done - hiseq_run_ids_do_not_process):
 
-                #print 'DEBUG sync launch on '+ str(run_id)
+                # print 'DEBUG sync launch on '+ str(run_id)
 
                 if lock_sync_step(conf, run_id):
                     welcome(conf)
@@ -276,7 +287,8 @@ def launch_steps(conf):
             traceback_msg = traceback.format_exc(sys.exc_info()[2])
 
             sync_run.error("Fail synchronization for run " + run_id + ", catch exception " + exception_msg,
-                           "Fail synchronization for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg, conf)
+                           "Fail synchronization for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg,
+                           conf)
 
     #
     # Demultiplexing
@@ -286,14 +298,14 @@ def launch_steps(conf):
         sync_run_ids_done = hiseq_run_ids_done
 
     demux_run_ids_done = demux_run.load_processed_run_ids(conf)
-    #print 'DEBUG launchStep demux done '+ str(demux_run_ids_done)
-    #print 'DEBUG runs to demux '+ str(sync_run_ids_done - demux_run_ids_done)
+    # print 'DEBUG launchStep demux done '+ str(demux_run_ids_done)
+    # print 'DEBUG runs to demux '+ str(sync_run_ids_done - demux_run_ids_done)
 
     if common.is_conf_value_equals_true(DEMUX_STEP_KEY, conf):
         try:
             for run_id in (sync_run_ids_done - demux_run_ids_done):
 
-                #print 'DEBUG demux launch on ' + str(run_id)
+                # print 'DEBUG demux launch on ' + str(run_id)
 
                 if lock_demux_step(conf, run_id):
                     welcome(conf)
@@ -313,7 +325,8 @@ def launch_steps(conf):
             traceback_msg = traceback.format_exc(sys.exc_info()[2])
 
             demux_run.error("Fail demultiplexing for run " + run_id + ", catch exception " + exception_msg,
-                            "Fail demultiplexing for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg, conf)
+                            "Fail demultiplexing for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg,
+                            conf)
 
     #
     # Quality control
@@ -325,8 +338,8 @@ def launch_steps(conf):
 
         try:
             for run_id in (demux_run_ids_done - qc_run_ids_done):
-                #print 'DEBUG: check type on run id ', type(run_id), '|'+run_id+'|', len(run_id)
-                #print 'DEBUG qc launch on ' + str(run_id)
+                # print 'DEBUG: check type on run id ', type(run_id), '|'+run_id+'|', len(run_id)
+                # print 'DEBUG qc launch on ' + str(run_id)
                 if lock_qc_step(conf, run_id):
                     welcome(conf)
                     common.log('INFO', 'Quality control ' + run_id, conf)
@@ -344,7 +357,8 @@ def launch_steps(conf):
             exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
             traceback_msg = traceback.format_exc(sys.exc_info()[2])
             qc_run.error("Fail quality control for run " + run_id + ", catch exception " + exception_msg,
-                           "Fail quality control for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg, conf)
+                         "Fail quality control for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg,
+                         conf)
 
     #
     # Partial synchronization
@@ -367,6 +381,7 @@ def launch_steps(conf):
     # Everything is OK
     return True
 
+
 def aozan_main():
     """Aozan main method.
 
@@ -377,10 +392,12 @@ def aozan_main():
     # Define command line parser
     parser = OptionParser(usage='usage: ' + Globals.APP_NAME_LOWER_CASE + '.sh [options] conf_file')
     parser.add_option('-q', '--quiet', action='store_true', dest='quiet',
-                default=False, help='quiet')
+                      default=False, help='quiet')
     parser.add_option('-v', '--version', action='store_true', dest='version', help='Aozan version')
-    parser.add_option('-e', '--exit-code', action='store_true', dest='exit_code', help='Returns non zero exit code if a step fails')
-    parser.add_option('-c', '--conf', action='store_true', dest='conf', help='Default Aozan configuration Aozan, load before configuration file.')
+    parser.add_option('-e', '--exit-code', action='store_true', dest='exit_code',
+                      help='Returns non zero exit code if a step fails')
+    parser.add_option('-c', '--conf', action='store_true', dest='conf',
+                      help='Default Aozan configuration Aozan, load before configuration file.')
 
     # Parse command line arguments
     (options, args) = parser.parse_args()
@@ -424,9 +441,10 @@ def aozan_main():
 
     # Check main path file in configuration
     if not common.check_configuration(conf, args[0]):
-        common.log('SEVERE', 'Aozan can not be executed. Configuration is invalid or missing, some useful directories may be inaccessible. ', conf)
+        common.log('SEVERE',
+                   'Aozan can not be executed. Configuration is invalid or missing, some useful directories may be inaccessible. ',
+                   conf)
         sys.exit(1)
-
 
     # Check critical free space available
     hiseq_run.send_mail_if_critical_free_space_available(conf)
@@ -458,34 +476,34 @@ def aozan_main():
                 sys.exit(1)
 
         except:
-                # Get exception info
-                exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
-                traceback_msg = traceback.format_exc(sys.exc_info()[2]).replace('\n', ' ')
+            # Get exception info
+            exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
+            traceback_msg = traceback.format_exc(sys.exc_info()[2]).replace('\n', ' ')
 
-                # Log the exception
-                common.log('SEVERE', 'Exception: ' + exception_msg, conf)
-                common.log('WARNING', traceback_msg, conf)
+            # Log the exception
+            common.log('SEVERE', 'Exception: ' + exception_msg, conf)
+            common.log('WARNING', traceback_msg, conf)
 
-                # Send a mail with the exception
-                common.send_msg("[Aozan] Exception: " + exception_msg, traceback_msg, is_not_error_message, conf)
+            # Send a mail with the exception
+            common.send_msg("[Aozan] Exception: " + exception_msg, traceback_msg, is_not_error_message, conf)
 
-                common.log('INFO', 'End of Aozan', conf)
+            common.log('INFO', 'End of Aozan', conf)
 
-                # Remove lock file
-                delete_lock_file(lock_file_path)
+            # Remove lock file
+            delete_lock_file(lock_file_path)
 
-                # Cancel logger, in case not be cancel properly
-                Common.cancelLogger()
-                sys.exit(1)
+            # Cancel logger, in case not be cancel properly
+            Common.cancelLogger()
+            sys.exit(1)
     else:
         if not options.quiet:
             print "A lock file exists."
         if not os.path.exists('/proc/%d' % (load_pid_in_lock_file(lock_file_path))):
             common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf[LOCK_FILE_KEY] +
-                         ". Please investigate last error and then remove the lock file.", is_error_message, conf[AOZAN_VAR_PATH_KEY] + '/aozan.lasterr', conf)
+                         ". Please investigate last error and then remove the lock file.", is_error_message,
+                         conf[AOZAN_VAR_PATH_KEY] + '/aozan.lasterr', conf)
 
 
 # Launch Aozan main
 if __name__ == "__main__":
     aozan_main()
-

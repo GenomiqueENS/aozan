@@ -31,6 +31,7 @@ def load_processed_run_ids(conf):
 
     return common.load_processed_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/qc.done')
 
+
 def add_run_id_to_processed_run_ids(run_id, conf):
     """Add a processed run id to the list of the run ids.
 
@@ -79,12 +80,13 @@ def qc(run_id, conf):
 
     # Check if input run data data exists
     if input_run_data_path == None:
-        error("Basecalling data directory does not exists", "Basecalling data directory does not exists." , conf)
+        error("Basecalling data directory does not exists", "Basecalling data directory does not exists.", conf)
         return False
 
     # Check if input root fastq root data exists
     if not common.is_dir_exists(FASTQ_DATA_PATH_KEY, conf):
-        error("Fastq data directory does not exists", "Fastq data directory does not exists: " + conf[FASTQ_DATA_PATH_KEY], conf)
+        error("Fastq data directory does not exists",
+              "Fastq data directory does not exists: " + conf[FASTQ_DATA_PATH_KEY], conf)
         return False
 
     # Create if not exists report directory for the run
@@ -105,12 +107,14 @@ def qc(run_id, conf):
     # Check if the output directory already exists
     if os.path.exists(reports_data_path + '/qc_' + run_id + '.tar.bz2'):
         error("quality control report archive already exists for run " + run_id,
-              'The quality control report archive already exists for run ' + run_id + ': ' + reports_data_path + '/qc_' + run_id + '.tar.bz2', conf)
+              'The quality control report archive already exists for run ' + run_id + ': ' + reports_data_path + '/qc_' + run_id + '.tar.bz2',
+              conf)
         return False
 
     # Check if enough free space is available
     if common.df(conf[REPORTS_DATA_PATH_KEY]) < 1 * 1024 * 1024 * 1024:
-        error("Not enough disk space to store aozan quality control for run " + run_id, "Not enough disk space to store aozan reports for run " + run_id +
+        error("Not enough disk space to store aozan quality control for run " + run_id,
+              "Not enough disk space to store aozan reports for run " + run_id +
               '.\nNeed more than 10 Gb on ' + conf[REPORTS_DATA_PATH_KEY] + '.', conf)
         return False
 
@@ -171,20 +175,18 @@ def qc(run_id, conf):
         error("error while computing qc report HTML for run " + run_id + ".", common.exception_msg(exp, conf), conf)
         return False
 
-
     # Check if the report has been generated
     if not os.path.exists(html_report_file):
         error("error while computing qc report for run " + run_id + ".", "No html report generated", conf)
         return False
 
-
-
     # Archive the reports
     cmd = 'cd ' + reports_data_path + '  && ' + \
-       'tar cjf qc_' + run_id + '.tar.bz2 qc_' + run_id
+          'tar cjf qc_' + run_id + '.tar.bz2 qc_' + run_id
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
-        error("error while saving the qc archive file for " + run_id, 'Error while saving the  qc archive file.\nCommand line:\n' + cmd, conf)
+        error("error while saving the qc archive file for " + run_id,
+              'Error while saving the  qc archive file.\nCommand line:\n' + cmd, conf)
         return False
 
     # Set read only basecall stats archives files
@@ -199,11 +201,12 @@ def qc(run_id, conf):
     cmd = 'chmod -R ugo-w ' + qc_output_dir
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
-        error("error while setting read only the output qc directory for run " + run_id, 'Error while setting read only the output qc directory.\nCommand line:\n' + cmd, conf)
+        error("error while setting read only the output qc directory for run " + run_id,
+              'Error while setting read only the output qc directory.\nCommand line:\n' + cmd, conf)
         return False
 
     # Create index.hml file
-    sessions = [Settings.HISEQ_STEP_KEY , Settings.DEMUX_STEP_KEY , Settings.QC_STEP_KEY]
+    sessions = [Settings.HISEQ_STEP_KEY, Settings.DEMUX_STEP_KEY, Settings.QC_STEP_KEY]
     common.create_html_index_file(conf, run_id, sessions)
 
     df_in_bytes = common.df(qc_output_dir)
@@ -217,18 +220,17 @@ def qc(run_id, conf):
     duration = time.time() - start_time
 
     msg = 'End of quality control for run ' + run_id + '.' + \
-        '\nJob finished at ' + common.time_to_human_readable(time.time()) + \
-        ' with no error in ' + common.duration_to_human_readable(duration) + '. ' + \
-        'You will find attached to this message the quality control report.\n\n' + \
-        'QC files for this run ' + \
-        'can be found in the following directory:\n  ' + qc_output_dir
+          '\nJob finished at ' + common.time_to_human_readable(time.time()) + \
+          ' with no error in ' + common.duration_to_human_readable(duration) + '. ' + \
+          'You will find attached to this message the quality control report.\n\n' + \
+          'QC files for this run ' + \
+          'can be found in the following directory:\n  ' + qc_output_dir
 
     # Add path to report if reports.url exists
     if common.is_conf_key_exists(REPORTS_URL_KEY, conf):
         msg += '\n\nRun reports can be found at following location:\n  ' + conf[REPORTS_URL_KEY] + '/' + run_id
 
     msg += '\n\nFor this task %.2f MB has been used and %.2f GB still free.' % (du, df)
-
 
     common.send_msg_with_attachment('[Aozan] End of quality control for run ' + run_id, msg, html_report_file, conf)
     common.log('INFO', 'QC step: success in ' + common.duration_to_human_readable(duration), conf)

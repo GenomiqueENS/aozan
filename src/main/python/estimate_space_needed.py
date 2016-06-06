@@ -12,6 +12,7 @@ from xml.dom.minidom import parse
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
 
+
 def estimate(run_id, conf):
     """Estimate space needed in directories : hiseq, bcl and fastq
     if it has not enough space free send a warning mail
@@ -101,10 +102,12 @@ def error(run_id, type_file, space_needed, space_free, dir_path, conf):
     short_message = "not enough disk space to store " + type_file + " for run " + run_id
     message = type_file + " : not enough disk space to store files for run " + run_id + ' on ' + dir_path + '.\n'
     message = message + '%.2f GB' % (space_needed / 1024 / 1024 / 1024) + ' is needed by Aozan'
-    message = message + ' however only %.2f GB' % (space_free / 1024 / 1024 / 1024) + ' of free space is currently available on this storage.'
+    message = message + ' however only %.2f GB' % (
+    space_free / 1024 / 1024 / 1024) + ' of free space is currently available on this storage.'
 
     # send warning mail
-    common.error('[Aozan] Estimate space needed : ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/space_estimated.lasterr', conf)
+    common.error('[Aozan] Estimate space needed : ' + short_message, message,
+                 conf[AOZAN_VAR_PATH_KEY] + '/space_estimated.lasterr', conf)
 
 
 def log_message(run_id, type_file, space_needed, space_free, conf):
@@ -118,7 +121,8 @@ def log_message(run_id, type_file, space_needed, space_free, conf):
         conf: configuration dictionary
     """
 
-    message = type_file + " : enough disk space to store files for run " + run_id + '.\n%.2f Gb' % (space_needed / 1024 / 1024 / 1024)
+    message = type_file + " : enough disk space to store files for run " + run_id + '.\n%.2f Gb' % (
+    space_needed / 1024 / 1024 / 1024)
     message = message + ' is needed, it is free space %.2f Gb ' % (space_free / 1024 / 1024 / 1024)
     common.log('INFO', message, conf)
 
@@ -149,6 +153,7 @@ def ratio_bcl_compressed(run_param_path):
         ratio_bcl_file_compressed = 1.0
 
     return ratio_bcl_file_compressed
+
 
 def compressed_quality_data(run_param_path):
     """

@@ -62,6 +62,7 @@ from fr.ens.biologie.genomique.aozan.util import StringUtils
 HISEQ_NAME = 'hiseq'
 NEXTSEQ_NAME = 'nextseq'
 
+
 def df(path):
     """Get the free space on a partition.
 
@@ -74,6 +75,7 @@ def df(path):
         return long(File(path).getFreeSpace())
 
     return 0L
+
 
 def du(path):
     """Get the disk usage of a directory.
@@ -93,6 +95,7 @@ def du(path):
 
     return long(lines[0].split('\t')[0])
 
+
 def is_conf_value_equals_true(settings_key, conf):
     """Check a property exists in configuration object and value equals 'true'
 
@@ -102,6 +105,7 @@ def is_conf_value_equals_true(settings_key, conf):
         return boolean
     """
     return is_conf_value_defined(settings_key, 'true', conf)
+
 
 def is_conf_key_exists(settings_key, conf):
     """Check a property exists in configuration object
@@ -207,6 +211,7 @@ def list_existing_files(path, files_array):
 
     return s + ' '
 
+
 def get_input_run_data_path(run_id, conf):
     """Return the path to input run data according to hiseq and synchronization step parameters
 
@@ -223,20 +228,24 @@ def get_input_run_data_path(run_id, conf):
 
     # Case without synchronization
     # Set a bcl path
-    if is_conf_value_defined(SYNC_STEP_KEY, 'false', conf) and is_conf_value_defined(DEMUX_USE_HISEQ_OUTPUT_KEY, 'false', conf):
+    if is_conf_value_defined(SYNC_STEP_KEY, 'false', conf) and is_conf_value_defined(DEMUX_USE_HISEQ_OUTPUT_KEY,
+                                                                                     'false', conf):
         path = conf[BCL_DATA_PATH_KEY]
 
     # Case without synchronization and use the hiseq outut path
     # Check if must use the direct output of the HiSeq
-    if is_conf_value_defined(SYNC_STEP_KEY, 'false', conf) and is_conf_value_equals_true(DEMUX_USE_HISEQ_OUTPUT_KEY, conf):
+    if is_conf_value_defined(SYNC_STEP_KEY, 'false', conf) and is_conf_value_equals_true(DEMUX_USE_HISEQ_OUTPUT_KEY,
+                                                                                         conf):
         # Retrieve the path of run data directory on HiSeq
         path = hiseq_run.find_hiseq_run_path(run_id, conf)
 
     if path == None or path == False or not os.path.exists(path):
-        error("Hiseq data directory does not exists.", "Hiseq data data directory does not exists.", get_last_error_file(conf), conf)
+        error("Hiseq data directory does not exists.", "Hiseq data data directory does not exists.",
+              get_last_error_file(conf), conf)
         return None
 
     return path + '/' + run_id
+
 
 def send_msg(subject, message, is_error, conf):
     """Send a message to the user about the data extraction.
@@ -247,7 +256,6 @@ def send_msg(subject, message, is_error, conf):
         is_error: true if it is a error message
         conf: configuration object
     """
-
 
     send_mail = is_conf_value_equals_true(SEND_MAIL_KEY, conf)
     smtp_server = conf[SMTP_SERVER_KEY]
@@ -266,15 +274,15 @@ def send_msg(subject, message, is_error, conf):
     mail_cc = None
     mail_bcc = None
 
-    if mail_to != None :
+    if mail_to != None:
         if type(mail_to) == str or type(mail_to) == unicode:
             mail_to = [mail_to]
 
-    if mail_cc != None :
+    if mail_cc != None:
         if type(mail_cc) == str or type(mail_cc) == unicode:
             mail_cc = [mail_cc]
 
-    if mail_bcc != None :
+    if mail_bcc != None:
         if type(mail_bcc) == str or type(mail_bcc) == unicode:
             mail_bcc = [mail_bcc]
 
@@ -288,9 +296,9 @@ def send_msg(subject, message, is_error, conf):
         server = smtplib.SMTP(smtp_server)
         dests = []
         dests.extend(mail_to)
-        if  mail_cc != None :
+        if mail_cc != None:
             dests.extend(mail_cc)
-        if mail_bcc != None :
+        if mail_bcc != None:
             dests.extend(mail_bcc)
         server.sendmail(mail_from, dests, composed)
         server.quit()
@@ -298,6 +306,7 @@ def send_msg(subject, message, is_error, conf):
         print '-------------'
         print composed
         print '-------------'
+
 
 def send_msg_with_attachment(subject, message, attachment_file, conf):
     """Send a message to the user about the data extraction."""
@@ -309,15 +318,15 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
     mail_cc = None
     mail_bcc = None
 
-    if mail_to != None :
+    if mail_to != None:
         if type(mail_to) == str or type(mail_to) == unicode:
             mail_to = [mail_to]
 
-    if mail_cc != None :
+    if mail_cc != None:
         if type(mail_cc) == str or type(mail_cc) == unicode:
             mail_cc = [mail_cc]
 
-    if mail_bcc != None :
+    if mail_bcc != None:
         if type(mail_bcc) == str or type(mail_bcc) == unicode:
             mail_bcc = [mail_bcc]
 
@@ -357,7 +366,6 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
     part2.add_header('Content-Disposition', 'attachment', filename=os.path.basename(attachment_file))
     msg.attach(part2)
 
-
     # Now send or store the message
     composed = msg.as_string()
 
@@ -365,9 +373,9 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
         server = smtplib.SMTP(smtp_server)
         dests = []
         dests.extend(mail_to)
-        if  mail_cc != None :
+        if mail_cc != None:
             dests.extend(mail_cc)
-        if mail_bcc != None :
+        if mail_bcc != None:
             dests.extend(mail_bcc)
         server.sendmail(mail_from, dests, composed)
         server.quit()
@@ -375,6 +383,7 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
         print '-------------'
         print composed
         print '-------------'
+
 
 def create_msg(mail_from, mail_to, mail_cc, mail_bcc, subject, message, conf):
     """Create a message to send.
@@ -417,6 +426,7 @@ def create_msg(mail_from, mail_to, mail_cc, mail_bcc, subject, message, conf):
     msg.attach(part1)
 
     return msg
+
 
 def get_last_error_file(conf):
     """Return path to the file which saves last error throws in common operation.
@@ -501,6 +511,7 @@ def exception_msg(exp, conf):
     else:
         return str(exp.getMessage())
 
+
 def duration_to_human_readable(time):
     """Convert a number of seconds in human readable string.
 
@@ -516,6 +527,7 @@ def duration_to_human_readable(time):
 
     return "%02d:%02d:%02d" % (hours, minutes, seconds)
 
+
 def time_to_human_readable(time_since_epoch):
     """Convert a number of seconds since epoch in a human readable string.
 
@@ -524,6 +536,7 @@ def time_to_human_readable(time_since_epoch):
     """
 
     return time.strftime("%a %b %d %H:%M:%S %Z %Y", time.localtime(time_since_epoch))
+
 
 def load_processed_run_ids(done_file_path):
     """Load the list of the processed run ids.
@@ -560,13 +573,15 @@ def add_run_id_to_processed_run_ids(run_id, done_file_path, conf):
         conf: configuration dictionary
     """
 
-    log('INFO', 'Add ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(done_file_path), conf)
+    log('INFO',
+        'Add ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(done_file_path), conf)
 
     f = open(done_file_path, 'a')
 
     f.write(run_id + '\n')
 
     f.close()
+
 
 def get_report_run_data_path(run_id, conf):
     """ Build report run data path from run id
@@ -579,6 +594,7 @@ def get_report_run_data_path(run_id, conf):
     """
 
     return conf[REPORTS_DATA_PATH_KEY] + '/' + run_id
+
 
 def get_runparameters_path(run_id, conf):
     """ Get path to run parameters related to the run_id. With HiSeq name is
@@ -697,7 +713,6 @@ def is_section_to_add_in_report(sections, section_name, version, run_id, conf):
     if version == 'all':
         return True
 
-
     rta_major_version = get_rta_major_version(run_id, conf)
     if version.endswith(str(rta_major_version)):
         return True
@@ -709,6 +724,7 @@ def is_section_to_add_in_report(sections, section_name, version, run_id, conf):
 
     # Section added in report html
     return False
+
 
 def check_configuration(conf, configuration_file_path):
     """ Check if path useful exists
@@ -772,20 +788,21 @@ def check_configuration(conf, configuration_file_path):
         if not is_fastq_compression_format_valid(conf):
             msg += '\n\t* Invalid FASTQ compression format: ' + conf[CASAVA_COMPRESSION_KEY]
 
-
     # # For step QC
     if Settings.QC_STEP_KEY in steps_to_launch:
         # Check path to blast if step enable
-        if is_conf_value_equals_true(QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY, conf) and not is_file_exists(QC_CONF_FASTQSCREEN_BLAST_PATH_KEY, conf):
-            msg += '\n\t* Blast enabled but blast file path does not exists: ' + conf[QC_CONF_FASTQSCREEN_BLAST_PATH_KEY]
-
+        if is_conf_value_equals_true(QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY, conf) and not is_file_exists(
+                QC_CONF_FASTQSCREEN_BLAST_PATH_KEY, conf):
+            msg += '\n\t* Blast enabled but blast file path does not exists: ' + conf[
+                QC_CONF_FASTQSCREEN_BLAST_PATH_KEY]
 
     if len(msg) > 0:
         msg = 'Error(s) found in Aozan configuration file (' + os.path.abspath(configuration_file_path) + '):' + msg
-        error("[Aozan] check configuration: error(s) in configuration file.", msg , get_last_error_file(conf), conf)
+        error("[Aozan] check configuration: error(s) in configuration file.", msg, get_last_error_file(conf), conf)
         return False
 
     return True
+
 
 def extract_steps_to_launch(update_logger, conf):
     """ List steps to launch
@@ -812,6 +829,7 @@ def extract_steps_to_launch(update_logger, conf):
 
     # Return list steps setting
     return steps
+
 
 def is_fastq_compression_format_valid(conf):
     """ Check compression format fastq for bcl2fastq
@@ -846,6 +864,7 @@ def is_fastq_compression_format_valid(conf):
 
     return False
 
+
 def get_rta_major_version(run_id, conf):
     """ Identify the RTA version used for the run from runParameter.xml file, from the version of RTA software
     Arguments:
@@ -875,6 +894,7 @@ def get_rta_major_version(run_id, conf):
     # TODO throw exception
     raise Exception('Unknown RTA version (' + rtaversion + ') for run ' + run_id)
 
+
 def is_sequencer_hiseq(run_id, conf):
     """ Check if sequencer is a HiSeq from the version of RTA software
     Arguments:
@@ -887,6 +907,7 @@ def is_sequencer_hiseq(run_id, conf):
 
     return get_rta_major_version(run_id, conf) == 1
 
+
 def is_sequencer_nextseq(run_id, conf):
     """ Check if sequencer is a NextSeq from the version of RTA software
     Arguments:
@@ -898,6 +919,7 @@ def is_sequencer_nextseq(run_id, conf):
     """
 
     return get_rta_major_version(run_id, conf) == 2
+
 
 def extract_rtaversion(run_id, conf):
     """ Extract RTA version from runParameter.xml file
@@ -924,6 +946,7 @@ def extract_rtaversion(run_id, conf):
 
     raise Exception('Unable to locate run parameter file to get RTA version for run ' + run_id)
 
+
 def is_RTA_1_version(run_id, conf):
     """ Identify sequencer type from runParameter.xml file, from the version of RTA software
     Arguments:
@@ -941,6 +964,7 @@ def is_RTA_1_version(run_id, conf):
 
     return rta_version.startswith("1.")
 
+
 def is_RTA_2_version(run_id, conf):
     """ Identify sequencer type from runParameter.xml file, from the version of RTA software
     Arguments:
@@ -957,6 +981,7 @@ def is_RTA_2_version(run_id, conf):
         return None
 
     return rta_version.startswith("2.")
+
 
 def get_instrument_name(run_id, conf):
     """ Identify the sequencer model from runParameter.xml file
@@ -1020,6 +1045,7 @@ def extract_elements_by_tagname_from_xml(xmlpath, tagname):
     # Default return empty list
     return []
 
+
 def print_default_configuration():
     """ Print default parameter in configuration.
 
@@ -1031,6 +1057,7 @@ def print_default_configuration():
 
     # Convert in test
     return ('\n'.join(str(x + '=' + conf[x]) for x in conf))
+
 
 def load_conf(conf, conf_file_path):
     """Load configuration file"""
@@ -1056,14 +1083,16 @@ def load_conf(conf, conf_file_path):
 
     converting_table_key['qc.conf.genome.alias.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY
     converting_table_key['qc.conf.settings.genomes'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY
-    converting_table_key['qc.conf.settings.genomes.desc.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY
-    converting_table_key['qc.conf.settings.mappers.indexes.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY
+    converting_table_key[
+        'qc.conf.settings.genomes.desc.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY
+    converting_table_key[
+        'qc.conf.settings.mappers.indexes.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY
 
     f = open(conf_file_path, 'r')
 
     for l in f:
         s = l[:-1].strip()
-        if len(s) == 0 or l[0] == '#' :
+        if len(s) == 0 or l[0] == '#':
             continue
 
         # Search other configuration file
@@ -1075,7 +1104,7 @@ def load_conf(conf, conf_file_path):
                 continue
 
             # Check file exists
-            if not(os.path.exists(other_configuration_path) or os.path.isfile(other_configuration_path)):
+            if not (os.path.exists(other_configuration_path) or os.path.isfile(other_configuration_path)):
                 sys.exit(1)
 
             # Check different path
@@ -1111,9 +1140,7 @@ def load_conf(conf, conf_file_path):
     return conf
 
 
-
 def set_default_conf(conf):
-
     # Global
     conf[Settings.AOZAN_ENABLE_KEY] = 'True'
     conf[Settings.SEND_MAIL_KEY] = 'False'
@@ -1171,7 +1198,6 @@ def set_default_conf(conf):
     conf[Settings.BCL_SPACE_FACTOR_KEY] = str(416000000)
     # estimation factor for hiseq_space_per_lane_per_cycle (cmd du -b)
     conf[Settings.HISEQ_SPACE_FACTOR_KEY] = str(3180000000)
-
 
     # Mail configuration
     conf[Settings.MAIL_HEADER_KEY] = 'THIS IS AN AUTOMATED MESSAGE.\\n\\n'
