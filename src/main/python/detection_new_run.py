@@ -49,11 +49,16 @@ def get_available_run_ids(conf):
     """
 
     result = set()
+    hiseq_run_ids_do_not_process = hiseq_run.load_deny_run_ids(conf)
 
     for hiseq_data_path in hiseq_run.get_hiseq_data_paths(conf):
 
         files = os.listdir(hiseq_data_path)
         for f in files:
+
+            # Do not process denied runs
+            if f in hiseq_run_ids_do_not_process:
+                continue
 
             if not (os.path.isdir(hiseq_data_path + '/' + f) and hiseq_run.check_run_id(f, conf)):
                 # No valid entry
