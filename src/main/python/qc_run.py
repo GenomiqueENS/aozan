@@ -36,7 +36,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
     """Add a processed run id to the list of the run ids.
 
     Arguments:
-        run id: The run id
+        run_id: The run id
         conf: configuration dictionary
     """
 
@@ -59,7 +59,7 @@ def qc(run_id, conf):
     """Proceed to quality control of a run.
 
     Arguments:
-        run id: The run id
+        run_id: The run id
         conf: configuration dictionary
     """
 
@@ -67,7 +67,7 @@ def qc(run_id, conf):
 
     input_run_data_path = common.get_input_run_data_path(run_id, conf)
 
-    if input_run_data_path == None:
+    if input_run_data_path is None:
         return False
 
     fastq_input_dir = conf[FASTQ_DATA_PATH_KEY] + '/' + run_id
@@ -79,7 +79,7 @@ def qc(run_id, conf):
     common.log('INFO', 'QC step: start', conf)
 
     # Check if input run data data exists
-    if input_run_data_path == None:
+    if input_run_data_path is None:
         error("Basecalling data directory does not exists", "Basecalling data directory does not exists.", conf)
         return False
 
@@ -107,8 +107,8 @@ def qc(run_id, conf):
     # Check if the output directory already exists
     if os.path.exists(reports_data_path + '/qc_' + run_id + '.tar.bz2'):
         error("quality control report archive already exists for run " + run_id,
-              'The quality control report archive already exists for run ' + run_id + ': ' + reports_data_path + '/qc_' + run_id + '.tar.bz2',
-              conf)
+              'The quality control report archive already exists for run ' + run_id + ': ' +
+              reports_data_path + '/qc_' + run_id + '.tar.bz2', conf)
         return False
 
     # Check if enough free space is available
@@ -119,7 +119,7 @@ def qc(run_id, conf):
         return False
 
     # Create temporary temporary directory
-    qc_output_dir = qc_output_dir + tmp_extension
+    qc_output_dir += tmp_extension
     if not os.path.exists(qc_output_dir):
         os.mkdir(qc_output_dir)
 

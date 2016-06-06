@@ -164,8 +164,6 @@ def is_conf_value_defined(settings_key, expected_value, conf):
         return boolean
     """
 
-    value = None
-
     # Get value
     try:
         value = conf[settings_key]
@@ -173,7 +171,7 @@ def is_conf_value_defined(settings_key, expected_value, conf):
         return False
 
     # Test if value is defined
-    if value == None:
+    if value is None:
         return False
 
     # Trim value
@@ -184,7 +182,7 @@ def is_conf_value_defined(settings_key, expected_value, conf):
         return False
 
     # Test if value must be compared to expected_value
-    if (expected_value == None):
+    if expected_value is None:
         return True
 
     # Trim and lower expected value
@@ -199,14 +197,14 @@ def list_existing_files(path, files_array):
     Arguments:
         path: path to directory
         files_array: all files to check
-        conf: configuration dictionary
     """
+
     s = ''
     for filename in files_array:
-        if (os.path.exists(path + '/' + filename)):
+        if os.path.exists(path + '/' + filename):
             s = filename + ' ' + s
 
-    if (s == ''):
+    if s == '':
         return None
 
     return s + ' '
@@ -239,7 +237,7 @@ def get_input_run_data_path(run_id, conf):
         # Retrieve the path of run data directory on HiSeq
         path = hiseq_run.find_hiseq_run_path(run_id, conf)
 
-    if path == None or path == False or not os.path.exists(path):
+    if path is None or path is False or not os.path.exists(path):
         error("Hiseq data directory does not exists.", "Hiseq data data directory does not exists.",
               get_last_error_file(conf), conf)
         return None
@@ -265,7 +263,7 @@ def send_msg(subject, message, is_error, conf):
         mail_to = conf[MAIL_ERROR_TO_KEY]
 
         # Mail error not define
-        if mail_to == None or mail_to == '':
+        if mail_to is None or mail_to == '':
             mail_to = conf[MAIL_TO_KEY]
     else:
         mail_to = conf[MAIL_TO_KEY]
@@ -274,15 +272,15 @@ def send_msg(subject, message, is_error, conf):
     mail_cc = None
     mail_bcc = None
 
-    if mail_to != None:
+    if mail_to is not None:
         if type(mail_to) == str or type(mail_to) == unicode:
             mail_to = [mail_to]
 
-    if mail_cc != None:
+    if mail_cc is not None:
         if type(mail_cc) == str or type(mail_cc) == unicode:
             mail_cc = [mail_cc]
 
-    if mail_bcc != None:
+    if mail_bcc is not None:
         if type(mail_bcc) == str or type(mail_bcc) == unicode:
             mail_bcc = [mail_bcc]
 
@@ -296,9 +294,9 @@ def send_msg(subject, message, is_error, conf):
         server = smtplib.SMTP(smtp_server)
         dests = []
         dests.extend(mail_to)
-        if mail_cc != None:
+        if mail_cc is not None:
             dests.extend(mail_cc)
-        if mail_bcc != None:
+        if mail_bcc is not None:
             dests.extend(mail_bcc)
         server.sendmail(mail_from, dests, composed)
         server.quit()
@@ -318,15 +316,15 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
     mail_cc = None
     mail_bcc = None
 
-    if mail_to != None:
+    if mail_to is not None:
         if type(mail_to) == str or type(mail_to) == unicode:
             mail_to = [mail_to]
 
-    if mail_cc != None:
+    if mail_cc is not None:
         if type(mail_cc) == str or type(mail_cc) == unicode:
             mail_cc = [mail_cc]
 
-    if mail_bcc != None:
+    if mail_bcc is not None:
         if type(mail_bcc) == str or type(mail_bcc) == unicode:
             mail_bcc = [mail_bcc]
 
@@ -373,9 +371,9 @@ def send_msg_with_attachment(subject, message, attachment_file, conf):
         server = smtplib.SMTP(smtp_server)
         dests = []
         dests.extend(mail_to)
-        if mail_cc != None:
+        if mail_cc is not None:
             dests.extend(mail_cc)
-        if mail_bcc != None:
+        if mail_bcc is not None:
             dests.extend(mail_bcc)
         server.sendmail(mail_from, dests, composed)
         server.quit()
@@ -395,7 +393,6 @@ def create_msg(mail_from, mail_to, mail_cc, mail_bcc, subject, message, conf):
         mail_bcc : masked receivers
         subject: subject of message
         message: text mail
-        is_error: true if it is a error message
         conf: configuration object
     """
 
@@ -406,13 +403,13 @@ def create_msg(mail_from, mail_to, mail_cc, mail_bcc, subject, message, conf):
     msg = MIMEMultipart()
     msg['From'] = mail_from
 
-    if mail_to != None:
+    if mail_to is not None:
         msg['To'] = COMMASPACE.join(mail_to)
 
-    if mail_cc != None:
+    if mail_cc is not None:
         msg['Cc'] = COMMASPACE.join(mail_cc)
 
-    if mail_bcc != None:
+    if mail_bcc is not None:
         msg['Bcc'] = COMMASPACE.join(mail_bcc)
 
     msg['Subject'] = subject
@@ -451,13 +448,13 @@ def error(short_message, message, last_error_file_path, conf):
     """
 
     # No write in last error file, directory does not exists
-    if last_error_file_path == False:
+    if last_error_file_path is False:
         return
 
     new_error = ''
-    if short_message != None:
+    if short_message is not None:
         new_error = short_message
-    if message != None:
+    if message is not None:
         new_error += ' ' + message
 
     if len(new_error) == 0:
@@ -512,37 +509,37 @@ def exception_msg(exp, conf):
         return str(exp.getMessage())
 
 
-def duration_to_human_readable(time):
+def duration_to_human_readable(ms_since_epoch):
     """Convert a number of seconds in human readable string.
 
     Arguments:
-        time: the number of seconds
+        ms_since_epoch: the number of seconds since epoch
     """
 
-    hours = int(time / 3600)
-    hours_rest = time % 3600
+    hours = int(ms_since_epoch / 3600)
+    hours_rest = ms_since_epoch % 3600
     minutes = int(hours_rest / 60)
-    minutes_rest = time % 60
+    minutes_rest = ms_since_epoch % 60
     seconds = int(minutes_rest)
 
     return "%02d:%02d:%02d" % (hours, minutes, seconds)
 
 
-def time_to_human_readable(time_since_epoch):
+def time_to_human_readable(ms_since_epoch):
     """Convert a number of seconds since epoch in a human readable string.
 
     Arguments:
-        time: the number of seconds
+        ms_since_epoch: the number of seconds
     """
 
-    return time.strftime("%a %b %d %H:%M:%S %Z %Y", time.localtime(time_since_epoch))
+    return time.strftime("%a %b %d %H:%M:%S %Z %Y", time.localtime(ms_since_epoch))
 
 
 def load_processed_run_ids(done_file_path):
     """Load the list of the processed run ids.
 
     Arguments:
-        conf: configuration dictionary
+        done_file_path: done file path
     """
 
     result = set()
@@ -568,7 +565,7 @@ def add_run_id_to_processed_run_ids(run_id, done_file_path, conf):
     """Add a processed run id to the list of the run ids.
 
     Arguments:
-        run id: The run id
+        run_id: The run id
         done_file_path: path of the done file
         conf: configuration dictionary
     """
@@ -587,8 +584,8 @@ def get_report_run_data_path(run_id, conf):
     """ Build report run data path from run id
 
     Arguments:
-        conf: configuration dictionary
         run_id: The run id
+        conf: configuration dictionary
     Return:
         path to report_run_data
     """
@@ -596,7 +593,7 @@ def get_report_run_data_path(run_id, conf):
     return conf[REPORTS_DATA_PATH_KEY] + '/' + run_id
 
 
-def get_runparameters_path(run_id, conf):
+def get_run_parameters_path(run_id, conf):
     """ Get path to run parameters related to the run_id. With HiSeq name is
            runParameters.xml, with NextSeq name is RunParameters.xml.
     Arguments:
@@ -609,7 +606,7 @@ def get_runparameters_path(run_id, conf):
 
     run_dir_path = hiseq_run.find_hiseq_run_path(run_id, conf)
 
-    if run_dir_path == False:
+    if run_dir_path is False:
         run_dir_path = conf[BCL_DATA_PATH_KEY]
 
     # Find file at the root of directory sequencer data
@@ -628,7 +625,6 @@ def create_html_index_file(conf, run_id, sections):
 
     Arguments:
         conf: configuration dictionary
-        output_file_path: path of the index.html file to create
         run_id: The run id
         sections: The list of section to write, use step key from configuration
     """
@@ -637,6 +633,7 @@ def create_html_index_file(conf, run_id, sections):
 
     report_path = get_report_run_data_path(run_id, conf)
     output_file_path = report_path + "/index.html"
+
     # Retrieve BufferedReader on index html template
     template_path = conf[INDEX_HTML_TEMPLATE_KEY]
     if template_path != None and template_path != '' and os.path.exists(template_path):
@@ -651,7 +648,8 @@ def create_html_index_file(conf, run_id, sections):
         lines = FileUtils.readFileByLines(jar_is)
 
     # TODO check all path in session write in link tag and add final file if exist
-    # NOT necessary to test step sync if Settings.SYNC_STEP_KEY in sections and os.path.exists(report_path + '/report_' + run_id):
+    # NOT necessary to test step sync if Settings.SYNC_STEP_KEY in sections
+    # and os.path.exists(report_path + '/report_' + run_id):
     if os.path.exists(report_path + '/report_' + run_id):
         sections.append('optional2')
 
@@ -675,7 +673,7 @@ def create_html_index_file(conf, run_id, sections):
         elif line.startswith('<!--END_SECTION'):
             write_lines = True
 
-        elif write_lines == True:
+        elif write_lines is True:
             if '${RUN_ID}' in line:
                 result += line.replace('${RUN_ID}', run_id) + '\n'
             elif '${VERSION}' in line:
@@ -695,6 +693,7 @@ def is_section_to_add_in_report(sections, section_name, version, run_id, conf):
     Arguments:
         sections: The list of section to write, use step key from configuration
         section_name: section name checked
+        version: version of the section
         run_id: The run id
         conf: configuration dictionary
 
@@ -859,7 +858,7 @@ def is_fastq_compression_format_valid(conf):
     conf[CASAVA_COMPRESSION_KEY] = compression
 
     # Check if compression format is allowed
-    if (compression == 'none' or compression == 'gzip' or compression == 'bzip2'):
+    if compression == 'none' or compression == 'gzip' or compression == 'bzip2':
         return True
 
     return False
@@ -877,13 +876,13 @@ def get_rta_major_version(run_id, conf):
         Exception if the version of RTA is unknown/unsupported
     """
 
-    if run_id == None:
+    if run_id is None:
         return None
 
     # Extract RTA version
     rtaversion = extract_rtaversion(run_id, conf)
 
-    if rtaversion != None:
+    if rtaversion is not None:
 
         if rtaversion.startswith("1."):
             return 1
@@ -931,15 +930,15 @@ def extract_rtaversion(run_id, conf):
         RTA version of the run or None
     """
     # Find file at the root of directory sequencer data
-    runParameter_file = get_runparameters_path(run_id, conf)
+    run_parameter_file = get_run_parameters_path(run_id, conf)
 
-    if runParameter_file != None:
+    if run_parameter_file is not None:
         # Extract element
-        rtaversion_element = extract_elements_by_tagname_from_xml(runParameter_file, "RTAVersion")
+        rtaversion_element = extract_elements_by_tag_name_from_xml(run_parameter_file, "RTAVersion")
 
         # Extract version
         if len(rtaversion_element) == 0:
-            raise Exception('Unable to get RTA version in ' + runParameter_file + ' for run ' + run_id)
+            raise Exception('Unable to get RTA version in ' + run_parameter_file + ' for run ' + run_id)
 
         # Extract major element version
         return rtaversion_element[0].text.strip()
@@ -993,10 +992,10 @@ def get_instrument_name(run_id, conf):
         A string with the instrument name
     """
 
-    runParameter_file = get_runparameters_path(run_id, conf)
+    run_parameter_file = get_run_parameters_path(run_id, conf)
 
     tree = ElementTree()
-    tree.parse(runParameter_file)
+    tree.parse(run_parameter_file)
 
     application_tags = list(tree.iter('ApplicationName'))
     scanner_tags = list(tree.iter('ScannerID'))
@@ -1015,29 +1014,29 @@ def get_instrument_name(run_id, conf):
     return sequencer_model
 
 
-def extract_elements_by_tagname_from_xml(xmlpath, tagname):
+def extract_elements_by_tag_name_from_xml(xml_path, tag_name):
     """ Extract an element from xml file path by tag name
     Arguments:
-        xmlpath: path to the xml file
-        tagname: tag name on element extracted
+        xml_path: path to the xml file
+        tag_name: tag name on element extracted
 
     Returns:
         list elements founded
     """
 
-    # Check file exits and tagname not empty
-    if os.path.exists(xmlpath) and os.path.isfile(xmlpath) and len(tagname) > 0:
+    # Check file exits and tag name not empty
+    if os.path.exists(xml_path) and os.path.isfile(xml_path) and len(tag_name) > 0:
         # Read file
         tree = ElementTree()
-        tree.parse(xmlpath)
+        tree.parse(xml_path)
 
         # Find tag from name
-        res = tree.findall(tagname)
+        res = tree.findall(tag_name)
 
         # Check result found
         if len(res) == 0:
             # Search in children nodes
-            res = tree.findall('*/' + tagname)
+            res = tree.findall('*/' + tag_name)
 
         # Return result
         return res
@@ -1056,7 +1055,7 @@ def print_default_configuration():
     set_default_conf(conf)
 
     # Convert in test
-    return ('\n'.join(str(x + '=' + conf[x]) for x in conf))
+    return '\n'.join(str(x + '=' + conf[x]) for x in conf)
 
 
 def load_conf(conf, conf_file_path):

@@ -124,7 +124,7 @@ def send_report(run_id, conf):
 
     run_info = hiseq_run.get_run_info(run_id, conf)
 
-    if run_info == None:
+    if run_info is None:
         return False
 
     # TODO ?? add check sample-sheet if demux step enable
@@ -143,7 +143,7 @@ def send_report(run_id, conf):
             reads_indexed_count += 1
         else:
             reads_not_indexed_count += 1
-            if (cycles_per_reads_not_indexed == 0):
+            if cycles_per_reads_not_indexed == 0:
                 cycles_per_reads_not_indexed = read.getNumberCycles()
 
             # Check same cycles count for each reads not indexed
@@ -185,7 +185,8 @@ def send_report(run_id, conf):
         if not os.path.isfile(attachment_file):
             return False
 
-        message = 'You will find attached to this message the first base report on sequencer HiSeq for the run ' + run_id + '.\n\n' + description_run
+        message = 'You will find attached to this message the first base report on sequencer HiSeq for the run ' + \
+                  run_id + '.\n\n' + description_run
         common.send_msg_with_attachment('[Aozan] First base report for HiSeq run ' + type_run_estimated + '  ' + run_id,
                                         message, attachment_file, conf)
 

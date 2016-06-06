@@ -95,7 +95,7 @@ def welcome(conf):
         conf: configuration object
     """
     global something_to_do
-    if something_to_do == False:
+    if not something_to_do:
         common.log('INFO', 'Start ' + Globals.WELCOME_MSG, conf)
         something_to_do = True
 
@@ -119,7 +119,7 @@ def lock_step(lock_file_path, step_name, conf):
 
     # Check if parent directory of the lock file exists
     if not os.path.isdir(os.path.dirname(lock_file_path)):
-        common.log('SEVERE', 'Parent directory of lock file does not exists. The lock file for ' + step_name + \
+        common.log('SEVERE', 'Parent directory of lock file does not exists. The lock file for ' + step_name +
                    ' step has not been created: ' + lock_file_path, conf)
         return True
 
@@ -131,7 +131,7 @@ def lock_step(lock_file_path, step_name, conf):
     try:
         open(lock_file_path, 'w').close()
     except:
-        common.log('SEVERE', 'The lock file cannot not been created (' + sys.exc_info()[0] + ') for ' + step_name + \
+        common.log('SEVERE', 'The lock file cannot not been created (' + sys.exc_info()[0] + ') for ' + step_name +
                    ': ' + lock_file_path, conf)
         return True
 
@@ -287,8 +287,8 @@ def launch_steps(conf):
             traceback_msg = traceback.format_exc(sys.exc_info()[2])
 
             sync_run.error("Fail synchronization for run " + run_id + ", catch exception " + exception_msg,
-                           "Fail synchronization for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg,
-                           conf)
+                           "Fail synchronization for run " + run_id + ", catch exception " + exception_msg +
+                           "\n Stacktrace : \n" + traceback_msg, conf)
 
     #
     # Demultiplexing
@@ -384,9 +384,6 @@ def launch_steps(conf):
 
 def aozan_main():
     """Aozan main method.
-
-    Arguments:
-        conf: configuration object
     """
 
     # Define command line parser
@@ -442,7 +439,8 @@ def aozan_main():
     # Check main path file in configuration
     if not common.check_configuration(conf, args[0]):
         common.log('SEVERE',
-                   'Aozan can not be executed. Configuration is invalid or missing, some useful directories may be inaccessible. ',
+                   'Aozan can not be executed. Configuration is invalid or missing, some useful directories ' +
+                   'may be inaccessible. ',
                    conf)
         sys.exit(1)
 

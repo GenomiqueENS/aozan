@@ -34,7 +34,7 @@ def estimate(run_id, conf):
         cycle_count = cycle_count + read.getNumberCycles()
 
     # retrieve data from runParameters.xml
-    run_param_path = common.get_runparameters_path(run_id, conf)
+    run_param_path = common.get_run_parameters_path(run_id, conf)
 
     #
     # Estimate space needed +10%
@@ -64,7 +64,7 @@ def check_space_needed_and_free(run_id, type_file, run_factor, conf):
     Arguments:
         run_id: the run id
         type_file: type file concerned
-        factor: factor to estimate space needed by current run
+        run_factor: factor to estimate space needed by current run
         conf: configuration dictionary
     """
 
@@ -81,7 +81,7 @@ def check_space_needed_and_free(run_id, type_file, run_factor, conf):
         space_remaining_not_enough = (space_free - space_needed) < (long(File(data_path).getTotalSpace()) * 0.05)
 
         # check if free space is available
-        if (space_needed > space_free) or (space_remaining_not_enough):
+        if (space_needed > space_free) or space_remaining_not_enough:
             error(run_id, type_file + ' files', space_needed, space_free, data_path, conf)
         else:
             log_message(run_id, type_file + ' files', space_needed, space_free, conf)
@@ -103,7 +103,7 @@ def error(run_id, type_file, space_needed, space_free, dir_path, conf):
     message = type_file + " : not enough disk space to store files for run " + run_id + ' on ' + dir_path + '.\n'
     message = message + '%.2f GB' % (space_needed / 1024 / 1024 / 1024) + ' is needed by Aozan'
     message = message + ' however only %.2f GB' % (
-    space_free / 1024 / 1024 / 1024) + ' of free space is currently available on this storage.'
+        space_free / 1024 / 1024 / 1024) + ' of free space is currently available on this storage.'
 
     # send warning mail
     common.error('[Aozan] Estimate space needed : ' + short_message, message,
@@ -122,8 +122,8 @@ def log_message(run_id, type_file, space_needed, space_free, conf):
     """
 
     message = type_file + " : enough disk space to store files for run " + run_id + '.\n%.2f Gb' % (
-    space_needed / 1024 / 1024 / 1024)
-    message = message + ' is needed, it is free space %.2f Gb ' % (space_free / 1024 / 1024 / 1024)
+        space_needed / 1024 / 1024 / 1024)
+    message += ' is needed, it is free space %.2f Gb ' % (space_free / 1024 / 1024 / 1024)
     common.log('INFO', message, conf)
 
 
@@ -136,7 +136,7 @@ def ratio_bcl_compressed(run_param_path):
     # for bcl files
     # bcl file : compressed or not, info in runParameters.xml
     compressed_bcl_file = False
-    balise = "CompressBcls";
+    balise = "CompressBcls"
 
     doc = parse(run_param_path)
 

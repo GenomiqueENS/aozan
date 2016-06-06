@@ -28,7 +28,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
     """Add a processed run id to the list of the run ids.
 
     Arguments:
-        run id: The run id
+        run_id: The run id
         conf: configuration dictionary
     """
 
@@ -84,7 +84,7 @@ def send_report(run_id, conf):
             reads_indexed_count += 1
         else:
             reads_not_indexed_count += 1
-            if (cycles_per_reads_not_indexed == 0):
+            if cycles_per_reads_not_indexed == 0:
                 cycles_per_reads_not_indexed = read.getNumberCycles()
 
             # Check same cycles count for each reads not indexed

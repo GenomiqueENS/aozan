@@ -55,7 +55,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
     """Add a processed run id to the list of the run ids.
 
     Arguments:
-        run id: The run id
+        run_id: The run id
         conf: configuration dictionary
     """
 
@@ -98,6 +98,7 @@ def partial_sync(run_id, last_sync, conf):
 
         Arguments:
                 run_id: the run id
+                last_sync: last synchronization
                 conf: configuration dictionary
     """
 
@@ -106,7 +107,7 @@ def partial_sync(run_id, last_sync, conf):
     final_output_path = bcl_data_path + '/' + run_id
 
     # Check if hiseq_data_path exists
-    if hiseq_data_path == False:
+    if hiseq_data_path is False:
         error('HiSeq run data not found',
               'HiSeq data for run ' + run_id + 'not found in HiSeq directories (' + conf[HISEQ_DATA_PATH_KEY] + ')',
               conf)

@@ -31,7 +31,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
     """Add a processed run id to the list of the run ids.
 
     Arguments:
-        run id: The run id
+        run_id: The run id
         conf: configuration dictionary
     """
 
@@ -50,7 +50,7 @@ def discovery_run(conf):
     if common.is_conf_value_equals_true(HISEQ_STEP_KEY, conf):
         for run_id in (hiseq_run.get_available_run_ids(conf) - run_ids_done):
 
-            if run_id == None or len(run_id) == 0:
+            if run_id is None or len(run_id) == 0:
                 # No run id found
                 return []
 
@@ -72,7 +72,7 @@ def check_end_run(run_id, conf):
     """Check the end of a run data transfert.
 
     Arguments:
-        runtId: the run id
+        run_id: the run id
         conf: configuration dictionary
     """
 
@@ -80,7 +80,7 @@ def check_end_run(run_id, conf):
     reads_number = hiseq_run.get_read_count(run_id, conf)
 
     # TODO
-    if hiseq_data_path == False:
+    if hiseq_data_path is False:
         return False
 
     # if reads_number equals -1, runParameters.xml is missing
@@ -88,7 +88,7 @@ def check_end_run(run_id, conf):
         return False
 
     prefix, suffix = ('Basecalling_Netcopy_complete_Read', '.txt') if (common.is_sequencer_hiseq(run_id, conf)) else (
-    'RTARead', 'Complete.txt')
+        'RTARead', 'Complete.txt')
 
     # File generate only by HiSeq sequencer
     for i in range(reads_number):
@@ -107,13 +107,13 @@ def check_end_run_since(run_id, secs, conf):
     """Check the end of a run data transfert since a number of seconds.
 
     Arguments:
-        runtId: the run id
+        run_id: the run id
         secs: maximal number of seconds
         conf: configuration dictionary
     """
 
     hiseq_data_path = hiseq_run.find_hiseq_run_path(run_id, conf)
-    if hiseq_data_path == False:
+    if hiseq_data_path is False:
         return -1
 
     reads_number = hiseq_run.get_read_count(run_id, conf)

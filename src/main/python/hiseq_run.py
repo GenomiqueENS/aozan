@@ -32,7 +32,7 @@ def get_runinfos_file(run_id, conf):
     """Get the RunInfos.xml path.
 
     Arguments:
-        runtId: the run id
+        run_id: the run id
         conf: configuration dictionary
     """
 
@@ -53,13 +53,13 @@ def get_run_info(run_id, conf):
     """Get the RunInfo object.
 
     Arguments:
-        runtId: the run id
+        run_id: the run id
         conf: configuration dictionary
     """
 
     file_src = get_runinfos_file(run_id, conf)
 
-    if file_src == None:
+    if file_src is None:
         return None
 
     return RunInfo.parse(file_src)
@@ -69,13 +69,13 @@ def get_read_count(run_id, conf):
     """Get the number of read of a run.
 
         Arguments:
-            runtId: the run id
+            run_id: the run id
             conf: configuration dictionary
     """
 
     run_info = get_run_info(run_id, conf)
 
-    if run_info == None:
+    if run_info is None:
         return -1
 
     return run_info.getReads().size()
@@ -85,13 +85,13 @@ def get_lane_count(run_id, conf):
     """Get the number of lanes of a run.
 
         Arguments:
-            runtId: the run id
+            run_id: the run id
             conf: configuration dictionary
     """
 
     run_info = get_run_info(run_id, conf)
 
-    if run_info == None:
+    if run_info is None:
         return -1
 
     return run_info.getFlowCellLaneCount()
@@ -101,7 +101,7 @@ def check_run_id(run_id, conf):
     """Check if the run id is valid.
 
     Arguments:
-        runId: the run id
+        run_id: the run id
         conf: configuration dictionary
     """
 
@@ -143,8 +143,9 @@ def get_available_run_ids(conf):
 
         files = os.listdir(hiseq_data_path)
         for f in files:
-            if os.path.isdir(hiseq_data_path + '/' + f) and check_run_id(f, conf) and detection_end_run.check_end_run(f,
-                                                                                                                      conf):
+            if os.path.isdir(hiseq_data_path + '/' + f) and \
+                    check_run_id(f, conf) and \
+                    detection_end_run.check_end_run(f, conf):
                 result.add(f)
 
     return result
@@ -165,7 +166,7 @@ def get_working_run_ids(conf):
         for f in files:
             if os.path.isdir(hiseq_data_path + '/' + f) and check_run_id(f,
                                                                          conf) and not detection_end_run.check_end_run(
-                    f, conf):
+                f, conf):
                 result.add(f)
 
     return result
@@ -215,15 +216,15 @@ def send_mail_if_critical_free_space_available(conf):
             free_space_threshold = long(conf[HISEQ_CRITICAL_MIN_SPACE_KEY])
             if df < free_space_threshold:
                 common.send_msg('[Aozan] Critical: Not enough disk space on Hiseq storage for current run',
-                                'There is only %.2f' % (
-                                df / (1024 * 1024 * 1024)) + ' Gb left for Hiseq run storage in ' + path + '. '
-                                                                                                           ' The current warning threshold is set to %.2f' % (
-                                free_space_threshold / (1024 * 1024 * 1024)) + ' Gb.', False, conf)
+                                'There is only %.2f' % (df / (1024 * 1024 * 1024)) +
+                                ' Gb left for Hiseq run storage in ' + path + '. '
+                                                                              ' The current warning threshold is set to %.2f' % (
+                                    free_space_threshold / (1024 * 1024 * 1024)) + ' Gb.', False, conf)
 
 
 def send_mail_if_recent_run(run_id, secs, conf):
     run_path = find_hiseq_run_path(run_id, conf)
-    if run_path == False:
+    if run_path is False:
         return
 
     last = detection_end_run.check_end_run_since(run_id, secs, conf)
@@ -251,7 +252,7 @@ def find_hiseq_run_path(run_id, conf):
 
         path_to_test = path.strip() + '/' + run_id
 
-        if (os.path.exists(path_to_test)):
+        if os.path.exists(path_to_test):
             return path.strip()
 
     return False
@@ -279,7 +280,7 @@ def create_run_summary_reports(run_id, conf):
         Save data in two distinct directory on hiseq and on report, and tar.bz2 version
 
     Arguments:
-        runId: the run id
+        run_id: the run id
         conf: configuration dictionary
     """
 
@@ -336,17 +337,17 @@ def create_run_summary_reports(run_id, conf):
     files = ['InterOp', 'RunInfo.xml', 'runParameters.xml', 'RunParameters.xml']
     files_to_copy = common.list_existing_files(source_path, files)
 
-    if (files_to_copy == None):
+    if files_to_copy is None:
         common.log("WARNING",
-                   "Archive " + hiseq_log_archive_file + " not create: none file exists " + files + ' in ' + source_path,
-                   conf)
+                   "Archive " + hiseq_log_archive_file + " not create: none file exists " + str(files) +
+                   ' in ' + source_path, conf)
     else:
         cmd = 'cd ' + source_path + ' && ' + \
               'cp -rp ' + files_to_copy + tmp_path + ' && ' + \
               'cd ' + tmp_base_path + ' && ' + \
               'mv ' + run_id + ' ' + hiseq_log_prefix + run_id + ' && ' + \
-              'tar cjf ' + reports_data_path + '/' + hiseq_log_archive_file + ' ' + hiseq_log_prefix + run_id + ' && ' + \
-              'rm -rf ' + tmp_path
+              'tar cjf ' + reports_data_path + '/' + hiseq_log_archive_file + ' ' + hiseq_log_prefix + run_id + \
+              ' && ' + 'rm -rf ' + tmp_path
         # + ' && rm -rf ' + hiseq_log_prefix + run_id
 
         common.log("INFO", "exec: " + cmd, conf)
@@ -374,7 +375,7 @@ def create_run_summary_reports(run_id, conf):
         files = ['./Config', './Recipe', './RTALogs', './RTAConfiguration.xml', './RunCompletionStatus.xml']
 
     files_to_copy = common.list_existing_files(source_path, files)
-    if (files_to_copy == None):
+    if files_to_copy is None:
         common.log("WARNING", "Archive " + report_archive_file + " not create: none file exists " + str(
             files) + ' in ' + source_path, conf)
     else:
