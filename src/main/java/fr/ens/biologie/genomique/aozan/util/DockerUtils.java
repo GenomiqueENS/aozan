@@ -533,7 +533,7 @@ public class DockerUtils {
   // Constructor
   //
 
-  public DockerUtils(final String commandLine, final String softwareName)
+  public DockerUtils(final List<String> commandLine, final String softwareName)
       throws AozanException {
     this(commandLine, softwareName, DEFAULT_VERSION);
   }
@@ -545,13 +545,13 @@ public class DockerUtils {
    * @param softwareVersion the software version
    * @throws AozanException
    */
-  public DockerUtils(final String commandLine, final String softwareName,
+  public DockerUtils(final List<String> commandLine, final String softwareName,
       final String softwareVersion) throws AozanException {
 
     checkNotNull(commandLine, "commande line");
     checkNotNull(softwareName, "software image Docker");
 
-    this.commandLine = splitShellCommandLine(commandLine);
+    this.commandLine = commandLine;
 
     this.imageName = softwareName.trim();
     this.imageDockerVersion = softwareVersion.trim();

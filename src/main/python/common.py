@@ -668,7 +668,7 @@ def create_html_index_file(conf, run_id, sections):
             # Extraction version
             version = tokens[2]
 
-            write_lines = is_section_to_add_in_report(sections, section_name, version, run_id, conf)
+            write_lines = is_section_to_add_in_report(sections, section_name, run_id, conf)
 
         elif line.startswith('<!--END_SECTION'):
             write_lines = True
@@ -686,14 +686,13 @@ def create_html_index_file(conf, run_id, sections):
     f_out.close()
 
 
-def is_section_to_add_in_report(sections, section_name, version, run_id, conf):
+def is_section_to_add_in_report(sections, section_name, run_id, conf):
     """
     Check if the section is required in report
 
     Arguments:
         sections: The list of section to write, use step key from configuration
         section_name: section name checked
-        version: version of the section
         run_id: The run id
         conf: configuration dictionary
 
@@ -708,21 +707,8 @@ def is_section_to_add_in_report(sections, section_name, version, run_id, conf):
     if not (is_conf_value_equals_true(section_name, conf) or section_name.startswith('optional')):
         return False
 
-    # Check if version on the section
-    if version == 'all':
-        return True
-
-    rta_major_version = get_rta_major_version(run_id, conf)
-    if version.endswith(str(rta_major_version)):
-        return True
-
-    #  Check if version end with 1 or 2 for bcl2fastq1 bcl2fastq2
-    major, full = demux_run.get_bcl2fastq_version(run_id, conf)
-    if version.endswith(str(major)):
-        return True
-
     # Section added in report html
-    return False
+    return True
 
 
 def check_configuration(conf, configuration_file_path):
@@ -1174,9 +1160,6 @@ def set_default_conf(conf):
 
     # New options since Aozan version 2.0 and managment of NextSeq
     conf[Settings.DEMUX_USE_DOCKER_ENABLE_KEY] = 'false'
-    # Set at default value
-    conf[Settings.BCL2FASTQ_VERSION_FOR_HISEQ_KEY] = demux_run.BCL2FASTQ_VERSION_1
-    conf[Settings.BCL2FASTQ_VERSION_FOR_NEXTSEQ_KEY] = demux_run.BCL2FASTQ_VERSION_2
 
     # Data path
     conf[Settings.TMP_PATH_KEY] = '/tmp'
