@@ -123,7 +123,7 @@ def get_flowcell_id_in_demultiplex_xml(fastq_output_dir):
 
 
 def build_samplesheet_filename(run_id, conf):
-    """ Return the sample sheet filename on the run.
+    """ Return the samplesheet filename on the run.
 
     Arguments:
         run_id: The run id
@@ -136,18 +136,17 @@ def build_samplesheet_filename(run_id, conf):
     return conf[BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY] + '_' + instrument_sn + '_%04d' % run_number
 
 
-def check_samplesheet(run_id, input_run_data_path, samplesheet_filename, conf):
-    """ Check sample sheet and convert in csv format if useful.
+def load_samplesheet(run_id, input_run_data_path, samplesheet_filename, conf):
+    """ Load the samplesheet.
 
     Arguments:
         run id: The run id
         input_run_data_path: The input run data path
-        samplesheet_filename: sample sheet filename
-        bcl2fastq_major_version: bcl2fastq major version
+        samplesheet_filename: samplesheet filename
         conf: configuration dictionary
 
     Return:
-        true it's all ok otherwise false
+        a Samplesheet object
     """
 
     run_info_path = input_run_data_path + '/RunInfo.xml'
@@ -155,127 +154,141 @@ def check_samplesheet(run_id, input_run_data_path, samplesheet_filename, conf):
     if not os.path.isfile(run_info_path):
         error("no RunInfo.xml file found for run " + run_id,
               "No RunInfo.xml file found for run " + run_id + ': ' + run_info_path + '.\n', conf)
-        return False, []
+        return None
 
     run_info = RunInfo.parse(run_info_path)
     flow_cell_id = run_info.getFlowCell()
-    lane_count = run_info.getFlowCellLaneCount()
 
     input_samplesheet_xls_path = conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] + '/' + samplesheet_filename + '.xls'
     input_samplesheet_csv_path = conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] + '/' + samplesheet_filename + '.csv'
-    samplesheet_csv_path = conf[TMP_PATH_KEY] + '/' + samplesheet_filename + '.csv'
+    input_samplesheet_generated_path = conf[TMP_PATH_KEY] + '/' + samplesheet_filename + 'generated.csv'
 
     common.log("INFO", "Flowcell id: " + flow_cell_id, conf)
-    common.log("INFO", "Flowcell lane count: " + str(lane_count), conf)
+
     common.log("INFO", "Samplesheet format: " + str(conf[BCL2FASTQ_SAMPLESHEET_FORMAT_KEY]), conf)
 
-    if common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'xls', conf):
+    try:
 
-        # Convert samplesheet in XLS format to CSV format
-        common.log("INFO", "Samplesheet path: " + str(input_samplesheet_xls_path), conf)
+        if common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'xls', conf):
 
-        # Check if the xls samplesheet exists
-        if not os.path.exists(input_samplesheet_xls_path):
-            error("no bcl2fastq sample sheet found", "No bcl2fastq sample sheet found for " + run_id + " run.\n" +
-                  'You must provide a ' + samplesheet_filename + '.xls file in ' + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] +
-                  ' directory to demultiplex and create fastq files for this run.\n', conf)
-            return False, []
+            # Convert samplesheet in XLS format to CSV format
+            common.log("INFO", "Samplesheet path: " + str(input_samplesheet_xls_path), conf)
 
-        try:
+            # Check if the xls samplesheet exists
+            if not os.path.exists(input_samplesheet_xls_path):
+                error("no bcl2fastq samplesheet found for run " + run_id,
+                      "No bcl2fastq samplesheet found for " + run_id + " run.\n" +
+                      'You must provide a ' + samplesheet_filename + '.xls file in ' + conf[
+                          BCL2FASTQ_SAMPLESHEETS_PATH_KEY] +
+                      ' directory to demultiplex and create fastq files for this run.\n', conf)
+                return None
 
             # Load XLS samplesheet file
             samplesheet = SampleSheetXLSReader(input_samplesheet_xls_path).read()
 
-            # Replace index sequence shortcuts by sequences
-            SampleSheetUtils.replaceIndexShortcutsBySequences(samplesheet, load_index_sequences(conf))
+        elif common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'csv', conf):
 
-            # Set the lane field if does not set
-            SampleSheetUtils.duplicateSamplesIfLaneFieldNotSet(samplesheet, lane_count)
+            # Copy the CSV file
+            common.log("INFO", "samplesheet filename : " + str(input_samplesheet_csv_path), conf)
 
-            # Write CSV samplesheet file in BCL2FASTQ2 format
-            writer = SampleSheetCSVWriter(samplesheet_csv_path)
-            writer.setVersion(2)
-            writer.writer(samplesheet)
+            # Check if the csv samplesheet exists
+            if not os.path.exists(input_samplesheet_csv_path):
+                error("no bcl2fastq samplesheet found for run " + run_id,
+                      "No bcl2fastq samplesheet found for " + run_id + " run.\n" +
+                      'You must provide a ' + samplesheet_filename + '.csv file in ' + conf[
+                          BCL2FASTQ_SAMPLESHEETS_PATH_KEY] +
+                      ' directory to demultiplex and create fastq files for this run.\n', conf)
+                return None
 
-        except AozanException, exp:
-            print StringUtils.stackTraceToString(exp)
+            # Load CSV samplesheet file
+            samplesheet = SampleSheetCSVReader(input_samplesheet_csv_path).read()
 
-            error("error while converting " + samplesheet_filename + ".xls to CSV format", exp.getMessage(), conf)
-            return False, []
-        except Exception, exp:
-            print StringUtils.stackTraceToString(exp)
+        elif common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'command', conf):
 
-            error("error while converting " + samplesheet_filename + ".xls to CSV format", exp.getMessage(), conf)
-            return False, []
+            action_error_msg = 'Error while creating Bcl2fastq CSV samplesheet file'
+            if not common.is_conf_key_exists(BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY, conf):
+                error(action_error_msg + ' for run ' + run_id, action_error_msg + ' the command is empty.', conf)
+                return None
 
-    elif common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'csv', conf):
+            cmd = conf[
+                      BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY] + ' ' + run_id + ' ' + input_samplesheet_generated_path
+            common.log("INFO", "exec: " + cmd, conf)
+            if os.system(cmd) != 0:
+                error(action_error_msg + ' for run ' + run_id,
+                      action_error_msg + '.\nCommand line:\n' + cmd, conf)
 
-        # Copy the CSV file
-        common.log("INFO", "sample sheet filename : " + str(input_samplesheet_xls_path), conf)
+            if not os.path.exists(input_samplesheet_generated_path):
+                error(action_error_msg + ' for run ' + run_id,
+                      action_error_msg + ', the external command did not create Bcl2fastq CSV file:\n' + cmd, conf)
+                return None
 
-        # Check if the csv samplesheet exists
-        if not os.path.exists(input_samplesheet_csv_path):
-            error("no bcl2fastq sample sheet found", "No bcl2fastq sample sheet found for " + run_id + " run.\n" +
-                  'You must provide a ' + samplesheet_filename + '.csv file in ' + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] +
-                  ' directory to demultiplex and create fastq files for this run.\n', conf)
-            return False, []
+            # Load CSV samplesheet file
+            samplesheet = SampleSheetCSVReader(input_samplesheet_generated_path).read()
 
-        cmd = 'cp ' + input_samplesheet_csv_path + ' ' + samplesheet_csv_path
-        common.log("INFO", "exec: " + cmd, conf)
-        if os.system(cmd) != 0:
-            error("error while copying Bcl2fastq CSV sample sheet file to temporary directory for run " + run_id,
-                  'Error while copying Bcl2fastq CSV sample sheet file to temporary directory.\nCommand line:\n' + cmd,
+            # Remove generated samplesheet
+            os.unlink(input_samplesheet_generated_path)
+
+        else:
+            error('Error while creating Bcl2fastq CSV samplesheet file for run ' + run_id,
+                  'No method to get Bcl2fastq samplesheet file has been defined. Please, set the ' +
+                  '"bcl2fastq.samplesheet.format" property.\n',
                   conf)
-            return False, []
+            return None
 
-    elif common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'command', conf):
+    except AozanException, exp:
+        print StringUtils.stackTraceToString(exp)
 
-        action_error_msg = 'Error while creating Bcl2fastq CSV sample sheet file'
-        if not common.is_conf_key_exists(BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY, conf):
-            error(action_error_msg + ' for run ' + run_id, action_error_msg + ' the command is empty.', conf)
-            return False, []
+        error("error reading samplesheet: " + samplesheet_filename, exp.getMessage(), conf)
+        return None
+    except Exception, exp:
+        print StringUtils.stackTraceToString(exp)
 
-        cmd = conf[BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY] + ' ' + run_id + ' ' + samplesheet_csv_path
-        common.log("INFO", "exec: " + cmd, conf)
-        if os.system(cmd) != 0:
-            error(action_error_msg + ' for run ' + run_id,
-                  action_error_msg + '.\nCommand line:\n' + cmd, conf)
+        error("error reading samplesheet: " + samplesheet_filename, exp.getMessage(), conf)
+        return None
 
-        if not os.path.exists(samplesheet_csv_path):
-            error(action_error_msg + ' for run ' + run_id,
-                  action_error_msg + ', the external command did not create Bcl2fastq CSV file:\n' + cmd, conf)
-            return False, []
-    else:
-        error('Error while creating Bcl2fastq CSV sample sheet file for run ' + run_id,
-              'No method to get Bcl2fastq sample sheet file has been defined. Please, set the ' +
-              '"bcl2fastq.samplesheet.format" property.\n',
-              conf)
-        return False, []
+    return samplesheet
 
-    # Check if Bcl2fastq CSV samplesheet file has been created
-    if not os.path.exists(samplesheet_csv_path):
-        error("error while reading Bcl2fastq CSV sample sheet file for run " + run_id,
-              'Error while reading Bcl2fastq CSV sample sheet file, the sample sheet file does not exist: \n' +
-              samplesheet_csv_path, conf)
-        return False, []
 
-    samplesheet_warnings = {}
+def update_samplesheet(samplesheet, run_id, lane_count, conf):
+    common.log("INFO", "Flowcell lane count: " + str(lane_count), conf)
 
-    # Check Bcl2fastq CSV samplesheet file
     try:
-        # Load CSV samplesheet file
-        samplesheet = SampleSheetCSVReader(samplesheet_csv_path).read()
+
+        # Replace index sequence shortcuts by sequences
+        SampleSheetUtils.replaceIndexShortcutsBySequences(samplesheet, load_index_sequences(conf))
+
+        # Set the lane field if does not set
+        SampleSheetUtils.duplicateSamplesIfLaneFieldNotSet(samplesheet, lane_count)
+
+    except AozanException, exp:
+        print StringUtils.stackTraceToString(exp)
+
+        error("error while updating samplesheet for run " + run_id, exp.getMessage(), conf)
+        return False
+    except Exception, exp:
+        print StringUtils.stackTraceToString(exp)
+
+        error("error while updating samplesheet for run " + run_id, exp.getMessage(), conf)
+        return False
+
+    return True
+
+
+def check_samplesheet(samplesheet, run_id, flow_cell_id, conf):
+    samplesheet_warnings = []
+
+    try:
 
         # Check values of samplesheet file
         samplesheet_warnings = SampleSheetCheck.checkSampleSheet(samplesheet, flow_cell_id)
 
-    # TODO: remove lock
+        # TODO: remove lock
 
     except IOException, exp:
-        error("error while checking " + samplesheet_filename + ".csv file ", exp.getMessage(), conf)
+        error("error while checking samplesheet for run " + run_id, exp.getMessage(), conf)
         return False, samplesheet_warnings
     except AozanException, exp:
-        error("error while checking " + samplesheet_filename + ".csv file ", exp.getMessage(), conf)
+        error("error while checking samplesheet for run " + run_id, exp.getMessage(), conf)
         return False, samplesheet_warnings
 
     # Log Bcl2fastq samplesheet warning
@@ -288,10 +301,49 @@ def check_samplesheet(run_id, input_run_data_path, samplesheet_filename, conf):
             else:
                 msg += ' '
             msg += warn
-        common.log("WARNING", "bcl2fastq sample sheet warnings: " + msg, conf)
+        common.log("WARNING", "bcl2fastq samplesheet warnings: " + msg, conf)
 
-    # Sample sheet
-    return samplesheet_csv_path, samplesheet_warnings
+    # Return samplesheet
+    return True, samplesheet_warnings
+
+
+def get_bcl2fastq_mismatches(samplesheet, default_value):
+    list = samplesheet.getMetadata('Settings', 'MismatchCount')
+
+    if list is None or len(list) == 0:
+        return default_value
+
+    result = default_value
+
+    for value in list:
+        try:
+            result = value.strip().replace(' ', '')
+        except ValueError:
+            pass
+
+    return result
+
+
+def write_bcl2fastq_samplesheet(samplesheet, samplesheet_path, conf):
+    try:
+
+        # Write CSV samplesheet file in BCL2FASTQ2 format
+        writer = SampleSheetCSVWriter(samplesheet_path)
+        writer.setVersion(2)
+        writer.writer(samplesheet)
+
+    except AozanException, exp:
+        print StringUtils.stackTraceToString(exp)
+
+        error("error while writing Bcl2fastq samplesheet: " + samplesheet_path, exp.getMessage(), conf)
+        return False
+    except Exception, exp:
+        print StringUtils.stackTraceToString(exp)
+
+        error("error while writing Bcl2fastq samplesheet: " + samplesheet_path, exp.getMessage(), conf)
+        return False
+
+    return True
 
 
 def get_cpu_count(conf):
@@ -361,7 +413,7 @@ def demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesh
         run_id: The run id
         input_run_data_path: input run data path to demultiplexing
         fastq_output_dir: fastq directory to save result on demultiplexing
-        samplesheet_csv_path: sample sheet path in csv format, version used by bcl2fastq
+        samplesheet_csv_path: samplesheet path in csv format, version used by bcl2fastq
         conf: configuration dictionary
     """
 
@@ -415,7 +467,7 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
         run_id: The run id
         input_run_data_path: input run data path to demultiplexing
         fastq_output_dir: fastq directory to save result on demultiplexing
-        samplesheet_csv_path: sample sheet path in csv format, version used by bcl2fastq
+        samplesheet_csv_path: samplesheet path in csv format, version used by bcl2fastq
         conf: configuration dictionary
     """
 
@@ -485,7 +537,7 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
     return True
 
 
-def is_confirmed_fastq_existence(fastq_output_dir):
+def check_if_output_fastq_files_exists(fastq_output_dir):
     """ Archive demultplexing statistics results file.
 
     Arguments:
@@ -509,7 +561,7 @@ def archive_demux_stat(run_id, fastq_output_dir, reports_data_path, basecall_sta
         reports_data_path: directory to save archives
         basecall_stats_file: file to archive
         basecall_stats_prefix: prefix file to archive
-        samplesheet_csv_path: sample sheet in csv
+        samplesheet_csv_path: samplesheet in csv
         conf: configuration dictionary
     """
 
@@ -539,12 +591,12 @@ def archive_demux_stat(run_id, fastq_output_dir, reports_data_path, basecall_sta
 
 
 def archive_samplesheet(run_id, samplesheet_xls_path, samplesheet_csv_path, conf):
-    """ Archive sample sheet file in archive sample sheet directory.
+    """ Archive samplesheet file in archive samplesheet directory.
 
     Arguments:
         run_id: The run id
-        samplesheet_xls_path: sample sheet path in format xls if exists
-        samplesheet_csv_path: sample sheet path in format csv
+        samplesheet_xls_path: samplesheet path in format xls if exists
+        samplesheet_csv_path: samplesheet path in format csv
         conf: configuration dictionary
     """
 
@@ -563,8 +615,8 @@ def archive_samplesheet(run_id, samplesheet_xls_path, samplesheet_csv_path, conf
 
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
-        error("error while archiving the sample sheet file for " + run_id,
-              'Error while archiving the sample sheet file for.\nCommand line:\n' + cmd, conf)
+        error("error while archiving the samplesheet file for " + run_id,
+              'Error while archiving the samplesheet file for.\nCommand line:\n' + cmd, conf)
         return False
 
     # Remove temporary samplesheet files
@@ -590,6 +642,7 @@ def demux(run_id, conf):
     reports_data_path = common.get_report_run_data_path(run_id, conf)
 
     samplesheet_filename = build_samplesheet_filename(run_id, conf)
+    bcl2fastq_samplesheet_path = conf[TMP_PATH_KEY] + '/' + samplesheet_filename + '.csv'
 
     input_samplesheet_xls_path = conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] + '/' + samplesheet_filename + '.xls'
 
@@ -617,8 +670,8 @@ def demux(run_id, conf):
 
     # Check if bcl2fastq samplesheets path exists
     if not common.is_dir_exists(BCL2FASTQ_SAMPLESHEETS_PATH_KEY, conf):
-        error("bcl2fastq sample sheets directory does not exists",
-              "Bcl2fastq sample sheets does not exists: " + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY], conf)
+        error("bcl2fastq samplesheets directory does not exists",
+              "Bcl2fastq samplesheets does not exists: " + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY], conf)
         return False
 
     # Check if bcl2fastq basedir path exists
@@ -677,50 +730,63 @@ def demux(run_id, conf):
                   du_factor) + ') on ' + fastq_output_dir + '.', conf)
         return False
 
-    # Check and convert if useful samplesheet
-    samplesheet_csv_path, samplesheet_warnings = check_samplesheet(run_id, input_run_data_path, samplesheet_filename, conf)
-    if not samplesheet_csv_path:
+    # Load RunInfo object
+    run_info = RunInfo.parse(input_run_data_path + '/RunInfo.xml')
+
+    # Load samplesheet
+    samplesheet = load_samplesheet(run_id, input_run_data_path, samplesheet_filename, conf)
+
+    if samplesheet is None:
         return False
 
-    # Check format compression bcl2fastq
-    if not common.is_fastq_compression_format_valid(conf):
-        error("error while checking FASTQ compression format",
-              "Invalid FASTQ compression format: " + conf[BCL2FASTQ_COMPRESSION_KEY], conf)
+    # Update samplesheet
+    if not update_samplesheet(samplesheet, run_id, run_info.getFlowCellLaneCount(), conf):
+        return False
+
+    # Check samplesheet
+    check_result, samplesheet_warnings = check_samplesheet(samplesheet, run_id, run_info.getFlowCell(), conf)
+    if not check_result:
         return False
 
     # Get the number of mismatches
-    nb_mismatch = conf[BCL2FASTQ_MISMATCHES_KEY]
+    nb_mismatch = get_bcl2fastq_mismatches(samplesheet, conf[BCL2FASTQ_MISMATCHES_KEY])
+
+    # Write final samplesheet
+    if not write_bcl2fastq_samplesheet(samplesheet, bcl2fastq_samplesheet_path, conf):
+        return False
 
     # Run demultiplexing
     if common.is_conf_value_equals_true(Settings.BCL2FASTQ_USE_DOCKER_KEY, conf):
         # With image docker
-        if not demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, nb_mismatch, conf):
+        if not demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, bcl2fastq_samplesheet_path,
+                                     nb_mismatch, conf):
             return False
     else:
-        if not demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, nb_mismatch, conf):
+        if not demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, bcl2fastq_samplesheet_path,
+                                    nb_mismatch, conf):
             return False
 
-    if not is_confirmed_fastq_existence(fastq_output_dir):
+    if not check_if_output_fastq_files_exists(fastq_output_dir):
         error("error with bcl2fastq execution for run " + run_id,
-              "Error with bcl2fastq execution for run " + run_id + " none FASTQ files found in " + fastq_output_dir,
+              "Error with bcl2fastq execution for run " + run_id + " no FASTQ file found in " + fastq_output_dir,
               conf)
         return False
 
     # Copy samplesheet to output directory
-    cmd = "cp -p " + samplesheet_csv_path + ' ' + fastq_output_dir
+    cmd = "cp -p " + bcl2fastq_samplesheet_path + ' ' + fastq_output_dir
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
-        error("error while copying sample sheet file to the fastq directory for run " + run_id,
-              'Error while copying sample sheet file to fastq directory.\nCommand line:\n' + cmd, conf)
+        error("error while copying samplesheet file to the fastq directory for run " + run_id,
+              'Error while copying samplesheet file to fastq directory.\nCommand line:\n' + cmd, conf)
         return False
 
     # Create archives on demultiplexing statistics
     if not archive_demux_stat(run_id, fastq_output_dir, reports_data_path, basecall_stats_file,
-                              basecall_stats_prefix, samplesheet_csv_path, conf):
+                              basecall_stats_prefix, bcl2fastq_samplesheet_path, conf):
         return False
 
     # Archive samplesheet
-    if not archive_samplesheet(run_id, input_samplesheet_xls_path, samplesheet_csv_path, conf):
+    if not archive_samplesheet(run_id, input_samplesheet_xls_path, bcl2fastq_samplesheet_path, conf):
         return False
 
     # Create index.hml file
@@ -736,14 +802,14 @@ def demux(run_id, conf):
 
     duration = time.time() - start_time
 
-    msg = 'End of demultiplexing for run ' + run_id + '.' + \
+    msg = 'End of demultiplexing with ' + nb_mismatch + ' mismatch(es) for run ' + run_id + '.' + \
           '\nJob finished at ' + common.time_to_human_readable(time.time()) + \
           ' with no error in ' + common.duration_to_human_readable(duration) + '.\n\n' + \
           'Fastq files for this run ' + \
           'can be found in the following directory:\n  ' + fastq_output_dir
 
     if samplesheet_warnings.size() > 0:
-        msg += '\n\nSample sheet warnings:'
+        msg += '\n\nSamplesheet warnings:'
         for warn in samplesheet_warnings:
             msg += "\n  - " + warn
 

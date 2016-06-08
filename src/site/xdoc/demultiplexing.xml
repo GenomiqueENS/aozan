@@ -69,8 +69,16 @@
 	     <tr><td>bcl2fastq.threads</td><td>integer</td><td>Number of computer cores</td><td>Number of threads to use for demultiplexing</td></tr>
 	   </table>
 
+     <h4>Configuring Bcl2fastq barcode mismatches in the samplesheet</h4>
+
+         <p>With Aozan, you can define the number of barcode mismatches to use
+            with Bcl2fastq by adding a entry named <b>MismatchCount</b> in your
+            <b>Settings</b> section of the samplesheet. This value will overide
+            of the <tt>bcl2fastq.mismatches</tt> value of the Aozan
+            configuration file.</p>
+
 	   
- 	 <h4>Configuration to run bcl2fastq with Docker images.</h4>
+     <h4>Configuration to run bcl2fastq with Docker images.</h4>
 
 	 <p>This Aozan version can run Docker image for demultiplexing step. On our platform, we build a new image for each bcl2fastq version.
 	 	We can downloaded from <a href="https://hub.docker.com/u/genomicpariscentre"> the repository genomic paris center</a></p>
