@@ -31,8 +31,8 @@ public class SampleSheetUtils {
 
   /**
    * Convert a SampleSheet object to CSV.
-   * @param samplesheet SampleSheet design object to convert
-   * @return a String with the converted design
+   * @param samplesheet SampleSheet samplesheet object to convert
+   * @return a String with the converted samplesheet
    */
   public static final String toSampleSheetV1CSV(final SampleSheet samplesheet) {
 
@@ -82,7 +82,7 @@ public class SampleSheetUtils {
   }
 
   /**
-   * Convert the name of a field of the design model to the bcl2fastq 2
+   * Convert the name of a field of the samplesheet model to the bcl2fastq 2
    * samplesheet field name.
    * @param fieldName the field name to convert
    * @return the converted field name
@@ -130,8 +130,8 @@ public class SampleSheetUtils {
 
   /**
    * Convert a SampleSheet object to CSV.
-   * @param samplesheet SampleSheet design object to convert
-   * @return a String with the converted design
+   * @param samplesheet SampleSheet samplesheet object to convert
+   * @return a String with the converted samplesheet
    */
   public static final String toSampleSheetV2CSV(final SampleSheet samplesheet) {
 
@@ -306,12 +306,12 @@ public class SampleSheetUtils {
   //
 
   /**
-   * Parse a design in a tabulated format from a String
+   * Parse a samplesheet in a tabulated format from a String
    * @param s string to parse
-   * @return a Casava Design object
+   * @return a Bcl2fastq samplesheet object
    * @throws IOException if an error occurs
    */
-  public static SampleSheet parseCSVDesign(final String s) throws IOException {
+  public static SampleSheet parseCSVSamplesheet(final String s) throws IOException {
 
     if (s == null) {
       return null;
@@ -333,7 +333,7 @@ public class SampleSheetUtils {
           }
 
           // Parse the line
-          parser.parseLine(parseCSVDesignLine(line));
+          parser.parseLine(parseCSVSamplesheetLine(line));
         }
 
         return parser.getSampleSheet();
@@ -342,12 +342,12 @@ public class SampleSheetUtils {
   }
 
   /**
-   * Parse a design in a tabulated format from a String
+   * Parse a samplesheet in a tabulated format from a String
    * @param s string to parse
-   * @return a Casava Design object
+   * @return a Bcl2fastq samplesheet object
    * @throws IOException if an error occurs
    */
-  public static SampleSheet parseTabulatedDesign(final String s)
+  public static SampleSheet parseTabulatedSamplesheet(final String s)
       throws IOException {
 
     if (s == null) {
@@ -370,7 +370,7 @@ public class SampleSheetUtils {
           }
 
           // Parse the line
-          parser.parseLine(parseTabulatedDesignLine(line));
+          parser.parseLine(parseTabulatedSamplesheetLine(line));
         }
 
         return parser.getSampleSheet();
@@ -379,12 +379,12 @@ public class SampleSheetUtils {
   }
 
   /**
-   * Custom splitter for Casava CSV file.
+   * Custom splitter for Bcl2fastq CSV file.
    * @param line line to parse
    * @return a list of String with the contents of each cell without unnecessary
    *         quotes
    */
-  public static final List<String> parseCSVDesignLine(final String line) {
+  public static final List<String> parseCSVSamplesheetLine(final String line) {
 
     final List<String> result = new ArrayList<String>();
 
@@ -418,12 +418,12 @@ public class SampleSheetUtils {
   }
 
   /**
-   * Custom splitter for Casava tabulated file.
+   * Custom splitter for Bcl2fastq tabulated file.
    * @param line line to parse
    * @return a list of String with the contents of each cell without unnecessary
    *         quotes
    */
-  public static List<String> parseTabulatedDesignLine(final String line) {
+  public static List<String> parseTabulatedSamplesheetLine(final String line) {
 
     if (line == null) {
       return null;
@@ -437,19 +437,19 @@ public class SampleSheetUtils {
   //
 
   /**
-   * Replace index shortcuts in a design object by index sequences.
-   * @param design Casava design object
+   * Replace index shortcuts in a samplesheet object by index sequences.
+   * @param samplesheet Bcl2fastq samplesheet object
    * @param sequences map for the sequences
    * @throws AozanException if the shortcut is unknown
    */
-  public static void replaceIndexShortcutsBySequences(final SampleSheet design,
+  public static void replaceIndexShortcutsBySequences(final SampleSheet samplesheet,
       final Map<String, String> sequences) throws AozanException {
 
-    if (design == null || sequences == null) {
+    if (samplesheet == null || sequences == null) {
       return;
     }
 
-    for (final Sample sample : design) {
+    for (final Sample sample : samplesheet) {
 
       if (sample.isIndex1Field()) {
 

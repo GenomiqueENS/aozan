@@ -81,7 +81,7 @@
 
 		<section name="Sample sheet validator">
 			<p>We also provide a <a href="http://outils.genomique.biologie.ens.fr/samplesheetvalidator/" target="_blank">Bcl2fastq samplesheet validator</a>
-			to help users to check their run design. This tool use only html and javascript. <u>No data is sent</u> to our servers when you use this tool.</p>
+			to help users to check their run samplesheet. This tool use only html and javascript. <u>No data is sent</u> to our servers when you use this tool.</p>
 		</section>
 
 		<section name="What's new in Aozan?">

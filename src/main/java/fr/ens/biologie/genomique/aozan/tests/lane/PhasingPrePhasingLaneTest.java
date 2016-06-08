@@ -31,7 +31,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
-import fr.ens.biologie.genomique.aozan.collectors.DesignCollector;
+import fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector;
 import fr.ens.biologie.genomique.aozan.collectors.PhasingCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
@@ -90,7 +90,7 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
   public List<String> getCollectorsNamesRequiered() {
 
     return ImmutableList.of(PhasingCollector.COLLECTOR_NAME,
-        DesignCollector.COLLECTOR_NAME);
+        SamplesheetCollector.COLLECTOR_NAME);
   }
 
   //

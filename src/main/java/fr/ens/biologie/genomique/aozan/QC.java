@@ -43,7 +43,7 @@ import com.google.common.io.Files;
 
 import fr.ens.biologie.genomique.aozan.collectors.Collector;
 import fr.ens.biologie.genomique.aozan.collectors.CollectorRegistry;
-import fr.ens.biologie.genomique.aozan.collectors.DesignCollector;
+import fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector;
 import fr.ens.biologie.genomique.aozan.collectors.RunInfoCollector;
 import fr.ens.biologie.genomique.aozan.fastqc.RuntimePatchFastQC;
 import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeAliases;
@@ -71,11 +71,11 @@ public class QC {
   /** RTA output directory property key. */
   public static final String RTA_OUTPUT_DIR = "rta.output.dir";
 
-  /** Casava design path property key. */
-  public static final String CASAVA_DESIGN_PATH = "casava.samplesheet.path";
+  /** Bcl2fastq samplesheet path property key. */
+  public static final String BCL2FASTQ_SAMPLESHEET_PATH = "casava.samplesheet.path";
 
-  /** Casava output directory property key. */
-  public static final String CASAVA_OUTPUT_DIR = "casava.output.dir";
+  /** Bcl2fastq output directory property key. */
+  public static final String BCL2FASTQ_OUTPUT_DIR = "casava.output.dir";
 
   /** QC output directory property key. */
   public static final String QC_OUTPUT_DIR = "qc.output.dir";
@@ -172,7 +172,7 @@ public class QC {
   public final QCReport computeReport() throws AozanException {
 
     final File RTAOutputDir = this.bclDir;
-    final File casavaOutputDir = this.fastqDir;
+    final File bcl2fastqOutputDir = this.fastqDir;
     final File QCOutputDir = this.qcDir;
 
     final File dataFile = new File(this.qcDir + "/data-" + this.runId + ".txt");
@@ -204,10 +204,10 @@ public class QC {
                 + RTAOutputDir);
       }
 
-      if (!casavaOutputDir.exists() || !casavaOutputDir.isDirectory()) {
+      if (!bcl2fastqOutputDir.exists() || !bcl2fastqOutputDir.isDirectory()) {
         throw new AozanException(
-            "The Casava output directory does not exist or is not a directory: "
-                + casavaOutputDir);
+            "The Bcl2fastq output directory does not exist or is not a directory: "
+                + bcl2fastqOutputDir);
       }
 
       if (!QCOutputDir.exists()) {
@@ -537,7 +537,7 @@ public class QC {
 
     // Get necessary collector for the qc report for sample test
     if (!this.sampleTests.isEmpty()) {
-      addCollectors(Lists.newArrayList(DesignCollector.COLLECTOR_NAME),
+      addCollectors(Lists.newArrayList(SamplesheetCollector.COLLECTOR_NAME),
           collectors);
     }
 
@@ -613,9 +613,9 @@ public class QC {
     }
 
     this.globalConf.put(RTA_OUTPUT_DIR, this.bclDir.getPath());
-    this.globalConf.put(CASAVA_DESIGN_PATH,
+    this.globalConf.put(BCL2FASTQ_SAMPLESHEET_PATH,
         this.sampleSheetFile.getAbsolutePath());
-    this.globalConf.put(CASAVA_OUTPUT_DIR, this.fastqDir.getPath());
+    this.globalConf.put(BCL2FASTQ_OUTPUT_DIR, this.fastqDir.getPath());
     this.globalConf.put(QC_OUTPUT_DIR, this.qcDir.getPath());
     this.globalConf.put(TMP_DIR, this.tmpDir.getAbsolutePath());
   }
@@ -663,7 +663,7 @@ public class QC {
     addSystemProperty(properties, Settings.QC_CONF_FASTQC_CASAVA_KEY,
         "fastqc.casava");
 
-    // Set fastQC nofilter default false, if casava=true, filter fastq file
+    // Set fastQC nofilter system property
     addSystemProperty(properties, Settings.QC_CONF_FASTQC_NOFILTER_KEY,
         "fastqc.nofilter");
 
@@ -800,7 +800,7 @@ public class QC {
   private static File getSampleSheetFile(final File fastqDir)
       throws AozanException {
 
-    final File[] designFiles = fastqDir.listFiles(new FilenameFilter() {
+    final File[] samplesheetFiles = fastqDir.listFiles(new FilenameFilter() {
 
       @Override
       public boolean accept(final File dir, final String name) {
@@ -809,11 +809,11 @@ public class QC {
       }
     });
 
-    if (designFiles == null || designFiles.length == 0) {
-      throw new AozanException("No Casava design file found in " + fastqDir);
+    if (samplesheetFiles == null || samplesheetFiles.length == 0) {
+      throw new AozanException("No Bcl2fastq samplesheet file found in " + fastqDir);
     }
 
-    return designFiles[0];
+    return samplesheetFiles[0];
   }
 
   //

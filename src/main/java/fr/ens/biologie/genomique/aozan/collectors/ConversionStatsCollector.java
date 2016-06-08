@@ -68,8 +68,8 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
   /** The Constant UNDETERMINED_NAME_KEY. */
   private static final String UNDETERMINED_NAME_KEY = "Undetermined";
 
-  /** The casava output path. */
-  private String casavaOutputPath;
+  /** The Bcl2fastq output path. */
+  private String bcl2FastqOutputPath;
 
   @Override
   public void configure(final QC qc, final Properties properties) {
@@ -78,7 +78,7 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
       return;
     }
 
-    this.casavaOutputPath = properties.getProperty(QC.CASAVA_OUTPUT_DIR);
+    this.bcl2FastqOutputPath = properties.getProperty(QC.BCL2FASTQ_OUTPUT_DIR);
   }
 
   @Override
@@ -90,7 +90,7 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
 
     // Demux summary path
     final String demuxSummaryPath =
-        this.casavaOutputPath + "/Stats/ConversionStats.xml";
+        this.bcl2FastqOutputPath + "/Stats/ConversionStats.xml";
 
     if (!new File(demuxSummaryPath).exists()) {
       throw new AozanException(

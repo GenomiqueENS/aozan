@@ -43,8 +43,8 @@ import fr.ens.biologie.genomique.aozan.tests.TestResult;
  * The class add in the qc report html values from FastqScreen for each sample,
  * after compile replica data and for each reference genomes. The list of
  * references genomes contains default references genomes defined in aozan
- * configuration file. It add the genomes sample for the run included in casava
- * design file, only if it can be used for mapping with bowtie. The alias
+ * configuration file. It add the genomes sample for the run included in Bcl2fastq
+ * samplesheet file, only if it can be used for mapping with Bowtie. The alias
  * genomes file make the correspondence between the genome sample and the
  * reference genome used with bowtie, if it exists. The class retrieve the
  * percent of reads mapped on each reference genomes.

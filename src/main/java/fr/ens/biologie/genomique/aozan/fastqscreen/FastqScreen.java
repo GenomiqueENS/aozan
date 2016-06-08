@@ -58,14 +58,14 @@ public class FastqScreen {
   // Fields for delayed initialization of fastqScreenGenomes
   private FastqScreenGenomes fastqScreenGenomes;
   private final File aliasGenomesFile;
-  private final File designFile;
+  private final File samplesheetFile;
   private final String contaminantGenomeNames;
 
   public FastqScreenGenomes getFastqScreenGenomes() throws AozanException {
 
     if (this.fastqScreenGenomes == null) {
       this.fastqScreenGenomes = new FastqScreenGenomes(this.aliasGenomesFile,
-          this.designFile, this.contaminantGenomeNames);
+          this.samplesheetFile, this.contaminantGenomeNames);
     }
 
     return this.fastqScreenGenomes;
@@ -192,7 +192,7 @@ public class FastqScreen {
     // Fields required to initialize fastqScreenGenomes
     this.aliasGenomesFile = new File(properties.getProperty(
         Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
-    this.designFile = new File(properties.getProperty(QC.CASAVA_DESIGN_PATH));
+    this.samplesheetFile = new File(properties.getProperty(QC.BCL2FASTQ_SAMPLESHEET_PATH));
     this.contaminantGenomeNames =
         properties.getProperty(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
 

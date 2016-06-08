@@ -100,12 +100,12 @@ public class RunDataGenerator {
       throw new AozanException("RTA output directory is not set.");
     }
 
-    if (!this.properties.containsKey(QC.CASAVA_DESIGN_PATH)) {
-      throw new AozanException("Casava design file path is not set.");
+    if (!this.properties.containsKey(QC.BCL2FASTQ_SAMPLESHEET_PATH)) {
+      throw new AozanException("Bcl2fastq samplesheet file path is not set.");
     }
 
-    if (!this.properties.containsKey(QC.CASAVA_OUTPUT_DIR)) {
-      throw new AozanException("Casava output directory is not set.");
+    if (!this.properties.containsKey(QC.BCL2FASTQ_OUTPUT_DIR)) {
+      throw new AozanException("Bcl2fastq output directory is not set.");
     }
 
     if (!this.properties.containsKey(QC.QC_OUTPUT_DIR)) {

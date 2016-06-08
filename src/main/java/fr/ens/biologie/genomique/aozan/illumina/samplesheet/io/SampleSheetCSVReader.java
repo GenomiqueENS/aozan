@@ -86,7 +86,7 @@ public class SampleSheetCSVReader implements SampleSheetReader {
       try {
 
         // Parse the line
-        parser.parseLine(SampleSheetUtils.parseCSVDesignLine(line));
+        parser.parseLine(SampleSheetUtils.parseCSVSamplesheetLine(line));
       } catch (IOException e) {
 
         // If an error occurs while parsing add the line to the exception

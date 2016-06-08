@@ -52,7 +52,7 @@ public class GenomeAliases {
 
   private static GenomeAliases singleton;
 
-  // Associated genome name from design file with valid genome call for mapping
+  // Associated genome name from samplesheet file with valid genome call for mapping
   private final Map<String, String> genomesAliases = new HashMap<>();
 
   /**
@@ -114,7 +114,7 @@ public class GenomeAliases {
         final String key = line.substring(0, pos);
         final String value = line.substring(pos + 1);
 
-        // Retrieve genomes identified in Casava design file
+        // Retrieve genomes identified in Bcl2fastq samplesheet file
         // Certain have not genome name reference
         if (!(value == null || value.isEmpty())) {
           genomes.put(key, value);

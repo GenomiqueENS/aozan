@@ -46,20 +46,20 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 
 /**
- * This class define a Casava design Collector.
+ * This class define a Bcl2fastq samplesheet collector.
  * @since 0.8
  * @author Laurent Jourdren
  */
-public class DesignCollector implements Collector {
+public class SamplesheetCollector implements Collector {
 
   /** The collector name. */
-  public static final String COLLECTOR_NAME = "design";
+  public static final String COLLECTOR_NAME = "samplesheet";
 
   public static final List<String> FASTQ_COLLECTOR_NAMES =
       Arrays.asList("tmppartialfastq", "undeterminedindexes", "fastqc",
           "globalstats", "fastqscreen", "projectstats");
 
-  private File casavaDesignFile;
+  private File samplesheetFile;
 
   @Override
   public String getName() {
@@ -85,7 +85,7 @@ public class DesignCollector implements Collector {
       return;
     }
 
-    this.casavaDesignFile = qc.getSampleSheetFile();
+    this.samplesheetFile = qc.getSampleSheetFile();
   }
 
   @Override
@@ -99,10 +99,10 @@ public class DesignCollector implements Collector {
       final Map<Integer, List<String>> samples = new HashMap<>();
       final Set<String> projectsName = new TreeSet<>();
 
-      // Read Casava design
-      final SampleSheet design = createSampleSheet(data);
+      // Read Bcl2fastq samplesheet
+      final SampleSheet samplesheet = createSampleSheet(data);
 
-      for (final Sample s : design) {
+      for (final Sample s : samplesheet) {
 
         final String prefix =
             "design.lane" + s.getLane() + "." + s.getSampleId();
@@ -145,7 +145,7 @@ public class DesignCollector implements Collector {
         default:
 
           throw new AozanException(
-              "Design collector bcl2fastq version is invalid: "
+              "Samplesheet collector bcl2fastq version is invalid: "
                   + s.getSampleSheet().getVersion());
         }
 
@@ -185,7 +185,7 @@ public class DesignCollector implements Collector {
 
     Preconditions.checkNotNull(data, "run data instance");
 
-    return new SampleSheetCSVReader(this.casavaDesignFile).read();
+    return new SampleSheetCSVReader(this.samplesheetFile).read();
   }
 
   @Override

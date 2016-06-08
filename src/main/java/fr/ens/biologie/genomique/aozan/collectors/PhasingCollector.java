@@ -57,7 +57,7 @@ public class PhasingCollector implements Collector {
   /** The collector name. */
   public static final String COLLECTOR_NAME = "phasing";
 
-  private String casavaOutputPath;
+  private String bcl2fastqOutputPath;
 
   @Override
   public String getName() {
@@ -83,7 +83,7 @@ public class PhasingCollector implements Collector {
       return;
     }
 
-    this.casavaOutputPath = qc.getFastqDir().getAbsolutePath();
+    this.bcl2fastqOutputPath = qc.getFastqDir().getAbsolutePath();
   }
 
   @Override
@@ -97,7 +97,7 @@ public class PhasingCollector implements Collector {
 
       // Demux summary path
       final File phasingStatsDir =
-          new File(this.casavaOutputPath
+          new File(this.bcl2fastqOutputPath
               + "/Basecall_Stats_" + data.get("run.info.flow.cell.id")
               + "/Phasing");
 

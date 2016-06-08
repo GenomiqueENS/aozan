@@ -45,7 +45,7 @@ public class DemultiplexingCollector implements Collector {
   public static final String PREFIX = "demux";
 
   private QC qc;
-  private File casavaOutputPath;
+  private File bcl2fastqOutputPath;
   private File samplesheetFile;
   private Properties conf;
 
@@ -78,7 +78,7 @@ public class DemultiplexingCollector implements Collector {
     }
 
     this.qc = qc;
-    this.casavaOutputPath = qc.getFastqDir();
+    this.bcl2fastqOutputPath = qc.getFastqDir();
     this.samplesheetFile = qc.getSampleSheetFile();
     this.conf = new Properties(properties);
   }
@@ -92,7 +92,7 @@ public class DemultiplexingCollector implements Collector {
 
     try {
       manager =
-          new Bcl2FastqOutput(this.samplesheetFile, this.casavaOutputPath);
+          new Bcl2FastqOutput(this.samplesheetFile, this.bcl2fastqOutputPath);
     } catch (IOException e) {
       throw new AozanException(e);
     }
@@ -130,15 +130,4 @@ public class DemultiplexingCollector implements Collector {
   public void clear() {
   }
 
-  //
-  // Getter
-  //
-
-  /**
-   * Gets the casava output path.
-   * @return the casava output path
-   */
-  public File getCasavaOutputPath() {
-    return this.casavaOutputPath;
-  }
 }

@@ -86,7 +86,7 @@
 		  the duration of the steps (data transfert, demultiplexing and quality control) is quite long and
 		  users must watch the end of each step to avoid loose time before getting data ready to analysis.
 		  Executing this tasks at the end of each sequencing is a quite off-putting job. Using Aozan allow to
-		  save time by automate all this tasks. In addition Aozan provide a CASAVA/Bcl2fastq CSV samplesheet generator
+		  save time by automate all this tasks. In addition Aozan provide a Bcl2fastq CSV samplesheet generator
 		  from an XLS file that avoid common syntax errors in the CSV file and allow usage of alias for the index
 		  sequences. This tool is access <a href="http://transcriptome.ens.fr/designvalidator">here</a>.
 		  </p>
@@ -124,7 +124,7 @@
    <li>rsync 3.0.x or later</li>
  </ul>
 
- <p>On Ubuntu, you can install requirements (except CASAVA) with the following command:</p>
+ <p>On Ubuntu, you can install requirements (except Bcl2fastq) with the following command:</p>
 <source>
 $ sudo apt-get install openjdk-7-jre-headless rsync
 </source>
@@ -362,12 +362,12 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
    <tr><td>bcl.data.path</td><td>/mnt/storage/bcl</td><td>Hiseq output data after synchronization. Usualy cif files
      are not copied in this directory</td></tr>
    <tr><td>fastq.data.path</td><td>/mnt/storage/fastq</td><td>Directory for the output of
-     demultiplexing with CASAVA or bcl2fastq</td></tr>
+     demultiplexing with Bcl2fastq</td></tr>
    <tr><td>reports.data.path</td><td>/mnt/storage/reports</td><td>Directory for the qc report</td></tr>
-   <tr><td>casava.designs.path</td><td>/mnt/storage/casava_designs</td><td>Directory with CASAVA sample sheets (with files
-	 like <tt>design_INSTRUMENT-SN_RUN-NUMBER$runId.xls</tt> where INSTRUMENT-SN is the instrument serial number and RUN-NUMBER
-	 is the run number, e.g. <tt>design_SNL125_0067.xls</tt>)
-     for demultiplexing. If a custom script is used to generate CSV design files, this directory will no be used.</td></tr>
+   <tr><td>bcl2fastq.samplesheet.path</td><td>/mnt/storage/samplesheet</td><td>Directory with Bcl2fastq sample sheets (with files
+	 like <tt>samplesheet_INSTRUMENT-SN_RUN-NUMBER$runId.xls</tt> where INSTRUMENT-SN is the instrument serial number and RUN-NUMBER
+	 is the run number, e.g. <tt>samplesheet_SNL125_0067.xls</tt>)
+     for demultiplexing. If a custom script is used to generate CSV samplesheet files, this directory will no be used.</td></tr>
    <tr><td>tmp.path</td><td>/tmp</td><td>Temporary directory</td></tr>
  </table>
 

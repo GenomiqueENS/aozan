@@ -48,12 +48,10 @@ from fr.ens.biologie.genomique.aozan.Settings import AOZAN_LOG_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import FASTQ_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
-from fr.ens.biologie.genomique.aozan.Settings import CASAVA_PATH_KEY
-from fr.ens.biologie.genomique.aozan.Settings import CASAVA_SAMPLESHEETS_PATH_KEY
-from fr.ens.biologie.genomique.aozan.Settings import CASAVA_COMPRESSION_KEY
-from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_VERSION_FOR_HISEQ_KEY
-from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_VERSION_FOR_NEXTSEQ_KEY
-from fr.ens.biologie.genomique.aozan.Settings import DEMUX_USE_DOCKER_ENABLE_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_SAMPLESHEETS_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_COMPRESSION_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_USE_DOCKER_KEY
 from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY
 
@@ -754,24 +752,24 @@ def check_configuration(conf, configuration_file_path):
 
     # # For step DEMUX
     if Settings.DEMUX_STEP_KEY in steps_to_launch:
-        # Check if casava designs path exists
-        if not is_dir_exists(CASAVA_SAMPLESHEETS_PATH_KEY, conf):
-            msg += '\n\t* Casava sample sheets directory does not exists: ' + conf[CASAVA_SAMPLESHEETS_PATH_KEY]
+        # Check if bcl2fastq samplesheet path exists
+        if not is_dir_exists(BCL2FASTQ_SAMPLESHEETS_PATH_KEY, conf):
+            msg += '\n\t* Bcl2fastq sample sheets directory does not exists: ' + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY]
 
         # Check if root input fastq data directory exists
         if not is_dir_exists(FASTQ_DATA_PATH_KEY, conf):
             msg += '\n\t* Fastq data directory does not exists: ' + conf[FASTQ_DATA_PATH_KEY]
 
-        # Check if casava designs path exists
-        if is_conf_value_equals_true(DEMUX_USE_DOCKER_ENABLE_KEY, conf):
+        # Check if bcl2fastq samplesheet path exists
+        if is_conf_value_equals_true(BCL2FASTQ_USE_DOCKER_KEY, conf):
             pass
         else:
-            if not is_dir_exists(CASAVA_PATH_KEY, conf):
-                msg += '\n\t* Casava/bcl2fastq path directory does not exists: ' + conf[CASAVA_PATH_KEY]
+            if not is_dir_exists(BCL2FASTQ_PATH_KEY, conf):
+                msg += '\n\t* bcl2fastq path directory does not exists: ' + conf[BCL2FASTQ_PATH_KEY]
 
         # Check compression type: three values None, gzip (default) bzip2
         if not is_fastq_compression_format_valid(conf):
-            msg += '\n\t* Invalid FASTQ compression format: ' + conf[CASAVA_COMPRESSION_KEY]
+            msg += '\n\t* Invalid FASTQ compression format: ' + conf[BCL2FASTQ_COMPRESSION_KEY]
 
     # # For step QC
     if Settings.QC_STEP_KEY in steps_to_launch:
@@ -828,10 +826,10 @@ def is_fastq_compression_format_valid(conf):
     """
 
     # Get the compression format defined by user
-    if not is_conf_key_exists(CASAVA_COMPRESSION_KEY, conf):
+    if not is_conf_key_exists(BCL2FASTQ_COMPRESSION_KEY, conf):
         compression = 'none'
     else:
-        compression = conf[CASAVA_COMPRESSION_KEY].lower().strip()
+        compression = conf[BCL2FASTQ_COMPRESSION_KEY].lower().strip()
 
     # Check for compression alias
     if len(compression) == 0:
@@ -841,7 +839,7 @@ def is_fastq_compression_format_valid(conf):
     elif compression == 'bz2' or compression == '.bz2':
         compression = 'bzip2'
 
-    conf[CASAVA_COMPRESSION_KEY] = compression
+    conf[BCL2FASTQ_COMPRESSION_KEY] = compression
 
     # Check if compression format is allowed
     if compression == 'none' or compression == 'gzip' or compression == 'bzip2':
@@ -1047,12 +1045,26 @@ def print_default_configuration():
 def load_conf(conf, conf_file_path):
     """Load configuration file"""
 
-    # in version Aozan 1.1.1 change key in configuration to replace design by sample sheet
-    # converting table between old and new key
+    # Converting table between old and new keys
     converting_table_key = {}
-    converting_table_key['casava.design.format'] = Settings.CASAVA_SAMPLESHEET_FORMAT_KEY
-    converting_table_key['casava.design.prefix.filename'] = Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY
-    converting_table_key['casava.designs.path'] = Settings.CASAVA_SAMPLESHEETS_PATH_KEY
+    converting_table_key['casava.design.format'] = Settings.BCL2FASTQ_SAMPLESHEET_FORMAT_KEY
+    converting_table_key['casava.design.prefix.filename'] = Settings.BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY
+    converting_table_key['casava.designs.path'] = Settings.BCL2FASTQ_SAMPLESHEETS_PATH_KEY
+
+    converting_table_key['casava.adapter.fasta.file.path'] = Settings. BCL2FASTQ_ADAPTER_FASTA_FILE_PATH_KEY
+    converting_table_key['casava.additionnal.arguments'] = Settings.BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY
+    converting_table_key['casava.compression'] = Settings.BCL2FASTQ_COMPRESSION_KEY
+    converting_table_key['casava.compression.level'] = Settings.BCL2FASTQ_COMPRESSION_LEVEL_KEY
+    converting_table_key['casava.fastq.cluster.count'] = Settings.BCL2FASTQ_FASTQ_CLUSTER_COUNT_KEY
+    converting_table_key['casava.mismatches'] = Settings.BCL2FASTQ_MISMATCHES_KEY
+    converting_table_key['casava.path'] = Settings.BCL2FASTQ_PATH_KEY
+    converting_table_key['casava.samplesheet.format'] = Settings.BCL2FASTQ_SAMPLESHEET_FORMAT_KEY
+    converting_table_key['casava.samplesheet.prefix.filename'] = Settings.BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY
+    converting_table_key['casava.samplesheets.path'] = Settings.BCL2FASTQ_SAMPLESHEETS_PATH_KEY
+    converting_table_key['casava.threads'] = Settings.BCL2FASTQ_THREADS_KEY
+    converting_table_key['casava.with.failed.reads'] = Settings.BCL2FASTQ_WITH_FAILED_READS_KEY
+    converting_table_key['casava.design.generator.command'] = Settings.BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY
+    converting_table_key['demux.use.docker.enable'] = Settings.BCL2FASTQ_USE_DOCKER_KEY
 
     converting_table_key['qc.conf.fastqc.threads'] = Settings.QC_CONF_THREADS_KEY
     converting_table_key['qc.conf.blast.arguments'] = Settings.QC_CONF_FASTQSCREEN_BLAST_ARGUMENTS_KEY
@@ -1105,7 +1117,7 @@ def load_conf(conf, conf_file_path):
             if len(fields) == 2:
                 conf[fields[0].strip()] = fields[1].strip()
 
-                # Check if needed to converting key for design fields
+                # Check if needed to converting key
                 if fields[0].strip() in converting_table_key:
                     conf[converting_table_key[fields[0].strip()]] = fields[1].strip()
     f.close()
@@ -1144,22 +1156,22 @@ def set_default_conf(conf):
     conf[Settings.SYNC_CONTINUOUS_SYNC_KEY] = 'False'
     conf[Settings.SYNC_CONTINUOUS_SYNC_MIN_AGE_FILES_KEY] = '15'
 
-    # Casava
+    # Bcl2fastq
     conf[Settings.DEMUX_USE_HISEQ_OUTPUT_KEY] = 'False'
-    conf[Settings.CASAVA_SAMPLESHEET_FORMAT_KEY] = 'xls'
-    conf[Settings.CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] = 'design'
-    conf[Settings.CASAVA_PATH_KEY] = '/usr/local/casava'
-    conf[Settings.CASAVA_COMPRESSION_KEY] = 'gzip'
-    conf[Settings.CASAVA_FASTQ_CLUSTER_COUNT_KEY] = '0'
-    conf[Settings.CASAVA_COMPRESSION_KEY] = '9'
-    conf[Settings.CASAVA_MISMATCHES_KEY] = '0'
-    conf[Settings.CASAVA_THREADS_KEY] = str(Runtime.getRuntime().availableProcessors())
-    conf[Settings.CASAVA_ADAPTER_FASTA_FILE_PATH_KEY] = ''
-    conf[Settings.CASAVA_WITH_FAILED_READS_KEY] = 'True'
-    conf[Settings.CASAVA_ADDITIONNAL_ARGUMENTS_KEY] = ''
+    conf[Settings.BCL2FASTQ_SAMPLESHEET_FORMAT_KEY] = 'xls'
+    conf[Settings.BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY] = 'samplesheet'
+    conf[Settings.BCL2FASTQ_PATH_KEY] = '/usr/local/bcl2fastq'
+    conf[Settings.BCL2FASTQ_COMPRESSION_KEY] = 'gzip'
+    conf[Settings.BCL2FASTQ_FASTQ_CLUSTER_COUNT_KEY] = '0'
+    conf[Settings.BCL2FASTQ_COMPRESSION_KEY] = '9'
+    conf[Settings.BCL2FASTQ_MISMATCHES_KEY] = '0'
+    conf[Settings.BCL2FASTQ_THREADS_KEY] = str(Runtime.getRuntime().availableProcessors())
+    conf[Settings.BCL2FASTQ_ADAPTER_FASTA_FILE_PATH_KEY] = ''
+    conf[Settings.BCL2FASTQ_WITH_FAILED_READS_KEY] = 'True'
+    conf[Settings.BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY] = ''
 
     # New options since Aozan version 2.0 and managment of NextSeq
-    conf[Settings.DEMUX_USE_DOCKER_ENABLE_KEY] = 'false'
+    conf[Settings.BCL2FASTQ_USE_DOCKER_KEY] = 'false'
 
     # Data path
     conf[Settings.TMP_PATH_KEY] = '/tmp'

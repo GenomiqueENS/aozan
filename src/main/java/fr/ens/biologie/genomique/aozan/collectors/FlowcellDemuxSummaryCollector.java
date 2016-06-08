@@ -56,7 +56,7 @@ import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
  */
 public class FlowcellDemuxSummaryCollector extends DemultiplexingCollector {
 
-  private String casavaOutputPath;
+  private String bcl2fastqOutputPath;
 
   @Override
   public void configure(final QC qc, final Properties properties) {
@@ -65,7 +65,7 @@ public class FlowcellDemuxSummaryCollector extends DemultiplexingCollector {
       return;
     }
 
-    this.casavaOutputPath = qc.getFastqDir().getAbsolutePath();
+    this.bcl2fastqOutputPath = qc.getFastqDir().getAbsolutePath();
   }
 
   @Override
@@ -77,7 +77,7 @@ public class FlowcellDemuxSummaryCollector extends DemultiplexingCollector {
 
     // Demux summary path
     final String demuxSummaryPath =
-        this.casavaOutputPath
+        this.bcl2fastqOutputPath
             + "/Basecall_Stats_" + data.getFlowcellId()
             + "/Flowcell_demux_summary.xml";
 

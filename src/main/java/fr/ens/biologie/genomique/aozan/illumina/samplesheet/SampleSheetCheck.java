@@ -14,9 +14,9 @@ public class SampleSheetCheck {
 
   /**
    * Check a samplesheet.
-   * @param samplesheet Casava design object to check
+   * @param samplesheet Bcl2fastq samplesheet object to check
    * @return a list of warnings
-   * @throws AozanException if the design is not valid
+   * @throws AozanException if the samplesheet is not valid
    */
   public static List<String> checkSampleSheet(final SampleSheet samplesheet)
       throws AozanException {

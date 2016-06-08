@@ -174,7 +174,7 @@ public abstract class AbstractFastqCollector implements Collector {
   @Override
   public List<String> getCollectorsNamesRequiered() {
     return Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME,
-        DesignCollector.COLLECTOR_NAME,
+        SamplesheetCollector.COLLECTOR_NAME,
         FlowcellDemuxSummaryCollector.COLLECTOR_NAME);
   }
 

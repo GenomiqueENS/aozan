@@ -36,7 +36,7 @@ public interface SampleSheetWriter {
 
   /**
    * Write a samplesheet.
-   * @param samplesheet design to write
+   * @param samplesheet samplesheet to write
    * @throws IOException if an error occurs while writing the samplesheet
    */
   void writer(SampleSheet samplesheet) throws IOException;

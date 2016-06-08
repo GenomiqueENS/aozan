@@ -65,51 +65,44 @@ public final class Settings {
   /** Hiseq warning minimum space. */
   public static final String HISEQ_WARNING_MIN_SPACE_KEY =
       "hiseq.warning.min.space";
-  /** Casava adapter fasta file path. */
-  public static final String CASAVA_ADAPTER_FASTA_FILE_PATH_KEY =
-      "casava.adapter.fasta.file.path";
-  /** Casava additionnal arguments. */
-  public static final String CASAVA_ADDITIONNAL_ARGUMENTS_KEY =
-      "casava.additionnal.arguments";
-  /** Casava compression fastq files. */
-  public static final String CASAVA_COMPRESSION_KEY = "casava.compression";
-  /** Casava compression level. */
-  public static final String CASAVA_COMPRESSION_LEVEL_KEY =
-      "casava.compression.level";
-  /** Casava fastq cluster count. */
-  public static final String CASAVA_FASTQ_CLUSTER_COUNT_KEY =
-      "casava.fastq.cluster.count";
-  /** Casava mismatches. */
-  public static final String CASAVA_MISMATCHES_KEY = "casava.mismatches";
-  /** Casava path. */
-  public static final String CASAVA_PATH_KEY = "casava.path";
-  /** Casava samplesheet format. */
-  public static final String CASAVA_SAMPLESHEET_FORMAT_KEY =
-      "casava.samplesheet.format";
-  /** Casava samplesheet prefix filename. */
-  public static final String CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY =
-      "casava.samplesheet.prefix.filename";
-  /** Casava samplesheet path. */
-  public static final String CASAVA_SAMPLESHEETS_PATH_KEY =
-      "casava.samplesheets.path";
-  /** Casava threads. */
-  public static final String CASAVA_THREADS_KEY = "casava.threads";
-  /** Casava with failed reads. */
-  public static final String CASAVA_WITH_FAILED_READS_KEY =
-      "casava.with.failed.reads";
-  /** Casava design generator command. */
-  public static final String CASAVA_DESIGN_GENERATOR_COMMAND_KEY =
-      "casava.design.generator.command";
-
+  /** Blc2fastq adapter fasta file path. */
+  public static final String BCL2FASTQ_ADAPTER_FASTA_FILE_PATH_KEY =
+      "bcl2fastq.adapter.fasta.file.path";
+  /** Blc2fastq additionnal arguments. */
+  public static final String BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY =
+      "bcl2fastq.additionnal.arguments";
+  /** Bcl2fastq compression fastq files. */
+  public static final String BCL2FASTQ_COMPRESSION_KEY = "bcl2fastq.compression";
+  /** Bcl2fastq compression level. */
+  public static final String BCL2FASTQ_COMPRESSION_LEVEL_KEY =
+      "bcl2fastq.compression.level";
+  /** Bcl2fastq fastq cluster count. */
+  public static final String BCL2FASTQ_FASTQ_CLUSTER_COUNT_KEY =
+      "bcl2fastq.fastq.cluster.count";
+  /** Bcl2fastq mismatches. */
+  public static final String BCL2FASTQ_MISMATCHES_KEY = "bcl2fastq.mismatches";
+  /** Bcl2fastq path. */
+  public static final String BCL2FASTQ_PATH_KEY = "bcl2fastq.path";
+  /** Bcl2fastq samplesheet format. */
+  public static final String BCL2FASTQ_SAMPLESHEET_FORMAT_KEY =
+      "bcl2fastq.samplesheet.format";
+  /** Bcl2fastq samplesheet prefix filename. */
+  public static final String BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY =
+      "bcl2fastq.samplesheet.prefix.filename";
+  /** Bcl2fastq samplesheet path. */
+  public static final String BCL2FASTQ_SAMPLESHEETS_PATH_KEY =
+      "bcl2fastq.samplesheet.path";
+  /** Bcl2fastq threads. */
+  public static final String BCL2FASTQ_THREADS_KEY = "bcl2fastq.threads";
+  /** Bcl2fastq with failed reads. */
+  public static final String BCL2FASTQ_WITH_FAILED_READS_KEY =
+      "bcl2fastq.with.failed.reads";
+  /** Bcl2fastq samplesheet generator command. */
+  public static final String BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY =
+      "bcl2fastq.samplesheet.generator.command";
   /** Set available use container docker. */
-  public static final String DEMUX_USE_DOCKER_ENABLE_KEY =
-      "demux.use.docker.enable";
-  /** Set bcl2fastq version for HiSeq sequencer. */
-  public static final String BCL2FASTQ_VERSION_FOR_HISEQ_KEY =
-      "bcl2fastq.version.for.hiseq";
-  /** Set bcl2fastq version for NextSeq sequencer. */
-  public static final String BCL2FASTQ_VERSION_FOR_NEXTSEQ_KEY =
-      "bcl2fastq.version.for.nextseq";
+  public static final String BCL2FASTQ_USE_DOCKER_KEY =
+      "bcl2fastq.use.docker";
 
   /** Demultiplex space factor. */
   public static final String DEMUX_SPACE_FACTOR_KEY = "demux.space.factor";
@@ -194,10 +187,10 @@ public final class Settings {
   /** Use exponential base groups in graph. */
   public static final String QC_CONF_FASTQC_EXPGROUP_KEY =
       "qc.conf.fastqc.expgroup";
-  /** Format fastq type casava/Illumina. */
+  /** Illumina FASTQ format for FastQC. */
   public static final String QC_CONF_FASTQC_CASAVA_KEY =
       "qc.conf.fastqc.casava";
-  /** Option for filter fastq file if casava=true for all modules. */
+  /** Filter bad Illumina FASTQ entry in FastQC. */
   public static final String QC_CONF_FASTQC_NOFILTER_KEY =
       "qc.conf.fastqc.nofilter";
   /**

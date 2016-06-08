@@ -30,7 +30,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
-import fr.ens.biologie.genomique.aozan.collectors.DesignCollector;
+import fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector;
 import fr.ens.biologie.genomique.aozan.collectors.ReadCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
@@ -49,7 +49,7 @@ public class RawClustersPhixLaneTest extends AbstractLaneTest {
   public List<String> getCollectorsNamesRequiered() {
 
     return ImmutableList.of(ReadCollector.COLLECTOR_NAME,
-        DesignCollector.COLLECTOR_NAME);
+        SamplesheetCollector.COLLECTOR_NAME);
   }
 
   @Override

@@ -63,9 +63,9 @@
 			
 			<li><a href="demultiplexing.html">Demultiplexing</a>
 				<ul>
-                  <li>Demultiplexing is performed by CASAVA/bcl2fastq</li>
+                  <li>Demultiplexing is performed by Bcl2fastq</li>
 				  <li>Parallel computation is done with &quot;<tt>make -j</tt>&quot;</li>
-				  <li>CASAVA or bcl2fastq has been modified to provide bzip2 compression functionality (optional)</li>
+				  <li>Bcl2fastq has been modified to provide bzip2 compression functionality (optional)</li>
 				  <li>Creates one fastq file by sample</li>
 				  <li>Uses alias for samples indexes (optional)</li></ul>
 			</li>

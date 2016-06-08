@@ -73,7 +73,7 @@ public abstract class StatisticsCollector implements Collector {
     // Use their data only if a test use them.
 
     return Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME,
-        DesignCollector.COLLECTOR_NAME, DemultiplexingCollector.COLLECTOR_NAME);
+        SamplesheetCollector.COLLECTOR_NAME, DemultiplexingCollector.COLLECTOR_NAME);
   }
 
   @Override

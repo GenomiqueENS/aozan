@@ -74,7 +74,7 @@
 	        <td>By default 2048 MiB are allocated to the JVM for running Aozan.
 	        	You can edit this value in the <code>aozan.sh</code> file with the 
 	         	<b>-Xmx</b> option of the JVM. However Aozan use external tools 
-	            like Casava/bcl2fastq or Bowtie that also need memory, 8 GiB seem to be
+	            like bcl2fastq or Bowtie that also need memory, 8 GiB seem to be
 	            a good amount of memory to run Aozan.
 	         </td>
 	      </tr>

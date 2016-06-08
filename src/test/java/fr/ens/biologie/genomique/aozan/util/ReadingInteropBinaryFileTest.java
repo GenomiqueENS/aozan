@@ -61,7 +61,7 @@ public class ReadingInteropBinaryFileTest extends TestCase {
 
     // Define path to file utils
     props.put("rta.output.dir", path + "/" + dir);
-    props.put("casava.output.dir", path + "/" + dir);
+    props.put("bcl2fastq.output.dir", path + "/" + dir);
 
     final ReadCollector readCollector = new ReadCollector();
     final RunInfoCollector runInfoCollector = new RunInfoCollector();

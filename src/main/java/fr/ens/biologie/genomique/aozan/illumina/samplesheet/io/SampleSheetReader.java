@@ -30,14 +30,14 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 
 
 /**
- * This interface define a reader for bcl2fastq samplesheet.
+ * This interface define a reader for Bcl2fastq samplesheet.
  * @since 1.1
  * @author Laurent Jourdren
  */
 public interface SampleSheetReader {
 
   /**
-   * Read a design.
+   * Read a samplesheet.
    * @return a SampleSheet object
    * @throws IOException if an error occurs while reading the samplesheet
    */

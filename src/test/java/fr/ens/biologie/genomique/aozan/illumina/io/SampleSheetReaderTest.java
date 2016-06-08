@@ -395,7 +395,7 @@ public class SampleSheetReaderTest extends TestCase {
       SampleSheetUtils.replaceIndexShortcutsBySequences(result,
           loadIndexSequences());
 
-      // Write CSV design file
+      // Write CSV samplesheet file
       SampleSheetCSVWriter writer = new SampleSheetCSVWriter(outputFile);
       writer.setVersion(version);
       writer.writer(result);

@@ -55,7 +55,7 @@ import fr.ens.biologie.genomique.eoulsan.data.DataFile;
 
 /**
  * This class read the alias genome file. It make correspondence between genome
- * name in casava design file and the genome name reference used for identified
+ * name in Bcl2fastq samplesheet file and the genome name reference used for identified
  * index of bowtie mapper.
  * @since 1.3
  * @author Sandrine Perrin
@@ -77,7 +77,7 @@ public class FastqScreenGenomes {
 
   /**
    * Set reference genomes for the samples of a run. Retrieve list of genomes
-   * sample from casava design file and filtered them compared to alias genome
+   * sample from Bcl2fastq samplesheet file and filtered them compared to alias genome
    * file. Keep only if it can be create the genome description object.
    * @return collection valid genomes names can be use for mapping
    * @throws AozanException if an error occurs during updating alias genomes
@@ -121,7 +121,7 @@ public class FastqScreenGenomes {
           newGenomes.add(genome);
 
         } else {
-          // Replace genome name from design file by valid name
+          // Replace genome name from samplesheet file by valid name
           genomes.add(aliasGenomeName);
           genomesAliases.addAlias(genome, aliasGenomeName);
         }
@@ -177,18 +177,18 @@ public class FastqScreenGenomes {
    * sequencing.
    * @return collection on genomes reference names for the samples
    */
-  private Set<String> createSampleRefsFromDesignFile(final File designFile) {
+  private Set<String> createSampleRefsFromSamplesheetFile(final File samplesheetFile) {
 
-    final Set<String> genomesFromDesign = new HashSet<>();
+    final Set<String> genomesFromSamplesheet = new HashSet<>();
 
-    if (designFile.exists() && designFile.isFile()) {
+    if (samplesheetFile.exists() && samplesheetFile.isFile()) {
 
       final SampleSheetCSVReader samplesheetReader;
       final SampleSheet samplesheet;
 
       try {
-        // Reading casava design file in format csv
-        samplesheetReader = new SampleSheetCSVReader(designFile);
+        // Reading Bcl2fastq samplesheet file in format csv
+        samplesheetReader = new SampleSheetCSVReader(samplesheetFile);
         samplesheet = samplesheetReader.read();
 
       } catch (final Exception e) {
@@ -196,29 +196,29 @@ public class FastqScreenGenomes {
         return Collections.emptySet();
       }
 
-      // Retrieve all genome sample included in casava design file
-      for (final Sample casavaSample : samplesheet) {
+      // Retrieve all genome sample included in Bcl2fastq samplesheet file
+      for (final Sample sample : samplesheet) {
         String genomeSample =
-            casavaSample.getSampleRef().replaceAll("\"", "").toLowerCase();
+            sample.getSampleRef().replaceAll("\"", "").toLowerCase();
 
         // Replace all symbols not letters or numbers by space
         genomeSample = PATTERN.matcher(genomeSample).replaceAll(" ");
 
-        genomesFromDesign.add(genomeSample.trim());
+        genomesFromSamplesheet.add(genomeSample.trim());
       }
 
       // TODO
-      LOGGER.warning("FQS-genomeMapper: list genomes name find in design "
-          + Joiner.on(", ").join(genomesFromDesign));
+      LOGGER.warning("FQS-genomeMapper: list genome names found in samplesheet: "
+          + Joiner.on(", ").join(genomesFromSamplesheet));
 
-      return genomesFromDesign;
+      return genomesFromSamplesheet;
 
     }
     // TODO
-    LOGGER.warning("FQS-genomeMapper: no genomes name found in design file "
-        + designFile.getAbsolutePath());
+    LOGGER.warning("FQS-genomeMapper: no genome name found in samplesheet file "
+        + samplesheetFile.getAbsolutePath());
 
-    // Fail to read design file
+    // Fail to read the samplesheet file
     return Collections.emptySet();
   }
 
@@ -299,11 +299,11 @@ public class FastqScreenGenomes {
 
     final File aliasGenomesFile = new File(properties
         .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
-    final File designFile = new File(properties.get(QC.CASAVA_DESIGN_PATH));
+    final File sampleshettFile = new File(properties.get(QC.BCL2FASTQ_SAMPLESHEET_PATH));
     final String contaminantGenomeNames =
         properties.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
 
-    return new FastqScreenGenomes(aliasGenomesFile, designFile,
+    return new FastqScreenGenomes(aliasGenomesFile, sampleshettFile,
         contaminantGenomeNames);
   }
 
@@ -320,12 +320,12 @@ public class FastqScreenGenomes {
 
     final File aliasGenomesFile = new File(properties.getProperty(
         Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
-    final File designFile =
-        new File(properties.getProperty(QC.CASAVA_DESIGN_PATH));
+    final File samplesheetFile =
+        new File(properties.getProperty(QC.BCL2FASTQ_SAMPLESHEET_PATH));
     final String contaminantGenomeNames =
         properties.getProperty(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
 
-    return new FastqScreenGenomes(aliasGenomesFile, designFile,
+    return new FastqScreenGenomes(aliasGenomesFile, samplesheetFile,
         contaminantGenomeNames);
   }
 
@@ -336,16 +336,16 @@ public class FastqScreenGenomes {
   /**
    * Public constructor.
    * @param aliasGenomesFile alias genomes file
-   * @param designFile design file
+   * @param samplesheetFile samplesheet file
    * @param contaminantGenomeNames a string with the list of the contaminant
    *          genomes
    * @throws AozanException if an error occurs while creating the object
    */
-  public FastqScreenGenomes(final File aliasGenomesFile, final File designFile,
+  public FastqScreenGenomes(final File aliasGenomesFile, final File samplesheetFile,
       final String contaminantGenomeNames) throws AozanException {
 
     checkNotNull(aliasGenomesFile, "aliasGenomesFile argument cannot be null");
-    checkNotNull(designFile, "designFile argument cannot be null");
+    checkNotNull(samplesheetFile, "samplesheetFile argument cannot be null");
     checkNotNull(contaminantGenomeNames,
         "contaminantGenomeNames argument cannot be null");
 
@@ -354,7 +354,7 @@ public class FastqScreenGenomes {
 
     // Collect genomes useful to contaminant detection
     this.sampleGenomes = initSampleGenomes(
-        createSampleRefsFromDesignFile(designFile), aliasGenomesFile);
+        createSampleRefsFromSamplesheetFile(samplesheetFile), aliasGenomesFile);
   }
 
 }

@@ -49,7 +49,6 @@ import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
-import fr.ens.biologie.genomique.eoulsan.EoulsanException;
 import fr.ens.biologie.genomique.eoulsan.EoulsanRuntimeException;
 import fr.ens.biologie.genomique.eoulsan.bio.BadBioEntryException;
 import fr.ens.biologie.genomique.eoulsan.bio.ReadSequence;
@@ -67,7 +66,7 @@ public class ReDemux {
 
   private final File inputDir;
   private final File outputDir;
-  private final SampleSheet design;
+  private final SampleSheet sampleSheet;
   private final Map<Integer, ReDemuxLane> lanesToRedemux = Maps.newHashMap();
 
   @SuppressWarnings("unused")
@@ -78,7 +77,7 @@ public class ReDemux {
    */
   private static class ReDemuxLane {
 
-    private final SampleSheet design;
+    private final SampleSheet samplesheet;
     private final int lane;
     private final List<Integer> reads;
     private final File inputDir;
@@ -141,7 +140,7 @@ public class ReDemux {
       final Pattern pattern = Pattern.compile(index);
       Sample sample = null;
 
-      for (Sample s : design.getSampleInLane(this.lane)) {
+      for (Sample s : samplesheet.getSampleInLane(this.lane)) {
 
         if (pattern.matcher(s.getIndex1()).matches()) {
 
@@ -175,7 +174,7 @@ public class ReDemux {
       int bestScore = Integer.MAX_VALUE;
       int bestCoreCount = 0;
 
-      for (Sample s : design.getSampleInLane(this.lane)) {
+      for (Sample s : samplesheet.getSampleInLane(this.lane)) {
 
         final String sampleIndex = s.getIndex1();
 
@@ -526,15 +525,15 @@ public class ReDemux {
 
     /**
      * Constructor.
-     * @param design Casava design object
+     * @param samplesheet Bcl2fastq samplesheet object
      * @param lane lane to re-demultiplex
      * @param inputDir input directory
      * @param outputDir output directory
      */
-    public ReDemuxLane(final SampleSheet design, final int lane,
+    public ReDemuxLane(final SampleSheet samplesheet, final int lane,
         final File inputDir, final File outputDir) {
 
-      this.design = design;
+      this.samplesheet = samplesheet;
       this.lane = lane;
       this.inputDir =
           new File(inputDir, "/Undetermined_indices/Sample_lane" + lane);
@@ -553,14 +552,14 @@ public class ReDemux {
   public void addIndex(final int lane, final String index)
       throws AozanException {
 
-    // TODO extract max lane number from designfile
+    // TODO extract max lane number from samplesheet
     Preconditions.checkArgument(lane >= 1 && lane <= 8,
         "Invalid lane number: " + lane);
 
     final ReDemuxLane reDemuxLane;
 
     if (!this.lanesToRedemux.containsKey(lane)) {
-      reDemuxLane = new ReDemuxLane(design, lane, inputDir, this.outputDir);
+      reDemuxLane = new ReDemuxLane(sampleSheet, lane, inputDir, this.outputDir);
       this.lanesToRedemux.put(lane, reDemuxLane);
     } else
       reDemuxLane = this.lanesToRedemux.get(lane);
@@ -613,15 +612,15 @@ public class ReDemux {
   /**
    * Constructor.
    * @param baseDir run base directory
-   * @param design Casava design object
+   * @param samplesheet Bcl2fastq samplesheet object
    * @param outputDir output directory
    */
-  public ReDemux(final File baseDir, final SampleSheet design,
+  public ReDemux(final File baseDir, final SampleSheet samplesheet,
       final File outputDir) {
 
-    Preconditions.checkNotNull(design, "design argument cannot be null");
+    Preconditions.checkNotNull(samplesheet, "samplesheet argument cannot be null");
     Preconditions.checkNotNull(baseDir, "baseDir argument cannot be null");
-    this.design = design;
+    this.sampleSheet = samplesheet;
     this.inputDir = baseDir;
     this.outputDir = outputDir;
   }
@@ -630,20 +629,20 @@ public class ReDemux {
   // Static methods
   //
 
-  public static void redemultiplex(final File designFile,
+  public static void redemultiplex(final File samplesheetFile,
       final String bcl2fastqVersion, final List<String> lanesAndIndex,
       final File outputDir) throws FileNotFoundException, IOException,
           AozanException, BadBioEntryException {
 
-    Preconditions.checkNotNull(designFile, "design file cannot be null");
+    Preconditions.checkNotNull(samplesheetFile, "samplesheetFile cannot be null");
     Preconditions.checkNotNull(lanesAndIndex, "laneAndIndex cannot be null");
     Preconditions.checkNotNull(outputDir, "output directory cannot be null");
 
-    // Load design
-    final SampleSheet design = new SampleSheetCSVReader(designFile).read();
+    // Load samplesheet
+    final SampleSheet samplesheet = new SampleSheetCSVReader(samplesheetFile).read();
 
     // Create ReDemux object
-    ReDemux rd = new ReDemux(designFile.getParentFile(), design, outputDir);
+    ReDemux rd = new ReDemux(samplesheetFile.getParentFile(), samplesheet, outputDir);
 
     for (String s : lanesAndIndex) {
 

@@ -45,7 +45,7 @@ import com.google.common.math.DoubleMath;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 
 /**
- * This class reads a Casava design file in xls format.
+ * This class reads a Bcl2fastq samplesheet file in xls format.
  * @since 0.1
  * @author Laurent Jourdren
  */

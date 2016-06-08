@@ -23,22 +23,22 @@ from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_URL_KEY
 from fr.ens.biologie.genomique.aozan.Settings import DEMUX_SPACE_FACTOR_KEY
-from fr.ens.biologie.genomique.aozan.Settings import CASAVA_ADAPTER_FASTA_FILE_PATH_KEY
-from fr.ens.biologie.genomique.aozan.Settings import CASAVA_ADDITIONNAL_ARGUMENTS_KEY
-from fr.ens.biologie.genomique.aozan.Settings import CASAVA_COMPRESSION_KEY
-from fr.ens.biologie.genomique.aozan.Settings import CASAVA_COMPRESSION_LEVEL_KEY
-from fr.ens.biologie.genomique.aozan.Settings import CASAVA_FASTQ_CLUSTER_COUNT_KEY
-from fr.ens.biologie.genomique.aozan.Settings import CASAVA_MISMATCHES_KEY
-from fr.ens.biologie.genomique.aozan.Settings import CASAVA_PATH_KEY
-from fr.ens.biologie.genomique.aozan.Settings import CASAVA_SAMPLESHEET_FORMAT_KEY
-from fr.ens.biologie.genomique.aozan.Settings import CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY
-from fr.ens.biologie.genomique.aozan.Settings import CASAVA_SAMPLESHEETS_PATH_KEY
-from fr.ens.biologie.genomique.aozan.Settings import CASAVA_THREADS_KEY
-from fr.ens.biologie.genomique.aozan.Settings import CASAVA_WITH_FAILED_READS_KEY
-from fr.ens.biologie.genomique.aozan.Settings import DEMUX_USE_DOCKER_ENABLE_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_ADAPTER_FASTA_FILE_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_COMPRESSION_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_COMPRESSION_LEVEL_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_FASTQ_CLUSTER_COUNT_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_MISMATCHES_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_SAMPLESHEET_FORMAT_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_SAMPLESHEETS_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_THREADS_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_WITH_FAILED_READS_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_USE_DOCKER_KEY
 from fr.ens.biologie.genomique.aozan.Settings import INDEX_SEQUENCES_KEY
 from fr.ens.biologie.genomique.aozan.Settings import FASTQ_DATA_PATH_KEY
-from fr.ens.biologie.genomique.aozan.Settings import CASAVA_DESIGN_GENERATOR_COMMAND_KEY
+from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY
 from fr.ens.biologie.genomique.aozan import Settings
 
 from fr.ens.biologie.genomique.aozan.util import StringUtils
@@ -133,7 +133,7 @@ def build_samplesheet_filename(run_id, conf):
     run_number = hiseq_run.get_run_number(run_id)
     instrument_sn = hiseq_run.get_instrument_sn(run_id)
 
-    return conf[CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + '_' + instrument_sn + '_%04d' % run_number
+    return conf[BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY] + '_' + instrument_sn + '_%04d' % run_number
 
 
 def check_samplesheet(run_id, input_run_data_path, samplesheet_filename, conf):
@@ -161,41 +161,41 @@ def check_samplesheet(run_id, input_run_data_path, samplesheet_filename, conf):
     flow_cell_id = run_info.getFlowCell()
     lane_count = run_info.getFlowCellLaneCount()
 
-    input_design_xls_path = conf[CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + samplesheet_filename + '.xls'
-    input_design_csv_path = conf[CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + samplesheet_filename + '.csv'
-    design_csv_path = conf[TMP_PATH_KEY] + '/' + samplesheet_filename + '.csv'
+    input_samplesheet_xls_path = conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] + '/' + samplesheet_filename + '.xls'
+    input_samplesheet_csv_path = conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] + '/' + samplesheet_filename + '.csv'
+    samplesheet_csv_path = conf[TMP_PATH_KEY] + '/' + samplesheet_filename + '.csv'
 
     common.log("INFO", "Flowcell id: " + flow_cell_id, conf)
     common.log("INFO", "Flowcell lane count: " + str(lane_count), conf)
-    common.log("INFO", "Samplesheet format: " + str(conf[CASAVA_SAMPLESHEET_FORMAT_KEY]), conf)
+    common.log("INFO", "Samplesheet format: " + str(conf[BCL2FASTQ_SAMPLESHEET_FORMAT_KEY]), conf)
 
-    if common.is_conf_value_defined(CASAVA_SAMPLESHEET_FORMAT_KEY, 'xls', conf):
+    if common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'xls', conf):
 
-        # Convert design in XLS format to CSV format
-        common.log("INFO", "Samplesheet path: " + str(input_design_xls_path), conf)
+        # Convert samplesheet in XLS format to CSV format
+        common.log("INFO", "Samplesheet path: " + str(input_samplesheet_xls_path), conf)
 
-        # Check if the xls design exists
-        if not os.path.exists(input_design_xls_path):
-            error("no casava sample sheet found", "No casava sample sheet found for " + run_id + " run.\n" +
-                  'You must provide a ' + samplesheet_filename + '.xls file in ' + conf[CASAVA_SAMPLESHEETS_PATH_KEY] +
+        # Check if the xls samplesheet exists
+        if not os.path.exists(input_samplesheet_xls_path):
+            error("no bcl2fastq sample sheet found", "No bcl2fastq sample sheet found for " + run_id + " run.\n" +
+                  'You must provide a ' + samplesheet_filename + '.xls file in ' + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] +
                   ' directory to demultiplex and create fastq files for this run.\n', conf)
             return False, []
 
         try:
 
-            # Load XLS design file
-            design = SampleSheetXLSReader(input_design_xls_path).read()
+            # Load XLS samplesheet file
+            samplesheet = SampleSheetXLSReader(input_samplesheet_xls_path).read()
 
             # Replace index sequence shortcuts by sequences
-            SampleSheetUtils.replaceIndexShortcutsBySequences(design, load_index_sequences(conf))
+            SampleSheetUtils.replaceIndexShortcutsBySequences(samplesheet, load_index_sequences(conf))
 
             # Set the lane field if does not set
-            SampleSheetUtils.duplicateSamplesIfLaneFieldNotSet(design, lane_count)
+            SampleSheetUtils.duplicateSamplesIfLaneFieldNotSet(samplesheet, lane_count)
 
-            # Write CSV design file in BCL2FASTQ2 format
-            writer = SampleSheetCSVWriter(design_csv_path)
+            # Write CSV samplesheet file in BCL2FASTQ2 format
+            writer = SampleSheetCSVWriter(samplesheet_csv_path)
             writer.setVersion(2)
-            writer.writer(design)
+            writer.writer(samplesheet)
 
         except AozanException, exp:
             print StringUtils.stackTraceToString(exp)
@@ -208,90 +208,90 @@ def check_samplesheet(run_id, input_run_data_path, samplesheet_filename, conf):
             error("error while converting " + samplesheet_filename + ".xls to CSV format", exp.getMessage(), conf)
             return False, []
 
-    elif common.is_conf_value_defined(CASAVA_SAMPLESHEET_FORMAT_KEY, 'csv', conf):
+    elif common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'csv', conf):
 
         # Copy the CSV file
-        common.log("INFO", "sample sheet filename : " + str(input_design_xls_path), conf)
+        common.log("INFO", "sample sheet filename : " + str(input_samplesheet_xls_path), conf)
 
-        # Check if the csv design exists
-        if not os.path.exists(input_design_csv_path):
-            error("no casava sample sheet found", "No casava sample sheet found for " + run_id + " run.\n" +
-                  'You must provide a ' + samplesheet_filename + '.csv file in ' + conf[CASAVA_SAMPLESHEETS_PATH_KEY] +
+        # Check if the csv samplesheet exists
+        if not os.path.exists(input_samplesheet_csv_path):
+            error("no bcl2fastq sample sheet found", "No bcl2fastq sample sheet found for " + run_id + " run.\n" +
+                  'You must provide a ' + samplesheet_filename + '.csv file in ' + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] +
                   ' directory to demultiplex and create fastq files for this run.\n', conf)
             return False, []
 
-        cmd = 'cp ' + input_design_csv_path + ' ' + design_csv_path
+        cmd = 'cp ' + input_samplesheet_csv_path + ' ' + samplesheet_csv_path
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
-            error("error while copying Casava CSV sample sheet file to temporary directory for run " + run_id,
-                  'Error while copying Casava CSV sample sheet file to temporary directory.\nCommand line:\n' + cmd,
+            error("error while copying Bcl2fastq CSV sample sheet file to temporary directory for run " + run_id,
+                  'Error while copying Bcl2fastq CSV sample sheet file to temporary directory.\nCommand line:\n' + cmd,
                   conf)
             return False, []
 
-    elif common.is_conf_value_defined(CASAVA_SAMPLESHEET_FORMAT_KEY, 'command', conf):
+    elif common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'command', conf):
 
-        action_error_msg = 'Error while creating Casava CSV sample sheet file'
-        if not common.is_conf_key_exists(CASAVA_DESIGN_GENERATOR_COMMAND_KEY, conf):
+        action_error_msg = 'Error while creating Bcl2fastq CSV sample sheet file'
+        if not common.is_conf_key_exists(BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY, conf):
             error(action_error_msg + ' for run ' + run_id, action_error_msg + ' the command is empty.', conf)
             return False, []
 
-        cmd = conf[CASAVA_DESIGN_GENERATOR_COMMAND_KEY] + ' ' + run_id + ' ' + design_csv_path
+        cmd = conf[BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY] + ' ' + run_id + ' ' + samplesheet_csv_path
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
             error(action_error_msg + ' for run ' + run_id,
                   action_error_msg + '.\nCommand line:\n' + cmd, conf)
 
-        if not os.path.exists(design_csv_path):
+        if not os.path.exists(samplesheet_csv_path):
             error(action_error_msg + ' for run ' + run_id,
-                  action_error_msg + ', the external command did not create Casava CSV file:\n' + cmd, conf)
+                  action_error_msg + ', the external command did not create Bcl2fastq CSV file:\n' + cmd, conf)
             return False, []
     else:
-        error('Error while creating Casava CSV sample sheet file for run ' + run_id,
-              'No method to get Casava sample sheet file has been defined. Please, set the ' +
-              '"casava.samplesheet.format" property.\n',
+        error('Error while creating Bcl2fastq CSV sample sheet file for run ' + run_id,
+              'No method to get Bcl2fastq sample sheet file has been defined. Please, set the ' +
+              '"bcl2fastq.samplesheet.format" property.\n',
               conf)
         return False, []
 
-    # Check if Casava CSV design file has been created
-    if not os.path.exists(design_csv_path):
-        error("error while reading Casava CSV sample sheet file for run " + run_id,
-              'Error while reading Casava CSV sample sheet file, the sample sheet file does not exist: \n' +
-              design_csv_path, conf)
+    # Check if Bcl2fastq CSV samplesheet file has been created
+    if not os.path.exists(samplesheet_csv_path):
+        error("error while reading Bcl2fastq CSV sample sheet file for run " + run_id,
+              'Error while reading Bcl2fastq CSV sample sheet file, the sample sheet file does not exist: \n' +
+              samplesheet_csv_path, conf)
         return False, []
 
-    design_warnings = {}
+    samplesheet_warnings = {}
 
-    # Check Casava CSV design file
+    # Check Bcl2fastq CSV samplesheet file
     try:
-        # Load CSV design file
-        design = SampleSheetCSVReader(design_csv_path).read()
+        # Load CSV samplesheet file
+        samplesheet = SampleSheetCSVReader(samplesheet_csv_path).read()
 
-        # Check values of design file
-        design_warnings = SampleSheetCheck.checkSampleSheet(design, flow_cell_id)
+        # Check values of samplesheet file
+        samplesheet_warnings = SampleSheetCheck.checkSampleSheet(samplesheet, flow_cell_id)
 
     # TODO: remove lock
 
     except IOException, exp:
         error("error while checking " + samplesheet_filename + ".csv file ", exp.getMessage(), conf)
-        return False, design_warnings
+        return False, samplesheet_warnings
     except AozanException, exp:
         error("error while checking " + samplesheet_filename + ".csv file ", exp.getMessage(), conf)
-        return False, design_warnings
+        return False, samplesheet_warnings
 
-    # Log Casava design warning
-    if design_warnings > 0:
+    # Log Bcl2fastq samplesheet warning
+    if samplesheet_warnings > 0:
         msg = ''
         first = True
-        for warn in design_warnings:
+        for warn in samplesheet_warnings:
             if first:
                 first = False
             else:
                 msg += ' '
             msg += warn
-        common.log("WARNING", "casava sample sheet warnings: " + msg, conf)
+        common.log("WARNING", "bcl2fastq sample sheet warnings: " + msg, conf)
 
     # Sample sheet
-    return design_csv_path, design_warnings
+    return samplesheet_csv_path, samplesheet_warnings
 
 
 def get_cpu_count(conf):
@@ -303,7 +303,7 @@ def get_cpu_count(conf):
     """
 
     # Get the number of cpu
-    cpu_count = int(conf[CASAVA_THREADS_KEY])
+    cpu_count = int(conf[BCL2FASTQ_THREADS_KEY])
     if cpu_count < 1:
         cpu_count = Runtime.getRuntime().availableProcessors()
 
@@ -334,7 +334,7 @@ def create_bcl2fastq_command_line(run_id, command_path, input_run_data_path, fas
     args.extend(['--input-dir', input_run_data_path + '/Data/Intensities/BaseCalls'])
     args.extend(['--output-dir', fastq_output_dir])
 
-    if common.is_conf_value_equals_true(CASAVA_WITH_FAILED_READS_KEY, conf):
+    if common.is_conf_value_equals_true(BCL2FASTQ_WITH_FAILED_READS_KEY, conf):
         args.extend(['--with-failed-reads'])
 
     # Specific parameter
@@ -344,8 +344,8 @@ def create_bcl2fastq_command_line(run_id, command_path, input_run_data_path, fas
     # args.extend(['--stats-dir', fastq_output_dir + '/Stats'])
     # args.extend(['--reports-dir', fastq_output_dir + '/Reports'])
 
-    if common.is_conf_key_exists(CASAVA_ADDITIONNAL_ARGUMENTS_KEY, conf):
-        args.append(conf[CASAVA_ADDITIONNAL_ARGUMENTS_KEY])
+    if common.is_conf_key_exists(BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY, conf):
+        args.append(conf[BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY])
 
     # Retrieve output in file
     args.extend(['>', tmp_path + '/bcl2fastq_output_' + run_id + '.out'])
@@ -365,7 +365,7 @@ def demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesh
         conf: configuration dictionary
     """
 
-    bcl2fastq_executable_path = conf[CASAVA_PATH_KEY]
+    bcl2fastq_executable_path = conf[BCL2FASTQ_PATH_KEY]
 
     # Check if the bcl2fastq path is OK
     if os.path.isdir(bcl2fastq_executable_path):
@@ -500,7 +500,7 @@ def is_confirmed_fastq_existence(fastq_output_dir):
 
 
 def archive_demux_stat(run_id, fastq_output_dir, reports_data_path, basecall_stats_file,
-                       basecall_stats_prefix, design_csv_path, conf):
+                       basecall_stats_prefix, samplesheet_csv_path, conf):
     """ Archive demultplexing statistics results file.
 
     Arguments:
@@ -509,7 +509,7 @@ def archive_demux_stat(run_id, fastq_output_dir, reports_data_path, basecall_sta
         reports_data_path: directory to save archives
         basecall_stats_file: file to archive
         basecall_stats_prefix: prefix file to archive
-        design_csv_path: sample sheet in csv
+        samplesheet_csv_path: sample sheet in csv
         conf: configuration dictionary
     """
 
@@ -521,7 +521,7 @@ def archive_demux_stat(run_id, fastq_output_dir, reports_data_path, basecall_sta
     cmd_list = []
     cmd_list.extend(['cd', fastq_output_dir, '&&'])
     cmd_list.extend(['mkdir', archive_run_dir, '&&'])
-    cmd_list.extend(['cp', '-r', 'Reports', 'Stats', 'InterOp', design_csv_path, archive_run_dir, '&&'])
+    cmd_list.extend(['cp', '-r', 'Reports', 'Stats', 'InterOp', samplesheet_csv_path, archive_run_dir, '&&'])
     cmd_list.extend(['tar cjf', archive_run_tar_file, '-C', reports_data_path, archive_run_dirname])
 
     cmd = " ".join(cmd_list)
@@ -548,17 +548,17 @@ def archive_samplesheet(run_id, samplesheet_xls_path, samplesheet_csv_path, conf
         conf: configuration dictionary
     """
 
-    # Add design to the archive of designs
-    if common.is_conf_value_defined(CASAVA_SAMPLESHEET_FORMAT_KEY, 'xls', conf):
+    # Add samplesheet to the archive of samplesheets
+    if common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'xls', conf):
         cmd = 'cp ' + samplesheet_xls_path + ' ' + conf[TMP_PATH_KEY] + \
               ' && cd ' + conf[TMP_PATH_KEY] + \
-              ' && zip -q ' + conf[CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + conf[
-                  CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip ' + \
+              ' && zip -q ' + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] + '/' + conf[
+                  BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip ' + \
               os.path.basename(samplesheet_csv_path) + ' ' + os.path.basename(samplesheet_xls_path)
     else:
         cmd = 'cd ' + conf[TMP_PATH_KEY] + \
-              ' && zip -q ' + conf[CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + conf[
-                  CASAVA_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip ' + \
+              ' && zip -q ' + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] + '/' + conf[
+                  BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip ' + \
               os.path.basename(samplesheet_csv_path)
 
     common.log("INFO", "exec: " + cmd, conf)
@@ -567,9 +567,9 @@ def archive_samplesheet(run_id, samplesheet_xls_path, samplesheet_csv_path, conf
               'Error while archiving the sample sheet file for.\nCommand line:\n' + cmd, conf)
         return False
 
-    # Remove temporary design files
+    # Remove temporary samplesheet files
     os.remove(samplesheet_csv_path)
-    if common.is_conf_value_defined(CASAVA_SAMPLESHEET_FORMAT_KEY, 'xls', conf):
+    if common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'xls', conf):
         os.remove(conf[TMP_PATH_KEY] + '/' + os.path.basename(samplesheet_xls_path))
 
     return True
@@ -589,9 +589,9 @@ def demux(run_id, conf):
     reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
     reports_data_path = common.get_report_run_data_path(run_id, conf)
 
-    design_filename = build_samplesheet_filename(run_id, conf)
+    samplesheet_filename = build_samplesheet_filename(run_id, conf)
 
-    input_design_xls_path = conf[CASAVA_SAMPLESHEETS_PATH_KEY] + '/' + design_filename + '.xls'
+    input_samplesheet_xls_path = conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] + '/' + samplesheet_filename + '.xls'
 
     input_run_data_path = common.get_input_run_data_path(run_id, conf)
 
@@ -615,17 +615,17 @@ def demux(run_id, conf):
               "Fastq data directory does not exists: " + conf[FASTQ_DATA_PATH_KEY], conf)
         return False
 
-    # Check if casava designs path exists
-    if not common.is_dir_exists(CASAVA_SAMPLESHEETS_PATH_KEY, conf):
-        error("Casava sample sheets directory does not exists",
-              "Casava sample sheets does not exists: " + conf[CASAVA_SAMPLESHEETS_PATH_KEY], conf)
+    # Check if bcl2fastq samplesheets path exists
+    if not common.is_dir_exists(BCL2FASTQ_SAMPLESHEETS_PATH_KEY, conf):
+        error("bcl2fastq sample sheets directory does not exists",
+              "Bcl2fastq sample sheets does not exists: " + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY], conf)
         return False
 
-    # Check if casava/bcl2fastq basedir path exists
-    if not common.is_conf_value_equals_true(DEMUX_USE_DOCKER_ENABLE_KEY, conf):
-        if not common.is_dir_exists(CASAVA_PATH_KEY, conf):
-            error("Casava/bcl2fastq directory path does not exists",
-                  "Casava/bcl2fastq path does not exists: " + conf[CASAVA_PATH_KEY], conf)
+    # Check if bcl2fastq basedir path exists
+    if not common.is_conf_value_equals_true(BCL2FASTQ_USE_DOCKER_KEY, conf):
+        if not common.is_dir_exists(BCL2FASTQ_PATH_KEY, conf):
+            error("bcl2fastq directory path does not exists",
+                  "Bcl2fastq path does not exists: " + conf[BCL2FASTQ_PATH_KEY], conf)
             return False
 
     # Check if temporary directory exists
@@ -667,7 +667,7 @@ def demux(run_id, conf):
     common.log("WARNING", "Demux step: space needed: " + str(space_needed), conf)
 
     common.log("CONFIG", "Bcl2fastq Docker mode: " + str(
-        common.is_conf_value_equals_true(Settings.DEMUX_USE_DOCKER_ENABLE_KEY, conf)), conf)
+        common.is_conf_value_equals_true(Settings.BCL2FASTQ_USE_DOCKER_KEY, conf)), conf)
 
     # Check if free space is available
     if output_df < space_needed:
@@ -678,26 +678,26 @@ def demux(run_id, conf):
         return False
 
     # Check and convert if useful samplesheet
-    design_csv_path, design_warnings = check_samplesheet(run_id, input_run_data_path, design_filename, conf)
-    if not design_csv_path:
+    samplesheet_csv_path, samplesheet_warnings = check_samplesheet(run_id, input_run_data_path, samplesheet_filename, conf)
+    if not samplesheet_csv_path:
         return False
 
     # Check format compression bcl2fastq
     if not common.is_fastq_compression_format_valid(conf):
         error("error while checking FASTQ compression format",
-              "Invalid FASTQ compression format: " + conf[CASAVA_COMPRESSION_KEY], conf)
+              "Invalid FASTQ compression format: " + conf[BCL2FASTQ_COMPRESSION_KEY], conf)
         return False
 
     # Get the number of mismatches
-    nb_mismatch = conf[CASAVA_MISMATCHES_KEY]
+    nb_mismatch = conf[BCL2FASTQ_MISMATCHES_KEY]
 
     # Run demultiplexing
-    if common.is_conf_value_equals_true(Settings.DEMUX_USE_DOCKER_ENABLE_KEY, conf):
+    if common.is_conf_value_equals_true(Settings.BCL2FASTQ_USE_DOCKER_KEY, conf):
         # With image docker
-        if not demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, design_csv_path, nb_mismatch, conf):
+        if not demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, nb_mismatch, conf):
             return False
     else:
-        if not demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, design_csv_path, nb_mismatch, conf):
+        if not demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesheet_csv_path, nb_mismatch, conf):
             return False
 
     if not is_confirmed_fastq_existence(fastq_output_dir):
@@ -706,8 +706,8 @@ def demux(run_id, conf):
               conf)
         return False
 
-    # Copy design to output directory
-    cmd = "cp -p " + design_csv_path + ' ' + fastq_output_dir
+    # Copy samplesheet to output directory
+    cmd = "cp -p " + samplesheet_csv_path + ' ' + fastq_output_dir
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while copying sample sheet file to the fastq directory for run " + run_id,
@@ -716,11 +716,11 @@ def demux(run_id, conf):
 
     # Create archives on demultiplexing statistics
     if not archive_demux_stat(run_id, fastq_output_dir, reports_data_path, basecall_stats_file,
-                              basecall_stats_prefix, design_csv_path, conf):
+                              basecall_stats_prefix, samplesheet_csv_path, conf):
         return False
 
     # Archive samplesheet
-    if not archive_samplesheet(run_id, input_design_xls_path, design_csv_path, conf):
+    if not archive_samplesheet(run_id, input_samplesheet_xls_path, samplesheet_csv_path, conf):
         return False
 
     # Create index.hml file
@@ -742,9 +742,9 @@ def demux(run_id, conf):
           'Fastq files for this run ' + \
           'can be found in the following directory:\n  ' + fastq_output_dir
 
-    if design_warnings.size() > 0:
+    if samplesheet_warnings.size() > 0:
         msg += '\n\nSample sheet warnings:'
-        for warn in design_warnings:
+        for warn in samplesheet_warnings:
             msg += "\n  - " + warn
 
     # Add path to report if reports.url exists

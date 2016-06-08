@@ -35,7 +35,7 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
 
 /**
- * This class define a writer for bcl2fastq CSV samplesheet files.
+ * This class define a writer for Bcl2fastq CSV samplesheet files.
  * @since 2.0
  * @author Laurent Jourdren
  */
