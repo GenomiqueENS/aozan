@@ -369,7 +369,7 @@ def create_run_summary_reports(run_id, conf):
     os.mkdir(tmp_path)
 
     # Define set file to copy in report archive, check if exists (depend on parameters Illumina)
-    if common.is_sequencer_hiseq(run_id, conf):
+    if common.get_rta_major_version(run_id, conf) == 1:
         files = ['./Data/Status_Files', './Data/reports', './Data/Status.htm', './First_Base_Report.htm']
     else:
         files = ['./Config', './Recipe', './RTALogs', './RTAConfiguration.xml', './RunCompletionStatus.xml']

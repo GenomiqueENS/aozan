@@ -874,32 +874,6 @@ def get_rta_major_version(run_id, conf):
     raise Exception('Unknown RTA version (' + rtaversion + ') for run ' + run_id)
 
 
-def is_sequencer_hiseq(run_id, conf):
-    """ Check if sequencer is a HiSeq from the version of RTA software
-    Arguments:
-        run_id: run id
-        conf: configuration dictionary
-
-    Returns:
-        true if sequencer is a HiSeq
-    """
-
-    return get_rta_major_version(run_id, conf) == 1
-
-
-def is_sequencer_nextseq(run_id, conf):
-    """ Check if sequencer is a NextSeq from the version of RTA software
-    Arguments:
-        run_id: run id
-        conf: configuration dictionary
-
-    Returns:
-        true if sequencer is a NextSeq
-    """
-
-    return get_rta_major_version(run_id, conf) == 2
-
-
 def extract_rtaversion(run_id, conf):
     """ Extract RTA version from runParameter.xml file
     Arguments:
