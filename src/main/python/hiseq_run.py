@@ -232,7 +232,7 @@ def send_mail_if_recent_run(run_id, secs, conf):
     if last > 0:
         df = common.df(run_path) / (1024 * 1024 * 1024)
         du = common.du(run_path + '/' + run_id) / (1024 * 1024 * 1024)
-        common.send_msg('[Aozan] End of the HiSeq run ' + run_id, 'A new run (' + run_id + ') has been terminated at ' +
+        common.send_msg('[Aozan] End of the run ' + run_id, 'A new run (' + run_id + ') has been terminated at ' +
                         common.time_to_human_readable(last) + '.\n' +
                         'Data for this run can be found at: ' + run_path +
                         '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df), False, conf)

@@ -185,15 +185,15 @@ def send_report(run_id, conf):
         if not os.path.isfile(attachment_file):
             return False
 
-        message = 'You will find attached to this message the first base report on sequencer HiSeq for the run ' + \
+        message = 'You will find attached to this message the first base report for the run ' + \
                   run_id + '.\n\n' + description_run
-        common.send_msg_with_attachment('[Aozan] First base report for HiSeq run ' + type_run_estimated + '  ' + run_id,
+        common.send_msg_with_attachment('[Aozan] First base report for the run ' + type_run_estimated + '  ' + run_id,
                                         message, attachment_file, conf)
 
     else:
         # With other no attachment file
-        message = 'You will find below features on new run on NextSeq ' + run_id + '.\n\n' + description_run
-        common.send_msg('[Aozan] Detection new run on sequencer NextSeq ' + type_run_estimated + '  ' + run_id, message,
+        message = 'You will find below the parameters of the run ' + run_id + '.\n\n' + description_run
+        common.send_msg('[Aozan] New run ' + type_run_estimated + ':  ' + run_id, message,
                         False, conf)
 
     return True

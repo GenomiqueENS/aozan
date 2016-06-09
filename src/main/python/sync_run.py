@@ -108,14 +108,14 @@ def partial_sync(run_id, last_sync, conf):
 
     # Check if hiseq_data_path exists
     if hiseq_data_path is False:
-        error('HiSeq run data not found',
-              'HiSeq data for run ' + run_id + 'not found in HiSeq directories (' + conf[HISEQ_DATA_PATH_KEY] + ')',
+        error('Sequencer run data not found',
+              'Sequencer data for run ' + run_id + 'not found in sequencer directories (' + conf[HISEQ_DATA_PATH_KEY] + ')',
               conf)
         return False
 
     # Check if hiseq_data_path exists
     if not os.path.exists(hiseq_data_path):
-        error("HiSeq directory does not exists", "HiSeq directory does not exists: " + hiseq_data_path, conf)
+        error("Sequencer directory does not exists", "Sequencer directory does not exists: " + hiseq_data_path, conf)
         return False
 
     # Check if bcl_data_path exists

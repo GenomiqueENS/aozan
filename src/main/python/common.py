@@ -57,10 +57,6 @@ from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_E
 
 from fr.ens.biologie.genomique.aozan.util import StringUtils
 
-HISEQ_NAME = 'hiseq'
-NEXTSEQ_NAME = 'nextseq'
-
-
 def df(path):
     """Get the free space on a partition.
 
@@ -236,7 +232,7 @@ def get_input_run_data_path(run_id, conf):
         path = hiseq_run.find_hiseq_run_path(run_id, conf)
 
     if path is None or path is False or not os.path.exists(path):
-        error("Hiseq data directory does not exists.", "Hiseq data data directory does not exists.",
+        error("Sequencer data directory does not exists.", "Sequencer data data directory does not exists.",
               get_last_error_file(conf), conf)
         return None
 
@@ -742,7 +738,7 @@ def check_configuration(conf, configuration_file_path):
         # Check if hiseq_data_path exists
         for hiseq_output_path in hiseq_run.get_hiseq_data_paths(conf):
             if not os.path.exists(hiseq_output_path):
-                msg += '\n\t* HiSeq directory does not exists: ' + hiseq_output_path
+                msg += '\n\t* Sequencer output directory does not exists: ' + hiseq_output_path
 
     # # For step SYNC
     if Settings.SYNC_STEP_KEY in steps_to_launch:
