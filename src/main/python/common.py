@@ -937,6 +937,25 @@ def is_RTA_2_version(run_id, conf):
 
 
 def get_instrument_name(run_id, conf):
+    """ Identify the sequencer name
+    Arguments:
+        run_id: run id
+        conf: configuration dictionary
+
+    Return:
+        A string with the instrument name
+    """
+
+    instrument_serial_number = run_id.split('_')[1]
+    key = 'sequencer.name.' + instrument_serial_number
+
+    if key in conf:
+        return conf[key]
+    else:
+        return get_instrument_model(run_id, conf)
+
+
+def get_instrument_model(run_id, conf):
     """ Identify the sequencer model from runParameter.xml file
     Arguments:
         run_id: run id
@@ -966,6 +985,8 @@ def get_instrument_name(run_id, conf):
         sequencer_model += ' ' + instrument_tags[0].text
 
     return sequencer_model
+
+
 
 
 def extract_elements_by_tag_name_from_xml(xml_path, tag_name):
