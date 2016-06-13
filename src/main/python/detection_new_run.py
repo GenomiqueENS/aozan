@@ -19,6 +19,7 @@ from fr.ens.biologie.genomique.aozan.Settings import FIRST_BASE_REPORT_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_STEP_KEY
 
 DONE_FILE = 'first_base_report.done'
+FIRST_BASE_REPORT_FILE = 'First_Base_Report.htm'
 
 
 def load_processed_run_ids(conf):
@@ -67,6 +68,10 @@ def get_available_run_ids(conf):
 
             # NextSeq sequencer create this file after clusterisation step
             if not os.path.exists(hiseq_data_path + '/' + f + '/RunInfo.xml'):
+                continue
+
+            if common.get_rta_major_version(f, conf) == 1 and \
+                    not os.path.exists(hiseq_data_path + '/' + FIRST_BASE_REPORT_FILE):
                 continue
 
             if not detection_end_run.check_end_run(f, conf):
@@ -179,7 +184,7 @@ def send_report(run_id, conf):
 
     if rta_major_version == 1:
         # With HiSeq send the first base report file
-        attachment_file = str(hiseq_run.find_hiseq_run_path(run_id, conf)) + '/' + run_id + '/First_Base_Report.htm'
+        attachment_file = str(hiseq_run.find_hiseq_run_path(run_id, conf)) + '/' + run_id + '/' + FIRST_BASE_REPORT_FILE
 
         # Do not send a message if the First base report file does not exists
         if not os.path.isfile(attachment_file):
