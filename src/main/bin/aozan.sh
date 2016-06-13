@@ -49,6 +49,9 @@ if [ `ls $LIBDIR/jython-standalone-*.jar | wc -l` -ne 1 ]; then
 	exit 1
 fi
 
+# Force language
+export LANG=C
+
 # Launch Aozan
 $JAVA_CMD \
         $JVM_OPTS \
