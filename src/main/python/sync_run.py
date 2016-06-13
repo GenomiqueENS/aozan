@@ -109,8 +109,8 @@ def partial_sync(run_id, last_sync, conf):
     # Check if hiseq_data_path exists
     if hiseq_data_path is False:
         error('Sequencer run data not found',
-              'Sequencer data for run ' + run_id + 'not found in sequencer directories (' + conf[HISEQ_DATA_PATH_KEY] + ')',
-              conf)
+              'Sequencer data for run ' + run_id + ' not found in sequencer directories (' +
+              conf[HISEQ_DATA_PATH_KEY] + ')', conf)
         return False
 
     # Check if hiseq_data_path exists
