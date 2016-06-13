@@ -393,6 +393,7 @@ def create_msg(mail_from, mail_to, mail_cc, mail_bcc, subject, message, conf):
     COMMASPACE = ', '
     message = conf[MAIL_HEADER_KEY].replace('\\n', '\n') + message + conf[MAIL_FOOTER_KEY].replace('\\n', '\n')
     message = message.replace('\n', '\r\n')
+    message = unicode(message)
 
     msg = MIMEMultipart()
     msg['From'] = mail_from
@@ -410,10 +411,10 @@ def create_msg(mail_from, mail_to, mail_cc, mail_bcc, subject, message, conf):
     msg['Date'] = formatdate()
 
     # Not seen
-    msg.preamble = message
+    msg.preamble = message.encode('ascii', 'ignore')
 
     # The message
-    part1 = MIMEText(message, 'plain')
+    part1 = MIMEText(message, 'plain', 'utf-8')
     msg.attach(part1)
 
     return msg
