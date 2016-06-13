@@ -11,7 +11,7 @@ from optparse import OptionParser
 import common, hiseq_run, sync_run, demux_run, qc_run
 import estimate_space_needed
 from java.util import Locale
-# import first_base_report
+
 import detection_new_run, detection_end_run
 from java.util import LinkedHashMap
 from fr.ens.biologie.genomique.aozan import Globals
@@ -19,7 +19,6 @@ from fr.ens.biologie.genomique.aozan import Common
 from fr.ens.biologie.genomique.aozan import AozanException
 
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_STEP_KEY
-from fr.ens.biologie.genomique.aozan.Settings import FIRST_BASE_REPORT_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import DEMUX_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import QC_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import DEMUX_USE_HISEQ_OUTPUT_KEY

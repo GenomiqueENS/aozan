@@ -3,7 +3,7 @@
 '''
 Created on 6 avril 2015
 
-With include NextSeq management, replace old first_base_report.py
+With include NextSeq management, replace the old first_base_report.py script
 
 @author: Laurent Jourdren
 @author: Sandrine Perrin
