@@ -254,6 +254,7 @@ def sync(run_id, conf):
 
     msg += '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df)
 
-    common.send_msg('[Aozan] End of synchronization for run ' + run_id, msg, False, conf)
+    common.send_msg('[Aozan] End of synchronization for run ' + run_id + ' on ' +
+                    common.get_instrument_name(run_id, conf), msg, False, conf)
     common.log('INFO', 'sync step: success in ' + common.duration_to_human_readable(duration), conf)
     return True

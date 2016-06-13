@@ -99,7 +99,8 @@ def error(run_id, type_file, space_needed, space_free, dir_path, conf):
         conf: configuration dictionary
     """
 
-    short_message = "not enough disk space to store " + type_file + " for run " + run_id
+    short_message = "not enough disk space to store " + type_file + " for run " + run_id + ' on ' + \
+                    common.get_instrument_name(run_id, conf)
     message = type_file + " : not enough disk space to store files for run " + run_id + ' on ' + dir_path + '.\n'
     message = message + '%.2f GB' % (space_needed / 1024 / 1024 / 1024) + ' is needed by Aozan'
     message = message + ' however only %.2f GB' % (

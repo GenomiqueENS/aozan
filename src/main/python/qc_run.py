@@ -232,6 +232,7 @@ def qc(run_id, conf):
 
     msg += '\n\nFor this task %.2f MB has been used and %.2f GB still free.' % (du, df)
 
-    common.send_msg_with_attachment('[Aozan] End of quality control for run ' + run_id, msg, html_report_file, conf)
+    common.send_msg_with_attachment('[Aozan] End of quality control for run ' + run_id + ' on ' +
+                                    common.get_instrument_name(run_id, conf), msg, html_report_file, conf)
     common.log('INFO', 'QC step: success in ' + common.duration_to_human_readable(duration), conf)
     return True

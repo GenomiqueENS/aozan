@@ -900,42 +900,6 @@ def extract_rtaversion(run_id, conf):
     raise Exception('Unable to locate run parameter file to get RTA version for run ' + run_id)
 
 
-def is_RTA_1_version(run_id, conf):
-    """ Identify sequencer type from runParameter.xml file, from the version of RTA software
-    Arguments:
-        run_id: run id
-        conf: configuration dictionary
-
-    Return:
-        True is RTA version is 1.X
-    """
-
-    rta_version = extract_rtaversion(run_id, conf)
-
-    if rta_version is None:
-        return None
-
-    return rta_version.startswith("1.")
-
-
-def is_RTA_2_version(run_id, conf):
-    """ Identify sequencer type from runParameter.xml file, from the version of RTA software
-    Arguments:
-        run_id: run id
-        conf: configuration dictionary
-
-    Return:
-        True is RTA version is 2.X
-    """
-
-    rta_version = extract_rtaversion(run_id, conf)
-
-    if rta_version is None:
-        return None
-
-    return rta_version.startswith("2.")
-
-
 def get_instrument_name(run_id, conf):
     """ Identify the sequencer name
     Arguments:
