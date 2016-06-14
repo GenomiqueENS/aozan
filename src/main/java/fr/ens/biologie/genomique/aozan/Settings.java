@@ -116,6 +116,10 @@ public final class Settings {
   /** Fastq space factor. */
   public static final String FASTQ_SPACE_FACTOR_KEY = "fastq.space.factor";
 
+  /** First base report step. */
+  public static final String FIRST_BASE_REPORT_STEP_KEY =
+      "first.base.report.step";
+
   /** Index html template path. */
   public static final String INDEX_HTML_TEMPLATE_KEY = "index.html.template";
   /** Index sequences path. */
