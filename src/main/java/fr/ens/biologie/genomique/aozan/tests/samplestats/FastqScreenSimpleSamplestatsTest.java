@@ -151,7 +151,7 @@ public class FastqScreenSimpleSamplestatsTest extends AbstractSimpleSampleTest {
     String genomeSampleReference = null;
     try {
       genomeSampleReference =
-          GenomeAliases.getInstance().getGenomeNameFromAlias(genomeSample);
+          GenomeAliases.getInstance().get(genomeSample);
     } catch (final AozanException e) {
     }
 

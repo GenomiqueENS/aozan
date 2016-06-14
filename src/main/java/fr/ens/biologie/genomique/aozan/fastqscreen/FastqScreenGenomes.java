@@ -26,8 +26,6 @@ package fr.ens.biologie.genomique.aozan.fastqscreen;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -39,12 +37,9 @@ import java.util.regex.Pattern;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
-import com.google.common.io.FileWriteMode;
-import com.google.common.io.Files;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Common;
-import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
@@ -55,8 +50,8 @@ import fr.ens.biologie.genomique.eoulsan.data.DataFile;
 
 /**
  * This class read the alias genome file. It make correspondence between genome
- * name in Bcl2fastq samplesheet file and the genome name reference used for identified
- * index of bowtie mapper.
+ * name in Bcl2fastq samplesheet file and the genome name reference used for
+ * identified index of bowtie mapper.
  * @since 1.3
  * @author Sandrine Perrin
  */
@@ -77,30 +72,28 @@ public class FastqScreenGenomes {
 
   /**
    * Set reference genomes for the samples of a run. Retrieve list of genomes
-   * sample from Bcl2fastq samplesheet file and filtered them compared to alias genome
-   * file. Keep only if it can be create the genome description object.
+   * sample from Bcl2fastq samplesheet file and filtered them compared to alias
+   * genome file. Keep only if it can be create the genome description object.
    * @return collection valid genomes names can be use for mapping
    * @throws AozanException if an error occurs during updating alias genomes
    *           file
    */
   private Set<String> initSampleGenomes(
       final Set<String> genomesReferencesSample, final File aliasGenomesFile)
-          throws AozanException {
+      throws AozanException {
 
     // Identify genomes can be use for mapping
     final Set<String> genomes = new HashSet<>();
-    final Set<String> newGenomes = new HashSet<>();
 
-    final GenomeAliases genomesAliases = GenomeAliases.getInstance();
+    final GenomeAliases genomeAliases = GenomeAliases.getInstance();
 
-    for (final String genome : genomesReferencesSample) {
-      final DataFile genomeFile = new DataFile("genome://" + genome);
+    for (final String genomeName : genomesReferencesSample) {
 
       // Retrieve genome description if it exists
       GenomeDescription gdesc = null;
       try {
         gdesc = GenomeDescriptionCreator.getInstance()
-            .createGenomeDescription(genomeFile);
+            .createGenomeDescription(new DataFile("genome://" + genomeName));
       } catch (final Exception isIgnored) {
         // Do nothing
       }
@@ -108,29 +101,26 @@ public class FastqScreenGenomes {
       // Check if a genome is available for mapping
       if (gdesc != null) {
         // Genome description exist for the genome
-        genomes.add(genome);
-        genomesAliases.addAlias(genome, genome);
+        genomes.add(genomeName);
+
+        // Add the genome as Alias if not exists
+        if (!genomeAliases.contains(genomeName)) {
+          genomeAliases.addAlias(genomeName, genomeName);
+        }
 
       } else {
-        // Parse alias file to find a valid genome name
-        final String aliasGenomeName =
-            genomesAliases.getGenomeNameFromAlias(genome);
 
-        if (aliasGenomeName == null || aliasGenomeName.isEmpty()) {
-          // No genome name found, add entry in alias genomes file
-          newGenomes.add(genome);
-
+        if (!genomeAliases.contains(genomeName)) {
+          genomeAliases.addUnknownAlias(genomeName);
         } else {
-          // Replace genome name from samplesheet file by valid name
-          genomes.add(aliasGenomeName);
-          genomesAliases.addAlias(genome, aliasGenomeName);
+          genomes.add(genomeAliases.get(genomeName));
         }
+
       }
     }
 
-    // Update alias genomes file
-    this.updateAliasGenomeFile(aliasGenomesFile,
-        Collections.unmodifiableSet(newGenomes));
+    // Update new unknown genome aliases
+    genomeAliases.saveUnknownAliases();
 
     // Union genomes contaminants and genomes references
     final Set<String> genomesToMap =
@@ -141,43 +131,12 @@ public class FastqScreenGenomes {
   }
 
   /**
-   * Add the genome of the sample in the file which does correspondence with
-   * reference genome.
-   * @param genomesToAdd genomes must be added in alias genomes file
-   */
-  private void updateAliasGenomeFile(final File aliasGenomesFile,
-      final Set<String> genomesToAdd) {
-
-    // None genome to add
-    if (genomesToAdd.isEmpty()) {
-      return;
-    }
-
-    try {
-      if (aliasGenomesFile.exists()) {
-
-        final Writer fw = Files.asCharSink(aliasGenomesFile,
-            Globals.DEFAULT_FILE_ENCODING, FileWriteMode.APPEND).openStream();
-
-        for (final String genomeSample : genomesToAdd) {
-          fw.write(genomeSample + "=\n");
-        }
-
-        fw.flush();
-        fw.close();
-      }
-    } catch (final IOException ignored) {
-      LOGGER.warning(
-          "Writing alias genomes file failed : file can not be updated.");
-    }
-  }
-
-  /**
    * Initialize collection on genomes reference names from the samples
    * sequencing.
    * @return collection on genomes reference names for the samples
    */
-  private Set<String> createSampleRefsFromSamplesheetFile(final File samplesheetFile) {
+  private Set<String> createSampleRefsFromSamplesheetFile(
+      final File samplesheetFile) {
 
     final Set<String> genomesFromSamplesheet = new HashSet<>();
 
@@ -208,8 +167,9 @@ public class FastqScreenGenomes {
       }
 
       // TODO
-      LOGGER.warning("FQS-genomeMapper: list genome names found in samplesheet: "
-          + Joiner.on(", ").join(genomesFromSamplesheet));
+      LOGGER
+          .warning("FQS-genomeMapper: list genome names found in samplesheet: "
+              + Joiner.on(", ").join(genomesFromSamplesheet));
 
       return genomesFromSamplesheet;
 
@@ -299,7 +259,8 @@ public class FastqScreenGenomes {
 
     final File aliasGenomesFile = new File(properties
         .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
-    final File sampleshettFile = new File(properties.get(QC.BCL2FASTQ_SAMPLESHEET_PATH));
+    final File sampleshettFile =
+        new File(properties.get(QC.BCL2FASTQ_SAMPLESHEET_PATH));
     final String contaminantGenomeNames =
         properties.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
 
@@ -341,8 +302,9 @@ public class FastqScreenGenomes {
    *          genomes
    * @throws AozanException if an error occurs while creating the object
    */
-  public FastqScreenGenomes(final File aliasGenomesFile, final File samplesheetFile,
-      final String contaminantGenomeNames) throws AozanException {
+  public FastqScreenGenomes(final File aliasGenomesFile,
+      final File samplesheetFile, final String contaminantGenomeNames)
+      throws AozanException {
 
     checkNotNull(aliasGenomesFile, "aliasGenomesFile argument cannot be null");
     checkNotNull(samplesheetFile, "samplesheetFile argument cannot be null");

@@ -28,11 +28,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
+import java.io.Writer;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
+import org.python.google.common.base.Strings;
+
+import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
@@ -52,8 +57,12 @@ public class GenomeAliases {
 
   private static GenomeAliases singleton;
 
-  // Associated genome name from samplesheet file with valid genome call for mapping
-  private final Map<String, String> genomesAliases = new HashMap<>();
+  // Associated genome name from samplesheet file with valid genome call for
+  // mapping
+  private final File genomeAliasesFile;
+  private final Map<String, String> genomeAliases = new HashMap<>();
+  private final Set<String> unknownAliases = new HashSet<>();
+  private final Set<String> newUnknownAliases = new HashSet<>();
 
   /**
    * Return the reference genome corresponding to the genome sample if it is
@@ -62,49 +71,63 @@ public class GenomeAliases {
    * @return reference genome corresponding to genome if it exists or empty
    *         string or null if no genome exist.
    */
-  public String getGenomeNameFromAlias(final String genomeName) {
+  public String get(final String genomeName) {
 
     checkNotNull(genomeName, "genome argument cannot be null");
 
-    final String genomeTrimmed =
-        genomeName.replaceAll("\"", "").trim().toLowerCase();
+    final String key = createKey(genomeName);
 
-    return this.genomesAliases.get(genomeTrimmed);
+    if (!this.genomeAliases.containsKey(key)) {
+      return null;
+    }
 
+    return this.genomeAliases.get(key).trim();
+  }
+
+  public boolean contains(final String genomeName) {
+
+    checkNotNull(genomeName, "genome argument cannot be null");
+
+    final String key = createKey(genomeName);
+
+    return this.genomeAliases.containsKey(key);
   }
 
   /**
    * Create a map which does correspondence between genome of sample and
    * reference genome from a file, the path is in aozan configuration.
-   * @param aliasFilePath alias file path
-   * @throws AozanException if alias genomes file doesn't exist.
+   * @param aliasFile alias file
+   * @throws AozanException if genome aliases file doesn't exist.
    */
-  private static Map<String, String> loadAliasGenomesFile(
-      final String aliasFilePath) throws AozanException {
+  private void loadGenomeAliasFile(final File aliasFile) throws AozanException {
 
-    if (aliasFilePath == null || aliasFilePath.trim().length() == 0) {
+    if (aliasFile == null) {
       LOGGER.fine("FastqScreen no alias genome file parameter define.");
-      return Collections.emptyMap();
+      return;
     }
-
-    final File aliasGenomesFile = new File(aliasFilePath.trim());
 
     final Map<String, String> genomes = new HashMap<>();
 
     // Not found alias genomes file
-    if (!aliasGenomesFile.exists()) {
+    if (!aliasFile.exists()) {
       throw new AozanException("FastqScreen alias genome file doesn't exists "
-          + aliasGenomesFile.getAbsolutePath());
+          + aliasFile.getAbsolutePath());
     }
 
     try {
       // Read alias genomes files
       final BufferedReader br =
-          Files.newReader(aliasGenomesFile, Globals.DEFAULT_FILE_ENCODING);
+          Files.newReader(aliasFile, Globals.DEFAULT_FILE_ENCODING);
 
       String line = null;
 
       while ((line = br.readLine()) != null) {
+
+        line = line.trim();
+
+        if (line.isEmpty() || line.startsWith("#")) {
+          continue;
+        }
 
         final int pos = line.indexOf('=');
         if (pos == -1) {
@@ -114,21 +137,19 @@ public class GenomeAliases {
         final String key = line.substring(0, pos);
         final String value = line.substring(pos + 1);
 
-        // Retrieve genomes identified in Bcl2fastq samplesheet file
-        // Certain have not genome name reference
         if (!(value == null || value.isEmpty())) {
-          genomes.put(key, value);
+          genomes.put(createKey(key), value);
+        } else {
+          this.unknownAliases.add(key);
         }
+
       }
       br.close();
 
     } catch (final IOException ignored) {
       LOGGER.warning("Reading alias genomes file failed: "
           + "none genome sample can be used for detection contamination.");
-      return Collections.emptyMap();
     }
-
-    return Collections.unmodifiableMap(genomes);
   }
 
   /**
@@ -141,7 +162,55 @@ public class GenomeAliases {
     checkNotNull(genomeName, "genomeName parameter cannot be null");
     checkNotNull(alias, "alias parameter cannot be null");
 
-    this.genomesAliases.put(genomeName, alias);
+    this.genomeAliases.put(genomeName, alias);
+  }
+
+  /**
+   * Add an alias.
+   * @param genomeName alias
+   * @param alias the value of the alias
+   */
+  public void addUnknownAlias(final String genomeName) {
+
+    checkNotNull(genomeName, "genomeName parameter cannot be null");
+
+    if (this.unknownAliases.contains(createKey(genomeName))) {
+      this.newUnknownAliases.add(genomeName);
+    }
+  }
+
+  /**
+   * Add the genome of the sample in the file which does correspondence with
+   * reference genome.
+   * @param genomesToAdd genomes must be added in alias genomes file
+   */
+  public void saveUnknownAliases() {
+
+    // None genome to add
+    if (this.newUnknownAliases.isEmpty()) {
+      return;
+    }
+
+    try {
+      if (this.genomeAliasesFile.exists()) {
+
+        final Writer fw =
+            Files
+                .asCharSink(this.genomeAliasesFile,
+                    Globals.DEFAULT_FILE_ENCODING, FileWriteMode.APPEND)
+                .openStream();
+
+        for (final String genomeSample : this.newUnknownAliases) {
+          fw.write(genomeSample + "=\n");
+        }
+
+        fw.flush();
+        fw.close();
+      }
+    } catch (final IOException ignored) {
+      LOGGER.warning(
+          "Writing alias genomes file failed : file can not be updated.");
+    }
   }
 
   //
@@ -177,6 +246,12 @@ public class GenomeAliases {
     return singleton;
   }
 
+  private String createKey(final String genomeName) {
+
+    return genomeName.replaceAll("\"", "").replaceAll(" ", "").trim()
+        .toLowerCase();
+  }
+
   //
   // Constructor
   //
@@ -187,8 +262,13 @@ public class GenomeAliases {
    */
   private GenomeAliases(final Map<String, String> props) throws AozanException {
 
-    this.genomesAliases.putAll(loadAliasGenomesFile(props
-        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY)));
+    final String genomeAliasesFilename =
+        props.get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY);
+
+    this.genomeAliasesFile = Strings.emptyToNull(genomeAliasesFilename) == null
+        ? null : new File(genomeAliasesFilename.trim());
+
+    loadGenomeAliasFile(this.genomeAliasesFile);
   }
 
 }

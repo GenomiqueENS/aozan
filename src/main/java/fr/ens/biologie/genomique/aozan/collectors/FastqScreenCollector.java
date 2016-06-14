@@ -185,7 +185,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
       // Get corresponding valid genome name for mapping
       sampleGenomeName =
-          GenomeAliases.getInstance().getGenomeNameFromAlias(sampleRef);
+          GenomeAliases.getInstance().get(sampleRef);
 
       Common.getLogger()
           .info("FQS-extract genomeRef for sample "
