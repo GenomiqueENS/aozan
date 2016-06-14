@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.python.google.common.base.Strings;
+import com.google.common.base.Strings;
 
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
