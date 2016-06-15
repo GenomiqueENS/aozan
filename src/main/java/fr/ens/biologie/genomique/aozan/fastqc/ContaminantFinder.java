@@ -23,8 +23,6 @@
 
 package fr.ens.biologie.genomique.aozan.fastqc;
 
-import static fr.ens.biologie.genomique.aozan.util.StringUtils.stackTraceToString;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -34,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
 import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.Globals;
@@ -79,21 +76,7 @@ public class ContaminantFinder {
     }
 
     if (bestHit == null) {
-
-      try {
-
-        final ContaminantHit contaminantBlast =
-            OverrepresentedSequencesBlast.getInstance().blastSequence(sequence);
-
-        if (contaminantBlast != null) {
-          bestHit = contaminantBlast;
-        }
-
-      } catch (final IOException | AozanException e) {
-
-        LOGGER.warning("Error during find contaminant with blast : "
-            + e.getMessage() + "\n" + stackTraceToString(e));
-      }
+      return new BlastContaminantHit(sequence);
     }
 
     return bestHit;
