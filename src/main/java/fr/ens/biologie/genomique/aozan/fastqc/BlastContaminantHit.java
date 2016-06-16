@@ -34,15 +34,14 @@ public class BlastContaminantHit extends ContaminantHit {
     try {
 
       // Get the blast result
-      final ContaminantHit result =
+      final BlastResultHit result =
           OverrepresentedSequencesBlast.getInstance().getResult(this.sequence);
 
-      // return the result
+      // Return the result
       if (result != null) {
-        result.toString();
+        return result.toString();
       }
 
-      return super.toString();
     } catch (final IOException | AozanException e) {
 
       Common.getLogger().warning("Error during find contaminant with blast : "

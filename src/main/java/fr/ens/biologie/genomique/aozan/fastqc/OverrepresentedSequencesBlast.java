@@ -23,11 +23,11 @@
 
 package fr.ens.biologie.genomique.aozan.fastqc;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.biologie.genomique.aozan.util.StringUtils.stackTraceToString;
 import static fr.ens.biologie.genomique.aozan.util.XMLUtilsParser.extractFirstValueToInt;
 import static fr.ens.biologie.genomique.aozan.util.XMLUtilsParser.extractFirstValueToString;
 import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.checkExistingFile;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -66,7 +66,6 @@ import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
 import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
-import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
 
 /**
  * This class launches blastn on one sequence query and parses xml result file
@@ -88,6 +87,7 @@ public class OverrepresentedSequencesBlast {
   private static final Object LOCK = new Object();
 
   // Tag configuration general of blast
+  private static final String HIT_TAG = "Hit";
   private static final String QUERY_LENGTH_TAG = "Iteration_query-len";
   private static final String QUERY_DEF_TAG = "Iteration_query-def";
   private static final String BLAST_VERSION_TAG = "BlastOutput_version";
@@ -240,7 +240,8 @@ public class OverrepresentedSequencesBlast {
 
     checkNotNull(sequence, "sequence argument cannot be null");
 
-    if (!this.sequencesAlreadyAnalysis.containsKey(sequence)) {
+    if (!this.sequencesAlreadyAnalysis.containsKey(sequence)
+        && !this.submittedSequences.contains(sequence)) {
       synchronized (this.submittedSequences) {
         this.submittedSequences.add(sequence);
       }
@@ -250,11 +251,11 @@ public class OverrepresentedSequencesBlast {
   /**
    * Get the blast result of a sequence
    * @param sequence the sequence to blast
-   * @return the result as ContaminantHit object
+   * @return the result as BlastResultHit object
    * @throws IOException if an error occurs while blasting sequences
    * @throws AozanException if an error occurs while blasting sequences
    */
-  public ContaminantHit getResult(final String sequence)
+  public BlastResultHit getResult(final String sequence)
       throws IOException, AozanException {
 
     checkNotNull(sequence, "sequence argument cannot be null");
@@ -267,10 +268,15 @@ public class OverrepresentedSequencesBlast {
 
     // Return the result if it already been computed
     if (this.sequencesAlreadyAnalysis.containsKey(sequence)) {
-      return this.sequencesAlreadyAnalysis.get(sequence).toContaminantHit();
+      return this.sequencesAlreadyAnalysis.get(sequence);
     }
 
     synchronized (this.submittedSequences) {
+
+      // Return the result if it already been computed since the end of the lock
+      if (this.sequencesAlreadyAnalysis.containsKey(sequence)) {
+        return this.sequencesAlreadyAnalysis.get(sequence);
+      }
 
       // Add the sequence to the submitted list
       this.submittedSequences.add(sequence);
@@ -282,7 +288,7 @@ public class OverrepresentedSequencesBlast {
       this.submittedSequences.clear();
 
       // Return the result
-      return this.sequencesAlreadyAnalysis.get(sequence).toContaminantHit();
+      return this.sequencesAlreadyAnalysis.get(sequence);
     }
   }
 
@@ -364,6 +370,7 @@ public class OverrepresentedSequencesBlast {
     final Map<String, String> result = new HashMap<>();
 
     LOGGER.info("FastQC-step: Launch " + sequences.size() + " blast(s)");
+    LOGGER.fine("FastQC-step: Blast command line: " + cmd);
 
     Process process;
     try {
@@ -377,7 +384,7 @@ public class OverrepresentedSequencesBlast {
       int count = 0;
       for (String sequence : sequences) {
 
-        String seqId = "seq" + count;
+        final String seqId = "seq" + ++count;
 
         os.write(">" + seqId + "\n" + sequence + "\n");
         result.put(seqId, sequence);
@@ -399,7 +406,7 @@ public class OverrepresentedSequencesBlast {
   }
 
   //
-  // Methods to parsing xml file.
+  // XML Parsing methods
   //
 
   /**
@@ -481,10 +488,10 @@ public class OverrepresentedSequencesBlast {
   }
 
   /**
-   * Search hit in xml result file.
-   * @param doc root of the xml file
+   * Search hit in XML result file.
+   * @param doc root of the XML file
    * @param sequence query blastn
-   * @return best hit contained in xml file or null
+   * @return best hit contained in XML file or null
    */
   private static Map<String, BlastResultHit> parseHit(final Document doc,
       final Map<String, String> sequences) {
@@ -494,29 +501,36 @@ public class OverrepresentedSequencesBlast {
     final List<Element> responses =
         XMLUtils.getElementsByTagName(doc, "Iteration");
 
-    // final Element elemIteration = responses.get(0);
+    if (responses == null) {
 
-    for (Element elemIteration : responses) {
+      // Empty responses
+      for (String seqId : sequences.keySet()) {
+        result.put(seqId, null);
+      }
+    } else {
 
-      final int queryLength =
-          extractFirstValueToInt(elemIteration, QUERY_LENGTH_TAG);
+      // Entries in responses
+      for (Element elemIteration : responses) {
 
-      final String seqId =
-          extractFirstValueToString(elemIteration, QUERY_DEF_TAG);
-      final String sequence = sequences.get(seqId);
+        final Integer queryLength =
+            extractFirstValueToInt(elemIteration, QUERY_LENGTH_TAG);
 
-      final List<Element> hits =
-          XMLUtils.getElementsByTagName(elemIteration, "Hit");
-      final int hitCount = hits.size();
+        final String seqId =
+            extractFirstValueToString(elemIteration, QUERY_DEF_TAG);
+        final String sequence = sequences.get(seqId);
 
-      // No hit found
-      if (hitCount == 0) {
-        result.put(sequence, null);
-      } else {
+        final List<Element> hits =
+            XMLUtils.getElementsByTagName(elemIteration, HIT_TAG);
 
-        // Parse the first hit to build result
-        result.put(sequence, new BlastResultHit(hits.get(0), hitCount,
-            queryLength, sequence, BLAST_RESULT_HTML_TYPE));
+        // No hit found
+        if (hits.isEmpty()) {
+          result.put(sequence, null);
+        } else {
+
+          // Parse the first hit to build result
+          result.put(sequence, new BlastResultHit(hits.get(0), hits.size(),
+              queryLength, sequence, BLAST_RESULT_HTML_TYPE));
+        }
       }
     }
 
