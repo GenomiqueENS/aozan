@@ -27,7 +27,7 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
-import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatistics;
+import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector;
 
 /**
  * The class define a test the maximum on passing filter clusters on samples in
@@ -40,13 +40,13 @@ public class PFClusterMaxSampleTest extends AbstractSimpleSampleTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(SampleStatistics.COLLECTOR_NAME);
+    return ImmutableList.of(SampleStatisticsCollector.COLLECTOR_NAME);
   }
 
   @Override
   protected String getKey(final String sampleName) {
 
-    return SampleStatistics.COLLECTOR_PREFIX
+    return SampleStatisticsCollector.COLLECTOR_PREFIX
         + sampleName + ".pf.cluster.max";
   }
 

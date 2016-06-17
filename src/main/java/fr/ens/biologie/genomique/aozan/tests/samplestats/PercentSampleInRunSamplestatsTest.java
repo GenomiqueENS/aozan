@@ -31,7 +31,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
-import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatistics;
+import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
@@ -49,7 +49,7 @@ public class PercentSampleInRunSamplestatsTest extends AbstractSampleTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(SampleStatistics.COLLECTOR_NAME);
+    return ImmutableList.of(SampleStatisticsCollector.COLLECTOR_NAME);
   }
 
   @Override
@@ -61,7 +61,7 @@ public class PercentSampleInRunSamplestatsTest extends AbstractSampleTest {
 
     // Build key for run data
     final String rawClusterSumKey =
-        SampleStatistics.COLLECTOR_PREFIX + sampleName + ".raw.cluster.sum";
+        SampleStatisticsCollector.COLLECTOR_PREFIX + sampleName + ".raw.cluster.sum";
 
     final int laneCount = data.getLaneCount();
 

@@ -47,7 +47,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
 
-import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatistics;
+import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 import fr.ens.biologie.genomique.aozan.tests.global.GlobalTest;
 import fr.ens.biologie.genomique.aozan.tests.lane.LaneTest;
@@ -299,7 +299,7 @@ public class QCReport {
       elements.addAll(extractSamplesNamesInRun());
 
       // Remove Undetermined if exists
-      elements.remove(SampleStatistics.UNDETERMINED_SAMPLE);
+      elements.remove(SampleStatisticsCollector.UNDETERMINED_SAMPLE);
     }
 
     // Build map associate lanes number with project
@@ -635,7 +635,7 @@ public class QCReport {
 
       // Add Undetermined sample
       if (this.data.isUndeterminedInLane(lane)) {
-        names.add(SampleStatistics.UNDETERMINED_SAMPLE);
+        names.add(SampleStatisticsCollector.UNDETERMINED_SAMPLE);
       }
     }
 

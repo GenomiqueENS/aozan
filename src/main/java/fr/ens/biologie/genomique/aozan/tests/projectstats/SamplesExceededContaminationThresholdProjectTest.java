@@ -27,7 +27,7 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
-import fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatistics;
+import fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector;
 
 /**
  * The class define test on samples count on a project which exceed a contaminant
@@ -42,13 +42,13 @@ public class SamplesExceededContaminationThresholdProjectTest extends
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(ProjectStatistics.COLLECTOR_NAME);
+    return ImmutableList.of(ProjectStatisticsCollector.COLLECTOR_NAME);
   }
 
   @Override
   protected String getKey(final String projectName) {
 
-    return ProjectStatistics.COLLECTOR_PREFIX
+    return ProjectStatisticsCollector.COLLECTOR_PREFIX
         + projectName + ".samples.exceeded.contamination.threshold.count";
   }
 

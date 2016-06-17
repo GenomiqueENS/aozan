@@ -23,7 +23,7 @@
 
 package fr.ens.biologie.genomique.aozan.tests.samplestats;
 
-import static fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatistics.UNDETERMINED_SAMPLE;
+import static fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector.UNDETERMINED_SAMPLE;
 import static fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput.UNDETERMINED_DIR_NAME;
 
 import java.util.Collections;
@@ -34,7 +34,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
-import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatistics;
+import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 
@@ -66,7 +66,7 @@ public class LinkReportFastqScreenSampleTest extends AbstractSampleTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(SampleStatistics.COLLECTOR_NAME);
+    return ImmutableList.of(SampleStatisticsCollector.COLLECTOR_NAME);
   }
 
   //

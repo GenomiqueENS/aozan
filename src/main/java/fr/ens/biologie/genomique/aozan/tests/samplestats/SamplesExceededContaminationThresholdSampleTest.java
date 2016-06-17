@@ -31,7 +31,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
-import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatistics;
+import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
@@ -52,19 +52,19 @@ public class SamplesExceededContaminationThresholdSampleTest extends
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(SampleStatistics.COLLECTOR_NAME);
+    return ImmutableList.of(SampleStatisticsCollector.COLLECTOR_NAME);
   }
 
   @Override
   public TestResult test(final RunData data, final String sampleName) {
 
-    if (sampleName.equals(SampleStatistics.UNDETERMINED_SAMPLE)) {
+    if (sampleName.equals(SampleStatisticsCollector.UNDETERMINED_SAMPLE)) {
       return new TestResult("NA");
     }
 
     try {
       final String key =
-          SampleStatistics.COLLECTOR_PREFIX
+          SampleStatisticsCollector.COLLECTOR_PREFIX
               + sampleName + ".samples.exceeded.contamination.threshold.count";
 
       final int val = data.getInt(key);

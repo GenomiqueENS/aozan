@@ -32,8 +32,8 @@ import com.google.common.collect.ImmutableList;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.RunData;
-import fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatistics;
-import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatistics;
+import fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector;
+import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
@@ -51,22 +51,22 @@ public class PercentSampleInProjectSamplestatsTest extends AbstractSampleTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(SampleStatistics.COLLECTOR_NAME,
-        ProjectStatistics.COLLECTOR_NAME);
+    return ImmutableList.of(SampleStatisticsCollector.COLLECTOR_NAME,
+        ProjectStatisticsCollector.COLLECTOR_NAME);
   }
 
   @Override
   public TestResult test(RunData data, String sampleName) {
 
     if (sampleName == null
-        || sampleName.equals(SampleStatistics.UNDETERMINED_SAMPLE)) {
+        || sampleName.equals(SampleStatisticsCollector.UNDETERMINED_SAMPLE)) {
 
       return new TestResult("NA");
     }
 
     // Build key for run data
     final String rawClusterSumKey =
-        SampleStatistics.COLLECTOR_PREFIX + sampleName + ".raw.cluster.sum";
+        SampleStatisticsCollector.COLLECTOR_PREFIX + sampleName + ".raw.cluster.sum";
 
     final long rawClusterSampleSum = data.getLong(rawClusterSumKey);
 

@@ -22,13 +22,13 @@
  */
 package fr.ens.biologie.genomique.aozan.tests.projectstats;
 
-import static fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatistics.COLLECTOR_PREFIX;
+import static fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector.COLLECTOR_PREFIX;
 
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
-import fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatistics;
+import fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector;
 
 /**
  * The Class GenomesProjectTest.
@@ -40,7 +40,7 @@ public class GenomesProjectTest extends AbstractSimpleProjectTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(ProjectStatistics.COLLECTOR_NAME);
+    return ImmutableList.of(ProjectStatisticsCollector.COLLECTOR_NAME);
   }
 
   @Override

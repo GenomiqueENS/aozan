@@ -42,7 +42,7 @@ import fr.ens.biologie.genomique.aozan.collectors.StatisticsCollector;
  * @author Sandrine Perrin
  * @since 2.0
  */
-public class ProjectStatistics extends StatisticsCollector {
+public class ProjectStatisticsCollector extends StatisticsCollector {
 
   /** Collector name. */
   public static final String COLLECTOR_NAME = "projectstats";
@@ -166,6 +166,6 @@ public class ProjectStatistics extends StatisticsCollector {
   /**
    * Instantiates a new project statistics.
    */
-  public ProjectStatistics() {
+  public ProjectStatisticsCollector() {
   }
 }

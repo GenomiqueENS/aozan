@@ -32,7 +32,7 @@ import com.google.common.collect.ImmutableList;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.collectors.UndeterminedIndexesCollector;
-import fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatistics;
+import fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
@@ -52,7 +52,7 @@ public class PercentRecoverableRawClusterProjectTest extends
   public List<String> getCollectorsNamesRequiered() {
 
     return ImmutableList.of(UndeterminedIndexesCollector.COLLECTOR_NAME,
-        ProjectStatistics.COLLECTOR_NAME);
+        ProjectStatisticsCollector.COLLECTOR_NAME);
   }
 
   @Override
@@ -64,10 +64,10 @@ public class PercentRecoverableRawClusterProjectTest extends
 
     // Build key for run data
     final String recoveryCountKey =
-        ProjectStatistics.COLLECTOR_PREFIX
+        ProjectStatisticsCollector.COLLECTOR_PREFIX
             + projectName + ".raw.cluster.recovery.sum";
     final String rawClusterSumKey =
-        ProjectStatistics.COLLECTOR_PREFIX
+        ProjectStatisticsCollector.COLLECTOR_PREFIX
             + projectName + ".raw.cluster.sum";
 
     try {

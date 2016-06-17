@@ -33,7 +33,7 @@ import com.google.common.collect.ImmutableList;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.collectors.FastqScreenCollector;
-import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatistics;
+import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector;
 import fr.ens.biologie.genomique.aozan.fastqscreen.FastqScreenGenomes;
 import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeAliases;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
@@ -59,7 +59,7 @@ public class FastqScreenSimpleSamplestatsTest extends AbstractSimpleSampleTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
     return ImmutableList.of(FastqScreenCollector.COLLECTOR_NAME,
-        SampleStatistics.COLLECTOR_NAME);
+        SampleStatisticsCollector.COLLECTOR_NAME);
   }
 
   @Override
@@ -112,7 +112,7 @@ public class FastqScreenSimpleSamplestatsTest extends AbstractSimpleSampleTest {
 
     // Check undetermined indexed sample
     if (sampleName == null
-        || sampleName.equals(SampleStatistics.UNDETERMINED_SAMPLE)) {
+        || sampleName.equals(SampleStatisticsCollector.UNDETERMINED_SAMPLE)) {
       return "fastqscreen.lane"
           + lane + ".undetermined.read1." + this.genomeReference + value;
     }

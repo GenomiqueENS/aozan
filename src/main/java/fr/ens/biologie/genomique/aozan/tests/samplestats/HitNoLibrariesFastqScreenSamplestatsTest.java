@@ -29,7 +29,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.collectors.FastqScreenCollector;
-import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatistics;
+import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 
 /**
@@ -91,7 +91,7 @@ public class HitNoLibrariesFastqScreenSamplestatsTest extends
 
     // Check undetermined indexed sample
     if (sampleName == null
-        || sampleName.equals(SampleStatistics.UNDETERMINED_SAMPLE)) {
+        || sampleName.equals(SampleStatisticsCollector.UNDETERMINED_SAMPLE)) {
       return "fastqscreen.lane"
           + lane + ".undetermined.read1.mappedexceptgenomesample";
     }

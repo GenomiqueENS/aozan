@@ -327,7 +327,7 @@ public class EntityStat implements Comparable<EntityStat> {
 
       if (isUndeterminedSample())
         return this.statisticsCollector.getCollectorPrefix()
-            + SampleStatistics.UNDETERMINED_SAMPLE;
+            + SampleStatisticsCollector.UNDETERMINED_SAMPLE;
 
       return this.statisticsCollector.getCollectorPrefix() + samples.get(0);
     }
@@ -537,7 +537,7 @@ public class EntityStat implements Comparable<EntityStat> {
 
     this.undeterminedSample =
         Strings.isNullOrEmpty(sampleName) ? false : (sampleName.trim()
-            .equals(SampleStatistics.UNDETERMINED_SAMPLE));
+            .equals(SampleStatisticsCollector.UNDETERMINED_SAMPLE));
 
     // Compile demultiplexing data
     this.rawClusterSamples = new ArrayList<>();
