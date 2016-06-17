@@ -48,6 +48,7 @@ import com.google.common.collect.Lists;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Common;
+import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.io.FastqSample;
@@ -73,8 +74,7 @@ public abstract class AbstractFastqCollector implements Collector {
 
   // Set samples to treat
   /** The fastq samples. */
-  private final Set<FastqSample> fastqSamples =
-      new LinkedHashSet<>();
+  private final Set<FastqSample> fastqSamples = new LinkedHashSet<>();
 
   // mode threaded
   /** The Constant CHECKING_DELAY_MS. */
@@ -577,8 +577,8 @@ public abstract class AbstractFastqCollector implements Collector {
     }
 
     // Define the part result file
-    return new File(dataFileDir,
-        this.getName() + "_" + fastqSample.getKeyFastqSample() + ".data");
+    return new File(dataFileDir, this.getName()
+        + "_" + fastqSample.getKeyFastqSample() + Globals.QC_DATA_EXTENSION);
 
   }
 
@@ -689,7 +689,8 @@ public abstract class AbstractFastqCollector implements Collector {
   private void deleteTemporaryDatafile(final FastqSample fs) {
 
     // Collect all data file
-    final List<File> files = collectFileFromSuffix(fs, ".data");
+    final List<File> files =
+        collectFileFromSuffix(fs, Globals.QC_DATA_EXTENSION);
 
     // Delete temporary data file
     for (final File f : files) {

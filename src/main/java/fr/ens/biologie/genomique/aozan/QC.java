@@ -175,7 +175,8 @@ public class QC {
     final File bcl2fastqOutputDir = this.fastqDir;
     final File QCOutputDir = this.qcDir;
 
-    final File dataFile = new File(this.qcDir + "/data-" + this.runId + ".txt");
+    final File dataFile =
+        new File(this.qcDir, this.runId + Globals.QC_DATA_EXTENSION);
 
     RunData data = null;
     // Check if raw data file exists

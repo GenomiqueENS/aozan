@@ -155,6 +155,9 @@ public class Globals {
     }
   };
 
+  /** QC data files extensions. */
+  public static final String QC_DATA_EXTENSION = ".data";
+
   //
   // Private constants
   //
