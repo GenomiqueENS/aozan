@@ -186,7 +186,7 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
     final boolean isPairedMode = runPE && !this.ignorePairedMode;
     if (!isPairedMode && fastqSample.getRead() == 2) {
       LOGGER.fine(COLLECTOR_NAME.toUpperCase()
-          + ": " + fastqSample.getSampleName() + " do not process second end.");
+          + ": Do not process second end for" + fastqSample.getSampleName() + " sample");
       return null;
     }
 
@@ -194,7 +194,7 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
     if (fastqSample.getFastqFiles().isEmpty()) {
       LOGGER.fine(COLLECTOR_NAME.toUpperCase()
           + ": No FASTQ file exists for " + fastqSample.getSampleName()
-          + " sample.");
+          + " sample");
       return null;
     }
 
