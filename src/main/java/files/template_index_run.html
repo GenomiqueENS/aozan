@@ -100,24 +100,18 @@ Run ${RUN_ID} reports</div>
 <div class="report">
 <!--START_SECTION hiseq.step rta1 -->
 <div id="section_sync">
-<h3>HiSeq reports</h3>
+<h3>Sequencer reports</h3>
 <ul>
 <li><a href="report_${RUN_ID}/First_Base_Report.htm">First base report</a></li>
 <li><a href="hiseq_log_${RUN_ID}.tar.bz2">HiSeq log (compressed archive)</a></li>
-<!--START_SECTION optional1 -->
-<li><a href="report_${RUN_ID}/Status.htm">Run info</a></li>
-<!--END_SECTION-->
-<!--START_SECTION optional2 -->
 <li><a href="report_${RUN_ID}.tar.bz2">All reports (compressed archive)</a></li>
-<!--END_SECTION-->
-<!--START_SECTION hiseq.step rta1 -->
 </ul>
 </div>
 <!--END_SECTION-->
 
 <!--START_SECTION hiseq.step rta2 -->
 <div id="section_sync">
-<h3>NextSeq reports</h3>
+<h3>Sequencer reports</h3>
 <ul>
 <li><a href="report_${RUN_ID}.tar.bz2">All reports (compressed archive)</a></li>
 <li><a href="hiseq_log_${RUN_ID}.tar.bz2">HiSeq log (compressed archive)</a></li>
@@ -126,19 +120,7 @@ Run ${RUN_ID} reports</div>
 <!--END_SECTION-->
 
 
-<!--START_SECTION demux.step bcl2fastq1 -->
-<div id="section_demux">
-<h3>Demultiplexing reports with bcl2fastq 1</h3>
-<ul>
-<li><a href="basecall_stats_${RUN_ID}/All.htm">All</a></li>
-<li><a href="basecall_stats_${RUN_ID}/IVC.htm">IVC</a></li>
-<li><a href="basecall_stats_${RUN_ID}/Demultiplex_Stats.htm">Demultiplex stats</a></li>
-<li><a href="basecall_stats_${RUN_ID}.tar.bz2">All reports (compressed archive)</a></li>
-</ul>
-</div>
-<!--END_SECTION-->
-
-<!--START_SECTION demux.step bcl2fastq2 -->
+<!--START_SECTION demux.step all -->
 <div id="section_demux">
 <h3>Demultiplexing reports with bcl2fastq 2</h3>
 <ul>

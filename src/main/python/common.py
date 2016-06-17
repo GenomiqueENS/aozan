@@ -663,7 +663,8 @@ def create_html_index_file(conf, run_id, sections):
             # Extraction version
             version = tokens[2]
 
-            write_lines = is_section_to_add_in_report(sections, section_name, run_id, conf)
+            write_lines = is_section_to_add_in_report(sections, section_name,
+                                                      version, run_id, conf)
 
         elif line.startswith('<!--END_SECTION'):
             write_lines = True
@@ -681,7 +682,7 @@ def create_html_index_file(conf, run_id, sections):
     f_out.close()
 
 
-def is_section_to_add_in_report(sections, section_name, run_id, conf):
+def is_section_to_add_in_report(sections, section_name, version, run_id, conf):
     """
     Check if the section is required in report
 
@@ -701,6 +702,17 @@ def is_section_to_add_in_report(sections, section_name, run_id, conf):
     # Check the section name related to a step name required or it is an optional section
     if not (is_conf_value_equals_true(section_name, conf) or section_name.startswith('optional')):
         return False
+
+    # Check if version on the section
+    if version == 'all':
+        return True
+
+    if version.startswith('rta'):
+        rta_major_version = get_rta_major_version(run_id, conf)
+        if version.endswith(str(rta_major_version)):
+            return True
+        else:
+            return False
 
     # Section added in report html
     return True
