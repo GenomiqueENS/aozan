@@ -83,7 +83,8 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
 
       // Configure score
       final double homogeneityInLane =
-          data.getDouble("design.lane" + lane + ".percent.homogeneity");
+          1 / data.getSamplesNameListInLane(lane).size();
+
       if (this.distance >= homogeneityInLane) {
         this.distance = 0.0;
       }

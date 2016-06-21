@@ -23,8 +23,9 @@
 
 package fr.ens.biologie.genomique.aozan;
 
-import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.checkExistingFile;
 import static com.google.common.base.Strings.nullToEmpty;
+import static fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector.SAMPLESHEET_DATA_PREFIX;
+import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.checkExistingFile;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -63,7 +64,7 @@ public class RunData {
    * @return all projects names
    */
   public String getProjectsName() {
-    return this.get("design.projects.names");
+    return this.get(SAMPLESHEET_DATA_PREFIX + ".projects.names");
   }
 
   /**
@@ -73,7 +74,8 @@ public class RunData {
    */
   public List<String> getSamplesNameInLane(final int lane) {
 
-    final String value = this.get("design.lane" + lane + ".samples.names");
+    final String value =
+        this.get(SAMPLESHEET_DATA_PREFIX + ".lane" + lane + ".samples.names");
 
     if (value == null) {
       return Collections.emptyList();
@@ -161,7 +163,8 @@ public class RunData {
    */
   public List<String> getSamplesNameListInLane(final int lane) {
 
-    final String value = this.get("design.lane" + lane + ".samples.names");
+    final String value =
+        this.get(SAMPLESHEET_DATA_PREFIX + ".lane" + lane + ".samples.names");
 
     if (value == null) {
       return Collections.emptyList();
@@ -176,7 +179,7 @@ public class RunData {
    */
   public List<String> getProjectsNameList() {
 
-    final String value = this.get("design.projects.names");
+    final String value = this.get(SAMPLESHEET_DATA_PREFIX + ".projects.names");
 
     if (value == null) {
       return Collections.emptyList();
@@ -192,7 +195,8 @@ public class RunData {
    * @return sequence index related to the lane and sample name
    */
   public String getIndexSample(final int lane, final String sampleName) {
-    return this.get("design.lane" + lane + "." + sampleName + ".index");
+    return this.get(
+        SAMPLESHEET_DATA_PREFIX + ".lane" + lane + "." + sampleName + ".index");
   }
 
   /**
@@ -202,8 +206,8 @@ public class RunData {
    * @return the project related to the sample
    */
   public String getProjectSample(final int lane, final String sampleName) {
-    return this
-        .get("design.lane" + lane + "." + sampleName + ".sample.project");
+    return this.get(SAMPLESHEET_DATA_PREFIX
+        + ".lane" + lane + "." + sampleName + ".sample.project");
   }
 
   /**
@@ -213,7 +217,8 @@ public class RunData {
    * @return the description of the sample
    */
   public String getSampleDescription(final int lane, final String sampleName) {
-    return this.get("design.lane" + lane + "." + sampleName + ".description");
+    return this.get(SAMPLESHEET_DATA_PREFIX
+        + ".lane" + lane + "." + sampleName + ".description");
   }
 
   /**
@@ -223,7 +228,8 @@ public class RunData {
    * @return the sample genome
    */
   public String getSampleGenome(final int lane, final String sampleName) {
-    return this.get("design.lane" + lane + "." + sampleName + ".sample.ref");
+    return this.get(SAMPLESHEET_DATA_PREFIX
+        + ".lane" + lane + "." + sampleName + ".sample.ref");
   }
 
   /**
@@ -234,7 +240,8 @@ public class RunData {
    */
   public String getSampleIndex(final int lane, final String sampleName) {
 
-    return this.get("design.lane" + lane + '.' + sampleName + ".index");
+    return this.get(
+        SAMPLESHEET_DATA_PREFIX + ".lane" + lane + '.' + sampleName + ".index");
   }
 
   /**
@@ -327,8 +334,8 @@ public class RunData {
    * @return true if the lane is a control otherwise false
    */
   public boolean isLaneControl(final int lane, final String sampleName) {
-    return this
-        .getBoolean("design.lane" + lane + "." + sampleName + ".control");
+    return this.getBoolean(SAMPLESHEET_DATA_PREFIX
+        + ".lane" + lane + "." + sampleName + ".control");
   }
 
   /**
@@ -640,7 +647,7 @@ public class RunData {
   //
 
   /**
-   * Test if the RunData contains  a key.
+   * Test if the RunData contains a key.
    * @param key key name
    * @return true if the RunData object contains the key
    */

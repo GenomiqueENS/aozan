@@ -55,6 +55,8 @@ public class SamplesheetCollector implements Collector {
   /** The collector name. */
   public static final String COLLECTOR_NAME = "samplesheet";
 
+  public static final String SAMPLESHEET_DATA_PREFIX = "samplesheet";
+
   public static final List<String> FASTQ_COLLECTOR_NAMES =
       Arrays.asList("tmppartialfastq", "undeterminedindexes", "fastqc",
           "globalstats", "fastqscreen", "projectstats");
@@ -104,8 +106,8 @@ public class SamplesheetCollector implements Collector {
 
       for (final Sample s : samplesheet) {
 
-        final String prefix =
-            "design.lane" + s.getLane() + "." + s.getSampleId();
+        final String prefix = SAMPLESHEET_DATA_PREFIX
+            + ".lane" + s.getLane() + "." + s.getSampleId();
 
         data.put(prefix + ".sample.ref", s.getSampleRef());
         data.put(prefix + ".indexed", s.isIndexed());
@@ -164,16 +166,20 @@ public class SamplesheetCollector implements Collector {
 
       // List samples by lane
       for (final Map.Entry<Integer, List<String>> e : samples.entrySet()) {
-        data.put("design.lane" + e.getKey() + ".samples.names", e.getValue());
+        data.put(
+            SAMPLESHEET_DATA_PREFIX + ".lane" + e.getKey() + ".samples.names",
+            e.getValue());
 
         // Check homogeneity between sample in lane
         // add in rundata interval for percent sample for each lane
         final double percent = 1.0 / e.getValue().size();
-        data.put("design.lane" + e.getKey() + ".percent.homogeneity", percent);
+        data.put(SAMPLESHEET_DATA_PREFIX
+            + ".lane" + e.getKey() + ".percent.homogeneity", percent);
       }
 
       // Add all projects name in data
-      data.put("design.projects.names", Joiner.on(",").join(projectsName));
+      data.put(SAMPLESHEET_DATA_PREFIX + ".projects.names",
+          Joiner.on(",").join(projectsName));
 
     } catch (final IOException e) {
       throw new AozanException(e);

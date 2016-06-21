@@ -158,7 +158,7 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
   @Override
   public AbstractFastqProcessThread collectSample(final RunData data,
       final FastqSample fastqSample, final File reportDir, final boolean runPE)
-          throws AozanException {
+      throws AozanException {
 
     checkNotNull(data, "data argument cannot be null");
     checkNotNull(fastqSample, "fastqSample argument cannot be null");
@@ -170,9 +170,8 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
           + fastqSample.getSampleName() + " no FastQ file exist");
     }
 
-    final boolean controlLane = data.getBoolean("design.lane"
-        + fastqSample.getLane() + "." + fastqSample.getSampleName()
-        + ".control");
+    final boolean controlLane =
+        data.isLaneControl(fastqSample.getLane(), fastqSample.getSampleName());
 
     // Skip control lane
     if (controlLane && this.skipControlLane) {
@@ -186,7 +185,8 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
     final boolean isPairedMode = runPE && !this.ignorePairedMode;
     if (!isPairedMode && fastqSample.getRead() == 2) {
       LOGGER.fine(COLLECTOR_NAME.toUpperCase()
-          + ": Do not process second end for" + fastqSample.getSampleName() + " sample");
+          + ": Do not process second end for" + fastqSample.getSampleName()
+          + " sample");
       return null;
     }
 

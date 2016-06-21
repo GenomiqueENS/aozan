@@ -141,11 +141,8 @@ public class FastqScreenSimpleSamplestatsTest extends AbstractSimpleSampleTest {
       final int read, final int readSample, final int lane,
       final String sampleName) {
 
-    final String keyGenomeSample =
-        "design.lane" + lane + "." + sampleName + ".sample.ref";
-
     // Set genome sample
-    final String genomeSample = data.get(keyGenomeSample);
+    final String genomeSample = data.getSampleGenome(lane, sampleName) ;
 
     // Set reference genome corresponding of genome sample if it exists
     String genomeSampleReference = null;

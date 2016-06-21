@@ -137,9 +137,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
       return null;
     }
 
-    final boolean controlLane = data.getBoolean("design.lane"
-        + fastqSample.getLane() + "." + fastqSample.getSampleName()
-        + ".control");
+    final boolean controlLane =
+        data.isLaneControl(fastqSample.getLane(), fastqSample.getSampleName());
 
     // Skip the control lane
     if (controlLane && this.skipControlLane) {
@@ -176,9 +175,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     final boolean isPairedMode = isRunPE && !this.ignorePairedMode;
 
     // Retrieve genome sample from run data
-    final String sampleRef = data.get("design.lane"
-        + fastqSample.getLane() + "." + fastqSample.getSampleName()
-        + ".sample.ref");
+    final String sampleRef = data.getSampleGenome(fastqSample.getLane(),
+        fastqSample.getSampleName());
 
     final String sampleGenomeName;
     if (sampleRef != null) {

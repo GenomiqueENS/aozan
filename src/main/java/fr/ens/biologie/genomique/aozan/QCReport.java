@@ -588,11 +588,11 @@ public class QCReport {
       default:
 
         for (final String sampleName : samplesNameInLane) {
-          // Extract project name corresponding to sample name
-          final String key =
-              "design.lane" + lane + "." + sampleName + ".sample.project";
 
-          final String projectName = this.data.get(key);
+          // Extract project name corresponding to sample name
+          final String projectName =
+              this.data.getProjectSample(lane, sampleName);
+
           if (projectName != null) {
             // Add project name and lane number in map
             nameWithLaneNumber.put(projectName, lane);
