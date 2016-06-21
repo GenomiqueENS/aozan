@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.tests.lane;
 
+import static fr.ens.biologie.genomique.aozan.collectors.ReadCollector.READ_DATA_PREFIX;
+
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -46,7 +48,7 @@ public class PFClustersLaneTest extends AbstractSimpleLaneTest {
   @Override
   protected String getKey(int read, boolean indexedRead, int lane) {
 
-    return "read" + read + ".lane" + lane + ".clusters.pf";
+    return READ_DATA_PREFIX + ".read" + read + ".lane" + lane + ".clusters.pf";
   }
 
   @Override

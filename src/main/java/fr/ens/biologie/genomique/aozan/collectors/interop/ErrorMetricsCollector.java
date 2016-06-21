@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.collectors.interop;
 
+import static fr.ens.biologie.genomique.aozan.collectors.ReadCollector.READ_DATA_PREFIX;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -325,7 +327,7 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
 
       final RunData data = new RunData();
 
-      final String key = "read" + this.readNumber + ".lane" + this.laneNumber;
+      final String key = READ_DATA_PREFIX + ".read" + this.readNumber + ".lane" + this.laneNumber;
 
       data.put(key + ".err.rate.100", this.errorRateCycle100);
       data.put(key + ".err.rate.100.sd", this.errorRateCycle100SD);

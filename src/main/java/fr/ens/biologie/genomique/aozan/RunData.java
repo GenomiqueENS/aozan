@@ -24,6 +24,7 @@
 package fr.ens.biologie.genomique.aozan;
 
 import static com.google.common.base.Strings.nullToEmpty;
+import static fr.ens.biologie.genomique.aozan.collectors.ReadCollector.READ_DATA_PREFIX;
 import static fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector.SAMPLESHEET_DATA_PREFIX;
 import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.checkExistingFile;
 
@@ -345,7 +346,8 @@ public class RunData {
    * @return percent align Phix related to the lane and the read
    */
   public double getReadPrcAlign(final int lane, final int read) {
-    return this.getDouble("read" + read + ".lane" + lane + ".prc.align");
+    return this.getDouble(
+        READ_DATA_PREFIX + ".read" + read + ".lane" + lane + ".prc.align");
   }
 
   /**
@@ -355,7 +357,8 @@ public class RunData {
    * @return the raw cluster count related to a lane and a read
    */
   public long getReadRawClusterCount(final int lane, final int read) {
-    return this.getLong("read" + read + ".lane" + lane + ".clusters.raw");
+    return this.getLong(
+        READ_DATA_PREFIX + ".read" + read + ".lane" + lane + ".clusters.raw");
   }
 
   /**
@@ -365,7 +368,8 @@ public class RunData {
    * @return the passing filter cluster count related to a lane and a read
    */
   public long getReadPFClusterCount(final int lane, final int read) {
-    return this.getLong("read" + read + ".lane" + lane + ".clusters.pf");
+    return this.getLong(
+        READ_DATA_PREFIX + ".read" + read + ".lane" + lane + ".clusters.pf");
   }
 
   /**

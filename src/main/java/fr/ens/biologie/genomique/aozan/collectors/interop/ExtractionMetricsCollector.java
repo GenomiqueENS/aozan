@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.collectors.interop;
 
+import static fr.ens.biologie.genomique.aozan.collectors.ReadCollector.READ_DATA_PREFIX;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -207,7 +209,7 @@ public class ExtractionMetricsCollector extends AbstractMetricsCollector {
 
       final RunData data = new RunData();
 
-      final String key = "read" + this.readNumber + ".lane" + this.laneNumber;
+      final String key = READ_DATA_PREFIX + ".read" + this.readNumber + ".lane" + this.laneNumber;
 
       data.put(key + ".first.cycle.int.pf", this.intensityCycle1);
       data.put(key + ".first.cycle.int.pf.sd", this.intensityCycle1SD);

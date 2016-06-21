@@ -23,6 +23,7 @@
 
 package fr.ens.biologie.genomique.aozan.collectors;
 
+import static fr.ens.biologie.genomique.aozan.collectors.ReadCollector.READ_DATA_PREFIX;
 import static fr.ens.biologie.genomique.eoulsan.util.XMLUtils.getAttributeNames;
 import static fr.ens.biologie.genomique.eoulsan.util.XMLUtils.getAttributeValue;
 
@@ -138,7 +139,7 @@ public class ReadXMLCollector implements Collector {
         }
       }
 
-      final String prefix = "read" + readNumber;
+      final String prefix = READ_DATA_PREFIX + ".read" + readNumber;
       data.put(prefix + ".density.ratio", densityRatio);
       data.put(prefix + ".type", readType);
 

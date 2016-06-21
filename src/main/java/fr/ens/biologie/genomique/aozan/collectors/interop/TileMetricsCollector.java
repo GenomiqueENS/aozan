@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.collectors.interop;
 
+import static fr.ens.biologie.genomique.aozan.collectors.ReadCollector.READ_DATA_PREFIX;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -357,8 +359,8 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
 
       for (final ReadTileMetrics rm : this.listReads) {
 
-        final String key =
-            "read" + rm.getNumberRead() + ".lane" + this.laneNumber;
+        final String key = READ_DATA_PREFIX +
+            ".read" + rm.getNumberRead() + ".lane" + this.laneNumber;
 
         // Same values for all read in a lane, values for one tile
         data.put(key + ".clusters.pf", this.numberClusterPF);
@@ -379,12 +381,12 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
         data.put(key + ".phasing", rm.getPhasing());
         data.put(key + ".prephasing", rm.getPrephasing());
 
-        data.put("read" + rm.getNumberRead() + ".density.ratio",
+        data.put(READ_DATA_PREFIX + ".read" + rm.getNumberRead() + ".density.ratio",
             this.densityRatio);
 
         final String s =
             data.isReadIndexed(rm.getNumberRead()) ? "(Index)" : "";
-        data.put("read" + rm.getNumberRead() + ".type", s);
+        data.put(READ_DATA_PREFIX + ".read" + rm.getNumberRead() + ".type", s);
 
       }
 

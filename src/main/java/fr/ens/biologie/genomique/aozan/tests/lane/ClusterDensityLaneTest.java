@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.tests.lane;
 
+import static fr.ens.biologie.genomique.aozan.collectors.ReadCollector.READ_DATA_PREFIX;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -57,10 +59,11 @@ public class ClusterDensityLaneTest extends AbstractLaneTest {
 
     try {
       final long clusterRaw =
-          data.getLong("read" + read + ".lane" + lane + ".clusters.raw");
+          data.getLong(READ_DATA_PREFIX
+              + ".read" + read + ".lane" + lane + ".clusters.raw");
 
       final double densityRatio =
-          data.getDouble("read" + read + ".density.ratio");
+          data.getDouble(READ_DATA_PREFIX + ".read" + read + ".density.ratio");
 
       final double density = clusterRaw * densityRatio / 1000.0;
 

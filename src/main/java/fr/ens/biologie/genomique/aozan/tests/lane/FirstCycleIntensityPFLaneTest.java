@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.tests.lane;
 
+import static fr.ens.biologie.genomique.aozan.collectors.ReadCollector.READ_DATA_PREFIX;
+
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -52,7 +54,8 @@ public class FirstCycleIntensityPFLaneTest extends AbstractSimpleLaneTest {
   protected String getKey(final int read, final boolean indexedRead,
       final int lane) {
 
-    return "read" + read + ".lane" + lane + ".first.cycle.int.pf";
+    return READ_DATA_PREFIX
+        + ".read" + read + ".lane" + lane + ".first.cycle.int.pf";
   }
 
   //

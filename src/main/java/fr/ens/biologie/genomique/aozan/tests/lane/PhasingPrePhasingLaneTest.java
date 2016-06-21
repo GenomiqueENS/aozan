@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.tests.lane;
 
+import static fr.ens.biologie.genomique.aozan.collectors.ReadCollector.READ_DATA_PREFIX;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +56,8 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
 
     try {
 
-      final String keyPrefix = "read" + read + ".lane" + lane;
+      final String keyPrefix =
+          READ_DATA_PREFIX + ".read" + read + ".lane" + lane;
       final double phasing = data.getDouble(keyPrefix + ".phasing") / 100.0;
       final double prephasing =
           data.getDouble(keyPrefix + ".prephasing") / 100.0;

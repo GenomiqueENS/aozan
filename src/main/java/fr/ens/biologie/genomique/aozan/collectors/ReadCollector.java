@@ -47,6 +47,8 @@ public class ReadCollector implements Collector {
   /** The collector name. */
   public static final String COLLECTOR_NAME = "read";
 
+  public static final String READ_DATA_PREFIX = "reads";
+
   private final List<Collector> subCollectionList = new ArrayList<>();
 
   @Override
