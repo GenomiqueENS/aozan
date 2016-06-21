@@ -94,7 +94,7 @@ public class FastqScreenProjectReport {
     // Build document instance
     final Document doc = buildDoc();
 
-    XMLUtilsWriter.createXMLFile(doc);
+    XMLUtilsWriter.createXMLFileContent(doc);
 
     XMLUtilsWriter.createHTMLFileFromXSL(doc, is, reportHtml);
   }

@@ -99,8 +99,8 @@ public final class XMLUtilsWriter {
         XMLUtils.addTagValue(doc, parent, "RunDate",
             dateFormatter.format(runDate));
 
-        XMLUtils.addTagValue(doc, parent, "SequencerType", data
-            .getSequencerType().toUpperCase(Globals.DEFAULT_LOCALE));
+        XMLUtils.addTagValue(doc, parent, "SequencerType",
+            data.getSequencerType().toUpperCase(Globals.DEFAULT_LOCALE));
 
       } catch (final ParseException e1) {
         XMLUtils.addTagValue(doc, parent, "RunDate", data.get("run.info.date"));
@@ -128,7 +128,8 @@ public final class XMLUtilsWriter {
       throws IOException, AozanException {
 
     if (doc == null) {
-      throw new AozanException("Error create XML file, document doesn't exist.");
+      throw new AozanException(
+          "Error create XML file, document doesn't exist.");
     }
 
     if (output == null) {
@@ -137,7 +138,7 @@ public final class XMLUtilsWriter {
     }
 
     // Transform document XML
-    final String text = createXMLFile(doc);
+    final String text = createXMLFileContent(doc);
 
     // Create XML file
     if (output.getAbsolutePath().endsWith(".html")) {
@@ -150,29 +151,35 @@ public final class XMLUtilsWriter {
   }
 
   /**
-   * Create a xml file from document xml.
-   * @param doc document xml
-   * @return document xml in text format
+   * Create a XML file content from XML document.
+   * @param doc the XML document
+   * @return a String with the XML document
    * @throws IOException if an error occurs while writing the file
    * @throws AozanException if document or output file doesn't exist or if an
    *           error occurs during transforming document.
    */
-  public static String createXMLFile(final Document doc) throws IOException,
-      AozanException {
+  public static String createXMLFileContent(final Document doc)
+      throws IOException, AozanException {
 
     if (doc == null) {
-      throw new AozanException("Error create XML file, document doesn't exist.");
+      throw new AozanException(
+          "Error create XML file, document doesn't exist.");
     }
 
     try {
-      // Print document XML
+
+      // Set up a transformer
       final TransformerFactory transfac = TransformerFactory.newInstance();
-      Transformer trans;
-      trans = transfac.newTransformer();
+      Transformer trans = transfac.newTransformer();
+      trans.setOutputProperty(OutputKeys.INDENT, "yes");
+      trans.setOutputProperty(OutputKeys.METHOD, "xml");
+      trans.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+
+      // Create the String writer
       final StringWriter swxml = new StringWriter();
-      final StreamResult resultxml = new StreamResult(swxml);
-      final DOMSource sourcexml = new DOMSource(doc);
-      trans.transform(sourcexml, resultxml);
+
+      // Write the DOM to the String writer
+      trans.transform(new DOMSource(doc), new StreamResult(swxml));
 
       return swxml.toString();
 
@@ -191,8 +198,8 @@ public final class XMLUtilsWriter {
    *           or if an error occurs during transforming document.
    */
   public static void createHTMLFileFromXSL(final Document doc,
-      final InputStream isXslFile, final File reportHtml) throws IOException,
-      AozanException {
+      final InputStream isXslFile, final File reportHtml)
+      throws IOException, AozanException {
 
     if (doc == null) {
       throw new AozanException(
@@ -240,13 +247,14 @@ public final class XMLUtilsWriter {
     try {
       // Set up a transformer
       final TransformerFactory transfac = TransformerFactory.newInstance();
-      Transformer trans;
-      trans = transfac.newTransformer();
+      Transformer trans = transfac.newTransformer();
       // trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+      trans.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, "yes");
       trans.setOutputProperty(OutputKeys.INDENT, "yes");
       trans.setOutputProperty(OutputKeys.METHOD, "html");
+      trans.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
-      // Create string from xml tree
+      // Create string from XML tree
       final StringWriter sw = new StringWriter();
       final StreamResult result = new StreamResult(sw);
 

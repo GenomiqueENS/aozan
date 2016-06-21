@@ -517,7 +517,7 @@ public class QCReport {
 
     doTests();
 
-    return XMLUtilsWriter.createXMLFile(this.doc);
+    return XMLUtilsWriter.createXMLFileContent(this.doc);
 
   }
 
