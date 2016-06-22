@@ -9,5 +9,5 @@ fr.ens.biologie.genomique.aozan.collectors.UndeterminedIndexesCollector
 fr.ens.biologie.genomique.aozan.collectors.GlobalStatsCollector
 fr.ens.biologie.genomique.aozan.collectors.AozanCollector
 fr.ens.biologie.genomique.aozan.collectors.DemultiplexingCollector
-fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatistics
-fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatistics
+fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector
+fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector
