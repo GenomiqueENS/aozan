@@ -49,7 +49,7 @@ public class ErrorRateLaneTest extends AbstractSimpleLaneTest {
   protected String getKey(int read, boolean indexedRead, int lane) {
 
     return READ_DATA_PREFIX
-        + ". read" + read + ".lane" + lane + ".err.rate.phix";
+        + ".read" + read + ".lane" + lane + ".err.rate.phix";
   }
 
   @Override

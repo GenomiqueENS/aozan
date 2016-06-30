@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.tests.global;
 
+import static fr.ens.biologie.genomique.aozan.collectors.ReadCollector.READ_DATA_PREFIX;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +63,8 @@ public class PercentErrorRateMeanGlobalTest extends AbstractGlobalTest {
 
     double errRatePhixSum = 0;
     for (int lane = 1; lane <= laneCount; lane++) {
-      final String key = "read1.lane" + lane + ".err.rate.phix";
+      final String key =
+          READ_DATA_PREFIX + ".read1.lane" + lane + ".err.rate.phix";
 
       errRatePhixSum += data.getDouble(key);
 

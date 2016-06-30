@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.tests.global;
 
+import static fr.ens.biologie.genomique.aozan.collectors.ReadCollector.READ_DATA_PREFIX;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -58,14 +60,15 @@ public class DensityClusterMeanGlobalTest extends AbstractGlobalTest {
 
     // Compute error rate per lane
     final int laneCount = data.getLaneCount();
-    final double densityRatio = data.getDouble("read1.density.ratio");
+    final double densityRatio =
+        data.getDouble(READ_DATA_PREFIX + ".read1.density.ratio");
 
     long clusterRawSum = 0;
 
     for (int lane = 1; lane <= laneCount; lane++) {
 
-      clusterRawSum += data.getLong("read1.lane" + lane + ".clusters.raw");
-
+      clusterRawSum += data
+          .getLong(READ_DATA_PREFIX + ".read1.lane" + lane + ".clusters.raw");
     }
 
     try {
