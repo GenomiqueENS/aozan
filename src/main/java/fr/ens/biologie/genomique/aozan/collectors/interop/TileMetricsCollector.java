@@ -83,7 +83,7 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
     initMetricsMap(data);
 
     // Distribution of metrics between lane and code
-    for (final IlluminaTileMetrics itm : reader.getSetIlluminaMetrics()) {
+    for (final TileMetrics itm : reader.getSetIlluminaMetrics()) {
 
       this.tileMetrics.get(itm.getLaneNumber()).addMetric(itm);
     }
@@ -191,7 +191,7 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
      * Save a record from TileMetricsOut.bin file.
      * @param itm illumina tile metrics
      */
-    public void addMetric(final IlluminaTileMetrics itm) {
+    public void addMetric(final TileMetrics itm) {
       final int tileNumber = itm.getTileNumber();
       final int code = itm.getMetricCode();
       final double value = itm.getMetricValue();

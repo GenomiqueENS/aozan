@@ -78,7 +78,7 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
       int keyMap;
 
       // Distribution of metrics between lane and code
-      for (final IlluminaErrorMetrics iem : reader.getSetIlluminaMetrics()) {
+      for (final ErrorMetrics iem : reader.getSetIlluminaMetrics()) {
         keyMap =
             getKeyMap(iem.getLaneNumber(),
                 getReadFromCycleNumber(iem.getCycleNumber()));
@@ -216,7 +216,7 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
      * Save a record from TileMetricsOut.bin file.
      * @param iem Illumina tile metrics
      */
-    public void addMetric(final IlluminaErrorMetrics iem) {
+    public void addMetric(final ErrorMetrics iem) {
 
       this.allErrorRates.put(iem.getTileNumber(), iem.getErrorRate());
       final int cycle = iem.getCycleNumber();

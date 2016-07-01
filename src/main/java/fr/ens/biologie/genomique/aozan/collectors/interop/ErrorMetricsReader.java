@@ -37,7 +37,7 @@ import fr.ens.biologie.genomique.aozan.AozanException;
  * @since 1.1
  */
 public class ErrorMetricsReader extends
-    AbstractBinaryFileReader<IlluminaErrorMetrics> {
+    AbstractBinaryFileReader<ErrorMetrics> {
 
   public static final String NAME = "ErrorMetricsOut";
 
@@ -71,9 +71,9 @@ public class ErrorMetricsReader extends
 
   @Override
   protected void addIlluminaMetricsInCollection(
-      final List<IlluminaErrorMetrics> collection, final ByteBuffer bb) {
+      final List<ErrorMetrics> collection, final ByteBuffer bb) {
 
-    collection.add(new IlluminaErrorMetrics(bb));
+    collection.add(new ErrorMetrics(bb));
   }
 
   //
