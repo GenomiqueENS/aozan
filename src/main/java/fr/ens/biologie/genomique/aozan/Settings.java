@@ -23,8 +23,9 @@
 
 package fr.ens.biologie.genomique.aozan;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This class define constants to keys of configuration Aozan file.
@@ -72,7 +73,8 @@ public final class Settings {
   public static final String BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY =
       "bcl2fastq.additionnal.arguments";
   /** Bcl2fastq compression fastq files. */
-  public static final String BCL2FASTQ_COMPRESSION_KEY = "bcl2fastq.compression";
+  public static final String BCL2FASTQ_COMPRESSION_KEY =
+      "bcl2fastq.compression";
   /** Bcl2fastq compression level. */
   public static final String BCL2FASTQ_COMPRESSION_LEVEL_KEY =
       "bcl2fastq.compression.level";
@@ -101,8 +103,7 @@ public final class Settings {
   public static final String BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY =
       "bcl2fastq.samplesheet.generator.command";
   /** Set available use container docker. */
-  public static final String BCL2FASTQ_USE_DOCKER_KEY =
-      "bcl2fastq.use.docker";
+  public static final String BCL2FASTQ_USE_DOCKER_KEY = "bcl2fastq.use.docker";
 
   /** Demultiplex space factor. */
   public static final String DEMUX_SPACE_FACTOR_KEY = "demux.space.factor";
@@ -283,42 +284,42 @@ public final class Settings {
   public static final String QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY =
       "qc.conf.fastqscreen.process.undetermined.samples";
 
-  //
-  // Read contains configuration Aozan file
-  //
-  private static Map<String, String> aozanConfiguration = null;
+  private final Map<String, String> map;
 
   /**
-   * Sets the globals configuration.
-   * @param conf the conf
+   * Get a setting value.
+   * @param key the setting key
+   * @return the value of the setting
    */
-  public static void setGlobalsConfiguration(final Map<String, String> conf) {
+  public String get(final String key) {
 
-    aozanConfiguration = Collections.unmodifiableMap(conf);
+    return this.map.get(key);
   }
 
   /**
-   * Gets the property from aozan configuration.
-   * @param key the key
-   * @return the property from aozan configuration
+   * Get an entry set of the setting values.
+   * @return an entry set of the settings
    */
-  public static String getPropertyFromAozanConfiguration(final String key) {
+  public Set<Map.Entry<String, String>> entrySet() {
 
-    if (aozanConfiguration.isEmpty())
-      return null;
-
-    return aozanConfiguration.get(key.trim());
+    return this.map.entrySet();
   }
 
-  public static String getLoggerPathFromAozanConfiguration() {
-    return aozanConfiguration.get(AOZAN_LOG_PATH_KEY);
+  //
+  // Constructor
+  //
+
+  /**
+   * Public constructor.
+   * @param map Aozan configuration
+   */
+  public Settings(final Map<String, String> map) {
+
+    if (map == null) {
+      throw new NullPointerException("The map object is null");
+    }
+
+    this.map = new HashMap<>(map);
   }
 
-  public static String getLoggerLevelFromAozanConfiguration() {
-    return aozanConfiguration.get(AOZAN_LOG_LEVEL_KEY);
-  }
-
-  public static String getConfigurationFilePathOnAozanConfiguration() {
-    return aozanConfiguration.get(AOZAN_CONF_FILE_PATH);
-  }
 }

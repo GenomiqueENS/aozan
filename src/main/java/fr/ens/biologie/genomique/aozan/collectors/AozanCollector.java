@@ -101,13 +101,9 @@ public class AozanCollector implements Collector {
     data.put(PREFIX + ".java.vm.name", System.getProperty("java.vm.name"));
     data.put(PREFIX + ".java.version", System.getProperty("java.version"));
 
-    data.put(PREFIX + ".logger.path",
-        Settings.getConfigurationFilePathOnAozanConfiguration());
-    data.put(PREFIX + ".logger.path",
-        Settings.getLoggerPathFromAozanConfiguration());
-    data.put(PREFIX + ".logger.level",
-        Settings.getLoggerLevelFromAozanConfiguration());
-
+    data.put(PREFIX + ".conf.path", Settings.AOZAN_CONF_FILE_PATH);
+    data.put(PREFIX + ".log.path", Settings.AOZAN_LOG_PATH_KEY);
+    data.put(PREFIX + ".log.level", Settings.AOZAN_LOG_LEVEL_KEY);
   }
 
   @Override
