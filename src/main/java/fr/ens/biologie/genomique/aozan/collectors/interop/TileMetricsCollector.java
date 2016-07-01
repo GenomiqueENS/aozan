@@ -124,18 +124,18 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
    */
   public int computeTilesCount(final RunData data) {
 
-    if (data.getSequencerType().equals("hiseq")) {
+    if (data.contains("run.info.flow.cell.section.per.lane")) {
+
+      // NextSeq case, compute tile count and add data from camera number
       return data.getInt("run.info.flow.cell.tile.count")
           * data.getInt("run.info.flow.cell.surface.count")
-          * data.getInt("run.info.flow.cell.swath.count");
+          * data.getInt("run.info.flow.cell.swath.count")
+          * data.getInt("run.info.flow.cell.section.per.lane");
     }
 
-    // Case NextSeq compute tile count, add data from camera number
     return data.getInt("run.info.flow.cell.tile.count")
         * data.getInt("run.info.flow.cell.surface.count")
-        * data.getInt("run.info.flow.cell.swath.count")
-        * data.getInt("run.info.flow.cell.section.per.lane");
-
+        * data.getInt("run.info.flow.cell.swath.count");
   }
 
   //
