@@ -40,6 +40,7 @@ import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.illumina.RunInfo;
+import fr.ens.biologie.genomique.aozan.illumina.RunParameters;
 
 /**
  * This collector collect data from the RunInfo.xml file, working with all RTA
@@ -56,6 +57,7 @@ public class RunInfoCollector implements Collector {
   public static final String PREFIX = "run.info";
 
   private File runInfoFile;
+  private File runParametersFile;
 
   @Override
   public String getName() {
@@ -80,12 +82,22 @@ public class RunInfoCollector implements Collector {
     if (conf == null)
       return;
 
+    final File parentFile;
+
     if (qc == null) {
       // Unit Test
-      this.runInfoFile = new File(conf.get(QC.RTA_OUTPUT_DIR), "RunInfo.xml");
+      parentFile = new File(conf.get(QC.RTA_OUTPUT_DIR));
     } else {
-      this.runInfoFile = new File(qc.getBclDir(), "RunInfo.xml");
+      parentFile = qc.getBclDir();
     }
+
+    this.runInfoFile = new File(parentFile, "RunInfo.xml");
+    this.runParametersFile = new File(parentFile, "runParameters.xml");
+
+    if (!this.runParametersFile.exists()) {
+      this.runParametersFile = new File(parentFile, "RunParameters.xml");
+    }
+
   }
 
   @Override
@@ -97,10 +109,23 @@ public class RunInfoCollector implements Collector {
     try {
       // Parse run info file
       final RunInfo runInfo = RunInfo.parse(this.runInfoFile);
+      final RunParameters runParameters =
+          RunParameters.parse(this.runParametersFile);
 
       data.put(PREFIX + ".run.id", runInfo.getId());
       data.put(PREFIX + ".run.number", runInfo.getNumber());
-      data.put(PREFIX + ".sequencer.type", runInfo.getSequencerType());
+      data.put(PREFIX + ".sequencer.family",
+          runParameters.getSequencerFamily());
+      data.put(PREFIX + ".sequencer.type", runParameters.getSequencerFamily());
+
+      data.put(PREFIX + ".application.name",
+          runParameters.getApplicationName());
+      data.put(PREFIX + ".application.version",
+          runParameters.getApplicationVersion());
+      data.put(PREFIX + ".rta.version", runParameters.getRTAVersion());
+      data.put(PREFIX + ".rta.major.version",
+          runParameters.getRTAMajorVersion());
+
       data.put(PREFIX + ".flow.cell.id", runInfo.getFlowCell());
       data.put(PREFIX + ".flow.cell.lane.count",
           runInfo.getFlowCellLaneCount());
@@ -110,7 +135,7 @@ public class RunInfoCollector implements Collector {
           runInfo.getFlowCellSwathCount());
       data.put(PREFIX + ".flow.cell.tile.count",
           runInfo.getFlowCellTileCount());
-      data.put(PREFIX + ".instrument", runInfo.getInstrument());
+
       data.put(PREFIX + ".date", runInfo.getDate());
 
       // Value specific on RTA version 1.X otherwise value is -1

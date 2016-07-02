@@ -491,37 +491,14 @@ public class RunInfo {
    */
   public int getTilesCount() {
 
-    if (isHiseqSequencer())
-      // Case Hiseq compute tile count
-      return this.flowCellLayout.getHiseqTilesCount();
+    if (this.flowCellLayout.sectionPerLane > 0) {
 
-    // Case NextSeq compute tile count, add data from camera number
-    return this.flowCellLayout.getNextseqTilesCount();
-  }
+      // Case NextSeq compute tile count, add data from camera number
+      return this.flowCellLayout.getNextseqTilesCount();
+    }
 
-  /**
-   * Checks if is next seq sequencer.
-   * @return true, if is next seq sequencer
-   */
-  public boolean isNextSeqSequencer() {
-    return this.flowCellLayout.sectionPerLane > 0;
-  }
-
-  /**
-   * Checks if is hiseq sequencer.
-   * @return true, if is hiseq sequencer
-   */
-  public boolean isHiseqSequencer() {
-    return this.flowCellLayout.sectionPerLane == -1;
-  }
-
-  /**
-   * Gets the sequencer type.
-   * @return the sequencer type
-   */
-  public String getSequencerType() {
-
-    return (isNextSeqSequencer() ? "nextseq" : "hiseq");
+    // Case Hiseq compute tile count
+    return this.flowCellLayout.getHiseqTilesCount();
   }
 
   /**
