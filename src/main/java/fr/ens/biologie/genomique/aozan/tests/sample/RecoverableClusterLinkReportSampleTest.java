@@ -25,7 +25,6 @@ package fr.ens.biologie.genomique.aozan.tests.sample;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 
@@ -33,6 +32,7 @@ import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.collectors.UndeterminedIndexesCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
+import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 
 /**
@@ -88,7 +88,7 @@ public class RecoverableClusterLinkReportSampleTest extends AbstractSampleTest {
   }
 
   @Override
-  public List<AozanTest> configure(final Map<String, String> properties)
+  public List<AozanTest> configure(final TestConfiguration conf)
       throws AozanException {
     return Collections.singletonList((AozanTest) this);
   }

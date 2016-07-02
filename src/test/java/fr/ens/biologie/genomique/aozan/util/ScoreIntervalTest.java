@@ -27,8 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.aozan.util.DoubleInterval;
-import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
+import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 import junit.framework.TestCase;
 
 public class ScoreIntervalTest extends TestCase {
@@ -106,7 +105,7 @@ public class ScoreIntervalTest extends TestCase {
 
     ScoreInterval si = new ScoreInterval();
     try {
-      si.configureDoubleInterval(map);
+      si.configureDoubleInterval(new TestConfiguration(map));
       assertTrue(true);
     } catch (AozanException e) {
       assertTrue(false);
@@ -124,7 +123,7 @@ public class ScoreIntervalTest extends TestCase {
 
     si = new ScoreInterval();
     try {
-      si.configureDoubleInterval(map);
+      si.configureDoubleInterval(new TestConfiguration(map));
       assertTrue(true);
     } catch (AozanException e) {
       assertTrue(false);
@@ -141,7 +140,7 @@ public class ScoreIntervalTest extends TestCase {
 
     si = new ScoreInterval();
     try {
-      si.configureDoubleInterval(map);
+      si.configureDoubleInterval(new TestConfiguration(map));
       assertTrue(true);
     } catch (AozanException e) {
       assertTrue(false);

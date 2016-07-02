@@ -28,7 +28,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -45,6 +44,7 @@ import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
+import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 import fr.ens.biologie.genomique.eoulsan.bio.GenomeDescription;
 import fr.ens.biologie.genomique.eoulsan.data.DataFile;
 
@@ -248,21 +248,21 @@ public class FastqScreenGenomes {
 
   /**
    * Private constructor of FastqScreenGenomeMapper.
-   * @param properties configuration properties
+   * @param testConfiguration configuration properties
    * @return a new instance of FastqScreenGenomes
    * @throws AozanException if the initialization of instance fail.
    */
   public static FastqScreenGenomes newInstance(
-      final Map<String, String> properties) throws AozanException {
+      final TestConfiguration testConfiguration) throws AozanException {
 
-    checkNotNull(properties, "props argument cannot be null");
+    checkNotNull(testConfiguration, "props argument cannot be null");
 
-    final File aliasGenomesFile = new File(properties
+    final File aliasGenomesFile = new File(testConfiguration
         .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
     final File sampleshettFile =
-        new File(properties.get(QC.BCL2FASTQ_SAMPLESHEET_PATH));
+        new File(testConfiguration.get(QC.BCL2FASTQ_SAMPLESHEET_PATH));
     final String contaminantGenomeNames =
-        properties.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
+        testConfiguration.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
 
     return new FastqScreenGenomes(aliasGenomesFile, sampleshettFile,
         contaminantGenomeNames);

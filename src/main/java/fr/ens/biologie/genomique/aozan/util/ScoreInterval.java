@@ -26,6 +26,7 @@ package fr.ens.biologie.genomique.aozan.util;
 import java.util.Map;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
+import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 
 /**
  * This class define a score interval.
@@ -81,11 +82,11 @@ public class ScoreInterval {
     return configure(key, value, false);
   }
 
-  public void configureDoubleInterval(final Map<String, String> properties)
+  public void configureDoubleInterval(final TestConfiguration conf)
       throws AozanException {
 
-    if (properties != null)
-      for (Map.Entry<String, String> e : properties.entrySet())
+    if (conf != null)
+      for (Map.Entry<String, String> e : conf.entrySet())
         configureDoubleInterval(e.getKey(), e.getValue());
   }
 

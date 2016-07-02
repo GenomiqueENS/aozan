@@ -25,7 +25,6 @@ package fr.ens.biologie.genomique.aozan.tests.sample;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
@@ -36,6 +35,7 @@ import fr.ens.biologie.genomique.aozan.collectors.FastqScreenCollector;
 import fr.ens.biologie.genomique.aozan.fastqscreen.FastqScreenGenomes;
 import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeAliases;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
+import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 
 /**
  * The class add in the qc report html values from FastqScreen for each sample
@@ -118,16 +118,16 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   }
 
   @Override
-  public List<AozanTest> configure(final Map<String, String> properties)
+  public List<AozanTest> configure(final TestConfiguration conf)
       throws AozanException {
 
-    if (properties == null || properties.isEmpty()) {
-      throw new NullPointerException("The properties object is null or empty");
+    if (conf == null || conf.isEmpty()) {
+      throw new NullPointerException("The conf object is null or empty");
     }
 
     // Initialization fastqScreenGenomeMapper object
     final FastqScreenGenomes fqsm =
-        FastqScreenGenomes.newInstance(properties);
+        FastqScreenGenomes.newInstance(conf);
 
     final Set<String> sampleGenomes = fqsm.getSampleGenomes();
     final Set<String> contaminantGenomes = fqsm.getContaminantGenomes();
@@ -141,7 +141,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
           new FastqScreenSimpleSampleTest(genome,
               contaminantGenomes.contains(genome));
 
-      testGenome.internalConfigure(properties);
+      testGenome.internalConfigure(conf);
 
       list.add(testGenome);
     }
@@ -162,9 +162,9 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     return this.genomeReference;
   }
 
-  private void internalConfigure(final Map<String, String> properties)
+  private void internalConfigure(final TestConfiguration conf)
       throws AozanException {
-    super.configure(properties);
+    super.configure(conf);
   }
 
   //

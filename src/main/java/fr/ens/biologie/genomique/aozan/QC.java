@@ -50,6 +50,7 @@ import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeAliases;
 import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeDescriptionCreator;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.AozanTestRegistry;
+import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 import fr.ens.biologie.genomique.aozan.tests.global.GlobalTest;
 import fr.ens.biologie.genomique.aozan.tests.lane.LaneTest;
 import fr.ens.biologie.genomique.aozan.tests.projectstats.ProjectTest;
@@ -89,8 +90,8 @@ public class QC {
 
   public static final String LANE_COUNT = "lane.count";
 
-  private static final String TEST_KEY_ENABLED_SUFFIX = ".enable";
-  private static final String TEST_KEY_PREFIX = "qc.test.";
+  public static final String TEST_KEY_ENABLED_SUFFIX = ".enable";
+  public static final String TEST_KEY_PREFIX = "qc.test.";
 
   private final File bclDir;
   private final File fastqDir;
@@ -406,8 +407,8 @@ public class QC {
         if (test != null) {
 
           // Configure the test
-          tests =
-              configureTest(test, settings, TEST_KEY_PREFIX + testName + ".");
+          tests = test.configure(new TestConfiguration(settings,
+              TEST_KEY_PREFIX + testName + "."));
 
           // Add the test to runTests, laneTests or sampleTests
           if (test instanceof GlobalTest) {
@@ -460,39 +461,6 @@ public class QC {
     for (final SampleStatsTest test : this.samplesStatsTests) {
       test.init();
     }
-  }
-
-  /**
-   * Configure an Aozan Test.
-   * @param test Aozan test to configure
-   * @param settings Aozan settings
-   * @param prefix key that enable the test
-   * @return list of Aozan tests
-   * @throws AozanException if an error occurs while configuring the test
-   */
-  private List<AozanTest> configureTest(final AozanTest test,
-      final Settings settings, final String prefix) throws AozanException {
-
-    final Map<String, String> testConf = new HashMap<>();
-
-    for (final Map.Entry<String, String> e : settings.entrySet()) {
-
-      final String key = e.getKey();
-
-      if (key.startsWith(prefix) && !key.endsWith(TEST_KEY_ENABLED_SUFFIX)) {
-
-        final String confKey = key.substring(prefix.length());
-        final String confValue = e.getValue();
-
-        testConf.put(confKey, confValue);
-
-      }
-
-      // add additional configuration in properties for collector
-      testConf.putAll(this.globalConf);
-    }
-
-    return test.configure(testConf);
   }
 
   /**
