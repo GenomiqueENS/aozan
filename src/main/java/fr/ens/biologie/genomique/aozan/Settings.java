@@ -297,6 +297,16 @@ public final class Settings {
   }
 
   /**
+   * Test if the settings contains a key.
+   * @param key the setting key
+   * @return true if the settins contains the key
+   */
+  public boolean containsKey(final String key) {
+
+    return this.map.containsKey(key);
+  }
+
+  /**
    * Get an entry set of the setting values.
    * @return an entry set of the settings
    */

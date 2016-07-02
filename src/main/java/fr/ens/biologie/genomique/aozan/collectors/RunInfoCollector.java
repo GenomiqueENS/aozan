@@ -39,6 +39,7 @@ import com.google.common.collect.Sets;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
+import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.illumina.RunInfo;
 import fr.ens.biologie.genomique.aozan.illumina.RunParameters;
 
@@ -58,6 +59,7 @@ public class RunInfoCollector implements Collector {
 
   private File runInfoFile;
   private File runParametersFile;
+  private Settings settings;
 
   @Override
   public String getName() {
@@ -89,6 +91,7 @@ public class RunInfoCollector implements Collector {
       parentFile = new File(conf.get(QC.RTA_OUTPUT_DIR));
     } else {
       parentFile = qc.getBclDir();
+      this.settings = qc.getSettings();
     }
 
     this.runInfoFile = new File(parentFile, "RunInfo.xml");
@@ -98,6 +101,7 @@ public class RunInfoCollector implements Collector {
       this.runParametersFile = new File(parentFile, "RunParameters.xml");
     }
 
+    
   }
 
   @Override
@@ -116,7 +120,9 @@ public class RunInfoCollector implements Collector {
       data.put(PREFIX + ".run.number", runInfo.getNumber());
       data.put(PREFIX + ".sequencer.family",
           runParameters.getSequencerFamily());
-      data.put(PREFIX + ".sequencer.type", runParameters.getSequencerFamily());
+      data.put(PREFIX + ".instrument", runInfo.getInstrument());
+      data.put(PREFIX + ".sequencer.name",
+          getSequencerName(runInfo, runParameters));
 
       data.put(PREFIX + ".application.name",
           runParameters.getApplicationName());
@@ -178,6 +184,24 @@ public class RunInfoCollector implements Collector {
     } catch (IOException | ParserConfigurationException | SAXException e) {
       throw new AozanException(e);
     }
+  }
+
+  /**
+   * Get the sequencer name.
+   * @param runInfo the RunInfo object
+   * @param runParameters the RunParameter object
+   * @return the name of the sequencer
+   */
+  private String getSequencerName(final RunInfo runInfo,
+      final RunParameters runParameters) {
+
+    final String key = "sequencer.name." + runInfo.getInstrument();
+
+    if (this.settings !=null && this.settings.containsKey(key)) {
+      return this.settings.get(key);
+    }
+
+    return runParameters.getSequencerFamily() + " " + runInfo.getInstrument();
   }
 
   @Override
