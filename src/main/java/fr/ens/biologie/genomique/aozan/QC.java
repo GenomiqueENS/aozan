@@ -223,10 +223,7 @@ public class QC {
 
       // Create RunDataGenerator object
       final RunDataGenerator rdg =
-          new RunDataGenerator(this.collectors, this.runId);
-
-      // Set the parameters of the generator
-      rdg.setGlobalConf(this.globalConf);
+          new RunDataGenerator(this.collectors, this.runId, this.globalConf);
 
       // Create the run data object
       data = rdg.collect(this);
@@ -409,7 +406,8 @@ public class QC {
         if (test != null) {
 
           // Configure the test
-          tests = configureTest(test, settings, TEST_KEY_PREFIX + testName + ".");
+          tests =
+              configureTest(test, settings, TEST_KEY_PREFIX + testName + ".");
 
           // Add the test to runTests, laneTests or sampleTests
           if (test instanceof GlobalTest) {
@@ -473,8 +471,7 @@ public class QC {
    * @throws AozanException if an error occurs while configuring the test
    */
   private List<AozanTest> configureTest(final AozanTest test,
-      final Settings settings, final String prefix)
-      throws AozanException {
+      final Settings settings, final String prefix) throws AozanException {
 
     final Map<String, String> testConf = new HashMap<>();
 
@@ -602,8 +599,7 @@ public class QC {
    * @param settings Aozan settings
    * @throws AozanException if an error occurs while searching paths
    */
-  private void initGlobalConf(final Settings settings)
-      throws AozanException {
+  private void initGlobalConf(final Settings settings) throws AozanException {
 
     for (final Map.Entry<String, String> e : settings.entrySet()) {
 
@@ -666,7 +662,8 @@ public class QC {
     addSystemProperty(settings, Settings.QC_CONF_FASTQC_NOFILTER_KEY,
         "fastqc.nofilter");
 
-    addSystemProperty(settings, Settings.QC_CONF_FASTQC_NANO_KEY, "fastqc.nano");
+    addSystemProperty(settings, Settings.QC_CONF_FASTQC_NANO_KEY,
+        "fastqc.nano");
 
     // Patch FastQC classes
     RuntimePatchFastQC.runPatchFastQC(Boolean
@@ -682,8 +679,8 @@ public class QC {
     final fr.ens.biologie.genomique.eoulsan.Settings eoulsanSettings =
         EoulsanRuntime.getSettings();
 
-    eoulsanSettings.setGenomeDescStoragePath(
-        settings.get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
+    eoulsanSettings.setGenomeDescStoragePath(settings
+        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
     eoulsanSettings.setGenomeMapperIndexStoragePath(settings
         .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY));
     eoulsanSettings.setGenomeStoragePath(
@@ -696,8 +693,8 @@ public class QC {
         "fr.ens.biologie.genomique.eoulsan.data.protocols.S3NDataProtocol"));
 
     // Initialize GenomeDescriptionCreator
-    GenomeDescriptionCreator.initialize(
-        settings.get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
+    GenomeDescriptionCreator.initialize(settings
+        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
   }
 
   /**
@@ -827,9 +824,9 @@ public class QC {
    * @param runId run id
    * @throws AozanException if an error occurs while initialize the QC object
    */
-  public QC(final Settings settings, final String bclDir,
-      final String fastqDir, final String qcDir, final String tmpDirname,
-      final String runId) throws AozanException {
+  public QC(final Settings settings, final String bclDir, final String fastqDir,
+      final String qcDir, final String tmpDirname, final String runId)
+      throws AozanException {
 
     this(settings, bclDir, fastqDir, qcDir,
         tmpDirname == null ? null : new File(tmpDirname), runId);
@@ -845,9 +842,9 @@ public class QC {
    * @param runId run id
    * @throws AozanException if an error occurs while initialize the QC object
    */
-  public QC(final Settings settings, final String bclDir,
-      final String fastqDir, final String qcDir, final File tmpDir,
-      final String runId) throws AozanException {
+  public QC(final Settings settings, final String bclDir, final String fastqDir,
+      final String qcDir, final File tmpDir, final String runId)
+      throws AozanException {
 
     this.bclDir = checkDir(bclDir);
     this.fastqDir = checkDir(fastqDir);

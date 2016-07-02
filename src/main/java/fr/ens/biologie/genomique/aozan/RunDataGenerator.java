@@ -57,22 +57,9 @@ public class RunDataGenerator {
   private static final String COLLECT_DONE = "collect.done";
 
   private final List<Collector> collectors;
-  private final Map<String, String> properties = new HashMap<>();
+  private final Map<String, String> properties;
 
   private final String runId;
-
-  /**
-   * Set global configuration for collectors and tests.
-   * @param conf global configuration object
-   */
-  public void setGlobalConf(final Map<String, String> conf) {
-
-    if (conf == null) {
-      return;
-    }
-
-    this.properties.putAll(conf);
-  }
 
   //
   // Others methods
@@ -229,16 +216,19 @@ public class RunDataGenerator {
    * Public constructor.
    * @param runId run id
    */
-  public RunDataGenerator(final List<Collector> collectors,
-      final String runId) {
+  public RunDataGenerator(final List<Collector> collectors, final String runId,
+      final Map<String, String> conf) {
 
     checkNotNull(collectors, "The list of collectors is null");
+    checkNotNull(conf, "the conf argument cannot be null");
 
     this.collectors = reorderCollector(collectors);
     this.runId = runId;
 
     // Add collector name requiered in properties
     addCollectorNameInProperties();
+
+    this.properties = new HashMap<>(conf);
   }
 
 }
