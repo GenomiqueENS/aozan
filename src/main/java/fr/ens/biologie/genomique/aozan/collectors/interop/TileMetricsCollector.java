@@ -123,7 +123,8 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
    */
   public int computeTilesCount(final RunData data) {
 
-    if (data.contains("run.info.flow.cell.section.per.lane")) {
+    if (data.contains("run.info.flow.cell.section.per.lane")
+        && data.getInt("run.info.flow.cell.section.per.lane") > 0) {
 
       // NextSeq case, compute tile count and add data from camera number
       return data.getInt("run.info.flow.cell.tile.count")
