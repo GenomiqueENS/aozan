@@ -25,7 +25,6 @@ package fr.ens.biologie.genomique.aozan.collectors;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import com.google.common.collect.ImmutableList;
 
@@ -69,16 +68,15 @@ public class ReadCollector implements Collector {
   }
 
   @Override
-  public void configure(final QC qc, final Properties properties) {
+  public void configure(final QC qc, final CollectorConfiguration conf) {
 
-    if (properties == null) {
+    if (conf == null) {
       return;
     }
 
     // Use ReadXMLCollector, if specified in aozan.conf
-    final String readXMLCollectorUsed =
-        properties.getProperty(Settings.QC_CONF_READ_XML_COLLECTOR_USED_KEY)
-            .trim().toLowerCase();
+    final String readXMLCollectorUsed = conf
+        .get(Settings.QC_CONF_READ_XML_COLLECTOR_USED_KEY).trim().toLowerCase();
 
     // Build the list of sub-collector
     if (readXMLCollectorUsed.equals("true")) {
@@ -95,7 +93,7 @@ public class ReadCollector implements Collector {
 
     // Configure sub-collector
     for (final Collector collector : this.subCollectionList) {
-      collector.configure(qc, properties);
+      collector.configure(qc, conf);
     }
   }
 

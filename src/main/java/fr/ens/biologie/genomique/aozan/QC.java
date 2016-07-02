@@ -43,8 +43,8 @@ import com.google.common.io.Files;
 
 import fr.ens.biologie.genomique.aozan.collectors.Collector;
 import fr.ens.biologie.genomique.aozan.collectors.CollectorRegistry;
-import fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector;
 import fr.ens.biologie.genomique.aozan.collectors.RunInfoCollector;
+import fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector;
 import fr.ens.biologie.genomique.aozan.fastqc.RuntimePatchFastQC;
 import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeAliases;
 import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeDescriptionCreator;

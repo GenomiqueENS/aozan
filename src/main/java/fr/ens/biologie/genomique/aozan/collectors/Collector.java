@@ -24,7 +24,6 @@
 package fr.ens.biologie.genomique.aozan.collectors;
 
 import java.util.List;
-import java.util.Properties;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
@@ -52,9 +51,9 @@ public interface Collector {
   /**
    * Configure the collector with the path of the run data.
    * @param qc QC object for the run
-   * @param properties object with the collector configuration
+   * @param conf the collector configuration
    */
-  void configure(QC qc, Properties properties);
+  void configure(QC qc, CollectorConfiguration conf);
 
   /**
    * Collect data.

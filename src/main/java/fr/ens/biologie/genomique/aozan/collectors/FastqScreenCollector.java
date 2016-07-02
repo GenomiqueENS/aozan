@@ -27,7 +27,6 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
@@ -79,15 +78,15 @@ public class FastqScreenCollector extends AbstractFastqCollector {
   }
 
   @Override
-  public void configure(final QC qc, final Properties properties) {
+  public void configure(final QC qc, final CollectorConfiguration conf) {
 
-    super.configure(qc, properties);
+    super.configure(qc, conf);
 
-    this.fastqscreen = new FastqScreen(properties);
+    this.fastqscreen = new FastqScreen(conf);
 
     try {
-      this.ignorePairedMode = Boolean.parseBoolean(properties.getProperty(
-          Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY));
+      this.ignorePairedMode = Boolean.parseBoolean(conf
+          .get(Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY));
 
     } catch (final Exception e) {
       // Default value
@@ -95,8 +94,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     }
 
     try {
-      this.skipControlLane = Boolean.parseBoolean(properties.getProperty(
-          Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY));
+      this.skipControlLane = Boolean.parseBoolean(
+          conf.get(Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY));
     } catch (final Exception e) {
       // Default value
       this.skipControlLane = true;
@@ -104,7 +103,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
     try {
       final String filename =
-          properties.getProperty(Settings.QC_CONF_FASTQSCREEN_XSL_FILE_KEY);
+          conf.get(Settings.QC_CONF_FASTQSCREEN_XSL_FILE_KEY);
       if (new File(filename).exists()) {
         this.fastqscreenXSLFile = new File(filename);
       }
@@ -115,9 +114,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
     // Check if process undetermined indices samples specify in Aozan
     // configuration
-    this.isProcessUndeterminedIndicesSamples =
-        Boolean.parseBoolean(properties.getProperty(
-            Settings.QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY));
+    this.isProcessUndeterminedIndicesSamples = Boolean.parseBoolean(conf
+        .get(Settings.QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY));
   }
 
   @Override
@@ -146,11 +144,12 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     }
 
     if (fastqSample.isUndeterminedIndex()) {
-      return createInterminedIndicesFastqScreenThread(data, fastqSample, reportDir,
-          isRunPE);
+      return createInterminedIndicesFastqScreenThread(data, fastqSample,
+          reportDir, isRunPE);
     }
 
-    return createStandardFastqScreenThread(data, fastqSample, reportDir, isRunPE);
+    return createStandardFastqScreenThread(data, fastqSample, reportDir,
+        isRunPE);
   }
 
   /**
@@ -182,8 +181,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     if (sampleRef != null) {
 
       // Get corresponding valid genome name for mapping
-      sampleGenomeName =
-          GenomeAliases.getInstance().get(sampleRef);
+      sampleGenomeName = GenomeAliases.getInstance().get(sampleRef);
 
       Common.getLogger()
           .info("FQS-extract genomeRef for sample "
@@ -210,8 +208,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
         if (fastqSampleR2.getKeyFastqSample().equals(prefixRead2)) {
 
           return new FastqScreenProcessThread(fastqSample, fastqSampleR2,
-              this.fastqscreen, data, genomes, sampleGenomeName,
-              reportDir, isPairedMode, isRunPE, this.fastqscreenXSLFile);
+              this.fastqscreen, data, genomes, sampleGenomeName, reportDir,
+              isPairedMode, isRunPE, this.fastqscreenXSLFile);
         }
       }
     }

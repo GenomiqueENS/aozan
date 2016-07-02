@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -59,9 +58,9 @@ public class FlowcellDemuxSummaryCollector extends DemultiplexingCollector {
   private String bcl2fastqOutputPath;
 
   @Override
-  public void configure(final QC qc, final Properties properties) {
+  public void configure(final QC qc, final CollectorConfiguration conf) {
 
-    if (properties == null) {
+    if (conf == null) {
       return;
     }
 
@@ -76,10 +75,9 @@ public class FlowcellDemuxSummaryCollector extends DemultiplexingCollector {
     }
 
     // Demux summary path
-    final String demuxSummaryPath =
-        this.bcl2fastqOutputPath
-            + "/Basecall_Stats_" + data.getFlowcellId()
-            + "/Flowcell_demux_summary.xml";
+    final String demuxSummaryPath = this.bcl2fastqOutputPath
+        + "/Basecall_Stats_" + data.getFlowcellId()
+        + "/Flowcell_demux_summary.xml";
 
     // Create the input stream
     try (InputStream is = new FileInputStream(demuxSummaryPath)) {
@@ -91,14 +89,16 @@ public class FlowcellDemuxSummaryCollector extends DemultiplexingCollector {
 
       parse(doc, data);
 
-    } catch (final IOException | SAXException | ParserConfigurationException e) {
+    } catch (final IOException | SAXException
+        | ParserConfigurationException e) {
       throw new AozanException(e);
     }
   }
 
   private void parse(final Document document, final RunData data) {
 
-    for (final Element e1 : XMLUtils.getElementsByTagName(document, "Summary")) {
+    for (final Element e1 : XMLUtils.getElementsByTagName(document,
+        "Summary")) {
       for (final Element e2 : XMLUtils.getElementsByTagName(e1, "Lane")) {
         parseLane(e2, data);
       }
@@ -229,11 +229,8 @@ public class FlowcellDemuxSummaryCollector extends DemultiplexingCollector {
     @Override
     public String toString() {
 
-      return Objects
-          .toStringHelper(this)
-          .add("yield", this.yield)
-          .add("yieldQ30", this.yieldQ30)
-          .add("clusterCount", this.clusterCount)
+      return Objects.toStringHelper(this).add("yield", this.yield)
+          .add("yieldQ30", this.yieldQ30).add("clusterCount", this.clusterCount)
           .add("clusterCount0MismatchBarcode",
               this.clusterCount0MismatchBarcode)
           .add("clusterCount1MismatchBarcode",

@@ -26,7 +26,6 @@ package fr.ens.biologie.genomique.aozan.collectors;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Properties;
 
 import com.google.common.collect.ImmutableList;
 
@@ -47,7 +46,7 @@ public class DemultiplexingCollector implements Collector {
   private QC qc;
   private File bcl2fastqOutputPath;
   private File samplesheetFile;
-  private Properties conf;
+  private CollectorConfiguration conf;
 
   //
   // Useful methods
@@ -71,16 +70,16 @@ public class DemultiplexingCollector implements Collector {
   }
 
   @Override
-  public void configure(final QC qc, final Properties properties) {
+  public void configure(final QC qc, final CollectorConfiguration conf) {
 
-    if (properties == null) {
+    if (conf == null) {
       return;
     }
 
     this.qc = qc;
     this.bcl2fastqOutputPath = qc.getFastqDir();
     this.samplesheetFile = qc.getSampleSheetFile();
-    this.conf = new Properties(properties);
+    this.conf = new CollectorConfiguration(conf);
   }
 
   @Override

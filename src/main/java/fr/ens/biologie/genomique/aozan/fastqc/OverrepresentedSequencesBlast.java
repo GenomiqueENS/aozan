@@ -43,7 +43,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
@@ -64,6 +63,7 @@ import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.Settings;
+import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
 import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
 import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
 
@@ -113,36 +113,36 @@ public class OverrepresentedSequencesBlast {
 
   /**
    * Configure and check that Blastn can be launched.
-   * @param properties object with the collector configuration
+   * @param conf object with the collector configuration
    */
-  public void configure(final Properties properties) {
+  public void configure(final CollectorConfiguration conf) {
 
-    checkNotNull(properties, "properties argument cannot be null");
+    checkNotNull(conf, "conf argument cannot be null");
 
     if (this.configured) {
       return;
     }
 
-    boolean stepEnabled = Boolean.parseBoolean(
-        properties.getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY)
+    boolean stepEnabled = Boolean
+        .parseBoolean(conf.get(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY)
             .trim().toLowerCase());
 
     if (stepEnabled) {
 
       // Check parameters
-      this.blastVersionExpected = properties
-          .getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_VERSION_EXPECTED_KEY);
+      this.blastVersionExpected =
+          conf.get(Settings.QC_CONF_FASTQSCREEN_BLAST_VERSION_EXPECTED_KEY);
 
-      this.tmpPath = properties.getProperty(QC.TMP_DIR);
+      this.tmpPath = conf.get(QC.TMP_DIR);
 
       // Path to blast executable
-      final String blastPath = properties
-          .getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_PATH_KEY).trim();
+      final String blastPath =
+          conf.get(Settings.QC_CONF_FASTQSCREEN_BLAST_PATH_KEY).trim();
 
       // Path to database for blast, need to add prefix filename used "nt"
       final String blastDBPath =
-          properties.getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_DB_PATH_KEY)
-              .trim() + PREFIX_FILENAME_DATABASE;
+          conf.get(Settings.QC_CONF_FASTQSCREEN_BLAST_DB_PATH_KEY).trim()
+              + PREFIX_FILENAME_DATABASE;
 
       // Check paths needed in configuration aozan
       if (blastPath == null
@@ -165,8 +165,8 @@ public class OverrepresentedSequencesBlast {
 
         try {
           // Add arguments from configuration Aozan
-          final String blastArguments = properties
-              .getProperty(Settings.QC_CONF_FASTQSCREEN_BLAST_ARGUMENTS_KEY);
+          final String blastArguments =
+              conf.get(Settings.QC_CONF_FASTQSCREEN_BLAST_ARGUMENTS_KEY);
 
           this.blastCommonCommandLine =
               createBlastCommandLine(blastPath, blastDBPath, blastArguments);

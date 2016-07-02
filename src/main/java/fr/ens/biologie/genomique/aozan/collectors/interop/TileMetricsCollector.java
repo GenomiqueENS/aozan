@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.TreeMap;
 
 import com.google.common.collect.Lists;
@@ -38,6 +37,7 @@ import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
+import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
 import fr.ens.biologie.genomique.aozan.util.StatisticsUtils;
 
 /**
@@ -61,13 +61,12 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
   }
 
   @Override
-  public void configure(final QC qc, final Properties properties) {
+  public void configure(final QC qc, final CollectorConfiguration conf) {
 
-    super.configure(qc, properties);
+    super.configure(qc, conf);
 
-    this.densityRatio =
-        Double.parseDouble(properties
-            .getProperty(Settings.QC_CONF_CLUSTER_DENSITY_RATIO_KEY));
+    this.densityRatio = Double
+        .parseDouble(conf.get(Settings.QC_CONF_CLUSTER_DENSITY_RATIO_KEY));
   }
 
   /**
@@ -202,7 +201,8 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
         if (!this.metricsPerTilePerCode.get(code).containsKey(tileNumber)) {
           this.metricsPerTilePerCode.get(code).put(tileNumber, value);
 
-        } else if (this.metricsPerTilePerCode.get(code).get(tileNumber) == 0.0) {
+        } else if (this.metricsPerTilePerCode.get(code)
+            .get(tileNumber) == 0.0) {
 
           // Replace value by numeric in case several value exist per tile
           this.metricsPerTilePerCode.get(code).put(tileNumber, value);
@@ -284,7 +284,8 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
       final Map<Integer, Double> numberClusterPFValues =
           this.metricsPerTilePerCode.get(103);
 
-      if (numberClusterPFValues.size() == 0 || numberClusterValues.size() == 0) {
+      if (numberClusterPFValues.size() == 0
+          || numberClusterValues.size() == 0) {
         return;
       }
 
@@ -359,8 +360,8 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
 
       for (final ReadTileMetrics rm : this.listReads) {
 
-        final String key = READ_DATA_PREFIX +
-            ".read" + rm.getNumberRead() + ".lane" + this.laneNumber;
+        final String key = READ_DATA_PREFIX
+            + ".read" + rm.getNumberRead() + ".lane" + this.laneNumber;
 
         // Same values for all read in a lane, values for one tile
         data.put(key + ".clusters.pf", this.numberClusterPF);
@@ -381,7 +382,8 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
         data.put(key + ".phasing", rm.getPhasing());
         data.put(key + ".prephasing", rm.getPrephasing());
 
-        data.put(READ_DATA_PREFIX + ".read" + rm.getNumberRead() + ".density.ratio",
+        data.put(
+            READ_DATA_PREFIX + ".read" + rm.getNumberRead() + ".density.ratio",
             this.densityRatio);
 
         final String s =
@@ -395,13 +397,12 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
 
     @Override
     public String toString() {
-      return String
-          .format(
-              "Density %.2f\t -PF %.2f\t nbC %s\t PF %s\t prc %.2f\tsd Density %.3f\t -PF %.3f\t nbC %.3f\t PF %.3f\t prc %.3f",
-              this.clusterDensity, this.clusterDensityPF, this.numberCluster,
-              this.numberClusterPF, this.prcPFClusters, this.clusterDensitySD,
-              this.clusterDensityPFSD, this.numberClusterSD,
-              this.numberClusterPFSD, this.prcPFClustersSD);
+      return String.format(
+          "Density %.2f\t -PF %.2f\t nbC %s\t PF %s\t prc %.2f\tsd Density %.3f\t -PF %.3f\t nbC %.3f\t PF %.3f\t prc %.3f",
+          this.clusterDensity, this.clusterDensityPF, this.numberCluster,
+          this.numberClusterPF, this.prcPFClusters, this.clusterDensitySD,
+          this.clusterDensityPFSD, this.numberClusterSD, this.numberClusterPFSD,
+          this.prcPFClustersSD);
     }
 
     //

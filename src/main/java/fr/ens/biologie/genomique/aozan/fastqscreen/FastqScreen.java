@@ -29,7 +29,6 @@ import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanRead
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -39,6 +38,7 @@ import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.Settings;
+import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
 
 /**
  * This class execute fastqscreen pair-end mode or single-end.
@@ -84,8 +84,8 @@ public class FastqScreen {
       final String sampleDescription, final List<String> genomes,
       final String genomeSample, final boolean paired) throws AozanException {
 
-    return this.execute(fastqRead, null, sampleDescription, genomes, genomeSample,
-        paired);
+    return this.execute(fastqRead, null, sampleDescription, genomes,
+        genomeSample, paired);
 
   }
 
@@ -103,11 +103,12 @@ public class FastqScreen {
   public FastqScreenResult execute(final File fastqRead1, final File fastqRead2,
       final String sampleDescription, final List<String> genomes,
       final String sampleGenome, final boolean isPairedMode)
-          throws AozanException {
+      throws AozanException {
 
     checkNotNull(fastqRead1, "fastqRead1 argument cannot be null");
     checkNotNull(genomes, "genomes argument cannot be null");
-    checkNotNull(sampleDescription, "sampleDescription argument cannot be null");
+    checkNotNull(sampleDescription,
+        "sampleDescription argument cannot be null");
 
     if (isPairedMode) {
       checkNotNull(fastqRead2, "fastqRead2 argument cannot be null");
@@ -169,19 +170,19 @@ public class FastqScreen {
   /**
    * Public constructor of fastqscreen. Initialization of settings of Eoulsan
    * necessary for use of mapper index.
-   * @param properties properties defines in configuration of aozan
+   * @param conf Collector configuration
    */
-  public FastqScreen(final Properties properties) {
+  public FastqScreen(final CollectorConfiguration conf) {
 
-    checkNotNull(properties, "properties argument cannot be null");
+    checkNotNull(conf, "properties argument cannot be null");
 
-    this.tmpDir = new File(properties.getProperty(QC.TMP_DIR));
+    this.tmpDir = new File(conf.get(QC.TMP_DIR));
 
-    if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
+    if (conf.containsKey(Settings.QC_CONF_THREADS_KEY)) {
       int threads = 1;
       try {
-        threads = Integer
-            .parseInt(properties.getProperty(Settings.QC_CONF_THREADS_KEY));
+        threads =
+            Integer.parseInt(conf.get(Settings.QC_CONF_THREADS_KEY));
       } catch (final NumberFormatException e) {
       }
       this.confThreads = threads;
@@ -190,17 +191,17 @@ public class FastqScreen {
     }
 
     // Fields required to initialize fastqScreenGenomes
-    this.aliasGenomesFile = new File(properties.getProperty(
-        Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
-    this.samplesheetFile = new File(properties.getProperty(QC.BCL2FASTQ_SAMPLESHEET_PATH));
+    this.aliasGenomesFile = new File(conf
+        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
+    this.samplesheetFile =
+        new File(conf.get(QC.BCL2FASTQ_SAMPLESHEET_PATH));
     this.contaminantGenomeNames =
-        properties.getProperty(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
+        conf.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
 
     // Parameter mapper instead of default value
-    this.mapperName =
-        properties.getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPER_KEY);
-    this.mapperArgument = properties
-        .getProperty(Settings.QC_CONF_FASTQSCREEN_MAPPER_ARGUMENT_KEY);
+    this.mapperName = conf.get(Settings.QC_CONF_FASTQSCREEN_MAPPER_KEY);
+    this.mapperArgument =
+        conf.get(Settings.QC_CONF_FASTQSCREEN_MAPPER_ARGUMENT_KEY);
 
   }
 }

@@ -35,7 +35,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -179,10 +178,10 @@ public abstract class AbstractFastqCollector implements Collector {
   }
 
   @Override
-  public void configure(final QC qc, final Properties properties) {
+  public void configure(final QC qc, final CollectorConfiguration conf) {
 
     checkNotNull(qc, "qc argument cannot be null");
-    checkNotNull(properties, "properties argument cannot be null");
+    checkNotNull(conf, "conf argument cannot be null");
 
     this.qcReportOutputPath = qc.getQcDir();
     this.tmpDir = qc.getTmpDir();

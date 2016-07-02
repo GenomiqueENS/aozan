@@ -26,7 +26,6 @@ package fr.ens.biologie.genomique.aozan.collectors.interop;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
 import com.google.common.collect.Lists;
 
@@ -34,6 +33,7 @@ import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.collectors.Collector;
+import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
 import fr.ens.biologie.genomique.aozan.collectors.RunInfoCollector;
 import fr.ens.biologie.genomique.aozan.collectors.interop.ReadsData.ReadData;
 
@@ -72,11 +72,10 @@ abstract class AbstractMetricsCollector implements Collector {
   }
 
   @Override
-  public void configure(final QC qc, final Properties properties) {
+  public void configure(final QC qc, final CollectorConfiguration conf) {
 
     if (qc == null) {
-      this.interOpDir =
-          new File(properties.getProperty(QC.RTA_OUTPUT_DIR), "InterOp");
+      this.interOpDir = new File(conf.get(QC.RTA_OUTPUT_DIR), "InterOp");
     } else {
       this.interOpDir = new File(qc.getBclDir(), "InterOp");
     }

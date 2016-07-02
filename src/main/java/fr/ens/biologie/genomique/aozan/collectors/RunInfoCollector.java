@@ -26,7 +26,6 @@ package fr.ens.biologie.genomique.aozan.collectors;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -76,15 +75,14 @@ public class RunInfoCollector implements Collector {
   }
 
   @Override
-  public void configure(final QC qc, final Properties properties) {
+  public void configure(final QC qc, final CollectorConfiguration conf) {
 
-    if (properties == null)
+    if (conf == null)
       return;
 
     if (qc == null) {
       // Unit Test
-      this.runInfoFile =
-          new File(properties.getProperty(QC.RTA_OUTPUT_DIR), "RunInfo.xml");
+      this.runInfoFile = new File(conf.get(QC.RTA_OUTPUT_DIR), "RunInfo.xml");
     } else {
       this.runInfoFile = new File(qc.getBclDir(), "RunInfo.xml");
     }

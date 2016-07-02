@@ -24,7 +24,6 @@
 package fr.ens.biologie.genomique.aozan.collectors;
 
 import java.util.List;
-import java.util.Properties;
 
 import com.google.common.collect.ImmutableList;
 
@@ -65,7 +64,7 @@ public class GlobalStatsCollector implements Collector {
   }
 
   @Override
-  public void configure(final QC qc, final Properties properties) {
+  public void configure(final QC qc, final CollectorConfiguration conf) {
     // Nothing to do
   }
 

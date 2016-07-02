@@ -26,7 +26,6 @@ package fr.ens.biologie.genomique.aozan.collectors;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Properties;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -73,19 +72,20 @@ public abstract class StatisticsCollector implements Collector {
     // Use their data only if a test use them.
 
     return Lists.newArrayList(RunInfoCollector.COLLECTOR_NAME,
-        SamplesheetCollector.COLLECTOR_NAME, DemultiplexingCollector.COLLECTOR_NAME);
+        SamplesheetCollector.COLLECTOR_NAME,
+        DemultiplexingCollector.COLLECTOR_NAME);
   }
 
   @Override
-  public void configure(final QC qc, final Properties properties) {
+  public void configure(final QC qc, final CollectorConfiguration conf) {
 
     // Set control quality directory
     this.reportDir = qc.getQcDir();
 
     // Set stylesheet file to build project report
     try {
-      final String filename = properties
-          .getProperty(Settings.QC_CONF_FASTQSCREEN_PROJECT_XSL_FILE_KEY);
+      final String filename =
+          conf.get(Settings.QC_CONF_FASTQSCREEN_PROJECT_XSL_FILE_KEY);
       if (new File(filename).exists()) {
         this.fastqscreenXSLFile = new File(filename);
       }
@@ -95,8 +95,8 @@ public abstract class StatisticsCollector implements Collector {
     }
 
     // Extract threshold from property
-    final String threshod = properties.getProperty(
-        Settings.QC_CONF_FASTQSCREEN_PERCENT_CONTAMINATION_THRESHOLD_KEY);
+    final String threshod = conf
+        .get(Settings.QC_CONF_FASTQSCREEN_PERCENT_CONTAMINATION_THRESHOLD_KEY);
 
     // Set the contaminant threshold
     if (threshod == null || threshod.isEmpty()) {
@@ -111,9 +111,8 @@ public abstract class StatisticsCollector implements Collector {
     }
 
     // Check optional collector selected
-    final List<String> collectorNames =
-        Splitter.on(',').trimResults().omitEmptyStrings()
-            .splitToList(properties.getProperty(QC.QC_COLLECTOR_NAMES));
+    final List<String> collectorNames = Splitter.on(',').trimResults()
+        .omitEmptyStrings().splitToList(conf.get(QC.QC_COLLECTOR_NAMES));
 
     undeterminedIndexesCollectorSelected =
         collectorNames.contains(UndeterminedIndexesCollector.COLLECTOR_NAME);
