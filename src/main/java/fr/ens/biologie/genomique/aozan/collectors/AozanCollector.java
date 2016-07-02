@@ -41,6 +41,7 @@ public class AozanCollector implements Collector {
   public static final String PREFIX = "aozan.info";
 
   private CollectorConfiguration conf;
+  private Settings settings;
 
   @Override
   public String getName() {
@@ -63,6 +64,7 @@ public class AozanCollector implements Collector {
     // Nothing to do
 
     this.conf = conf;
+    this.settings = qc.getSettings();
   }
 
   @Override
@@ -99,9 +101,12 @@ public class AozanCollector implements Collector {
     data.put(PREFIX + ".java.vm.name", System.getProperty("java.vm.name"));
     data.put(PREFIX + ".java.version", System.getProperty("java.version"));
 
-    data.put(PREFIX + ".conf.path", Settings.AOZAN_CONF_FILE_PATH);
-    data.put(PREFIX + ".log.path", Settings.AOZAN_LOG_PATH_KEY);
-    data.put(PREFIX + ".log.level", Settings.AOZAN_LOG_LEVEL_KEY);
+    data.put(PREFIX + ".conf.path",
+        this.settings.get(Settings.AOZAN_CONF_FILE_PATH));
+    data.put(PREFIX + ".log.path",
+        this.settings.get(Settings.AOZAN_LOG_PATH_KEY));
+    data.put(PREFIX + ".log.level",
+        this.settings.get(Settings.AOZAN_LOG_LEVEL_KEY));
   }
 
   @Override

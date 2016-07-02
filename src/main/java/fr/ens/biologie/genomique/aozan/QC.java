@@ -93,6 +93,8 @@ public class QC {
   public static final String TEST_KEY_ENABLED_SUFFIX = ".enable";
   public static final String TEST_KEY_PREFIX = "qc.test.";
 
+  private final Settings settings;
+
   private final File bclDir;
   private final File fastqDir;
   private final File qcDir;
@@ -161,6 +163,14 @@ public class QC {
    */
   public File getTmpDir() {
     return this.tmpDir;
+  }
+
+  /**
+   * Get Aozan settings.
+   * @return the settings
+   */
+  public Settings getSettings() {
+    return this.settings;
   }
 
   //
@@ -814,6 +824,7 @@ public class QC {
       final String qcDir, final File tmpDir, final String runId)
       throws AozanException {
 
+    this.settings = settings;
     this.bclDir = checkDir(bclDir);
     this.fastqDir = checkDir(fastqDir);
     this.qcDir = checkDir(qcDir);
