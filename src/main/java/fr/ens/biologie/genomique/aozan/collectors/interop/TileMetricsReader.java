@@ -36,7 +36,7 @@ import fr.ens.biologie.genomique.aozan.AozanException;
  * @since 1.1
  */
 public class TileMetricsReader extends
-    AbstractBinaryFileReader<IlluminaTileMetrics> {
+    AbstractBinaryFileReader<TileMetrics> {
 
   public static final String NAME = "TileMetricsOut";
 
@@ -68,9 +68,9 @@ public class TileMetricsReader extends
 
   @Override
   protected void addIlluminaMetricsInCollection(
-      final List<IlluminaTileMetrics> collection, final ByteBuffer bb) {
+      final List<TileMetrics> collection, final ByteBuffer bb) {
 
-    collection.add(new IlluminaTileMetrics(bb));
+    collection.add(new TileMetrics(bb));
   }
 
   //

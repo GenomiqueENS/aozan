@@ -28,7 +28,6 @@ import static fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput.UNDETERMI
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 
@@ -36,12 +35,13 @@ import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
+import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 
 public class LinkReportFastqScreenSampleTest extends AbstractSampleTest {
 
   @Override
-  public List<AozanTest> configure(Map<String, String> properties)
+  public List<AozanTest> configure(final TestConfiguration conf)
       throws AozanException {
     return Collections.singletonList((AozanTest) this);
   }

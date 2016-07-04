@@ -36,6 +36,7 @@ import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector;
 import fr.ens.biologie.genomique.aozan.collectors.PhasingCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
+import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 import fr.ens.biologie.genomique.aozan.util.DoubleInterval;
 import fr.ens.biologie.genomique.aozan.util.Interval;
@@ -101,13 +102,13 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
   //
 
   @Override
-  public List<AozanTest> configure(final Map<String, String> properties)
+  public List<AozanTest> configure(final TestConfiguration conf)
       throws AozanException {
 
-    if (properties == null)
+    if (conf == null)
       throw new NullPointerException("The properties object is null");
 
-    for (Map.Entry<String, String> e : properties.entrySet()) {
+    for (Map.Entry<String, String> e : conf.entrySet()) {
 
       if ("phasing.interval".equals(e.getKey().trim().toLowerCase()))
         this.phasingInterval = new DoubleInterval(e.getValue());

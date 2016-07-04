@@ -48,7 +48,7 @@ import java.nio.ByteBuffer;
  * @author Sandrine Perrin
  * @since 1.1
  */
-public class IlluminaErrorMetrics {
+public class ErrorMetrics {
 
   /** The lane number. */
   private final int laneNumber; // uint16
@@ -166,7 +166,7 @@ public class IlluminaErrorMetrics {
    * Constructor. One record countReads on the ByteBuffer.
    * @param bb ByteBuffer who read one record
    */
-  IlluminaErrorMetrics(final ByteBuffer bb) {
+  ErrorMetrics(final ByteBuffer bb) {
 
     this.laneNumber = uShortToInt(bb.getShort());
     this.tileNumber = uShortToInt(bb.getShort());

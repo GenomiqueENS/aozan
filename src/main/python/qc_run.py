@@ -126,7 +126,7 @@ def qc(run_id, conf):
     try:
 
         # Initialize the QC object
-        qc = QC(conf, input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id)
+        qc = QC(Settings(conf), input_run_data_path, fastq_input_dir, qc_output_dir, conf[TMP_PATH_KEY], run_id)
 
         # Compute the report
         report = qc.computeReport()

@@ -73,7 +73,7 @@ public class ExtractionMetricsCollector extends AbstractMetricsCollector {
     initMetricsMap();
 
     // Distribution of metrics between lane and code
-    for (final IlluminaIntensityMetrics iim : reader.getSetIlluminaMetrics()) {
+    for (final ExtractionMetrics iim : reader.getSetIlluminaMetrics()) {
 
       // key : number read, value(pair:first number cycle, last number cycle)
       keyMap =
@@ -155,7 +155,7 @@ public class ExtractionMetricsCollector extends AbstractMetricsCollector {
      * the twentieth cycle.
      * @param iim illumina tile metrics
      */
-    public void addMetric(final IlluminaIntensityMetrics iim) {
+    public void addMetric(final ExtractionMetrics iim) {
       final int cycle = iim.getCycleNumber();
 
       // here use only the value for base A, like in the Illumina files.

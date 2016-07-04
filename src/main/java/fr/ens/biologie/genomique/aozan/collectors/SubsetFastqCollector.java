@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
@@ -94,16 +93,16 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
   }
 
   @Override
-  public void configure(final QC qc, final Properties properties) {
+  public void configure(final QC qc, final CollectorConfiguration conf) {
 
-    super.configure(qc, properties);
+    super.configure(qc, conf);
 
     // Set the number of threads
-    if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
+    if (conf.containsKey(Settings.QC_CONF_THREADS_KEY)) {
 
       try {
-        final int confThreads = Integer.parseInt(
-            properties.getProperty(Settings.QC_CONF_THREADS_KEY).trim());
+        final int confThreads =
+            Integer.parseInt(conf.get(Settings.QC_CONF_THREADS_KEY).trim());
         if (confThreads > 0) {
           this.numberThreads = confThreads;
         }
@@ -113,24 +112,24 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
     }
 
     try {
-      this.skipControlLane = Boolean.parseBoolean(properties.getProperty(
-          Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY));
+      this.skipControlLane = Boolean.parseBoolean(
+          conf.get(Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY));
     } catch (final Exception e) {
       // Default value
       this.skipControlLane = true;
     }
 
     try {
-      this.ignorePairedMode = Boolean.parseBoolean(properties.getProperty(
-          Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY));
+      this.ignorePairedMode = Boolean.parseBoolean(conf
+          .get(Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY));
 
     } catch (final Exception e) {
       // Default value
       this.ignorePairedMode = false;
     }
 
-    final int readsToCopy = Integer.parseInt(properties
-        .getProperty(Settings.QC_CONF_FASTQSCREEN_FASTQ_READS_PF_USED_KEY));
+    final int readsToCopy = Integer.parseInt(
+        conf.get(Settings.QC_CONF_FASTQSCREEN_FASTQ_READS_PF_USED_KEY));
     if (readsToCopy == -1) {
       // Use a fully fastq file, force uncompress fastq file independently
       // number reads
@@ -139,8 +138,8 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
       this.countReadsPFtoCopy = readsToCopy;
     }
 
-    final int countReads = Integer.parseInt(properties
-        .getProperty(Settings.QC_CONF_FASTQSCREEN_FASTQ_MAX_READS_PARSED_KEY));
+    final int countReads = Integer.parseInt(
+        conf.get(Settings.QC_CONF_FASTQSCREEN_FASTQ_MAX_READS_PARSED_KEY));
     if (countReads == -1) {
       // Parsing fully fastq file
       this.maxReadsPFtoParse = Integer.MAX_VALUE;
@@ -150,9 +149,8 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
 
     // Check if process undetermined indices samples specify in Aozan
     // configuration
-    this.isProcessUndeterminedIndicesSamples =
-        Boolean.parseBoolean(properties.getProperty(
-            Settings.QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY));
+    this.isProcessUndeterminedIndicesSamples = Boolean.parseBoolean(conf
+        .get(Settings.QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY));
   }
 
   @Override

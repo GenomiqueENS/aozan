@@ -43,13 +43,14 @@ import com.google.common.io.Files;
 
 import fr.ens.biologie.genomique.aozan.collectors.Collector;
 import fr.ens.biologie.genomique.aozan.collectors.CollectorRegistry;
-import fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector;
 import fr.ens.biologie.genomique.aozan.collectors.RunInfoCollector;
+import fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector;
 import fr.ens.biologie.genomique.aozan.fastqc.RuntimePatchFastQC;
 import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeAliases;
 import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeDescriptionCreator;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.AozanTestRegistry;
+import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 import fr.ens.biologie.genomique.aozan.tests.global.GlobalTest;
 import fr.ens.biologie.genomique.aozan.tests.lane.LaneTest;
 import fr.ens.biologie.genomique.aozan.tests.projectstats.ProjectTest;
@@ -72,7 +73,8 @@ public class QC {
   public static final String RTA_OUTPUT_DIR = "rta.output.dir";
 
   /** Bcl2fastq samplesheet path property key. */
-  public static final String BCL2FASTQ_SAMPLESHEET_PATH = "casava.samplesheet.path";
+  public static final String BCL2FASTQ_SAMPLESHEET_PATH =
+      "casava.samplesheet.path";
 
   /** Bcl2fastq output directory property key. */
   public static final String BCL2FASTQ_OUTPUT_DIR = "casava.output.dir";
@@ -88,8 +90,10 @@ public class QC {
 
   public static final String LANE_COUNT = "lane.count";
 
-  private static final String TEST_KEY_ENABLED_SUFFIX = ".enable";
-  private static final String TEST_KEY_PREFIX = "qc.test.";
+  public static final String TEST_KEY_ENABLED_SUFFIX = ".enable";
+  public static final String TEST_KEY_PREFIX = "qc.test.";
+
+  private final Settings settings;
 
   private final File bclDir;
   private final File fastqDir;
@@ -161,6 +165,14 @@ public class QC {
     return this.tmpDir;
   }
 
+  /**
+   * Get Aozan settings.
+   * @return the settings
+   */
+  public Settings getSettings() {
+    return this.settings;
+  }
+
   //
   // Report methods
   //
@@ -222,10 +234,7 @@ public class QC {
 
       // Create RunDataGenerator object
       final RunDataGenerator rdg =
-          new RunDataGenerator(this.collectors, this.runId);
-
-      // Set the parameters of the generator
-      rdg.setGlobalConf(this.globalConf);
+          new RunDataGenerator(this.collectors, this.runId, this.globalConf);
 
       // Create the run data object
       data = rdg.collect(this);
@@ -289,7 +298,7 @@ public class QC {
    */
   public void writeReport(final QCReport report,
       final String stylesheetFilename, final String outputFilename)
-          throws AozanException {
+      throws AozanException {
 
     if (outputFilename == null) {
       throw new AozanException("The filename for the qc report is null");
@@ -383,16 +392,15 @@ public class QC {
 
   /**
    * Init the QC.
-   * @param properties Aozan configuration
+   * @param settings Aozan settings
    * @throws AozanException if an error occurs while initialize the QC
    */
-  private void init(final Map<String, String> properties)
-      throws AozanException {
+  private void init(final Settings settings) throws AozanException {
 
     final AozanTestRegistry registry = new AozanTestRegistry();
     List<AozanTest> tests;
 
-    for (final Map.Entry<String, String> e : properties.entrySet()) {
+    for (final Map.Entry<String, String> e : settings.entrySet()) {
 
       final String key = e.getKey();
       final String value = e.getValue();
@@ -409,8 +417,8 @@ public class QC {
         if (test != null) {
 
           // Configure the test
-          tests =
-              configureTest(test, properties, TEST_KEY_PREFIX + testName + ".");
+          tests = test.configure(new TestConfiguration(settings,
+              TEST_KEY_PREFIX + testName + "."));
 
           // Add the test to runTests, laneTests or sampleTests
           if (test instanceof GlobalTest) {
@@ -463,40 +471,6 @@ public class QC {
     for (final SampleStatsTest test : this.samplesStatsTests) {
       test.init();
     }
-  }
-
-  /**
-   * Configure an Aozan Test.
-   * @param test Aozan test to configure
-   * @param properties Aozan configuration
-   * @param prefix key that enable the test
-   * @return list of Aozan tests
-   * @throws AozanException if an error occurs while configuring the test
-   */
-  private List<AozanTest> configureTest(final AozanTest test,
-      final Map<String, String> properties, final String prefix)
-          throws AozanException {
-
-    final Map<String, String> conf = new HashMap<>();
-
-    for (final Map.Entry<String, String> e : properties.entrySet()) {
-
-      final String key = e.getKey();
-
-      if (key.startsWith(prefix) && !key.endsWith(TEST_KEY_ENABLED_SUFFIX)) {
-
-        final String confKey = key.substring(prefix.length());
-        final String confValue = e.getValue();
-
-        conf.put(confKey, confValue);
-
-      }
-
-      // add additional configuration in properties for collector
-      conf.putAll(this.globalConf);
-    }
-
-    return test.configure(conf);
   }
 
   /**
@@ -600,13 +574,12 @@ public class QC {
   /**
    * Set global configuration used by collector and aozan tests. It retrieve all
    * paths present in aozan configuration file.
-   * @param properties aozan configuration file
+   * @param settings Aozan settings
    * @throws AozanException if an error occurs while searching paths
    */
-  private void initGlobalConf(final Map<String, String> properties)
-      throws AozanException {
+  private void initGlobalConf(final Settings settings) throws AozanException {
 
-    for (final Map.Entry<String, String> e : properties.entrySet()) {
+    for (final Map.Entry<String, String> e : settings.entrySet()) {
 
       if (e.getKey().startsWith("qc.conf.")) {
         this.globalConf.put(e.getKey(), e.getValue());
@@ -623,11 +596,10 @@ public class QC {
 
   /**
    * Initialize FastQC v0.11.X from configuration Aozan.
-   * @param properties Aozan properties
+   * @param settings Aozan settings
    * @throws AozanException if an error occurs when patching FastQC classes.
    */
-  private void initFastQC(final Map<String, String> properties)
-      throws AozanException {
+  private void initFastQC(final Settings settings) throws AozanException {
 
     // Define parameters of FastQC
     System.setProperty("java.awt.headless", "true");
@@ -637,84 +609,82 @@ public class QC {
     System.setProperty("fastqc.threads", "1");
 
     // Contaminant file
-    addSystemProperty(properties, Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY,
+    addSystemProperty(settings, Settings.QC_CONF_FASTQC_CONTAMINANT_FILE_KEY,
         "fastqc.contaminant_file");
 
     // Adapter file
-    addSystemProperty(properties, Settings.QC_CONF_FASTQC_ADAPTER_FILE_KEY,
+    addSystemProperty(settings, Settings.QC_CONF_FASTQC_ADAPTER_FILE_KEY,
         "fastqc.adapter_file");
 
     // Limits file
-    addSystemProperty(properties, Settings.QC_CONF_FASTQC_LIMITS_FILE_KEY,
+    addSystemProperty(settings, Settings.QC_CONF_FASTQC_LIMITS_FILE_KEY,
         "fastqc.limits_file");
 
     // Kmer Size
-    addSystemProperty(properties, Settings.QC_CONF_FASTQC_KMER_SIZE_KEY,
+    addSystemProperty(settings, Settings.QC_CONF_FASTQC_KMER_SIZE_KEY,
         "fastqc.kmer_size");
 
     // Set fastQC nogroup
-    addSystemProperty(properties, Settings.QC_CONF_FASTQC_NOGROUP_KEY,
+    addSystemProperty(settings, Settings.QC_CONF_FASTQC_NOGROUP_KEY,
         "fastqc.nogroup");
 
     // Set fastQC expgroup
-    addSystemProperty(properties, Settings.QC_CONF_FASTQC_EXPGROUP_KEY,
+    addSystemProperty(settings, Settings.QC_CONF_FASTQC_EXPGROUP_KEY,
         "fastqc.expgroup");
 
     // Set fastQC format fastq
-    addSystemProperty(properties, Settings.QC_CONF_FASTQC_CASAVA_KEY,
+    addSystemProperty(settings, Settings.QC_CONF_FASTQC_CASAVA_KEY,
         "fastqc.casava");
 
     // Set fastQC nofilter system property
-    addSystemProperty(properties, Settings.QC_CONF_FASTQC_NOFILTER_KEY,
+    addSystemProperty(settings, Settings.QC_CONF_FASTQC_NOFILTER_KEY,
         "fastqc.nofilter");
 
-    addSystemProperty(properties, Settings.QC_CONF_FASTQC_NANO_KEY,
+    addSystemProperty(settings, Settings.QC_CONF_FASTQC_NANO_KEY,
         "fastqc.nano");
 
     // Patch FastQC classes
-    RuntimePatchFastQC.runPatchFastQC(Boolean.valueOf(
-        properties.get(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY)));
+    RuntimePatchFastQC.runPatchFastQC(Boolean
+        .valueOf(settings.get(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY)));
   }
 
   /**
    * Initialize initGenomeDescriptionCreator.
-   * @param properties Aozan properties
+   * @param settings Aozan settings
    */
-  private void initGenomeDescriptionCreator(
-      final Map<String, String> properties) {
+  private void initGenomeDescriptionCreator(final Settings settings) {
 
-    final fr.ens.biologie.genomique.eoulsan.Settings settings =
+    final fr.ens.biologie.genomique.eoulsan.Settings eoulsanSettings =
         EoulsanRuntime.getSettings();
 
-    settings.setGenomeDescStoragePath(properties
+    eoulsanSettings.setGenomeDescStoragePath(settings
         .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
-    settings.setGenomeMapperIndexStoragePath(properties
+    eoulsanSettings.setGenomeMapperIndexStoragePath(settings
         .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY));
-    settings.setGenomeStoragePath(
-        properties.get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY));
+    eoulsanSettings.setGenomeStoragePath(
+        settings.get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY));
 
     // Set data protocol from Eoulsan not load for Aozan because it needs to add
     // dependencies
-    DataProtocolService.getInstance()
-        .addClassesToNotLoad(Lists.newArrayList(
-            "fr.ens.biologie.genomique.eoulsan.data.protocols.S3DataProtocol",
-            "fr.ens.biologie.genomique.eoulsan.data.protocols.S3NDataProtocol"));
+    DataProtocolService.getInstance().addClassesToNotLoad(Lists.newArrayList(
+        "fr.ens.biologie.genomique.eoulsan.data.protocols.S3DataProtocol",
+        "fr.ens.biologie.genomique.eoulsan.data.protocols.S3NDataProtocol"));
 
     // Initialize GenomeDescriptionCreator
-    GenomeDescriptionCreator.initialize(properties
+    GenomeDescriptionCreator.initialize(settings
         .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
   }
 
   /**
    * Add a system properties from Aozan properties.
-   * @param properties Aozan properties
+   * @param settings Aozan settings
    * @param keyAozan key in Aozan properties
    * @param keySystem key in System properties
    */
-  private static void addSystemProperty(final Map<String, String> properties,
+  private static void addSystemProperty(final Settings settings,
       final String keyAozan, final String keySystem) {
 
-    final String value = properties.get(keyAozan);
+    final String value = settings.get(keyAozan);
 
     if (value != null && !value.isEmpty()) {
       System.setProperty(keySystem, value);
@@ -811,7 +781,8 @@ public class QC {
     });
 
     if (samplesheetFiles == null || samplesheetFiles.length == 0) {
-      throw new AozanException("No Bcl2fastq samplesheet file found in " + fastqDir);
+      throw new AozanException(
+          "No Bcl2fastq samplesheet file found in " + fastqDir);
     }
 
     return samplesheetFiles[0];
@@ -823,7 +794,7 @@ public class QC {
 
   /**
    * Public constructor.
-   * @param properties QC properties
+   * @param settings Aozan settings
    * @param bclDir BCL directory
    * @param fastqDir fastq directory
    * @param qcDir the qc dir
@@ -831,17 +802,17 @@ public class QC {
    * @param runId run id
    * @throws AozanException if an error occurs while initialize the QC object
    */
-  public QC(final Map<String, String> properties, final String bclDir,
-      final String fastqDir, final String qcDir, final String tmpDirname,
-      final String runId) throws AozanException {
+  public QC(final Settings settings, final String bclDir, final String fastqDir,
+      final String qcDir, final String tmpDirname, final String runId)
+      throws AozanException {
 
-    this(properties, bclDir, fastqDir, qcDir,
+    this(settings, bclDir, fastqDir, qcDir,
         tmpDirname == null ? null : new File(tmpDirname), runId);
   }
 
   /**
    * Public constructor.
-   * @param properties QC properties
+   * @param settings Aozan settings
    * @param bclDir BCL directory
    * @param fastqDir fastq directory
    * @param qcDir the qc dir
@@ -849,14 +820,11 @@ public class QC {
    * @param runId run id
    * @throws AozanException if an error occurs while initialize the QC object
    */
-  public QC(final Map<String, String> properties, final String bclDir,
-      final String fastqDir, final String qcDir, final File tmpDir,
-      final String runId) throws AozanException {
+  public QC(final Settings settings, final String bclDir, final String fastqDir,
+      final String qcDir, final File tmpDir, final String runId)
+      throws AozanException {
 
-    if (properties == null) {
-      throw new NullPointerException("The properties object is null");
-    }
-
+    this.settings = settings;
     this.bclDir = checkDir(bclDir);
     this.fastqDir = checkDir(fastqDir);
     this.qcDir = checkDir(qcDir);
@@ -867,11 +835,11 @@ public class QC {
 
     this.sampleSheetFile = getSampleSheetFile(this.fastqDir);
 
-    initGlobalConf(properties);
-    GenomeAliases.initialize(properties);
-    initGenomeDescriptionCreator(properties);
+    initGlobalConf(settings);
+    GenomeAliases.initialize(settings);
+    initGenomeDescriptionCreator(settings);
 
-    initFastQC(properties);
-    init(properties);
+    initFastQC(settings);
+    init(settings);
   }
 }

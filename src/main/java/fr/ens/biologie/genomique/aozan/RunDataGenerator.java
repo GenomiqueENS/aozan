@@ -30,9 +30,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -40,6 +40,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 
 import fr.ens.biologie.genomique.aozan.collectors.Collector;
+import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
 
 /**
  * This Class collect Data.
@@ -56,24 +57,9 @@ public class RunDataGenerator {
   private static final String COLLECT_DONE = "collect.done";
 
   private final List<Collector> collectors;
-  private final Properties properties = new Properties();
+  private final Map<String, String> properties;
 
   private final String runId;
-
-  /**
-   * Set global configuration for collectors and tests.
-   * @param conf global configuration object
-   */
-  public void setGlobalConf(final Map<String, String> conf) {
-
-    if (conf == null) {
-      return;
-    }
-
-    for (final Map.Entry<String, String> e : conf.entrySet()) {
-      this.properties.setProperty(e.getKey(), e.getValue());
-    }
-  }
 
   //
   // Others methods
@@ -129,7 +115,7 @@ public class RunDataGenerator {
           + " collector start for run " + this.runId);
 
       // Configure
-      collector.configure(qc, new Properties(this.properties));
+      collector.configure(qc, new CollectorConfiguration(this.properties));
 
       // And collect data
       collector.collect(data);
@@ -138,8 +124,7 @@ public class RunDataGenerator {
           + " collector end for run " + this.runId + " in "
           + toTimeHumanReadable(timerCollector.elapsed(TimeUnit.MILLISECONDS)));
 
-      final File qcDir =
-          new File(this.properties.getProperty(QC.QC_OUTPUT_DIR));
+      final File qcDir = new File(this.properties.get(QC.QC_OUTPUT_DIR));
       final File dataFile = new File(qcDir, collector.getName()
           + '-' + System.currentTimeMillis() + ".snapshot.data");
 
@@ -161,7 +146,7 @@ public class RunDataGenerator {
         + toTimeHumanReadable(timerGlobal.elapsed(TimeUnit.MILLISECONDS)));
     timerGlobal.stop();
 
-    this.properties.setProperty(COLLECT_DONE, "true");
+    this.properties.put(COLLECT_DONE, "true");
 
     return data;
   }
@@ -220,8 +205,7 @@ public class RunDataGenerator {
     LOGGER.config("Collectors requiered for QC " + propertyValue);
 
     // Update properties
-    this.properties.setProperty(QC.QC_COLLECTOR_NAMES, propertyValue);
-
+    this.properties.put(QC.QC_COLLECTOR_NAMES, propertyValue);
   }
 
   //
@@ -232,16 +216,19 @@ public class RunDataGenerator {
    * Public constructor.
    * @param runId run id
    */
-  public RunDataGenerator(final List<Collector> collectors,
-      final String runId) {
+  public RunDataGenerator(final List<Collector> collectors, final String runId,
+      final Map<String, String> conf) {
 
     checkNotNull(collectors, "The list of collectors is null");
+    checkNotNull(conf, "the conf argument cannot be null");
 
     this.collectors = reorderCollector(collectors);
     this.runId = runId;
 
     // Add collector name requiered in properties
     addCollectorNameInProperties();
+
+    this.properties = new HashMap<>(conf);
   }
 
 }

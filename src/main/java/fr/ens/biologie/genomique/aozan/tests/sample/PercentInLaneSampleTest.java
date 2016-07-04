@@ -25,15 +25,15 @@ package fr.ens.biologie.genomique.aozan.tests.sample;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
-import fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector;
 import fr.ens.biologie.genomique.aozan.collectors.FlowcellDemuxSummaryCollector;
+import fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
+import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 
 /**
@@ -113,17 +113,17 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
   //
 
   @Override
-  public List<AozanTest> configure(final Map<String, String> properties)
+  public List<AozanTest> configure(final TestConfiguration conf)
       throws AozanException {
 
-    if (properties == null) {
+    if (conf == null) {
       throw new NullPointerException("The properties object is null");
     }
 
-    final String d = properties.get(MARGE_PERCENT_IN_LANE_KEY);
+    final String d = conf.get(MARGE_PERCENT_IN_LANE_KEY);
     if (d != null) {
       this.distance =
-          Double.parseDouble(properties.get(MARGE_PERCENT_IN_LANE_KEY));
+          Double.parseDouble(conf.get(MARGE_PERCENT_IN_LANE_KEY));
 
       if (this.distance >= 1.0) {
         this.distance = 0.0;

@@ -27,20 +27,22 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
-import junit.framework.TestCase;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
+import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
 import fr.ens.biologie.genomique.aozan.collectors.ReadCollector;
 import fr.ens.biologie.genomique.aozan.collectors.RunInfoCollector;
+import junit.framework.TestCase;
 
 public class ReadingInteropBinaryFileTest extends TestCase {
   private static final String SR50_FILE = "SR50.data";
   private static final String PE100_FILE = "PE100.data";
 
-  private final Properties props = new Properties();
+  private final Map<String,String> props = new HashMap<>();
   private String path;
 
   public void testPE100() throws AozanException, IOException {
@@ -67,8 +69,8 @@ public class ReadingInteropBinaryFileTest extends TestCase {
     final RunInfoCollector runInfoCollector = new RunInfoCollector();
 
     // Path to save rundata
-    runInfoCollector.configure(null, props);
-    readCollector.configure(null, props);
+    runInfoCollector.configure(null, new CollectorConfiguration(props));
+    readCollector.configure(null, new CollectorConfiguration(props));
 
     // Create runData from binary files
     RunData dataTest = new RunData();

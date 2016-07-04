@@ -30,7 +30,6 @@ import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -77,9 +76,9 @@ public class PhasingCollector implements Collector {
   }
 
   @Override
-  public void configure(final QC qc, final Properties properties) {
+  public void configure(final QC qc, final CollectorConfiguration conf) {
 
-    if (properties == null) {
+    if (conf == null) {
       return;
     }
 
@@ -96,10 +95,9 @@ public class PhasingCollector implements Collector {
     try {
 
       // Demux summary path
-      final File phasingStatsDir =
-          new File(this.bcl2fastqOutputPath
-              + "/Basecall_Stats_" + data.get("run.info.flow.cell.id")
-              + "/Phasing");
+      final File phasingStatsDir = new File(this.bcl2fastqOutputPath
+          + "/Basecall_Stats_" + data.get("run.info.flow.cell.id")
+          + "/Phasing");
 
       // Get lane count
       final int laneCount = data.getLaneCount();
@@ -112,21 +110,21 @@ public class PhasingCollector implements Collector {
 
         for (int lane = 1; lane <= laneCount; lane++) {
 
-          final File phasingFile =
-              new File(phasingStatsDir, String.format("s_%d_%02d_phasing.xml",
-                  lane, cycle));
+          final File phasingFile = new File(phasingStatsDir,
+              String.format("s_%d_%02d_phasing.xml", lane, cycle));
           parse(phasingFile, read, lane, data);
         }
       }
 
-    } catch (final IOException | SAXException | ParserConfigurationException e) {
+    } catch (final IOException | SAXException
+        | ParserConfigurationException e) {
       throw new AozanException(e);
     }
   }
 
-  private static void parse(final File file, final int read,
-      final int lane, final RunData data) throws ParserConfigurationException,
-      SAXException, IOException {
+  private static void parse(final File file, final int read, final int lane,
+      final RunData data)
+      throws ParserConfigurationException, SAXException, IOException {
 
     // Create the input stream
     final InputStream is = new FileInputStream(file);
@@ -136,7 +134,8 @@ public class PhasingCollector implements Collector {
     final Document document = dBuilder.parse(is);
     document.getDocumentElement().normalize();
 
-    for (final Element e : XMLUtils.getElementsByTagName(document, "Parameters")) {
+    for (final Element e : XMLUtils.getElementsByTagName(document,
+        "Parameters")) {
 
       final double phasing =
           Double.parseDouble(XMLUtils.getTagValue(e, "Phasing"));

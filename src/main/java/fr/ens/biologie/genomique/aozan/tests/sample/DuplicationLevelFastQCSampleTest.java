@@ -24,11 +24,11 @@ package fr.ens.biologie.genomique.aozan.tests.sample;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import uk.ac.babraham.FastQC.Modules.OverRepresentedSeqs;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
+import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
+import uk.ac.babraham.FastQC.Modules.OverRepresentedSeqs;
 
 /**
  * This class define a sample test for FastQC duplication level module.
@@ -41,7 +41,7 @@ public class DuplicationLevelFastQCSampleTest extends AbstractFastQCSampleTest {
       .duplicationLevelModule().name();
 
   @Override
-  public List<AozanTest> configure(final Map<String, String> properties)
+  public List<AozanTest> configure(final TestConfiguration conf)
       throws AozanException {
     return Collections.singletonList((AozanTest) this);
   }
