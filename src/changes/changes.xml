@@ -598,5 +598,44 @@
 			</action>
 		</release>
 
+		<release version="2.0-rc14" description="Aozan 2.0-rc14 release"  date="2016-07-04">
+			<action dev="jourdren" type="update">
+                                 The user can now define the number of mismatches of barcode for bcl2fastq in the samplesheet using the "MismatchCount" value of the "Settings" section.
+			</action>
+			<action dev="jourdren" type="update">
+                                 The file with all QC data is now renamed from data-RUN_ID.txt to RUN_ID.data.
+			</action>
+			<action dev="jourdren" type="update">
+                                 Remove bcl2fastq 1.x support.
+			</action>
+			<action dev="jourdren" type="update">
+                                 Replace all occurences of "casava" by "bcl2fastq".
+			</action>
+			<action dev="jourdren" type="update">
+                                 Remplace all occurences of "design" by "samplesheet".
+			</action>
+			<action dev="jourdren" type="update">
+                                 In QC, rename all data entries starting with "design." by "samplesheet.".
+			</action>
+			<action dev="jourdren" type="update">
+                                 Add a prefix for data of all ReadCollector entries.
+			</action>
+			<action dev="jourdren" type="update">
+                                 Remove "HiSeq" and "NextSeq" strings from all Aozan messages, use instead the family name of the sequencer and its serial number.
+			</action>
+			<action dev="jourdren" type="update">
+                                 Force use LANG=C environment variable in aozan.sh.
+			</action>
+			<action dev="jourdren" type="update">
+                                 The emails are now sent in UTF8.
+			</action>
+			<action dev="jourdren" type="update">
+                                 In OverrepresentedSequencesBlast, several blast are now performed at each execution of blast.
+			</action>
+			<action dev="jourdren" type="update">
+                                 Reorganize GenomeAliases class code.
+			</action>
+		</release>
+
 	</body>
 </document>
