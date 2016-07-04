@@ -817,7 +817,7 @@ def extract_steps_to_launch(update_logger, conf):
     # Add data in logger
     if update_logger:
         txt = ", ".join(steps)
-        log("CONFIG", "Step(s) " + txt + " is setting.", conf)
+        log("CONFIG", "Aozan steps enabled: " + txt, conf)
 
     # Return list steps setting
     return steps

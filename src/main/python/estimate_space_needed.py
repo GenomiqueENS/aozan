@@ -101,9 +101,9 @@ def error(run_id, type_file, space_needed, space_free, dir_path, conf):
 
     short_message = "not enough disk space to store " + type_file + " for run " + run_id + ' on ' + \
                     common.get_instrument_name(run_id, conf)
-    message = type_file + " : not enough disk space to store files for run " + run_id + ' on ' + dir_path + '.\n'
+    message = type_file + ": not enough disk space to store files for run " + run_id + ' on ' + dir_path + '.'
     message = message + '%.2f GB' % (space_needed / 1024 / 1024 / 1024) + ' is needed by Aozan'
-    message = message + ' however only %.2f GB' % (
+    message = message + ' However only %.2f GB' % (
         space_free / 1024 / 1024 / 1024) + ' of free space is currently available on this storage.'
 
     # send warning mail
@@ -122,7 +122,7 @@ def log_message(run_id, type_file, space_needed, space_free, conf):
         conf: configuration dictionary
     """
 
-    message = type_file + " : enough disk space to store files for run " + run_id + '.\n%.2f Gb' % (
+    message = type_file + ": enough disk space to store files for run " + run_id + '. %.2f Gb' % (
         space_needed / 1024 / 1024 / 1024)
     message += ' is needed, it is free space %.2f Gb ' % (space_free / 1024 / 1024 / 1024)
     common.log('INFO', message, conf)
