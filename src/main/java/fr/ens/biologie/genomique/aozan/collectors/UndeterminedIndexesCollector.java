@@ -26,7 +26,6 @@ package fr.ens.biologie.genomique.aozan.collectors;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
 import com.google.common.collect.Lists;
 
@@ -85,16 +84,16 @@ public class UndeterminedIndexesCollector extends AbstractFastqCollector {
   }
 
   @Override
-  public void configure(final QC qc, final Properties properties) {
+  public void configure(final QC qc, final CollectorConfiguration conf) {
 
-    super.configure(qc, properties);
+    super.configure(qc, conf);
 
     // Set the number of threads
-    if (properties.containsKey(Settings.QC_CONF_THREADS_KEY)) {
+    if (conf.containsKey(Settings.QC_CONF_THREADS_KEY)) {
 
       try {
-        int confThreads = Integer.parseInt(
-            properties.getProperty(Settings.QC_CONF_THREADS_KEY).trim());
+        int confThreads =
+            Integer.parseInt(conf.get(Settings.QC_CONF_THREADS_KEY).trim());
         if (confThreads > 0)
           this.numberThreads = confThreads;
 
@@ -104,8 +103,8 @@ public class UndeterminedIndexesCollector extends AbstractFastqCollector {
 
     // Set external xsl file to write report html instead of default version
     try {
-      String filename = properties
-          .getProperty(Settings.QC_CONF_UNDETERMINED_INDEXED_XSL_FILE_KEY);
+      String filename =
+          conf.get(Settings.QC_CONF_UNDETERMINED_INDEXED_XSL_FILE_KEY);
       if (new File(filename).exists())
         this.undeterminedIndexedXSLFile = new File(filename);
     } catch (Exception e) {
@@ -123,7 +122,7 @@ public class UndeterminedIndexesCollector extends AbstractFastqCollector {
   @Override
   protected AbstractFastqProcessThread collectSample(final RunData data,
       final FastqSample fastqSample, final File reportDir, boolean runPE)
-          throws AozanException {
+      throws AozanException {
 
     if (fastqSample.getFastqFiles().isEmpty()) {
       return null;

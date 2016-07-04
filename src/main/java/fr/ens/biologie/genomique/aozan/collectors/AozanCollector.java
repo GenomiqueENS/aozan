@@ -23,7 +23,7 @@
 package fr.ens.biologie.genomique.aozan.collectors;
 
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Globals;
@@ -40,7 +40,8 @@ public class AozanCollector implements Collector {
   /** Prefix for run data */
   public static final String PREFIX = "aozan.info";
 
-  private Properties properties;
+  private CollectorConfiguration conf;
+  private Settings settings;
 
   @Override
   public String getName() {
@@ -59,10 +60,11 @@ public class AozanCollector implements Collector {
   }
 
   @Override
-  public void configure(final QC qc, final Properties properties) {
+  public void configure(final QC qc, final CollectorConfiguration conf) {
     // Nothing to do
 
-    this.properties = properties;
+    this.conf = conf;
+    this.settings = qc.getSettings();
   }
 
   @Override
@@ -76,12 +78,9 @@ public class AozanCollector implements Collector {
     data.put(PREFIX + ".build.number", Globals.APP_BUILD_NUMBER);
     data.put(PREFIX + ".build.year", Globals.APP_BUILD_YEAR);
 
-    for (Object o : properties.keySet()) {
-      final String key = (String) o;
-      final String value =
-          properties.getProperty(key).toLowerCase(Globals.DEFAULT_LOCALE);
-
-      data.put(PREFIX + ".conf." + key, value);
+    for (Map.Entry<String, String> e : conf.entrySet()) {
+      data.put(PREFIX + ".conf." + e.getKey(),
+          e.getValue().toLowerCase(Globals.DEFAULT_LOCALE));
     }
 
     data.put(PREFIX + ".host.name", SystemUtils.getHostName());
@@ -94,20 +93,20 @@ public class AozanCollector implements Collector {
     // User information
     data.put(PREFIX + ".user.name", System.getProperty("user.name"));
     data.put(PREFIX + ".user.home", System.getProperty("user.home"));
-    data.put(PREFIX + ".user.current.directory", System.getProperty("user.dir"));
+    data.put(PREFIX + ".user.current.directory",
+        System.getProperty("user.dir"));
 
     // Java version
     data.put(PREFIX + ".java.vendor", System.getProperty("java.vendor"));
     data.put(PREFIX + ".java.vm.name", System.getProperty("java.vm.name"));
     data.put(PREFIX + ".java.version", System.getProperty("java.version"));
 
-    data.put(PREFIX + ".logger.path",
-        Settings.getConfigurationFilePathOnAozanConfiguration());
-    data.put(PREFIX + ".logger.path",
-        Settings.getLoggerPathFromAozanConfiguration());
-    data.put(PREFIX + ".logger.level",
-        Settings.getLoggerLevelFromAozanConfiguration());
-
+    data.put(PREFIX + ".conf.path",
+        this.settings.get(Settings.AOZAN_CONF_FILE_PATH));
+    data.put(PREFIX + ".log.path",
+        this.settings.get(Settings.AOZAN_LOG_PATH_KEY));
+    data.put(PREFIX + ".log.level",
+        this.settings.get(Settings.AOZAN_LOG_LEVEL_KEY));
   }
 
   @Override

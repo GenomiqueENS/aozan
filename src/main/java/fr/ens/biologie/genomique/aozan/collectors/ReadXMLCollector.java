@@ -34,7 +34,6 @@ import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -108,7 +107,8 @@ public class ReadXMLCollector implements Collector {
       parse(doc, data);
 
       is.close();
-    } catch (final IOException | SAXException | ParserConfigurationException e) {
+    } catch (final IOException | SAXException
+        | ParserConfigurationException e) {
       throw new AozanException(e);
     }
   }
@@ -144,7 +144,8 @@ public class ReadXMLCollector implements Collector {
       data.put(prefix + ".type", readType);
 
       // Parse Lane tag
-      for (final Element laneElement : XMLUtils.getElementsByTagName(e, "Lane")) {
+      for (final Element laneElement : XMLUtils.getElementsByTagName(e,
+          "Lane")) {
 
         int lane = -1;
         final Map<String, String> map = new LinkedHashMap<>();
@@ -256,8 +257,9 @@ public class ReadXMLCollector implements Collector {
   }
 
   @Override
-  public void configure(final QC qc, final Properties properties) {
-    if (properties == null) {
+  public void configure(final QC qc, final CollectorConfiguration conf) {
+
+    if (conf == null) {
       return;
     }
 

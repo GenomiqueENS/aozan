@@ -45,7 +45,7 @@ import java.util.Arrays;
  * @author Sandrine Perrin
  * @since 1.1
  */
-public class IlluminaIntensityMetrics {
+public class ExtractionMetrics {
 
   // Index array fwhm or intensities : corresponding reading order from binary
   // file
@@ -117,7 +117,7 @@ public class IlluminaIntensityMetrics {
    * Constructor. One record countReads on the ByteBuffer.
    * @param bb ByteBuffer who read one record
    */
-  IlluminaIntensityMetrics(final ByteBuffer bb) {
+  ExtractionMetrics(final ByteBuffer bb) {
 
     this.laneNumber = uShortToInt(bb.getShort());
     this.tileNumber = uShortToInt(bb.getShort());

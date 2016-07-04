@@ -36,7 +36,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import com.google.common.base.Strings;
-
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
 
@@ -219,16 +218,15 @@ public class GenomeAliases {
 
   /**
    * Create a instance of GenomeAliases or if it exists return instance.
-   * @param props the props
+   * @param settings Aozan settings
    * @throws AozanException if the initialization of instance fail.
    */
-  public static void initialize(final Map<String, String> props)
-      throws AozanException {
+  public static void initialize(final Settings settings) throws AozanException {
 
-    checkNotNull(props, "props argument cannot be null");
+    checkNotNull(settings, "conf argument cannot be null");
 
     if (singleton == null) {
-      singleton = new GenomeAliases(props);
+      singleton = new GenomeAliases(settings);
     }
   }
 
@@ -258,12 +256,13 @@ public class GenomeAliases {
 
   /**
    * Private constructor of GenomeAliases.
+   * @param settings Aozan settings
    * @throws AozanException if the initialization of instance fail.
    */
-  private GenomeAliases(final Map<String, String> props) throws AozanException {
+  private GenomeAliases(final Settings settings) throws AozanException {
 
-    final String genomeAliasesFilename =
-        props.get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY);
+    final String genomeAliasesFilename = settings
+        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY);
 
     this.genomeAliasesFile = Strings.emptyToNull(genomeAliasesFilename) == null
         ? null : new File(genomeAliasesFilename.trim());

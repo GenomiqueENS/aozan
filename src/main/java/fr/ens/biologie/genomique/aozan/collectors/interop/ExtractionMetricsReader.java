@@ -36,7 +36,7 @@ import fr.ens.biologie.genomique.aozan.AozanException;
  * @since 1.1
  */
 public class ExtractionMetricsReader extends
-    AbstractBinaryFileReader<IlluminaIntensityMetrics> {
+    AbstractBinaryFileReader<ExtractionMetrics> {
 
   public static final String NAME = "ExtractionMetricsOut";
 
@@ -68,9 +68,9 @@ public class ExtractionMetricsReader extends
 
   @Override
   protected void addIlluminaMetricsInCollection(
-      final List<IlluminaIntensityMetrics> collection, final ByteBuffer bb) {
+      final List<ExtractionMetrics> collection, final ByteBuffer bb) {
 
-    collection.add(new IlluminaIntensityMetrics(bb));
+    collection.add(new ExtractionMetrics(bb));
   }
 
   //

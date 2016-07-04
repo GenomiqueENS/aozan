@@ -24,7 +24,6 @@
 package fr.ens.biologie.genomique.aozan.tests;
 
 import java.util.List;
-import java.util.Map;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 
@@ -67,11 +66,10 @@ public interface AozanTest {
 
   /**
    * Configure the test.
-   * @param properties a map with the configuration of the test
+   * @param conf the test configuration
    * @return list of Aozan tests
    */
-  List<AozanTest> configure(final Map<String, String> properties)
-      throws AozanException;
+  List<AozanTest> configure(final TestConfiguration conf) throws AozanException;
 
   /**
    * Initialize the test.

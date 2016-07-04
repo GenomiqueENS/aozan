@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -72,13 +71,13 @@ public class ConversionStatsCollector extends DemultiplexingCollector {
   private String bcl2FastqOutputPath;
 
   @Override
-  public void configure(final QC qc, final Properties properties) {
+  public void configure(final QC qc, final CollectorConfiguration conf) {
 
-    if (properties == null) {
+    if (conf == null) {
       return;
     }
 
-    this.bcl2FastqOutputPath = properties.getProperty(QC.BCL2FASTQ_OUTPUT_DIR);
+    this.bcl2FastqOutputPath = qc.getFastqDir().getPath();
   }
 
   @Override

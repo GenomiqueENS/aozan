@@ -25,7 +25,6 @@ package fr.ens.biologie.genomique.aozan.tests.projectstats;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 
@@ -34,6 +33,7 @@ import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.collectors.UndeterminedIndexesCollector;
 import fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
+import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
 
@@ -99,13 +99,13 @@ public class PercentRecoverableRawClusterProjectTest extends
   }
 
   @Override
-  public List<AozanTest> configure(Map<String, String> properties)
+  public List<AozanTest> configure(final TestConfiguration conf)
       throws AozanException {
 
-    if (properties == null)
-      throw new NullPointerException("The properties object is null");
+    if (conf == null)
+      throw new NullPointerException("The conf object is null");
 
-    this.interval.configureDoubleInterval(properties);
+    this.interval.configureDoubleInterval(conf);
 
     return Collections.singletonList((AozanTest) this);
   }

@@ -26,7 +26,6 @@ package fr.ens.biologie.genomique.aozan.collectors;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -40,7 +39,9 @@ import com.google.common.collect.Sets;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
+import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.illumina.RunInfo;
+import fr.ens.biologie.genomique.aozan.illumina.RunParameters;
 
 /**
  * This collector collect data from the RunInfo.xml file, working with all RTA
@@ -57,6 +58,8 @@ public class RunInfoCollector implements Collector {
   public static final String PREFIX = "run.info";
 
   private File runInfoFile;
+  private File runParametersFile;
+  private Settings settings;
 
   @Override
   public String getName() {
@@ -76,18 +79,29 @@ public class RunInfoCollector implements Collector {
   }
 
   @Override
-  public void configure(final QC qc, final Properties properties) {
+  public void configure(final QC qc, final CollectorConfiguration conf) {
 
-    if (properties == null)
+    if (conf == null)
       return;
+
+    final File parentFile;
 
     if (qc == null) {
       // Unit Test
-      this.runInfoFile =
-          new File(properties.getProperty(QC.RTA_OUTPUT_DIR), "RunInfo.xml");
+      parentFile = new File(conf.get(QC.RTA_OUTPUT_DIR));
     } else {
-      this.runInfoFile = new File(qc.getBclDir(), "RunInfo.xml");
+      parentFile = qc.getBclDir();
+      this.settings = qc.getSettings();
     }
+
+    this.runInfoFile = new File(parentFile, "RunInfo.xml");
+    this.runParametersFile = new File(parentFile, "runParameters.xml");
+
+    if (!this.runParametersFile.exists()) {
+      this.runParametersFile = new File(parentFile, "RunParameters.xml");
+    }
+
+    
   }
 
   @Override
@@ -99,10 +113,25 @@ public class RunInfoCollector implements Collector {
     try {
       // Parse run info file
       final RunInfo runInfo = RunInfo.parse(this.runInfoFile);
+      final RunParameters runParameters =
+          RunParameters.parse(this.runParametersFile);
 
       data.put(PREFIX + ".run.id", runInfo.getId());
       data.put(PREFIX + ".run.number", runInfo.getNumber());
-      data.put(PREFIX + ".sequencer.type", runInfo.getSequencerType());
+      data.put(PREFIX + ".sequencer.family",
+          runParameters.getSequencerFamily());
+      data.put(PREFIX + ".instrument", runInfo.getInstrument());
+      data.put(PREFIX + ".sequencer.name",
+          getSequencerName(runInfo, runParameters));
+
+      data.put(PREFIX + ".application.name",
+          runParameters.getApplicationName());
+      data.put(PREFIX + ".application.version",
+          runParameters.getApplicationVersion());
+      data.put(PREFIX + ".rta.version", runParameters.getRTAVersion());
+      data.put(PREFIX + ".rta.major.version",
+          runParameters.getRTAMajorVersion());
+
       data.put(PREFIX + ".flow.cell.id", runInfo.getFlowCell());
       data.put(PREFIX + ".flow.cell.lane.count",
           runInfo.getFlowCellLaneCount());
@@ -112,7 +141,7 @@ public class RunInfoCollector implements Collector {
           runInfo.getFlowCellSwathCount());
       data.put(PREFIX + ".flow.cell.tile.count",
           runInfo.getFlowCellTileCount());
-      data.put(PREFIX + ".instrument", runInfo.getInstrument());
+
       data.put(PREFIX + ".date", runInfo.getDate());
 
       // Value specific on RTA version 1.X otherwise value is -1
@@ -155,6 +184,24 @@ public class RunInfoCollector implements Collector {
     } catch (IOException | ParserConfigurationException | SAXException e) {
       throw new AozanException(e);
     }
+  }
+
+  /**
+   * Get the sequencer name.
+   * @param runInfo the RunInfo object
+   * @param runParameters the RunParameter object
+   * @return the name of the sequencer
+   */
+  private String getSequencerName(final RunInfo runInfo,
+      final RunParameters runParameters) {
+
+    final String key = "sequencer.name." + runInfo.getInstrument();
+
+    if (this.settings !=null && this.settings.containsKey(key)) {
+      return this.settings.get(key);
+    }
+
+    return runParameters.getSequencerFamily() + " " + runInfo.getInstrument();
   }
 
   @Override

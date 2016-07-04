@@ -393,11 +393,43 @@ public class RunData {
   }
 
   /**
-   * Gets the sequencer type.
-   * @return the sequencer type
+   * Gets the sequencer name.
+   * @return the sequencer name
    */
-  public String getSequencerType() {
-    return this.get("run.info.sequencer.type");
+  public String getSequencerName() {
+    return this.get("run.info.sequencer.name");
+  }
+
+  /**
+   * Gets the sequencer family.
+   * @return the sequencer name
+   */
+  public String getSequencerFamily() {
+    return this.get("run.info.sequencer.family");
+  }
+
+  /**
+   * Gets the sequencer application name.
+   * @return the sequencer application name
+   */
+  public String getSequencerApplicationName() {
+    return this.get("run.info.application.name");
+  }
+
+  /**
+   * Gets the sequencer application version.
+   * @return the sequencer application version
+   */
+  public String getSequencerApplicationVersion() {
+    return this.get("run.info.application.version");
+  }
+
+  /**
+   * Gets the RTA version.
+   * @return the RTA version
+   */
+  public String getSequencerRTAVersion() {
+    return this.get("run.info.rta.version");
   }
 
   /**

@@ -98,19 +98,28 @@ public final class XMLUtilsWriter {
         final Date runDate = sdf.parse(data.get("run.info.date"));
         XMLUtils.addTagValue(doc, parent, "RunDate",
             dateFormatter.format(runDate));
-
-        XMLUtils.addTagValue(doc, parent, "SequencerType",
-            data.getSequencerType().toUpperCase(Globals.DEFAULT_LOCALE));
-
       } catch (final ParseException e1) {
         XMLUtils.addTagValue(doc, parent, "RunDate", data.get("run.info.date"));
       }
 
-      XMLUtils.addTagValue(doc, parent, "FlowcellId", data.getFlowcellId());
+      XMLUtils.addTagValue(doc, parent, "SequencerName",
+          data.getSequencerName());
+      XMLUtils.addTagValue(doc, parent, "SequencerFamily",
+          data.getSequencerFamily());
       XMLUtils.addTagValue(doc, parent, "InstrumentSN",
           data.get("run.info.instrument"));
+
+      XMLUtils.addTagValue(doc, parent, "FlowcellId", data.getFlowcellId());
       XMLUtils.addTagValue(doc, parent, "InstrumentRunNumber",
           data.get("run.info.run.number"));
+
+      XMLUtils.addTagValue(doc, parent, "SequencerApplicationName",
+          data.getSequencerApplicationName());
+      XMLUtils.addTagValue(doc, parent, "SequencerApplicationVersion",
+          data.getSequencerApplicationVersion());
+      XMLUtils.addTagValue(doc, parent, "SequencerRTAVersion",
+          data.getSequencerRTAVersion());
+
       XMLUtils.addTagValue(doc, parent, "ReportDate",
           dateFormatter.format(new Date()));
     }
