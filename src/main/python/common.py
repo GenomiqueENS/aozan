@@ -456,7 +456,7 @@ def error(short_message, message, last_error_file_path, conf):
         new_error = 'Error without description'
 
     new_error.replace('\n', ' ')
-    log('SEVERE', new_error, conf)
+    log('SEVERE', new_error.replace('\n', ' '), conf)
 
     if os.path.exists(last_error_file_path):
         f = open(last_error_file_path, 'r')

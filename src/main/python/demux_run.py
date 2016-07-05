@@ -418,13 +418,14 @@ def demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesh
     """
 
     bcl2fastq_executable_path = conf[BCL2FASTQ_PATH_KEY]
+    run_id_msg = " for run " + run_id + ' on ' + common.get_instrument_name(run_id, conf)
 
     # Check if the bcl2fastq path is OK
     if os.path.isdir(bcl2fastq_executable_path):
         bcl2fastq_executable_path += '/bcl2fastq'
     elif not os.path.isfile(bcl2fastq_executable_path):
-        error("error while setting executable command file bcl2fastq for run " + run_id + ", invalid bcl2fastq path: " +
-              bcl2fastq_executable_path, "error while setting executable command file bcl2fastq for run " + run_id +
+        error("error while setting executable command file bcl2fastq" + run_id_msg + ", invalid bcl2fastq path: " +
+              bcl2fastq_executable_path, "error while setting executable command file bcl2fastq" + run_id_msg +
               ", invalid bcl2fastq path: " + bcl2fastq_executable_path, conf)
         return False
 
@@ -435,7 +436,7 @@ def demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesh
 
     exit_code = os.system(cmd)
     if exit_code != 0:
-        error("error while setting executable command file bcl2fastq for run " + run_id,
+        error("error while setting executable command file bcl2fastq " + run_id_msg,
               'Error while setting executable command file bcl2fastq (exit code: ' + str(
                   exit_code) + ').\nCommand line:\n' + cmd, conf)
         return False
@@ -443,7 +444,7 @@ def demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesh
     cmd = 'cp ' + conf[TMP_PATH_KEY] + '/bcl2fastq_output_' + run_id + '.* ' + fastq_output_dir
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
-        error("error while setting read only the output fastq directory for run " + run_id,
+        error("error while setting read only the output fastq directory" + run_id_msg,
               'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
         return False
 
@@ -452,7 +453,7 @@ def demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesh
     cmd = 'find ' + fastq_output_dir + ' -type f -name "*.fastq.*" -exec chmod ugo-w {} \; '
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
-        error("error while setting read only the output fastq directory for run " + run_id,
+        error("error while setting read only the output fastq directory" + run_id_msg,
               'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
         return False
 
@@ -474,6 +475,7 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
     # In docker mount with input_run_data_path
     input_docker = '/data/input'
     input_run_data_path_in_docker = input_docker
+    run_id_msg = " for run " + run_id + ' on ' + common.get_instrument_name(run_id, conf)
 
     # In docker mount with fastq_output_dir
     output_docker = '/data/output'
@@ -530,7 +532,7 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
     cmd = 'find ' + fastq_output_dir + ' -type f -name "*.fastq.*" -exec chmod ugo-w {} \; '
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
-        error("error while setting read only the output fastq directory for run " + run_id,
+        error("error while setting read only the output fastq directory" + run_id_msg,
               'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
         return False
 
