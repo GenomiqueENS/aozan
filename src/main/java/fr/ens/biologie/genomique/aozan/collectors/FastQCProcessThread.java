@@ -241,7 +241,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
       if (!reportFile.delete()) {
         LOGGER.warning(
-            "FastQC: fail to delete report " + reportFile.getAbsolutePath());
+            "FASTQC: fail to delete report " + reportFile.getAbsolutePath());
       }
     }
 
@@ -252,7 +252,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
       if (!reportZip.delete()) {
         LOGGER.warning(
-            "FastQC: fail to delete report " + reportZip.getAbsolutePath());
+            "FASTQC: fail to delete report " + reportZip.getAbsolutePath());
       }
     }
   }

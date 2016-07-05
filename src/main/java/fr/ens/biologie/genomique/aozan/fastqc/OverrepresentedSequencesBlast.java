@@ -175,7 +175,7 @@ public class OverrepresentedSequencesBlast {
           // with no hit
           loadSequencesToIgnore();
 
-          LOGGER.info("FastQC: blast is enabled, command line = "
+          LOGGER.info("FASTQC: blast is enabled, command line = "
               + this.blastCommonCommandLine);
 
         } catch (final IOException | AozanException e) {
@@ -350,7 +350,7 @@ public class OverrepresentedSequencesBlast {
     // Remove XML file
     if (resultXMLFile.exists()) {
       if (!resultXMLFile.delete()) {
-        LOGGER.warning("FastQC-step: Cannot delete the Blast xml output file "
+        LOGGER.warning("FASTQC: Cannot delete the Blast xml output file "
             + resultXMLFile.getAbsolutePath());
       }
     }
@@ -369,8 +369,8 @@ public class OverrepresentedSequencesBlast {
     final ProcessBuilder builder = new ProcessBuilder(cmd);
     final Map<String, String> result = new HashMap<>();
 
-    LOGGER.info("FastQC-step: Launch " + sequences.size() + " blast(s)");
-    LOGGER.fine("FastQC-step: Blast command line: " + cmd);
+    LOGGER.info("FASTQC: Launch " + sequences.size() + " blast(s)");
+    LOGGER.fine("FASTQC: Blast command line: " + cmd);
 
     Process process;
     try {

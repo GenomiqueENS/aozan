@@ -117,7 +117,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
 
       // Rename file: remove '.tmp' final
       if (!this.tmpFastqFile.renameTo(getFastqSample().getSubsetFastqFile())) {
-        LOGGER.warning("FastQC: fail to rename tmp fastq file "
+        LOGGER.warning("FASTQC: fail to rename tmp fastq file "
             + this.tmpFastqFile.getAbsolutePath());
       }
     }
