@@ -156,10 +156,10 @@ def send_report(run_id, conf):
 
     # Identification type run according to data in RunInfos.xml : SR or PE
     if reads_not_indexed_count == 1:
-        type_run_estimated = "SR-" + str(cycles_per_reads_not_indexed - 1) + " with " + str(
+        type_run_estimated = "SR-" + str(cycles_per_reads_not_indexed) + " with " + str(
             reads_indexed_count) + " index(es)"
     elif reads_not_indexed_count == 2:
-        type_run_estimated = "PE-" + str(cycles_per_reads_not_indexed - 1) + " with " + str(
+        type_run_estimated = "PE-" + str(cycles_per_reads_not_indexed) + " with " + str(
             reads_indexed_count) + " index(es)"
     else:
         type_run_estimated = "Undetermined run type (" + str(reads_not_indexed_count) + " reads with " + str(
