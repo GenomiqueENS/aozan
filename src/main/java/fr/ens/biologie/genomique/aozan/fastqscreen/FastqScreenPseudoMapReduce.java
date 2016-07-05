@@ -475,9 +475,11 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     if (firstDoMapRunning) {
       // Update logger at the first execution
-      LOGGER.info("FASTQSCREEN : init  mapper "
-          + mapper.getMapperName() + ", arguments \"" + getMapperArguments()
-          + "\" in mode " + (pairedMode ? "paired" : "single"));
+      LOGGER.info("FASTQSCREEN: init "
+          + mapper.getMapperName() + " mapper, arguments: \""
+          + getMapperArguments() + "\", mode: "
+          + (pairedMode ? "paired" : "single") + ", threads: "
+          + this.mapperThreads);
     }
     return mapper;
   }

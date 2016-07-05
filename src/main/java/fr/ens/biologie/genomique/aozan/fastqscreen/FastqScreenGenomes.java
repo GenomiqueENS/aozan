@@ -28,7 +28,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -255,7 +254,7 @@ public class FastqScreenGenomes {
   public static FastqScreenGenomes newInstance(
       final TestConfiguration testConfiguration) throws AozanException {
 
-    checkNotNull(testConfiguration, "props argument cannot be null");
+    checkNotNull(testConfiguration, "testConfiguration argument cannot be null");
 
     final File aliasGenomesFile = new File(testConfiguration
         .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
@@ -265,28 +264,6 @@ public class FastqScreenGenomes {
         testConfiguration.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
 
     return new FastqScreenGenomes(aliasGenomesFile, sampleshettFile,
-        contaminantGenomeNames);
-  }
-
-  /**
-   * Private constructor of FastqScreenGenomeMapper.
-   * @param properties configuration properties
-   * @return a new instance of FastqScreenGenomes
-   * @throws AozanException if the initialization of instance fail.
-   */
-  public static FastqScreenGenomes newInstance(final Properties properties)
-      throws AozanException {
-
-    checkNotNull(properties, "properties argument cannot be null");
-
-    final File aliasGenomesFile = new File(properties.getProperty(
-        Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
-    final File samplesheetFile =
-        new File(properties.getProperty(QC.BCL2FASTQ_SAMPLESHEET_PATH));
-    final String contaminantGenomeNames =
-        properties.getProperty(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
-
-    return new FastqScreenGenomes(aliasGenomesFile, samplesheetFile,
         contaminantGenomeNames);
   }
 

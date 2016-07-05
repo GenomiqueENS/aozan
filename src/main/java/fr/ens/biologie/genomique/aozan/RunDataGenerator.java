@@ -57,7 +57,7 @@ public class RunDataGenerator {
   private static final String COLLECT_DONE = "collect.done";
 
   private final List<Collector> collectors;
-  private final Map<String, String> properties;
+  private final Map<String, String> generatorsProperties;
 
   private final String runId;
 
@@ -78,27 +78,27 @@ public class RunDataGenerator {
 
     final RunData data = new RunData();
 
-    if (this.properties.containsKey(COLLECT_DONE)) {
+    if (this.generatorsProperties.containsKey(COLLECT_DONE)) {
       throw new AozanException("Collect has been already done.");
     }
 
-    if (!this.properties.containsKey(QC.RTA_OUTPUT_DIR)) {
+    if (!this.generatorsProperties.containsKey(QC.RTA_OUTPUT_DIR)) {
       throw new AozanException("RTA output directory is not set.");
     }
 
-    if (!this.properties.containsKey(QC.BCL2FASTQ_SAMPLESHEET_PATH)) {
+    if (!this.generatorsProperties.containsKey(QC.BCL2FASTQ_SAMPLESHEET_PATH)) {
       throw new AozanException("Bcl2fastq samplesheet file path is not set.");
     }
 
-    if (!this.properties.containsKey(QC.BCL2FASTQ_OUTPUT_DIR)) {
+    if (!this.generatorsProperties.containsKey(QC.BCL2FASTQ_OUTPUT_DIR)) {
       throw new AozanException("Bcl2fastq output directory is not set.");
     }
 
-    if (!this.properties.containsKey(QC.QC_OUTPUT_DIR)) {
+    if (!this.generatorsProperties.containsKey(QC.QC_OUTPUT_DIR)) {
       throw new AozanException("QC output directory is not set.");
     }
 
-    if (!this.properties.containsKey(QC.TMP_DIR)) {
+    if (!this.generatorsProperties.containsKey(QC.TMP_DIR)) {
       throw new AozanException("Temporary directory is not set.");
     }
 
@@ -115,7 +115,7 @@ public class RunDataGenerator {
           + " collector start for run " + this.runId);
 
       // Configure
-      collector.configure(qc, new CollectorConfiguration(this.properties));
+      collector.configure(qc, new CollectorConfiguration(this.generatorsProperties));
 
       // And collect data
       collector.collect(data);
@@ -124,7 +124,7 @@ public class RunDataGenerator {
           + " collector end for run " + this.runId + " in "
           + toTimeHumanReadable(timerCollector.elapsed(TimeUnit.MILLISECONDS)));
 
-      final File qcDir = new File(this.properties.get(QC.QC_OUTPUT_DIR));
+      final File qcDir = new File(this.generatorsProperties.get(QC.QC_OUTPUT_DIR));
       final File dataFile = new File(qcDir, collector.getName()
           + '-' + System.currentTimeMillis() + ".snapshot.data");
 
@@ -146,7 +146,7 @@ public class RunDataGenerator {
         + toTimeHumanReadable(timerGlobal.elapsed(TimeUnit.MILLISECONDS)));
     timerGlobal.stop();
 
-    this.properties.put(COLLECT_DONE, "true");
+    this.generatorsProperties.put(COLLECT_DONE, "true");
 
     return data;
   }
@@ -200,12 +200,12 @@ public class RunDataGenerator {
     }
 
     // Compile collector names
-    final String propertyValue = Joiner.on(",").join(collectorNames);
+    final String propertyValue = Joiner.on(", ").join(collectorNames);
 
-    LOGGER.config("Collectors requiered for QC " + propertyValue);
+    LOGGER.config("Collectors requiered for QC: " + propertyValue);
 
     // Update properties
-    this.properties.put(QC.QC_COLLECTOR_NAMES, propertyValue);
+    this.generatorsProperties.put(QC.QC_COLLECTOR_NAMES, propertyValue);
   }
 
   //
@@ -217,18 +217,17 @@ public class RunDataGenerator {
    * @param runId run id
    */
   public RunDataGenerator(final List<Collector> collectors, final String runId,
-      final Map<String, String> conf) {
+      final Map<String, String> generatorsConf) {
 
     checkNotNull(collectors, "The list of collectors is null");
-    checkNotNull(conf, "the conf argument cannot be null");
+    checkNotNull(generatorsConf, "the generatorsConf argument cannot be null");
 
     this.collectors = reorderCollector(collectors);
     this.runId = runId;
+    this.generatorsProperties = new HashMap<>(generatorsConf);
 
     // Add collector name requiered in properties
     addCollectorNameInProperties();
-
-    this.properties = new HashMap<>(conf);
   }
 
 }

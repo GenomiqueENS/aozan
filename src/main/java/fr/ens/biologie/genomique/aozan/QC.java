@@ -418,7 +418,7 @@ public class QC {
 
           // Configure the test
           tests = test.configure(new TestConfiguration(settings,
-              TEST_KEY_PREFIX + testName + "."));
+              TEST_KEY_PREFIX + testName + ".", globalConf));
 
           // Add the test to runTests, laneTests or sampleTests
           if (test instanceof GlobalTest) {

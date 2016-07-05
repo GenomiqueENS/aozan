@@ -58,10 +58,12 @@ public class TestConfiguration {
    * test.
    * @param settings Aozan configuration
    * @param prefix test prefix
+   * @param globalConf global configuration
    * @return a map with the test configuration
    */
   private static final Map<String, String> createConfiguration(
-      final Settings settings, final String prefix) {
+      final Settings settings, final String prefix,
+      final Map<String, String> globalConf) {
 
     if (settings == null) {
       throw new NullPointerException("The settings object is null");
@@ -69,6 +71,10 @@ public class TestConfiguration {
 
     if (prefix == null) {
       throw new NullPointerException("The prefix object is null");
+    }
+
+    if (globalConf == null) {
+      throw new NullPointerException("The globalConf object is null");
     }
 
     final Map<String, String> result = new HashMap<>();
@@ -87,7 +93,14 @@ public class TestConfiguration {
       }
     }
 
+    result.putAll(globalConf);
+
     return result;
+  }
+
+  @Override
+  public String toString() {
+    return this.map.toString();
   }
 
   //
@@ -98,10 +111,12 @@ public class TestConfiguration {
    * Public constructor.
    * @param settings Aozan settings
    * @param prefix test prefix
+   * @param globalConf global configuration
    */
-  public TestConfiguration(final Settings settings, final String prefix) {
+  public TestConfiguration(final Settings settings, final String prefix,
+      final Map<String, String> globalConf) {
 
-    this(createConfiguration(settings, prefix));
+    this(createConfiguration(settings, prefix, globalConf));
   }
 
   /**

@@ -42,6 +42,11 @@ public class CollectorConfiguration {
     return this.map.entrySet();
   }
 
+  @Override
+  public String toString() {
+    return this.map.toString();
+  }
+
   //
   // Constructors
   //
