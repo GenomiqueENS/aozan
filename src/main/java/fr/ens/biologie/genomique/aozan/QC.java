@@ -43,6 +43,7 @@ import com.google.common.io.Files;
 
 import fr.ens.biologie.genomique.aozan.collectors.Collector;
 import fr.ens.biologie.genomique.aozan.collectors.CollectorRegistry;
+import fr.ens.biologie.genomique.aozan.collectors.FastqScreenCollector;
 import fr.ens.biologie.genomique.aozan.collectors.RunInfoCollector;
 import fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector;
 import fr.ens.biologie.genomique.aozan.fastqc.RuntimePatchFastQC;
@@ -400,6 +401,8 @@ public class QC {
     final AozanTestRegistry registry = new AozanTestRegistry();
     List<AozanTest> tests;
 
+    boolean fastqScreenCollectorRequirementInitialized = false;
+
     for (final Map.Entry<String, String> e : settings.entrySet()) {
 
       final String key = e.getKey();
@@ -415,6 +418,15 @@ public class QC {
         final AozanTest test = registry.get(testName);
 
         if (test != null) {
+
+          // Initialize FastqScreen requirements
+          if (!fastqScreenCollectorRequirementInitialized
+              && test.getCollectorsNamesRequiered()
+                  .contains(FastqScreenCollector.COLLECTOR_NAME)) {
+
+            initFastqScreenCollectorRequirements(settings);
+            fastqScreenCollectorRequirementInitialized = true;
+          }
 
           // Configure the test
           tests = test.configure(new TestConfiguration(settings,
@@ -453,7 +465,8 @@ public class QC {
 
     }
 
-    initCollectors();
+    // Create the list of collectors
+    createCollectorList();
 
     // Initialize tests
     for (final GlobalTest test : this.globalTests) {
@@ -477,7 +490,7 @@ public class QC {
    * Initialize the collectors.
    * @throws AozanException if an error occurs while initialize a collector
    */
-  private void initCollectors() throws AozanException {
+  private void createCollectorList() throws AozanException {
 
     final Set<Collector> collectors = new HashSet<>();
 
@@ -500,8 +513,8 @@ public class QC {
 
     // Test if number test enable in configuration empty
     if (testsList.isEmpty()) {
-      throw new AozanException(
-          "None test enabled, it must at least one test selected to launch collectors of the qc step.");
+      throw new AozanException("None test enabled, "
+          + "it must at least one test selected to launch collectors of the qc step.");
     }
 
     // Get necessary collector for the qc report for lane test
@@ -599,7 +612,8 @@ public class QC {
    * @param settings Aozan settings
    * @throws AozanException if an error occurs when patching FastQC classes.
    */
-  private void initFastQC(final Settings settings) throws AozanException {
+  private void initFastQCCollectorRequirements(final Settings settings)
+      throws AozanException {
 
     // Define parameters of FastQC
     System.setProperty("java.awt.headless", "true");
@@ -651,18 +665,55 @@ public class QC {
   /**
    * Initialize initGenomeDescriptionCreator.
    * @param settings Aozan settings
+   * @throws AozanException if an error occurs while initializing the genome
+   *           aliases
    */
-  private void initGenomeDescriptionCreator(final Settings settings) {
+  private void initFastqScreenCollectorRequirements(final Settings settings)
+      throws AozanException {
+
+    // Initialize Genome aliases
+    GenomeAliases.initialize(settings);
 
     final fr.ens.biologie.genomique.eoulsan.Settings eoulsanSettings =
         EoulsanRuntime.getSettings();
 
-    eoulsanSettings.setGenomeDescStoragePath(settings
-        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
-    eoulsanSettings.setGenomeMapperIndexStoragePath(settings
-        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY));
-    eoulsanSettings.setGenomeStoragePath(
-        settings.get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY));
+    final String genomeDescStoragePath = settings
+        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY);
+
+    final String genomeMapperIndexStoragePath = settings
+        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY);
+
+    final String genomeStoragePath =
+        settings.get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY);
+
+    if (genomeDescStoragePath == null
+        || genomeDescStoragePath.trim().isEmpty()) {
+      throw new AozanException("No "
+          + Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY
+          + " property set in Aozan settings to define the path to "
+          + "the genome description files");
+    }
+
+    if (genomeMapperIndexStoragePath == null
+        || genomeMapperIndexStoragePath.trim().isEmpty()) {
+      throw new AozanException("No "
+          + Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY
+          + " property set in Aozan settings to define the path to "
+          + "the genome mapper index files");
+    }
+
+    if (genomeStoragePath == null || genomeStoragePath.trim().isEmpty()) {
+      throw new AozanException("No "
+          + Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY
+          + " property set in Aozan settings to define the path to "
+          + "the genomes files");
+    }
+
+    // Set the values
+    eoulsanSettings.setGenomeDescStoragePath(genomeDescStoragePath);
+    eoulsanSettings
+        .setGenomeMapperIndexStoragePath(genomeMapperIndexStoragePath);
+    eoulsanSettings.setGenomeStoragePath(genomeStoragePath);
 
     // Set data protocol from Eoulsan not load for Aozan because it needs to add
     // dependencies
@@ -835,11 +886,13 @@ public class QC {
 
     this.sampleSheetFile = getSampleSheetFile(this.fastqDir);
 
+    // Create the global settings for collectors and tests
     initGlobalConf(settings);
-    GenomeAliases.initialize(settings);
-    initGenomeDescriptionCreator(settings);
 
-    initFastQC(settings);
+    // Initialize FastQC requirements
+    initFastQCCollectorRequirements(settings);
+
+    // Create tests and collectors
     init(settings);
   }
 }

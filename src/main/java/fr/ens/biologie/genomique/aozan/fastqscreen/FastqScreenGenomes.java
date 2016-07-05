@@ -217,9 +217,8 @@ public class FastqScreenGenomes {
     // No genome can be use for mapping
     if (genomes.isEmpty()) {
       throw new AozanException(
-          "FastqScreen : none genomes contaminant can be use from configuration file: "
-              + contaminantGenomeNames + " found: "
-              + Joiner.on("-").join(genomes));
+          "FastqScreen : no genome contaminant can be use from configuration file: "
+              + contaminantGenomeNames);
     }
 
     return Collections.unmodifiableSet(genomes);
