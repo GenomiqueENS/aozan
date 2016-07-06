@@ -42,7 +42,7 @@
 		an example is <a href="./aozan-example.conf">here.</a>. The available steps are:</p>
 		<p/>
 		<ul>
-			<li><a href="new-run-discovering.xml">New run discovering</a>
+			<li><a href="new-run-discovering.html">New run discovering</a>
                <ul><li>send an email, if a new run is currently running. 
                	For HiSeq Illumina sequencer, send in attachment the first base report</li></ul>
             </li>
