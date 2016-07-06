@@ -135,7 +135,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     if (firstDoMapRunning) {
       // Update logger at the first execution
-      LOGGER.info("FASTQSCREEN mapping sample "
+      LOGGER.info("FASTQSCREEN: map "
           + fastqRead1.getName() + " on genomes "
           + Joiner.on(",").join(genomes));
     }
@@ -143,6 +143,10 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     for (final String genome : genomes) {
       // Timer : for step mapping on genome
       final Stopwatch timer = Stopwatch.createStarted();
+
+      LOGGER.info("FASTQSCREEN: map "
+          + fastqRead1.getName() + "(" + fastqRead1
+          + (this.pairedMode ? ", " + fastqRead2 : "") + ")" + " on " + genome);
 
       // Create instance of Mapper
       final SequenceReadsMapper mapper =
@@ -156,7 +160,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
         if (archiveIndexFile == null) {
           LOGGER.warning(
-              "FASTQSCREEN : archive index file not found for " + genome);
+              "FASTQSCREEN: archive index file not found for " + genome);
           continue;
         }
 
@@ -165,52 +169,57 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
         this.setGenomeReference(genome, sampleGenome);
 
-        final File indexDir = new File(
-            StringUtils.filenameWithoutExtension(archiveIndexFile.getPath()));
-
-        mapper.init(archiveIndexFile, indexDir, this.reporter, COUNTER_GROUP);
-
-        if (this.pairedMode) {
-
-          // Paired end mode
-          final MapperProcess process = mapper.mapPE(fastqRead1, fastqRead2);
-
-          // final InputStream outputSAM =
-          // mapper.mapPE(fastqRead1, fastqRead2).getStout();
-          // parser.parseLines(outputSAM);
-
-          parser.parseLines(process.getStout());
-
-          // Wait the end of the process and do cleanup
-          process.waitFor();
-
-          this.readsprocessed = parser.getReadsprocessed();
-
+        // Do nothing if the file is empty
+        if (fastqRead1.length() == 0) {
+          parser.closeMapOutputFile();
         } else {
 
-          if (this.desc == null) {
-            throw new AozanException(
-                "Fastqscreen : genome description is null for bowtie");
+          final File indexDir = new File(
+              StringUtils.filenameWithoutExtension(archiveIndexFile.getPath()));
+
+          mapper.init(archiveIndexFile, indexDir, this.reporter, COUNTER_GROUP);
+
+          if (this.pairedMode) {
+
+            // Paired end mode
+            final MapperProcess process = mapper.mapPE(fastqRead1, fastqRead2);
+
+            // final InputStream outputSAM =
+            // mapper.mapPE(fastqRead1, fastqRead2).getStout();
+            // parser.parseLines(outputSAM);
+
+            parser.parseLines(process.getStout());
+
+            // Wait the end of the process and do cleanup
+            process.waitFor();
+
+          } else {
+
+            if (this.desc == null) {
+              throw new AozanException(
+                  "Fastqscreen: genome description is null for bowtie");
+            }
+
+            // Single read mapping
+            final MapperProcess process = mapper.mapSE(fastqRead1);
+
+            // final InputStream outputSAM =
+            // mapper.mapSE(fastqRead1).getStout();
+            // parser.parseLines(outputSAM);
+
+            parser.parseLines(process.getStout());
+
+            // Wait the end of the process and do cleanup
+            process.waitFor();
           }
-
-          // Single read mapping
-          final MapperProcess process = mapper.mapSE(fastqRead1);
-
-          // final InputStream outputSAM = mapper.mapSE(fastqRead1).getStout();
-          // parser.parseLines(outputSAM);
-
-          parser.parseLines(process.getStout());
-
-          // Wait the end of the process and do cleanup
-          process.waitFor();
-
-          this.readsprocessed = parser.getReadsprocessed();
         }
+
+        this.readsprocessed = parser.getReadsprocessed();
 
         // Throw an exception if an exception has occurred while mapping
         mapper.throwMappingException();
 
-        LOGGER.fine("FASTQSCREEN : "
+        LOGGER.fine("FASTQSCREEN: "
             + mapper.getMapperName() + " mapping on genome " + genome
             + " in mode " + (this.pairedMode ? "paired" : "single") + ", in "
             + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
@@ -270,7 +279,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     indexer.createIndex(genomeDataFile, this.desc, result);
 
-    LOGGER.fine("FASTQSCREEN : create/retrieve index for "
+    LOGGER.fine("FASTQSCREEN: create/retrieve index for "
         + genomeDataFile.getName() + " in "
         + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
@@ -328,6 +337,11 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     checkNotNull(values, "values argument cannot be null");
 
+    // Do not process null keys
+    if (key == null) {
+      return;
+    }
+
     boolean oneHit = true;
     boolean oneGenome = true;
     String currentGenome = null;
@@ -372,12 +386,13 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   public FastqScreenResult getFastqScreenResult() throws AozanException {
 
     if (this.readsmapped > this.readsprocessed) {
-      LOGGER.warning("FASTQSCREEN :  mapped reads count "
-          + this.readsmapped + " must been inferior to processed reads count"
-          + this.readsprocessed);
+      LOGGER.warning("FASTQSCREEN: mapped reads count ("
+          + this.readsmapped + ") must been inferior to processed reads count ("
+          + this.readsprocessed + ")");
       return null;
     }
-    LOGGER.fine("FASTQSCREEN : result of mappings : nb read mapped "
+
+    LOGGER.fine("FASTQSCREEN: result of mappings : nb read mapped "
         + this.readsmapped + " / nb read " + this.readsprocessed);
 
     this.fastqScreenResult.countPercentValue(this.readsmapped,
@@ -455,7 +470,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       mapper = SequenceReadsMapperService.getInstance().newService(mapperName);
 
       if (mapper == null) {
-        throw new AozanException("FASTQSCREEN : mapper name "
+        throw new AozanException("FASTQSCREEN: mapper name "
             + mapperName + " from configuration Aozan doesn't recognized.");
       }
 

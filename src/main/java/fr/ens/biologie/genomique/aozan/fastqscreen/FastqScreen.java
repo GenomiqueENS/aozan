@@ -129,7 +129,7 @@ public class FastqScreen {
         pmr.doMap(fastqRead1, genomes, sampleGenome, this.confThreads);
       }
 
-      LOGGER.fine("FASTQSCREEN : step map for "
+      LOGGER.fine("FASTQSCREEN: step map for "
           + sampleDescription + " in mode "
           + (isPairedMode ? "paired" : "single") + " on genome(s) " + genomes
           + " in " + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
@@ -142,7 +142,7 @@ public class FastqScreen {
 
       pmr.doReduce(outputDoReduceFile);
 
-      LOGGER.fine("FASTQSCREEN : step reduce for "
+      LOGGER.fine("FASTQSCREEN: step reduce for "
           + sampleDescription + " in mode "
           + (isPairedMode ? "paired" : "single") + " in "
           + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));

@@ -128,7 +128,7 @@ public class FastqScreenSAMParser {
   /**
    * Write last record and close file mapOutputFile.
    */
-  private void closeMapOutputFile() throws IOException {
+  void closeMapOutputFile() throws IOException {
 
     // processing read buffer - end of input stream bowtie execution
     if (this.headerParsed) {

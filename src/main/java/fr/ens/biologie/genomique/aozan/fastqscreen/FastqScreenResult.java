@@ -348,7 +348,7 @@ public class FastqScreenResult {
 
     if (this.resultsPerGenome.isEmpty()) {
       throw new AozanException(
-          "During fastqScreen execusion : no genome receive");
+          "During fastqScreen execution: no genome receive");
     }
     this.readsMapped = readsMapped;
     this.readsprocessed = readsprocessed;

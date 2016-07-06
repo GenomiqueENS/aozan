@@ -74,7 +74,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   @Override
   protected void logThreadStart() {
     LOGGER.fine(
-        "FASTQSCREEN : start for " + getFastqSample().getKeyFastqSample());
+        "FASTQSCREEN: start for " + getFastqSample().getKeyFastqSample());
   }
 
   @Override
@@ -86,7 +86,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   @Override
   protected void logThreadEnd(final String duration) {
 
-    LOGGER.fine("FASTQSCREEN : end for "
+    LOGGER.fine("FASTQSCREEN: end for "
         + getFastqSample().getKeyFastqSample() + " in mode "
         + (this.isPairedEndMode ? "paired" : "single")
         + (isSuccess()
@@ -105,7 +105,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     // Report with a link in qc html page
     writeHtml(report);
 
-    LOGGER.fine("FASTQSCREEN : save "
+    LOGGER.fine("FASTQSCREEN: save "
         + getFastqSample().getPrefixReport() + " report fastqscreen");
   }
 
@@ -146,7 +146,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     final String prefixR1 = "fastqscreen" + getFastqSample().getRundataPrefix();
     getResults().put(this.resultsFastqscreen.createRundata(prefixR1));
 
-    // run paired : same values for fastqSample R2
+    // Paired-end run : same values for fastqSample R2
     if (this.isRunPE) {
 
       final String prefixR2 = "fastqscreen"
@@ -183,7 +183,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     br.close();
 
-    // Run paired-end : copy file for read R2
+    // Run paired-end: copy file for read R2
     if (this.isRunPE) {
       final File fileR2 = new File(this.reportDir.getAbsolutePath()
           + "/" + getFastqSample().getPrefixReport(2) + "-fastqscreen.csv");
@@ -191,7 +191,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
       if (fileR2.exists()) {
         if (!fileR2.delete()) {
           LOGGER.warning(
-              "Fastqscreen : fail delete report " + fileR2.getAbsolutePath());
+              "FASTQSCREEN: Fail delete report " + fileR2.getAbsolutePath());
         }
       }
 
@@ -216,14 +216,14 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     // br.close();
 
-    // Run paired-end : copy file for read R2
+    // Run paired-end: copy file for read R2
     if (this.isRunPE) {
       final File outputReportR2 = new File(this.reportDir.getAbsolutePath()
           + "/" + getFastqSample().getPrefixReport(2) + "-fastqscreen.html");
 
       if (outputReportR2.exists()) {
         if (!outputReportR2.delete()) {
-          LOGGER.warning("Fastqscreen : fail delete report "
+          LOGGER.warning("FASTQSCREEN: Fail delete report "
               + outputReportR2.getAbsolutePath());
         }
       }
