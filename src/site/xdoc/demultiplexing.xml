@@ -61,7 +61,7 @@
 	     <tr><td>bcl2fastq.samplesheet.prefix.filename</td><td>string</td><td>samplesheet</td><td>prefix for Bcl2fastq samplesheet file <a href="./samplesheet_SNL110_template.xls" target="_blank">(example).</a></td></tr>
 	     <tr><td>bcl2fastq.samplesheet.generator.command</td><td>String</td><td>Not set</td><td>Command to execute to generate the Bcl2fastq samplesheet
   in CSV format when <b>bcl2fastq.samplesheet.format</b> parameter is set to "command"</td></tr>
-	     <tr><td>bcl2fastq.samplesheets.path</td><td>string</td><td>Not set</td><td>Path to CSV/XLS samplesheet files.</td></tr>
+	     <tr><td>bcl2fastq.samplesheet.path</td><td>string</td><td>Not set</td><td>Path to CSV/XLS samplesheet files.</td></tr>
 	     <tr><td>bcl2fastq.mismatches</td><td>integer</td><td>0</td><td>Number of mismatches allowed in adapters indexes</td></tr>
 	     <tr><td>bcl2fastq.path</td><td>string</td><td>/usr/local/bcl2fastq</td><td>Path to Bcl2fastq basedir</td></tr>
 	     <tr><td>bcl2fastq.with.failed.reads</td><td>boolean</td><td>True</td><td>Add reads that not pass Illumina filter in fastq files</td></tr>
