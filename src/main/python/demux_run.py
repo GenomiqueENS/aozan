@@ -387,7 +387,7 @@ def create_bcl2fastq_command_line(run_id, command_path, input_run_data_path, fas
     args.extend(['--output-dir', fastq_output_dir])
 
     if common.is_conf_value_equals_true(BCL2FASTQ_WITH_FAILED_READS_KEY, conf):
-        args.extend(['--with-failed-reads'])
+        args.append('--with-failed-reads')
 
     # Specific parameter
     args.extend(['--runfolder-dir', input_run_data_path])
@@ -395,6 +395,16 @@ def create_bcl2fastq_command_line(run_id, command_path, input_run_data_path, fas
     args.extend(['--min-log-level', 'TRACE'])
     # args.extend(['--stats-dir', fastq_output_dir + '/Stats'])
     # args.extend(['--reports-dir', fastq_output_dir + '/Reports'])
+
+    # Set the compression level
+    if common.is_conf_key_exists(BCL2FASTQ_COMPRESSION_LEVEL_KEY, conf):
+        level_str = conf[BCL2FASTQ_COMPRESSION_LEVEL_KEY].strip()
+        try:
+            level_int = int(level_str)
+            if level_int > 0 and level_int < 10:
+                args.extend('-fastq-compression-level', level_int)
+        except ValueError:
+            pass
 
     if common.is_conf_key_exists(BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY, conf):
         args.append(conf[BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY])
