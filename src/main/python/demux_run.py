@@ -8,6 +8,7 @@ Created on 25 oct. 2011
 import os.path, stat, sys
 import common, hiseq_run, time
 import glob
+import re
 from xml.etree.ElementTree import ElementTree
 from java.io import IOException
 from java.lang import Runtime, Throwable, Exception
@@ -402,12 +403,14 @@ def create_bcl2fastq_command_line(run_id, command_path, input_run_data_path, fas
         try:
             level_int = int(level_str)
             if level_int > 0 and level_int < 10:
-                args.extend('-fastq-compression-level', level_int)
+                args.extend(['--fastq-compression-level', str(level_int)])
         except ValueError:
             pass
 
     if common.is_conf_key_exists(BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY, conf):
-        args.append(conf[BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY])
+        additional_args = conf[BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY]
+        additional_args = re.sub('\\s+', ' ', additional_args).strip()
+        args.extends(additional_args.split(' '))
 
     # Retrieve output in file
     args.extend(['>', tmp_path + '/bcl2fastq_output_' + run_id + '.out'])
