@@ -86,10 +86,6 @@
        <table>
 	     <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
 	     <tr><td>bcl2fastq.use.docker</td><td>boolean</td><td>True</td><td>Enable to use Docker container to run bcl2fastq for demultiplexing.</td></tr>
-	     <tr><td>bcl2fastq.version.for.hiseq</td><td>string</td><td>2.17.1.14</td><td>Full name on Docker image container to use. 
-     		Example RTA version1 (software Illumina Real Time Analysis 1, it used with HiSeq sequencer). 
-     		To use previous version on blc2fastq, we should call 1.8.4 Docker image name.</td></tr>
-	     <tr><td>bcl2fastq.version.for.nextseq</td><td>string</td><td>latest</td><td>Full name on Docker image container to use. </td></tr>
 	   </table>
 	   
 	   

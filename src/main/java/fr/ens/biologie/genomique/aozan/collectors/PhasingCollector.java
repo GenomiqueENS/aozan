@@ -96,7 +96,7 @@ public class PhasingCollector implements Collector {
 
       // Demux summary path
       final File phasingStatsDir = new File(this.bcl2fastqOutputPath
-          + "/Basecall_Stats_" + data.get("run.info.flow.cell.id")
+          + "/Basecall_Stats_" + data.getFlowcellId()
           + "/Phasing");
 
       // Get lane count

@@ -1016,8 +1016,11 @@ def load_conf(conf, conf_file_path):
     # Converting table between old and new keys
     converting_table_key = {}
     converting_table_key['casava.design.format'] = Settings.BCL2FASTQ_SAMPLESHEET_FORMAT_KEY
+    converting_table_key['casava.samplesheet.format'] = Settings.BCL2FASTQ_SAMPLESHEET_FORMAT_KEY
     converting_table_key['casava.design.prefix.filename'] = Settings.BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY
+    converting_table_key['casava.samplesheet.prefix.filename'] = Settings.BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY
     converting_table_key['casava.designs.path'] = Settings.BCL2FASTQ_SAMPLESHEETS_PATH_KEY
+    converting_table_key['casava.samplesheets.path'] = Settings.BCL2FASTQ_SAMPLESHEETS_PATH_KEY
 
     converting_table_key['casava.adapter.fasta.file.path'] = Settings. BCL2FASTQ_ADAPTER_FASTA_FILE_PATH_KEY
     converting_table_key['casava.additionnal.arguments'] = Settings.BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY
@@ -1026,12 +1029,11 @@ def load_conf(conf, conf_file_path):
     converting_table_key['casava.fastq.cluster.count'] = Settings.BCL2FASTQ_FASTQ_CLUSTER_COUNT_KEY
     converting_table_key['casava.mismatches'] = Settings.BCL2FASTQ_MISMATCHES_KEY
     converting_table_key['casava.path'] = Settings.BCL2FASTQ_PATH_KEY
-    converting_table_key['casava.samplesheet.format'] = Settings.BCL2FASTQ_SAMPLESHEET_FORMAT_KEY
-    converting_table_key['casava.samplesheet.prefix.filename'] = Settings.BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY
-    converting_table_key['casava.samplesheets.path'] = Settings.BCL2FASTQ_SAMPLESHEETS_PATH_KEY
+
     converting_table_key['casava.threads'] = Settings.BCL2FASTQ_THREADS_KEY
     converting_table_key['casava.with.failed.reads'] = Settings.BCL2FASTQ_WITH_FAILED_READS_KEY
     converting_table_key['casava.design.generator.command'] = Settings.BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY
+    converting_table_key['casava.samplesheet.generator.command'] = Settings.BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY
     converting_table_key['demux.use.docker.enable'] = Settings.BCL2FASTQ_USE_DOCKER_KEY
 
     converting_table_key['qc.conf.fastqc.threads'] = Settings.QC_CONF_THREADS_KEY
