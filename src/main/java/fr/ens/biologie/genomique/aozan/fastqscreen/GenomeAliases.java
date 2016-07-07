@@ -101,11 +101,10 @@ public class GenomeAliases {
   private void loadGenomeAliasFile(final File aliasFile) throws AozanException {
 
     if (aliasFile == null) {
-      LOGGER.fine("FastqScreen no alias genome file parameter define.");
+      LOGGER.fine("FASTQSCREEN: "
+          + "No genome alias file defined in Aozan configuration");
       return;
     }
-
-    final Map<String, String> genomes = new HashMap<>();
 
     // Not found alias genomes file
     if (!aliasFile.exists()) {
@@ -137,7 +136,7 @@ public class GenomeAliases {
         final String value = line.substring(pos + 1);
 
         if (!(value == null || value.isEmpty())) {
-          genomes.put(createKey(key), value);
+          this.genomeAliases.put(createKey(key), value);
         } else {
           this.unknownAliases.add(key);
         }
@@ -268,6 +267,8 @@ public class GenomeAliases {
         ? null : new File(genomeAliasesFilename.trim());
 
     loadGenomeAliasFile(this.genomeAliasesFile);
+
+    LOGGER.info("FASTQSCREEN: " + this.genomeAliases.size() + " genome alias(es) loaded");
   }
 
 }
