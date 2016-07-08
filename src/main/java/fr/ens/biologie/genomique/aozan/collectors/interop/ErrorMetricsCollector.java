@@ -51,14 +51,14 @@ import fr.ens.biologie.genomique.aozan.util.StatisticsUtils;
 public class ErrorMetricsCollector extends AbstractMetricsCollector {
 
   /** The sub-collector name from ReadCollector. */
-  public static final String NAME_COLLECTOR = "ErrorMetricsCollector";
+  public static final String COLLECTOR_NAME = "ErrorMetricsCollector";
 
   private final Map<Integer, ErrorRatesPerLane> errorRatesMetrics =
       new HashMap<>();
 
   @Override
   public String getName() {
-    return NAME_COLLECTOR;
+    return COLLECTOR_NAME;
   }
 
   /**

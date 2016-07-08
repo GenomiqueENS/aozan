@@ -46,7 +46,7 @@ import fr.ens.biologie.genomique.aozan.util.StatisticsUtils;
 public class ExtractionMetricsCollector extends AbstractMetricsCollector {
 
   /** The sub-collector name from ReadCollector. */
-  public static final String NAME_COLLECTOR = "ExtractionMetricsCollector";
+  public static final String COLLECTOR_NAME = "ExtractionMetricsCollector";
 
   /** The intensity metrics. */
   private final Map<Integer, ExtractionMetricsPerLane> intensityMetrics =
@@ -54,7 +54,7 @@ public class ExtractionMetricsCollector extends AbstractMetricsCollector {
 
   @Override
   public String getName() {
-    return NAME_COLLECTOR;
+    return COLLECTOR_NAME;
   }
 
   /**
