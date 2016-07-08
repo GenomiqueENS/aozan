@@ -50,7 +50,7 @@ public class RecoverableRawClusterSampleTest extends AbstractSimpleSampleTest {
     if (sampleName == null)
       return "undeterminedindices.lane"
           + lane + ".recoverable.raw.cluster.count";
-    
+
     return "undeterminedindices.lane"
         + lane + ".sample." + sampleName + ".recoverable.raw.cluster.count";
   }

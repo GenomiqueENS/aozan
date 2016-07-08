@@ -30,6 +30,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
+import fr.ens.biologie.genomique.aozan.collectors.FlowcellDemuxSummaryCollector;
 import fr.ens.biologie.genomique.aozan.collectors.UndeterminedIndexesCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
@@ -49,13 +50,14 @@ public class RecoverablePFClusterPercentSampleTest extends AbstractSampleTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(UndeterminedIndexesCollector.COLLECTOR_NAME);
+    return ImmutableList.of(UndeterminedIndexesCollector.COLLECTOR_NAME,
+        FlowcellDemuxSummaryCollector.COLLECTOR_NAME);
   }
 
   @Override
   public TestResult test(final RunData data, final int read,
       final int readSample, final int lane, final String sampleName) {
-    
+
     String recoveryCountKey;
     String sampleCountKey;
 
@@ -63,29 +65,24 @@ public class RecoverablePFClusterPercentSampleTest extends AbstractSampleTest {
       return new TestResult("NA");
     }
 
-    
     if (sampleName == null) {
       // Case undetermined
       recoveryCountKey =
           "undeterminedindices.lane" + lane + ".recoverable.pf.cluster.count";
 
-      sampleCountKey =
-          "demux.lane"
-              + lane + ".sample.lane" + lane + ".read" + readSample
-              + ".pf.cluster.count";
+      sampleCountKey = "demux.lane"
+          + lane + ".sample.lane" + lane + ".read" + readSample
+          + ".pf.cluster.count";
 
     } else {
 
       // Case sample
-      recoveryCountKey =
-          "undeterminedindices.lane"
-              + lane + ".sample." + sampleName
-              + ".recoverable.pf.cluster.count";
+      recoveryCountKey = "undeterminedindices.lane"
+          + lane + ".sample." + sampleName + ".recoverable.pf.cluster.count";
 
-      sampleCountKey =
-          "demux.lane"
-              + lane + ".sample." + sampleName + ".read" + readSample
-              + ".pf.cluster.count";
+      sampleCountKey = "demux.lane"
+          + lane + ".sample." + sampleName + ".read" + readSample
+          + ".pf.cluster.count";
     }
 
     try {
@@ -135,7 +132,8 @@ public class RecoverablePFClusterPercentSampleTest extends AbstractSampleTest {
    * Public constructor.
    */
   public RecoverablePFClusterPercentSampleTest() {
-    super("recoverablepfclusterssamplespercent", "", "Recoverable PF clusters", "%");
+    super("recoverablepfclusterssamplespercent", "", "Recoverable PF clusters",
+        "%");
   }
 
 }

@@ -30,6 +30,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
+import fr.ens.biologie.genomique.aozan.collectors.FlowcellDemuxSummaryCollector;
 import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
@@ -49,7 +50,8 @@ public class PercentQ30BasePFSamplestatsTest extends AbstractSampleTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(SampleStatisticsCollector.COLLECTOR_NAME);
+    return ImmutableList.of(SampleStatisticsCollector.COLLECTOR_NAME,
+        FlowcellDemuxSummaryCollector.COLLECTOR_NAME);
   }
 
   @Override

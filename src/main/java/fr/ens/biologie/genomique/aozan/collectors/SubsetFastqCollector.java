@@ -219,8 +219,8 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
         + data.get(prefix + ".raw.cluster.count"));
 
     // Check value exist in rundata, if not then fastq is empty
-    if (data.get(prefix + ".pf.cluster.count") == null
-        || data.get(prefix + ".raw.cluster.count") == null) {
+    if (!data.contains(prefix + ".pf.cluster.count")
+        || !data.contains(prefix + ".raw.cluster.count")) {
 
       // No demultiplexing data exist
       LOGGER.warning(COLLECTOR_NAME.toUpperCase()
@@ -231,8 +231,8 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
       return null;
     }
 
-    final int pfClusterCount = data.getInt(prefix + ".pf.cluster.count");
-    final int rawClusterCount = data.getInt(prefix + ".raw.cluster.count");
+    final long pfClusterCount = data.getInt(prefix + ".pf.cluster.count");
+    final long rawClusterCount = data.getInt(prefix + ".raw.cluster.count");
 
     // Create the thread object
     return new SubsetFastqThread(fastqSample, rawClusterCount, pfClusterCount,

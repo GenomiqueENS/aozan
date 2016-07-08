@@ -30,6 +30,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
+import fr.ens.biologie.genomique.aozan.collectors.FlowcellDemuxSummaryCollector;
 import fr.ens.biologie.genomique.aozan.collectors.UndeterminedIndexesCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
@@ -49,7 +50,8 @@ public class RecoverableRawClusterPercentSampleTest extends AbstractSampleTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(UndeterminedIndexesCollector.COLLECTOR_NAME);
+    return ImmutableList.of(UndeterminedIndexesCollector.COLLECTOR_NAME,
+        FlowcellDemuxSummaryCollector.COLLECTOR_NAME);
   }
 
   @Override
