@@ -23,7 +23,7 @@
 
 package fr.ens.biologie.genomique.aozan;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -329,7 +329,7 @@ public final class Settings {
       throw new NullPointerException("The map object is null");
     }
 
-    this.map = new HashMap<>(map);
+    this.map = new LinkedHashMap<>(map);
   }
 
 }
