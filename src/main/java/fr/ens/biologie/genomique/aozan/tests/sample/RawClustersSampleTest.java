@@ -27,7 +27,7 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
-import fr.ens.biologie.genomique.aozan.collectors.FlowcellDemuxSummaryCollector;
+import fr.ens.biologie.genomique.aozan.collectors.DemultiplexingCollector;
 
 /**
  * This class define a raw clusters count test for samples.
@@ -39,7 +39,7 @@ public class RawClustersSampleTest extends AbstractSimpleSampleTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(FlowcellDemuxSummaryCollector.COLLECTOR_NAME);
+    return ImmutableList.of(DemultiplexingCollector.COLLECTOR_NAME);
   }
 
   @Override

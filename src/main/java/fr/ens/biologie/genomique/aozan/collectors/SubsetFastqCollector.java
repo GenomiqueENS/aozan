@@ -86,7 +86,7 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
   public List<String> getCollectorsNamesRequiered() {
 
     final List<String> result = super.getCollectorsNamesRequiered();
-    result.add(FlowcellDemuxSummaryCollector.COLLECTOR_NAME);
+    result.add(DemultiplexingCollector.COLLECTOR_NAME);
 
     return Collections.unmodifiableList(result);
 

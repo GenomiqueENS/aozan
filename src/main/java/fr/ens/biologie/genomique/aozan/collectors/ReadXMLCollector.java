@@ -55,7 +55,7 @@ import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
  * @author Laurent Jourdren
  * @since 1.1
  */
-public class ReadXMLCollector implements Collector {
+class ReadXMLCollector implements Collector {
 
   /** Sub-collector for readCollector. */
   private static final String NAME_COLLECTOR = "ReadXMLCollector";
