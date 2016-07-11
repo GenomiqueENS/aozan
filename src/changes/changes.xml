@@ -637,7 +637,7 @@
 			</action>
 		</release>
 
-		<release version="2.0-rc15" description="Aozan 2.0-rc15 release"  date="TBD">
+		<release version="2.0-rc15" description="Aozan 2.0-rc15 release"  date="2016-07-11">
 			<action dev="jourdren" type="fix">
                                  The 'qc.conf.threads' configuration settings value now works for Fastq-screen.
 			</action>
@@ -660,7 +660,10 @@
                                  The genome aliases for FastqScreen were not correctly loaded.
 			</action>
 			<action dev="jourdren" type="fix">
-                                 Fix exception of FastQC when few reads are processed.
+                                 Fix exception in FastQC when few reads are processed.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 Fix exception in undetermined collector when few reads are processed.
 			</action>
 		</release>
 
