@@ -21,6 +21,7 @@ fr.ens.biologie.genomique.aozan.tests.global.SamplesCountGlobalTest
 fr.ens.biologie.genomique.aozan.tests.global.UndeterminedClustersPercentGlobalTest
 fr.ens.biologie.genomique.aozan.tests.global.PercentErrorRateMeanGlobalTest
 fr.ens.biologie.genomique.aozan.tests.global.DensityClusterMeanGlobalTest
+fr.ens.biologie.genomique.aozan.tests.global.PercentQ30GlobalTest
 fr.ens.biologie.genomique.aozan.tests.lane.ClusterDensityLaneTest
 fr.ens.biologie.genomique.aozan.tests.lane.ErrorRate100CycleLaneTest
 fr.ens.biologie.genomique.aozan.tests.lane.ErrorRate35CycleLaneTest
@@ -34,6 +35,7 @@ fr.ens.biologie.genomique.aozan.tests.lane.PercentCycle20IntensityLaneTest
 fr.ens.biologie.genomique.aozan.tests.lane.PhasingPrePhasingLaneTest
 fr.ens.biologie.genomique.aozan.tests.lane.RawClustersLaneTest
 fr.ens.biologie.genomique.aozan.tests.lane.RawClustersPhixLaneTest
+fr.ens.biologie.genomique.aozan.tests.lane.PercentQ30LaneTest
 fr.ens.biologie.genomique.aozan.tests.projectstats.SampleCountProjectTest
 fr.ens.biologie.genomique.aozan.tests.projectstats.LanesRunProjectTest
 fr.ens.biologie.genomique.aozan.tests.projectstats.GenomesProjectTest

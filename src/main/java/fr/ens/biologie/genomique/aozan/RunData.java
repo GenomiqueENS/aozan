@@ -502,6 +502,34 @@ public class RunData {
   }
 
   /**
+   * Get an longTable key.
+   * @param key key name
+   * @return the table of values of the data for the key
+   */
+  public long[] getLongArray(final String key) {
+
+    final String value = get(key);
+
+    if (value == null) {
+      return null;
+    }
+
+    String[] values = value.split(",");
+    long[] results = new long[values.length];
+    for (int i = 0; i < results.length; i++) {
+      try {
+        results[i] = Long.parseLong(values[i].trim());
+      } catch (NumberFormatException e) {
+        throw new AozanRuntimeException(
+            "DataRun getInt throw NumberFormatException on this key "
+                + key + " (value is " + value + ")");
+      }
+    }
+
+    return results;
+  }
+
+  /**
    * Get a long key.
    * @param key key name
    * @return the value of the data for the key
@@ -649,6 +677,27 @@ public class RunData {
       put(key, (String) null);
     } else {
       put(key, Joiner.on(',').join(strings));
+    }
+  }
+
+  /**
+   * Set a key with an array of longs as value.
+   * @param key key to set
+   * @param longs list of the key
+   */
+  public void put(final String key, final long... longs) {
+
+    if (longs == null) {
+      put(key, (String) null);
+    } else {
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < longs.length; i++) {
+        if (i > 0) {
+          sb.append(',');
+        }
+        sb.append(longs[i]);
+      }
+      put(key, sb.toString());
     }
   }
 
