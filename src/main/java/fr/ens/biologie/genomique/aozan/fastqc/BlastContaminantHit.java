@@ -39,7 +39,7 @@ public class BlastContaminantHit extends ContaminantHit {
 
       // Return the result
       if (result != null) {
-        return result.toString();
+        return result.toContaminantHit().toString();
       }
 
     } catch (final IOException | AozanException e) {

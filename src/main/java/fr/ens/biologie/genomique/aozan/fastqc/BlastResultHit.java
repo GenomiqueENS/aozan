@@ -126,10 +126,10 @@ class BlastResultHit {
    */
   private String contaminantHitToTextType() {
 
-    String name = "Search with Blastall+" +
+    String name = "Search with Blastn, " +
             " First hit on " +
             (this.countHits > 100 ? "+100" : this.countHits) +
-            " : " +
+            ": " +
             this.result +
             " Evalue=" +
             this.hspEValue +
@@ -156,14 +156,13 @@ class BlastResultHit {
    */
   private String contaminantHitToHtmlType() {
 
-    final String name = ("Search with Blastn, <a href=" + LINK_NCBI_BLASTN) + this.sequence + "\"" + " target=\"_blank\">more detail</a>" +
-            " First hit on " + (this.countHits > 100 ? "+100" : this.countHits) + " : " +
-            " <br/>" +
-            this.result +
-            " <br/>" +
-            " Evalue=" + this.hspEValue + ", " +
-            " Ident=" + this.prcIdentity + "%," +
-            " QueryCovergap=" + this.queryCover + "%";
+    final String name = "Search with Blastn, <a href="
+        + LINK_NCBI_BLASTN + this.sequence + "\""
+        + " target=\"_blank\">more detail</a>" + " First hit on "
+        + (this.countHits > 100 ? "+100" : this.countHits) + ": " + " <br/>"
+        + this.result + " <br/>" + " Evalue=" + this.hspEValue + ", "
+        + " Ident=" + this.prcIdentity + "%," + " QueryCovergap="
+        + this.queryCover + "%";
 
     // Return only the best hit
     if (this.prcIdentity < MIN_IDENTITY_EXPECTED
