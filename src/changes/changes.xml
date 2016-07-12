@@ -638,6 +638,9 @@
 		</release>
 
 		<release version="2.0-rc15" description="Aozan 2.0-rc15 release"  date="2016-07-11">
+			<action dev="jourdren" type="update">
+                                 FastQC 0.11.5 is now embedded in Aozan.
+			</action>
 			<action dev="jourdren" type="fix">
                                  The 'qc.conf.threads' configuration settings value now works for Fastq-screen.
 			</action>
@@ -664,6 +667,12 @@
 			</action>
 			<action dev="jourdren" type="fix">
                                  Fix exception in undetermined collector when few reads are processed.
+			</action>
+		</release>
+
+		<release version="2.0-rc16" description="Aozan 2.0-rc16 release"  date="TBD">
+			<action dev="firmo" type="add">
+                                 Add 2 new tests to show Q30 of the run lanes and of all the run.
 			</action>
 		</release>
 
