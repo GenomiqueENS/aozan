@@ -674,6 +674,9 @@
 			<action dev="firmo" type="add">
                                  Add 2 new tests to show Q30 of the run lanes and of all the run.
 			</action>
+			<action dev="jourdren" type="fix">
+                                 In FastQC report for overrepresented sequences, the blast message was a Java reference instead of the real blast result message.
+			</action>
 		</release>
 
 	</body>
