@@ -34,6 +34,7 @@ import fr.ens.biologie.genomique.aozan.collectors.ReadCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
+import fr.ens.biologie.genomique.aozan.util.MathUtils;
 import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
 
 /**
@@ -64,27 +65,6 @@ public class PercentQ30LaneTest extends AbstractLaneTest {
     return ImmutableList.of(ReadCollector.COLLECTOR_NAME);
   }
 
-  /**
-   * Get the Q30 score from an array of longs with number of cluster for each
-   * quality score
-   * @return Q30 score.
-   */
-  public double getQ30(long[] values) {
-
-    long count = 0;
-    long count30 = 0;
-
-    for (int i = 0; i < values.length; i++) {
-      count += values[i];
-      if (i >= 29) {
-        count30 += values[i];
-      }
-    }
-
-    return ((double) count30 / count);
-
-  }
-
   @Override
   public TestResult test(RunData data, int read, boolean indexedRead,
       int lane) {
@@ -93,7 +73,7 @@ public class PercentQ30LaneTest extends AbstractLaneTest {
     double q30 = 0;
 
     // Do the test ?
-    q30 = getQ30(values);
+    q30 = MathUtils.computeQ30(values);
 
     if (this.interval == null) {
       return new TestResult(q30, true);

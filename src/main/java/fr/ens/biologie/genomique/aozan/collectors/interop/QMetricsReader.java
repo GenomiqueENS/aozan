@@ -103,42 +103,83 @@ public class QMetricsReader extends QualityMetricsReader {
     collection.add(new QualityMetrics(bb));
   }
 
+  /**
+   * Get an integer telling if Qscore binning is enabled
+   * @return if Qscore binning is enabled.
+   */
   public int getQualityScoreBinningEnabled() {
     return qualityScoreBinningEnabled;
   }
 
+  /**
+   * Get the number of bin
+   * @return int number of bin
+   */
   public int getQualityScoreBinNumber() {
     return qualityScoreBinNumber;
   }
 
+  /**
+   * Get an array of int with the lower boundaries of each bin
+   * @return int[] the lower boundaries of each bin
+   */
   public int[] getLowerBoundary() {
     return lowerBoundary;
   }
 
+  /**
+   * Get an array of int with the upper boundaries of each bin
+   * @return int[] the upper boundaries of each bin
+   */
   public int[] getUpperBoundary() {
     return upperBoundary;
   }
 
+  /**
+   * Get an array of int with the value on which quality score of a bin is remapped
+   * @return int[] remapped score quality
+   */
   public int[] getRemappedScoreQuality() {
     return remappedScoreQuality;
   }
 
+
+  /**
+   * Set an integer telling if Qscore binning is enabled
+   * @param integer if Qscore binning is enabled.
+   */
   public void setQualityScoreBinningEnabled(int value) {
     this.qualityScoreBinningEnabled = value;
   }
 
+  /**
+   * Set the number of bin
+   * @param int number of bin
+   */
   public void setQualityScoreBinNumber(int value) {
     this.qualityScoreBinNumber = value;
   }
 
+  /**
+   * Set an array of int with the lower boundaries of each bin
+   * @param int[] the lower boundaries of each bin
+   */
   public void setLowerBoundary(int[] value) {
     this.lowerBoundary = value;
   }
-
+  
+  /**
+   * Set an array of int with the upper boundaries of each bin
+   * @param int[] the upper boundaries of each bin
+   */
   public void setUpperBoundary(int[] value) {
     this.upperBoundary = value;
   }
 
+  /**
+   * Set an array of int with the value on which quality score of a bin is remapped
+   * @param int[] remapped score quality
+   */
   public void setRemappedScoreQuality(int[] value) {
     this.remappedScoreQuality = value;
   }
