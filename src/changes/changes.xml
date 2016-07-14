@@ -670,7 +670,7 @@
 			</action>
 		</release>
 
-		<release version="2.0-rc16" description="Aozan 2.0-rc16 release"  date="TBD">
+		<release version="2.0-rc16" description="Aozan 2.0-rc16 release"  date="2016-07-14">
 			<action dev="firmo" type="add">
                                  Add 2 new tests to show Q30 of the run lanes and of all the run.
 			</action>
