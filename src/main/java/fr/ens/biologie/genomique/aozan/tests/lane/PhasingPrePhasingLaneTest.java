@@ -65,22 +65,19 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
 
       final List<String> sampleNames = data.getSamplesNameListInLane(lane);
 
-      final boolean control =
-          sampleNames.size() == 1
-              && data.isLaneControl(lane, sampleNames.get(0));
+      final boolean control = sampleNames.size() == 1
+          && data.isLaneControl(lane, sampleNames.get(0));
 
-      final String message =
-          String.format("%,.3f%% / %,.3f%%", phasing * 100.0,
-              prephasing * 100.0) + (control ? " (C)" : "");
+      final String message = String.format("%,.3f%% / %,.3f%%", phasing * 100.0,
+          prephasing * 100.0) + (control ? " (C)" : "");
 
       // No score for indexed read
       if (indexedRead
           || this.phasingInterval == null || this.prephasingInterval == null)
         return new TestResult(message);
 
-      final boolean result =
-          phasingInterval.isInInterval(phasing)
-              || prephasingInterval.isInInterval(prephasing);
+      final boolean result = phasingInterval.isInInterval(phasing)
+          || prephasingInterval.isInInterval(prephasing);
 
       return new TestResult(result ? 9 : 0, message);
 

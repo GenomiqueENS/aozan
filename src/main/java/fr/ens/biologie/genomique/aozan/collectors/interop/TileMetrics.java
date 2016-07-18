@@ -107,5 +107,4 @@ public class TileMetrics {
     this.metricValue = bb.getFloat();
 
   }
-
 }
