@@ -32,6 +32,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.python.google.common.base.Strings;
 
 import com.google.common.base.Joiner;
@@ -45,12 +48,10 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVRea
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVWriter;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetXLSReader;
 import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
-import junit.framework.TestCase;
+import junit.framework.Assert;
 
-public class SampleSheetReaderTest extends TestCase {
+public class SampleSheetReaderTest {
 
-  // TODO Use Junit 4.11 instead of 3.8
-  
   private static final Splitter NEWLINE_SPLITTER =
       Splitter.on("\n").trimResults().omitEmptyStrings();
 
@@ -119,6 +120,7 @@ public class SampleSheetReaderTest extends TestCase {
   private String path;
   private File outputFile;
 
+  @Test
   public void testReadsWithHeaderVersion2() {
 
     testSampleSheet(SAMPLESHEET_WITH_HEADER_BCL2FASTQ_V2_FILENAME, 2,
@@ -150,6 +152,7 @@ public class SampleSheetReaderTest extends TestCase {
   /**
    * Test reads short csv version.
    */
+  @Test
   public void testReadsShortCSVVersion() {
 
     try {
@@ -167,11 +170,13 @@ public class SampleSheetReaderTest extends TestCase {
    * Reads xls sample sheet file and check sample sheet instance is the same
    * that expected, with right converting index sequences.
    */
+  @Test
   public void testReadsXLSVersion2WithoutLaneColumnToCreate() {
 
     testSampleSheet(SAMPLESHEET_BCL2FASTQ_V2_FILENAME, 2, EXPECTED_CSV, false);
   }
 
+  @Test
   public void testReadsXLSVersion2WithLaneColumnToCreate() {
 
     testSampleSheet(SAMPLESHEET_BCL2FASTQ_V2_FILENAME, 2, EXPECTED_CSV_FULL,
@@ -179,12 +184,14 @@ public class SampleSheetReaderTest extends TestCase {
 
   }
 
+  @Test
   public void testReadsXLSVersion2DualIndexWithLaneColumnToCreate() {
 
     testSampleSheet(SAMPLESHEET_DUALINDEX_BCL2FASTQ_V2_FILENAME, 2,
         EXPECTED_FULL_WITH_DUALINDEX_CSV, true);
   }
 
+  @Test
   public void testReadsCSVVersion2WithLaneColumnToCreate() {
 
     final int laneCount = 2;
@@ -199,12 +206,13 @@ public class SampleSheetReaderTest extends TestCase {
     final Map<String, SampleSheetTest> samplesheetExpected =
         buildSamplesheetExpected(EXPECTED_CSV_FULL, 2);
 
-    assertTrue("no sample read in expected string ",
+    Assert.assertTrue("no sample read in expected string ",
         samplesheetExpected.size() > 0);
 
     compareSamplesheetV2(samplesheetExpected, samplesheetTested, true);
   }
 
+  @Test
   public void testReadsCSVVersion2WithoutLaneColumnToCreate() {
 
     final File csvFile = writeCSVFromTabulatedString(EXPECTED_CSV);
@@ -216,7 +224,7 @@ public class SampleSheetReaderTest extends TestCase {
     final Map<String, SampleSheetTest> samplesheetExpected =
         buildSamplesheetExpected(EXPECTED_CSV, 2);
 
-    assertTrue("no sample read in expected string ",
+    Assert.assertTrue("no sample read in expected string ",
         samplesheetExpected.size() > 0);
 
     compareSamplesheetV2(samplesheetExpected, samplesheetTested, false);
@@ -226,6 +234,7 @@ public class SampleSheetReaderTest extends TestCase {
    * Reads xls samplesheet file and check samplesheet instance is the same that
    * expected, with right converting index sequences.
    */
+  @Test
   public void testReadsXLSVersion1() {
 
     final File samplesheet = new File(path, SAMPLESHEET_BCL2FASTQ_V1_FILENAME);
@@ -253,7 +262,8 @@ public class SampleSheetReaderTest extends TestCase {
       final Map<String, SampleSheetTest> samplesheetExpected,
       final SampleSheet tested, final boolean withLane) {
 
-    assertFalse("No sample expected loaded ", samplesheetExpected.isEmpty());
+    Assert.assertFalse("No sample expected loaded ",
+        samplesheetExpected.isEmpty());
 
     for (Sample e : tested) {
 
@@ -261,12 +271,13 @@ public class SampleSheetReaderTest extends TestCase {
       final int laneNumber = e.getLane() == -1 ? 0 : e.getLane();
 
       if (withLane)
-        assertFalse("Lane number should be define in " + e, laneNumber == 0);
+        Assert.assertFalse("Lane number should be define in " + e,
+            laneNumber == 0);
 
       final SampleSheetTest expected =
           samplesheetExpected.get(sampleId + "_" + laneNumber);
 
-      assertNotNull("Sample id "
+      Assert.assertNotNull("Sample id "
           + sampleId + "_" + laneNumber
           + " not found in expected dataset, it contains\n" + Joiner.on("\n\t")
               .withKeyValueSeparator(",").join(samplesheetExpected),
@@ -278,7 +289,7 @@ public class SampleSheetReaderTest extends TestCase {
       samplesheetExpected.remove(sampleId + "_" + laneNumber);
     }
 
-    assertEquals(
+    Assert.assertEquals(
         "expected sample(s) missing: "
             + Joiner.on(",").join(samplesheetExpected.keySet()),
         0, samplesheetExpected.size());
@@ -287,19 +298,20 @@ public class SampleSheetReaderTest extends TestCase {
   private void compareSamplesheetEntryV2(final SampleSheetTest expected,
       final Sample tested, final boolean withLane) {
 
-    assertEquals("Sample ref", expected.getSampleRef(), tested.getSampleRef());
-    assertEquals("Sample description", expected.getDescription(),
+    Assert.assertEquals("Sample ref", expected.getSampleRef(),
+        tested.getSampleRef());
+    Assert.assertEquals("Sample description", expected.getDescription(),
         tested.getDescription());
-    assertEquals("Sample project", expected.getSampleProject(),
+    Assert.assertEquals("Sample project", expected.getSampleProject(),
         tested.getSampleProject());
-    assertEquals("Sample index", expected.getIndex(),
+    Assert.assertEquals("Sample index", expected.getIndex(),
         Strings.nullToEmpty(tested.getIndex1()));
 
-    assertEquals("Sample index2", expected.getIndex2(),
+    Assert.assertEquals("Sample index2", expected.getIndex2(),
         Strings.nullToEmpty(tested.getIndex2()));
 
     if (withLane) {
-      assertEquals("Sample lane", expected.getLane(), tested.getLane());
+      Assert.assertEquals("Sample lane", expected.getLane(), tested.getLane());
     }
   }
 
@@ -315,27 +327,30 @@ public class SampleSheetReaderTest extends TestCase {
       final SampleSheetTest expected =
           samplesheetExpected.get(sampleId + "_" + lane);
 
-      assertNotNull("Sample id " + sampleId + "not found in expected dataset",
+      Assert.assertNotNull(
+          "Sample id " + sampleId + "not found in expected dataset",
           Joiner.on(",").join(samplesheetExpected.keySet()));
 
-      assertEquals("Sample ref", expected.getSampleRef(), s.getSampleRef());
-      assertEquals("Sample description", expected.getDescription(),
+      Assert.assertEquals("Sample ref", expected.getSampleRef(),
+          s.getSampleRef());
+      Assert.assertEquals("Sample description", expected.getDescription(),
           s.getDescription());
-      assertEquals("Sample project", expected.getSampleProject(),
+      Assert.assertEquals("Sample project", expected.getSampleProject(),
           s.getSampleProject());
-      assertEquals("Sample index", expected.getIndex(), s.getIndex1());
+      Assert.assertEquals("Sample index", expected.getIndex(), s.getIndex1());
 
-      assertEquals("Sample lane", expected.getLane(), s.getLane());
-      assertEquals("flowcell id", expected.getFCID(),
+      Assert.assertEquals("Sample lane", expected.getLane(), s.getLane());
+      Assert.assertEquals("flowcell id", expected.getFCID(),
           s.getSampleSheet().getFlowCellId());
-      assertEquals("Recipe", expected.getRecipe(), s.get("Recipe"));
-      assertEquals("operator", expected.getOperator(), s.get("Operator"));
+      Assert.assertEquals("Recipe", expected.getRecipe(), s.get("Recipe"));
+      Assert.assertEquals("operator", expected.getOperator(),
+          s.get("Operator"));
 
       // Remove entry in expected map
       samplesheetExpected.remove(sampleId + "_" + lane);
     }
 
-    assertEquals(
+    Assert.assertEquals(
         "expected sample(s) missing: "
             + Joiner.on(",").join(samplesheetExpected.keySet()),
         samplesheetExpected.size(), 0);
@@ -448,8 +463,8 @@ public class SampleSheetReaderTest extends TestCase {
   // Common methods
   //
 
-  @Override
-  public void setUp() {
+  @Before
+  public void init() {
 
     // Path to samplesheet directory
     path = new File(
@@ -459,7 +474,8 @@ public class SampleSheetReaderTest extends TestCase {
 
   }
 
-  public void tearDown() {
+  @After
+  public void destroy() {
 
     if (outputFile.exists()) {
       outputFile.delete();

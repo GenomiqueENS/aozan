@@ -32,64 +32,71 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import fr.ens.biologie.genomique.aozan.Globals;
 // JUnit classes
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
+import junit.framework.Assert;
 
-public class StylesheetQCReportTest extends TestCase {
+//@RunWith(Suite.class)
+//@Suite.SuiteClasses({StylesheetQCReportTest.class})
+
+public class StylesheetQCReportTest {
 
   private TransformerFactory transFact;
 
-  /**
-   * All JUnit tests have a constructor that takes the test name.
-   */
-  public StylesheetQCReportTest(String name) {
-    super(name);
-  }
+  // /**
+  // * All JUnit tests have a constructor that takes the test name.
+  // */
+  // public StylesheetQCReportTest(String name) {
+  // super(name);
+  // }
 
   /**
    * Initialization before each test[...] method is called.
    */
-  public void setUp() {
+  @Before
+  public void init() {
     this.transFact = TransformerFactory.newInstance();
   }
 
   /**
    * An individual unit test.
    */
+  @Test
   public void testTransformReportQC() throws Exception {
-    assertTrue("Invalide syntax XSL "
-        + Globals.EMBEDDED_QC_XSL + " for report QC ",
+    Assert.assertTrue(
+        "Invalide syntax XSL " + Globals.EMBEDDED_QC_XSL + " for report QC ",
         isStylesheetValide(Globals.EMBEDDED_QC_XSL, "reportQCXML.xml"));
   }
 
+  @Test
   public void testTransformReportFQS() throws Exception {
-    assertTrue(
+    Assert.assertTrue(
         "Invalide syntax XSL "
             + Globals.EMBEDDED_FASTQSCREEN_XSL + " for report fastqscreen",
         isStylesheetValide(Globals.EMBEDDED_FASTQSCREEN_XSL,
             "reportFastqscreenXML.xml"));
   }
 
+  @Test
   public void testTransformReportUndetermined() throws Exception {
-    assertTrue(
+    Assert.assertTrue(
         "Invalide syntax XSL "
             + Globals.EMBEDDED_UNDETERMINED_XSL
             + " for report undetermined for lane ",
-        isStylesheetValide(Globals.EMBEDDED_QC_XSL, "reportUndeterminedXML.xml"));
+        isStylesheetValide(Globals.EMBEDDED_QC_XSL,
+            "reportUndeterminedXML.xml"));
   }
 
   private boolean isStylesheetValide(final String stylesheetFile,
       final String reportFile) {
     try {
 
-      Templates templates =
-          this.transFact.newTemplates(new StreamSource(
-              fr.ens.biologie.genomique.aozan.QC.class
-                  .getResourceAsStream(stylesheetFile)));
+      Templates templates = this.transFact.newTemplates(
+          new StreamSource(fr.ens.biologie.genomique.aozan.QC.class
+              .getResourceAsStream(stylesheetFile)));
 
       Transformer trans = templates.newTransformer();
 
@@ -101,8 +108,8 @@ public class StylesheetQCReportTest extends TestCase {
           new StreamSource(this.getClass().getResourceAsStream(reportFile)),
           new StreamResult(writer));
 
-      assertTrue("HTML page generate for " + reportFile + " fail ", writer
-          .toString().length() > 0);
+      Assert.assertTrue("HTML page generate for " + reportFile + " fail ",
+          writer.toString().length() > 0);
 
       return true;
     } catch (TransformerException ae) {
@@ -111,18 +118,20 @@ public class StylesheetQCReportTest extends TestCase {
 
   }
 
-  /**
-   * @return a TestSuite, which is a composite of Test objects.
-   */
-  public static Test suite() {
-    // uses reflection to locate each method named test[...]
-    return new TestSuite(StylesheetQCReportTest.class);
-  }
-
-  /**
-   * Allow the unit tests to be invoked from the command line in text-only mode.
-   */
-  public static void main(String[] args) {
-    TestRunner.run(suite());
-  }
+  // /**
+  // * @return a TestSuite, which is a composite of Test objects.
+  // */
+  // @Test
+  // public static TestSuite suite() {
+  // // uses reflection to locate each method named test[...]
+  // return new TestSuite(StylesheetQCReportTest.class);
+  // }
+  //
+  // /**
+  // * Allow the unit tests to be invoked from the command line in text-only
+  // mode.
+  // */
+  // public static void main(String[] args) {
+  // TestRunner.run(suite());
+  // }
 }
