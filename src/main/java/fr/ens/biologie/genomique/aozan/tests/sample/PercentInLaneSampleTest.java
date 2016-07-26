@@ -30,7 +30,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
-import fr.ens.biologie.genomique.aozan.collectors.FlowcellDemuxSummaryCollector;
+import fr.ens.biologie.genomique.aozan.collectors.DemultiplexingCollector;
 import fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
@@ -49,7 +49,7 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(FlowcellDemuxSummaryCollector.COLLECTOR_NAME,
+    return ImmutableList.of(DemultiplexingCollector.COLLECTOR_NAME,
         SamplesheetCollector.COLLECTOR_NAME);
   }
 

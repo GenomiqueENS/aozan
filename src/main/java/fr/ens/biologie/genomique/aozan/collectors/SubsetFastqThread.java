@@ -62,8 +62,8 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
   // count reads pf necessary for create a temporary partial fastq
   private final int countReadsPFtoCopy;
 
-  private final int rawClusterCount;
-  private final int pfClusterCountParsed;
+  private final long rawClusterCount;
+  private final long pfClusterCountParsed;
 
   private final File tmpFastqFile;
   private boolean uncompressFastqFile = false;
@@ -368,7 +368,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
    *           FastQC
    */
   public SubsetFastqThread(final FastqSample fastqSample,
-      final int rawClusterCount, final int pfClusterCount,
+      final long rawClusterCount, final long pfClusterCount,
       final int numberReadsToCopy, final int maxReadsToParse)
       throws AozanException {
 

@@ -699,6 +699,15 @@ public class UndeterminedIndexesProcessThread
     int recoverableRawClusterCount = 0;
     int recoverablePFClusterCount = 0;
 
+    // Initialize results for each sample of the lane
+    for (final int sampleId : this.data.getSamplesInLane(this.lane)) {
+
+      getResults().put("undeterminedindices.sample."
+          + sampleId + ".recoverable.raw.cluster.count", 0);
+      getResults().put("undeterminedindices.sample."
+          + sampleId + ".recoverable.pf.cluster.count", 0);
+    }
+
     if (!this.isSkipProcessResult) {
       // For each sample find the indexes sequences that can be recovered
       for (final Map.Entry<Integer, String> e : this.sampleIndexes.entrySet()) {

@@ -53,7 +53,7 @@ import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
  * @since 0.8
  * @author Laurent Jourdren
  */
-public class FlowcellDemuxSummaryCollector extends DemultiplexingCollector {
+class FlowcellDemuxSummaryCollector extends DemultiplexingCollector {
 
   private String bcl2fastqOutputPath;
 

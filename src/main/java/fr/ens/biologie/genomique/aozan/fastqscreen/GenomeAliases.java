@@ -165,8 +165,7 @@ public class GenomeAliases {
 
   /**
    * Add an alias.
-   * @param genomeName alias
-   * @param alias the value of the alias
+   * @param genomeName the name of the unknown alias
    */
   public void addUnknownAlias(final String genomeName) {
 
@@ -180,7 +179,6 @@ public class GenomeAliases {
   /**
    * Add the genome of the sample in the file which does correspondence with
    * reference genome.
-   * @param genomesToAdd genomes must be added in alias genomes file
    */
   public void saveUnknownAliases() {
 

@@ -97,8 +97,8 @@ abstract class AbstractBinaryFileReader<M> {
     recordBuf.order(ByteOrder.LITTLE_ENDIAN);
 
     try {
-      FileUtils.checkExistingFile(getMetricsFile(), "Error binary file "
-          + getMetricsFile().getAbsolutePath());
+      FileUtils.checkExistingFile(getMetricsFile(),
+          "Error binary file " + getMetricsFile().getAbsolutePath());
 
       final FileInputStream is = new FileInputStream(getMetricsFile());
       final FileChannel channel = is.getChannel();
@@ -113,7 +113,6 @@ abstract class AbstractBinaryFileReader<M> {
     } catch (final IOException e) {
       throw new AozanException(e);
     }
-
     // check version file
     if (HEADER_SIZE > 0) {
       ByteBuffer b = ByteBuffer.allocate(HEADER_SIZE);
@@ -122,6 +121,7 @@ abstract class AbstractBinaryFileReader<M> {
       b.position(0);
 
       checkVersionFile(b);
+      readOptionalFlag(b);
     }
 
     // Build collection of illumina metrics
@@ -135,6 +135,10 @@ abstract class AbstractBinaryFileReader<M> {
     }
 
     return collection;
+  }
+
+  protected void readOptionalFlag(ByteBuffer bb) {
+
   }
 
   /**
@@ -158,7 +162,7 @@ abstract class AbstractBinaryFileReader<M> {
     if (actualVersion != getExpectedVersion()) {
       throw new AozanException(getName()
           + " expects the version number to be " + getExpectedVersion()
-          + ".  Actual Version in Header( " + actualVersion + ")");
+          + ".  Actual Version in Header(" + actualVersion + ")");
     }
 
     // Check the size record needed
@@ -166,7 +170,7 @@ abstract class AbstractBinaryFileReader<M> {
     if (getExpectedRecordSize() != actualRecordSize) {
       throw new AozanException(getName()
           + " expects the record size to be " + getExpectedRecordSize()
-          + ".  Actual Record Size in Header( " + actualRecordSize + ")");
+          + ".  Actual Record Size in Header(" + actualRecordSize + ")");
     }
 
   }
@@ -183,12 +187,13 @@ abstract class AbstractBinaryFileReader<M> {
   AbstractBinaryFileReader(final File dirPath) throws AozanException {
 
     if (dirPath == null) {
-      throw new AozanException("No path to the InterOp directory has been provided");
+      throw new AozanException(
+          "No path to the InterOp directory has been provided");
     }
 
     if (!dirPath.exists()) {
-      throw new AozanException("Path to interOp directory doesn't exists "
-          + dirPath);
+      throw new AozanException(
+          "Path to interOp directory doesn't exists " + dirPath);
     }
 
     this.dirInterOpPath = dirPath;

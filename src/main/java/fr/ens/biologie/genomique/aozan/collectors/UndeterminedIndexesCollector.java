@@ -78,7 +78,7 @@ public class UndeterminedIndexesCollector extends AbstractFastqCollector {
 
     final List<String> result =
         Lists.newArrayList(super.getCollectorsNamesRequiered());
-    result.add(FlowcellDemuxSummaryCollector.COLLECTOR_NAME);
+    result.add(DemultiplexingCollector.COLLECTOR_NAME);
 
     return Collections.unmodifiableList(result);
   }

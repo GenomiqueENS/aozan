@@ -4,7 +4,7 @@
 
   <groupId>fr.ens.biologie.genomique</groupId>
   <artifactId>aozan</artifactId>
-  <version>2.0-rc15-SNAPSHOT</version>
+  <version>2.0-rc17-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Aozan</name>
@@ -41,6 +41,19 @@
     <developer>
       <id>perrin</id>
       <name>Sandrine Perrin</name>
+      <email>aozan 0 biologie ens fr</email>
+      <url />
+      <organization>École normale supérieure, IBENS, Genomic Paris Centre</organization>
+      <organizationUrl>https://www.genomique.biologie.ens.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>1</timezone>
+      <properties />
+    </developer>
+    <developer>
+      <id>firmo</id>
+      <name>Cyril Firmo</name>
       <email>aozan 0 biologie ens fr</email>
       <url />
       <organization>École normale supérieure, IBENS, Genomic Paris Centre</organization>

@@ -637,5 +637,47 @@
 			</action>
 		</release>
 
+		<release version="2.0-rc15" description="Aozan 2.0-rc15 release"  date="2016-07-11">
+			<action dev="jourdren" type="update">
+                                 FastQC 0.11.5 is now embedded in Aozan.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 The 'qc.conf.threads' configuration settings value now works for Fastq-screen.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 The Eoulsan configuration needed by FastqScreen is now only set when FastqScreen is enabled. If a setting is required by FastqScreen is not set, an error message is now thrown.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 The subject message of the email sent when a new run is detected now contains the correct number of the run cycles.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 The choice of the FASTQ file compression level is now (re)working.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 The additional arguments of bcl2fastq were not correctly handled.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 The FastqScreen now works when the FASTQ files are empty.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 The genome aliases for FastqScreen were not correctly loaded.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 Fix exception in FastQC when few reads are processed.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 Fix exception in undetermined collector when few reads are processed.
+			</action>
+		</release>
+
+		<release version="2.0-rc16" description="Aozan 2.0-rc16 release"  date="2016-07-14">
+			<action dev="firmo" type="add">
+                                 Add 2 new tests to show Q30 of the run lanes and of all the run.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 In FastQC report for overrepresented sequences, the blast message was a Java reference instead of the real blast result message.
+			</action>
+		</release>
+
 	</body>
 </document>

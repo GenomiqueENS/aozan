@@ -49,7 +49,7 @@ import fr.ens.biologie.genomique.aozan.util.StatisticsUtils;
 public class TileMetricsCollector extends AbstractMetricsCollector {
 
   /** The sub-collector name from ReadCollector. */
-  public static final String NAME_COLLECTOR = "TileMetricsCollector";
+  public static final String COLLECTOR_NAME = "TileMetricsCollector";
 
   private double densityRatio = 0.0;
 
@@ -57,7 +57,7 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
 
   @Override
   public String getName() {
-    return NAME_COLLECTOR;
+    return COLLECTOR_NAME;
   }
 
   @Override

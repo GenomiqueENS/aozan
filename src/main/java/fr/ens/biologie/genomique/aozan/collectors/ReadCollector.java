@@ -34,6 +34,7 @@ import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.collectors.interop.ErrorMetricsCollector;
 import fr.ens.biologie.genomique.aozan.collectors.interop.ExtractionMetricsCollector;
+import fr.ens.biologie.genomique.aozan.collectors.interop.QualityMetricsCollector;
 import fr.ens.biologie.genomique.aozan.collectors.interop.TileMetricsCollector;
 
 /**
@@ -89,6 +90,7 @@ public class ReadCollector implements Collector {
       this.subCollectionList.add(new TileMetricsCollector());
       this.subCollectionList.add(new ExtractionMetricsCollector());
       this.subCollectionList.add(new ErrorMetricsCollector());
+      this.subCollectionList.add(new QualityMetricsCollector());
     }
 
     // Configure sub-collector

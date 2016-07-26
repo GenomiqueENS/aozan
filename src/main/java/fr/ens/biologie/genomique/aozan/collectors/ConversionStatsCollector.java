@@ -56,7 +56,7 @@ import fr.ens.biologie.genomique.aozan.RunData;
  * @since 2.0
  * @author Sandrine Perrin
  */
-public class ConversionStatsCollector extends DemultiplexingCollector {
+class ConversionStatsCollector extends DemultiplexingCollector {
 
   /** The Constant ALL_NAME_KEY. */
   private static final String ALL_NAME_KEY = "all";

@@ -55,10 +55,10 @@ import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
  * @author Laurent Jourdren
  * @since 1.1
  */
-public class ReadXMLCollector implements Collector {
+class ReadXMLCollector implements Collector {
 
   /** Sub-collector for readCollector. */
-  private static final String NAME_COLLECTOR = "ReadXMLCollector";
+  private static final String COLLECTOR_NAME = "ReadXMLCollector";
 
   private String RTAOutputDirPath;
 
@@ -243,7 +243,7 @@ public class ReadXMLCollector implements Collector {
 
   @Override
   public String getName() {
-    return NAME_COLLECTOR;
+    return COLLECTOR_NAME;
   }
 
   @Override

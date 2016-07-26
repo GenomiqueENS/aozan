@@ -117,6 +117,10 @@
         
         <tr><td>qc.test.globaldensitycluster.enable</td><td>boolean</td><td>False</td><td>Enable cluster density test</td></tr>
         <tr><td>qc.test.globaldensitycluster.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of cluster density</td></tr>
+        
+        <tr><td>qc.test.globalpercentq30.enable</td><td>boolean</td><td>False</td><td>Enable global Q30 percent test</td></tr>
+        <tr><td>qc.test.globalpercentq30.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of global Q30 percent</td></tr>       
+
          
        </table>
 

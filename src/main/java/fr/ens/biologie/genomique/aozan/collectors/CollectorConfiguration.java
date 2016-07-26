@@ -66,7 +66,7 @@ public class CollectorConfiguration {
 
   /**
    * Public constructor.
-   * @param map Collector configuration
+   * @param conf Collector configuration
    */
   public CollectorConfiguration(final CollectorConfiguration conf) {
 

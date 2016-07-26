@@ -30,7 +30,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
-import fr.ens.biologie.genomique.aozan.collectors.FlowcellDemuxSummaryCollector;
+import fr.ens.biologie.genomique.aozan.collectors.DemultiplexingCollector;
 import fr.ens.biologie.genomique.aozan.collectors.GlobalStatsCollector;
 import fr.ens.biologie.genomique.aozan.collectors.RunInfoCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
@@ -52,7 +52,7 @@ public class UndeterminedClustersPercentGlobalTest extends AbstractGlobalTest {
 
     return ImmutableList.of(GlobalStatsCollector.COLLECTOR_NAME,
         RunInfoCollector.COLLECTOR_NAME,
-        FlowcellDemuxSummaryCollector.COLLECTOR_NAME);
+        DemultiplexingCollector.COLLECTOR_NAME);
   }
 
   @Override
