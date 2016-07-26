@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.tests.samplestats;
 
+import static fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector.COLLECTOR_PREFIX;
+
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -44,10 +46,10 @@ public class PFClusterMinSampleTest extends AbstractSimpleSampleTest {
   }
 
   @Override
-  protected String getKey(final String sampleName) {
+  protected String getKey(final int pooledSampleId) {
 
-    return SampleStatisticsCollector.COLLECTOR_PREFIX
-        + sampleName + ".pf.cluster.min";
+    return COLLECTOR_PREFIX
+        + ".pooledsample" + pooledSampleId + ".pf.cluster.min";
   }
 
   @Override

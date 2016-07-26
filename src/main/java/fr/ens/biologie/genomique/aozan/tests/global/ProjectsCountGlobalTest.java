@@ -56,7 +56,7 @@ public class ProjectsCountGlobalTest extends AbstractGlobalTest {
 
     try {
 
-      final int projectsCount = data.getProjectsNameList().size();
+      final int projectsCount = data.getProjectCount();
 
       return new TestResult(this.interval.getScore(projectsCount),
           projectsCount, false);

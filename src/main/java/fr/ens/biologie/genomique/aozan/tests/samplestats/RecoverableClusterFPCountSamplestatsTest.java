@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.tests.samplestats;
 
+import static fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector.COLLECTOR_PREFIX;
+
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -35,8 +37,8 @@ import fr.ens.biologie.genomique.aozan.tests.samplestats.AbstractSimpleSampleTes
  * @author Sandrine Perrin
  * @since 1.4
  */
-public class RecoverableClusterFPCountSamplestatsTest extends
-    AbstractSimpleSampleTest {
+public class RecoverableClusterFPCountSamplestatsTest
+    extends AbstractSimpleSampleTest {
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -45,10 +47,10 @@ public class RecoverableClusterFPCountSamplestatsTest extends
   }
 
   @Override
-  protected String getKey(final String sampleName) {
+  protected String getKey(final int pooledSampleId) {
 
-    return SampleStatisticsCollector.COLLECTOR_PREFIX
-        + sampleName + ".pf.cluster.recovery.sum";
+    return COLLECTOR_PREFIX
+        + ".pooledsample" + pooledSampleId + ".pf.cluster.recovery.sum";
   }
 
   @Override

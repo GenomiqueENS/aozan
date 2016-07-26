@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.tests.samplestats;
 
+import static fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector.COLLECTOR_PREFIX;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -44,8 +46,8 @@ import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
  * @author Sandrine Perrin
  * @since 1.4
  */
-public class SamplesExceededContaminationThresholdSampleTest extends
-    AbstractSampleTest {
+public class SamplesExceededContaminationThresholdSampleTest
+    extends AbstractSampleStatsTest {
 
   private final ScoreInterval interval = new ScoreInterval();
 
@@ -56,16 +58,17 @@ public class SamplesExceededContaminationThresholdSampleTest extends
   }
 
   @Override
-  public TestResult test(final RunData data, final String sampleName) {
+  public TestResult test(final RunData data, final int pooledSampleId) {
 
-    if (sampleName.equals(SampleStatisticsCollector.UNDETERMINED_SAMPLE)) {
+    // Do no process undetermined samples
+    if (data.isUndeterminedPooledSample(pooledSampleId)) {
       return new TestResult("NA");
     }
 
     try {
-      final String key =
-          SampleStatisticsCollector.COLLECTOR_PREFIX
-              + sampleName + ".samples.exceeded.contamination.threshold.count";
+      final String key = COLLECTOR_PREFIX
+          + ".pooledsample" + pooledSampleId
+          + ".samples.exceeded.contamination.threshold.count";
 
       final int val = data.getInt(key);
 

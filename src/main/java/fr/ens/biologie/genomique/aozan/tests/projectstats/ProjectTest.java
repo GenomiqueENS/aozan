@@ -36,8 +36,9 @@ public interface ProjectTest extends AozanTest {
   /**
    * Do a test.
    * @param data result object
+   * @param projectId the projectId
    * @return a TestResult object with the result of the test
    */
-  TestResult test(RunData data, String projectName);
+  TestResult test(RunData data, int projectId);
 
 }

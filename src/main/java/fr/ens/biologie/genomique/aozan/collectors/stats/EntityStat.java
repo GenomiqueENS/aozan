@@ -23,9 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.collectors.stats;
 
-import static fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput.UNDETERMINED_DIR_NAME;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -33,10 +32,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
+import com.google.common.base.Objects;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.collectors.StatisticsCollector;
 import fr.ens.biologie.genomique.aozan.util.StatisticsUtils;
@@ -47,7 +45,9 @@ import fr.ens.biologie.genomique.aozan.util.StatisticsUtils;
  * @author Sandrine Perrin
  * @since 1.4
  */
-public class EntityStat implements Comparable<EntityStat> {
+public class EntityStat {
+
+  // TODO Reorganise this code
 
   /** Default genome value. */
   private static final String DEFAULT_GENOME = "No genome.";
@@ -58,25 +58,17 @@ public class EntityStat implements Comparable<EntityStat> {
   /** Run data. */
   private final RunData data;
 
-  /** Project name. */
-  private final String projectName;
+  /** Project Id. */
+  private final int projectId;
 
-  /** The sample name. */
-  private final String sampleName;
-
-  /** The entity name. */
-  private final String entityName;
-
-  private final File reportDirectory;
-
-  /** Report samples on detection contaminant. */
-  private final List<File> fastqscreenReportToCompile;
+  /** The sample Id. */
+  private final int sampleId;
 
   /** Genomes. */
   private final Set<String> genomes;
 
   /** Samples, with technical replicats. */
-  private final List<String> samples;
+  private final List<Integer> samples;
 
   /** Lanes in run for project. */
   private final Set<Integer> lanes;
@@ -96,9 +88,6 @@ public class EntityStat implements Comparable<EntityStat> {
    */
   private List<Double> mappedContaminationPercentSamples;
 
-  /** Sample count. */
-  private int sampleCount = 0;
-
   /** Project is indexed. */
   private boolean isIndexed;
 
@@ -108,43 +97,30 @@ public class EntityStat implements Comparable<EntityStat> {
   /** Cluster recovery sum. */
   private int pfClusterRecoverySum = 0;
 
-  /** Project directory output. */
-  private File projectDir;
-
   /** Data compile in run data. */
   private boolean compiledData = false;
-
-  private final boolean undeterminedSample;
-
-  @Override
-  public int compareTo(final EntityStat that) {
-
-    // Compare on project name
-    return that.projectName.toLowerCase(Globals.DEFAULT_LOCALE).compareTo(
-        this.projectName.toLowerCase(Globals.DEFAULT_LOCALE));
-  }
 
   /**
    * Creates the run data project.
    * @return the run data.
    * @throws AozanException if run data object has already be create.
    */
-  public RunData createRunDataProject() throws AozanException {
+  public RunData createRunDataProject(final String prefix)
+      throws AozanException {
 
     if (compiledData) {
       throw new AozanException("Run data always updated for project "
-          + projectName + ".");
+          + this.data.getProjectName(this.projectId) + ".");
     }
 
     final RunData data = new RunData();
-    final String prefix = getPrefixRunData();
 
     StatisticsUtils stats = null;
 
     data.put(prefix + ".lanes", Joiner.on(",").join(this.lanes));
 
-    data.put(prefix + ".genomes.ref", (this.genomes.isEmpty() ? "NA" : Joiner
-        .on(",").join(getGenomes())));
+    data.put(prefix + ".genomes.ref",
+        (this.genomes.isEmpty() ? "NA" : Joiner.on(",").join(getGenomes())));
 
     data.put(prefix + ".samples.count", samples.size());
     data.put(prefix + ".isindexed", isIndexed);
@@ -194,39 +170,39 @@ public class EntityStat implements Comparable<EntityStat> {
 
   /**
    * Adds the sample.
-   * @param lane the lane in run
-   * @param sample the sample name
+   * @param sampleId the sample id
    * @throws AozanException if run data object has already be create.
    */
-  public void addEntity(final int lane, final String sample)
-      throws AozanException {
+  public void addEntity(final int sampleId) throws AozanException {
 
     if (compiledData) {
       throw new AozanException("Can not add new sample ("
-          + sample + ")for projet " + projectName
-          + ".Data always compile to updata run data.");
+          + this.data.getSampleDemuxName(sampleId) + ") for project "
+          + this.data.getProjectName(this.projectId)
+          + ". Data always compile to updata run data.");
     }
 
+    final int lane = this.data.getSampleLane(sampleId);
+
     this.lanes.add(lane);
-    this.sampleCount++;
 
     this.isIndexed = this.data.isLaneIndexed(lane);
 
     // Extract raw cluster
-    this.rawClusterSamples.add(this.data.getSampleRawClusterCount(lane, READ,
-        sample));
+    this.rawClusterSamples
+        .add(this.data.getSampleRawClusterCount(sampleId, READ));
 
     // Extract pf cluster
-    this.pfClusterSamples.add(this.data.getSamplePFClusterCount(lane, READ,
-        sample));
+    this.pfClusterSamples
+        .add(this.data.getSamplePFClusterCount(sampleId, READ));
 
-    computeConditionalRundata(lane, sample);
+    computeConditionalRundata(sampleId);
 
-    this.samples.add(sample);
+    this.samples.add(sampleId);
 
     // Extract from samplesheet file
-    if (data.getSampleGenome(lane, sample) != null) {
-      this.genomes.add(data.getSampleGenome(lane, sample));
+    if (data.getSampleGenome(sampleId) != null) {
+      this.genomes.add(data.getSampleGenome(sampleId));
     }
   }
 
@@ -234,43 +210,47 @@ public class EntityStat implements Comparable<EntityStat> {
    * Compute conditional rundata according to collector selected.
    * UndeterminedIndexesCollector and FastqScreenCollector is optional for this
    * collector.
-   * @param lane the lane
-   * @param sample the sample
+   * @param sampleId the sample Id
    */
-  private void computeConditionalRundata(final int lane, final String sample) {
+  private void computeConditionalRundata(final int sampleId) {
 
-    final String name = (isUndeterminedSample() ? null : sample);
+    final int lane = this.data.getSampleLane(sampleId);
 
     // Check collector is selected
     if (this.statisticsCollector.isUndeterminedIndexesCollectorSelected()
-        && this.data.isUndeterminedInLane(lane) ) {
+        && this.data.isUndeterminedInLane(lane)) {
 
       // Check if lane is indexed
       if (this.data.isLaneIndexed(lane)) {
-        this.rawClusterRecoverySum +=
-            this.data.getSampleRawClusterRecoveryCount(lane, name);
 
-        this.pfClusterRecoverySum +=
-            this.data.getSamplePFClusterRecoveryCount(lane, name);
+        if (!this.data.isUndeterminedSample(sampleId)) {
+          this.rawClusterRecoverySum +=
+              this.data.getSampleRawClusterRecoveryCount(sampleId);
+
+          this.pfClusterRecoverySum +=
+              this.data.getSamplePFClusterRecoveryCount(sampleId);
+
+        } else {
+          this.rawClusterRecoverySum +=
+              this.data.getLaneRawClusterRecoveryCount(lane);
+
+          this.pfClusterRecoverySum +=
+              this.data.getLanePFClusterRecoveryCount(lane);
+        }
       }
     }
 
     // Check collector is selected
     if (this.statisticsCollector.isFastqScreenCollectorSelected()) {
 
-      this.mappedContaminationPercentSamples.add(this.data
-          .getPercentMappedReadOnContaminationSample(lane, name, READ));
+      this.mappedContaminationPercentSamples.add(
+          this.data.getPercentMappedReadOnContaminationSample(sampleId, READ));
     }
-
   }
 
   //
   // Getter
   //
-
-  public boolean isUndeterminedSample() {
-    return undeterminedSample;
-  }
 
   /**
    * Gets the samples with contamination count.
@@ -279,7 +259,7 @@ public class EntityStat implements Comparable<EntityStat> {
   private String getSamplesWithContaminationCount() {
     int count = 0;
 
-    if (isUndeterminedSample()) {
+    if (this.data.isUndeterminedSample(this.sampleId)) {
       return "NA";
     }
 
@@ -289,7 +269,7 @@ public class EntityStat implements Comparable<EntityStat> {
         count++;
     }
 
-    return count + "";
+    return "" + count;
   }
 
   /**
@@ -304,193 +284,51 @@ public class EntityStat implements Comparable<EntityStat> {
     return this.genomes;
   }
 
-  /**
-   * Gets the report html file.
-   * @return the report html file
-   */
-  public File getReportHtmlFile() {
-
-    if (this.statisticsCollector.isSampleStatisticsCollector()) {
-      return new File(this.projectDir, this.sampleName + "-fastqscreen.html");
-    }
-
-    return new File(this.projectDir, this.projectName + "-fastqscreen.html");
-  }
-
-  /**
-   * Gets the prefix run data.
-   * @return the prefix run data
-   */
-  private String getPrefixRunData() {
-
-    if (this.statisticsCollector.isSampleStatisticsCollector()) {
-
-      if (isUndeterminedSample())
-        return this.statisticsCollector.getCollectorPrefix()
-            + SampleStatisticsCollector.UNDETERMINED_SAMPLE;
-
-      return this.statisticsCollector.getCollectorPrefix() + samples.get(0);
-    }
-
-    return this.statisticsCollector.getCollectorPrefix() + projectName;
-  }
-
-  /**
-   * Builds the name.
-   * @param projectName the project name
-   * @param sampleName the sample name
-   * @return the string
-   */
-  private String buildName(final String projectName, final String sampleName) {
-
-    return this.projectName
-        + (sampleName == null || sampleName.isEmpty() || isUndeterminedSample()
-            ? "" : " " + sampleName);
-  }
-
-  /**
-   * Gets the samples.
-   * @return the samples
-   */
-  public List<String> getSamples() {
-    return samples;
-  }
-
-  /**
-   * Gets the fastq screen report.
-   * @return the fastq screen report
-   */
-  public List<File> getFastqScreenReport() {
-
-    if (this.fastqscreenReportToCompile == null)
-      return Collections.emptyList();
-
-    return Collections.unmodifiableList(this.fastqscreenReportToCompile);
-  }
-
-  /**
-   * Gets the project name.
-   * @return the project name
-   */
-  public String getProjectName() {
-    return this.projectName;
-  }
-
-  /**
-   * Gets the name.
-   * @return the name
-   */
-  public String getName() {
-    return this.entityName;
-  }
-
-  /**
-   * Gets the project dir.
-   * @return the project dir
-   */
-  public File getProjectDir() {
-    return this.projectDir;
-  }
-
   @Override
   public String toString() {
-    return "EntityStat [projectName="
-        + projectName + ", entityName=" + entityName + ", reportDirectory="
-        + reportDirectory + ", fastqscreenReportToCompile="
-        + fastqscreenReportToCompile + ", genomes=" + genomes + ", samples="
-        + samples + ", lanes=" + lanes + ", statisticsCollector="
-        + statisticsCollector + ", rawClusterSamples=" + rawClusterSamples
-        + ", pfClusterSamples=" + pfClusterSamples
-        + ", mappedContaminationPercentSamples="
-        + mappedContaminationPercentSamples + ", sampleCount=" + sampleCount
-        + ", isIndexed=" + isIndexed + ", rawClusterRecoverySum="
-        + rawClusterRecoverySum + ", pfClusterRecoverySum="
-        + pfClusterRecoverySum + ", projectDir=" + projectDir
-        + ", compiledData=" + compiledData + "]";
+
+    return Objects.toStringHelper(this).add("genomes", this.genomes)
+        .add("samples", this.samples).add("lanes", this.lanes)
+        .add("statisticsCollector", this.statisticsCollector)
+        .add("rawClusterSamples", this.rawClusterSamples)
+        .add("pfClusterSamples", this.pfClusterSamples)
+        .add("mappedContaminationPercentSamples",
+            this.mappedContaminationPercentSamples)
+        .add("isIndexed", this.isIndexed)
+        .add("rawClusterRecoverySum", this.rawClusterRecoverySum)
+        .add("pfClusterRecoverySum", this.pfClusterRecoverySum)
+        .add("compiledData", this.compiledData).toString();
   }
 
-  
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result =
-        prime * result + ((entityName == null) ? 0 : entityName.hashCode());
-    result = prime * result + ((genomes == null) ? 0 : genomes.hashCode());
-    result = prime * result + (isIndexed ? 1231 : 1237);
-    result = prime * result + ((lanes == null) ? 0 : lanes.hashCode());
-    result =
-        prime * result + ((projectDir == null) ? 0 : projectDir.hashCode());
-    result =
-        prime * result + ((projectName == null) ? 0 : projectName.hashCode());
-    result =
-        prime
-            * result
-            + ((reportDirectory == null) ? 0 : reportDirectory.hashCode());
-    result = prime * result + sampleCount;
-    result =
-        prime * result + ((sampleName == null) ? 0 : sampleName.hashCode());
-    result = prime * result + ((samples == null) ? 0 : samples.hashCode());
-    result = prime * result + (undeterminedSample ? 1231 : 1237);
-    return result;
+
+    return Objects.hashCode(genomes, isIndexed, lanes, projectId, sampleId,
+        samples);
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+
+    if (!(obj instanceof EntityStat)) {
       return false;
-    EntityStat other = (EntityStat) obj;
-    if (entityName == null) {
-      if (other.entityName != null)
-        return false;
-    } else if (!entityName.equals(other.entityName))
-      return false;
-    if (genomes == null) {
-      if (other.genomes != null)
-        return false;
-    } else if (!genomes.equals(other.genomes))
-      return false;
-    if (isIndexed != other.isIndexed)
-      return false;
-    if (lanes == null) {
-      if (other.lanes != null)
-        return false;
-    } else if (!lanes.equals(other.lanes))
-      return false;
-    if (projectDir == null) {
-      if (other.projectDir != null)
-        return false;
-    } else if (!projectDir.equals(other.projectDir))
-      return false;
-    if (projectName == null) {
-      if (other.projectName != null)
-        return false;
-    } else if (!projectName.equals(other.projectName))
-      return false;
-    if (reportDirectory == null) {
-      if (other.reportDirectory != null)
-        return false;
-    } else if (!reportDirectory.equals(other.reportDirectory))
-      return false;
-    if (sampleCount != other.sampleCount)
-      return false;
-    if (sampleName == null) {
-      if (other.sampleName != null)
-        return false;
-    } else if (!sampleName.equals(other.sampleName))
-      return false;
-    if (samples == null) {
-      if (other.samples != null)
-        return false;
-    } else if (!samples.equals(other.samples))
-      return false;
-    if (undeterminedSample != other.undeterminedSample)
-      return false;
-    return true;
+    }
+
+    EntityStat that = (EntityStat) obj;
+
+    return Objects.equal(this.genomes, that.genomes)
+        && Objects.equal(this.isIndexed, that.isIndexed)
+        && Objects.equal(this.lanes, that.lanes)
+        && Objects.equal(this.projectId, that.projectId)
+        && Objects.equal(this.sampleId, that.sampleId)
+        && Objects.equal(this.samples, that.samples);
   }
 
   //
@@ -499,17 +337,16 @@ public class EntityStat implements Comparable<EntityStat> {
   /**
    * Instantiates a new project stat.
    * @param runData the run data
-   * @param projectName the project name
+   * @param projectId the project id
    * @param statCollector the stat collector
    * @param fastqscreenReportToCompile the fastqscreen report to compile
    * @throws AozanException if an error occurs when listing source fastqscreen
    *           xml report file.
    */
-  public EntityStat(final RunData runData, final String projectName,
-      final StatisticsCollector statCollector,
-      final List<File> fastqscreenReportToCompile) throws AozanException {
+  public EntityStat(final RunData runData, final int projectId,
+      final StatisticsCollector statCollector) throws AozanException {
 
-    this(runData, projectName, null, statCollector, fastqscreenReportToCompile);
+    this(runData, projectId, -1, statCollector);
   }
 
   /**
@@ -521,37 +358,26 @@ public class EntityStat implements Comparable<EntityStat> {
    * @param fastqscreenReportToCompile the fastqscreen report to compile
    * @throws AozanException the aozan exception
    */
-  public EntityStat(final RunData runData, final String projectName,
-      final String sampleName, final StatisticsCollector statCollector,
-      final List<File> fastqscreenReportToCompile) throws AozanException {
+  public EntityStat(final RunData runData, final int projectId,
+      final int sampleId, final StatisticsCollector statCollector)
+      throws AozanException {
+
+    checkNotNull(runData, "runData argument cannot be null");
+    checkNotNull(statCollector, "statCollector argument cannot be null");
 
     this.data = runData;
-    this.projectName = projectName;
-    this.sampleName = sampleName;
-
-    this.entityName = buildName(this.projectName, sampleName);
+    this.projectId = projectId;
+    this.sampleId = sampleId;
 
     this.genomes = new LinkedHashSet<>();
     this.lanes = new LinkedHashSet<>();
     this.samples = new ArrayList<>();
-
-    this.undeterminedSample =
-        Strings.isNullOrEmpty(sampleName) ? false : (sampleName.trim()
-            .equals(SampleStatisticsCollector.UNDETERMINED_SAMPLE));
 
     // Compile demultiplexing data
     this.rawClusterSamples = new ArrayList<>();
     this.pfClusterSamples = new ArrayList<>();
     this.mappedContaminationPercentSamples = new ArrayList<>();
 
-    this.reportDirectory = statCollector.getReportDirectory();
-    this.projectDir =
-        (isUndeterminedSample() ? new File(reportDirectory,
-            UNDETERMINED_DIR_NAME) : new File(reportDirectory
-            + "/Project_" + this.projectName));
-
     this.statisticsCollector = statCollector;
-
-    this.fastqscreenReportToCompile = fastqscreenReportToCompile;
   }
 }

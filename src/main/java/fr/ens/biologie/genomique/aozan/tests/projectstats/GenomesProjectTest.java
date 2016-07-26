@@ -44,9 +44,9 @@ public class GenomesProjectTest extends AbstractSimpleProjectTest {
   }
 
   @Override
-  protected String getKey(final String projectName) {
+  protected String getKey(final int projectId) {
 
-    return COLLECTOR_PREFIX + projectName + ".genomes.ref";
+    return COLLECTOR_PREFIX + ".project" + projectId + ".genomes.ref";
   }
 
   @Override

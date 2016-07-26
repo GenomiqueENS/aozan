@@ -46,7 +46,6 @@ import com.google.common.base.Joiner;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Globals;
-import fr.ens.biologie.genomique.aozan.collectors.stats.EntityStat;
 import fr.ens.biologie.genomique.aozan.util.XMLUtilsWriter;
 
 /**
@@ -57,11 +56,11 @@ import fr.ens.biologie.genomique.aozan.util.XMLUtilsWriter;
  */
 public class FastqScreenProjectReport {
 
-  /** Project data instance. */
-  private final EntityStat entitiesStat;
-
   /** Stylesheet xsl file. */
   private final File fastqscreenXSLFile;
+
+  private final List<File> fastqScreenFiles;
+  private final String description;
 
   /**
    * Creates the HTML report.
@@ -69,12 +68,12 @@ public class FastqScreenProjectReport {
    * @throws AozanException the Aozan exception
    * @throws IOException if a error occurs when create report HTML.
    */
-  public void createReport(final File reportHtml) throws AozanException,
-      IOException {
+  public void createReport(final File reportHtml)
+      throws AozanException, IOException {
 
     checkNotNull(reportHtml, "fastqscreen report filename");
 
-    if (entitiesStat.getFastqScreenReport().isEmpty()) {
+    if (fastqScreenFiles.isEmpty()) {
       return;
     }
 
@@ -83,9 +82,8 @@ public class FastqScreenProjectReport {
     if (fastqscreenXSLFile == null) {
 
       // Use default stylesheet file
-      is =
-          this.getClass().getResourceAsStream(
-              Globals.EMBEDDED_FASTQSCREEN_PROJECT_XSL);
+      is = this.getClass()
+          .getResourceAsStream(Globals.EMBEDDED_FASTQSCREEN_PROJECT_XSL);
     } else {
       // Use specific stylesheet from properties
       is = new FileInputStream(fastqscreenXSLFile);
@@ -132,7 +130,7 @@ public class FastqScreenProjectReport {
     root.appendChild(project);
 
     // Parsing all sample on project
-    for (File fqsxml : entitiesStat.getFastqScreenReport()) {
+    for (File fqsxml : this.fastqScreenFiles) {
 
       // Buid document on sample xml file
       final Document srcDoc = buildDom(fqsxml);
@@ -190,7 +188,7 @@ public class FastqScreenProjectReport {
 
     if (doc == null) {
       throw new AozanException("Fail to create document from file "
-          + xmlFile.getAbsolutePath() + " for " + entitiesStat.getName());
+          + xmlFile.getAbsolutePath() + " for " + description);
     }
 
     doc.getDocumentElement().normalize();
@@ -322,14 +320,20 @@ public class FastqScreenProjectReport {
 
   /**
    * Instantiates a new fastq screen project report.
-   * @param project the project
+   * @param fastqScreenFiles FastqScreen files
+   * @param description description of the report
    * @param xslFile the xsl file
    */
-  public FastqScreenProjectReport(final EntityStat project, final File xslFile) {
+  public FastqScreenProjectReport(final List<File> fastqScreenFiles,
+      final String description, final File xslFile) {
 
-    this.entitiesStat = project;
+    checkNotNull(fastqScreenFiles, "fastqScreenFiles argument cannot be null");
+    checkNotNull(description, "description argument cannot be null");
+
+    // this.entityStat = entites;
+    this.fastqScreenFiles = fastqScreenFiles;
+    this.description = description;
     this.fastqscreenXSLFile = xslFile;
-
   }
 
 }

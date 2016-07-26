@@ -26,16 +26,19 @@ package fr.ens.biologie.genomique.aozan.collectors;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import java.util.TreeSet;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
@@ -56,11 +59,61 @@ public class SamplesheetCollector implements Collector {
 
   public static final String SAMPLESHEET_DATA_PREFIX = "samplesheet";
 
-  public static final List<String> FASTQ_COLLECTOR_NAMES =
-      Arrays.asList("tmppartialfastq", "undeterminedindexes", "fastqc",
-          "globalstats", "fastqscreen", "projectstats");
-
   private File samplesheetFile;
+
+  /**
+   * This private class define a pooled sample.
+   */
+  private static class PooledSample {
+
+    private final String project;
+    private final String name;
+    private final String index1;
+    private final String index2;
+    private final String ref;
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(this.project, this.name, this.index1, this.index2,
+          this.ref);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+
+      if (!(obj instanceof PooledSample)) {
+        return false;
+      }
+
+      final PooledSample that = (PooledSample) obj;
+
+      return this.project.equals(that.project)
+          && this.name.equals(that.name) && this.index1.equals(that.index1)
+          && this.index2.equals(that.index2) && this.ref.equals(that.ref);
+    }
+
+    //
+    // Constructor
+    //
+
+    /**
+     * Constructor.
+     * @param project project name
+     * @param name sample name
+     * @param index1 first index
+     * @param index2 second index
+     * @param ref the genome reference
+     */
+    public PooledSample(final String project, final String name,
+        final String index1, final String index2, final String ref) {
+
+      this.project = project;
+      this.name = name;
+      this.index1 = index1;
+      this.index2 = index2;
+      this.ref = ref;
+    }
+  }
 
   @Override
   public String getName() {
@@ -97,26 +150,66 @@ public class SamplesheetCollector implements Collector {
     }
 
     try {
-      final Map<Integer, List<String>> samples = new HashMap<>();
-      final Set<String> projectsName = new TreeSet<>();
+      final Multimap<Integer, Integer> samplesInLane =
+          ArrayListMultimap.create();
+      final Set<String> projectNames = new LinkedHashSet<>();
+      final Multimap<String, Integer> projectSamples =
+          ArrayListMultimap.create();
+      final Multimap<PooledSample, Integer> pooledSamples =
+          ArrayListMultimap.create();
 
       // Read Bcl2fastq samplesheet
-      final SampleSheet samplesheet = createSampleSheet(data);
+      final SampleSheet samplesheet =
+          new SampleSheetCSVReader(this.samplesheetFile).read();
+
+      int sampleNumber = 0;
+      final Set<Integer> lanes = new HashSet<>();
+      final Set<Integer> indexedLanes = new HashSet<>();
+
+      // TODO handle empty samplesheet where a sample is create by lane
+      // TODO save pooled samples
 
       for (final Sample s : samplesheet) {
 
-        final String prefix = SAMPLESHEET_DATA_PREFIX
-            + ".lane" + s.getLane() + "." + s.getSampleId();
+        sampleNumber++;
 
-        data.put(prefix + ".sample.ref", s.getSampleRef());
+        final String prefix =
+            SAMPLESHEET_DATA_PREFIX + ".sample" + sampleNumber;
+
+        final String id = s.getSampleId();
+        final String name = s.getSampleName();
+        final String demuxName = demuxName(id, name);
+        final int lane = s.getLane();
+        final String project = Strings.nullToEmpty(s.getSampleProject());
+        final String index1 = Strings.nullToEmpty(s.getIndex1());
+        final String index2 = Strings.nullToEmpty(s.getIndex2());
+        final String ref = Strings.nullToEmpty(s.getSampleRef());
+
+        data.put(prefix + ".id", id);
+        data.put(prefix + ".name", name);
+        data.put(prefix + ".demux.name", demuxName);
+        data.put(prefix + ".lane", lane);
+        data.put(prefix + ".undetermined", false);
+        data.put(prefix + ".ref", s.getSampleRef());
         data.put(prefix + ".indexed", s.isIndexed());
-        data.put(prefix + ".index", s.getIndex1());
+        data.put(prefix + ".index", index1);
         data.put(prefix + ".description", s.getDescription());
-        data.put(prefix + ".sample.project", s.getSampleProject());
+        data.put(prefix + ".project", project);
+
+        lanes.add(s.getLane());
+        if (s.isIndexed()) {
+          indexedLanes.add(s.getLane());
+        }
 
         if (s.isDualIndexed()) {
-          data.put(prefix + ".index2", s.getIndex2());
+          data.put(prefix + ".index2", index2);
         }
+
+        projectSamples.put(project, sampleNumber);
+        pooledSamples.put(
+            new PooledSample(project, demuxName, index1, index2, ref),
+            sampleNumber);
+        samplesInLane.put(lane, sampleNumber);
 
         // Extract data exist only with first version
         switch (s.getSampleSheet().getVersion()) {
@@ -140,7 +233,6 @@ public class SamplesheetCollector implements Collector {
                   s.get(fieldName));
             }
           }
-
           break;
 
         default:
@@ -150,47 +242,158 @@ public class SamplesheetCollector implements Collector {
                   + s.getSampleSheet().getVersion());
         }
 
-        final List<String> samplesInLane;
-        if (!samples.containsKey(s.getLane())) {
-          samplesInLane = new ArrayList<>();
-          samples.put(s.getLane(), samplesInLane);
-        } else {
-          samplesInLane = samples.get(s.getLane());
-        }
-        samplesInLane.add(s.getSampleId());
-
         // List projects in run
-        projectsName.add(s.getSampleProject());
+        projectNames.add(s.getSampleProject());
       }
+
+      // Add undetermined samples
+      final List<String> undeterminedSamples = new ArrayList<>();
+      for (int lane : lanes) {
+
+        if (indexedLanes.contains(lane)) {
+
+          sampleNumber++;
+
+          final String prefix =
+              SAMPLESHEET_DATA_PREFIX + ".sample" + sampleNumber;
+          data.put(prefix + ".id", "undetermined");
+          data.put(prefix + ".lane", lane);
+          data.put(prefix + ".undetermined", true);
+          data.put(prefix + ".ref", "");
+          data.put(prefix + ".indexed", false);
+          data.put(prefix + ".index", "");
+          data.put(prefix + ".description", "");
+          data.put(prefix + ".project", "");
+
+          data.put(
+              SAMPLESHEET_DATA_PREFIX + ".lane" + lane + ".undetermined.sample",
+              sampleNumber);
+          undeterminedSamples.add(Integer.toString(sampleNumber));
+          samplesInLane.put(lane, sampleNumber);
+        }
+      }
+
+      data.put(SAMPLESHEET_DATA_PREFIX + ".undetermined.samples",
+          Joiner.on(",").join(undeterminedSamples));
 
       // List samples by lane
-      for (final Map.Entry<Integer, List<String>> e : samples.entrySet()) {
-        data.put(
-            SAMPLESHEET_DATA_PREFIX + ".lane" + e.getKey() + ".samples.names",
-            e.getValue());
-
-        // Check homogeneity between sample in lane
-        // add in rundata interval for percent sample for each lane
-        final double percent = 1.0 / e.getValue().size();
-        data.put(SAMPLESHEET_DATA_PREFIX
-            + ".lane" + e.getKey() + ".percent.homogeneity", percent);
+      for (final Map.Entry<Integer, Collection<Integer>> e : samplesInLane
+          .asMap().entrySet()) {
+        data.put(SAMPLESHEET_DATA_PREFIX + ".lane" + e.getKey() + ".samples",
+            Joiner.on(",").join(e.getValue()));
       }
+
+      data.put(SAMPLESHEET_DATA_PREFIX + ".sample.count", sampleNumber);
 
       // Add all projects name in data
       data.put(SAMPLESHEET_DATA_PREFIX + ".projects.names",
-          Joiner.on(",").join(projectsName));
+          Joiner.on(",").join(projectNames));
+
+      // Add the projects
+      addProjects(data, projectNames, projectSamples);
+
+      // Add pooled samples
+      addPooledSamplesInRunData(data, pooledSamples, undeterminedSamples);
 
     } catch (final IOException e) {
       throw new AozanException(e);
     }
   }
 
-  private SampleSheet createSampleSheet(final RunData data)
-      throws IOException, AozanException {
+  /**
+   * Add pooled samples keys in RunData object.
+   * @param data the RunData object
+   * @param pooledSamples the pooled samples
+   * @param undeterminedSamples the undetermined samples
+   */
+  private static void addPooledSamplesInRunData(final RunData data,
+      final Multimap<PooledSample, Integer> pooledSamples,
+      final List<String> undeterminedSamples) {
 
-    Preconditions.checkNotNull(data, "run data instance");
+    int pooledSampleNumber = 0;
 
-    return new SampleSheetCSVReader(this.samplesheetFile).read();
+    for (Map.Entry<PooledSample, Collection<Integer>> e : pooledSamples.asMap()
+        .entrySet()) {
+
+      pooledSampleNumber++;
+
+      final PooledSample ps = e.getKey();
+      final String prefix =
+          SAMPLESHEET_DATA_PREFIX + ".pooledsample" + pooledSampleNumber;
+
+      data.put(prefix + ".demux.name", ps.name);
+      data.put(prefix + ".description",
+          data.getSampleDescription(e.getValue().iterator().next()));
+      data.put(prefix + ".undetermined", false);
+      data.put(prefix + ".index", ps.index1);
+
+      if (!ps.index2.isEmpty()) {
+        data.put(prefix + ".index", ps.index2);
+      }
+      data.put(prefix + ".project.name", ps.project);
+      data.put(prefix + ".project", data.getProjectId(ps.project));
+      data.put(prefix + ".ref", ps.ref);
+      data.put(prefix + ".samples", Joiner.on(",").join(e.getValue()));
+    }
+
+    if (!undeterminedSamples.isEmpty()) {
+
+      pooledSampleNumber++;
+      final String prefix =
+          SAMPLESHEET_DATA_PREFIX + ".pooledsample" + pooledSampleNumber;
+      data.put(prefix + ".demux.name", "undetermined");
+      data.put(prefix + ".description", "");
+      data.put(prefix + ".undetermined", true);
+      data.put(prefix + ".index", "");
+      data.put(prefix + ".project.name", "");
+      data.put(prefix + ".ref", "");
+      data.put(prefix + ".samples", Joiner.on(",").join(undeterminedSamples));
+    }
+
+    data.put(SAMPLESHEET_DATA_PREFIX + ".pooledsample.count",
+        pooledSampleNumber);
+  }
+
+  /**
+   * Add private keys in RunData object.
+   * @param data the RunData object
+   * @param projectNames the project names
+   * @param undeterminedSamples the project samples
+   */
+  private static void addProjects(final RunData data,
+      final Set<String> projectNames,
+      final Multimap<String, Integer> projectSamples) {
+
+    int projectNumber = 0;
+
+    for (String projectName : projectNames) {
+
+      projectNumber++;
+
+      final String prefix =
+          SAMPLESHEET_DATA_PREFIX + ".project" + projectNumber;
+
+      data.put(prefix + ".name", projectName);
+      data.put(prefix + ".samples",
+          Joiner.on(",").join(projectSamples.get(projectName)));
+    }
+    data.put(SAMPLESHEET_DATA_PREFIX + ".project.count", projectNumber);
+  }
+
+  /**
+   * Get the demultiplexing name of the sample.
+   * @param sampleIdentifier the sample identifier
+   * @param sampleName the sample name
+   * @return the demultiplexing name of the sample
+   */
+  private String demuxName(final String sampleIdentifier,
+      final String sampleName) {
+
+    if (sampleName != null && !sampleName.isEmpty()) {
+      return sampleName;
+    }
+
+    return sampleIdentifier;
   }
 
   @Override

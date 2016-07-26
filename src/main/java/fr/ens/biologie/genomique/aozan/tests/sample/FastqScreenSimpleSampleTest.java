@@ -41,11 +41,11 @@ import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
  * The class add in the qc report html values from FastqScreen for each sample
  * and for each reference genomes. The list of references genomes contains
  * default references genomes defined in aozan configuration file. It add the
- * genomes sample for the run included in Bcl2fastq samplesheet file, only if it can be
- * used for mapping with bowtie. The alias genomes file make the correspondence
- * between the genome sample and the reference genome used with bowtie, if it
- * exists. The class retrieve the percent of reads mapped on each reference
- * genomes.
+ * genomes sample for the run included in Bcl2fastq samplesheet file, only if it
+ * can be used for mapping with bowtie. The alias genomes file make the
+ * correspondence between the genome sample and the reference genome used with
+ * bowtie, if it exists. The class retrieve the percent of reads mapped on each
+ * reference genomes.
  * @since 1.0
  * @author Sandrine Perrin
  */
@@ -60,21 +60,20 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   }
 
   @Override
-  public String getKey(final int read, final int readSample, final int lane,
-      final String sampleName) {
+  public String getKey(final int read, final int readSample, final int sampleId,
+      final int lane, final boolean undetermined) {
 
-    final String value =
-        this.isGenomeContamination
-            ? ".mapped.percent" : ".one.hit.one.library.percent";
+    final String value = this.isGenomeContamination
+        ? ".mapped.percent" : ".one.hit.one.library.percent";
 
-    // Check indetermined indexed sample
-    if (sampleName == null) {
-      return "fastqscreen.lane"
-          + lane + ".undetermined.read1." + this.genomeReference + value;
+    // Check undetermined indexed sample
+    if (undetermined) {
+      return "fastqscreen.sample"
+          + sampleId + ".read1." + this.genomeReference + value;
     }
-    return "fastqscreen.lane"
-        + lane + ".sample." + sampleName + ".read" + readSample + "."
-        + sampleName + "." + this.genomeReference + value;
+
+    return "fastqscreen.sample"
+        + sampleId + ".read" + readSample + "." + this.genomeReference + value;
   }
 
   @Override
@@ -94,17 +93,15 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
    */
   @Override
   protected int transformScore(final int score, final RunData data,
-      final int read, final int readSample, final int lane,
-      final String sampleName) {
+      final int read, final int readSample, final int sampleId) {
 
     // Set genome sample
-    final String genomeSample = data.getSampleGenome(lane, sampleName);
+    final String genomeSample = data.getSampleGenome(sampleId);
 
     // Set reference genome corresponding of genome sample if it exists
     String genomeSampleReference = null;
     try {
-      genomeSampleReference =
-          GenomeAliases.getInstance().get(genomeSample);
+      genomeSampleReference = GenomeAliases.getInstance().get(genomeSample);
     } catch (final AozanException e) {
     }
 
@@ -126,8 +123,7 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
     }
 
     // Initialization fastqScreenGenomeMapper object
-    final FastqScreenGenomes fqsm =
-        FastqScreenGenomes.newInstance(conf);
+    final FastqScreenGenomes fqsm = FastqScreenGenomes.newInstance(conf);
 
     final Set<String> sampleGenomes = fqsm.getSampleGenomes();
     final Set<String> contaminantGenomes = fqsm.getContaminantGenomes();
@@ -184,8 +180,10 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
    */
   public FastqScreenSimpleSampleTest(final String genome,
       final boolean isGenomeContamination) {
-    super("fsqmapped", "", "fastqscreen "
-        + (isGenomeContamination ? "" : "single ") + "mapped on " + genome, "%");
+    super("fsqmapped", "",
+        "fastqscreen "
+            + (isGenomeContamination ? "" : "single ") + "mapped on " + genome,
+        "%");
     this.genomeReference = genome;
     this.isGenomeContamination = isGenomeContamination;
   }

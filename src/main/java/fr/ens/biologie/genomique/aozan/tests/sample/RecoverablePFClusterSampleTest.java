@@ -44,15 +44,16 @@ public class RecoverablePFClusterSampleTest extends AbstractSimpleSampleTest {
   }
 
   @Override
-  protected String getKey(final int read, final int readSample, final int lane,
-      final String sampleName) {
+  protected String getKey(final int read, final int readSample,
+      final int sampleId, final int lane, final boolean undetermined) {
 
-    if (sampleName == null)
+    if (undetermined) {
       return "undeterminedindices.lane"
           + lane + ".recoverable.pf.cluster.count";
+    }
 
-    return "undeterminedindices.lane"
-        + lane + ".sample." + sampleName + ".recoverable.pf.cluster.count";
+    return "undeterminedindices.sample"
+        + sampleId + ".recoverable.pf.cluster.count";
   }
 
   @Override

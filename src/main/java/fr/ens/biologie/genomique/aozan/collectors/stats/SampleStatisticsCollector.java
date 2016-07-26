@@ -30,9 +30,9 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
@@ -46,11 +46,13 @@ import fr.ens.biologie.genomique.aozan.collectors.StatisticsCollector;
  */
 public class SampleStatisticsCollector extends StatisticsCollector {
 
+  // TODO Check the RunData keys names
+
   /** Collector name. */
   public static final String COLLECTOR_NAME = "samplestats";
 
   /** Collector prefix for updating rundata */
-  public static final String COLLECTOR_PREFIX = "samplestats.";
+  public static final String COLLECTOR_PREFIX = "samplestats";
 
   public static final String UNDETERMINED_SAMPLE = "undetermined";
 
@@ -61,7 +63,7 @@ public class SampleStatisticsCollector extends StatisticsCollector {
 
   @Override
   public String getCollectorPrefix() {
-    return COLLECTOR_PREFIX;
+    return COLLECTOR_PREFIX + ".pooledsample";
   }
 
   @Override
@@ -74,51 +76,48 @@ public class SampleStatisticsCollector extends StatisticsCollector {
     return false;
   }
 
-  public List<EntityStat> extractEntityStats(final RunData data)
+  public Map<Integer, EntityStat> extractEntityStats(final RunData data)
       throws AozanException {
 
-    final int laneCount = data.getLaneCount();
-
     // Initialization ProjectStats with the project name
-    final Map<String, EntityStat> samples = new HashMap<>();
+    final Map<Integer, EntityStat> pooledSamples =
+        new TreeMap<>(new RunData.PooledSampleComparator(data));
 
-    samples.put(UNDETERMINED_SAMPLE,
-        new EntityStat(data, UNDETERMINED_SAMPLE, UNDETERMINED_SAMPLE, this,
-            extractFastqscreenReportForUndeterminedSample()));
+    for (int pooledSampleId : data.getAllPooledSamples()) {
 
-    // Add projects name
-    for (int lane = 1; lane <= laneCount; lane++) {
+      final String demuxName = data.getPooledSampleDemuxName(pooledSampleId);
+      final boolean undetermined =
+          data.isUndeterminedPooledSample(pooledSampleId);
 
-      // Parse all samples in lane
-      for (String sampleName : data.getSamplesNameListInLane(lane)) {
+      final EntityStat entityStat;
 
-        if (!samples.containsKey(sampleName)) {
+      if (!undetermined) {
 
-          // Extract project name related to sample name
-          final String projectName = data.getProjectSample(lane, sampleName);
+        final int projectId = data.getPooledSampleProject(pooledSampleId);
 
-          samples.put(sampleName, new EntityStat(data, projectName, sampleName,
-              this, extractFastqscreenReport(projectName, sampleName)));
-        }
+        entityStat = new EntityStat(data, projectId, pooledSampleId, this);
+        pooledSamples.put(pooledSampleId, entityStat);
 
-        // Update Statistics
-        samples.get(sampleName).addEntity(lane, sampleName);
+        // Add FastqScreen report
+        addFastqScreenReport(projectId, pooledSampleId,
+            extractFastqscreenReport(data, projectId, demuxName));
+      } else {
+
+        entityStat = new EntityStat(data, -1, pooledSampleId, this);
+        pooledSamples.put(pooledSampleId, entityStat);
+
+        // Add FastqScreen report
+        addFastqScreenReport(-1, pooledSampleId,
+            extractFastqscreenReport(data, -1, demuxName));
       }
 
-      // Update Statistics on undetermined sample on each lane
-      if (data.isUndeterminedInLane(lane)) {
-        samples.get(UNDETERMINED_SAMPLE).addEntity(lane, "lane" + lane);
+      // Update the entity stats for each sample
+      for (int sampleId : data.getSamplesInPooledSample(pooledSampleId)) {
+        entityStat.addEntity(sampleId);
       }
     }
 
-    // Sorted list project
-    final List<EntityStat> samplesSorted =
-        new ArrayList<>(samples.values());
-
-    Collections.sort(samplesSorted);
-
-    return Collections.unmodifiableList(samplesSorted);
-
+    return pooledSamples;
   }
 
   /**
@@ -126,16 +125,16 @@ public class SampleStatisticsCollector extends StatisticsCollector {
    * @return the list of xml file used to create project report.
    * @throws AozanException if the output project directory does not exist.
    */
-  private List<File> extractFastqscreenReport(final String projectName,
-      final String sampleName) throws AozanException {
+  private List<File> extractFastqscreenReport(final RunData data,
+      final int projectId, final String sampleName) throws AozanException {
 
     final List<File> reports = new ArrayList<>();
 
-    if (projectName.equals(UNDETERMINED_SAMPLE)) {
+    if (projectId == -1) {
       reports.addAll(extractFastqscreenReportForUndeterminedSample());
     } else {
-      reports
-          .addAll(extractFastqscreenReportOnProject(projectName, sampleName));
+      reports.addAll(extractFastqscreenReportOnProject(
+          data.getProjectName(projectId), sampleName));
     }
 
     // Sort by filename

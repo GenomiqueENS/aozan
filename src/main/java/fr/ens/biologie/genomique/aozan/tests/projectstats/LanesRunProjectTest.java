@@ -44,9 +44,9 @@ public class LanesRunProjectTest extends AbstractSimpleProjectTest {
   }
 
   @Override
-  protected String getKey(final String projectName) {
+  protected String getKey(final int projectId) {
 
-    return COLLECTOR_PREFIX + projectName + ".lanes";
+    return COLLECTOR_PREFIX + ".project" + projectId + ".lanes";
   }
 
   @Override

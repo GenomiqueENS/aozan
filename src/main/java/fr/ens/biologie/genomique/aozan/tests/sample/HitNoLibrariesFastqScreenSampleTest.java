@@ -37,8 +37,8 @@ import fr.ens.biologie.genomique.aozan.collectors.FastqScreenCollector;
  * @since 1.0
  * @author Sandrine Perrin
  */
-public class HitNoLibrariesFastqScreenSampleTest extends
-    AbstractSimpleSampleTest {
+public class HitNoLibrariesFastqScreenSampleTest
+    extends AbstractSimpleSampleTest {
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -46,19 +46,11 @@ public class HitNoLibrariesFastqScreenSampleTest extends
   }
 
   @Override
-  protected String getKey(final int read, final int readSample, final int lane,
-      final String sampleName) {
+  protected String getKey(final int read, final int readSample,
+      final int sampleId, final int lane, final boolean undetermined) {
 
-    // Check undetermined indexed sample
-    if (sampleName == null) {
-
-      return "fastqscreen.lane"
-          + lane + ".undetermined.read" + read + ".mappedexceptgenomesample";
-    }
-
-    return "fastqscreen.lane"
-        + lane + ".sample." + sampleName + ".read" + readSample + "."
-        + sampleName + ".mappedexceptgenomesample";
+    return "fastqscreen.sample"
+        + sampleId + ".read" + readSample + ".mappedexceptgenomesample";
   }
 
   @Override

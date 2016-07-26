@@ -28,7 +28,7 @@ package fr.ens.biologie.genomique.aozan.tests.samplestats;
  * @since 1.3
  * @author Laurent Jourdren
  */
-public abstract class AbstractSampleTest implements SampleStatsTest {
+public abstract class AbstractSampleStatsTest implements SampleStatsTest {
 
   private final String name;
   private final String description;
@@ -81,7 +81,7 @@ public abstract class AbstractSampleTest implements SampleStatsTest {
    * @param description description of the test
    * @param columnName column name of the test
    */
-  protected AbstractSampleTest(final String name, final String description,
+  protected AbstractSampleStatsTest(final String name, final String description,
       final String columnName) {
 
     this(name, description, columnName, "");
@@ -94,7 +94,7 @@ public abstract class AbstractSampleTest implements SampleStatsTest {
    * @param columnName column name of the test
    * @param unit unit of the test
    */
-  protected AbstractSampleTest(final String name, final String description,
+  protected AbstractSampleStatsTest(final String name, final String description,
       final String columnName, final String unit) {
 
     this.name = name;

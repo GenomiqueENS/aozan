@@ -168,8 +168,7 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
           + fastqSample.getSampleName() + " no FastQ file exist");
     }
 
-    final boolean controlLane =
-        data.isLaneControl(fastqSample.getLane(), fastqSample.getSampleName());
+    final boolean controlLane = data.isLaneControl(fastqSample.getSampleId());
 
     // Skip control lane
     if (controlLane && this.skipControlLane) {

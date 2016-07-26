@@ -45,10 +45,12 @@ public class LinkReportFastqScreenSimpleSampleTest extends AbstractSampleTest {
 
   @Override
   public TestResult test(final RunData data, final int read,
-      final int readSample, final int lane, final String sampleName) {
+      final int readSample, final int sampleId) {
 
-    if (sampleName == null) {
-      // return new TestResult("NA");
+    final int lane = data.getSampleLane(sampleId);
+
+    if (data.isUndeterminedSample(sampleId)) {
+
       final String projectName = "Undetermined_indices";
 
       final String filename =
@@ -61,23 +63,20 @@ public class LinkReportFastqScreenSimpleSampleTest extends AbstractSampleTest {
       return new TestResult(-1, url, "url");
     }
 
-    // Check fastqscreen launch for sample
-    final String key =
-        "fastqscreen.lane"
-            + lane + ".sample." + sampleName + ".read" + readSample + "."
-            + sampleName + ".mappedexceptgenomesample";
+    final String key = "fastqscreen.sample"
+        + sampleId + ".read" + readSample + ".mappedexceptgenomesample";
 
     if (data.get(key) == null) {
       return new TestResult("NA");
     }
 
     // Get HTML report URL
-    final String projectName = data.getProjectSample(lane, sampleName);
-    final String index = data.getIndexSample(lane, sampleName);
+    final String projectName = data.getProjectSample(sampleId);
+    final String index = data.getIndexSample(sampleId);
+    final String demuxName = data.getSampleDemuxName(sampleId);
 
-    final String filename =
-        String.format("%s_%s_L%03d_R1_001-fastqscreen.html", sampleName,
-            "".equals(index) ? "NoIndex" : index, lane);
+    final String filename = String.format("%s_%s_L%03d_R1_001-fastqscreen.html",
+        demuxName, "".equals(index) ? "NoIndex" : index, lane);
 
     final String url = "Project_" + projectName + "/" + filename;
 

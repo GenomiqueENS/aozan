@@ -38,7 +38,7 @@ import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 
-public class LinkReportFastqScreenSampleTest extends AbstractSampleTest {
+public class LinkReportFastqScreenSampleTest extends AbstractSampleStatsTest {
 
   @Override
   public List<AozanTest> configure(final TestConfiguration conf)
@@ -47,16 +47,17 @@ public class LinkReportFastqScreenSampleTest extends AbstractSampleTest {
   }
 
   @Override
-  public TestResult test(RunData data, String sampleName) {
+  public TestResult test(final RunData data, final int pooledSampleId) {
+
+    final String sampleName = data.getPooledSampleDemuxName(pooledSampleId);
+    final String project = data.getPooledSampleProjectName(pooledSampleId);
 
     // Get HTML report URL
     final String filename = String.format("%s-fastqscreen.html", sampleName);
 
     // Get project name to build url
-    final String projectName =
-        (sampleName.equals(UNDETERMINED_SAMPLE)
-            ? UNDETERMINED_DIR_NAME : "Project_"
-                + data.getProjectSample(1, sampleName));
+    final String projectName = (sampleName.equals(UNDETERMINED_SAMPLE)
+        ? UNDETERMINED_DIR_NAME : "Project_" + project);
 
     final String url = projectName + "/" + filename;
 

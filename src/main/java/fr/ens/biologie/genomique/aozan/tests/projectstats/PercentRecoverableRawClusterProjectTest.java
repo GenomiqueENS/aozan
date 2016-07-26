@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.tests.projectstats;
 
+import static fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector.COLLECTOR_PREFIX;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -43,8 +45,8 @@ import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
  * @author Sandrine Perrin
  * @since 1.4
  */
-public class PercentRecoverableRawClusterProjectTest extends
-    AbstractProjectTest {
+public class PercentRecoverableRawClusterProjectTest
+    extends AbstractProjectTest {
 
   private final ScoreInterval interval = new ScoreInterval();
 
@@ -56,19 +58,13 @@ public class PercentRecoverableRawClusterProjectTest extends
   }
 
   @Override
-  public TestResult test(RunData data, String projectName) {
-
-    if (projectName == null) {
-      return new TestResult("NA");
-    }
+  public TestResult test(final RunData data, final int projectId) {
 
     // Build key for run data
     final String recoveryCountKey =
-        ProjectStatisticsCollector.COLLECTOR_PREFIX
-            + projectName + ".raw.cluster.recovery.sum";
+        COLLECTOR_PREFIX + ".project" + projectId + ".raw.cluster.recovery.sum";
     final String rawClusterSumKey =
-        ProjectStatisticsCollector.COLLECTOR_PREFIX
-            + projectName + ".raw.cluster.sum";
+        COLLECTOR_PREFIX + ".project" + projectId + ".raw.cluster.sum";
 
     try {
       // Set raw cluster sum for a project
@@ -77,7 +73,7 @@ public class PercentRecoverableRawClusterProjectTest extends
       // Set recoverable raw cluster sum for a project
       final long recoveryCount;
 
-      if (data.get(recoveryCountKey)==null) {
+      if (data.get(recoveryCountKey) == null) {
         recoveryCount = 0;
       } else {
         recoveryCount = data.getLong(recoveryCountKey);

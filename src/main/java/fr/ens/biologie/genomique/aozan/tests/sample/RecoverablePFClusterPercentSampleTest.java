@@ -54,39 +54,31 @@ public class RecoverablePFClusterPercentSampleTest extends AbstractSampleTest {
 
   @Override
   public TestResult test(final RunData data, final int read,
-      final int readSample, final int lane, final String sampleName) {
-    
+      final int readSample, final int sampleId) {
+
     String recoveryCountKey;
     String sampleCountKey;
+
+    final int lane = data.getSampleLane(sampleId);
+    final boolean undetermined = data.isUndeterminedSample(sampleId);
 
     if (!data.isLaneIndexed(lane)) {
       return new TestResult("NA");
     }
 
-    
-    if (sampleName == null) {
+    if (data.isUndeterminedSample(sampleId)) {
       // Case undetermined
       recoveryCountKey =
           "undeterminedindices.lane" + lane + ".recoverable.pf.cluster.count";
-
-      sampleCountKey =
-          "demux.lane"
-              + lane + ".sample.lane" + lane + ".read" + readSample
-              + ".pf.cluster.count";
-
     } else {
 
       // Case sample
-      recoveryCountKey =
-          "undeterminedindices.lane"
-              + lane + ".sample." + sampleName
-              + ".recoverable.pf.cluster.count";
-
-      sampleCountKey =
-          "demux.lane"
-              + lane + ".sample." + sampleName + ".read" + readSample
-              + ".pf.cluster.count";
+      recoveryCountKey = "undeterminedindices.sample"
+          + sampleId + ".recoverable.pf.cluster.count";
     }
+
+    sampleCountKey =
+        "demux.sample" + sampleId + ".read" + readSample + ".pf.cluster.count";
 
     try {
       final long recoveryCount;
@@ -100,7 +92,7 @@ public class RecoverablePFClusterPercentSampleTest extends AbstractSampleTest {
       final long sampleCount = data.getLong(sampleCountKey);
       final double percent = (double) recoveryCount / (double) sampleCount;
 
-      if (interval == null || sampleName == null)
+      if (interval == null || undetermined)
         return new TestResult(percent, true);
 
       return new TestResult(this.interval.getScore(percent), percent, true);
@@ -135,7 +127,8 @@ public class RecoverablePFClusterPercentSampleTest extends AbstractSampleTest {
    * Public constructor.
    */
   public RecoverablePFClusterPercentSampleTest() {
-    super("recoverablepfclusterssamplespercent", "", "Recoverable PF clusters", "%");
+    super("recoverablepfclusterssamplespercent", "", "Recoverable PF clusters",
+        "%");
   }
 
 }

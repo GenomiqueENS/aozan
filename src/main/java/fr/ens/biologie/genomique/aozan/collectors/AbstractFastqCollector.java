@@ -51,6 +51,7 @@ import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.io.FastqSample;
+import fr.ens.biologie.genomique.aozan.io.FastqSampleUtils;
 
 /**
  * The abstract class define commons methods for the Collectors which treats
@@ -209,7 +210,15 @@ public abstract class AbstractFastqCollector implements Collector {
     checkNotNull(data, "data argument cannot be null");
 
     try {
-      createListFastqSamples(data);
+
+      if (!this.fastqSamples.isEmpty()) {
+        return;
+      }
+
+      this.fastqSamples.addAll(FastqSampleUtils.createListFastqSamples2(qc,
+          data, isProcessStandardSamples(),
+          isProcessUndeterminedIndicesSamples(), !isProcessAllReads()));
+
     } catch (IOException e) {
       throw new AozanException(e);
     }
@@ -390,112 +399,6 @@ public abstract class AbstractFastqCollector implements Collector {
   //
   // Private methods
   //
-
-  /**
-   * Construct the map with all samples to treat.
-   * @param data result data object
-   * @throws IOException
-   */
-  private void createListFastqSamples(final RunData data) throws IOException {
-
-    if (!this.fastqSamples.isEmpty()) {
-      return;
-    }
-
-    final int laneCount = data.getLaneCount();
-    final int readCount = data.getReadCount();
-
-    int readIndexedCount = 0;
-
-    for (int read = 1; read <= readCount; read++) {
-
-      if (data.isReadIndexed(read)) {
-        continue;
-      }
-
-      readIndexedCount++;
-
-      for (int lane = 1; lane <= laneCount; lane++) {
-
-        final List<String> sampleNames = data.getSamplesNameListInLane(lane);
-
-        if (this.isProcessStandardSamples()) {
-          for (final String sampleName : sampleNames) {
-
-            // Skip invalid sample for quality control, like FASTQ file empty
-            if (!isValidFastQSampleForQC(data, lane, sampleName,
-                readIndexedCount)) {
-              continue;
-            }
-
-            // Get the sample index
-            final String index = data.getIndexSample(lane, sampleName);
-
-            // Get project name
-            final String projectName = data.getProjectSample(lane, sampleName);
-
-            // Get description on sample
-            final String descriptionSample =
-                data.getSampleDescription(lane, sampleName);
-
-            this.fastqSamples.add(new FastqSample(this.qc, readIndexedCount,
-                lane, sampleName, projectName, descriptionSample, index));
-
-          } // Sample
-        }
-
-        // Add undetermined indices samples
-        if (this.isProcessUndeterminedIndicesSamples()) {
-
-          // Check Undetermined fastq exist for this lane
-          final String laneBarcode = data
-              .get("demux.lane" + lane + ".sample.lane" + lane + ".barcode");
-
-          if (laneBarcode != null && data.isUndeterminedInLane(lane)) {
-
-            // Add undetermined sample
-            this.fastqSamples
-                .add(new FastqSample(this.qc, readIndexedCount, lane));
-          }
-        }
-      } // Lane
-
-      // Process only one read if needed
-      if (!this.isProcessAllReads()) {
-        break;
-      }
-
-    } // Read
-  }
-
-  /**
-   * Checks if is valid fast q sample for qc.
-   * @param data result data object.
-   * @param lane the lane number.
-   * @param sampleName the sample name.
-   * @param read the read number.
-   * @return true, if sample is valid otherwise false, like FASTQ file empty.
-   */
-  private boolean isValidFastQSampleForQC(final RunData data, final int lane,
-      final String sampleName, final int read) {
-
-    final String prefix =
-        "demux.lane" + lane + ".sample." + sampleName + ".read" + read;
-
-    // Check value exist in rundata, if not then fastq is empty
-    final boolean valid = !(data.get(prefix + ".pf.cluster.count") == null
-        || data.get(prefix + ".raw.cluster.count") == null);
-
-    if (!valid)
-      LOGGER.warning("Sample "
-          + sampleName + " lane " + lane
-          + ": no demultiplexing data found, no quality control data. Use prefix in rundata "
-          + prefix);
-
-    // Return true if sample valid
-    return valid;
-
-  }
 
   /**
    * Restore rundata from the save file if it exists.

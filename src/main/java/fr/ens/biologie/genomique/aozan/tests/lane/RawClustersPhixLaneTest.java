@@ -69,11 +69,10 @@ public class RawClustersPhixLaneTest extends AbstractLaneTest {
       // Compute raw cluster corresponding to percent Phix
       final int rawClusterPhix = (int) (rawClusterCount * alignPhixPrc);
 
-      final List<String> sampleNames = data.getSamplesNameListInLane(lane);
+      final List<Integer> sampleIds = data.getSamplesInLane(lane);
 
       final boolean control =
-          sampleNames.size() == 1
-              && data.isLaneControl(lane, sampleNames.get(0));
+          sampleIds.size() == 1 && data.isLaneControl(sampleIds.get(0));
 
       // No score for indexed read
       if (indexedRead || !control)

@@ -53,6 +53,7 @@ public class FastqSample {
       Globals.APP_NAME_LOWER_CASE + "_subset_fastq_";
   private static final String NO_INDEX = "NoIndex";
 
+  private final int sampleId;
   private final int read;
   private final int lane;
   private final String sampleName;
@@ -152,13 +153,7 @@ public class FastqSample {
    */
   public String getRundataPrefix() {
 
-    if (isUndeterminedIndex()) {
-      return ".lane" + this.lane + ".undetermined.read" + this.read;
-    }
-
-    return ".lane"
-        + this.lane + ".sample." + this.sampleName + ".read" + this.read + "."
-        + this.sampleName;
+    return ".sample" + this.sampleId + ".read" + this.read;
   }
 
   /**
@@ -243,6 +238,14 @@ public class FastqSample {
   //
   // Getters
   //
+
+  /**
+   * Get the sample Id.
+   * @return the sample Id
+   */
+  public int getSampleId() {
+    return this.sampleId;
+  }
 
   /**
    * Get the number of read from the sample in run.
@@ -377,6 +380,7 @@ public class FastqSample {
 
   /**
    * Public constructor corresponding of a technical replica sample.
+   * @param sampleId the sample Id
    * @param read read number
    * @param lane lane number
    * @param sampleName name of the sample
@@ -385,14 +389,15 @@ public class FastqSample {
    * @param index value of index or if doesn't exists, NoIndex
    * @throws IOException if an error occurs while reading bcl2fastq version
    */
-  public FastqSample(final QC qc, final int read, final int lane,
-      final String sampleName, final String projectName,
+  public FastqSample(final QC qc, final int sampleId, final int read,
+      final int lane, final String sampleName, final String projectName,
       final String descriptionSample, final String index) throws IOException {
 
     checkNotNull(qc, "qc argument cannot be null");
     checkArgument(read > 0, "read value cannot be lower than 1");
     checkArgument(lane > 0, "read value cannot be lower than 1");
 
+    this.sampleId = sampleId;
     this.read = read;
     this.lane = lane;
     this.sampleName = sampleName;
@@ -416,17 +421,19 @@ public class FastqSample {
 
   /**
    * Public constructor corresponding of a undetermined index sample.
+   * @param sampleId the sample Id
    * @param read read number
    * @param lane lane number
    * @throws IOException if an error occurs while reading bcl2fastq version
    */
-  public FastqSample(final QC qc, final int read, final int lane)
-      throws IOException {
+  public FastqSample(final QC qc, final int sampleId, final int read,
+      final int lane) throws IOException {
 
     checkNotNull(qc, "qc argument cannot be null");
     checkArgument(read > 0, "read value cannot be lower than 1");
     checkArgument(lane > 0, "read value cannot be lower than 1");
 
+    this.sampleId = sampleId;
     this.read = read;
     this.lane = lane;
     this.sampleName = "lane" + lane;

@@ -44,9 +44,9 @@ public class SampleCountProjectTest extends AbstractSimpleProjectTest {
   }
 
   @Override
-  protected String getKey(final String projectName) {
+  protected String getKey(final int projectId) {
 
-    return COLLECTOR_PREFIX + projectName + ".samples.count";
+    return COLLECTOR_PREFIX + ".project" + projectId + ".samples.count";
   }
 
   @Override

@@ -44,7 +44,9 @@ public class LinkReportFastqScreenProjectTest extends AbstractProjectTest {
   }
 
   @Override
-  public TestResult test(RunData data, String projectName) {
+  public TestResult test(final RunData data, final int projectId) {
+
+    final String projectName = data.getProjectName(projectId);
 
     // Get HTML report URL
     final String filename = String.format("%s-fastqscreen.html", projectName);

@@ -54,7 +54,10 @@ public class RecoverableRawClusterPercentSampleTest extends AbstractSampleTest {
 
   @Override
   public TestResult test(final RunData data, final int re2ad,
-      final int readSample, final int lane, final String sampleName) {
+      final int readSample, final int sampleId) {
+
+    final boolean undetermined = data.isUndeterminedSample(sampleId);
+    final int lane = data.getSampleLane(sampleId);
 
     String recoveryCountKey;
     String sampleCountKey;
@@ -63,28 +66,23 @@ public class RecoverableRawClusterPercentSampleTest extends AbstractSampleTest {
       return new TestResult("NA");
     }
 
-    if (sampleName == null) {
-      // Case undetermined
+    if (undetermined) {
+      // Undetermined case
       recoveryCountKey =
           "undeterminedindices.lane" + lane + ".recoverable.raw.cluster.count";
 
-      sampleCountKey =
-          "demux.lane"
-              + lane + ".sample.lane" + lane + ".read" + readSample
-              + ".raw.cluster.count";
+      sampleCountKey = "demux.lane"
+          + lane + ".sample.lane" + lane + ".read" + readSample
+          + ".raw.cluster.count";
 
     } else {
 
       // Case sample
-      recoveryCountKey =
-          "undeterminedindices.lane"
-              + lane + ".sample." + sampleName
-              + ".recoverable.raw.cluster.count";
+      recoveryCountKey = "undeterminedindices.sample"
+          + sampleId + ".recoverable.raw.cluster.count";
 
-      sampleCountKey =
-          "demux.lane"
-              + lane + ".sample." + sampleName + ".read" + readSample
-              + ".raw.cluster.count";
+      sampleCountKey = "demux.sample"
+          + sampleId + ".read" + readSample + ".raw.cluster.count";
     }
 
     try {
@@ -99,7 +97,7 @@ public class RecoverableRawClusterPercentSampleTest extends AbstractSampleTest {
       final long sampleCount = data.getLong(sampleCountKey);
       final double percent = (double) recoveryCount / (double) sampleCount;
 
-      if (interval == null || sampleName == null)
+      if (interval == null || undetermined)
         return new TestResult(percent, true);
 
       return new TestResult(this.interval.getScore(percent), percent, true);

@@ -35,8 +35,8 @@ import fr.ens.biologie.genomique.aozan.tests.samplestats.AbstractSimpleSampleTes
  * @author Sandrine Perrin
  * @since 1.4
  */
-public class RecoverableClusterRawCountSamplestatsTest extends
-    AbstractSimpleSampleTest {
+public class RecoverableClusterRawCountSamplestatsTest
+    extends AbstractSimpleSampleTest {
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -45,10 +45,10 @@ public class RecoverableClusterRawCountSamplestatsTest extends
   }
 
   @Override
-  protected String getKey(final String sampleName) {
+  protected String getKey(final int pooledSampleId) {
 
     return SampleStatisticsCollector.COLLECTOR_PREFIX
-        + sampleName + ".raw.cluster.recovery.sum";
+        + ".pooledsample" + pooledSampleId + ".raw.cluster.recovery.sum";
   }
 
   @Override

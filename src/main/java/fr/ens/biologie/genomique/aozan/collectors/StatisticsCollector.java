@@ -23,9 +23,14 @@
 
 package fr.ens.biologie.genomique.aozan.collectors;
 
+import static fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput.UNDETERMINED_DIR_NAME;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -58,6 +63,8 @@ public abstract class StatisticsCollector implements Collector {
 
   private boolean undeterminedIndexesCollectorSelected = false;
   private boolean fastqScreenCollectorSelected = false;
+
+  private Map<String, List<File>> fastqScreenReportFiles = new HashMap<>();
 
   @Override
   public boolean isStatisticCollector() {
@@ -114,12 +121,11 @@ public abstract class StatisticsCollector implements Collector {
     final List<String> collectorNames = Splitter.on(',').trimResults()
         .omitEmptyStrings().splitToList(conf.get(QC.QC_COLLECTOR_NAMES));
 
-    undeterminedIndexesCollectorSelected =
+    this.undeterminedIndexesCollectorSelected =
         collectorNames.contains(UndeterminedIndexesCollector.COLLECTOR_NAME);
 
-    fastqScreenCollectorSelected =
+    this.fastqScreenCollectorSelected =
         collectorNames.contains(FastqScreenCollector.COLLECTOR_NAME);
-
   }
 
   @Override
@@ -131,16 +137,17 @@ public abstract class StatisticsCollector implements Collector {
   public void collect(RunData data) throws AozanException {
 
     // Parse FastqSample to build list Project
-    final List<EntityStat> stats = extractEntityStats(data);
+    final Map<Integer, EntityStat> stats = extractEntityStats(data);
 
     // Collect projects statistics in rundata
-    for (EntityStat stat : stats) {
-      data.put(stat.createRunDataProject());
+    for (Map.Entry<Integer, EntityStat> e : stats.entrySet()) {
+      data.put(
+          e.getValue().createRunDataProject(getCollectorPrefix() + e.getKey()));
     }
 
     try {
-      // Build FastqScreen project report html
-      createReport(stats);
+      // Build FastqScreen project HTML report
+      createReport(data, stats.values());
     } catch (IOException e) {
       throw new AozanException(e);
     }
@@ -152,7 +159,8 @@ public abstract class StatisticsCollector implements Collector {
    * @throws AozanException the Aozan exception
    * @throws IOException if a error occurs when create report HTML.
    */
-  private void createReport(final List<EntityStat> projects)
+  private void createReport(final RunData data,
+      final Collection<EntityStat> projects)
       throws AozanException, IOException {
 
     // Check FastqScreen collected
@@ -161,27 +169,66 @@ public abstract class StatisticsCollector implements Collector {
       return;
     }
 
-    for (EntityStat p : projects) {
-      final FastqScreenProjectReport fpr =
-          new FastqScreenProjectReport(p, fastqscreenXSLFile);
+    for (Map.Entry<String, List<File>> e : this.fastqScreenReportFiles
+        .entrySet()) {
 
-      fpr.createReport(p.getReportHtmlFile());
+      final String[] fields = e.getKey().split("\t");
+      final int projectId = Integer.parseInt(fields[0]);
+      final int pooledSampleId = Integer.parseInt(fields[1]);
+      final String description = "project "
+          + data.getProjectName(projectId) + ", sample "
+          + data.getSampleDemuxName(pooledSampleId);
 
+      final FastqScreenProjectReport fpr = new FastqScreenProjectReport(
+          e.getValue(), description, this.fastqscreenXSLFile);
+
+      final File projectDir = (data.isUndeterminedSample(pooledSampleId)
+          ? new File(this.reportDir, UNDETERMINED_DIR_NAME) : new File(
+              this.reportDir + "/Project_" + data.getProjectName(projectId)));
+
+      final File htmlReportFile;
+
+      if (isSampleStatisticsCollector()) {
+        htmlReportFile =
+            new File(projectDir, data.getPooledSampleDemuxName(pooledSampleId)
+                + "-fastqscreen.html");
+      } else {
+        htmlReportFile = new File(projectDir,
+            data.getProjectName(projectId) + "-fastqscreen.html");
+      }
+
+      fpr.createReport(htmlReportFile);
     }
+  }
 
+  //
+  // Protected methods
+  //
+
+  /**
+   * Add a FastqScreen report.
+   * @param projectId the projectId
+   * @param sampleId the sampleId
+   * @param reportFiles the list of report file
+   */
+  protected void addFastqScreenReport(final int projectId, final int sampleId,
+      final List<File> reportFiles) {
+
+    this.fastqScreenReportFiles.put(projectId + "\t" + sampleId, reportFiles);
   }
 
   //
   // Abstract methods
   //
+
   /**
    * Extract entity stats.
    * @param data the data
    * @return the list
    * @throws AozanException the aozan exception
    */
-  public abstract List<EntityStat> extractEntityStats(final RunData data)
-      throws AozanException;
+  public abstract Map<Integer, EntityStat> extractEntityStats(
+      final RunData data) throws AozanException;
 
   /**
    * Checks if is sample statistics collector.

@@ -25,7 +25,10 @@ package fr.ens.biologie.genomique.aozan.collectors;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 
@@ -61,7 +64,8 @@ public class DemultiplexingCollector implements Collector {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(RunInfoCollector.COLLECTOR_NAME);
+    return ImmutableList.of(RunInfoCollector.COLLECTOR_NAME,
+        SamplesheetCollector.COLLECTOR_NAME);
   }
 
   @Override
@@ -123,6 +127,44 @@ public class DemultiplexingCollector implements Collector {
 
     // Collect data
     subCollector.collect(data);
+
+    // Add the new keys here
+    addNewKeys(data);
+  }
+
+  private void addNewKeys(final RunData data) {
+
+    final Map<String, String> prefixes = new HashMap<>();
+
+    // Compute the prefix convertion table
+    for (int sampleId : data.getAllSamples()) {
+
+      final int lane = data.getSampleLane(sampleId);
+      final boolean undetermined = data.isUndeterminedSample(sampleId);
+      final String sampleName = data.getSampleDemuxName(sampleId);
+
+      final String oldPrefix = "demux.lane"
+          + lane + ".sample." + (undetermined ? "undetermined" : sampleName)
+          + '.';
+      final String newPrefix = "demux.sample" + sampleId + '.';
+
+      prefixes.put(oldPrefix, newPrefix);
+    }
+
+    // Add the new keys
+    for (String key : new LinkedHashSet<>(data.getMap().keySet())) {
+
+      for (Map.Entry<String, String> e : prefixes.entrySet()) {
+
+        final String oldPrefixKey = e.getKey();
+        if (key.startsWith(oldPrefixKey)) {
+
+          final String newKey = key.replace(oldPrefixKey, e.getValue());
+
+          data.put(newKey, data.get(key));
+        }
+      }
+    }
   }
 
   @Override

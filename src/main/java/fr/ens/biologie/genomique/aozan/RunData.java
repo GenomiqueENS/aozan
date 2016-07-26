@@ -23,7 +23,7 @@
 
 package fr.ens.biologie.genomique.aozan;
 
-import static com.google.common.base.Strings.nullToEmpty;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.biologie.genomique.aozan.collectors.ReadCollector.READ_DATA_PREFIX;
 import static fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector.SAMPLESHEET_DATA_PREFIX;
 import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.checkExistingFile;
@@ -32,8 +32,10 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,70 +62,172 @@ public class RunData {
   private final Map<String, String> map = new LinkedHashMap<>();
 
   //
-  // Methods to extract data
+  // Comparators
   //
+
   /**
-   * Get all projects names, separated by comma.
-   * @return all projects names
+   * This class define a comparator to order projects.
    */
-  public String getProjectsName() {
-    return this.get(SAMPLESHEET_DATA_PREFIX + ".projects.names");
+  public static class ProjectComparator implements Comparator<Integer> {
+
+    private final RunData data;
+
+    @Override
+    public int compare(final Integer i1, final Integer i2) {
+
+      final String projectName1 = data.getProjectName(i1);
+      final String projectName2 = data.getProjectName(i2);
+
+      return projectName1.compareTo(projectName2);
+    }
+
+    /**
+     * Constructor.
+     * @param data run data object
+     */
+    public ProjectComparator(final RunData data) {
+
+      checkNotNull(data, "data object cannot be null");
+      this.data = data;
+    }
   }
+
+  /**
+   * This class define a comparator to order pooled samples.
+   */
+  public static class PooledSampleComparator implements Comparator<Integer> {
+
+    private final RunData data;
+
+    @Override
+    public int compare(final Integer i1, final Integer i2) {
+
+      final boolean undetermined1 = data.isUndeterminedPooledSample(i1);
+      final boolean undetermined2 = data.isUndeterminedPooledSample(i1);
+
+      final int compare1 = Boolean.compare(undetermined1, undetermined2);
+
+      if (compare1 != 0) {
+        return compare1;
+      }
+
+      final String projectName1 = data.getPooledSampleProjectName(i1);
+      final String projectName2 = data.getPooledSampleProjectName(i2);
+
+      final int compare2 = projectName1.compareTo(projectName2);
+
+      if (compare2 != 0) {
+        return compare2;
+      }
+
+      final String pooledSampleName1 = data.getPooledSampleDemuxName(i1);
+      final String pooledSampleName2 = data.getPooledSampleDemuxName(i2);
+
+      return pooledSampleName1.compareTo(pooledSampleName2);
+    }
+
+    /**
+     * Constructor.
+     * @param data run data object
+     */
+    public PooledSampleComparator(final RunData data) {
+
+      checkNotNull(data, "data object cannot be null");
+      this.data = data;
+    }
+  }
+
+  //
+  // Sample getters
+  //
 
   /**
    * Get all samples names related to the lane as a list.
    * @param lane the lane number
    * @return all samples related to the lane
    */
-  public List<String> getSamplesNameInLane(final int lane) {
+  public List<Integer> getAllSamplesInLane(final int lane) {
 
     final String value =
-        this.get(SAMPLESHEET_DATA_PREFIX + ".lane" + lane + ".samples.names");
+        get(SAMPLESHEET_DATA_PREFIX + ".lane" + lane + ".samples");
 
     if (value == null) {
       return Collections.emptyList();
     }
 
-    return COMMA_SPLITTER.splitToList(value);
+    final List<String> resultString = COMMA_SPLITTER.splitToList(value);
+
+    final List<Integer> result = new ArrayList<>(resultString.size());
+
+    for (String s : resultString) {
+      result.add(Integer.parseInt(s));
+    }
+
+    return result;
   }
 
   /**
-   * Get the read count in run.
-   * @return read count.
+   * Get all samples identifiers (without undetermined samples) related to the
+   * lane as a list.
+   * @param lane the lane number
+   * @return all samples related to the lane
    */
-  public int getReadCount() {
-    return this.getInt("run.info.read.count");
+  public List<Integer> getSamplesInLane(final int lane) {
+
+    final List<Integer> result = new ArrayList<Integer>();
+
+    for (int sampleId : getAllSamplesInLane(lane)) {
+
+      if (!isUndeterminedSample(sampleId)) {
+        result.add(sampleId);
+      }
+    }
+
+    return result;
   }
 
   /**
-   * Get the lane count in run.
-   * @return lane count
+   * Get all samples identifiers (with undetermined samples) of the run.
+   * @param lane the lane number
+   * @return all samples related to the lane
    */
-  public int getLaneCount() {
-    return this.getInt("run.info.flow.cell.lane.count");
+  public List<Integer> getAllSamples() {
+
+    final List<Integer> result = new ArrayList<Integer>();
+    final int sampleCount = getSampleCount();
+
+    for (int i = 1; i <= sampleCount; i++) {
+      result.add(i);
+    }
+
+    return result;
   }
 
   /**
-   * Check if the read is indexed.
-   * @param read the read number
-   * @return true if the read is indexed,otherwise false
+   * Get all samples identifiers (without undetermined samples) of the run.
+   * @param lane the lane number
+   * @return all samples related to the lane
    */
-  public boolean isReadIndexed(final int read) {
-    return this.getBoolean("run.info.read" + read + ".indexed");
+  public List<Integer> getSamples() {
+
+    final List<Integer> result = new ArrayList<Integer>();
+    final int sampleCount = getSampleCount();
+
+    for (int i = 1; i <= sampleCount; i++) {
+      if (!isUndeterminedSample(i)) {
+        result.add(i);
+      }
+    }
+
+    return result;
   }
 
   /**
-   * Checks if is lane indexed.
-   * @param lane the lane
-   * @return true, if is lane indexed
+   * Get the sample count.
+   * @return the sample count
    */
-  public boolean isLaneIndexed(final int lane) {
-    final String res =
-        this.get("demux.lane" + lane + ".sample.lane" + lane + ".barcode");
-
-    return (res == null
-        ? false : res.trim().toLowerCase(Globals.DEFAULT_LOCALE)
-            .equals("undetermined"));
+  public int getSampleCount() {
+    return getInt(SAMPLESHEET_DATA_PREFIX + ".sample.count");
   }
 
   /**
@@ -133,23 +237,528 @@ public class RunData {
    */
   public boolean isUndeterminedInLane(final int lane) {
 
-    final List<String> samplesInLane = this.getSamplesNameListInLane(lane);
+    final List<Integer> samples = getAllSamplesInLane(lane);
 
-    switch (samplesInLane.size()) {
-
-    case 0:
-      return true;
-
-    case 1:
-      final String sampleIndex =
-          nullToEmpty(getSampleIndex(lane, samplesInLane.get(0)));
-
-      return !"".equals(sampleIndex.trim());
-
-    default:
-      return true;
+    if (samples == null) {
+      return false;
     }
+
+    for (int sampleId : samples) {
+
+      if (isUndeterminedSample(sampleId)) {
+        return true;
+      }
+    }
+
+    return false;
   }
+
+  /**
+   * Get the sequence index related to a sample.
+   * @param sampleId the sample id
+   * @return sequence index related to sample
+   */
+  public String getIndexSample(final int sampleId) {
+    return get(SAMPLESHEET_DATA_PREFIX + ".sample" + sampleId + ".index");
+  }
+
+  /**
+   * Get the sample identifier string.
+   * @param lane the lane number
+   * @param sampleId the sample id
+   * @return sequence index related to the lane and sample name
+   */
+  public String getSampleIdentifier(final int sampleId) {
+    return get(SAMPLESHEET_DATA_PREFIX + ".sample" + sampleId + ".id");
+  }
+
+  /**
+   * Get the name of a sample.
+   * @param lane the lane number
+   * @param sampleId the sample id
+   * @return sequence index related to the lane and sample name
+   */
+  public String getSampleName(final int sampleId) {
+    return get(SAMPLESHEET_DATA_PREFIX + ".sample" + sampleId + ".name");
+  }
+
+  /**
+   * Get the demultiplexing name of a sample.
+   * @param lane the lane number
+   * @param sampleId the sample id
+   * @return sequence index related to the lane and sample name
+   */
+  public String getSampleDemuxName(final int sampleId) {
+    return get(SAMPLESHEET_DATA_PREFIX + ".sample" + sampleId + ".demux.name");
+  }
+
+  /**
+   * Get the lane of a sample.
+   * @param lane the lane number
+   * @param sampleId the sample id
+   * @return sequence index related to the lane and sample name
+   */
+  public int getSampleLane(final int sampleId) {
+    return getInt(SAMPLESHEET_DATA_PREFIX + ".sample" + sampleId + ".lane");
+  }
+
+  /**
+   * Test if the sample is an undetermined sample.
+   * @param lane the lane number
+   * @param sampleId the sample id
+   * @return sequence index related to the lane and sample name
+   */
+  public boolean isUndeterminedSample(final int sampleId) {
+    return getBoolean(
+        SAMPLESHEET_DATA_PREFIX + ".sample" + sampleId + ".undetermined");
+  }
+
+  /**
+   * Test if the sample is an indexed sample.
+   * @param lane the lane number
+   * @param sampleId the sample id
+   * @return sequence index related to the lane and sample name
+   */
+  public boolean isIndexedSample(final int sampleId) {
+    return getBoolean(
+        SAMPLESHEET_DATA_PREFIX + ".sample" + sampleId + ".indexed");
+  }
+
+  /**
+   * Get the project related to a sample.
+   * @param sampleId the sample id
+   * @return the project related to the sample
+   */
+  public String getProjectSample(final int sampleId) {
+    return get(SAMPLESHEET_DATA_PREFIX + ".sample" + sampleId + ".project");
+  }
+
+  /**
+   * Get the description of a sample.
+   * @param sampleName the sample name
+   * @return the description of the sample
+   */
+  public String getSampleDescription(final int sampleId) {
+    return this
+        .get(SAMPLESHEET_DATA_PREFIX + ".sample" + sampleId + ".description");
+  }
+
+  /**
+   * Gets the sample genome.
+   * @param sampleId the sample id
+   * @return the sample genome
+   */
+  public String getSampleGenome(final int sampleId) {
+    return get(SAMPLESHEET_DATA_PREFIX + ".sample" + sampleId + ".ref");
+  }
+
+  /**
+   * Get the index of a sample.
+   * @param sampleId the sample id
+   * @return the index of the sample
+   */
+  public String getSampleIndex(final int sampleId) {
+
+    return get(SAMPLESHEET_DATA_PREFIX + ".sample" + sampleId + ".index");
+  }
+
+  /**
+   * Check if the lane related to the sample name is a control lane.
+   * @param sampleId the sample Id
+   * @return true if the lane is a control otherwise false
+   */
+  public boolean isLaneControl(final int sampleId) {
+    return getBoolean(
+        SAMPLESHEET_DATA_PREFIX + ".sample" + sampleId + ".control");
+  }
+
+  /**
+   * Get the identifier of sample from its lane and demuxmultiplexing name.
+   * @param lane the lane
+   * @param demuxName the demultiplexing name
+   * @return the id of the sample or -1 if not found
+   */
+  public int getSampleId(final int lane, final String demuxName) {
+
+    if (demuxName == null || lane < 1 || lane > getLaneCount()) {
+      return -1;
+    }
+
+    for (int i : getAllSamplesInLane(lane)) {
+
+      if (demuxName.equals(getSampleDemuxName(i))) {
+        return i;
+      }
+    }
+
+    return -1;
+  }
+
+  //
+  // Pooled sample getters
+  //
+
+  /**
+   * Get the pooled sample count.
+   * @return the pooled sample count
+   */
+  public int getPooledSampleCount() {
+    return getInt(SAMPLESHEET_DATA_PREFIX + ".pooledsample.count");
+  }
+
+  /**
+   * Get the demultiplexing name of a pooled sample.
+   * @param pooledSampleId the id of the pooled sample
+   * @return the demultiplexing name of a pooled sample
+   */
+  public String getPooledSampleDemuxName(final int pooledSampleId) {
+    return get(SAMPLESHEET_DATA_PREFIX
+        + ".pooledsample" + pooledSampleId + ".demux.name");
+  }
+
+  /**
+   * Get the project name of a pooled sample.
+   * @param pooledSampleId the id of the pooled sample
+   * @return the project name of a pooled sample
+   */
+  public String getPooledSampleProjectName(final int pooledSampleId) {
+    return get(SAMPLESHEET_DATA_PREFIX
+        + ".pooledsample" + pooledSampleId + ".project.name");
+  }
+
+  /**
+   * Get the project id of a pooled sample.
+   * @param pooledSampleId the id of the pooled sample
+   * @return the project id of a pooled sample
+   */
+  public int getPooledSampleProject(final int pooledSampleId) {
+    return getInt(SAMPLESHEET_DATA_PREFIX
+        + ".pooledsample" + pooledSampleId + ".project");
+  }
+
+  /**
+   * Get the index of a pooled sample.
+   * @param pooledSampleId the id of the pooled sample
+   * @return the index of a pooled sample
+   */
+  public String getPooledSampleIndex(final int pooledSampleId) {
+    return get(
+        SAMPLESHEET_DATA_PREFIX + ".pooledsample" + pooledSampleId + ".index");
+  }
+
+  /**
+   * Get the description of a pooled sample.
+   * @param pooledSampleId the id of the pooled sample
+   * @return the description of a pooled sample
+   */
+  public String getPooledSampleDescription(final int pooledSampleId) {
+    return get(SAMPLESHEET_DATA_PREFIX
+        + ".pooledsample" + pooledSampleId + ".description");
+  }
+
+  /**
+   * Get the list of sample identifiers in a pooled sample.
+   * @param pooledSampleId the id of the pooled sample
+   * @return a list of sample identifiers
+   */
+  public List<Integer> getSamplesInPooledSample(final int pooledSampleId) {
+
+    final List<Integer> result = new ArrayList<Integer>();
+
+    for (String s : Splitter.on(',').trimResults().omitEmptyStrings()
+        .split(get(SAMPLESHEET_DATA_PREFIX
+            + ".pooledsample" + pooledSampleId + ".samples"))) {
+      try {
+        result.add(Integer.parseInt(s));
+      } catch (NumberFormatException e) {
+        // Do nothing
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Get all samples ids (with undetermined samples) of the run.
+   * @param lane the lane number
+   * @return all samples related to the lane
+   */
+  public List<Integer> getAllPooledSamples() {
+
+    final List<Integer> result = new ArrayList<Integer>();
+    final int pooledSampleCount = getPooledSampleCount();
+
+    for (int i = 1; i <= pooledSampleCount; i++) {
+      result.add(i);
+    }
+
+    return result;
+  }
+
+  /**
+   * Get all samples ids (without undetermined samples) of the run.
+   * @param lane the lane number
+   * @return all samples related to the lane
+   */
+  public List<Integer> getPooledSamples() {
+
+    final List<Integer> result = new ArrayList<Integer>();
+    final int pooledSampleCount = getPooledSampleCount();
+
+    for (int i = 1; i <= pooledSampleCount; i++) {
+      if (!isUndeterminedPooledSample(i)) {
+        result.add(i);
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Test if the sample is an undetermined sample.
+   * @param lane the lane number
+   * @param sampleId the sample id
+   * @return sequence index related to the lane and sample name
+   */
+  public boolean isUndeterminedPooledSample(final int pooledSampleId) {
+    return getBoolean(SAMPLESHEET_DATA_PREFIX
+        + ".pooledsample" + pooledSampleId + ".undetermined");
+  }
+
+  //
+  // Project getters
+  //
+
+  /**
+   * Get the project count.
+   * @return the project count
+   */
+  public int getProjectCount() {
+    return getInt(SAMPLESHEET_DATA_PREFIX + ".project.count");
+  }
+
+  /**
+   * Get all project identifiers of the run.
+   * @param lane the lane number
+   * @return all project identifiers of the run
+   */
+  public List<Integer> getProjects() {
+
+    final List<Integer> result = new ArrayList<>();
+
+    final int projectCount = getProjectCount();
+
+    for (int i = 1; i <= projectCount; i++) {
+      result.add(i);
+    }
+
+    return result;
+  }
+
+  /**
+   * Get the name of a project.
+   * @param projectId the id of the project
+   * @return the name of a project
+   */
+  public String getProjectName(final int projectId) {
+    return get(SAMPLESHEET_DATA_PREFIX + ".project" + projectId + ".name");
+  }
+
+  /**
+   * Get the id of a project from its name.
+   * @param projectName the name of the project
+   * @return the id of the projet or -1 if not found
+   */
+  public int getProjectId(final String projectName) {
+
+    if (projectName == null) {
+      return -1;
+    }
+
+    final int projectCount = getProjectCount();
+
+    for (int i = 1; i <= projectCount; i++) {
+
+      if (projectName
+          .equals(get(SAMPLESHEET_DATA_PREFIX + ".project" + i + ".name"))) {
+        return i;
+      }
+
+    }
+
+    return -1;
+  }
+
+  /**
+   * Get the list of the samples of a project.
+   * @param projectId the project id
+   * @return a list with the sample identifiers of the project
+   */
+  public List<Integer> getSamplesInProject(final int projectId) {
+
+    final List<Integer> result = new ArrayList<Integer>();
+
+    for (String s : Splitter.on(',').trimResults().omitEmptyStrings().split(
+        get(SAMPLESHEET_DATA_PREFIX + ".project" + projectId + ".samples"))) {
+      try {
+        result.add(Integer.parseInt(s));
+      } catch (NumberFormatException e) {
+        // Do nothing
+      }
+    }
+
+    return result;
+  }
+
+  //
+  // Run info getters
+  //
+
+  /**
+   * Get the read count in run.
+   * @return read count.
+   */
+  public int getReadCount() {
+    return getInt("run.info.read.count");
+  }
+
+  /**
+   * Get the lane count in run.
+   * @return lane count
+   */
+  public int getLaneCount() {
+    return getInt("run.info.flow.cell.lane.count");
+  }
+
+  /**
+   * Check if the read is indexed.
+   * @param read the read number
+   * @return true if the read is indexed,otherwise false
+   */
+  public boolean isReadIndexed(final int read) {
+    return getBoolean("run.info.read" + read + ".indexed");
+  }
+
+  /**
+   * Gets the run tiles per lane.
+   * @return the run tiles per lane
+   */
+  public int getRunTilesPerLane() {
+
+    return getInt("run.info.tiles.per.lane.count");
+  }
+
+  /**
+   * Get the run mode.
+   * @return run mode
+   */
+  public String getRunMode() {
+    return get("run.info.run.mode");
+  }
+
+  /**
+   * Gets the sequencer name.
+   * @return the sequencer name
+   */
+  public String getSequencerName() {
+    return get("run.info.sequencer.name");
+  }
+
+  /**
+   * Gets the sequencer family.
+   * @return the sequencer name
+   */
+  public String getSequencerFamily() {
+    return get("run.info.sequencer.family");
+  }
+
+  /**
+   * Gets the sequencer application name.
+   * @return the sequencer application name
+   */
+  public String getSequencerApplicationName() {
+    return get("run.info.application.name");
+  }
+
+  /**
+   * Gets the sequencer application version.
+   * @return the sequencer application version
+   */
+  public String getSequencerApplicationVersion() {
+    return get("run.info.application.version");
+  }
+
+  /**
+   * Gets the RTA version.
+   * @return the RTA version
+   */
+  public String getSequencerRTAVersion() {
+    return get("run.info.rta.version");
+  }
+
+  /**
+   * Get the cycles count in the read.
+   * @param read the read number
+   * @return cycles count in the read
+   */
+  public int getReadCyclesCount(final int read) {
+    return getInt("run.info.read" + read + ".cycles");
+  }
+
+  /**
+   * Gets the flowcell id.
+   * @return the flowcell id
+   */
+  public String getFlowcellId() {
+
+    return get("run.info.flow.cell.id");
+  }
+
+  //
+  // Demux getters
+  //
+
+  /**
+   * Checks if is lane indexed.
+   * @param lane the lane
+   * @return true, if is lane indexed
+   */
+  public boolean isLaneIndexed(final int lane) {
+    final String res =
+        get("demux.lane" + lane + ".sample.lane" + lane + ".barcode");
+
+    return (res == null
+        ? false : res.trim().toLowerCase(Globals.DEFAULT_LOCALE)
+            .equals("undetermined"));
+  }
+
+  /**
+   * Get the raw cluster count for a sample.
+   * @param sampleId the sampleId
+   * @param read the read
+   * @return the raw cluster count of the sample
+   */
+  public int getSampleRawClusterCount(final int sampleId, final int read) {
+
+    return getInt(
+        "demux.sample" + sampleId + ".read" + read + ".raw.cluster.count");
+  }
+
+  /**
+   * Get the passing filter cluster count for a sample.
+   * @param sampleId the sample id
+   * @param read the read
+   * @return the passing filter cluster count of the sample
+   */
+  public int getSamplePFClusterCount(final int sampleId, final int read) {
+
+    return getInt(
+        "demux.sample" + sampleId + ".read" + read + ".pf.cluster.count");
+  }
+
+  //
+  // Read getters
+  //
 
   /**
    * Get the tiles count.
@@ -161,195 +770,13 @@ public class RunData {
   }
 
   /**
-   * Get the sample names related to a lane, in a list.
-   * @param lane the number
-   * @return a list with the sample names related to the lane
-   */
-  public List<String> getSamplesNameListInLane(final int lane) {
-
-    final String value =
-        this.get(SAMPLESHEET_DATA_PREFIX + ".lane" + lane + ".samples.names");
-
-    if (value == null) {
-      return Collections.emptyList();
-    }
-
-    return COMMA_SPLITTER.splitToList(value);
-  }
-
-  /**
-   * Get all projects names, in a list.
-   * @return a list projects names
-   */
-  public List<String> getProjectsNameList() {
-
-    final String value = this.get(SAMPLESHEET_DATA_PREFIX + ".projects.names");
-
-    if (value == null) {
-      return Collections.emptyList();
-    }
-
-    return COMMA_SPLITTER.splitToList(value);
-  }
-
-  /**
-   * Get the sequence index related to the lane number and the sample name.
-   * @param lane the lane number
-   * @param sampleName the sample name
-   * @return sequence index related to the lane and sample name
-   */
-  public String getIndexSample(final int lane, final String sampleName) {
-    return this.get(
-        SAMPLESHEET_DATA_PREFIX + ".lane" + lane + "." + sampleName + ".index");
-  }
-
-  /**
-   * Get the project related to a sample of the lane.
-   * @param lane the lane number
-   * @param sampleName the sample name
-   * @return the project related to the sample
-   */
-  public String getProjectSample(final int lane, final String sampleName) {
-    return this.get(SAMPLESHEET_DATA_PREFIX
-        + ".lane" + lane + "." + sampleName + ".sample.project");
-  }
-
-  /**
-   * Get the description of a sample.
-   * @param lane the lane
-   * @param sampleName the sample name
-   * @return the description of the sample
-   */
-  public String getSampleDescription(final int lane, final String sampleName) {
-    return this.get(SAMPLESHEET_DATA_PREFIX
-        + ".lane" + lane + "." + sampleName + ".description");
-  }
-
-  /**
-   * Gets the sample genome.
-   * @param lane the lane
-   * @param sampleName the sample name
-   * @return the sample genome
-   */
-  public String getSampleGenome(final int lane, final String sampleName) {
-    return this.get(SAMPLESHEET_DATA_PREFIX
-        + ".lane" + lane + "." + sampleName + ".sample.ref");
-  }
-
-  /**
-   * Get the index of a sample
-   * @param lane lane
-   * @param sampleName the sample name
-   * @return the index of the sample
-   */
-  public String getSampleIndex(final int lane, final String sampleName) {
-
-    return this.get(
-        SAMPLESHEET_DATA_PREFIX + ".lane" + lane + '.' + sampleName + ".index");
-  }
-
-  /**
-   * Get the raw cluster count for a sample.
-   * @param lane the lane
-   * @param read the read
-   * @param sampleName sample name
-   * @return the raw cluster count of the sample
-   */
-  public int getSampleRawClusterCount(final int lane, final int read,
-      final String sampleName) {
-
-    return this.getInt("demux.lane"
-        + lane + ".sample." + sampleName + ".read" + read
-        + ".raw.cluster.count");
-  }
-
-  /**
-   * Get the passing filter cluster count for a sample.
-   * @param lane the lane
-   * @param read the read
-   * @param sampleName sample name
-   * @return the passing filter cluster count of the sample
-   */
-  public int getSamplePFClusterCount(final int lane, final int read,
-      final String sampleName) {
-
-    return this.getInt("demux.lane"
-        + lane + ".sample." + sampleName + ".read" + read
-        + ".pf.cluster.count");
-  }
-
-  /**
-   * Get the raw cluster recovery count for a sample.
-   * @param lane the lane
-   * @param sampleName sample name
-   * @return the raw cluster recovery count of the sample
-   */
-  public int getSampleRawClusterRecoveryCount(final int lane,
-      final String sampleName) {
-
-    if (sampleName == null)
-      return this.getInt(
-          "undeterminedindices.lane" + lane + ".recoverable.raw.cluster.count");
-
-    return this.getInt("undeterminedindices.lane"
-        + lane + ".sample." + sampleName + ".recoverable.raw.cluster.count");
-  }
-
-  /**
-   * Get the passing filter cluster recovery count for a sample.
-   * @param lane the lane
-   * @param sampleName sample name
-   * @return the passing filter cluster recovery count of the sample
-   */
-  public int getSamplePFClusterRecoveryCount(final int lane,
-      final String sampleName) {
-
-    if (sampleName == null)
-      return this.getInt(
-          "undeterminedindices.lane" + lane + ".recoverable.pf.cluster.count");
-
-    return this.getInt("undeterminedindices.lane"
-        + lane + ".sample." + sampleName + ".recoverable.pf.cluster.count");
-  }
-
-  /**
-   * Get the percent mapped read on dataset contaminants.
-   * @param lane the lane
-   * @param sampleName sample name
-   * @param read the read number
-   * @return the percent mapped read on dataset contaminants.
-   */
-  public double getPercentMappedReadOnContaminationSample(final int lane,
-      final String sampleName, final int read) {
-
-    if (sampleName == null)
-      return this.getDouble("fastqscreen.lane"
-          + lane + ".undetermined.read" + read + ".mappedexceptgenomesample");
-
-    return this.getDouble("fastqscreen.lane"
-        + lane + ".sample." + sampleName + ".read" + read + "." + sampleName
-        + ".mappedexceptgenomesample");
-  }
-
-  /**
-   * Check if the lane related to the sample name is a control lane.
-   * @param lane the lane number
-   * @param sampleName the sample name
-   * @return true if the lane is a control otherwise false
-   */
-  public boolean isLaneControl(final int lane, final String sampleName) {
-    return this.getBoolean(SAMPLESHEET_DATA_PREFIX
-        + ".lane" + lane + "." + sampleName + ".control");
-  }
-
-  /**
    * Get the percent align Phix related to the lane and the read.
    * @param lane the lane number
    * @param read the read number
    * @return percent align Phix related to the lane and the read
    */
   public double getReadPrcAlign(final int lane, final int read) {
-    return this.getDouble(
+    return getDouble(
         READ_DATA_PREFIX + ".read" + read + ".lane" + lane + ".prc.align");
   }
 
@@ -360,7 +787,7 @@ public class RunData {
    * @return the raw cluster count related to a lane and a read
    */
   public long getReadRawClusterCount(final int lane, final int read) {
-    return this.getLong(
+    return getLong(
         READ_DATA_PREFIX + ".read" + read + ".lane" + lane + ".clusters.raw");
   }
 
@@ -371,83 +798,73 @@ public class RunData {
    * @return the passing filter cluster count related to a lane and a read
    */
   public long getReadPFClusterCount(final int lane, final int read) {
-    return this.getLong(
+    return getLong(
         READ_DATA_PREFIX + ".read" + read + ".lane" + lane + ".clusters.pf");
   }
 
-  /**
-   * Gets the run tiles per lane.
-   * @return the run tiles per lane
-   */
-  public int getRunTilesPerLane() {
+  //
+  // Undetermined getters
+  //
 
-    return this.getInt("run.info.tiles.per.lane.count");
+  /**
+   * Get the raw cluster recovery count for a sample.
+   * @param sampleId the sample id
+   * @return the raw cluster recovery count of the sample
+   */
+  public int getSampleRawClusterRecoveryCount(final int sampleId) {
+
+    return getInt("undeterminedindices.sample"
+        + sampleId + ".recoverable.raw.cluster.count");
   }
 
   /**
-   * Get the run mode.
-   * @return run mode
+   * Get the passing filter cluster recovery count for a sample.
+   * @param sampleId the sample id
+   * @return the passing filter cluster recovery count of the sample
    */
-  public String getRunMode() {
-    return this.get("run.info.run.mode");
+  public int getSamplePFClusterRecoveryCount(final int sampleId) {
+
+    return getInt("undeterminedindices.sample"
+        + sampleId + ".recoverable.pf.cluster.count");
   }
 
   /**
-   * Gets the sequencer name.
-   * @return the sequencer name
+   * Get the raw cluster recovery count for a lane.
+   * @param lane the lane
+   * @return the raw cluster recovery count of the lane
    */
-  public String getSequencerName() {
-    return this.get("run.info.sequencer.name");
+  public int getLaneRawClusterRecoveryCount(final int lane) {
+
+    return getInt(
+        "undeterminedindices.lane" + lane + ".recoverable.raw.cluster.count");
   }
 
   /**
-   * Gets the sequencer family.
-   * @return the sequencer name
+   * Get the passing filter cluster recovery count for a lane.
+   * @param lane the lane
+   * @return the passing filter cluster recovery count of the lane
    */
-  public String getSequencerFamily() {
-    return this.get("run.info.sequencer.family");
+  public int getLanePFClusterRecoveryCount(final int lane) {
+
+    return getInt(
+        "undeterminedindices.lane" + lane + ".recoverable.pf.cluster.count");
   }
 
-  /**
-   * Gets the sequencer application name.
-   * @return the sequencer application name
-   */
-  public String getSequencerApplicationName() {
-    return this.get("run.info.application.name");
-  }
+  //
+  // FastqScreen getters
+  //
 
   /**
-   * Gets the sequencer application version.
-   * @return the sequencer application version
-   */
-  public String getSequencerApplicationVersion() {
-    return this.get("run.info.application.version");
-  }
-
-  /**
-   * Gets the RTA version.
-   * @return the RTA version
-   */
-  public String getSequencerRTAVersion() {
-    return this.get("run.info.rta.version");
-  }
-
-  /**
-   * Get the cycles count in the read.
+   * Get the percent mapped read on dataset contaminants.
+   * @param sampleId the sample Id
    * @param read the read number
-   * @return cycles count in the read
+   * @return the percent mapped read on dataset contaminants.
    */
-  public int getReadCyclesCount(final int read) {
-    return this.getInt("run.info.read" + read + ".cycles");
-  }
+  public double getPercentMappedReadOnContaminationSample(final int sampleId,
+      final int read) {
 
-  /**
-   * Gets the flowcell id.
-   * @return the flowcell id
-   */
-  public String getFlowcellId() {
-
-    return this.get("run.info.flow.cell.id");
+    return getDouble("fastqscreen.sample"
+        + sampleId + ".read" + read + ".mappedexceptgenomesample");
   }
 
   //

@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.tests.projectstats;
 
+import static fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector.COLLECTOR_PREFIX;
+
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -44,10 +46,9 @@ public class PFClusterMinProjectTest extends AbstractSimpleProjectTest {
   }
 
   @Override
-  protected String getKey(final String projectName) {
+  protected String getKey(final int projectId) {
 
-    return ProjectStatisticsCollector.COLLECTOR_PREFIX
-        + projectName + ".pf.cluster.min";
+    return COLLECTOR_PREFIX + ".project" + projectId + ".pf.cluster.min";
   }
 
   @Override

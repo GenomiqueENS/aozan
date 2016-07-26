@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.tests.projectstats;
 
+import static fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector.COLLECTOR_PREFIX;
+
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -30,14 +32,15 @@ import com.google.common.collect.ImmutableList;
 import fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector;
 
 /**
- * The class define test on samples count on a project which exceed a contaminant
- * threshold on percent mapped reads on dataset contaminants genomes. The
- * default value of threshold is 0.10, can be redefine in configuration file.
+ * The class define test on samples count on a project which exceed a
+ * contaminant threshold on percent mapped reads on dataset contaminants
+ * genomes. The default value of threshold is 0.10, can be redefine in
+ * configuration file.
  * @author Sandrine Perrin
  * @since 1.4
  */
-public class SamplesExceededContaminationThresholdProjectTest extends
-    AbstractSimpleProjectTest {
+public class SamplesExceededContaminationThresholdProjectTest
+    extends AbstractSimpleProjectTest {
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -46,10 +49,11 @@ public class SamplesExceededContaminationThresholdProjectTest extends
   }
 
   @Override
-  protected String getKey(final String projectName) {
+  protected String getKey(final int projectId) {
 
-    return ProjectStatisticsCollector.COLLECTOR_PREFIX
-        + projectName + ".samples.exceeded.contamination.threshold.count";
+    return COLLECTOR_PREFIX
+        + ".project" + projectId
+        + ".samples.exceeded.contamination.threshold.count";
   }
 
   @Override

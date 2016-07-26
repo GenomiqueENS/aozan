@@ -46,13 +46,13 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
    * Get the the key in the RunData object for the value to test.
    * @param read index of the read
    * @param readSample index of read without indexed reads
-   * @param lane index of the lane
-   * @param sampleName name of the sample. If null, must return the key for
-   *          undetermined indexes
+   * @param sampleId the id of the sample
+   * @param lane sample lane
+   * @param undetermined true if the sample is an undetermined sample
    * @return a String with the required key
    */
-  protected abstract String getKey(final int read, int readSample,
-      final int lane, final String sampleName);
+  protected abstract String getKey(final int read, int readSample, int sampleId, int lane,
+      boolean undetermined);
 
   /**
    * Transform the value.
@@ -61,11 +61,11 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
    * @param read index of read
    * @param readSample index of read without indexed reads
    * @param lane lane index
-   * @param sampleName sample name
+   * @param sampleId the sample Id
    * @return the transformed value
    */
   protected Number transformValue(final Number value, final RunData data,
-      final int read, final int readSample, final int lane, final String sampleName) {
+      final int read, final int readSample, final int sampleId) {
 
     return value;
   }
@@ -77,11 +77,11 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
    * @param read index of read
    * @param readSample index of read without indexed reads
    * @param lane lane index
-   * @param sampleName sample name
+   * @param sampleId the sample id
    * @return the transformed score
    */
   protected int transformScore(final int score, final RunData data,
-      final int read, final int readSample, final int lane, final String sampleName) {
+      final int read, final int readSample, final int sampleId) {
 
     return score;
   }
@@ -102,10 +102,13 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
   protected abstract Class<?> getValueType();
 
   @Override
-  public TestResult test(final RunData data, final int read, final int readSample,
-      final int lane, final String sampleName) {
+  public TestResult test(final RunData data, final int read,
+      final int readSample, final int sampleId) {
 
-    final String key = getKey(read, readSample, lane, sampleName);
+    final boolean undetermined = data.isUndeterminedSample(sampleId);
+    final int lane = data.getSampleLane(sampleId);
+
+    final String key = getKey(read, readSample, sampleId, lane, undetermined);
 
     if (key == null) {
       return null;
@@ -151,16 +154,15 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
 
       // Transform the value id needed
       final Number transformedValue =
-          transformValue(value, data, read, readSample, lane, sampleName);
+          transformValue(value, data, read, readSample, sampleId);
 
       // Do the test ?
-      if (this.interval == null || sampleName == null) {
+      if (this.interval == null || undetermined) {
         return new TestResult(transformedValue, isValuePercent());
       }
 
-      final int score =
-          transformScore(this.interval.getScore(transformedValue), data, read,
-              readSample, lane, sampleName);
+      final int score = transformScore(this.interval.getScore(transformedValue),
+          data, read, readSample, sampleId);
 
       return new TestResult(score, transformedValue, isValuePercent());
 

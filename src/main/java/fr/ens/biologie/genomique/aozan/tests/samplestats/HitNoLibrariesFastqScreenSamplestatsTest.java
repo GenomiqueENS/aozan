@@ -29,7 +29,6 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.collectors.FastqScreenCollector;
-import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 
 /**
@@ -39,8 +38,10 @@ import fr.ens.biologie.genomique.aozan.tests.TestResult;
  * @since 2.0
  * @author Sandrine Perrin
  */
-public class HitNoLibrariesFastqScreenSamplestatsTest extends
-    AbstractSimpleSampleTest {
+public class HitNoLibrariesFastqScreenSamplestatsTest
+    extends AbstractSimpleSampleTest {
+
+  // TODO rename column header fastqScreen -> FastqScreen
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -48,28 +49,28 @@ public class HitNoLibrariesFastqScreenSamplestatsTest extends
   }
 
   @Override
-  public TestResult test(final RunData data, final String sampleName) {
-
-    // Compute error rate per lane
-    final int laneCount = data.getLaneCount();
+  public TestResult test(final RunData data, final int pooledSampleId) {
 
     double value = 0;
+    int sampleCount = 0;
 
-    for (int lane = 1; lane <= laneCount; lane++) {
+    for (int sampleId : data.getSamplesInPooledSample(pooledSampleId)) {
 
-      final String key = getKey(sampleName, lane);
+      final String key = getSampleKey(sampleId);
+      sampleCount++;
+
+      if (data.contains(key)) {
+        value += data.getDouble(key);
+      }
 
       // Check value exist
       if (data.get(key) == null) {
         return new TestResult("NA");
       }
-
-      value += data.getDouble(key);
-
     }
 
     try {
-      final double percent = value / (double) laneCount;
+      final double percent = value / (double) sampleCount;
 
       if (getInterval() == null)
         return new TestResult(percent);
@@ -83,23 +84,17 @@ public class HitNoLibrariesFastqScreenSamplestatsTest extends
   }
 
   @Override
-  public String getKey(final String sampleName) {
+  public String getKey(final int pooledSampleId) {
     throw new UnsupportedOperationException();
   }
 
-  public String getKey(final String sampleName, final int lane) {
-
-    // Check undetermined indexed sample
-    if (sampleName == null
-        || sampleName.equals(SampleStatisticsCollector.UNDETERMINED_SAMPLE)) {
-      return "fastqscreen.lane"
-          + lane + ".undetermined.read1.mappedexceptgenomesample";
-    }
-
-    return "fastqscreen.lane"
-        + lane + ".sample." + sampleName + ".read1." + sampleName
-        + ".mappedexceptgenomesample";
-
+  /**
+   * Get the the key in the RunData object for the value to test.
+   * @param sampleId the sample Id
+   * @return a String with the required key
+   */
+  public String getSampleKey(final int sampleId) {
+    return "fastqscreen.sample" + sampleId + ".read1.mappedexceptgenomesample";
   }
 
   @Override
@@ -128,6 +123,6 @@ public class HitNoLibrariesFastqScreenSamplestatsTest extends
    */
   public HitNoLibrariesFastqScreenSamplestatsTest() {
     super("samplestathitnolibrariessum", "",
-        "fastqScreen mapped except genome sample", "%");
+        "FastqScreen mapped except genome sample", "%");
   }
 }

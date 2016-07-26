@@ -38,7 +38,7 @@ import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
  * @since 0.8
  * @author Laurent Jourdren
  */
-public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
+public abstract class AbstractSimpleSampleTest extends AbstractSampleStatsTest {
 
   private final ScoreInterval interval = new ScoreInterval();
 
@@ -61,10 +61,10 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
 
   /**
    * Get the the key in the RunData object for the value to test.
-   * @param sampleName the sample name
+   * @param pooledSampleId the pooled sample Id
    * @return a String with the required key
    */
-  protected abstract String getKey(final String sampleName);
+  protected abstract String getKey(final int pooledSampleId);
 
   /**
    * Transform the value.
@@ -75,23 +75,6 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
   protected Number transformValue(final Number value, final RunData data) {
 
     return value;
-  }
-
-  /**
-   * Transform the score.
-   * @param score value to transform
-   * @param data run data
-   * @param read index of read
-   * @param readSample index of read without indexed reads
-   * @param lane lane index
-   * @param sampleName sample name
-   * @return the transformed score
-   */
-  protected int transformScore(final int score, final RunData data,
-      final int read, final int readSample, final int lane,
-      final String sampleName) {
-
-    return score;
   }
 
   /**
@@ -110,9 +93,9 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
   protected abstract Class<?> getValueType();
 
   @Override
-  public TestResult test(final RunData data, final String sampleName) {
+  public TestResult test(final RunData data, final int pooledSampleId) {
 
-    final String key = getKey(sampleName);
+    final String key = getKey(pooledSampleId);
 
     if (key == null) {
       return null;

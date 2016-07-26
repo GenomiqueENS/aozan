@@ -40,30 +40,29 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
 
   @Override
   public TestResult test(final RunData data, final int read,
-      final int readSample, final int lane, final String sampleName) {
+      final int readSample, final int sampleId) {
+
+    final boolean undetermined = data.isUndeterminedSample(sampleId);
+    final int lane = data.getSampleLane(sampleId);
 
     // Check indetermined indexed sample
-    if (sampleName == null) {
-      // return new TestResult("NA");
+    if (undetermined) {
+
       final String projectName = "Undetermined_indices";
 
-      final String dirname =
-          String.format("lane%s_Undetermined_L%03d_R%d_001-fastqc", lane, lane,
-              readSample);
+      final String dirname = String.format(
+          "lane%s_Undetermined_L%03d_R%d_001-fastqc", lane, lane, readSample);
 
-      final String url =
-          projectName
-              + "/" + dirname + "/fastqc_report.html#M" + getHTMLAnchorIndex();
+      final String url = projectName
+          + "/" + dirname + "/fastqc_report.html#M" + getHTMLAnchorIndex();
 
       // Set score test at -1
       return new TestResult(-1, url, "url");
     }
 
-    final String prefixKey =
-        "fastqc.lane"
-            + lane + ".sample." + sampleName + ".read" + readSample + "."
-            + sampleName + "."
-            + getQCModuleName().replace(' ', '.').toLowerCase();
+    final String prefixKey = "fastqc.sample"
+        + sampleId + ".read" + readSample + "."
+        + getQCModuleName().replace(' ', '.').toLowerCase();
 
     if (data.get(prefixKey + ".error") == null)
       return new TestResult("NA");
@@ -74,18 +73,16 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
 
     final int score = errorRaise ? 0 : (warningRaise ? 4 : 9);
 
-    final String projectName = data.getProjectSample(lane, sampleName);
+    final String projectName = data.getProjectSample(sampleId);
+    final String index = data.getIndexSample(sampleId);
+    final String sampleName = data.getSampleDemuxName(sampleId);
 
-    final String index = data.getIndexSample(lane, sampleName);
+    final String dirname = String.format("%s_%s_L%03d_R%d_001-fastqc",
+        sampleName, "".equals(index) ? "NoIndex" : index, lane, readSample);
 
-    final String dirname =
-        String.format("%s_%s_L%03d_R%d_001-fastqc", sampleName,
-            "".equals(index) ? "NoIndex" : index, lane, readSample);
-
-    final String url =
-        "Project_"
-            + projectName + "/" + dirname + "/fastqc_report.html#M"
-            + getHTMLAnchorIndex();
+    final String url = "Project_"
+        + projectName + "/" + dirname + "/fastqc_report.html#M"
+        + getHTMLAnchorIndex();
 
     return new TestResult(score, url, "url");
   }

@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.tests.samplestats;
 
+import static fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector.COLLECTOR_PREFIX;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -42,7 +44,8 @@ import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
  * @author Sandrine Perrin
  * @since 1.4
  */
-public class PercentRecoverablePFClusterSampleTest extends AbstractSampleTest {
+public class PercentRecoverablePFClusterSampleTest
+    extends AbstractSampleStatsTest {
 
   private final ScoreInterval interval = new ScoreInterval();
 
@@ -53,19 +56,13 @@ public class PercentRecoverablePFClusterSampleTest extends AbstractSampleTest {
   }
 
   @Override
-  public TestResult test(RunData data, String sampleName) {
-
-    if (sampleName == null) {
-      return new TestResult("NA");
-    }
+  public TestResult test(final RunData data, final int pooledSampleId) {
 
     // Build key for run data
-    final String recoveryCountKey =
-        SampleStatisticsCollector.COLLECTOR_PREFIX
-            + sampleName + ".pf.cluster.recovery.sum";
+    final String recoveryCountKey = COLLECTOR_PREFIX
+        + ".pooledsample" + pooledSampleId + ".pf.cluster.recovery.sum";
     final String pfClusterSumKey =
-        SampleStatisticsCollector.COLLECTOR_PREFIX
-            + sampleName + ".pf.cluster.sum";
+        COLLECTOR_PREFIX + ".pooledsample" + pooledSampleId + ".pf.cluster.sum";
 
     try {
       // Set raw cluster sum for a project
@@ -109,7 +106,8 @@ public class PercentRecoverablePFClusterSampleTest extends AbstractSampleTest {
    * Public constructor.
    */
   public PercentRecoverablePFClusterSampleTest() {
-    super("samplestatsrecoverablepfclusterpercent", "", "Recoverable PF cluster ", "%");
+    super("samplestatsrecoverablepfclusterpercent", "",
+        "Recoverable PF cluster ", "%");
   }
 
 }

@@ -1,6 +1,6 @@
 package fr.ens.biologie.genomique.aozan.collectors;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -61,7 +61,7 @@ public class CollectorConfiguration {
       throw new NullPointerException("The map object is null");
     }
 
-    this.map = new HashMap<>(map);
+    this.map = new LinkedHashMap<>(map);
   }
 
   /**
@@ -74,7 +74,7 @@ public class CollectorConfiguration {
       throw new NullPointerException("The conf object is null");
     }
 
-    this.map = new HashMap<>(conf.map);
+    this.map = new LinkedHashMap<>(conf.map);
   }
 
 }

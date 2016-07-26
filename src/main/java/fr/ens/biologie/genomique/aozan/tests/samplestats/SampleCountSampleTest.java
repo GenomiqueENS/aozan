@@ -44,9 +44,10 @@ public class SampleCountSampleTest extends AbstractSimpleSampleTest {
   }
 
   @Override
-  protected String getKey(final String sampleName) {
+  protected String getKey(final int pooledSampleId) {
 
-    return COLLECTOR_PREFIX + sampleName + ".samples.count";
+    return COLLECTOR_PREFIX
+        + ".pooledsample" + pooledSampleId + ".samples.count";
   }
 
   @Override

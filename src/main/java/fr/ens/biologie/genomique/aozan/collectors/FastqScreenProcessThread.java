@@ -73,8 +73,8 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
   @Override
   protected void logThreadStart() {
-    LOGGER.fine(
-        "FASTQSCREEN: start for " + getFastqSample().getKeyFastqSample());
+    LOGGER
+        .fine("FASTQSCREEN: start for " + getFastqSample().getKeyFastqSample());
   }
 
   @Override
@@ -102,6 +102,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
         + "/" + getFastqSample().getPrefixReport() + "-fastqscreen";
 
     writeCSV(report);
+
     // Report with a link in qc html page
     writeHtml(report);
 
@@ -149,8 +150,8 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     // Paired-end run : same values for fastqSample R2
     if (this.isRunPE) {
 
-      final String prefixR2 = "fastqscreen"
-          + getFastqSample().getRundataPrefix().replace(".read1.", ".read2.");
+      final String prefixR2 =
+          prefixR1.substring(0, prefixR1.length() - 1) + '2';
 
       getResults().put(this.resultsFastqscreen.createRundata(prefixR2));
     }
@@ -210,11 +211,8 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     final File outputReportR1 = new File(fileName + ".html");
 
-    // BufferedWriter br = Files.newWriter(file, Charsets.UTF_8);
     this.resultsFastqscreen.reportToHtml(getFastqSample(), this.data,
         this.sampleGenome, outputReportR1, this.fastqscreenXSLFile);
-
-    // br.close();
 
     // Run paired-end: copy file for read R2
     if (this.isRunPE) {
@@ -229,7 +227,6 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
       }
 
       FileUtils.copyFile(outputReportR1, outputReportR2);
-
     }
   }
 
@@ -292,7 +289,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
       final Set<String> genomes, final String sampleGenome,
       final File reportDir, final boolean isPairedEndMode,
       final boolean isRunPE, final File fastqscreenXSLFile)
-          throws AozanException {
+      throws AozanException {
 
     super(fastqSample);
 

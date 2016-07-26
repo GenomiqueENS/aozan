@@ -23,13 +23,14 @@
 
 package fr.ens.biologie.genomique.aozan.tests.samplestats;
 
+import static fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector.COLLECTOR_PREFIX;
+
 import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector;
 import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector;
@@ -44,7 +45,8 @@ import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
  * @author Sandrine Perrin
  * @since 2.0
  */
-public class PercentSampleInProjectSamplestatsTest extends AbstractSampleTest {
+public class PercentSampleInProjectSamplestatsTest
+    extends AbstractSampleStatsTest {
 
   private final ScoreInterval interval = new ScoreInterval();
 
@@ -56,32 +58,25 @@ public class PercentSampleInProjectSamplestatsTest extends AbstractSampleTest {
   }
 
   @Override
-  public TestResult test(RunData data, String sampleName) {
+  public TestResult test(final RunData data, final int pooledSampleId) {
 
-    if (sampleName == null
-        || sampleName.equals(SampleStatisticsCollector.UNDETERMINED_SAMPLE)) {
-
+    // Do no process undetermined samples
+    if (data.isUndeterminedPooledSample(pooledSampleId)) {
       return new TestResult("NA");
     }
 
     // Build key for run data
-    final String rawClusterSumKey =
-        SampleStatisticsCollector.COLLECTOR_PREFIX + sampleName + ".raw.cluster.sum";
+    final String rawClusterSumKey = COLLECTOR_PREFIX
+        + ".pooledsample" + pooledSampleId + ".raw.cluster.sum";
 
     final long rawClusterSampleSum = data.getLong(rawClusterSumKey);
 
-    final String projectName = getProjectName(data, sampleName);
-
-    if (projectName == null) {
-      return new TestResult("NA");
-    }
-
     try {
 
+      final int projectId = data.getPooledSampleProject(pooledSampleId);
+
       final long rawClusterInProjectSum =
-          data.getLong("projectstats."
-              + projectName.toLowerCase(Globals.DEFAULT_LOCALE)
-              + ".raw.cluster.sum");
+          data.getLong("projectstats.project" + projectId + ".raw.cluster.sum");
 
       // Compute percent sample in project
       final double percent =
@@ -96,28 +91,6 @@ public class PercentSampleInProjectSamplestatsTest extends AbstractSampleTest {
 
       return new TestResult("NA");
     }
-  }
-
-  /**
-   * Get the project name of a Sample.
-   * @param data the data object
-   * @param sampleName the sample
-   * @return the project name or null if it is not been found.
-   */
-  private static String getProjectName(final RunData data, final String sampleName) {
-
-    final int laneCount = data.getLaneCount();
-
-    String projectName = null;
-    int lane = 0;
-
-    while (projectName == null && lane <= laneCount) {
-
-      lane++;
-      projectName = data.getProjectSample(lane, sampleName);
-    }
-
-    return projectName;
   }
 
   @Override

@@ -81,6 +81,8 @@ import uk.ac.babraham.FastQC.Sequence.SequenceFormatException;
 public class UndeterminedIndexesProcessThread
     extends AbstractFastqProcessThread {
 
+  // TODO use a prefix for RunData entries
+
   /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
 
@@ -96,11 +98,11 @@ public class UndeterminedIndexesProcessThread
   private final File reportDir;
   private final File xslFile;
 
-  private final Map<String, String> sampleIndexes;
-  private final Map<String, String> reverseSampleIndexes;
+  private final Map<Integer, String> sampleIndexes;
+  private final Map<String, Integer> reverseSampleIndexes;
   private final Multiset<String> rawUndeterminedIndices = HashMultiset.create();
   private final Multiset<String> pfUndeterminedIndices = HashMultiset.create();
-  private final Multimap<String, String> newSamplesIndexes =
+  private final Multimap<Integer, String> newSamplesIndexes =
       ArrayListMultimap.create();
   private final Multimap<String, String> newIndexes =
       ArrayListMultimap.create();
@@ -153,6 +155,9 @@ public class UndeterminedIndexesProcessThread
 
     @Override
     public int hashCode() {
+
+      // TODO re-implement this method using Objects.hashcode()
+
       final int prime = 31;
       int result = 1;
       result = prime * result
@@ -173,6 +178,9 @@ public class UndeterminedIndexesProcessThread
 
     @Override
     public boolean equals(final Object obj) {
+
+      // TODO re-implement this method using Guava
+
       if (this == obj) {
         return true;
       }
@@ -251,8 +259,12 @@ public class UndeterminedIndexesProcessThread
         final boolean demultiplexingWithConflict) {
 
       // Extract all samples names per lane
-      final List<String> sampleNames =
-          new ArrayList<>(data.getSamplesNameInLane(lane));
+      final List<Integer> sampleIds =
+          new ArrayList<>(data.getSamplesInLane(lane));
+      final List<String> sampleNames = new ArrayList<>(sampleIds.size());
+      for (int sampleId : sampleIds) {
+        sampleNames.add(data.getSampleDemuxName(sampleId));
+      }
 
       Collections.sort(sampleNames);
 
@@ -348,6 +360,9 @@ public class UndeterminedIndexesProcessThread
 
     @Override
     public int hashCode() {
+
+      // TODO Re-implement this method using Objects.hashcode()
+
       final int prime = 31;
       int result = 1;
       result = prime * result
@@ -368,6 +383,9 @@ public class UndeterminedIndexesProcessThread
 
     @Override
     public boolean equals(final Object obj) {
+
+      // TODO Re-implement this method using Guava
+
       if (this == obj) {
         return true;
       }
@@ -644,7 +662,7 @@ public class UndeterminedIndexesProcessThread
 
     int minMismatchFound = Integer.MAX_VALUE;
 
-    for (final Map.Entry<String, String> e : this.sampleIndexes.entrySet()) {
+    for (final Map.Entry<Integer, String> e : this.sampleIndexes.entrySet()) {
 
       for (final String i : this.rawUndeterminedIndices.elementSet()) {
         final String index = e.getValue();
@@ -683,9 +701,9 @@ public class UndeterminedIndexesProcessThread
 
     if (!this.isSkipProcessResult) {
       // For each sample find the indexes sequences that can be recovered
-      for (final Map.Entry<String, String> e : this.sampleIndexes.entrySet()) {
+      for (final Map.Entry<Integer, String> e : this.sampleIndexes.entrySet()) {
 
-        final String sampleName = e.getKey();
+        final int sampleId = e.getKey();
         final String index = e.getValue();
 
         for (final String i : this.rawUndeterminedIndices.elementSet()) {
@@ -694,20 +712,19 @@ public class UndeterminedIndexesProcessThread
 
           if (mismatches > 0 && mismatches <= this.maxMismatches) {
 
-            this.newSamplesIndexes.put(sampleName, i);
+            this.newSamplesIndexes.put(sampleId, i);
             this.newIndexes.put(i, index);
           }
         }
       }
 
       // Compute results for each sample
-      for (final String sampleName : this.data
-          .getSamplesNameListInLane(this.lane)) {
+      for (final int sampleId : this.data.getSamplesInLane(this.lane)) {
         recoverableRawClusterCount +=
-            computeRecoverableSampleClusterCount(sampleName,
+            computeRecoverableSampleClusterCount(sampleId,
                 this.rawUndeterminedIndices, ".recoverable.raw.cluster.count");
         recoverablePFClusterCount +=
-            computeRecoverableSampleClusterCount(sampleName,
+            computeRecoverableSampleClusterCount(sampleId,
                 this.pfUndeterminedIndices, ".recoverable.pf.cluster.count");
       }
     }
@@ -732,20 +749,20 @@ public class UndeterminedIndexesProcessThread
 
   /**
    * Compute for a sample the number of clusters that can be recovered.
-   * @param sampleName sample name
+   * @param sampleId sample Id
    * @param indicesCounts multiset that contain data to process
    * @param resultKeySuffix the suffix for the run data key entry
    * @return the number of cluster that can be recovered for the sample
    */
-  private int computeRecoverableSampleClusterCount(final String sampleName,
+  private int computeRecoverableSampleClusterCount(final int sampleId,
       final Multiset<String> indicesCounts, final String resultKeySuffix) {
 
     int recoverableClusterCount = 0;
 
     if (!this.isSkipProcessResult) {
       // Sum the number of cluster that can be recovered
-      if (this.newSamplesIndexes.containsKey(sampleName)) {
-        for (final String newIndex : this.newSamplesIndexes.get(sampleName)) {
+      if (this.newSamplesIndexes.containsKey(sampleId)) {
+        for (final String newIndex : this.newSamplesIndexes.get(sampleId)) {
 
           if (indicesCounts.contains(newIndex)) {
             final int count = indicesCounts.count(newIndex);
@@ -756,9 +773,7 @@ public class UndeterminedIndexesProcessThread
     }
 
     // Set the result for the sample
-    getResults().put(
-        "undeterminedindices"
-            + ".lane" + this.lane + ".sample." + sampleName + resultKeySuffix,
+    getResults().put("undeterminedindices.sample" + sampleId + resultKeySuffix,
         recoverableClusterCount);
 
     return recoverableClusterCount;
@@ -771,9 +786,8 @@ public class UndeterminedIndexesProcessThread
     createReportForLane();
 
     // Create the report for each samples
-    for (final String sampleName : this.data
-        .getSamplesNameListInLane(this.lane)) {
-      createReportForSample(sampleName);
+    for (final int sampleId : this.data.getSamplesInLane(this.lane)) {
+      createReportForSample(sampleId);
     }
   }
 
@@ -814,9 +828,13 @@ public class UndeterminedIndexesProcessThread
       final int rawClusterCount = e.getCount();
       final int pfClusterCount = this.pfUndeterminedIndices.count(index);
 
-      final List<String> samplesCollection = getSampleForNewIndex(index);
+      final List<Integer> sampleIds = getSampleForNewIndex(index);
+      final List<String> sampleNames = new ArrayList<>(sampleIds.size());
+      for (int sampleId : sampleIds) {
+        sampleNames.add(this.data.getSampleDemuxName(sampleId));
+      }
       final String samples =
-          samplesCollection.size() > 0 ? JOINER.join(samplesCollection) : "";
+          sampleIds.size() > 0 ? JOINER.join(sampleNames) : "";
 
       entries.add(new LaneResultEntry(index, rawClusterCount, pfClusterCount,
           totalRawClusterCount, totalPFClusterCount, samples));
@@ -834,10 +852,10 @@ public class UndeterminedIndexesProcessThread
    * @param newIndex the index
    * @return a list with the names of the samples
    */
-  private List<String> getSampleForNewIndex(final String newIndex) {
+  private List<Integer> getSampleForNewIndex(final String newIndex) {
 
     final Collection<String> indexesCollection = this.newIndexes.get(newIndex);
-    final List<String> samplesCollection = new ArrayList<>();
+    final List<Integer> samplesCollection = new ArrayList<>();
     for (final String i : indexesCollection) {
       samplesCollection.add(this.reverseSampleIndexes.get(i));
     }
@@ -907,38 +925,39 @@ public class UndeterminedIndexesProcessThread
 
     final File reportHtml = createLaneResultFile(".html");
 
-    toXML("lane" + this.lane + "_undetermined", null, entries, totalEntry,
-        reportHtml, false, demultiplexingWithConflict);
-
+    toXML(-1, null, entries, totalEntry, reportHtml, false,
+        demultiplexingWithConflict);
   }
 
   /**
    * Create the report for a sample.
-   * @param sampleName the sample name
+   * @param sampleId the sample name
    * @throws IOException if an error occurs while creating the report
    * @throws AozanException if an
    */
-  private void createReportForSample(final String sampleName)
+  private void createReportForSample(final int sampleId)
       throws IOException, AozanException {
 
     // Create sorted set
     final List<SampleResultEntry> entries = new ArrayList<>();
 
-    final int sampleRawClusterCount = getSampleRawClusterCount(sampleName);
-    final int samplePFClusterCount = getSamplePFClusterCount(sampleName);
+    final int sampleRawClusterCount =
+        this.data.getSampleRawClusterCount(sampleId, this.read);
+    final int samplePFClusterCount =
+        this.data.getSamplePFClusterCount(sampleId, this.read);
 
     // Original result
     final SampleResultEntry demuxEntry =
-        new SampleResultEntry(this.sampleIndexes.get(sampleName),
+        new SampleResultEntry(this.sampleIndexes.get(sampleId),
             sampleRawClusterCount, samplePFClusterCount, sampleRawClusterCount,
-            samplePFClusterCount, "Demultiplexing result " + sampleName);
+            samplePFClusterCount, "Demultiplexing result " + sampleId);
 
     int newIndexesRawClusterCount = 0;
     int newIndexesPFClusterCount = 0;
 
     // Add the new index found
-    if (this.newSamplesIndexes.containsKey(sampleName)) {
-      for (final String newIndex : this.newSamplesIndexes.get(sampleName)) {
+    if (this.newSamplesIndexes.containsKey(sampleId)) {
+      for (final String newIndex : this.newSamplesIndexes.get(sampleId)) {
 
         final int newIndexRawClusterCount =
             this.rawUndeterminedIndices.count(newIndex);
@@ -969,24 +988,25 @@ public class UndeterminedIndexesProcessThread
     // Sort lists
     Collections.sort(entries);
 
-    writeCSV(sampleName, demuxEntry, entries, totalEntry);
-    writeHTML(sampleName, demuxEntry, entries, totalEntry);
+    writeCSV(sampleId, demuxEntry, entries, totalEntry);
+    writeHTML(sampleId, demuxEntry, entries, totalEntry);
   }
 
   /**
    * Create the sample result file.
-   * @param sampleName the sample name
+   * @param sampleId the sample name
    * @param extension extension of the file
    * @return a File object
    * @throws IOException if it fails to create directory of report
    */
-  private File createSampleResultFile(final String sampleName,
+  private File createSampleResultFile(final int sampleId,
       final String extension) throws IOException {
 
     final File reportFile =
         new File(this.reportDir.getParentFile().getAbsolutePath()
-            + "/Project_" + getProjectSample(sampleName) + "/" + sampleName
-            + "_lane" + this.lane + "-potentialindices" + extension);
+            + "/Project_" + this.data.getProjectSample(sampleId) + "/"
+            + this.data.getSampleDemuxName(sampleId) + "_lane" + this.lane
+            + "-potentialindices" + extension);
 
     // Create parent directory if necessary
     final File parentDir = reportFile.getParentFile();
@@ -999,17 +1019,18 @@ public class UndeterminedIndexesProcessThread
 
   /**
    * Write the sample result file in csv format.
+   * @param sampleId the sample Id
    * @param demuxEntry original demux result
    * @param entries entries to write
    * @param totalEntry total entries summary
    * @throws IOException if an error occurs while writing the file
    */
-  private void writeCSV(final String sampleName,
-      final SampleResultEntry demuxEntry, final List<SampleResultEntry> entries,
-      final SampleResultEntry totalEntry) throws IOException {
+  private void writeCSV(final int sampleId, final SampleResultEntry demuxEntry,
+      final List<SampleResultEntry> entries, final SampleResultEntry totalEntry)
+      throws IOException {
 
     final BufferedWriter br = Files.newWriter(
-        createSampleResultFile(sampleName, ".csv"), StandardCharsets.UTF_8);
+        createSampleResultFile(sampleId, ".csv"), StandardCharsets.UTF_8);
 
     // Header
     br.write(ResultEntry.headerCSV());
@@ -1030,7 +1051,7 @@ public class UndeterminedIndexesProcessThread
 
   /**
    * Write the sample result file in HTML format.
-   * @param sampleName sample name
+   * @param sampleId sample id
    * @param demuxEntry original demux result
    * @param entries entries to write
    * @param totalEntry total entries summary
@@ -1038,19 +1059,18 @@ public class UndeterminedIndexesProcessThread
    * @throws AozanException if on useful file is not define or if an error
    *           occurs during transforming document.
    */
-  private void writeHTML(final String sampleName,
-      final SampleResultEntry demuxEntry, final List<SampleResultEntry> entries,
-      final SampleResultEntry totalEntry) throws IOException, AozanException {
+  private void writeHTML(final int sampleId, final SampleResultEntry demuxEntry,
+      final List<SampleResultEntry> entries, final SampleResultEntry totalEntry)
+      throws IOException, AozanException {
 
-    final File reportHtml = createSampleResultFile(sampleName, ".html");
+    final File reportHtml = createSampleResultFile(sampleId, ".html");
 
-    toXML(sampleName, demuxEntry, entries, totalEntry, reportHtml, true, false);
-
+    toXML(sampleId, demuxEntry, entries, totalEntry, reportHtml, true, false);
   }
 
   /**
    * Write the sample result file in HTML format.
-   * @param sampleName sample name
+   * @param sampleId sample id
    * @param demuxEntry original demux result
    * @param entries entries to write
    * @param totalEntry total entries summary
@@ -1062,7 +1082,7 @@ public class UndeterminedIndexesProcessThread
    * @throws AozanException if an usefull file are not define or if an error
    *           occurs during building document xml
    */
-  private void toXML(final String sampleName, final ResultEntry demuxEntry,
+  private void toXML(final int sampleId, final ResultEntry demuxEntry,
       final List<? extends ResultEntry> entries, final ResultEntry totalEntry,
       final File reportHtml, final boolean isSampleData,
       final boolean demultiplexingWithConflict)
@@ -1091,25 +1111,30 @@ public class UndeterminedIndexesProcessThread
     // Common XML tag
     XMLUtilsWriter.buildXMLCommonTagHeader(doc, root, this.data);
 
-    XMLUtils.addTagValue(doc, root, "sampleName", sampleName);
+    if (sampleId == -1) {
 
-    // Case Undetermined indices samples, no project name
-    if (isSampleData) {
-      XMLUtils.addTagValue(doc, root, "projectName",
-          getProjectSample(sampleName));
-    }
+      XMLUtils.addTagValue(doc, root, "sampleName",
+          "lane" + this.lane + "_undetermined");
+      XMLUtils.addTagValue(doc, root, "description", null);
+      XMLUtils.addTagValue(doc, root, "condition",
+          "Compile results on recovery clusters in undetermined fastq with "
+              + this.maxMismatches + " mismatch(es).");
 
-    XMLUtils.addTagValue(doc, root, "description",
-        this.data.getSampleDescription(this.lane, sampleName));
-
-    XMLUtils.addTagValue(doc, root, "condition",
-        "Compile results on recovery clusters in undetermined fastq with "
-            + this.maxMismatches + " mismatch(es).");
-
-    if (!isSampleData) {
       // Add sample name in this lane
       LaneResultEntry.samplesNameXML(doc, root, this.data, this.lane,
           demultiplexingWithConflict);
+
+    } else {
+
+      XMLUtils.addTagValue(doc, root, "sampleName",
+          this.data.getSampleDemuxName(sampleId));
+      XMLUtils.addTagValue(doc, root, "projectName",
+          this.data.getProjectSample(sampleId));
+      XMLUtils.addTagValue(doc, root, "description",
+          this.data.getSampleDescription(sampleId));
+      XMLUtils.addTagValue(doc, root, "condition",
+          "Compile results on recovery clusters in undetermined fastq with "
+              + this.maxMismatches + " mismatch(es).");
     }
 
     // Table - column
@@ -1182,15 +1207,15 @@ public class UndeterminedIndexesProcessThread
    * @param map the original map
    * @return a new map with the inversed key-values
    */
-  private Map<String, String> reverse(final Map<String, String> map) {
+  private Map<String, Integer> reverse(final Map<Integer, String> map) {
 
     if (map == null) {
       return null;
     }
 
-    final Map<String, String> result = new HashMap<>();
+    final Map<String, Integer> result = new HashMap<>();
 
-    for (final Map.Entry<String, String> e : map.entrySet()) {
+    for (final Map.Entry<Integer, String> e : map.entrySet()) {
       result.put(e.getValue(), e.getKey());
     }
 
@@ -1201,50 +1226,19 @@ public class UndeterminedIndexesProcessThread
    * Get a map with for each sample the index.
    * @return a Map object
    */
-  private Map<String, String> getSampleIndexes() {
+  private Map<Integer, String> getSampleIndexes() {
 
-    final Map<String, String> result = new HashMap<>();
+    final Map<Integer, String> result = new HashMap<>();
 
-    for (final String sampleName : this.data
-        .getSamplesNameListInLane(this.lane)) {
+    for (final int sampleId : this.data.getSamplesInLane(this.lane)) {
 
       // Get the sample index
-      final String index = this.data.getIndexSample(this.lane, sampleName);
+      final String index = this.data.getIndexSample(sampleId);
 
-      result.put(sampleName, index);
+      result.put(sampleId, index);
     }
 
     return result;
-  }
-
-  /**
-   * Get the project related to a sample of the lane.
-   * @param sampleName the sample name
-   * @return the project related to the sample
-   */
-  private String getProjectSample(final String sampleName) {
-
-    return this.data.getProjectSample(this.lane, sampleName);
-  }
-
-  /**
-   * Get the raw cluster count for a sample.
-   * @param sampleName sample name
-   * @return the raw cluster count of the sample
-   */
-  private int getSampleRawClusterCount(final String sampleName) {
-
-    return this.data.getSampleRawClusterCount(this.lane, this.read, sampleName);
-  }
-
-  /**
-   * Get the passing filter cluster count for a sample.
-   * @param sampleName sample name
-   * @return the passing filter cluster count of the sample
-   */
-  private int getSamplePFClusterCount(final String sampleName) {
-
-    return this.data.getSamplePFClusterCount(this.lane, this.read, sampleName);
   }
 
   //

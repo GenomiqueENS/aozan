@@ -25,12 +25,11 @@ package fr.ens.biologie.genomique.aozan.collectors.stats;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
@@ -44,11 +43,13 @@ import fr.ens.biologie.genomique.aozan.collectors.StatisticsCollector;
  */
 public class ProjectStatisticsCollector extends StatisticsCollector {
 
+  // TODO Check the RunData keys names
+
   /** Collector name. */
   public static final String COLLECTOR_NAME = "projectstats";
 
   /** Collector prefix for updating rundata. */
-  public static final String COLLECTOR_PREFIX = "projectstats.";
+  public static final String COLLECTOR_PREFIX = "projectstats";
 
   @Override
   public String getName() {
@@ -57,7 +58,7 @@ public class ProjectStatisticsCollector extends StatisticsCollector {
 
   @Override
   public String getCollectorPrefix() {
-    return COLLECTOR_PREFIX;
+    return COLLECTOR_PREFIX + ".project";
   }
 
   @Override
@@ -71,36 +72,21 @@ public class ProjectStatisticsCollector extends StatisticsCollector {
   }
 
   @Override
-  public List<EntityStat> extractEntityStats(final RunData data)
+  public Map<Integer, EntityStat> extractEntityStats(final RunData data)
       throws AozanException {
 
-    final int laneCount = data.getLaneCount();
-
     // Initialization ProjectStats with the project name
-    final Map<String, EntityStat> projects = initMap(data);
+    final Map<Integer, EntityStat> projects = initMap(data);
 
-    // Add projects name
-    for (int lane = 1; lane <= laneCount; lane++) {
+    for (int projectId : data.getProjects()) {
 
-      // Parse all samples in lane
-      for (String sampleName : data.getSamplesNameListInLane(lane)) {
-
-        // Extract project name related to sample name
-        final String projectName = data.getProjectSample(lane, sampleName);
-
+      for (int sampleId : data.getSamplesInProject(projectId)) {
         // Save new sample in related project
-        projects.get(projectName).addEntity(lane, sampleName);
+        projects.get(projectId).addEntity(sampleId);
       }
     }
 
-    // Sorted list project
-    final List<EntityStat> projectsSorted =
-        new ArrayList<>(projects.values());
-
-    Collections.sort(projectsSorted);
-
-    return Collections.unmodifiableList(projectsSorted);
-
+    return projects;
   }
 
   /**
@@ -109,18 +95,19 @@ public class ProjectStatisticsCollector extends StatisticsCollector {
    * @return the map
    * @throws AozanException the aozan exception
    */
-  private Map<String, EntityStat> initMap(final RunData data)
+  private Map<Integer, EntityStat> initMap(final RunData data)
       throws AozanException {
 
-    final Map<String, EntityStat> projects = new HashMap<>();
-
-    // Extract projects names from run data
-    final List<String> projectsName = data.getProjectsNameList();
+    final Map<Integer, EntityStat> projects =
+        new TreeMap<>(new RunData.ProjectComparator(data));
 
     // Add projects
-    for (String projectName : projectsName) {
-      projects.put(projectName, new EntityStat(data, projectName, this,
-          extractFastqscreenReport(projectName)));
+    for (int projectId : data.getProjects()) {
+
+      projects.put(projectId, new EntityStat(data, projectId, this));
+
+      addFastqScreenReport(projectId, -1,
+          extractFastqscreenReport(data.getProjectName(projectId)));
     }
 
     return Collections.unmodifiableMap(projects);
@@ -139,8 +126,8 @@ public class ProjectStatisticsCollector extends StatisticsCollector {
         new File(this.getReportDirectory(), "/Project_" + projectName);
 
     if (!projectDir.exists())
-      throw new AozanException("Project directory does not exist "
-          + projectDir.getAbsolutePath());
+      throw new AozanException(
+          "Project directory does not exist " + projectDir.getAbsolutePath());
 
     // Extract in project directory all fastqscreen report xml
     final List<File> reports =

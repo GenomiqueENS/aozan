@@ -43,17 +43,11 @@ public class RawClustersSampleTest extends AbstractSimpleSampleTest {
   }
 
   @Override
-  protected String getKey(final int read, final int readSample, final int lane,
-      final String sampleName) {
+  protected String getKey(final int read, final int readSample,
+      final int sampleId, final int lane, final boolean undetermined) {
 
-    if (sampleName == null)
-      return "demux.lane"
-          + lane + ".sample.lane" + lane + ".read" + readSample
-          + ".raw.cluster.count";
-
-    return "demux.lane"
-        + lane + ".sample." + sampleName + ".read" + readSample
-        + ".raw.cluster.count";
+    return "demux.sample"
+        + sampleId + ".read" + readSample + ".raw.cluster.count";
   }
 
   @Override

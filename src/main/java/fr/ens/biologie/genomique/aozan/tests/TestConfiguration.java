@@ -1,6 +1,6 @@
 package fr.ens.biologie.genomique.aozan.tests;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -77,7 +77,7 @@ public class TestConfiguration {
       throw new NullPointerException("The globalConf object is null");
     }
 
-    final Map<String, String> result = new HashMap<>();
+    final Map<String, String> result = new LinkedHashMap<>();
 
     for (final Map.Entry<String, String> e : settings.entrySet()) {
 
@@ -129,7 +129,7 @@ public class TestConfiguration {
       throw new NullPointerException("The map object is null");
     }
 
-    this.map = new HashMap<>(map);
+    this.map = new LinkedHashMap<>(map);
   }
 
 }

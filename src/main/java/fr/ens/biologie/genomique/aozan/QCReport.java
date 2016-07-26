@@ -42,7 +42,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
@@ -62,9 +61,6 @@ import fr.ens.biologie.genomique.aozan.util.XMLUtilsWriter;
  * @author Laurent Jourdren
  */
 public class QCReport {
-  /** Splitter */
-  private static final Splitter COMMA_SPLITTER = Splitter.on(",").trimResults()
-      .omitEmptyStrings();
 
   private final RunData data;
 
@@ -173,8 +169,8 @@ public class QCReport {
 
           final Element testElement = doc.createElement("Test");
           testElement.setAttribute("name", test.getName());
-          testElement
-              .setAttribute("score", Integer.toString(result.getScore()));
+          testElement.setAttribute("score",
+              Integer.toString(result.getScore()));
           testElement.setAttribute("type", result.getType());
           testElement.setTextContent(result.getMessage());
           laneElement.appendChild(testElement);
@@ -187,7 +183,10 @@ public class QCReport {
   private void doProjectsStatsTests(final Element parentElement) {
 
     final Document doc = this.doc;
-    final List<String> projects = this.data.getProjectsNameList();
+
+    // Sort pooled samples
+    final List<Integer> projectIds = this.data.getProjects();
+    Collections.sort(projectIds, new RunData.ProjectComparator(data));
 
     final Element root = doc.createElement("ProjectsReport");
     parentElement.appendChild(root);
@@ -207,13 +206,13 @@ public class QCReport {
     final Element projectsElement = doc.createElement("Projects");
     root.appendChild(projectsElement);
 
-    for (String project : projects) {
+    for (int projectId : projectIds) {
       final Element projectElement = doc.createElement("Project");
-      projectElement.setAttribute("name", project);
+      projectElement.setAttribute("name", data.getProjectName(projectId));
       projectsElement.appendChild(projectElement);
 
       for (final ProjectTest test : this.projectStatsTests) {
-        final TestResult result = test.test(this.data, project);
+        final TestResult result = test.test(this.data, projectId);
 
         final Element testElement = doc.createElement("Test");
         testElement.setAttribute("name", test.getName());
@@ -229,12 +228,11 @@ public class QCReport {
   private void doSamplesStatsTests(final Element parentElement) {
 
     // Check needed to add this tests
-    if (asToIgnoreSampleStatsTestsForQCReport()) {
+    if (this.data.getProjectCount() > 1) {
       return;
     }
 
     final Document doc = this.doc;
-    final List<String> samplesNames = extractSamplesNamesInRun();
 
     final Element root = doc.createElement("SamplesStatsReport");
     parentElement.appendChild(root);
@@ -254,17 +252,22 @@ public class QCReport {
     final Element samplesStatsElement = doc.createElement("SamplesStats");
     root.appendChild(samplesStatsElement);
 
-    for (String sampleName : samplesNames) {
+    // Sort pooled samples
+    final List<Integer> pooledSamples = data.getAllPooledSamples();
+    Collections.sort(pooledSamples, new RunData.PooledSampleComparator(data));
+
+    for (int pooledSampleId : pooledSamples) {
       final Element sampleStatsElement = doc.createElement("SampleStats");
-      sampleStatsElement.setAttribute("name", sampleName);
+      sampleStatsElement.setAttribute("name",
+          this.data.getPooledSampleDemuxName(pooledSampleId));
       sampleStatsElement.setAttribute("description",
-          this.data.getSampleDescription(1, sampleName));
+          this.data.getPooledSampleDescription(pooledSampleId));
       sampleStatsElement.setAttribute("index",
-          this.data.getIndexSample(1, sampleName));
+          this.data.getPooledSampleIndex(pooledSampleId));
       samplesStatsElement.appendChild(sampleStatsElement);
 
       for (final SampleStatsTest test : this.samplesStatsTests) {
-        final TestResult result = test.test(this.data, sampleName);
+        final TestResult result = test.test(this.data, pooledSampleId);
 
         final Element testElement = doc.createElement("Test");
         testElement.setAttribute("name", test.getName());
@@ -286,16 +289,18 @@ public class QCReport {
     final Document doc = this.doc;
 
     final List<String> elements = new ArrayList<>();
-    String typeFilter;
+    String filterType;
 
-    if (asToIgnoreSampleStatsTestsForQCReport()) {
-      typeFilter = "project";
-      final String list = this.data.getProjectsName();
-      elements.addAll(COMMA_SPLITTER.splitToList(list));
+    if (this.data.getProjectCount() > 1) {
+      filterType = "project";
+
+      for (int projectId : this.data.getProjects()) {
+        elements.add(this.data.getProjectName(projectId));
+      }
 
     } else {
 
-      typeFilter = "sample";
+      filterType = "sample";
       elements.addAll(extractSamplesNamesInRun());
 
       // Remove Undetermined if exists
@@ -304,7 +309,7 @@ public class QCReport {
 
     // Build map associate lanes number with project
     final ListMultimap<String, Integer> lanesNumberRelatedElement =
-        extractLaneNumberRelatedProjectName(typeFilter);
+        extractLaneNumberRelatedProjectName(filterType);
 
     final Element filter = doc.createElement("TableFilter");
     parentElement.appendChild(filter);
@@ -321,7 +326,7 @@ public class QCReport {
       // Build command javascript for filter line samples report by project
       elementFilter.setAttribute("cmdJS",
           "'" + Joiner.on(",").join(lanesRelatedProject) + "'");
-      elementFilter.setAttribute("typeFilter", typeFilter);
+      elementFilter.setAttribute("typeFilter", filterType);
 
       elementFilter.setTextContent(element);
       filter.appendChild(elementFilter);
@@ -342,7 +347,7 @@ public class QCReport {
     }
 
     undeterminedLanes.setAttribute("cmdJS", "'" + Joiner.on(",").join(s) + "'");
-    undeterminedLanes.setAttribute("typeFilter", typeFilter);
+    undeterminedLanes.setAttribute("typeFilter", filterType);
 
     undeterminedLanes.setTextContent("undetermined");
     filter.appendChild(undeterminedLanes);
@@ -392,54 +397,55 @@ public class QCReport {
 
       for (int lane = 1; lane <= laneCount; lane++) {
 
-        final List<String> sampleNames =
-            this.data.getSamplesNameListInLane(lane);
+        final List<Integer> sampleIds = this.data.getAllSamplesInLane(lane);
 
-        final boolean noIndex;
+        for (final int sampleId : sampleIds) {
 
-        if (sampleNames.isEmpty()) {
-          noIndex = true;
-        } else {
-          final String firstIndex =
-              this.data.getIndexSample(lane, sampleNames.get(0));
-          noIndex = sampleNames.size() == 1 && "".equals(firstIndex);
-        }
-
-        for (final String sampleName : sampleNames) {
+          // Get the sample name
+          final String sampleName = this.data.getSampleDemuxName(sampleId);
 
           // Get the sample index
-          final String index = this.data.getIndexSample(lane, sampleName);
+          final String index = this.data.getIndexSample(sampleId);
 
           // Get the sample description
-          final String desc = this.data.getSampleDescription(lane, sampleName);
+          String desc = this.data.getSampleDescription(sampleId);
+          desc = "".equals(desc) ? "No description" : desc;
 
           // Get the sample project
-          final String projectName =
-              this.data.getProjectSample(lane, sampleName);
+          String projectName = this.data.getProjectSample(sampleId);
+          projectName =
+              "".equals(projectName) ? "Undefined project" : projectName;
 
-          addSample(readElement, read, readSample, lane, sampleName, desc,
-              projectName, noIndex ? "NoIndex" : index);
-        }
+          final String indexString;
 
-        // Undetermined indexes
-        if (!noIndex) {
-          addSample(readElement, read, readSample, lane, null, null, null,
-              "undetermined");
+          if (this.data.isUndeterminedSample(sampleId)) {
+            indexString = "undetermined";
+            projectName = "undetermined";
+          } else {
+            if (this.data.isIndexedSample(sampleId)) {
+              indexString = index;
+            } else {
+              indexString = "NoIndex";
+            }
+          }
+          addSample(readElement, read, readSample, sampleId, lane, sampleName,
+              desc, projectName, indexString);
         }
       }
     }
   }
 
   private void addSample(final Element readElement, final int read,
-      final int readSample, final int lane, final String sampleName,
-      final String desc, final String projectName, final String index) {
+      final int readSample, final int sampleId, final int lane,
+      final String sampleName, final String desc, final String projectName,
+      final String index) {
 
     final Element sampleElement = this.doc.createElement("Sample");
-    sampleElement.setAttribute("name", sampleName == null
-        ? "undetermined" : sampleName);
+    sampleElement.setAttribute("name",
+        sampleName == null ? "undetermined" : sampleName);
     sampleElement.setAttribute("desc", desc == null ? "No description" : desc);
-    sampleElement.setAttribute("project", projectName == null
-        ? "undetermined" : projectName);
+    sampleElement.setAttribute("project",
+        projectName == null ? "undetermined" : projectName);
     sampleElement.setAttribute("lane", Integer.toString(lane));
     sampleElement.setAttribute("index", index);
 
@@ -448,7 +454,7 @@ public class QCReport {
     for (final SampleTest test : this.sampleTests) {
 
       final TestResult result =
-          test.test(this.data, read, readSample, lane, sampleName);
+          test.test(this.data, read, readSample, sampleId);
 
       final Element testElement = this.doc.createElement("Test");
       testElement.setAttribute("name", test.getName());
@@ -573,25 +579,24 @@ public class QCReport {
     for (int lane = 1; lane <= laneCount; lane++) {
 
       // Extract samples name in lane
-      final List<String> samplesNameInLane =
-          this.data.getSamplesNameListInLane(lane);
+      final List<Integer> samplesInLane = this.data.getSamplesInLane(lane);
 
       switch (typeFilter) {
 
       case "sample":
 
-        for (final String sampleName : samplesNameInLane) {
-          nameWithLaneNumber.put(sampleName, lane);
+        for (final int sampleId : samplesInLane) {
+          nameWithLaneNumber.put(this.data.getSampleDemuxName(sampleId), lane);
         }
 
         break;
+
       default:
 
-        for (final String sampleName : samplesNameInLane) {
+        for (final int sampleId : samplesInLane) {
 
           // Extract project name corresponding to sample name
-          final String projectName =
-              this.data.getProjectSample(lane, sampleName);
+          final String projectName = this.data.getProjectSample(sampleId);
 
           if (projectName != null) {
             // Add project name and lane number in map
@@ -608,18 +613,6 @@ public class QCReport {
   }
 
   /**
-   * State qc report.
-   * @return true, if successful
-   */
-  private boolean asToIgnoreSampleStatsTestsForQCReport() {
-
-    final List<String> projetsNamesInRun = this.data.getProjectsNameList();
-
-    return projetsNamesInRun.size() > 1;
-
-  }
-
-  /**
    * Extract samples names in run from Rundata instance.
    * @return the list of samples names
    */
@@ -631,7 +624,9 @@ public class QCReport {
 
     for (int lane = 1; lane <= laneCount; lane++) {
       // Add all samples names by lane and ignore replica
-      names.addAll(this.data.getSamplesNameListInLane(lane));
+      for (int sampleId : this.data.getSamplesInLane(lane)) {
+        names.add(this.data.getSampleDemuxName(sampleId));
+      }
 
       // Add Undetermined sample
       if (this.data.isUndeterminedInLane(lane)) {
@@ -656,8 +651,7 @@ public class QCReport {
    * @param sampleTests list of the sample tests
    */
   public QCReport(final RunData data, final List<GlobalTest> globalTests,
-      final List<LaneTest> laneTests,
-      final List<ProjectTest> projectStatsTests,
+      final List<LaneTest> laneTests, final List<ProjectTest> projectStatsTests,
       final List<SampleStatsTest> samplesStatsTests,
       final List<SampleTest> sampleTests) {
 

@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.tests.projectstats;
 
+import static fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector.COLLECTOR_PREFIX;
+
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -30,8 +32,8 @@ import com.google.common.collect.ImmutableList;
 import fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector;
 
 /**
- * The class define a test the sum on passing filter clusters on samples in
- * a project.
+ * The class define a test the sum on passing filter clusters on samples in a
+ * project.
  * @author Sandrine Perrin
  * @since 1.4
  */
@@ -44,10 +46,9 @@ public class PFClusterSumProjectTest extends AbstractSimpleProjectTest {
   }
 
   @Override
-  protected String getKey(final String projectName) {
+  protected String getKey(final int projectId) {
 
-    return ProjectStatisticsCollector.COLLECTOR_PREFIX
-        + projectName + ".pf.cluster.sum";
+    return COLLECTOR_PREFIX + ".project" + projectId + ".pf.cluster.sum";
   }
 
   @Override

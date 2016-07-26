@@ -61,10 +61,10 @@ public abstract class AbstractSimpleProjectTest extends AbstractProjectTest {
 
   /**
    * Get the the key in the RunData object for the value to test.
-   * @param projectName the project name
+   * @param projectId the project Id
    * @return a String with the required key
    */
-  protected abstract String getKey(final String projectName);
+  protected abstract String getKey(final int projectId);
 
   /**
    * Transform the value.
@@ -93,9 +93,9 @@ public abstract class AbstractSimpleProjectTest extends AbstractProjectTest {
   protected abstract Class<?> getValueType();
 
   @Override
-  public TestResult test(final RunData data, final String projectName) {
+  public TestResult test(final RunData data, final int projectId) {
 
-    final String key = getKey(projectName);
+    final String key = getKey(projectId);
 
     if (key == null) {
       return null;

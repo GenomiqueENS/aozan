@@ -44,9 +44,9 @@ public class IsIndexedProjectTest extends AbstractSimpleProjectTest {
   }
 
   @Override
-  protected String getKey(final String projectName) {
+  protected String getKey(final int projectId) {
 
-    return COLLECTOR_PREFIX + projectName + ".isindexed";
+    return COLLECTOR_PREFIX + ".project" + projectId + ".isindexed";
   }
 
   @Override

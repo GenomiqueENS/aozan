@@ -45,10 +45,13 @@ public class RecoverableClusterLinkReportSampleTest extends AbstractSampleTest {
 
   @Override
   public TestResult test(final RunData data, final int read,
-      final int readSample, final int lane, final String sampleName) {
+      final int readSample, final int sampleId) {
+
+    final boolean undetermined = data.isUndeterminedSample(sampleId);
+    final int lane = data.getSampleLane(sampleId);
 
     // Case undetermined indices sample
-    if (sampleName == null) {
+    if (undetermined) {
 
       final String key =
           "undeterminedindices.lane" + lane + ".recoverable.pf.cluster.count";
@@ -57,30 +60,28 @@ public class RecoverableClusterLinkReportSampleTest extends AbstractSampleTest {
         return new TestResult("NA");
       }
 
-      final String url =
-          String
-              .format(
-                  "Undetermined_indices/lane%s_Undetermined_L%03d_R1_001-potentialindices.html",
-                  lane, lane);
+      final String url = String.format(
+          "Undetermined_indices/lane%s_Undetermined_L%03d_R1_001-potentialindices.html",
+          lane, lane);
 
       return new TestResult(-1, url, "url");
 
     }
 
     // Case standard sample
-    final String key =
-        "undeterminedindices.lane"
-            + lane + ".sample." + sampleName + ".recoverable.pf.cluster.count";
+    final String key = "undeterminedindices.sample"
+        + sampleId + ".recoverable.pf.cluster.count";
 
     if (data.get(key) == null) {
       return new TestResult("NA");
     }
 
     // Get HTML report URL
-    final String projectName = data.getProjectSample(lane, sampleName);
+    final String projectName = data.getProjectSample(sampleId);
+    final String demuxName = data.getSampleDemuxName(sampleId);
 
     final String filename =
-        String.format("%s_lane%s-potentialindices.html", sampleName, lane);
+        String.format("%s_lane%s-potentialindices.html", demuxName, lane);
 
     final String url = "Project_" + projectName + "/" + filename;
 

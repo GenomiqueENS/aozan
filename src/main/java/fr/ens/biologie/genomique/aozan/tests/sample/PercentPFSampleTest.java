@@ -53,23 +53,18 @@ public class PercentPFSampleTest extends AbstractSampleTest {
 
   @Override
   public TestResult test(final RunData data, final int re2ad,
-      final int readSample, final int lane, final String sampleName) {
+      final int readSample, final int sampleId) {
 
-    final String prefix;
+    final boolean undetermined = data.isUndeterminedSample(sampleId);
 
-    if (sampleName == null)
-      prefix =
-          "demux.lane" + lane + ".sample.lane" + lane + ".read" + readSample;
-    else
-      prefix =
-          "demux.lane" + lane + ".sample." + sampleName + ".read" + readSample;
+    final String prefix = "demux.sample" + sampleId + ".read" + readSample;
 
     try {
       final long raw = data.getLong(prefix + ".raw.cluster.count");
       final long pf = data.getLong(prefix + ".pf.cluster.count");
       final double percent = (double) pf / (double) raw;
 
-      if (interval == null || sampleName == null)
+      if (interval == null || undetermined)
         return new TestResult(percent, true);
 
       return new TestResult(this.interval.getScore(percent), percent, true);

@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -107,7 +108,7 @@ public class QC {
   private final List<ProjectTest> projectStatsTests = new ArrayList<>();
   private final List<SampleStatsTest> samplesStatsTests = new ArrayList<>();
   private final List<SampleTest> sampleTests = new ArrayList<>();
-  private final Map<String, String> globalConf = new HashMap<>();
+  private final Map<String, String> globalConf = new LinkedHashMap<>();
 
   private final File tmpDir;
   private final File sampleSheetFile;

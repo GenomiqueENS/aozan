@@ -44,9 +44,9 @@ public class LanesRunProjectTest extends AbstractSimpleSampleTest {
   }
 
   @Override
-  protected String getKey(final String sampleName) {
+  protected String getKey(final int pooledSampleId) {
 
-    return COLLECTOR_PREFIX + sampleName + ".lanes";
+    return COLLECTOR_PREFIX + ".pooledsample" + pooledSampleId + ".lanes";
   }
 
   @Override

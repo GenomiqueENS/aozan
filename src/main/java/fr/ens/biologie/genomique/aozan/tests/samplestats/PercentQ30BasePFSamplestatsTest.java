@@ -42,7 +42,7 @@ import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
  * @author Sandrine Perrin
  * @since 2.0
  */
-public class PercentQ30BasePFSamplestatsTest extends AbstractSampleTest {
+public class PercentQ30BasePFSamplestatsTest extends AbstractSampleStatsTest {
 
   private final ScoreInterval interval = new ScoreInterval();
 
@@ -53,14 +53,9 @@ public class PercentQ30BasePFSamplestatsTest extends AbstractSampleTest {
   }
 
   @Override
-  public TestResult test(RunData data, String sampleName) {
-
-    if (sampleName == null) {
-      return new TestResult("NA");
-    }
+  public TestResult test(final RunData data, final int pooledSampleId) {
 
     // Compile all Q30 value on sample,
-    final int laneCount = data.getLaneCount();
     final int readCount = data.getReadCount();
 
     long q30Cumul = 0;
@@ -76,10 +71,11 @@ public class PercentQ30BasePFSamplestatsTest extends AbstractSampleTest {
 
         readIndexedCount++;
 
-        for (int lane = 1; lane <= laneCount; lane++) {
+        for (int sampleId : data.getSamplesInPooledSample(pooledSampleId)) {
 
           final String prefix =
-              buildPrefixRundata(sampleName, lane, readIndexedCount);
+              // buildPrefixRundata(sampleName, lane, readIndexedCount);
+              "demux.sample" + sampleId + ".read" + readIndexedCount;
 
           final String q30Key = prefix + ".pf.yield.q30";
           final String rawKey = prefix + ".pf.yield";
@@ -105,16 +101,6 @@ public class PercentQ30BasePFSamplestatsTest extends AbstractSampleTest {
 
       return new TestResult("NA");
     }
-  }
-
-  private String buildPrefixRundata(final String sampleName, final int lane,
-      final int read) {
-
-    if (sampleName.equals(SampleStatisticsCollector.UNDETERMINED_SAMPLE))
-      return "demux.lane" + lane + ".sample.lane" + lane + ".read" + read;
-
-    return "demux.lane" + lane + ".sample." + sampleName + ".read" + read;
-
   }
 
   @Override

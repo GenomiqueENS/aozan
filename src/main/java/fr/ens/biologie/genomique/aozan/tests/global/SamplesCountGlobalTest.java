@@ -62,7 +62,7 @@ public class SamplesCountGlobalTest extends AbstractGlobalTest {
 
       for (int lane = 1; lane <= laneCount; lane++) {
 
-        samplesCount += data.getSamplesNameInLane(lane).size();
+        samplesCount += data.getSamplesInLane(lane).size();
       }
 
       return new TestResult(this.interval.getScore(samplesCount), samplesCount,

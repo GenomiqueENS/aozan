@@ -55,21 +55,13 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
 
   @Override
   public TestResult test(final RunData data, final int read,
-      final int readSample, final int lane, final String sampleName) {
+      final int readSample, final int sampleId) {
 
-    final String rawSampleKey;
+    final boolean undetermined = data.isUndeterminedSample(sampleId);
+    final int lane = data.getSampleLane(sampleId);
 
-    if (sampleName == null) {
-      rawSampleKey =
-          "demux.lane"
-              + lane + ".sample.lane" + lane + ".read" + readSample
-              + ".raw.cluster.count";
-    } else {
-      rawSampleKey =
-          "demux.lane"
-              + lane + ".sample." + sampleName + ".read" + readSample
-              + ".raw.cluster.count";
-    }
+    final String rawSampleKey =
+        "demux.sample" + sampleId + ".read" + readSample + ".raw.cluster.count";
 
     final String rawAll =
         "demux.lane" + lane + ".all.read" + readSample + ".raw.cluster.count";
@@ -82,8 +74,7 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
       final double percent = (double) raw / (double) all;
 
       // Configure score
-      final double homogeneityInLane =
-          1 / data.getSamplesNameListInLane(lane).size();
+      final double homogeneityInLane = 1 / data.getSamplesInLane(lane).size();
 
       if (this.distance >= homogeneityInLane) {
         this.distance = 0.0;
@@ -93,10 +84,10 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
       final double max = homogeneityInLane + this.distance;
 
       // If distance not set, score = -1
-      final int score =
-          (this.distance == 0.0 ? -1 : (percent > max || percent < min) ? 4 : 9);
+      final int score = (this.distance == 0.0
+          ? -1 : (percent > max || percent < min) ? 4 : 9);
 
-      if (sampleName == null) {
+      if (undetermined) {
         return new TestResult(percent, true);
       }
 
@@ -122,8 +113,7 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
 
     final String d = conf.get(MARGE_PERCENT_IN_LANE_KEY);
     if (d != null) {
-      this.distance =
-          Double.parseDouble(conf.get(MARGE_PERCENT_IN_LANE_KEY));
+      this.distance = Double.parseDouble(conf.get(MARGE_PERCENT_IN_LANE_KEY));
 
       if (this.distance >= 1.0) {
         this.distance = 0.0;
