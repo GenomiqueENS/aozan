@@ -46,6 +46,9 @@ public class UndeterminedIndexesCollector extends AbstractFastqCollector {
   /** The collector name. */
   public static final String COLLECTOR_NAME = "undeterminedindexes";
 
+  /** Prefix for run data */
+  public static final String RUN_DATA_PREFIX = "undeterminedindices";
+
   private int numberThreads = Runtime.getRuntime().availableProcessors();
   private File undeterminedIndexedXSLFile;
 

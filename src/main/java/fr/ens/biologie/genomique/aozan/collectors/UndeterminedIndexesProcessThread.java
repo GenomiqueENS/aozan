@@ -25,6 +25,7 @@ package fr.ens.biologie.genomique.aozan.collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.biologie.genomique.aozan.collectors.UndeterminedIndexesCollector.COLLECTOR_NAME;
+import static fr.ens.biologie.genomique.aozan.collectors.UndeterminedIndexesCollector.RUN_DATA_PREFIX;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -38,6 +39,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -80,8 +82,6 @@ import uk.ac.babraham.FastQC.Sequence.SequenceFormatException;
  */
 public class UndeterminedIndexesProcessThread
     extends AbstractFastqProcessThread {
-
-  // TODO use a prefix for RunData entries
 
   /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
@@ -156,74 +156,32 @@ public class UndeterminedIndexesProcessThread
     @Override
     public int hashCode() {
 
-      // TODO re-implement this method using Objects.hashcode()
-
-      final int prime = 31;
-      int result = 1;
-      result = prime * result
-          + ((this.comment == null) ? 0 : this.comment.hashCode());
-      long temp;
-      temp = Double.doubleToLongBits(this.inPFUndeterminedIndicePercent);
-      result = prime * result + (int) (temp ^ (temp >>> 32));
-      temp = Double.doubleToLongBits(this.inRawUndeterminedIndicePercent);
-      result = prime * result + (int) (temp ^ (temp >>> 32));
-      result =
-          prime * result + ((this.index == null) ? 0 : this.index.hashCode());
-      result = prime * result + this.pfClusterCount;
-      temp = Double.doubleToLongBits(this.pfPercent);
-      result = prime * result + (int) (temp ^ (temp >>> 32));
-      result = prime * result + this.rawClusterCount;
-      return result;
+      return Objects.hash(this.index, this.rawClusterCount, this.pfClusterCount,
+          this.pfPercent, this.inRawUndeterminedIndicePercent,
+          this.inPFUndeterminedIndicePercent, this.comment);
     }
 
     @Override
     public boolean equals(final Object obj) {
 
-      // TODO re-implement this method using Guava
-
       if (this == obj) {
         return true;
       }
-      if (obj == null) {
+
+      if (obj == null || getClass() != obj.getClass())
         return false;
-      }
-      if (getClass() != obj.getClass()) {
-        return false;
-      }
-      final LaneResultEntry other = (LaneResultEntry) obj;
-      if (this.comment == null) {
-        if (other.comment != null) {
-          return false;
-        }
-      } else if (!this.comment.equals(other.comment)) {
-        return false;
-      }
-      if (Double.doubleToLongBits(this.inPFUndeterminedIndicePercent) != Double
-          .doubleToLongBits(other.inPFUndeterminedIndicePercent)) {
-        return false;
-      }
-      if (Double.doubleToLongBits(this.inRawUndeterminedIndicePercent) != Double
-          .doubleToLongBits(other.inRawUndeterminedIndicePercent)) {
-        return false;
-      }
-      if (this.index == null) {
-        if (other.index != null) {
-          return false;
-        }
-      } else if (!this.index.equals(other.index)) {
-        return false;
-      }
-      if (this.pfClusterCount != other.pfClusterCount) {
-        return false;
-      }
-      if (Double.doubleToLongBits(this.pfPercent) != Double
-          .doubleToLongBits(other.pfPercent)) {
-        return false;
-      }
-      if (this.rawClusterCount != other.rawClusterCount) {
-        return false;
-      }
-      return true;
+
+      final LaneResultEntry that = (LaneResultEntry) obj;
+
+      return Objects.equals(this.index, that.index)
+          && Objects.equals(this.rawClusterCount, that.rawClusterCount)
+          && Objects.equals(this.pfClusterCount, that.pfClusterCount)
+          && Objects.equals(this.pfPercent, that.pfPercent)
+          && Objects.equals(this.inRawUndeterminedIndicePercent,
+              that.inRawUndeterminedIndicePercent)
+          && Objects.equals(this.inPFUndeterminedIndicePercent,
+              that.inPFUndeterminedIndicePercent)
+          && Objects.equals(this.comment, that.comment);
     }
 
     @Override
@@ -361,74 +319,30 @@ public class UndeterminedIndexesProcessThread
     @Override
     public int hashCode() {
 
-      // TODO Re-implement this method using Objects.hashcode()
-
-      final int prime = 31;
-      int result = 1;
-      result = prime * result
-          + ((this.comment == null) ? 0 : this.comment.hashCode());
-      result =
-          prime * result + ((this.index == null) ? 0 : this.index.hashCode());
-      result = prime * result + this.pfClusterCount;
-      long temp;
-      temp = Double.doubleToLongBits(this.pfClusterPercent);
-      result = prime * result + (int) (temp ^ (temp >>> 32));
-      temp = Double.doubleToLongBits(this.pfPercent);
-      result = prime * result + (int) (temp ^ (temp >>> 32));
-      result = prime * result + this.rawClusterCount;
-      temp = Double.doubleToLongBits(this.rawClusterPercent);
-      result = prime * result + (int) (temp ^ (temp >>> 32));
-      return result;
+      return Objects.hash(this.index, this.rawClusterCount, this.pfClusterCount,
+          this.comment, this.pfPercent, this.rawClusterPercent,
+          this.pfClusterPercent);
     }
 
     @Override
     public boolean equals(final Object obj) {
 
-      // TODO Re-implement this method using Guava
-
       if (this == obj) {
         return true;
       }
-      if (obj == null) {
+
+      if (obj == null || getClass() != obj.getClass())
         return false;
-      }
-      if (getClass() != obj.getClass()) {
-        return false;
-      }
-      final SampleResultEntry other = (SampleResultEntry) obj;
-      if (this.comment == null) {
-        if (other.comment != null) {
-          return false;
-        }
-      } else if (!this.comment.equals(other.comment)) {
-        return false;
-      }
-      if (this.index == null) {
-        if (other.index != null) {
-          return false;
-        }
-      } else if (!this.index.equals(other.index)) {
-        return false;
-      }
-      if (this.pfClusterCount != other.pfClusterCount) {
-        return false;
-      }
-      if (Double.doubleToLongBits(this.pfClusterPercent) != Double
-          .doubleToLongBits(other.pfClusterPercent)) {
-        return false;
-      }
-      if (Double.doubleToLongBits(this.pfPercent) != Double
-          .doubleToLongBits(other.pfPercent)) {
-        return false;
-      }
-      if (this.rawClusterCount != other.rawClusterCount) {
-        return false;
-      }
-      if (Double.doubleToLongBits(this.rawClusterPercent) != Double
-          .doubleToLongBits(other.rawClusterPercent)) {
-        return false;
-      }
-      return true;
+
+      final SampleResultEntry that = (SampleResultEntry) obj;
+
+      return Objects.equals(this.index, that.index)
+          && Objects.equals(this.rawClusterCount, that.rawClusterCount)
+          && Objects.equals(this.pfClusterCount, that.pfClusterCount)
+          && Objects.equals(this.pfPercent, that.pfPercent)
+          && Objects.equals(this.rawClusterPercent, that.rawClusterPercent)
+          && Objects.equals(this.pfClusterPercent, that.pfClusterPercent)
+          && Objects.equals(this.comment, that.comment);
     }
 
     @Override
@@ -688,7 +602,7 @@ public class UndeterminedIndexesProcessThread
     } else {
       this.maxMismatches = minMismatchFound;
       getResults().put(
-          "undeterminedindices.lane" + this.lane + ".mismatch.recovery.cluster",
+          RUN_DATA_PREFIX + ".lane" + this.lane + ".mismatch.recovery.cluster",
           this.maxMismatches);
     }
   }
@@ -702,10 +616,10 @@ public class UndeterminedIndexesProcessThread
     // Initialize results for each sample of the lane
     for (final int sampleId : this.data.getSamplesInLane(this.lane)) {
 
-      getResults().put("undeterminedindices.sample."
-          + sampleId + ".recoverable.raw.cluster.count", 0);
-      getResults().put("undeterminedindices.sample."
-          + sampleId + ".recoverable.pf.cluster.count", 0);
+      getResults().put(RUN_DATA_PREFIX
+          + ".sample." + sampleId + ".recoverable.raw.cluster.count", 0);
+      getResults().put(RUN_DATA_PREFIX
+          + ".sample." + sampleId + ".recoverable.pf.cluster.count", 0);
     }
 
     if (!this.isSkipProcessResult) {
@@ -740,12 +654,11 @@ public class UndeterminedIndexesProcessThread
 
     // Set the result for the lane
     getResults().put(
-        "undeterminedindices.lane"
-            + this.lane + ".recoverable.raw.cluster.count",
+        RUN_DATA_PREFIX
+            + ".lane" + this.lane + ".recoverable.raw.cluster.count",
         recoverableRawClusterCount);
     getResults().put(
-        "undeterminedindices.lane"
-            + this.lane + ".recoverable.pf.cluster.count",
+        RUN_DATA_PREFIX + ".lane" + this.lane + ".recoverable.pf.cluster.count",
         recoverablePFClusterCount);
 
     // Create report
@@ -782,7 +695,7 @@ public class UndeterminedIndexesProcessThread
     }
 
     // Set the result for the sample
-    getResults().put("undeterminedindices.sample" + sampleId + resultKeySuffix,
+    getResults().put(RUN_DATA_PREFIX + ".sample" + sampleId + resultKeySuffix,
         recoverableClusterCount);
 
     return recoverableClusterCount;
@@ -1165,9 +1078,6 @@ public class UndeterminedIndexesProcessThread
     for (final ResultEntry e : entries) {
       e.toXML(doc, results, "entry");
     }
-
-    // TODO debug
-    // XMLUtilsWriter.createXMLFile(doc, reportHtml);
 
     // Set xsl file to write report HTML file
     InputStream is = null;
