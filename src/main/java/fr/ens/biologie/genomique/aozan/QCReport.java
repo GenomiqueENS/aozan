@@ -208,6 +208,7 @@ public class QCReport {
 
     for (int projectId : projectIds) {
       final Element projectElement = doc.createElement("Project");
+      projectElement.setAttribute("id", "" + projectId);
       projectElement.setAttribute("name", data.getProjectName(projectId));
       projectsElement.appendChild(projectElement);
 
@@ -258,6 +259,7 @@ public class QCReport {
 
     for (int pooledSampleId : pooledSamples) {
       final Element sampleStatsElement = doc.createElement("SampleStats");
+      sampleStatsElement.setAttribute("id", "" + pooledSampleId);
       sampleStatsElement.setAttribute("name",
           this.data.getPooledSampleDemuxName(pooledSampleId));
       sampleStatsElement.setAttribute("description",
@@ -441,6 +443,7 @@ public class QCReport {
       final String index) {
 
     final Element sampleElement = this.doc.createElement("Sample");
+    sampleElement.setAttribute("id", "" + sampleId);
     sampleElement.setAttribute("name",
         sampleName == null ? "undetermined" : sampleName);
     sampleElement.setAttribute("desc", desc == null ? "No description" : desc);
