@@ -41,8 +41,6 @@ import fr.ens.biologie.genomique.aozan.tests.TestResult;
 public class HitNoLibrariesFastqScreenSamplestatsTest
     extends AbstractSimpleSampleTest {
 
-  // TODO rename column header fastqScreen -> FastqScreen
-
   @Override
   public List<String> getCollectorsNamesRequiered() {
     return ImmutableList.of(FastqScreenCollector.COLLECTOR_NAME);
@@ -105,13 +103,6 @@ public class HitNoLibrariesFastqScreenSamplestatsTest
   @Override
   protected Class<?> getValueType() {
     return Double.class;
-  }
-
-  @SuppressWarnings("unused")
-  protected Number transformValue(final Number value, final RunData data,
-      final int read, final boolean indexedRead, final int lane) {
-
-    return value.doubleValue() * 100.0;
   }
 
   //
