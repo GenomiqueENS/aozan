@@ -103,7 +103,7 @@ public class RunData {
     public int compare(final Integer i1, final Integer i2) {
 
       final boolean undetermined1 = data.isUndeterminedPooledSample(i1);
-      final boolean undetermined2 = data.isUndeterminedPooledSample(i1);
+      final boolean undetermined2 = data.isUndeterminedPooledSample(i2);
 
       final int compare1 = Boolean.compare(undetermined1, undetermined2);
 
