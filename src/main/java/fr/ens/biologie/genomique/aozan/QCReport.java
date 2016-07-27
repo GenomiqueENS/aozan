@@ -266,6 +266,8 @@ public class QCReport {
           this.data.getPooledSampleDescription(pooledSampleId));
       sampleStatsElement.setAttribute("index",
           this.data.getPooledSampleIndex(pooledSampleId));
+      sampleStatsElement.setAttribute("project",
+          this.data.getPooledSampleProjectName(pooledSampleId));
       samplesStatsElement.appendChild(sampleStatsElement);
 
       for (final SampleStatsTest test : this.samplesStatsTests) {
