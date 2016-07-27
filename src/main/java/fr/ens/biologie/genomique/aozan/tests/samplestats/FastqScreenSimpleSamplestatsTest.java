@@ -182,7 +182,7 @@ public class FastqScreenSimpleSamplestatsTest extends AbstractSimpleSampleTest {
   public FastqScreenSimpleSamplestatsTest(final String genome,
       final boolean isGenomeContamination) {
     super("samplestatsfsqmapped", "",
-        "fastqscreen "
+        "FastqScreen "
             + (isGenomeContamination ? "" : "single ") + "mapped on " + genome,
         "%");
     this.genomeReference = genome;
