@@ -64,7 +64,7 @@ public class RawClusterSumProjectTest extends AbstractSimpleProjectTest {
    * Public constructor.
    */
   public RawClusterSumProjectTest() {
-    super("rawclustersumproject", "", "Raw clusters sum");
+    super("project.rawclustersumproject", "", "Raw clusters sum");
   }
 
 }

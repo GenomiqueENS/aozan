@@ -74,7 +74,7 @@ public class PFClustersMedianeGlobalTest extends AbstractSimpleGlobalTest {
    */
   public PFClustersMedianeGlobalTest() {
 
-    super("globalpfclustersmediane", "", "PF Clusters Mediane Est.");
+    super("global.globalpfclustersmediane", "", "PF Clusters Mediane Est.");
   }
 
 }

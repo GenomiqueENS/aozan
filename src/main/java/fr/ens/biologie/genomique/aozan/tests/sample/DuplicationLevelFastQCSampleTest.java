@@ -67,7 +67,7 @@ public class DuplicationLevelFastQCSampleTest extends AbstractFastQCSampleTest {
    */
   public DuplicationLevelFastQCSampleTest() {
 
-    super("duplicationlevel", "duplication level", "Duplication level");
+    super("sample.duplicationlevel", "duplication level", "Duplication level");
   }
 
 }

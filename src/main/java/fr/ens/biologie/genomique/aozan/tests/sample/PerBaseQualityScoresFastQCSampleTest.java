@@ -69,7 +69,7 @@ public class PerBaseQualityScoresFastQCSampleTest extends
    */
   public PerBaseQualityScoresFastQCSampleTest() {
 
-    super("perbasequalityscores", "per base quality scores",
+    super("sample.perbasequalityscores", "per base quality scores",
         "Per base quality scores");
   }
 

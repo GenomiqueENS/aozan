@@ -75,7 +75,7 @@ public class PFClustersStandardDeviationGlobalTest extends
    */
   public PFClustersStandardDeviationGlobalTest() {
 
-    super("globalpfclusterssd", "", "PF Clusters SD Est.");
+    super("global.globalpfclusterssd", "", "PF Clusters SD Est.");
   }
 
 }

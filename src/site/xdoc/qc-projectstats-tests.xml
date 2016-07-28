@@ -50,21 +50,21 @@
        <table>
          <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
 
-		<tr><td>qc.test.samplecountproject.enable</td><td>integer interval</td><td>False</td><td>Enable sample count project test</td></tr>
-		<tr><td>qc.test.genomesproject.enable</td><td>string</td><td>False</td><td>Enable genomes projects test</td></tr>
-		<tr><td>qc.test.lanesrunproject.enable</td><td>string</td><td>False</td><td>Enable lanes number on run test</td></tr>
-		<tr><td>qc.test.isindexedproject.enable</td><td>string</td><td>False</td><td>Enable global base count test</td></tr>
-		<tr><td>qc.test.rawclusterminproject.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.project.samplecountproject.enable</td><td>integer interval</td><td>False</td><td>Enable sample count project test</td></tr>
+		<tr><td>qc.test.project.genomesproject.enable</td><td>string</td><td>False</td><td>Enable genomes projects test</td></tr>
+		<tr><td>qc.test.project.lanesrunproject.enable</td><td>string</td><td>False</td><td>Enable lanes number on run test</td></tr>
+		<tr><td>qc.test.project.isindexedproject.enable</td><td>string</td><td>False</td><td>Enable global base count test</td></tr>
+		<tr><td>qc.test.project.rawclusterminproject.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable raw cluster minimum count in samples on project test</td></tr>
-		<tr><td>qc.test.rawclustermaxproject.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.project.rawclustermaxproject.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable raw cluster maximum count in samples on project  test</td></tr>
-		<tr><td>qc.test.rawclustersumproject.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.project.rawclustersumproject.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable raw cluster sum on project  test</td></tr>
-		<tr><td>qc.test.pfclusterminproject.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.project.pfclusterminproject.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable passing filter cluster minimum count in samples on project  test</td></tr>
-		<tr><td>qc.test.pfclustermaxproject.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.project.pfclustermaxproject.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable passing filter cluster minimum count in samples on project  test</td></tr>
-		<tr><td>qc.test.pfclustersumproject.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.project.pfclustersumproject.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable passing filter cluster sum on project  test</td></tr>
        </table>
 

@@ -63,7 +63,7 @@ public class LanesRunProjectTest extends AbstractSimpleProjectTest {
    * Public constructor.
    */
   public LanesRunProjectTest() {
-    super("lanesrunproject", "", "Lane(s)");
+    super("project.lanesrunproject", "", "Lane(s)");
   }
 
 }

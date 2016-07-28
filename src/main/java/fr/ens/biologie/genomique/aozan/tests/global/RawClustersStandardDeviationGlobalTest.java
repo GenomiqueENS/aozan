@@ -75,7 +75,7 @@ public class RawClustersStandardDeviationGlobalTest extends
    */
   public RawClustersStandardDeviationGlobalTest() {
 
-    super("globalrawclusterssd", "", "Raw Clusters SD Est.");
+    super("global.globalrawclusterssd", "", "Raw Clusters SD Est.");
   }
 
 }

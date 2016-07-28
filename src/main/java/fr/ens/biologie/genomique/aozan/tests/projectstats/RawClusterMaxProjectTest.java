@@ -64,7 +64,7 @@ public class RawClusterMaxProjectTest extends AbstractSimpleProjectTest {
    * Public constructor.
    */
   public RawClusterMaxProjectTest() {
-    super("rawclustermaxproject", "", "Raw clusters max");
+    super("project.rawclustermaxproject", "", "Raw clusters max");
   }
 
 }

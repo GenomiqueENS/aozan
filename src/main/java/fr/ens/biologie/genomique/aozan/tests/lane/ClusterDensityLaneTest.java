@@ -101,6 +101,6 @@ public class ClusterDensityLaneTest extends AbstractLaneTest {
    */
   public ClusterDensityLaneTest() {
 
-    super("clusterdensity", "", "Cluster Density", "k/mm2");
+    super("lane.clusterdensity", "", "Cluster Density", "k/mm2");
   }
 }

@@ -106,7 +106,7 @@ public class PercentRecoverableRawClusterSampleTest
    * Public constructor.
    */
   public PercentRecoverableRawClusterSampleTest() {
-    super("samplestatsrecoverablerawclusterpercent", "",
+    super("samplestats.samplestatsrecoverablerawclusterpercent", "",
         "Recoverable raw cluster ", "%");
   }
 

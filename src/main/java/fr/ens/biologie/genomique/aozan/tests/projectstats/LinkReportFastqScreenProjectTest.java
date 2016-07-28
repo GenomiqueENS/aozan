@@ -71,7 +71,7 @@ public class LinkReportFastqScreenProjectTest extends AbstractProjectTest {
    */
   public LinkReportFastqScreenProjectTest() {
 
-    super("linkprojectreport", "link report fastqScreen", "FastqScreen report");
+    super("project.linkprojectreport", "link report fastqScreen", "FastqScreen report");
   }
 
 }

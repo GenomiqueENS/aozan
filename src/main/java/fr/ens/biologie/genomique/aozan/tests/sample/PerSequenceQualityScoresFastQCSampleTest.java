@@ -70,7 +70,7 @@ public class PerSequenceQualityScoresFastQCSampleTest extends
    */
   public PerSequenceQualityScoresFastQCSampleTest() {
 
-    super("persequencequalityscores", "per sequence quality scores",
+    super("sample.persequencequalityscores", "per sequence quality scores",
         "Per sequence quality scores");
   }
 

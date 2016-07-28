@@ -100,7 +100,7 @@ public class PercentQ30SampleTest extends AbstractSampleTest {
    * Public constructor.
    */
   public PercentQ30SampleTest() {
-    super("percentq30", "", ">= Q30 Base PF", "%");
+    super("sample.percentq30", "", ">= Q30 Base PF", "%");
   }
 
 }

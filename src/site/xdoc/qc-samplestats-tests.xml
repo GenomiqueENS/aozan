@@ -51,29 +51,29 @@
        <h4>Configuration samples statistics quality tests</h4>
        <table>
         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
-		<tr><td>qc.test.samplestatcountsample.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.samplestats.samplestatcountsample.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable sample count project test</td></tr>
-		<tr><td>qc.test.samplestatsrawclustermin.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.samplestats.samplestatsrawclustermin.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable raw cluster minimum count on replica samples</td></tr>
-		<tr><td>qc.test.samplestatsrawclustermax.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.samplestats.samplestatsrawclustermax.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable raw cluster maximum count on replica samples</td></tr>
-		<tr><td>qc.test.samplestatrawclustersum.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.samplestats.samplestatrawclustersum.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable raw cluster sum on replica samples</td></tr>
-		<tr><td>qc.test.samplestatspfclustermin.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.samplestats.samplestatspfclustermin.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable passing filter cluster minimum count on replica samples</td></tr>
-		<tr><td>qc.test.samplestatspfclustermax.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.samplestats.samplestatspfclustermax.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable passing filter cluster minimum count on replica samples</td></tr>
-		<tr><td>qc.test.samplestatpfclustersum.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.samplestats.samplestatpfclustersum.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable passing filter cluster sum on replica samples</td></tr>
-        <tr><td>qc.test.samplestatspercentq30basepf.enable</td><td>boolean</td><td>False</td>
+        <tr><td>qc.test.samplestats.samplestatspercentq30basepf.enable</td><td>boolean</td><td>False</td>
         	<td>Enable samplestatspercentq30basepf test</td></tr>
-     	<tr><td>qc.test.samplestatsmeanqualityscorepf.enable</td><td>boolean</td><td>False</td>
+     	<tr><td>qc.test.samplestats.samplestatsmeanqualityscorepf.enable</td><td>boolean</td><td>False</td>
          	<td>Enable samplestatsmeanqualityscorepf test</td></tr>
-		<tr><td>qc.test.samplestatspassingfilterclusterpercent.enable</td><td>boolean</td><td>False</td>
+		<tr><td>qc.test.samplestats.samplestatspassingfilterclusterpercent.enable</td><td>boolean</td><td>False</td>
 			<td>Enable samplestatspassingfilterclusterpercent test</td></tr>
-	    <tr><td>qc.test.percentsampleinrun.enable</td><td>boolean</td><td>False</td>
+	    <tr><td>qc.test.samplestats.percentsampleinrun.enable</td><td>boolean</td><td>False</td>
 	    	<td>Enable percentsampleinrun test</td></tr>
-        <tr><td>qc.test.percentsampleinproject.enable</td><td>boolean</td><td>False</td>
+        <tr><td>qc.test.samplestats.percentsampleinproject.enable</td><td>boolean</td><td>False</td>
         	<td>Enable percentsampleinproject test</td></tr>
        </table>
 

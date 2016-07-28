@@ -65,7 +65,7 @@ public class PFClusterMinProjectTest extends AbstractSimpleProjectTest {
    * Public constructor.
    */
   public PFClusterMinProjectTest() {
-    super("pfclusterminproject", "", "PF clusters min");
+    super("project.pfclusterminproject", "", "PF clusters min");
   }
 
 }

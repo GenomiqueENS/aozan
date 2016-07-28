@@ -70,7 +70,7 @@ public class LanesCountGlobalTest extends AbstractSimpleGlobalTest {
    */
   public LanesCountGlobalTest() {
 
-    super("globallanescount", "", "Lane Count.");
+    super("global.globallanescount", "", "Lane Count.");
   }
 
 }

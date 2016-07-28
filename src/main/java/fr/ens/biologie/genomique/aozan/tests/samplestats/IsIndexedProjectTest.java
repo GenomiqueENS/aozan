@@ -63,7 +63,7 @@ public class IsIndexedProjectTest extends AbstractSimpleSampleTest {
    * Public constructor.
    */
   public IsIndexedProjectTest() {
-    super("isindexedsample", "", "Is indexed");
+    super("samplestats.isindexedsample", "", "Is indexed");
   }
 
 }

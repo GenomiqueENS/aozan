@@ -74,7 +74,7 @@ public class RawClustersPhixGlobalTest extends AbstractSimpleGlobalTest {
    */
   public RawClustersPhixGlobalTest() {
 
-    super("globalrawclustersphix", "", "PhiX Raw Clusters Est.");
+    super("global.globalrawclustersphix", "", "PhiX Raw Clusters Est.");
   }
 
 }

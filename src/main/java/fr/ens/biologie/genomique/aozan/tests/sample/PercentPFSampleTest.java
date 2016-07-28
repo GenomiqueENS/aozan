@@ -99,7 +99,7 @@ public class PercentPFSampleTest extends AbstractSampleTest {
    * Public constructor.
    */
   public PercentPFSampleTest() {
-    super("percentpfsample", "", "Passing filter", "%");
+    super("sample.percentpfsample", "", "Passing filter", "%");
   }
 
 }

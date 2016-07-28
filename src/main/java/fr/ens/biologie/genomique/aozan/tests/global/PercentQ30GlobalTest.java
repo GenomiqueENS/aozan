@@ -91,7 +91,7 @@ public class PercentQ30GlobalTest extends AbstractGlobalTest {
    */
   public PercentQ30GlobalTest() {
 
-    super("globalpercentq30", "", "Q30", "%");
+    super("global.globalpercentq30", "", "Q30", "%");
   }
 
 }

@@ -111,7 +111,7 @@ public class PercentSampleInRunSamplestatsTest extends AbstractSampleStatsTest {
    * Public constructor.
    */
   public PercentSampleInRunSamplestatsTest() {
-    super("percentsampleinrun", "", "Sample in Run", "%");
+    super("samplestats.percentsampleinrun", "", "Sample in Run", "%");
   }
 
 }

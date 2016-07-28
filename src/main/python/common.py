@@ -1055,6 +1055,112 @@ def load_conf(conf, conf_file_path):
     converting_table_key[
         'qc.conf.settings.mappers.indexes.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY
 
+
+    # Converting table between old and new test names
+    test_name_converting_table = {}
+    test_name_converting_table['globalpercentq30'] = 'global.globalpercentq30'
+    test_name_converting_table['globalrawclustersmean'] = 'global.globalrawclustersmean'
+    test_name_converting_table['globalrawclusterscount'] = 'global.globalrawclusterscount'
+    test_name_converting_table['globalsamplescount'] = 'global.globalsamplescount'
+    test_name_converting_table['globalbasecount'] = 'global.globalbasecount'
+    test_name_converting_table['globalrawclustersphixsd'] = 'global.globalrawclustersphixsd'
+    test_name_converting_table['globalpfclustersmediane'] = 'global.globalpfclustersmediane'
+    test_name_converting_table['globalrawclustersphixmean'] = 'global.globalrawclustersphixmean'
+    test_name_converting_table['globalprcpfclusters'] = 'global.globalprcpfclusters'
+    test_name_converting_table['globalerrorrate'] = 'global.globalerrorrate'
+    test_name_converting_table['globalprojectscount'] = 'global.globalprojectscount'
+    test_name_converting_table['globalpfclusterssd'] = 'global.globalpfclusterssd'
+    test_name_converting_table['globalprcundeterminedcluster'] = 'global.globalprcundeterminedcluster'
+    test_name_converting_table['globaldensitycluster'] = 'global.globaldensitycluster'
+    test_name_converting_table['globalrawclustersphix'] = 'global.globalrawclustersphix'
+    test_name_converting_table['globalrawclustersmediane'] = 'global.globalrawclustersmediane'
+    test_name_converting_table['globalpercentalignal'] = 'global.globalpercentalignal'
+    test_name_converting_table['globalcyclescount'] = 'global.globalcyclescount'
+    test_name_converting_table['globalrawclusterssd'] = 'global.globalrawclusterssd'
+    test_name_converting_table['globallanescount'] = 'global.globallanescount'
+    test_name_converting_table['nonindexedglobalbasecount'] = 'global.nonindexedglobalbasecount'
+    test_name_converting_table['globalrawclustersphixmediane'] = 'global.globalrawclustersphixmediane'
+    test_name_converting_table['globalpfclustersmean'] = 'global.globalpfclustersmean'
+    test_name_converting_table['globalpfclusterscount'] = 'global.globalpfclusterscount'
+    test_name_converting_table['errorrate75cycle'] = 'lane.errorrate75cycle'
+    test_name_converting_table['clusterdensity'] = 'lane.clusterdensity'
+    test_name_converting_table['pfclusters'] = 'lane.pfclusters'
+    test_name_converting_table['errorrate35cycle'] = 'lane.errorrate35cycle'
+    test_name_converting_table['percentintensitycycle20'] = 'lane.percentintensitycycle20'
+    test_name_converting_table['firstcycleintensity'] = 'lane.firstcycleintensity'
+    test_name_converting_table['phasingprephasing'] = 'lane.phasingprephasing'
+    test_name_converting_table['errorrate'] = 'lane.errorrate'
+    test_name_converting_table['rawclusters'] = 'lane.rawclusters'
+    test_name_converting_table['percentalign'] = 'lane.percentalign'
+    test_name_converting_table['errorrate100cycle'] = 'lane.errorrate100cycle'
+    test_name_converting_table['pfclusterspercent'] = 'lane.pfclusterspercent'
+    test_name_converting_table['lanepercentq30'] = 'lane.lanepercentq30'
+    test_name_converting_table['rawclusterphix'] = 'lane.rawclusterphix'
+    test_name_converting_table['lanesrunproject'] = 'project.lanesrunproject'
+    test_name_converting_table['rawclustermaxproject'] = 'project.rawclustermaxproject'
+    test_name_converting_table['genomesproject'] = 'project.genomesproject'
+    test_name_converting_table['recoverablerawclusterpercent'] = 'project.recoverablerawclusterpercent'
+    test_name_converting_table['pfclustersumproject'] = 'project.pfclustersumproject'
+    test_name_converting_table['rawclustersumproject'] = 'project.rawclustersumproject'
+    test_name_converting_table['linkprojectreport'] = 'project.linkprojectreport'
+    test_name_converting_table['recoverablepfclusterpercent'] = 'project.recoverablepfclusterpercent'
+    test_name_converting_table['isindexedproject'] = 'project.isindexedproject'
+    test_name_converting_table['samplesexceededcontaminationthreshold'] = 'project.samplesexceededcontaminationthreshold'
+    test_name_converting_table['pfclusterminproject'] = 'project.pfclusterminproject'
+    test_name_converting_table['rawclusterminproject'] = 'project.rawclusterminproject'
+    test_name_converting_table['pfclustermaxproject'] = 'project.pfclustermaxproject'
+    test_name_converting_table['samplecountproject'] = 'project.samplecountproject'
+    test_name_converting_table['fsqmapped'] = 'sample.fsqmapped'
+    test_name_converting_table['sequencelengthdistribution'] = 'sequencelengthdistribution'
+    test_name_converting_table['linkreport'] = 'sample.linkreport'
+    test_name_converting_table['percentinlanesample'] = 'sample.percentinlanesample'
+    test_name_converting_table['percentpfsample'] = 'sample.percentpfsample'
+    test_name_converting_table['perbasequalityscores'] = 'sample.perbasequalityscores'
+    test_name_converting_table['pertilesequencequality'] = 'sample.pertilesequencequality'
+    test_name_converting_table['linkreportrecoverycluster'] = 'sample.linkreportrecoverycluster'
+    test_name_converting_table['percentq30'] = 'sample.percentq30'
+    test_name_converting_table['meanqualityscorepf'] = 'sample.meanqualityscorepf'
+    test_name_converting_table['persequencequalityscores'] = 'sample.persequencequalityscores'
+    test_name_converting_table['recoverablerawclusterssamples'] = 'sample.recoverablerawclusterssamples'
+    test_name_converting_table['recoverablerawclusterssamplespercent'] = 'sample.recoverablerawclusterssamplespercent'
+    test_name_converting_table['basicstats'] = 'sample.basicstats'
+    test_name_converting_table['recoverablepfclusterssamplespercent'] = 'sample.recoverablepfclusterssamplespercent'
+    test_name_converting_table['badtiles'] = 'sample.badtiles'
+    test_name_converting_table['adaptercontent'] = 'sample.adaptercontent'
+    test_name_converting_table['duplicationlevel'] = 'sample.duplicationlevel'
+    test_name_converting_table['persequencegccontent'] = 'sample.persequencegccontent'
+    test_name_converting_table['overrepresentedseqs'] = 'sample.overrepresentedseqs'
+    test_name_converting_table['pfclusterssamples'] = 'sample.pfclusterssamples'
+    test_name_converting_table['recoverablepfclusterssamples'] = 'sample.recoverablepfclusterssamples'
+    test_name_converting_table['ncontent'] = 'sample.ncontent'
+    test_name_converting_table['hitnolibraries'] = 'sample.hitnolibraries'
+    test_name_converting_table['rawclusterssamples'] = 'sample.rawclusterssamples'
+    test_name_converting_table['kmercontent'] = 'sample.kmercontent'
+    test_name_converting_table['perbasesequencecontent'] = 'sample.perbasesequencecontent'
+    test_name_converting_table['lanesrunsample'] = 'samplestats.lanesrunsample'
+    test_name_converting_table['samplestatsfsqmapped'] = 'samplestats.samplestatsfsqmapped'
+    test_name_converting_table['samplestatpfclustersum'] = 'samplestats.samplestatpfclustersum'
+    test_name_converting_table['genomessample'] = 'samplestats.genomessample'
+    test_name_converting_table['meanqualityscorepfsamplestats'] = 'samplestats.meanqualityscorepfsamplestats'
+    test_name_converting_table['samplestatsrecoverablerawclusterpercent'] = 'samplestats.samplestatsrecoverablerawclusterpercent'
+    test_name_converting_table['samplestatspercentq30basepf'] = 'samplestats.samplestatspercentq30basepf'
+    test_name_converting_table['linksamplereport'] = 'samplestats.linksamplereport'
+    test_name_converting_table['samplestathitnolibrariessum'] = 'samplestats.samplestathitnolibrariessum'
+    test_name_converting_table['samplestatrawclustersum'] = 'samplestats.samplestatrawclustersum'
+    test_name_converting_table['percentsampleinproject'] = 'samplestats.percentsampleinproject'
+    test_name_converting_table['isindexedsample'] = 'samplestats.isindexedsample'
+    test_name_converting_table['samplestatspassingfilterclusterpercent'] = 'samplestats.samplestatspassingfilterclusterpercent'
+    test_name_converting_table['samplestatcountsample'] = 'samplestats.samplestatcountsample'
+    test_name_converting_table['samplestatsrecoverablepfclusterpercent'] = 'samplestats.samplestatsrecoverablepfclusterpercent'
+    test_name_converting_table['samplestatexceededcontaminationthreshold'] = 'samplestats.samplestatexceededcontaminationthreshold'
+    test_name_converting_table['samplestatsrawclustermin'] = 'samplestats.samplestatsrawclustermin'
+    test_name_converting_table['samplestatspfclustermax'] = 'samplestats.samplestatspfclustermax'
+    test_name_converting_table['samplestatspfclustermin'] = 'samplestats.samplestatspfclustermin'
+    test_name_converting_table['samplestatsrecoveryrawcluster'] = 'samplestats.samplestatsrecoveryrawcluster'
+    test_name_converting_table['samplestatsrawclustermax'] = 'samplestats.samplestatsrawclustermax'
+    test_name_converting_table['percentsampleinrun'] = 'samplestats.percentsampleinrun'
+    test_name_converting_table['samplestatsrecoverypfcluster'] = 'samplestats.samplestatsrecoverypfcluster'
+
     f = open(conf_file_path, 'r')
 
     for l in f:
@@ -1083,13 +1189,25 @@ def load_conf(conf, conf_file_path):
 
         else:
             fields = s.split('=')
+            key = fields[0].strip()
+            value = fields[1].strip()
 
             if len(fields) == 2:
-                conf[fields[0].strip()] = fields[1].strip()
+                conf[key] = value
 
                 # Check if needed to converting key
-                if fields[0].strip() in converting_table_key:
-                    conf[converting_table_key[fields[0].strip()]] = fields[1].strip()
+                if key in converting_table_key:
+                    conf[converting_table_key[key]] = value
+
+                # Converting old test names to new ones
+                if key.startswith('qc.test.'):
+                    for k in test_name_converting_table.keys():
+                        prefix = 'qc.test.' + k + '.'
+                        if key.startswith(prefix):
+                            conf['qc.test.' + test_name_converting_table[k] + key[len(prefix)-1:]] = value
+
+		
+
     f.close()
 
     # Save configuration file path

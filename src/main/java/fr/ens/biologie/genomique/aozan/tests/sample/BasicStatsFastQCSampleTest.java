@@ -67,7 +67,7 @@ public class BasicStatsFastQCSampleTest extends AbstractFastQCSampleTest {
    */
   public BasicStatsFastQCSampleTest() {
 
-    super("basicstats", "basic statistics", "Basic Stats");
+    super("sample.basicstats", "basic statistics", "Basic Stats");
   }
 
 }

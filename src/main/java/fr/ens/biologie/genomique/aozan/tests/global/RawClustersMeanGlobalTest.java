@@ -74,6 +74,6 @@ public class RawClustersMeanGlobalTest extends AbstractSimpleGlobalTest {
    */
   public RawClustersMeanGlobalTest() {
 
-    super("globalrawclustersmean", "", "Raw Clusters Mean Est.");
+    super("global.globalrawclustersmean", "", "Raw Clusters Mean Est.");
   }
 }

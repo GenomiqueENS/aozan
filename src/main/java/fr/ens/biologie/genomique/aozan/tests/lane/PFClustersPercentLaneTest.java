@@ -99,7 +99,7 @@ public class PFClustersPercentLaneTest extends AbstractLaneTest {
    */
   public PFClustersPercentLaneTest() {
 
-    super("pfclusterspercent", "", "PF Clusters", "%");
+    super("lane.pfclusterspercent", "", "PF Clusters", "%");
   }
 
 }

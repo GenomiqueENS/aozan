@@ -92,7 +92,7 @@ public class PercentQ30LaneTest extends AbstractLaneTest {
    */
   public PercentQ30LaneTest() {
 
-    super("lanepercentq30", "", "Q30", "%");
+    super("lane.lanepercentq30", "", "Q30", "%");
   }
 
 }

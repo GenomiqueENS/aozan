@@ -65,7 +65,7 @@ public class PFClusterSumProjectTest extends AbstractSimpleProjectTest {
    * Public constructor.
    */
   public PFClusterSumProjectTest() {
-    super("pfclustersumproject", "", "PF clusters sum");
+    super("project.pfclustersumproject", "", "PF clusters sum");
   }
 
 }

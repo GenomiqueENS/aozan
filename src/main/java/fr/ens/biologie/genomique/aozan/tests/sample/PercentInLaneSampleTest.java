@@ -131,7 +131,7 @@ public class PercentInLaneSampleTest extends AbstractSampleTest {
    * Public constructor.
    */
   public PercentInLaneSampleTest() {
-    super("percentinlanesample", "", "Sample in lane", "%");
+    super("sample.percentinlanesample", "", "Sample in lane", "%");
   }
 
 }

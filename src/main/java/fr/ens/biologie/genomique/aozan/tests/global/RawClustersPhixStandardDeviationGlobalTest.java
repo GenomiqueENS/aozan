@@ -75,7 +75,7 @@ public class RawClustersPhixStandardDeviationGlobalTest extends
    */
   public RawClustersPhixStandardDeviationGlobalTest() {
 
-    super("globalrawclustersphixsd", "", "PhiX Raw Clusters SD Est.");
+    super("global.globalrawclustersphixsd", "", "PhiX Raw Clusters SD Est.");
   }
 
 }

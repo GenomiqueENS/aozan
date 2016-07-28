@@ -69,7 +69,7 @@ public class RecoverableRawClusterSampleTest extends AbstractSimpleSampleTest {
    * Public constructor.
    */
   public RecoverableRawClusterSampleTest() {
-    super("recoverablerawclusterssamples", "", "Recoverable raw clusters");
+    super("sample.recoverablerawclusterssamples", "", "Recoverable raw clusters");
   }
 
 }

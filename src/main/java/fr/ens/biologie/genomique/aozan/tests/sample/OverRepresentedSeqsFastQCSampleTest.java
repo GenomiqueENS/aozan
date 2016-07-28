@@ -69,7 +69,7 @@ public class OverRepresentedSeqsFastQCSampleTest extends
    */
   public OverRepresentedSeqsFastQCSampleTest() {
 
-    super("overrepresentedseqs", "over represented seqs",
+    super("sample.overrepresentedseqs", "over represented seqs",
         "Over represented seqs");
   }
 

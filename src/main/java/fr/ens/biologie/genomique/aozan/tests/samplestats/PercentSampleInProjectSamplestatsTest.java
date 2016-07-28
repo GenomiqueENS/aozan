@@ -113,7 +113,7 @@ public class PercentSampleInProjectSamplestatsTest
    * Public constructor.
    */
   public PercentSampleInProjectSamplestatsTest() {
-    super("percentsampleinproject", "", "Sample in Project", "%");
+    super("samplestats.percentsampleinproject", "", "Sample in Project", "%");
   }
 
 }

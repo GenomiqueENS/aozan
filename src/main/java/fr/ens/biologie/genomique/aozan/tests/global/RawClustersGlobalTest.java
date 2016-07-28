@@ -74,7 +74,7 @@ public class RawClustersGlobalTest extends AbstractSimpleGlobalTest {
    */
   public RawClustersGlobalTest() {
 
-    super("globalrawclusterscount", "", "Raw Clusters Est.");
+    super("global.globalrawclusterscount", "", "Raw Clusters Est.");
   }
 
 }

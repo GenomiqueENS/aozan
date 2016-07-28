@@ -74,7 +74,7 @@ public class PFClustersMeanGlobalTest extends AbstractSimpleGlobalTest {
    */
   public PFClustersMeanGlobalTest() {
 
-    super("globalpfclustersmean", "", "PF Clusters Mean Est.");
+    super("global.globalpfclustersmean", "", "PF Clusters Mean Est.");
   }
 
 }

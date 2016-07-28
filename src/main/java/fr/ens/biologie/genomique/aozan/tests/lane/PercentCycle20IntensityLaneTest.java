@@ -81,7 +81,7 @@ public class PercentCycle20IntensityLaneTest extends AbstractSimpleLaneTest {
    */
   public PercentCycle20IntensityLaneTest() {
 
-    super("percentintensitycycle20", "", "Intensity cycle 20", "%");
+    super("lane.percentintensitycycle20", "", "Intensity cycle 20", "%");
   }
 
 }

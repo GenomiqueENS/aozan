@@ -76,7 +76,7 @@ public class PercentAlignGlobalTest extends AbstractSimpleGlobalTest {
    */
   public PercentAlignGlobalTest() {
 
-    super("globalpercentalignal", "", "PhiX Align Est.", "%");
+    super("global.globalpercentalignal", "", "PhiX Align Est.", "%");
   }
 
 }

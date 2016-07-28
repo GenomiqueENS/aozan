@@ -70,7 +70,7 @@ public class CyclesCountGlobalTest extends AbstractSimpleGlobalTest {
    */
   public CyclesCountGlobalTest() {
 
-    super("globalcyclescount", "", "Cycles Count.");
+    super("global.globalcyclescount", "", "Cycles Count.");
   }
 
 }

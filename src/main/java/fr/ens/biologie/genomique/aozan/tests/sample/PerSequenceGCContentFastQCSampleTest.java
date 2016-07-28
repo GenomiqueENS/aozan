@@ -69,7 +69,7 @@ public class PerSequenceGCContentFastQCSampleTest extends
    */
   public PerSequenceGCContentFastQCSampleTest() {
 
-    super("persequencegccontent", "per sequence GC content",
+    super("sample.persequencegccontent", "per sequence GC content",
         "Per sequence GC content");
   }
 

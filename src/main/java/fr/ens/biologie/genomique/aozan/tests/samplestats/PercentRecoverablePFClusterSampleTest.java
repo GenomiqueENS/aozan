@@ -106,7 +106,7 @@ public class PercentRecoverablePFClusterSampleTest
    * Public constructor.
    */
   public PercentRecoverablePFClusterSampleTest() {
-    super("samplestatsrecoverablepfclusterpercent", "",
+    super("samplestats.samplestatsrecoverablepfclusterpercent", "",
         "Recoverable PF cluster ", "%");
   }
 

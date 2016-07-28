@@ -103,7 +103,7 @@ public class PercentAlignLaneTest extends AbstractLaneTest {
    */
   public PercentAlignLaneTest() {
 
-    super("percentalign", "", "PhiX Align", "%");
+    super("lane.percentalign", "", "PhiX Align", "%");
   }
 
 }

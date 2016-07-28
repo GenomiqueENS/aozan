@@ -63,7 +63,7 @@ public class LanesRunProjectTest extends AbstractSimpleSampleTest {
    * Public constructor.
    */
   public LanesRunProjectTest() {
-    super("lanesrunsample", "", "Lane(s)");
+    super("samplestats.lanesrunsample", "", "Lane(s)");
   }
 
 }

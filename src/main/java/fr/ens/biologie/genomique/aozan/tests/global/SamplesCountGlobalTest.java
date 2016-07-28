@@ -100,7 +100,7 @@ public class SamplesCountGlobalTest extends AbstractGlobalTest {
    */
   public SamplesCountGlobalTest() {
 
-    super("globalsamplescount", "", "Samples Count.");
+    super("global.globalsamplescount", "", "Samples Count.");
   }
 
 }

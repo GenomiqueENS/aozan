@@ -74,7 +74,7 @@ public class RawClustersMedianeGlobalTest extends AbstractSimpleGlobalTest {
    */
   public RawClustersMedianeGlobalTest() {
 
-    super("globalrawclustersmediane", "", "Raw Clusters Mediane Est.");
+    super("global.globalrawclustersmediane", "", "Raw Clusters Mediane Est.");
   }
 
 }

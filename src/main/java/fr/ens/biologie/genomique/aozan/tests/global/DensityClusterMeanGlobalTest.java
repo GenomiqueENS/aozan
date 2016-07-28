@@ -106,7 +106,7 @@ public class DensityClusterMeanGlobalTest extends AbstractGlobalTest {
    * Public constructor.
    */
   public DensityClusterMeanGlobalTest() {
-    super("globaldensitycluster", "", "Density Cluster");
+    super("global.globaldensitycluster", "", "Density Cluster");
   }
 
 }

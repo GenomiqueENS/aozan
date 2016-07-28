@@ -413,10 +413,10 @@ public class QC {
           && key.endsWith(TEST_KEY_ENABLED_SUFFIX) && value != null
           && "true".equals(value.trim().toLowerCase())) {
 
-        final String testName = key.substring(TEST_KEY_PREFIX.length(),
+        final String testFullName = key.substring(TEST_KEY_PREFIX.length(),
             key.length() - TEST_KEY_ENABLED_SUFFIX.length());
 
-        final AozanTest test = registry.get(testName);
+        final AozanTest test = registry.get(testFullName);
 
         if (test != null) {
 
@@ -429,34 +429,54 @@ public class QC {
             fastqScreenCollectorRequirementInitialized = true;
           }
 
+          // Get the type of the test
+          final String[] fields = testFullName.split("\\.");
+          if (fields.length != 2) {
+            throw new AozanException("Invalid test name: " + testFullName);
+          }
+          final String testType = fields[0];
+
           // Configure the test
           tests = test.configure(new TestConfiguration(settings,
-              TEST_KEY_PREFIX + testName + ".", globalConf));
+              TEST_KEY_PREFIX + testFullName + ".", globalConf));
 
           // Add the test to runTests, laneTests or sampleTests
-          if (test instanceof GlobalTest) {
+
+          switch (testType) {
+
+          case "global":
             for (final AozanTest t : tests) {
               this.globalTests.add((GlobalTest) t);
             }
-          } else if (test instanceof LaneTest) {
+            break;
+
+          case "lane":
             for (final AozanTest t : tests) {
               this.laneTests.add((LaneTest) t);
             }
+            break;
 
-          } else if (test instanceof SampleTest) {
+          case "sample":
             for (final AozanTest t : tests) {
               this.sampleTests.add((SampleTest) t);
             }
+            break;
 
-          } else if (test instanceof ProjectTest) {
+          case "project":
             for (final AozanTest t : tests) {
               this.projectStatsTests.add((ProjectTest) t);
             }
+            break;
 
-          } else if (test instanceof SampleStatsTest) {
+          case "samplestat":
             for (final AozanTest t : tests) {
               this.samplesStatsTests.add((SampleStatsTest) t);
             }
+            break;
+
+          default:
+            throw new AozanException("Unknown test type: " + testType);
+
           }
 
         } else {

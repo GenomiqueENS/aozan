@@ -79,7 +79,7 @@ public class LinkReportFastqScreenSampleTest extends AbstractSampleStatsTest {
    */
   public LinkReportFastqScreenSampleTest() {
 
-    super("linksamplereport", "link report fastqScreen", "FastqScreen report");
+    super("samplestats.linksamplereport", "link report fastqScreen", "FastqScreen report");
   }
 
 }

@@ -74,7 +74,7 @@ public class RawClustersPhixMedianeGlobalTest extends AbstractSimpleGlobalTest {
    */
   public RawClustersPhixMedianeGlobalTest() {
 
-    super("globalrawclustersphixmediane", "", "PhiX Raw Clusters Mediane Est.");
+    super("global.globalrawclustersphixmediane", "", "PhiX Raw Clusters Mediane Est.");
   }
 
 }

@@ -79,7 +79,7 @@ public class ErrorRate75CycleLaneTest extends AbstractSimpleLaneTest {
    */
   public ErrorRate75CycleLaneTest() {
 
-    super("errorrate75cycle", "", "Error Rate 75 cycles", "%");
+    super("lane.errorrate75cycle", "", "Error Rate 75 cycles", "%");
   }
 
 }

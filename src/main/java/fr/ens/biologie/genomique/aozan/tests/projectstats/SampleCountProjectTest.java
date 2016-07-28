@@ -63,7 +63,7 @@ public class SampleCountProjectTest extends AbstractSimpleProjectTest {
    * Public constructor.
    */
   public SampleCountProjectTest() {
-    super("samplecountproject", "", "Samples count");
+    super("project.samplecountproject", "", "Samples count");
   }
 
 }

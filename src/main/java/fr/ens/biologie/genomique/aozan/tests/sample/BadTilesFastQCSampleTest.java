@@ -68,7 +68,7 @@ public class BadTilesFastQCSampleTest extends AbstractFastQCSampleTest {
    */
   public BadTilesFastQCSampleTest() {
 
-    super("badtiles", "bad tiles", "Bad tiles");
+    super("sample.badtiles", "bad tiles", "Bad tiles");
   }
 
 }

@@ -69,7 +69,7 @@ public class PerBaseSequenceContentFastQCSampleTest extends
    */
   public PerBaseSequenceContentFastQCSampleTest() {
 
-    super("perbasesequencecontent", "per base sequence content",
+    super("sample.perbasesequencecontent", "per base sequence content",
         "Per base sequence content");
   }
 

@@ -64,7 +64,7 @@ public class RawClusterMinProjectTest extends AbstractSimpleProjectTest {
    * Public constructor.
    */
   public RawClusterMinProjectTest() {
-    super("rawclusterminproject", "", "Raw clusters min");
+    super("project.rawclusterminproject", "", "Raw clusters min");
   }
 
 }

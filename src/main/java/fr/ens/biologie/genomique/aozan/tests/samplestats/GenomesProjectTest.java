@@ -63,7 +63,7 @@ public class GenomesProjectTest extends AbstractSimpleSampleTest {
    * Public constructor.
    */
   public GenomesProjectTest() {
-    super("genomessample", "", "Genome(s)");
+    super("samplestats.genomessample", "", "Genome(s)");
   }
 
 }

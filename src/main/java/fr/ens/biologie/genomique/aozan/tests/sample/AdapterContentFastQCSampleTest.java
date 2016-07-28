@@ -70,7 +70,7 @@ public class AdapterContentFastQCSampleTest extends
    */
   public AdapterContentFastQCSampleTest () {
 
-    super("adaptercontent", "adapter content",
+    super("sample.adaptercontent", "adapter content",
         "Adapter content");
   }
 

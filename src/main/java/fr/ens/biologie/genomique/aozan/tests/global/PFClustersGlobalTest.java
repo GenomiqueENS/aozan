@@ -74,7 +74,7 @@ public class PFClustersGlobalTest extends AbstractSimpleGlobalTest {
    */
   public PFClustersGlobalTest() {
 
-    super("globalpfclusterscount", "", "PF Clusters Est.");
+    super("global.globalpfclusterscount", "", "PF Clusters Est.");
   }
 
 }

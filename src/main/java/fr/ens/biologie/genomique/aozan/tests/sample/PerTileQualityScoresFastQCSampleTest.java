@@ -70,7 +70,7 @@ public class PerTileQualityScoresFastQCSampleTest extends
    */
   public PerTileQualityScoresFastQCSampleTest() {
 
-    super("pertilesequencequality", "per tile sequence quality",
+    super("sample.pertilesequencequality", "per tile sequence quality",
         "Per tile sequence quality");
   }
 

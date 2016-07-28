@@ -124,7 +124,7 @@ public class PhasingPrePhasingLaneTest extends AbstractLaneTest {
 
   public PhasingPrePhasingLaneTest() {
 
-    super("phasingprephasing", "", "Phasing / Prephasing");
+    super("lane.phasingprephasing", "", "Phasing / Prephasing");
   }
 
 }

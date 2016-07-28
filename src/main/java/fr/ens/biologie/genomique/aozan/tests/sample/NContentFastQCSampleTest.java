@@ -67,7 +67,7 @@ public class NContentFastQCSampleTest extends AbstractFastQCSampleTest {
    */
   public NContentFastQCSampleTest() {
 
-    super("ncontent", "n content", "N Content");
+    super("sample.ncontent", "n content", "N Content");
   }
 
 }

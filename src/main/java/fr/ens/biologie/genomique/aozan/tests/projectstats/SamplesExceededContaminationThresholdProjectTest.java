@@ -70,7 +70,7 @@ public class SamplesExceededContaminationThresholdProjectTest
    * Public constructor.
    */
   public SamplesExceededContaminationThresholdProjectTest() {
-    super("samplesexceededcontaminationthreshold", "",
+    super("project.samplesexceededcontaminationthreshold", "",
         "Sample(s) exceeded contamination threshold");
   }
 

@@ -65,6 +65,6 @@ public class PFClusterMaxProjectTest extends AbstractSimpleProjectTest {
    * Public constructor.
    */
   public PFClusterMaxProjectTest() {
-    super("pfclustermaxproject", "", "PF clusters max");
+    super("project.pfclustermaxproject", "", "PF clusters max");
   }
 }

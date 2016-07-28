@@ -65,7 +65,7 @@ public class RawClusterMaxSampleTest extends AbstractSimpleSampleTest {
    * Public constructor.
    */
   public RawClusterMaxSampleTest() {
-    super("samplestatsrawclustermax", "", "Raw_clusters_max");
+    super("samplestats.samplestatsrawclustermax", "", "Raw_clusters_max");
   }
 
 }

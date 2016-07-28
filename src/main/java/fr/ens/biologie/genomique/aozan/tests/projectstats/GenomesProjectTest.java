@@ -63,7 +63,7 @@ public class GenomesProjectTest extends AbstractSimpleProjectTest {
    * Public constructor.
    */
   public GenomesProjectTest() {
-    super("genomesproject", "", "Genome(s)");
+    super("project.genomesproject", "", "Genome(s)");
   }
 
 }

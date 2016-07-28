@@ -125,7 +125,7 @@ public class PercentQ30BasePFSamplestatsTest extends AbstractSampleStatsTest {
    * Public constructor.
    */
   public PercentQ30BasePFSamplestatsTest() {
-    super("samplestatspercentq30basepf", "", ">= Q30 Base PF", "%");
+    super("samplestats.samplestatspercentq30basepf", "", ">= Q30 Base PF", "%");
   }
 
 }

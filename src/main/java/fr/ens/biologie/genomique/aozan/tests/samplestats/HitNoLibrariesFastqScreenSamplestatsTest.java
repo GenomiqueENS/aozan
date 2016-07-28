@@ -92,7 +92,7 @@ public class HitNoLibrariesFastqScreenSamplestatsTest
    * @return a String with the required key
    */
   public String getSampleKey(final int sampleId) {
-    return "fastqscreen.sample" + sampleId + ".read1.mappedexceptgenomesample";
+    return "samplestats.fastqscreen.sample" + sampleId + ".read1.mappedexceptgenomesample";
   }
 
   @Override
@@ -113,7 +113,7 @@ public class HitNoLibrariesFastqScreenSamplestatsTest
    * Public constructor.
    */
   public HitNoLibrariesFastqScreenSamplestatsTest() {
-    super("samplestathitnolibrariessum", "",
+    super("samplestats.samplestathitnolibrariessum", "",
         "FastqScreen mapped except genome sample", "%");
   }
 }

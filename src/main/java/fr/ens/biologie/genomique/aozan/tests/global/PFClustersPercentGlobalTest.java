@@ -75,7 +75,7 @@ public class PFClustersPercentGlobalTest extends AbstractSimpleGlobalTest {
    */
   public PFClustersPercentGlobalTest() {
 
-    super("globalprcpfclusters", "", "PF Clusters Est.", "%");
+    super("global.globalprcpfclusters", "", "PF Clusters Est.", "%");
   }
 
 }

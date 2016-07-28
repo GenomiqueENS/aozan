@@ -74,7 +74,7 @@ public class RawClustersLaneTest extends AbstractSimpleLaneTest {
    */
   public RawClustersLaneTest() {
 
-    super("rawclusters", "", "Raw Clusters Est.");
+    super("lane.rawclusters", "", "Raw Clusters Est.");
   }
 
 }

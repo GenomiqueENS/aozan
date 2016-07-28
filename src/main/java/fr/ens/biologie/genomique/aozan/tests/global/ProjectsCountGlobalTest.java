@@ -92,7 +92,7 @@ public class ProjectsCountGlobalTest extends AbstractGlobalTest {
    */
   public ProjectsCountGlobalTest() {
 
-    super("globalprojectscount", "", "Projects Count.");
+    super("global.globalprojectscount", "", "Projects Count.");
   }
 
 }

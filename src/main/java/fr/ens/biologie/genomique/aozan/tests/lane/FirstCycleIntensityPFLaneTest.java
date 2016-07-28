@@ -67,7 +67,7 @@ public class FirstCycleIntensityPFLaneTest extends AbstractSimpleLaneTest {
    */
   public FirstCycleIntensityPFLaneTest() {
 
-    super("firstcycleintensity", "", "First cycle intensity");
+    super("lane.firstcycleintensity", "", "First cycle intensity");
   }
 
 }

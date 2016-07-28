@@ -112,7 +112,7 @@ public class RawClustersPhixLaneTest extends AbstractLaneTest {
    */
   public RawClustersPhixLaneTest() {
 
-    super("rawclusterphix", "", "PhiX raw cluster Est.");
+    super("lane.rawclusterphix", "", "PhiX raw cluster Est.");
   }
 
 }

@@ -67,7 +67,7 @@ public class KmerContentFastQCSampleTest extends AbstractFastQCSampleTest {
    */
   public KmerContentFastQCSampleTest() {
 
-    super("kmercontent", "kmer content", "kmer content");
+    super("sample.kmercontent", "kmer content", "kmer content");
   }
 
 }

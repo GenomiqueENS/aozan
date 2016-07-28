@@ -70,7 +70,7 @@ public class RecoverablePFClusterSampleTest extends AbstractSimpleSampleTest {
    * Public constructor.
    */
   public RecoverablePFClusterSampleTest() {
-    super("recoverablepfclusterssamples", "", "Recoverable PF clusters");
+    super("sample.recoverablepfclusterssamples", "", "Recoverable PF clusters");
   }
 
 }

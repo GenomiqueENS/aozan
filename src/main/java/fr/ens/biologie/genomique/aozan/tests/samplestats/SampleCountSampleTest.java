@@ -64,7 +64,7 @@ public class SampleCountSampleTest extends AbstractSimpleSampleTest {
    * Public constructor.
    */
   public SampleCountSampleTest() {
-    super("samplestatcountsample", "", "Samples count");
+    super("samplestats.samplestatcountsample", "", "Samples count");
   }
 
 }
