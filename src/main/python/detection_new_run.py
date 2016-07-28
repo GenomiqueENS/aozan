@@ -165,7 +165,7 @@ def send_report(run_id, conf):
         type_run_estimated = "Undetermined run type (" + str(reads_not_indexed_count) + " reads with " + str(
             reads_indexed_count) + " index(es))"
 
-    description_run = "Informations about this run :\n"
+    description_run = "Informations about this run:\n"
     description_run += "\t- " + str(run_info.getFlowCellLaneCount()) + " lanes with " + str(
         run_info.alignToPhix.size()) + " aligned to Phix.\n"
     description_run += "\t- " + str(reads_not_indexed_count) + " read(s) and " + str(
@@ -178,7 +178,7 @@ def send_report(run_id, conf):
         description_run += "\t- " + str(cycles_per_reads_not_indexed) + " cycles per reads (" + str(
             cycles_count) + " total cycles).\n"
 
-    description_run += "\t- " + "estimated run type : " + type_run_estimated + ".\n"
+    description_run += "\t- " + "Estimated run type: " + type_run_estimated + ".\n"
 
     rta_major_version = common.get_rta_major_version(run_id, conf)
 
