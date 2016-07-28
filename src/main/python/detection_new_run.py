@@ -157,19 +157,31 @@ def send_report(run_id, conf):
     # Identification type run according to data in RunInfos.xml : SR or PE
     if reads_not_indexed_count == 1:
         type_run_estimated = "SR-" + str(cycles_per_reads_not_indexed) + " with " + str(
-            reads_indexed_count) + " index(es)"
+            reads_indexed_count) + " index"
+        if reads_indexed_count > 1:
+            type_run_estimated += "es"
     elif reads_not_indexed_count == 2:
         type_run_estimated = "PE-" + str(cycles_per_reads_not_indexed) + " with " + str(
             reads_indexed_count) + " index(es)"
+        if reads_indexed_count > 1:
+            type_run_estimated += "es"
     else:
         type_run_estimated = "Undetermined run type (" + str(reads_not_indexed_count) + " reads with " + str(
-            reads_indexed_count) + " index(es))"
+            reads_indexed_count) + " index)"
+        if reads_indexed_count > 1:
+            type_run_estimated += "es"
+        type_run_estimated += ")"
 
     description_run = "Informations about this run:\n"
     description_run += "\t- " + str(run_info.getFlowCellLaneCount()) + " lanes with " + str(
         run_info.alignToPhix.size()) + " aligned to Phix.\n"
-    description_run += "\t- " + str(reads_not_indexed_count) + " read(s) and " + str(
-        reads_indexed_count) + " index(es).\n"
+    description_run += "\t- " + str(reads_not_indexed_count) + " read"
+    if reads_not_indexed_count > 1:
+        description_run += "s"
+    description_run += " and " + str(reads_indexed_count) + " index"
+    if reads_indexed_count > 1:
+        description_run += "es"
+    description_run += ".\n"
 
     if error_cycles_per_reads_not_indexes_count or cycles_per_reads_not_indexed == 0:
         description_run += "\t- ERROR : cycles count per reads different between reads (" + str(
