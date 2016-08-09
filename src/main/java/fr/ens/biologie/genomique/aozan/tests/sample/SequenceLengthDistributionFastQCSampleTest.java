@@ -70,7 +70,7 @@ public class SequenceLengthDistributionFastQCSampleTest extends
    */
   public SequenceLengthDistributionFastQCSampleTest() {
 
-    super("sequencelengthdistribution", "sequence length distribution",
+    super("sample.sequencelengthdistribution", "sequence length distribution",
         "Sequence length distribution");
   }
 
