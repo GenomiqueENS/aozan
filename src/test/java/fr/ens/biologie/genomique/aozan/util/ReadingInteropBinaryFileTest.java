@@ -30,25 +30,39 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
 import fr.ens.biologie.genomique.aozan.collectors.ReadCollector;
 import fr.ens.biologie.genomique.aozan.collectors.RunInfoCollector;
-import junit.framework.TestCase;
+import org.junit.Assert;
 
-public class ReadingInteropBinaryFileTest extends TestCase {
+public class ReadingInteropBinaryFileTest {
   private static final String SR50_FILE = "SR50.data";
   private static final String PE100_FILE = "PE100.data";
 
-  private final Map<String,String> props = new HashMap<>();
+  private final Map<String, String> props = new HashMap<>();
   private String path;
 
+  @Before
+  public void init() {
+
+    // Path to directory InterOP
+    path = new File(new File(".").getAbsolutePath() + "/src/test/java/files")
+        .getAbsolutePath();
+
+  }
+
+  @Test
   public void testPE100() throws AozanException, IOException {
     compareRunData("PE100", "InterOp_PE100", PE100_FILE);
   }
 
+  @Test
   public void testSR50() throws AozanException, IOException {
     compareRunData("SR50", "InterOp_SR50", SR50_FILE);
   }
@@ -90,20 +104,11 @@ public class ReadingInteropBinaryFileTest extends TestCase {
 
       final String key = line.substring(0, pos);
       final String value = line.substring(pos + 1);
-
       // Compare runData test and original for each line
-      assertEquals("For " + runName + " : " + key + " must be same ? ", value,
-          dataTest.get(key));
+      Assert.assertEquals("For " + runName + " : " + key + " must be same ? ",
+          value, dataTest.get(key));
     }
     br.close();
-  }
-
-  public void setUp() {
-
-    // Path to directory InterOP
-    path = new File(new File(".").getAbsolutePath() + "/src/test/java/files")
-        .getAbsolutePath();
-
   }
 
 }

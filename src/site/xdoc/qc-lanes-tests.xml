@@ -86,10 +86,9 @@
          <tr><td>qc.test.lane.firstcycleintensity.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of firstcycleintensity</td></tr>
          <tr><td>qc.test.lane.percentintensitycycle20.enable</td><td>boolean</td><td>False</td><td>Enable percentintensitycycle20 test</td></tr>
          <tr><td>qc.test.lane.percentintensitycycle20.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of percentintensitycycle20</td></tr>
-         <!--tr><td>qc.test.lane.phasingprephasing.enable</td><td>boolean</td><td>False</td><td>Enable phasingprephasing test</td></tr>
+         <tr><td>qc.test.lane.phasingprephasing.enable</td><td>boolean</td><td>False</td><td>Enable phasingprephasing test</td></tr>
          <tr><td>qc.test.lane.phasingprephasing.phasing.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of phasing</td></tr>
-         <tr><td>qc.test.lane.phasingprephasing.prephasing.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of prephasing</td></tr-->
-         
+         <tr><td>qc.test.lane.phasingprephasing.prephasing.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of prephasing</td></tr>
          <tr><td>qc.test.lane.lanepercentq30.enable</td><td>boolean</td><td>False</td><td>Enable lane Q30 percent test</td></tr>
          <tr><td>qc.test.lane.lanepercentq30.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of lane Q30 percent</td></tr>       
 

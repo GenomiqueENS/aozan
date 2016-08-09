@@ -1,5 +1,4 @@
 fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector
-fr.ens.biologie.genomique.aozan.collectors.PhasingCollector
 fr.ens.biologie.genomique.aozan.collectors.ReadCollector
 fr.ens.biologie.genomique.aozan.collectors.RunInfoCollector
 fr.ens.biologie.genomique.aozan.collectors.FastQCCollector
