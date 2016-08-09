@@ -617,9 +617,9 @@ public class UndeterminedIndexesProcessThread
     for (final int sampleId : this.data.getSamplesInLane(this.lane)) {
 
       getResults().put(RUN_DATA_PREFIX
-          + ".sample." + sampleId + ".recoverable.raw.cluster.count", 0);
+          + ".sample" + sampleId + ".recoverable.raw.cluster.count", 0);
       getResults().put(RUN_DATA_PREFIX
-          + ".sample." + sampleId + ".recoverable.pf.cluster.count", 0);
+          + ".sample" + sampleId + ".recoverable.pf.cluster.count", 0);
     }
 
     if (!this.isSkipProcessResult) {
