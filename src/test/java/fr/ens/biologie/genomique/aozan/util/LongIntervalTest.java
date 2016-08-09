@@ -25,207 +25,212 @@ package fr.ens.biologie.genomique.aozan.util;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.util.LongInterval;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class LongIntervalTest extends TestCase {
+public class LongIntervalTest {
 
+  @Test
   public void testIsInInterval() {
 
     LongInterval di = new LongInterval(10, 20);
-    assertFalse(di.isInInterval(Long.MIN_VALUE));
-    assertFalse(di.isInInterval(Long.MAX_VALUE));
-    assertFalse(di.isInInterval(5));
-    assertFalse(di.isInInterval(9));
-    assertTrue(di.isInInterval(10));
-    assertTrue(di.isInInterval(15));
-    assertTrue(di.isInInterval(20));
-    assertTrue(di.isInInterval(20));
-    assertFalse(di.isInInterval(25));
+    Assert.assertFalse(di.isInInterval(Long.MIN_VALUE));
+    Assert.assertFalse(di.isInInterval(Long.MAX_VALUE));
+    Assert.assertFalse(di.isInInterval(5));
+    Assert.assertFalse(di.isInInterval(9));
+    Assert.assertTrue(di.isInInterval(10));
+    Assert.assertTrue(di.isInInterval(15));
+    Assert.assertTrue(di.isInInterval(20));
+    Assert.assertTrue(di.isInInterval(20));
+    Assert.assertFalse(di.isInInterval(25));
 
     di = new LongInterval(Long.MIN_VALUE, 20);
-    assertTrue(di.isInInterval(Long.MIN_VALUE));
-    assertFalse(di.isInInterval(Long.MAX_VALUE));
-    assertTrue(di.isInInterval(10));
+    Assert.assertTrue(di.isInInterval(Long.MIN_VALUE));
+    Assert.assertFalse(di.isInInterval(Long.MAX_VALUE));
+    Assert.assertTrue(di.isInInterval(10));
 
     di = new LongInterval(Long.MIN_VALUE, 20);
-    assertTrue(di.isInInterval(Long.MIN_VALUE));
-    assertFalse(di.isInInterval(Long.MAX_VALUE));
-    assertTrue(di.isInInterval(10));
-    assertFalse(di.isInInterval(25));
+    Assert.assertTrue(di.isInInterval(Long.MIN_VALUE));
+    Assert.assertFalse(di.isInInterval(Long.MAX_VALUE));
+    Assert.assertTrue(di.isInInterval(10));
+    Assert.assertFalse(di.isInInterval(25));
 
     di = new LongInterval(10, Long.MAX_VALUE);
-    assertFalse(di.isInInterval(5));
-    assertTrue(di.isInInterval(10));
-    assertTrue(di.isInInterval(25));
-    assertTrue(di.isInInterval(Long.MAX_VALUE));
+    Assert.assertFalse(di.isInInterval(5));
+    Assert.assertTrue(di.isInInterval(10));
+    Assert.assertTrue(di.isInInterval(25));
+    Assert.assertTrue(di.isInInterval(Long.MAX_VALUE));
 
   }
 
+  @Test
   public void testLongIntervalDoubleDouble() {
 
     LongInterval di = new LongInterval(10, 20);
-    assertEquals(10, di.getMin());
-    assertTrue(di.isMinIncluded());
-    assertEquals(20, di.getMax());
-    assertTrue(di.isMaxIncluded());
+    Assert.assertEquals(10, di.getMin());
+    Assert.assertTrue(di.isMinIncluded());
+    Assert.assertEquals(20, di.getMax());
+    Assert.assertTrue(di.isMaxIncluded());
 
     di = new LongInterval(20, 10);
-    assertEquals(10, di.getMin());
-    assertEquals(20, di.getMax());
+    Assert.assertEquals(10, di.getMin());
+    Assert.assertEquals(20, di.getMax());
 
     di = new LongInterval(Long.MIN_VALUE, Long.MAX_VALUE);
-    assertEquals(Long.MIN_VALUE, di.getMin(), 0.001);
-    assertTrue(di.isMinIncluded());
-    assertEquals(Long.MAX_VALUE, di.getMax(), 0.001);
-    assertTrue(di.isMaxIncluded());
+    Assert.assertEquals(Long.MIN_VALUE, di.getMin(), 0.001);
+    Assert.assertTrue(di.isMinIncluded());
+    Assert.assertEquals(Long.MAX_VALUE, di.getMax(), 0.001);
+    Assert.assertTrue(di.isMaxIncluded());
 
     di = new LongInterval(Long.MAX_VALUE, Long.MIN_VALUE);
-    assertEquals(Long.MIN_VALUE, di.getMin(), 0.001);
-    assertEquals(Long.MAX_VALUE, di.getMax(), 0.001);
+    Assert.assertEquals(Long.MIN_VALUE, di.getMin(), 0.001);
+    Assert.assertEquals(Long.MAX_VALUE, di.getMax(), 0.001);
 
   }
 
+  @Test
   public void testLongIntervalDoubleBooleanDoubleBoolean() {
 
     LongInterval di = new LongInterval(10, true, 20, true);
-    assertEquals(10, di.getMin());
-    assertTrue(di.isMinIncluded());
-    assertEquals(20, di.getMax());
-    assertTrue(di.isMaxIncluded());
+    Assert.assertEquals(10, di.getMin());
+    Assert.assertTrue(di.isMinIncluded());
+    Assert.assertEquals(20, di.getMax());
+    Assert.assertTrue(di.isMaxIncluded());
 
     di = new LongInterval(10, false, 20, true);
-    assertEquals(10, di.getMin());
-    assertFalse(di.isMinIncluded());
-    assertEquals(20, di.getMax());
-    assertTrue(di.isMaxIncluded());
+    Assert.assertEquals(10, di.getMin());
+    Assert.assertFalse(di.isMinIncluded());
+    Assert.assertEquals(20, di.getMax());
+    Assert.assertTrue(di.isMaxIncluded());
 
     di = new LongInterval(10, true, 20, false);
-    assertEquals(10, di.getMin());
-    assertTrue(di.isMinIncluded());
-    assertEquals(20, di.getMax());
-    assertFalse(di.isMaxIncluded());
+    Assert.assertEquals(10, di.getMin());
+    Assert.assertTrue(di.isMinIncluded());
+    Assert.assertEquals(20, di.getMax());
+    Assert.assertFalse(di.isMaxIncluded());
 
     di = new LongInterval(10, false, 20, false);
-    assertEquals(10, di.getMin());
-    assertFalse(di.isMinIncluded());
-    assertEquals(20, di.getMax());
-    assertFalse(di.isMaxIncluded());
+    Assert.assertEquals(10, di.getMin());
+    Assert.assertFalse(di.isMinIncluded());
+    Assert.assertEquals(20, di.getMax());
+    Assert.assertFalse(di.isMaxIncluded());
   }
 
+  @Test
   public void testLongIntervalString() {
 
     LongInterval di = null;
     try {
       di = new LongInterval("[10, 20]");
-      assertTrue(true);
+      Assert.assertTrue(true);
     } catch (AozanException e) {
-      assertTrue(false);
+      Assert.assertTrue(false);
     }
-    assertEquals(10.0, di.getMin(), 0.001);
-    assertTrue(di.isMinIncluded());
-    assertEquals(20.0, di.getMax(), 0.001);
-    assertTrue(di.isMaxIncluded());
+    Assert.assertEquals(10.0, di.getMin(), 0.001);
+    Assert.assertTrue(di.isMinIncluded());
+    Assert.assertEquals(20.0, di.getMax(), 0.001);
+    Assert.assertTrue(di.isMaxIncluded());
 
     try {
       di = new LongInterval("]10, 20]");
-      assertTrue(true);
+      Assert.assertTrue(true);
     } catch (AozanException e) {
-      assertTrue(false);
+      Assert.assertTrue(false);
     }
-    assertEquals(10.0, di.getMin(), 0.001);
-    assertFalse(di.isMinIncluded());
-    assertEquals(20.0, di.getMax(), 0.001);
-    assertTrue(di.isMaxIncluded());
+    Assert.assertEquals(10.0, di.getMin(), 0.001);
+    Assert.assertFalse(di.isMinIncluded());
+    Assert.assertEquals(20.0, di.getMax(), 0.001);
+    Assert.assertTrue(di.isMaxIncluded());
 
     try {
       di = new LongInterval("(10, 20]");
-      assertTrue(true);
+      Assert.assertTrue(true);
     } catch (AozanException e) {
-      assertTrue(false);
+      Assert.assertTrue(false);
     }
-    assertEquals(10.0, di.getMin(), 0.001);
-    assertFalse(di.isMinIncluded());
-    assertEquals(20.0, di.getMax(), 0.001);
-    assertTrue(di.isMaxIncluded());
+    Assert.assertEquals(10.0, di.getMin(), 0.001);
+    Assert.assertFalse(di.isMinIncluded());
+    Assert.assertEquals(20.0, di.getMax(), 0.001);
+    Assert.assertTrue(di.isMaxIncluded());
 
     try {
       di = new LongInterval("[10, 20[");
-      assertTrue(true);
+      Assert.assertTrue(true);
     } catch (AozanException e) {
-      assertTrue(false);
+      Assert.assertTrue(false);
     }
-    assertEquals(10.0, di.getMin(), 0.001);
-    assertTrue(di.isMinIncluded());
-    assertEquals(20.0, di.getMax(), 0.001);
-    assertFalse(di.isMaxIncluded());
+    Assert.assertEquals(10.0, di.getMin(), 0.001);
+    Assert.assertTrue(di.isMinIncluded());
+    Assert.assertEquals(20.0, di.getMax(), 0.001);
+    Assert.assertFalse(di.isMaxIncluded());
 
     try {
       di = new LongInterval("[10, 20)");
-      assertTrue(true);
+      Assert.assertTrue(true);
     } catch (AozanException e) {
-      assertTrue(false);
+      Assert.assertTrue(false);
     }
-    assertEquals(10.0, di.getMin(), 0.001);
-    assertTrue(di.isMinIncluded());
-    assertEquals(20.0, di.getMax(), 0.001);
-    assertFalse(di.isMaxIncluded());
+    Assert.assertEquals(10.0, di.getMin(), 0.001);
+    Assert.assertTrue(di.isMinIncluded());
+    Assert.assertEquals(20.0, di.getMax(), 0.001);
+    Assert.assertFalse(di.isMaxIncluded());
 
     try {
       di = new LongInterval("]10, 20[");
-      assertTrue(true);
+      Assert.assertTrue(true);
     } catch (AozanException e) {
-      assertTrue(false);
+      Assert.assertTrue(false);
     }
-    assertEquals(10.0, di.getMin(), 0.001);
-    assertFalse(di.isMinIncluded());
-    assertEquals(20.0, di.getMax(), 0.001);
-    assertFalse(di.isMaxIncluded());
+    Assert.assertEquals(10.0, di.getMin(), 0.001);
+    Assert.assertFalse(di.isMinIncluded());
+    Assert.assertEquals(20.0, di.getMax(), 0.001);
+    Assert.assertFalse(di.isMaxIncluded());
 
     try {
       di = new LongInterval("(10, 20)");
-      assertTrue(true);
+      Assert.assertTrue(true);
     } catch (AozanException e) {
-      assertTrue(false);
+      Assert.assertTrue(false);
     }
-    assertEquals(10.0, di.getMin(), 0.001);
-    assertFalse(di.isMinIncluded());
-    assertEquals(20.0, di.getMax(), 0.001);
-    assertFalse(di.isMaxIncluded());
+    Assert.assertEquals(10.0, di.getMin(), 0.001);
+    Assert.assertFalse(di.isMinIncluded());
+    Assert.assertEquals(20.0, di.getMax(), 0.001);
+    Assert.assertFalse(di.isMaxIncluded());
 
     try {
       di = new LongInterval("]10,20[");
-      assertTrue(true);
+      Assert.assertTrue(true);
     } catch (AozanException e) {
-      assertTrue(false);
+      Assert.assertTrue(false);
     }
-    assertEquals(10.0, di.getMin(), 0.001);
-    assertFalse(di.isMinIncluded());
-    assertEquals(20.0, di.getMax(), 0.001);
-    assertFalse(di.isMaxIncluded());
+    Assert.assertEquals(10.0, di.getMin(), 0.001);
+    Assert.assertFalse(di.isMinIncluded());
+    Assert.assertEquals(20.0, di.getMax(), 0.001);
+    Assert.assertFalse(di.isMaxIncluded());
 
     try {
       di = new LongInterval("]10,  20[");
-      assertTrue(true);
+      Assert.assertTrue(true);
     } catch (AozanException e) {
-      assertTrue(false);
+      Assert.assertTrue(false);
     }
-    assertEquals(10.0, di.getMin(), 0.001);
-    assertFalse(di.isMinIncluded());
-    assertEquals(20.0, di.getMax(), 0.001);
-    assertFalse(di.isMaxIncluded());
+    Assert.assertEquals(10.0, di.getMin(), 0.001);
+    Assert.assertFalse(di.isMinIncluded());
+    Assert.assertEquals(20.0, di.getMax(), 0.001);
+    Assert.assertFalse(di.isMaxIncluded());
 
     try {
       di = new LongInterval("]10; 20[");
-      assertTrue(false);
+      Assert.assertTrue(false);
     } catch (AozanException e) {
-      assertTrue(true);
+      Assert.assertTrue(true);
     }
 
     try {
       di = new LongInterval(")10, 20(");
-      assertTrue(false);
+      Assert.assertTrue(false);
     } catch (AozanException e) {
-      assertTrue(true);
+      Assert.assertTrue(true);
     }
 
   }
