@@ -385,9 +385,8 @@ def create_run_summary_reports(run_id, conf):
               'cd ' + tmp_base_path + ' && ' + \
               'mv ' + run_id + ' ' + report_prefix + run_id + ' && ' + \
               'tar cjf ' + reports_data_path + '/' + report_archive_file + ' ' + report_prefix + run_id + ' && ' + \
+              'chmod -R u=rwX,go=rX ' + report_prefix + run_id + ' && ' + \
               'mv ' + report_prefix + run_id + ' ' + reports_data_path
-        # 'cd ' + base_dir_path + ' && ' + \
-        # 'cp -p ../First_Base_Report.htm ' + reports_data_path + '/' + run_id + '/ && ' + \
 
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
