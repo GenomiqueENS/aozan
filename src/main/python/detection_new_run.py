@@ -29,7 +29,7 @@ def load_processed_run_ids(conf):
         conf: configuration dictionary
     """
 
-    return common.load_processed_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + DONE_FILE)
+    return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + DONE_FILE)
 
 
 def add_run_id_to_processed_run_ids(run_id, conf):
@@ -40,7 +40,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-    common.add_run_id_to_processed_run_ids(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + DONE_FILE, conf)
+    common.add_run_id(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + DONE_FILE, conf)
 
 
 def get_available_run_ids(conf):

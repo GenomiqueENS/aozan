@@ -49,6 +49,17 @@ from fr.ens.biologie.genomique.aozan.illumina.samplesheet.io import SampleSheetX
 
 BCL2FASTQ2_VERSION = "latest"
 
+DENY_FILE = 'demux.deny'
+DONE_FILE = 'demux.done'
+LASTERR_FILE = 'demux.lasterr'
+
+def load_denied_run_ids(conf):
+    """Load the list of the denied run ids.
+
+    Arguments:
+        conf: configuration dictionary
+    """
+    return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + DENY_FILE)
 
 def load_processed_run_ids(conf):
     """Load the list of the processed run ids.
@@ -57,7 +68,7 @@ def load_processed_run_ids(conf):
         conf: configuration dictionary
     """
 
-    return common.load_processed_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/demux.done')
+    return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + DONE_FILE)
 
 
 def add_run_id_to_processed_run_ids(run_id, conf):
@@ -68,7 +79,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-    common.add_run_id_to_processed_run_ids(run_id, conf[AOZAN_VAR_PATH_KEY] + '/demux.done', conf)
+    common.add_run_id(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + DONE_FILE, conf)
 
 
 def error(short_message, message, conf):
@@ -80,7 +91,7 @@ def error(short_message, message, conf):
         conf: configuration dictionary
     """
 
-    common.error('[Aozan] demultiplexer: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/demux.lasterr', conf)
+    common.error('[Aozan] demultiplexer: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/' + LASTERR_FILE, conf)
 
 
 def load_index_sequences(conf):
