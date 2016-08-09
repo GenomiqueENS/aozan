@@ -1111,7 +1111,7 @@ def load_conf(conf, conf_file_path):
     test_name_converting_table['pfclustermaxproject'] = 'project.pfclustermaxproject'
     test_name_converting_table['samplecountproject'] = 'project.samplecountproject'
     test_name_converting_table['fsqmapped'] = 'sample.fsqmapped'
-    test_name_converting_table['sequencelengthdistribution'] = 'sequencelengthdistribution'
+    test_name_converting_table['sequencelengthdistribution'] = 'sample.sequencelengthdistribution'
     test_name_converting_table['linkreport'] = 'sample.linkreport'
     test_name_converting_table['percentinlanesample'] = 'sample.percentinlanesample'
     test_name_converting_table['percentpfsample'] = 'sample.percentpfsample'
@@ -1193,20 +1193,20 @@ def load_conf(conf, conf_file_path):
             value = fields[1].strip()
 
             if len(fields) == 2:
-                conf[key] = value
 
                 # Check if needed to converting key
                 if key in converting_table_key:
-                    conf[converting_table_key[key]] = value
+                    key = converting_table_key[key]
 
                 # Converting old test names to new ones
                 if key.startswith('qc.test.'):
                     for k in test_name_converting_table.keys():
                         prefix = 'qc.test.' + k + '.'
                         if key.startswith(prefix):
-                            conf['qc.test.' + test_name_converting_table[k] + key[len(prefix)-1:]] = value
+                            key = 'qc.test.' + test_name_converting_table[k] + key[len(prefix)-1:]
+                            break
 
-		
+                conf[key] = value
 
     f.close()
 
