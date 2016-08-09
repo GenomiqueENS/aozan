@@ -30,7 +30,7 @@ import org.junit.Test;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class ScoreIntervalTest {
 

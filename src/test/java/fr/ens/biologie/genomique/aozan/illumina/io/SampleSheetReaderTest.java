@@ -48,7 +48,7 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVRea
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVWriter;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetXLSReader;
 import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class SampleSheetReaderTest {
 

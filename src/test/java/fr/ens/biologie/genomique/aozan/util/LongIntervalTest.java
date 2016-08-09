@@ -25,7 +25,7 @@ package fr.ens.biologie.genomique.aozan.util;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.util.LongInterval;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class LongIntervalTest {

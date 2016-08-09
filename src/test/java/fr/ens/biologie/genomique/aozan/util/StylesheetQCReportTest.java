@@ -37,7 +37,10 @@ import org.junit.Test;
 
 import fr.ens.biologie.genomique.aozan.Globals;
 // JUnit classes
-import junit.framework.Assert;
+import org.junit.Assert;
+
+import org.junit.runners.Suite;
+import org.junit.runner.RunWith;
 
 //@RunWith(Suite.class)
 //@Suite.SuiteClasses({StylesheetQCReportTest.class})
@@ -118,20 +121,9 @@ public class StylesheetQCReportTest {
 
   }
 
-  // /**
-  // * @return a TestSuite, which is a composite of Test objects.
-  // */
-  // @Test
-  // public static TestSuite suite() {
-  // // uses reflection to locate each method named test[...]
-  // return new TestSuite(StylesheetQCReportTest.class);
-  // }
-  //
-  // /**
-  // * Allow the unit tests to be invoked from the command line in text-only
-  // mode.
-  // */
-  // public static void main(String[] args) {
-  // TestRunner.run(suite());
-  // }
+  @RunWith(Suite.class)
+  @Suite.SuiteClasses({StylesheetQCReportTest.class})
+  public class TestSuite {
+  }
+
 }

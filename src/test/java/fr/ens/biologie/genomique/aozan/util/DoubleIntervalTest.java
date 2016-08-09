@@ -23,9 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.util;
 
-
 import fr.ens.biologie.genomique.aozan.AozanException;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class DoubleIntervalTest {

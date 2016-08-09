@@ -39,7 +39,7 @@ import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
 import fr.ens.biologie.genomique.aozan.collectors.ReadCollector;
 import fr.ens.biologie.genomique.aozan.collectors.RunInfoCollector;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class ReadingInteropBinaryFileTest {
   private static final String SR50_FILE = "SR50.data";
