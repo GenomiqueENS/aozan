@@ -188,7 +188,6 @@ public class RunData {
 
   /**
    * Get all samples identifiers (with undetermined samples) of the run.
-   * @param lane the lane number
    * @return all samples related to the lane
    */
   public List<Integer> getAllSamples() {
@@ -205,7 +204,6 @@ public class RunData {
 
   /**
    * Get all samples identifiers (without undetermined samples) of the run.
-   * @param lane the lane number
    * @return all samples related to the lane
    */
   public List<Integer> getSamples() {
@@ -264,7 +262,6 @@ public class RunData {
 
   /**
    * Get the sample identifier string.
-   * @param lane the lane number
    * @param sampleId the sample id
    * @return sequence index related to the lane and sample name
    */
@@ -274,7 +271,6 @@ public class RunData {
 
   /**
    * Get the name of a sample.
-   * @param lane the lane number
    * @param sampleId the sample id
    * @return sequence index related to the lane and sample name
    */
@@ -284,7 +280,6 @@ public class RunData {
 
   /**
    * Get the demultiplexing name of a sample.
-   * @param lane the lane number
    * @param sampleId the sample id
    * @return sequence index related to the lane and sample name
    */
@@ -294,7 +289,6 @@ public class RunData {
 
   /**
    * Get the lane of a sample.
-   * @param lane the lane number
    * @param sampleId the sample id
    * @return sequence index related to the lane and sample name
    */
@@ -304,7 +298,6 @@ public class RunData {
 
   /**
    * Test if the sample is an undetermined sample.
-   * @param lane the lane number
    * @param sampleId the sample id
    * @return sequence index related to the lane and sample name
    */
@@ -315,7 +308,6 @@ public class RunData {
 
   /**
    * Test if the sample is an indexed sample.
-   * @param lane the lane number
    * @param sampleId the sample id
    * @return sequence index related to the lane and sample name
    */
@@ -335,7 +327,7 @@ public class RunData {
 
   /**
    * Get the description of a sample.
-   * @param sampleName the sample name
+   * @param sampleId the sample id
    * @return the description of the sample
    */
   public String getSampleDescription(final int sampleId) {
@@ -480,7 +472,6 @@ public class RunData {
 
   /**
    * Get all samples ids (with undetermined samples) of the run.
-   * @param lane the lane number
    * @return all samples related to the lane
    */
   public List<Integer> getAllPooledSamples() {
@@ -497,7 +488,6 @@ public class RunData {
 
   /**
    * Get all samples ids (without undetermined samples) of the run.
-   * @param lane the lane number
    * @return all samples related to the lane
    */
   public List<Integer> getPooledSamples() {
@@ -516,8 +506,7 @@ public class RunData {
 
   /**
    * Test if the sample is an undetermined sample.
-   * @param lane the lane number
-   * @param sampleId the sample id
+   * @param pooledSampleId the pooled sample id
    * @return sequence index related to the lane and sample name
    */
   public boolean isUndeterminedPooledSample(final int pooledSampleId) {
@@ -539,7 +528,6 @@ public class RunData {
 
   /**
    * Get all project identifiers of the run.
-   * @param lane the lane number
    * @return all project identifiers of the run
    */
   public List<Integer> getProjects() {

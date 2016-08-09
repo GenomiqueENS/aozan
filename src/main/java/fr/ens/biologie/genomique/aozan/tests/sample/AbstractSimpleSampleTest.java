@@ -60,7 +60,6 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
    * @param data run data
    * @param read index of read
    * @param readSample index of read without indexed reads
-   * @param lane lane index
    * @param sampleId the sample Id
    * @return the transformed value
    */
@@ -76,7 +75,6 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
    * @param data run data
    * @param read index of read
    * @param readSample index of read without indexed reads
-   * @param lane lane index
    * @param sampleId the sample id
    * @return the transformed score
    */

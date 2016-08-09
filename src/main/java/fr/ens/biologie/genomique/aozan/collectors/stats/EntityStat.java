@@ -339,7 +339,6 @@ public class EntityStat {
    * @param runData the run data
    * @param projectId the project id
    * @param statCollector the stat collector
-   * @param fastqscreenReportToCompile the fastqscreen report to compile
    * @throws AozanException if an error occurs when listing source fastqscreen
    *           xml report file.
    */
@@ -352,10 +351,9 @@ public class EntityStat {
   /**
    * Instantiates a new entity stat.
    * @param runData the run data
-   * @param projectName the project name
-   * @param sampleName the sample name
+   * @param projectId the project id
+   * @param sampleId the sample id
    * @param statCollector the stat collector
-   * @param fastqscreenReportToCompile the fastqscreen report to compile
    * @throws AozanException the aozan exception
    */
   public EntityStat(final RunData runData, final int projectId,

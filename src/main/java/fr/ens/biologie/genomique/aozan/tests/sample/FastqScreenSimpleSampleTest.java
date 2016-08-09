@@ -84,11 +84,11 @@ public class FastqScreenSimpleSampleTest extends AbstractSimpleSampleTest {
   /**
    * Transform the score : if genome of sample is the same as reference genome.
    * then the score is reverse for change the color in QC report
+   * @param score the score to transform
    * @param data run data
    * @param read index of read
    * @param readSample index of read without indexed reads
-   * @param lane lane index
-   * @param sampleName sample name
+   * @param sampleId sample id
    * @return the transformed score
    */
   @Override
