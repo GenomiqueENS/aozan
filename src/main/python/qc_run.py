@@ -22,6 +22,19 @@ from fr.ens.biologie.genomique.aozan.Settings import QC_REPORT_SAVE_REPORT_DATA_
 from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
 
 
+DENY_FILE = 'qc.deny'
+DONE_FILE = 'qc.done'
+LASTERR_FILE = 'qc.lasterr'
+
+def load_denied_run_ids(conf):
+    """Load the list of the denied run ids.
+
+    Arguments:
+        conf: configuration dictionary
+    """
+    return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + DENY_FILE)
+
+
 def load_processed_run_ids(conf):
     """Load the list of the processed run ids.
 
@@ -29,7 +42,7 @@ def load_processed_run_ids(conf):
         conf: configuration dictionary
     """
 
-    return common.load_processed_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/qc.done')
+    return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + DONE_FILE)
 
 
 def add_run_id_to_processed_run_ids(run_id, conf):
@@ -40,7 +53,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-    common.add_run_id_to_processed_run_ids(run_id, conf[AOZAN_VAR_PATH_KEY] + '/qc.done', conf)
+    common.add_run_id(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + DONE_FILE, conf)
 
 
 def error(short_message, message, conf):
@@ -52,7 +65,7 @@ def error(short_message, message, conf):
         conf: configuration dictionary
     """
 
-    common.error('[Aozan] qc: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/qc.lasterr', conf)
+    common.error('[Aozan] qc: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/' + LASTERR_FILE, conf)
 
 
 def qc(run_id, conf):

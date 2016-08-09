@@ -58,23 +58,15 @@ from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_E
 from fr.ens.biologie.genomique.aozan.util import StringUtils
 
 PRIORITY_FILE = 'runs.priority'
-DENY_FILE = 'runs.deny'
 
-def get_prioritized_run_ids(conf):
+def load_prioritized_run_ids(conf):
     """Load the list of the prioritized run ids.
 
     Arguments:
         conf: configuration dictionary
     """
-    return load_prioritized_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + PRIORITY_FILE)
+    return load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + PRIORITY_FILE)
 
-def get_denied_run_ids(conf):
-    """Load the list of the denied run ids.
-
-    Arguments:
-        conf: configuration dictionary
-    """
-    return load_denied_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + DENY_FILE)
 
 def df(path):
     """Get the free space on a partition.
@@ -549,19 +541,19 @@ def time_to_human_readable(ms_since_epoch):
     return time.strftime("%a %b %d %H:%M:%S %Z %Y", time.localtime(ms_since_epoch))
 
 
-def load_processed_run_ids(done_file_path):
-    """Load the list of the processed run ids.
+def load_run_ids(file_path):
+    """Load a list of run ids.
 
     Arguments:
-        done_file_path: done file path
+        file_path: file path
     """
 
     result = set()
 
-    if not os.path.exists(done_file_path):
+    if not os.path.exists(file_path):
         return result
 
-    f = open(done_file_path, 'r')
+    f = open(file_path, 'r')
 
     for l in f:
         run_id = l[:-1]
@@ -575,108 +567,19 @@ def load_processed_run_ids(done_file_path):
     return result
 
 
-def add_run_id_to_processed_run_ids(run_id, done_file_path, conf):
-    """Add a processed run id to the list of the run ids.
+def add_run_id(run_id, file_path, conf):
+    """Add a run id to a list of the run ids.
 
     Arguments:
         run_id: The run id
-        done_file_path: path of the done file
+        file_path: path of the file
         conf: configuration dictionary
     """
 
     log('INFO',
-        'Add ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(done_file_path), conf)
+        'Add ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(file_path), conf)
 
-    f = open(done_file_path, 'a')
-
-    f.write(run_id + '\n')
-
-    f.close()
-
-
-def load_prioritized_run_ids(priority_file_path):
-    """Load the list of the prioritize run ids.
-
-    Arguments:
-        priority_file_path: done file path
-    """
-
-    result = set()
-
-    if not os.path.exists(priority_file_path):
-        return result
-
-    f = open(priority_file_path, 'r')
-
-    for l in f:
-        run_id = l[:-1]
-        if len(run_id) == 0:
-            continue
-        # Extract first field
-        result.add(run_id.strip())
-
-    f.close()
-
-    return result
-
-
-def add_run_id_to_prioritized_run_ids(run_id, priority_file_path, conf):
-    """Add a prioritized run id to the list of the run ids.
-
-    Arguments:
-        run_id: The run id
-        priority_file_path: path of the priority file
-        conf: configuration dictionary
-    """
-
-    log('INFO',
-        'Add ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(priority_file_path), conf)
-
-    f = open(priority_file_path, 'a')
-
-    f.write(run_id + '\n')
-
-    f.close()
-
-def load_denied_run_ids(denied_file_path):
-    """Load the list of the denied run ids.
-
-    Arguments:
-        denied_file_path: denied file path
-    """
-
-    result = set()
-
-    if not os.path.exists(denied_file_path):
-        return result
-
-    f = open(denied_file_path, 'r')
-
-    for l in f:
-        run_id = l[:-1]
-        if len(run_id) == 0:
-            continue
-        # Extract first field
-        result.add(run_id.strip())
-
-    f.close()
-
-    return result
-
-
-def add_run_id_to_denied_run_ids(run_id, denied_file_path, conf):
-    """Add a denied run id to the list of the run ids.
-
-    Arguments:
-        run_id: The run id
-        denied_file_path: path of the denied file
-        conf: configuration dictionary
-    """
-
-    log('INFO',
-        'Add ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(denied_file_path), conf)
-
-    f = open(denied_file_path, 'a')
+    f = open(file_path, 'a')
 
     f.write(run_id + '\n')
 
