@@ -468,7 +468,7 @@ public class QC {
             }
             break;
 
-          case "samplestat":
+          case "samplestats":
             for (final AozanTest t : tests) {
               this.samplesStatsTests.add((SampleStatsTest) t);
             }
