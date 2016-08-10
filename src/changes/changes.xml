@@ -679,5 +679,17 @@
 			</action>
 		</release>
 
+		<release version="2.0-rc17" description="Aozan 2.0-rc17 release"  date="TBD">
+			<action dev="jourdren" type="update">
+                                 Reorganize key names in RunData to use an id for each sample/pooledsample/project instead of their name.
+			</action>
+			<action dev="jourdren" type="update">
+                                 All the tests configuration keys are now prefixed with its type (lane, sample, project, global and samplestats).
+			</action>
+			<action dev="jourdren" type="fix">
+                                 All the files in the report directory have now the 755 permissions.
+			</action>
+		</release>
+
 	</body>
 </document>
