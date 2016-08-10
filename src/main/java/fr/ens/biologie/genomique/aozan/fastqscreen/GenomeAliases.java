@@ -266,7 +266,8 @@ public class GenomeAliases {
 
     loadGenomeAliasFile(this.genomeAliasesFile);
 
-    LOGGER.info("FASTQSCREEN: " + this.genomeAliases.size() + " genome alias(es) loaded");
+    LOGGER.info("FASTQSCREEN: "
+        + this.genomeAliases.size() + " genome alias(es) loaded");
   }
 
 }

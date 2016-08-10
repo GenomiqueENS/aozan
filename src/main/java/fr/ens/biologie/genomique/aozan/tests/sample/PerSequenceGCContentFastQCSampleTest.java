@@ -36,11 +36,11 @@ import uk.ac.babraham.FastQC.Modules.PerSequenceGCContent;
  * @since 0.8
  * @author Laurent Jourdren
  */
-public class PerSequenceGCContentFastQCSampleTest extends
-    AbstractFastQCSampleTest {
+public class PerSequenceGCContentFastQCSampleTest
+    extends AbstractFastQCSampleTest {
 
-  private static final String FASTQC_MODULE_NAME = new PerSequenceGCContent()
-      .name();
+  private static final String FASTQC_MODULE_NAME =
+      new PerSequenceGCContent().name();
 
   @Override
   public List<AozanTest> configure(final TestConfiguration conf)

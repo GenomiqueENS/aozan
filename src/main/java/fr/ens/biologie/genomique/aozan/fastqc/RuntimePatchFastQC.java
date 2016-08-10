@@ -140,8 +140,8 @@ public class RuntimePatchFastQC {
       // Check class not frozen
       if (cc != null && !cc.isFrozen()) {
 
-        final CtClass newSuperClazz = ClassPool.getDefault()
-            .get("fr.ens.biologie.genomique.aozan.fastqc.AbstractQCModuleAozan");
+        final CtClass newSuperClazz = ClassPool.getDefault().get(
+            "fr.ens.biologie.genomique.aozan.fastqc.AbstractQCModuleAozan");
         cc.setSuperclass(newSuperClazz);
 
         // cc.writeFile();

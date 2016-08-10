@@ -67,8 +67,7 @@ public class FastqScreenResult {
           + "\t %Multiple_hits_one_library \t %One_hit_multiple_libraries \t "
           + "%Multiple_hits_multiple_libraries";
 
-  private final Map<String, DataPerGenome> resultsPerGenome =
-      new HashMap<>();
+  private final Map<String, DataPerGenome> resultsPerGenome = new HashMap<>();
   private double percentUnmappedNoneGenome = 0.0;
   private double percentMappedAtLeastOneGenome = 0.0;
   private double percentMappedExceptGenomeSample = 0.0;
@@ -94,8 +93,8 @@ public class FastqScreenResult {
 
     s.append("FastqScreen : for Projet ");
     s.append(fastqSample.getProjectName());
-    s.append(genomeSample == null ? "" : " (genome reference for sample "
-        + genomeSample + ").");
+    s.append(genomeSample == null
+        ? "" : " (genome reference for sample " + genomeSample + ").");
     s.append("\nresult for sample : ");
     s.append(fastqSample.getSampleName());
     s.append(" on lane ");
@@ -165,8 +164,8 @@ public class FastqScreenResult {
     // Call stylesheet file for report
     InputStream is = null;
     if (fastqscreenXSLFile == null) {
-      is =
-          this.getClass().getResourceAsStream(Globals.EMBEDDED_FASTQSCREEN_XSL);
+      is = this.getClass()
+          .getResourceAsStream(Globals.EMBEDDED_FASTQSCREEN_XSL);
     } else {
       is = new FileInputStream(fastqscreenXSLFile);
     }
@@ -221,10 +220,10 @@ public class FastqScreenResult {
     XMLUtilsWriter.buildXMLCommonTagHeader(doc, root, data);
 
     // Specific data on sample
-    XMLUtils
-        .addTagValue(doc, root, "projectName", fastqSample.getProjectName());
-    XMLUtils.addTagValue(doc, root, "genomeSample", (genomeSample == null
-        ? "no genome" : genomeSample));
+    XMLUtils.addTagValue(doc, root, "projectName",
+        fastqSample.getProjectName());
+    XMLUtils.addTagValue(doc, root, "genomeSample",
+        (genomeSample == null ? "no genome" : genomeSample));
     XMLUtils.addTagValue(doc, root, "sampleName", fastqSample.getSampleName());
     XMLUtils.addTagValue(doc, root, "descriptionSample",
         fastqSample.getDescription());
@@ -278,22 +277,22 @@ public class FastqScreenResult {
     // Build report fastqscreen
     final Element unmappedElement = doc.createElement("ReadsUnmapped");
     unmappedElement.setAttribute("name", "reads_unmapped_none_genome");
-    unmappedElement.setTextContent(Double.toString(DataPerGenome
-        .roundDouble(this.percentUnmappedNoneGenome)));
+    unmappedElement.setTextContent(Double
+        .toString(DataPerGenome.roundDouble(this.percentUnmappedNoneGenome)));
     report.appendChild(unmappedElement);
 
     final Element mappedElement = doc.createElement("ReadsMappedOneGenome");
     mappedElement.setAttribute("name", "reads_mapped_at_least_one_genome");
-    mappedElement.setTextContent(Double.toString(DataPerGenome
-        .roundDouble(this.percentMappedAtLeastOneGenome)));
+    mappedElement.setTextContent(Double.toString(
+        DataPerGenome.roundDouble(this.percentMappedAtLeastOneGenome)));
     report.appendChild(mappedElement);
 
     final Element mappedExceptGenomeElement =
         doc.createElement("ReadsMappedExceptGenomeSample");
     mappedExceptGenomeElement.setAttribute("name",
         "reads_mapped_at_except_genome_sample");
-    mappedExceptGenomeElement.setTextContent(Double.toString(DataPerGenome
-        .roundDouble(this.percentMappedExceptGenomeSample)));
+    mappedExceptGenomeElement.setTextContent(Double.toString(
+        DataPerGenome.roundDouble(this.percentMappedExceptGenomeSample)));
     report.appendChild(mappedExceptGenomeElement);
 
     final Element readsMappedElement = doc.createElement("ReadsMapped");
@@ -321,8 +320,8 @@ public class FastqScreenResult {
     }
 
     if (!this.resultsPerGenome.containsKey(genome)) {
-      this.resultsPerGenome
-          .put(genome, new DataPerGenome(genome, genomeSample));
+      this.resultsPerGenome.put(genome,
+          new DataPerGenome(genome, genomeSample));
     }
   }
 
@@ -369,10 +368,13 @@ public class FastqScreenResult {
         ((double) (readsprocessed - readsMapped)) / readsprocessed;
 
     this.percentMappedAtLeastOneGenome =
-        Math.round((1.0 - this.percentUnmappedNoneGenome) * 100000.0) / 100000.0;
+        Math.round((1.0 - this.percentUnmappedNoneGenome) * 100000.0)
+            / 100000.0;
 
-    this.percentMappedExceptGenomeSample =
-        Math.round((this.percentMappedAtLeastOneGenome - percentMappedOnlyOnGenomeSample) * 100000.0) / 100000.0;
+    this.percentMappedExceptGenomeSample = Math.round(
+        (this.percentMappedAtLeastOneGenome - percentMappedOnlyOnGenomeSample)
+            * 100000.0)
+        / 100000.0;
 
     this.isComputedPercent = true;
   }
@@ -507,11 +509,9 @@ public class FastqScreenResult {
       this.multipleHitsMultipleLibrariesPercent =
           this.multipleHitsMultipleLibrariesCount / readsprocessed;
 
-      this.mappedPercent =
-          (this.oneHitOneLibraryCount
-              + this.multipleHitsOneLibraryCount
-              + this.oneHitMultipleLibrariesCount + this.multipleHitsMultipleLibrariesCount)
-              / readsprocessed;
+      this.mappedPercent = (this.oneHitOneLibraryCount
+          + this.multipleHitsOneLibraryCount + this.oneHitMultipleLibrariesCount
+          + this.multipleHitsMultipleLibrariesCount) / readsprocessed;
 
       this.unMappedPercent = 1.0 - this.mappedPercent;
 
@@ -553,8 +553,7 @@ public class FastqScreenResult {
       // add line in RunData
       data.put(prefix + "." + this.genome + "." + MAPPED_LEGEND + ".percent",
           this.mappedPercent);
-      data.put(
-          prefix + "." + this.genome + "." + UN_MAPPED_LEGEND + ".percent",
+      data.put(prefix + "." + this.genome + "." + UN_MAPPED_LEGEND + ".percent",
           this.unMappedPercent);
       data.put(prefix
           + "." + this.genome + "." + ONE_HIT_ONE_LIBRARY_LEGEND + ".percent",
@@ -565,9 +564,11 @@ public class FastqScreenResult {
       data.put(prefix
           + "." + this.genome + "." + ONE_HIT_MULTIPLE_LIBRARIES_LEGEND
           + ".percent", this.oneHitMultipleLibrariesPercent);
-      data.put(prefix
-          + "." + this.genome + "." + MULTIPLE_HITS_MULTIPLE_LIBRARIES_LEGEND
-          + ".percent", this.multipleHitsMultipleLibrariesPercent);
+      data.put(
+          prefix
+              + "." + this.genome + "."
+              + MULTIPLE_HITS_MULTIPLE_LIBRARIES_LEGEND + ".percent",
+          this.multipleHitsMultipleLibrariesPercent);
 
     }
 

@@ -22,7 +22,8 @@
  */
 
 /**
- * Root package of Aozan. It contains classes for exception, settings, runtime and the main class.
+ * Root package of Aozan. It contains classes for exception, settings, runtime
+ * and the main class.
  * @since 0.1
  */
 package fr.ens.biologie.genomique.aozan;

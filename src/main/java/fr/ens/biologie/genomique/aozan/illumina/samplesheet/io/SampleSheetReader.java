@@ -27,8 +27,6 @@ import java.io.IOException;
 
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 
-
-
 /**
  * This interface define a reader for Bcl2fastq samplesheet.
  * @since 1.1

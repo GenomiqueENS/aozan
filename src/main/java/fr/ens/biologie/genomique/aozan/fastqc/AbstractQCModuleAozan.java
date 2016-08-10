@@ -40,15 +40,15 @@ import uk.ac.babraham.FastQC.Report.HTMLReportArchive;
 public abstract class AbstractQCModuleAozan extends AbstractQCModule {
 
   @Override
-  protected void writeTable(final HTMLReportArchive report, final TableModel table)
-      throws IOException, XMLStreamException {
+  protected void writeTable(final HTMLReportArchive report,
+      final TableModel table) throws IOException, XMLStreamException {
     writeXhtmlTable(report, table);
     writeTextTable(report, table);
   }
 
   @Override
-  protected void writeXhtmlTable(final HTMLReportArchive report, final TableModel table)
-      throws IOException, XMLStreamException {
+  protected void writeXhtmlTable(final HTMLReportArchive report,
+      final TableModel table) throws IOException, XMLStreamException {
     final XMLStreamWriter w = report.xhtmlStream();
     w.writeStartElement("table");
     w.writeStartElement("thead");
@@ -81,8 +81,8 @@ public abstract class AbstractQCModuleAozan extends AbstractQCModule {
   }
 
   @Override
-  protected void writeTextTable(final HTMLReportArchive report, final TableModel table)
-      throws IOException {
+  protected void writeTextTable(final HTMLReportArchive report,
+      final TableModel table) throws IOException {
 
     final StringBuffer d = report.dataDocument();
     d.append('#');
@@ -125,7 +125,7 @@ public abstract class AbstractQCModuleAozan extends AbstractQCModule {
     if (startPos > 0 && endPos > startPos) {
       // Remove link tag
       final String s =
-          text.substring(0, startPos - 2) +". "+ text.substring(endPos + 4);
+          text.substring(0, startPos - 2) + ". " + text.substring(endPos + 4);
 
       // Remove new line tag
       result = s.replaceAll("<br/>", "");

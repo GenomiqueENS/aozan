@@ -22,7 +22,8 @@
  */
 
 /**
- * This package defines the collectors which collects data from InterOp binary files for a run.
+ * This package defines the collectors which collects data from InterOp binary
+ * files for a run.
  * @since 1.1
  */
 package fr.ens.biologie.genomique.aozan.collectors.interop;

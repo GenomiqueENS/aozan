@@ -253,7 +253,8 @@ public class FastqScreenGenomes {
   public static FastqScreenGenomes newInstance(
       final TestConfiguration testConfiguration) throws AozanException {
 
-    checkNotNull(testConfiguration, "testConfiguration argument cannot be null");
+    checkNotNull(testConfiguration,
+        "testConfiguration argument cannot be null");
 
     final File aliasGenomesFile = new File(testConfiguration
         .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));

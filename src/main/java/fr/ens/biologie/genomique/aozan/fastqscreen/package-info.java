@@ -22,7 +22,8 @@
  */
 
 /**
- * This package contains a module fastqscreen for the contamination detection in each sample of a run. 
+ * This package contains a module fastqscreen for the contamination detection in
+ * each sample of a run.
  * @since 1.0
  */
 package fr.ens.biologie.genomique.aozan.fastqscreen;

@@ -77,6 +77,7 @@ public class HitNoLibrariesFastqScreenSampleTest
    * Public constructor.
    */
   public HitNoLibrariesFastqScreenSampleTest() {
-    super("sample.hitnolibraries", "", "fastqScreen mapped except genome sample", "%");
+    super("sample.hitnolibraries", "",
+        "fastqScreen mapped except genome sample", "%");
   }
 }

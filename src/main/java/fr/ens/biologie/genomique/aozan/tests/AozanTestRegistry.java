@@ -65,13 +65,12 @@ public class AozanTestRegistry {
     }
 
     if (this.tests.containsKey(test.getName())) {
-      throw new AozanRuntimeException("The AozanTest ("
-          + test.getName() + ") is already registred");
+      throw new AozanRuntimeException(
+          "The AozanTest (" + test.getName() + ") is already registred");
     }
 
     this.tests.put(test.getName(), test);
   }
-
 
   //
   // Constructor

@@ -23,7 +23,6 @@
 
 package fr.ens.biologie.genomique.aozan.tests.sample;
 
-
 /**
  * This class define a abstract sample test.
  * @since 0.8

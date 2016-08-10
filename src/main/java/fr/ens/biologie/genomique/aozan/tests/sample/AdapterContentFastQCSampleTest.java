@@ -37,11 +37,9 @@ import uk.ac.babraham.FastQC.Modules.AdapterContent;
  * @author Sandrine Perrin
  * @author Laurent Jourdren
  */
-public class AdapterContentFastQCSampleTest extends
-    AbstractFastQCSampleTest {
+public class AdapterContentFastQCSampleTest extends AbstractFastQCSampleTest {
 
-  private static final String FASTQC_MODULE_NAME = new AdapterContent()
-      .name();
+  private static final String FASTQC_MODULE_NAME = new AdapterContent().name();
 
   @Override
   public List<AozanTest> configure(final TestConfiguration conf)
@@ -68,11 +66,9 @@ public class AdapterContentFastQCSampleTest extends
   /**
    * Public constructor.
    */
-  public AdapterContentFastQCSampleTest () {
+  public AdapterContentFastQCSampleTest() {
 
-    super("sample.adaptercontent", "adapter content",
-        "Adapter content");
+    super("sample.adaptercontent", "adapter content", "Adapter content");
   }
 
 }
-

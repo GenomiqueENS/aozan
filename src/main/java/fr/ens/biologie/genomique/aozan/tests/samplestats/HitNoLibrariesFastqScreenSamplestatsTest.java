@@ -92,7 +92,8 @@ public class HitNoLibrariesFastqScreenSamplestatsTest
    * @return a String with the required key
    */
   public String getSampleKey(final int sampleId) {
-    return "samplestats.fastqscreen.sample" + sampleId + ".read1.mappedexceptgenomesample";
+    return "samplestats.fastqscreen.sample"
+        + sampleId + ".read1.mappedexceptgenomesample";
   }
 
   @Override

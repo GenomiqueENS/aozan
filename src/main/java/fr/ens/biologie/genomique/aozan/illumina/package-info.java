@@ -22,8 +22,8 @@
  */
 
 /**
- * This package contains classes to handle files generated and used by Illumina software.
+ * This package contains classes to handle files generated and used by Illumina
+ * software.
  * @since 2.0
  */
 package fr.ens.biologie.genomique.aozan.illumina;
-

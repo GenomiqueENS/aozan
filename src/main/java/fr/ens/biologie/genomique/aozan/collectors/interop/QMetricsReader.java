@@ -136,13 +136,13 @@ public class QMetricsReader extends QualityMetricsReader {
   }
 
   /**
-   * Get an array of int with the value on which quality score of a bin is remapped
+   * Get an array of int with the value on which quality score of a bin is
+   * remapped
    * @return int[] remapped score quality
    */
   public int[] getRemappedScoreQuality() {
     return remappedScoreQuality;
   }
-
 
   /**
    * Set an integer telling if Qscore binning is enabled
@@ -167,7 +167,7 @@ public class QMetricsReader extends QualityMetricsReader {
   public void setLowerBoundary(int[] value) {
     this.lowerBoundary = value;
   }
-  
+
   /**
    * Set an array of int with the upper boundaries of each bin
    * @param value int[] the upper boundaries of each bin
@@ -177,7 +177,8 @@ public class QMetricsReader extends QualityMetricsReader {
   }
 
   /**
-   * Set an array of int with the value on which quality score of a bin is remapped
+   * Set an array of int with the value on which quality score of a bin is
+   * remapped
    * @param value int[] remapped score quality
    */
   public void setRemappedScoreQuality(int[] value) {

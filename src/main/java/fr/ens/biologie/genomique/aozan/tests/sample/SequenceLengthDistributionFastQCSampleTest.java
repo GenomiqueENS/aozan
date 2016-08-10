@@ -37,8 +37,8 @@ import uk.ac.babraham.FastQC.Modules.SequenceLengthDistribution;
  * @since 0.8
  * @author Laurent Jourdren
  */
-public class SequenceLengthDistributionFastQCSampleTest extends
-    AbstractFastQCSampleTest {
+public class SequenceLengthDistributionFastQCSampleTest
+    extends AbstractFastQCSampleTest {
 
   private static final String FASTQC_MODULE_NAME =
       new SequenceLengthDistribution().name();

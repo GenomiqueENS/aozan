@@ -115,7 +115,8 @@ public class RunDataGenerator {
           + " collector start for run " + this.runId);
 
       // Configure
-      collector.configure(qc, new CollectorConfiguration(this.generatorsProperties));
+      collector.configure(qc,
+          new CollectorConfiguration(this.generatorsProperties));
 
       // And collect data
       collector.collect(data);
@@ -124,7 +125,8 @@ public class RunDataGenerator {
           + " collector end for run " + this.runId + " in "
           + toTimeHumanReadable(timerCollector.elapsed(TimeUnit.MILLISECONDS)));
 
-      final File qcDir = new File(this.generatorsProperties.get(QC.QC_OUTPUT_DIR));
+      final File qcDir =
+          new File(this.generatorsProperties.get(QC.QC_OUTPUT_DIR));
       final File dataFile = new File(qcDir, collector.getName()
           + '-' + System.currentTimeMillis() + ".snapshot.data");
 

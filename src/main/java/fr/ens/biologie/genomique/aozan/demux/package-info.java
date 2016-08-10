@@ -22,7 +22,7 @@
  */
 
 /**
- * This package allows to re-demultiplexing selected project sequencing.  
+ * This package allows to re-demultiplexing selected project sequencing.
  * @since 1.4
  */
 package fr.ens.biologie.genomique.aozan.demux;

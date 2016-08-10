@@ -37,11 +37,11 @@ import uk.ac.babraham.FastQC.Modules.PerTileQualityScores;
  * @author Sandrine Perrin
  * @author Laurent Jourdren
  */
-public class PerTileQualityScoresFastQCSampleTest extends
-    AbstractFastQCSampleTest {
+public class PerTileQualityScoresFastQCSampleTest
+    extends AbstractFastQCSampleTest {
 
-  private static final String FASTQC_MODULE_NAME = new PerTileQualityScores()
-      .name();
+  private static final String FASTQC_MODULE_NAME =
+      new PerTileQualityScores().name();
 
   @Override
   public List<AozanTest> configure(final TestConfiguration conf)

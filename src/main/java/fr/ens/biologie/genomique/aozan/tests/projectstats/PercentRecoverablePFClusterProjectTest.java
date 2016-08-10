@@ -114,7 +114,8 @@ public class PercentRecoverablePFClusterProjectTest
    * Public constructor.
    */
   public PercentRecoverablePFClusterProjectTest() {
-    super("project.recoverablepfclusterpercent", "", "Recoverable PF cluster ", "%");
+    super("project.recoverablepfclusterpercent", "", "Recoverable PF cluster ",
+        "%");
   }
 
 }

@@ -54,9 +54,8 @@ public class FileUtils {
 
     final List<String> result = new ArrayList<>();
 
-    final BufferedReader reader =
-        new BufferedReader(new InputStreamReader(is,
-            Globals.DEFAULT_FILE_ENCODING));
+    final BufferedReader reader = new BufferedReader(
+        new InputStreamReader(is, Globals.DEFAULT_FILE_ENCODING));
 
     String line = null;
 

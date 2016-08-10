@@ -36,8 +36,7 @@ import fr.ens.biologie.genomique.aozan.AozanException;
  * @author Sandrine Perrin
  * @since 1.1
  */
-public class ErrorMetricsReader extends
-    AbstractBinaryFileReader<ErrorMetrics> {
+public class ErrorMetricsReader extends AbstractBinaryFileReader<ErrorMetrics> {
 
   public static final String NAME = "ErrorMetricsOut";
 
@@ -86,8 +85,8 @@ public class ErrorMetricsReader extends
    *           that expected.
    */
 
-  ErrorMetricsReader(final File dirPath) throws FileNotFoundException,
-      AozanException {
+  ErrorMetricsReader(final File dirPath)
+      throws FileNotFoundException, AozanException {
 
     super(dirPath);
 

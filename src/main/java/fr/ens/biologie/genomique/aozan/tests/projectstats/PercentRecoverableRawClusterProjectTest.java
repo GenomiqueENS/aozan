@@ -114,7 +114,8 @@ public class PercentRecoverableRawClusterProjectTest
    * Public constructor.
    */
   public PercentRecoverableRawClusterProjectTest() {
-    super("project.recoverablerawclusterpercent", "", "Recoverable raw cluster ", "%");
+    super("project.recoverablerawclusterpercent", "",
+        "Recoverable raw cluster ", "%");
   }
 
 }

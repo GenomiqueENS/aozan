@@ -71,17 +71,15 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
     super.collect(data);
 
     try {
-      final ErrorMetricsReader reader =
-          new ErrorMetricsReader(getInterOpDir());
+      final ErrorMetricsReader reader = new ErrorMetricsReader(getInterOpDir());
       initMetricsMap(data);
 
       int keyMap;
 
       // Distribution of metrics between lane and code
       for (final ErrorMetrics iem : reader.getSetIlluminaMetrics()) {
-        keyMap =
-            getKeyMap(iem.getLaneNumber(),
-                getReadFromCycleNumber(iem.getCycleNumber()));
+        keyMap = getKeyMap(iem.getLaneNumber(),
+            getReadFromCycleNumber(iem.getCycleNumber()));
 
         this.errorRatesMetrics.get(keyMap).addMetric(iem);
       }
@@ -154,8 +152,8 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
         final ReadData readData = getReadData(read);
 
         final int keyMap = lane * 100 + read;
-        this.errorRatesMetrics.put(keyMap, new ErrorRatesPerLane(lane, read,
-            true, readData));
+        this.errorRatesMetrics.put(keyMap,
+            new ErrorRatesPerLane(lane, read, true, readData));
       }
     }
   }
@@ -201,16 +199,16 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
         ArrayListMultimap.create();
 
     // Save pair tile-rate error for cycles (1 to 35) for all tiles
-    private final ListMultimap<Integer, Number> error35 = ArrayListMultimap
-        .create();
+    private final ListMultimap<Integer, Number> error35 =
+        ArrayListMultimap.create();
 
     // Save pair tile-rate error for cycles (1 to 75) for all tiles, for run PE
-    private final ListMultimap<Integer, Number> error75 = ArrayListMultimap
-        .create();
+    private final ListMultimap<Integer, Number> error75 =
+        ArrayListMultimap.create();
 
     // Save pair tile-rate error for cycles (1 to 100) for all tiles, for run PE
-    private final ListMultimap<Integer, Number> error100 = ArrayListMultimap
-        .create();
+    private final ListMultimap<Integer, Number> error100 =
+        ArrayListMultimap.create();
 
     /**
      * Save a record from TileMetricsOut.bin file.
@@ -327,7 +325,8 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
 
       final RunData data = new RunData();
 
-      final String key = READ_DATA_PREFIX + ".read" + this.readNumber + ".lane" + this.laneNumber;
+      final String key = READ_DATA_PREFIX
+          + ".read" + this.readNumber + ".lane" + this.laneNumber;
 
       data.put(key + ".err.rate.100", this.errorRateCycle100);
       data.put(key + ".err.rate.100.sd", this.errorRateCycle100SD);
@@ -345,14 +344,12 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
 
     @Override
     public String toString() {
-      return String
-          .format(
-              "\t%d\t%d\trate %.2f\trate sd %.3f\t35 %.2f\t35 sd %.3f\t75 %.2f\t75 sd %.3f\t100 %.2f\t100 sd %.3f\tmin %d\tmax %d",
-              this.laneNumber, this.readNumber, this.errorRate,
-              this.errorRateSD, this.errorRateCycle35, this.errorRateCycle35SD,
-              this.errorRateCycle75, this.errorRateCycle75SD,
-              this.errorRateCycle100, this.errorRateCycle100SD,
-              this.calledCyclesMin, this.calledCyclesMax);
+      return String.format(
+          "\t%d\t%d\trate %.2f\trate sd %.3f\t35 %.2f\t35 sd %.3f\t75 %.2f\t75 sd %.3f\t100 %.2f\t100 sd %.3f\tmin %d\tmax %d",
+          this.laneNumber, this.readNumber, this.errorRate, this.errorRateSD,
+          this.errorRateCycle35, this.errorRateCycle35SD, this.errorRateCycle75,
+          this.errorRateCycle75SD, this.errorRateCycle100,
+          this.errorRateCycle100SD, this.calledCyclesMin, this.calledCyclesMax);
 
     }
 
@@ -364,8 +361,8 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
      * Constructor.
      * @param lane lane number
      * @param read read number
-     * @param empty if true, all values are default values (0.0),
-     *          corresponding to a control lane or without skipping Phix
+     * @param empty if true, all values are default values (0.0), corresponding
+     *          to a control lane or without skipping Phix
      */
     public ErrorRatesPerLane(final int lane, final int read, boolean empty,
         final ReadData readData) {

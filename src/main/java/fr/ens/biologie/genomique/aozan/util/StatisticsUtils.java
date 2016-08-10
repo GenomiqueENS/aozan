@@ -82,8 +82,8 @@ public class StatisticsUtils {
 
     buildDescriptiveStatisticsWithZero();
 
-    return (this.dsWithoutZero.getN() == 0 ? 0.0 : new Median()
-        .evaluate(this.dsWithoutZero.getValues()));
+    return (this.dsWithoutZero.getN() == 0
+        ? 0.0 : new Median().evaluate(this.dsWithoutZero.getValues()));
 
   }
 

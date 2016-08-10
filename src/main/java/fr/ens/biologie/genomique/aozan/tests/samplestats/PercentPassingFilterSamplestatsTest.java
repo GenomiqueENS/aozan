@@ -106,7 +106,8 @@ public class PercentPassingFilterSamplestatsTest
    * Public constructor.
    */
   public PercentPassingFilterSamplestatsTest() {
-    super("samplestats.samplestatspassingfilterclusterpercent", "", "Passing filter", "%");
+    super("samplestats.samplestatspassingfilterclusterpercent", "",
+        "Passing filter", "%");
   }
 
 }

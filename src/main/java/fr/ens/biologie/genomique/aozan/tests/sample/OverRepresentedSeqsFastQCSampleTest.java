@@ -36,11 +36,11 @@ import uk.ac.babraham.FastQC.Modules.OverRepresentedSeqs;
  * @since 0.8
  * @author Laurent Jourdren
  */
-public class OverRepresentedSeqsFastQCSampleTest extends
-    AbstractFastQCSampleTest {
+public class OverRepresentedSeqsFastQCSampleTest
+    extends AbstractFastQCSampleTest {
 
-  private static final String FASTQC_MODULE_NAME = new OverRepresentedSeqs()
-      .name();
+  private static final String FASTQC_MODULE_NAME =
+      new OverRepresentedSeqs().name();
 
   @Override
   public List<AozanTest> configure(final TestConfiguration conf)

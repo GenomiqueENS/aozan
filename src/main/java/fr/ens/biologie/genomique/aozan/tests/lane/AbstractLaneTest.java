@@ -23,7 +23,6 @@
 
 package fr.ens.biologie.genomique.aozan.tests.lane;
 
-
 /**
  * This class define a abstract Lane test.
  * @since 0.8

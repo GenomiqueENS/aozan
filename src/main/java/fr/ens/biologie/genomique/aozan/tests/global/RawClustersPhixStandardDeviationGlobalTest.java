@@ -36,8 +36,8 @@ import fr.ens.biologie.genomique.aozan.collectors.ReadCollector;
  * @since 1.3
  * @author Sandrine Perrin
  */
-public class RawClustersPhixStandardDeviationGlobalTest extends
-    AbstractSimpleGlobalTest {
+public class RawClustersPhixStandardDeviationGlobalTest
+    extends AbstractSimpleGlobalTest {
 
   @Override
   public List<String> getCollectorsNamesRequiered() {

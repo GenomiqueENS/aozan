@@ -126,18 +126,10 @@ class BlastResultHit {
    */
   private String contaminantHitToTextType() {
 
-    String name = "Search with Blastn, " +
-            " First hit on " +
-            (this.countHits > 100 ? "+100" : this.countHits) +
-            ": " +
-            this.result +
-            " Evalue=" +
-            this.hspEValue +
-            ", " +
-            " Ident=" + this.prcIdentity +
-            "%," +
-            " QueryCovergap=" +
-            this.queryCover + "%";
+    String name = "Search with Blastn, "
+        + " First hit on " + (this.countHits > 100 ? "+100" : this.countHits)
+        + ": " + this.result + " Evalue=" + this.hspEValue + ", " + " Ident="
+        + this.prcIdentity + "%," + " QueryCovergap=" + this.queryCover + "%";
 
     // Return only the best hit
     if (this.prcIdentity < MIN_IDENTITY_EXPECTED
@@ -203,7 +195,8 @@ class BlastResultHit {
    * @param htmlTypeOutput true if output in html type, otherwise in text type
    */
   public BlastResultHit(final Element hit, final int countHits,
-      final int queryLength, final String sequence, final boolean htmlTypeOutput) {
+      final int queryLength, final String sequence,
+      final boolean htmlTypeOutput) {
 
     this.sequence = sequence;
     this.htmlTypeOutput = htmlTypeOutput;

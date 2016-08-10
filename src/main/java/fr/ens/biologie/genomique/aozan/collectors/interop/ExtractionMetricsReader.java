@@ -35,8 +35,8 @@ import fr.ens.biologie.genomique.aozan.AozanException;
  * @author Sandrine Perrin
  * @since 1.1
  */
-public class ExtractionMetricsReader extends
-    AbstractBinaryFileReader<ExtractionMetrics> {
+public class ExtractionMetricsReader
+    extends AbstractBinaryFileReader<ExtractionMetrics> {
 
   public static final String NAME = "ExtractionMetricsOut";
 

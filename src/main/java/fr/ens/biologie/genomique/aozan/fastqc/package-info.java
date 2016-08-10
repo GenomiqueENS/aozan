@@ -22,8 +22,9 @@
  */
 
 /**
- * This package contains a QCModule for FastQC that list the bad tiles in a fastq
- * file and class used for modify fastqc bytecode, it is necessary with FastQC version 0.10.1. 
+ * This package contains a QCModule for FastQC that list the bad tiles in a
+ * fastq file and class used for modify fastqc bytecode, it is necessary with
+ * FastQC version 0.10.1.
  * @since 0.8
  */
 package fr.ens.biologie.genomique.aozan.fastqc;
