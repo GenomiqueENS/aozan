@@ -8,7 +8,6 @@ Created on 25 oct. 2011
 
 import hiseq_run, sync_run, demux_run
 import smtplib, os.path, time, sys
-import fcntl, time, errno
 import mimetypes
 from email.utils import formatdate
 from glob import glob
@@ -31,6 +30,13 @@ from fr.ens.biologie.genomique.aozan import Settings
 from fr.ens.biologie.genomique.aozan import AozanException
 from fr.ens.biologie.genomique.aozan.util import FileUtils
 from fr.ens.biologie.genomique.aozan.illumina import RunInfo
+from java.nio.channels import FileChannel
+from java.nio.channels import FileLock
+from java.io import BufferedWriter;
+from java.io import File;
+from java.io import FileWriter;
+from java.io import RandomAccessFile;
+
 
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_DEBUG_KEY
 from fr.ens.biologie.genomique.aozan.Settings import SEND_MAIL_KEY
@@ -59,8 +65,6 @@ from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_E
 from fr.ens.biologie.genomique.aozan.util import StringUtils
 
 PRIORITY_FILE = 'runs.priority'
-LOCK_MAX_ATTEMPTS = 100
-LOCK_SLEEP_DURATION = 0.1
 
 def load_prioritized_run_ids(conf):
     """Load the list of the prioritized run ids.
@@ -578,25 +582,31 @@ def add_run_id(run_id, file_path, conf):
         file_path: path of the file
         conf: configuration dictionary
     """
-
-    f = open(file_path, 'a')
     log('INFO','Add ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(file_path), conf)
-    attempt = 0
-    while attempt <= LOCK_MAX_ATTEMPTS:
-        try:
-            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            f.write(run_id + '\n')
-            f.close()
-            fcntl.flock(f, fcntl.LOCK_UN)
-            return
-        except IOError as e:
-            # raise on unrelated IOErrors
-            if e.errno != errno.EAGAIN:
-                raise Exception("Can't write " + run_id + " to " + file_path + ".")
-            else:
-                attemps = attemps + 1
-                time.sleep(LOCK_SLEEP_DURATION)
-    raise Exception("Lock timeout: Can't write " + run_id + " to " + file_path + ".")
+
+    f = File(file_path);
+    try:
+        # Creating lock
+        channel = RandomAccessFile(f, "rw").getChannel()
+        lock = channel.lock()
+
+        # Creating writer
+        fileWriter = FileWriter(f.getAbsoluteFile())
+        bw = BufferedWriter(fileWriter)
+
+        # Appending run_id
+        bw.append(run_id + '\n')
+
+        # Closing channels and locks ...
+        bw.close()
+        channel.close()
+        if lock:
+            lock.release()
+        return
+
+    except:
+        raise Exception("Can't write " + run_id + " to " + file_path)
+
         
 
 def get_report_run_data_path(run_id, conf):
