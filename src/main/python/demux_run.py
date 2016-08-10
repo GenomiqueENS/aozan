@@ -188,15 +188,25 @@ def load_samplesheet(run_id, input_run_data_path, samplesheet_filename, conf):
 
             # Check if the xls samplesheet exists
             if not os.path.exists(input_samplesheet_xls_path):
-                error("no bcl2fastq samplesheet found for run " + run_id,
-                      "No bcl2fastq samplesheet found for " + run_id + " run.\n" +
-                      'You must provide a ' + samplesheet_filename + '.xls file in ' + conf[
-                          BCL2FASTQ_SAMPLESHEETS_PATH_KEY] +
-                      ' directory to demultiplex and create fastq files for this run.\n', conf)
-                return None
 
-            # Load XLS samplesheet file
-            samplesheet = SampleSheetXLSReader(input_samplesheet_xls_path).read()
+                # Test if the samplesheet exists at the root of the run directory
+                input_samplesheet_csv_path = input_run_data_path + '/SampleSheet.csv'
+
+                if not os.path.exists(input_samplesheet_csv_path):
+                    error("no bcl2fastq samplesheet found for run " + run_id,
+                          "No bcl2fastq samplesheet found for " + run_id + " run.\n" +
+                          'You must provide a ' + samplesheet_filename + '.xls file in ' + conf[
+                              BCL2FASTQ_SAMPLESHEETS_PATH_KEY] +
+                          ' directory or a SampleSheet.csv file in the root of ' +
+                          'the run directory to demultiplex and create FASTQ ' +
+                          'files for this run.\n', conf)
+                    return None
+                else:
+                    # Load CSV samplesheet file at the root of the run directory
+                    samplesheet = SampleSheetCSVReader(input_samplesheet_csv_path).read()
+            else:
+                # Load XLS samplesheet file
+                samplesheet = SampleSheetXLSReader(input_samplesheet_xls_path).read()
 
         elif common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'csv', conf):
 
@@ -205,12 +215,19 @@ def load_samplesheet(run_id, input_run_data_path, samplesheet_filename, conf):
 
             # Check if the csv samplesheet exists
             if not os.path.exists(input_samplesheet_csv_path):
-                error("no bcl2fastq samplesheet found for run " + run_id,
-                      "No bcl2fastq samplesheet found for " + run_id + " run.\n" +
-                      'You must provide a ' + samplesheet_filename + '.csv file in ' + conf[
-                          BCL2FASTQ_SAMPLESHEETS_PATH_KEY] +
-                      ' directory to demultiplex and create fastq files for this run.\n', conf)
-                return None
+
+                # Test if the samplesheet exists at the root of the run directory
+                input_samplesheet_csv_path = input_run_data_path + '/SampleSheet.csv'
+
+                if not os.path.exists(input_samplesheet_csv_path):
+                    error("no bcl2fastq samplesheet found for run " + run_id,
+                          "No bcl2fastq samplesheet found for " + run_id + " run.\n" +
+                          'You must provide a ' + samplesheet_filename + '.csv file in ' + conf[
+                              BCL2FASTQ_SAMPLESHEETS_PATH_KEY] +
+                          ' directory or a SampleSheet.csv file in the root of ' +
+                          'the run directory to demultiplex and create FASTQ ' +
+                          'files for this run.\n', conf)
+                    return None
 
             # Load CSV samplesheet file
             samplesheet = SampleSheetCSVReader(input_samplesheet_csv_path).read()
