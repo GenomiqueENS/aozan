@@ -30,6 +30,13 @@ from fr.ens.biologie.genomique.aozan import Settings
 from fr.ens.biologie.genomique.aozan import AozanException
 from fr.ens.biologie.genomique.aozan.util import FileUtils
 from fr.ens.biologie.genomique.aozan.illumina import RunInfo
+from java.nio.channels import FileChannel
+from java.nio.channels import FileLock
+from java.io import BufferedWriter;
+from java.io import File;
+from java.io import FileWriter;
+from java.io import RandomAccessFile;
+
 
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_DEBUG_KEY
 from fr.ens.biologie.genomique.aozan.Settings import SEND_MAIL_KEY
@@ -575,16 +582,32 @@ def add_run_id(run_id, file_path, conf):
         file_path: path of the file
         conf: configuration dictionary
     """
+    log('INFO','Add ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(file_path), conf)
 
-    log('INFO',
-        'Add ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(file_path), conf)
+    f = File(file_path);
+    try:
+        # Creating lock
+        channel = RandomAccessFile(f, "rw").getChannel()
+        lock = channel.lock()
 
-    f = open(file_path, 'a')
+        # Creating writer
+        fileWriter = FileWriter(f.getAbsoluteFile())
+        bw = BufferedWriter(fileWriter)
 
-    f.write(run_id + '\n')
+        # Appending run_id
+        bw.append(run_id + '\n')
 
-    f.close()
+        # Closing channels and locks ...
+        bw.close()
+        channel.close()
+        if lock:
+            lock.release()
+        return
 
+    except:
+        raise Exception("Can't write " + run_id + " to " + file_path)
+
+        
 
 def get_report_run_data_path(run_id, conf):
     """ Build report run data path from run id
