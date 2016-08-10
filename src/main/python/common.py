@@ -8,6 +8,7 @@ Created on 25 oct. 2011
 
 import hiseq_run, sync_run, demux_run
 import smtplib, os.path, time, sys
+import fcntl, time, errno
 import mimetypes
 from email.utils import formatdate
 from glob import glob
@@ -58,6 +59,8 @@ from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_E
 from fr.ens.biologie.genomique.aozan.util import StringUtils
 
 PRIORITY_FILE = 'runs.priority'
+LOCK_MAX_ATTEMPTS = 100
+LOCK_SLEEP_DURATION = 0.1
 
 def load_prioritized_run_ids(conf):
     """Load the list of the prioritized run ids.
@@ -576,15 +579,25 @@ def add_run_id(run_id, file_path, conf):
         conf: configuration dictionary
     """
 
-    log('INFO',
-        'Add ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(file_path), conf)
-
     f = open(file_path, 'a')
-
-    f.write(run_id + '\n')
-
-    f.close()
-
+    log('INFO','Add ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(file_path), conf)
+    attempt = 0
+    while attempt <= LOCK_MAX_ATTEMPTS:
+        try:
+            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            f.write(run_id + '\n')
+            f.close()
+            fcntl.flock(f, fcntl.LOCK_UN)
+            return
+        except IOError as e:
+            # raise on unrelated IOErrors
+            if e.errno != errno.EAGAIN:
+                raise Exception("Can't write " + run_id + " to " + file_path + ".")
+            else:
+                attemps = attemps + 1
+                time.sleep(LOCK_SLEEP_DURATION)
+    raise Exception("Lock timeout: Can't write " + run_id + " to " + file_path + ".")
+        
 
 def get_report_run_data_path(run_id, conf):
     """ Build report run data path from run id
