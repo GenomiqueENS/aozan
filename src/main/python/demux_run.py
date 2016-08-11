@@ -53,6 +53,7 @@ DENY_FILE = 'demux.deny'
 DONE_FILE = 'demux.done'
 LASTERR_FILE = 'demux.lasterr'
 
+
 def load_denied_run_ids(conf):
     """Load the list of the denied run ids.
 
@@ -60,6 +61,7 @@ def load_denied_run_ids(conf):
         conf: configuration dictionary
     """
     return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + DENY_FILE)
+
 
 def load_processed_run_ids(conf):
     """Load the list of the processed run ids.
@@ -91,7 +93,8 @@ def error(short_message, message, conf):
         conf: configuration dictionary
     """
 
-    common.error('[Aozan] demultiplexer: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/' + LASTERR_FILE, conf)
+    common.error('[Aozan] demultiplexer: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/' + LASTERR_FILE,
+                 conf)
 
 
 def load_index_sequences(conf):
@@ -653,7 +656,7 @@ def archive_samplesheet(run_id, original_samplesheet_path, samplesheet_csv_path,
 
     # Add samplesheet to the archive of samplesheets
     if common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'xls', conf) \
-       and original_samplesheet_path.endswith(".xls"):
+            and original_samplesheet_path.endswith(".xls"):
 
         cmd = 'cp ' + original_samplesheet_path + ' ' + conf[TMP_PATH_KEY] + \
               ' && cd ' + conf[TMP_PATH_KEY] + \

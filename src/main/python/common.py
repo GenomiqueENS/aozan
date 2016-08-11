@@ -35,7 +35,6 @@ from java.nio.channels import FileLock
 from java.io import File;
 from java.io import RandomAccessFile;
 
-
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_DEBUG_KEY
 from fr.ens.biologie.genomique.aozan.Settings import SEND_MAIL_KEY
 from fr.ens.biologie.genomique.aozan.Settings import SMTP_SERVER_KEY
@@ -63,6 +62,7 @@ from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_E
 from fr.ens.biologie.genomique.aozan.util import StringUtils
 
 PRIORITY_FILE = 'runs.priority'
+
 
 def load_prioritized_run_ids(conf):
     """Load the list of the prioritized run ids.
@@ -580,7 +580,8 @@ def add_run_id(run_id, file_path, conf):
         file_path: path of the file
         conf: configuration dictionary
     """
-    log('INFO','Add ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(file_path), conf)
+    log('INFO', 'Add ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(file_path),
+        conf)
 
     f = File(file_path);
     try:
@@ -607,7 +608,6 @@ def add_run_id(run_id, file_path, conf):
 
     except:
         raise Exception("Can't write " + run_id + " to " + file_path)
-
 
 
 def get_report_run_data_path(run_id, conf):
@@ -999,8 +999,6 @@ def get_instrument_model(run_id, conf):
     return sequencer_model
 
 
-
-
 def extract_elements_by_tag_name_from_xml(xml_path, tag_name):
     """ Extract an element from xml file path by tag name
     Arguments:
@@ -1057,7 +1055,7 @@ def load_conf(conf, conf_file_path):
     converting_table_key['casava.designs.path'] = Settings.BCL2FASTQ_SAMPLESHEETS_PATH_KEY
     converting_table_key['casava.samplesheets.path'] = Settings.BCL2FASTQ_SAMPLESHEETS_PATH_KEY
 
-    converting_table_key['casava.adapter.fasta.file.path'] = Settings. BCL2FASTQ_ADAPTER_FASTA_FILE_PATH_KEY
+    converting_table_key['casava.adapter.fasta.file.path'] = Settings.BCL2FASTQ_ADAPTER_FASTA_FILE_PATH_KEY
     converting_table_key['casava.additionnal.arguments'] = Settings.BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY
     converting_table_key['casava.compression'] = Settings.BCL2FASTQ_COMPRESSION_KEY
     converting_table_key['casava.compression.level'] = Settings.BCL2FASTQ_COMPRESSION_LEVEL_KEY
@@ -1089,7 +1087,6 @@ def load_conf(conf, conf_file_path):
         'qc.conf.settings.genomes.desc.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY
     converting_table_key[
         'qc.conf.settings.mappers.indexes.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY
-
 
     # Converting table between old and new test names
     test_name_converting_table = {}
@@ -1140,7 +1137,8 @@ def load_conf(conf, conf_file_path):
     test_name_converting_table['linkprojectreport'] = 'project.linkprojectreport'
     test_name_converting_table['recoverablepfclusterpercent'] = 'project.recoverablepfclusterpercent'
     test_name_converting_table['isindexedproject'] = 'project.isindexedproject'
-    test_name_converting_table['samplesexceededcontaminationthreshold'] = 'project.samplesexceededcontaminationthreshold'
+    test_name_converting_table[
+        'samplesexceededcontaminationthreshold'] = 'project.samplesexceededcontaminationthreshold'
     test_name_converting_table['pfclusterminproject'] = 'project.pfclusterminproject'
     test_name_converting_table['rawclusterminproject'] = 'project.rawclusterminproject'
     test_name_converting_table['pfclustermaxproject'] = 'project.pfclustermaxproject'
@@ -1177,17 +1175,21 @@ def load_conf(conf, conf_file_path):
     test_name_converting_table['samplestatpfclustersum'] = 'samplestats.samplestatpfclustersum'
     test_name_converting_table['genomessample'] = 'samplestats.genomessample'
     test_name_converting_table['meanqualityscorepfsamplestats'] = 'samplestats.meanqualityscorepfsamplestats'
-    test_name_converting_table['samplestatsrecoverablerawclusterpercent'] = 'samplestats.samplestatsrecoverablerawclusterpercent'
+    test_name_converting_table[
+        'samplestatsrecoverablerawclusterpercent'] = 'samplestats.samplestatsrecoverablerawclusterpercent'
     test_name_converting_table['samplestatspercentq30basepf'] = 'samplestats.samplestatspercentq30basepf'
     test_name_converting_table['linksamplereport'] = 'samplestats.linksamplereport'
     test_name_converting_table['samplestathitnolibrariessum'] = 'samplestats.samplestathitnolibrariessum'
     test_name_converting_table['samplestatrawclustersum'] = 'samplestats.samplestatrawclustersum'
     test_name_converting_table['percentsampleinproject'] = 'samplestats.percentsampleinproject'
     test_name_converting_table['isindexedsample'] = 'samplestats.isindexedsample'
-    test_name_converting_table['samplestatspassingfilterclusterpercent'] = 'samplestats.samplestatspassingfilterclusterpercent'
+    test_name_converting_table[
+        'samplestatspassingfilterclusterpercent'] = 'samplestats.samplestatspassingfilterclusterpercent'
     test_name_converting_table['samplestatcountsample'] = 'samplestats.samplestatcountsample'
-    test_name_converting_table['samplestatsrecoverablepfclusterpercent'] = 'samplestats.samplestatsrecoverablepfclusterpercent'
-    test_name_converting_table['samplestatexceededcontaminationthreshold'] = 'samplestats.samplestatexceededcontaminationthreshold'
+    test_name_converting_table[
+        'samplestatsrecoverablepfclusterpercent'] = 'samplestats.samplestatsrecoverablepfclusterpercent'
+    test_name_converting_table[
+        'samplestatexceededcontaminationthreshold'] = 'samplestats.samplestatexceededcontaminationthreshold'
     test_name_converting_table['samplestatsrawclustermin'] = 'samplestats.samplestatsrawclustermin'
     test_name_converting_table['samplestatspfclustermax'] = 'samplestats.samplestatspfclustermax'
     test_name_converting_table['samplestatspfclustermin'] = 'samplestats.samplestatspfclustermin'
@@ -1238,7 +1240,7 @@ def load_conf(conf, conf_file_path):
                     for k in test_name_converting_table.keys():
                         prefix = 'qc.test.' + k + '.'
                         if key.startswith(prefix):
-                            key = 'qc.test.' + test_name_converting_table[k] + key[len(prefix)-1:]
+                            key = 'qc.test.' + test_name_converting_table[k] + key[len(prefix) - 1:]
                             break
 
                 conf[key] = value

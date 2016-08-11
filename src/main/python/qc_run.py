@@ -21,10 +21,10 @@ from fr.ens.biologie.genomique.aozan.Settings import QC_REPORT_STYLESHEET_KEY
 from fr.ens.biologie.genomique.aozan.Settings import QC_REPORT_SAVE_REPORT_DATA_KEY
 from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
 
-
 DENY_FILE = 'qc.deny'
 DONE_FILE = 'qc.done'
 LASTERR_FILE = 'qc.lasterr'
+
 
 def load_denied_run_ids(conf):
     """Load the list of the denied run ids.
