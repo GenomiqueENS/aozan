@@ -32,9 +32,7 @@ from fr.ens.biologie.genomique.aozan.util import FileUtils
 from fr.ens.biologie.genomique.aozan.illumina import RunInfo
 from java.nio.channels import FileChannel
 from java.nio.channels import FileLock
-from java.io import BufferedWriter;
 from java.io import File;
-from java.io import FileWriter;
 from java.io import RandomAccessFile;
 
 
@@ -586,28 +584,31 @@ def add_run_id(run_id, file_path, conf):
 
     f = File(file_path);
     try:
+        # Open file
+        raf = RandomAccessFile(f, 'rws')
+
         # Creating lock
-        channel = RandomAccessFile(f, "rw").getChannel()
+        channel = raf.getChannel()
         lock = channel.lock()
 
-        # Creating writer
-        fileWriter = FileWriter(f.getAbsoluteFile())
-        bw = BufferedWriter(fileWriter)
+        # Set position at the end of the file
+        raf.seek(f.length())
 
-        # Appending run_id
-        bw.append(run_id + '\n')
+        # Add the run_id at the end of the file
+        raf.writeUTF(run_id + '\n')
 
-        # Closing channels and locks ...
-        bw.close()
-        channel.close()
+        # Release locks
         if lock:
             lock.release()
-        return
+
+        # Close file
+        channel.close()
+        raf.close()
 
     except:
         raise Exception("Can't write " + run_id + " to " + file_path)
 
-        
+
 
 def get_report_run_data_path(run_id, conf):
     """ Build report run data path from run id
