@@ -36,11 +36,11 @@ import uk.ac.babraham.FastQC.Modules.PerBaseQualityScores;
  * @since 0.8
  * @author Laurent Jourdren
  */
-public class PerBaseQualityScoresFastQCSampleTest extends
-    AbstractFastQCSampleTest {
+public class PerBaseQualityScoresFastQCSampleTest
+    extends AbstractFastQCSampleTest {
 
-  private static final String FASTQC_MODULE_NAME = new PerBaseQualityScores()
-      .name();
+  private static final String FASTQC_MODULE_NAME =
+      new PerBaseQualityScores().name();
 
   @Override
   public List<AozanTest> configure(final TestConfiguration conf)

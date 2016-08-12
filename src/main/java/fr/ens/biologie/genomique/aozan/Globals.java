@@ -39,7 +39,6 @@ import java.util.logging.LogRecord;
 
 import fr.ens.biologie.genomique.eoulsan.core.Version;
 
-
 /**
  * This class contains Globals constants.
  * @since 0.6
@@ -58,8 +57,8 @@ public class Globals {
   public static final String APP_NAME_LOWER_CASE = APP_NAME.toLowerCase();
 
   /** The prefix of the parameters of the application. */
-  public static final String PARAMETER_PREFIX = "fr.ens.transcriptome."
-      + APP_NAME_LOWER_CASE;
+  public static final String PARAMETER_PREFIX =
+      "fr.ens.transcriptome." + APP_NAME_LOWER_CASE;
 
   /** The version of the application. */
   public static final String APP_VERSION_STRING = getVersion();
@@ -145,8 +144,8 @@ public class Globals {
   /** Format of the log. */
   public static final Formatter LOG_FORMATTER = new Formatter() {
 
-    private final DateFormat df = new SimpleDateFormat("yyyy.MM.dd kk:mm:ss",
-        DEFAULT_LOCALE);
+    private final DateFormat df =
+        new SimpleDateFormat("yyyy.MM.dd kk:mm:ss", DEFAULT_LOCALE);
 
     @Override
     public String format(final LogRecord record) {
@@ -230,8 +229,8 @@ public class Globals {
 
     readManifest();
 
-    return manifestAttributes != null ? manifestAttributes
-        .getValue(propertyKey) : null;
+    return manifestAttributes != null
+        ? manifestAttributes.getValue(propertyKey) : null;
   }
 
   private static synchronized void readManifest() {

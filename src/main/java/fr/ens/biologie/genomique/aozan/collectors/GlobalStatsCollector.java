@@ -136,8 +136,8 @@ public class GlobalStatsCollector implements Collector {
     data.put(COLLECTOR_PREFIX + "clusters.pf.mean", pfStats.getMeanToInteger());
     data.put(COLLECTOR_PREFIX + "clusters.pf.sd",
         pfStats.getStandardDeviationToInteger());
-    data.put(COLLECTOR_PREFIX + "prc.pf.clusters", (double) pfClusterSum
-        / rawClusterSum);
+    data.put(COLLECTOR_PREFIX + "prc.pf.clusters",
+        (double) pfClusterSum / rawClusterSum);
 
     // Set phix align data
     data.put(COLLECTOR_PREFIX + "clusters.raw.phix.count", phixClusterSum);
@@ -147,16 +147,16 @@ public class GlobalStatsCollector implements Collector {
         phixStats.getMeanToInteger());
     data.put(COLLECTOR_PREFIX + "clusters.raw.phix.sd",
         phixStats.getStandardDeviationToInteger());
-    data.put(COLLECTOR_PREFIX + "prc.pf.clusters.phix", (double) phixClusterSum
-        / rawClusterSum);
+    data.put(COLLECTOR_PREFIX + "prc.pf.clusters.phix",
+        (double) phixClusterSum / rawClusterSum);
 
     // Run data
     data.put(COLLECTOR_PREFIX + "cycles", cyclesSum);
     data.put(COLLECTOR_PREFIX + "cycles.non.indexed", nonIndexedCyclesSum);
     data.put(COLLECTOR_PREFIX + "indexes", indexesCount);
     data.put(COLLECTOR_PREFIX + "bases", rawClusterSum * cyclesSum * tiles);
-    data.put(COLLECTOR_PREFIX + "bases.non.indexed", rawClusterSum
-        * nonIndexedCyclesSum * tiles);
+    data.put(COLLECTOR_PREFIX + "bases.non.indexed",
+        rawClusterSum * nonIndexedCyclesSum * tiles);
 
   }
 

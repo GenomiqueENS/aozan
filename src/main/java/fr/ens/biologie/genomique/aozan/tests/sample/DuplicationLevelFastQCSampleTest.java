@@ -37,8 +37,8 @@ import uk.ac.babraham.FastQC.Modules.OverRepresentedSeqs;
  */
 public class DuplicationLevelFastQCSampleTest extends AbstractFastQCSampleTest {
 
-  private static final String FASTQC_MODULE_NAME = new OverRepresentedSeqs()
-      .duplicationLevelModule().name();
+  private static final String FASTQC_MODULE_NAME =
+      new OverRepresentedSeqs().duplicationLevelModule().name();
 
   @Override
   public List<AozanTest> configure(final TestConfiguration conf)

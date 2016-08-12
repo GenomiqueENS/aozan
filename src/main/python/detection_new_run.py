@@ -192,22 +192,16 @@ def send_report(run_id, conf):
 
     description_run += "\t- " + "Estimated run type: " + type_run_estimated + ".\n"
 
-    rta_major_version = common.get_rta_major_version(run_id, conf)
+    attachment_file = str(hiseq_run.find_hiseq_run_path(run_id, conf)) + '/' + run_id + '/' + FIRST_BASE_REPORT_FILE
 
-    if rta_major_version == 1:
-        # With HiSeq send the first base report file
-        attachment_file = str(hiseq_run.find_hiseq_run_path(run_id, conf)) + '/' + run_id + '/' + FIRST_BASE_REPORT_FILE
-
-        # Do not send a message if the First base report file does not exists
-        if not os.path.isfile(attachment_file):
-            return False
+    # If the First base report file exists, send it by email
+    if common.is_file_readable(attachment_file):
 
         message = 'You will find attached to this message the first base report for the run ' + \
                   run_id + '.\n\n' + description_run
         common.send_msg_with_attachment('[Aozan] First base report for the run ' + type_run_estimated + '  ' + run_id +
                                         ' on ' + common.get_instrument_name(run_id, conf),
                                         message, attachment_file, conf)
-
     else:
         # With other no attachment file
         message = 'You will find below the parameters of the run ' + run_id + '.\n\n' + description_run

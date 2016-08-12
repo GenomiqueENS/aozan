@@ -22,7 +22,8 @@
  */
 
 /**
- * This package contains class of tests which defines the collector to launch and creates a report of a quality control.
+ * This package contains class of tests which defines the collector to launch
+ * and creates a report of a quality control.
  * @since 0.8
  */
 package fr.ens.biologie.genomique.aozan.tests;

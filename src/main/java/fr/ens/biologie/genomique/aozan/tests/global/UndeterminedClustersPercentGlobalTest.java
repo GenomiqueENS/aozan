@@ -121,7 +121,8 @@ public class UndeterminedClustersPercentGlobalTest extends AbstractGlobalTest {
    */
   public UndeterminedClustersPercentGlobalTest() {
 
-    super("global.globalprcundeterminedcluster", "", "Undetermined Cluster Est.", "%");
+    super("global.globalprcundeterminedcluster", "",
+        "Undetermined Cluster Est.", "%");
   }
 
 }

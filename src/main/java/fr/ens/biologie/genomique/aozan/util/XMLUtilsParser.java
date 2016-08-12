@@ -46,8 +46,8 @@ public final class XMLUtilsParser {
    * @param index value
    * @return value of tag
    */
-  public static Integer extractValueToInt(final Element e,
-      final String tagName, final int index) {
+  public static Integer extractValueToInt(final Element e, final String tagName,
+      final int index) {
     List<Element> elements = XMLUtils.getElementsByTagName(e, tagName);
 
     if (index >= elements.size())

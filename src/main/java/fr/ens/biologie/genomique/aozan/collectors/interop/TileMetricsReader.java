@@ -35,8 +35,7 @@ import fr.ens.biologie.genomique.aozan.AozanException;
  * @author Sandrine Perrin
  * @since 1.1
  */
-public class TileMetricsReader extends
-    AbstractBinaryFileReader<TileMetrics> {
+public class TileMetricsReader extends AbstractBinaryFileReader<TileMetrics> {
 
   public static final String NAME = "TileMetricsOut";
 

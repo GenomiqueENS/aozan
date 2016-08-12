@@ -105,8 +105,8 @@ public class ScoreInterval {
     String trimmedKey = key.trim().toLowerCase();
 
     if ("interval".equals(trimmedKey)) {
-      setInterval(9, doubleInterval
-          ? new DoubleInterval(value) : new LongInterval(value));
+      setInterval(9,
+          doubleInterval ? new DoubleInterval(value) : new LongInterval(value));
       return true;
     }
 

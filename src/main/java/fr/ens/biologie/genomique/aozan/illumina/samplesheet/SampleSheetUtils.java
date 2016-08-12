@@ -311,7 +311,8 @@ public class SampleSheetUtils {
    * @return a Bcl2fastq samplesheet object
    * @throws IOException if an error occurs
    */
-  public static SampleSheet parseCSVSamplesheet(final String s) throws IOException {
+  public static SampleSheet parseCSVSamplesheet(final String s)
+      throws IOException {
 
     if (s == null) {
       return null;
@@ -442,8 +443,9 @@ public class SampleSheetUtils {
    * @param sequences map for the sequences
    * @throws AozanException if the shortcut is unknown
    */
-  public static void replaceIndexShortcutsBySequences(final SampleSheet samplesheet,
-      final Map<String, String> sequences) throws AozanException {
+  public static void replaceIndexShortcutsBySequences(
+      final SampleSheet samplesheet, final Map<String, String> sequences)
+      throws AozanException {
 
     if (samplesheet == null || sequences == null) {
       return;

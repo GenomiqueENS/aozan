@@ -79,8 +79,8 @@ final class ReadsData {
     }
 
     // No read number found
-    throw new AozanException("Cycle number invalid "
-        + cycleNumber + ". No read found.");
+    throw new AozanException(
+        "Cycle number invalid " + cycleNumber + ". No read found.");
   }
 
   /**
@@ -106,8 +106,8 @@ final class ReadsData {
       final int lastCycle = firstCycle + numberCycles - 1;
 
       // Save new read
-      reads.put(read, new ReadData(read, numberCycles, firstCycle, lastCycle,
-          isIndexed));
+      reads.put(read,
+          new ReadData(read, numberCycles, firstCycle, lastCycle, isIndexed));
 
       // Compile count cycles
       counterCycles = lastCycle + 1;
@@ -212,7 +212,8 @@ final class ReadsData {
      */
     public boolean isCycleIncluded(int cycleNumber) {
 
-      return (cycleNumber >= firstCycleNumber && cycleNumber <= lastCycleNumber);
+      return (cycleNumber >= firstCycleNumber
+          && cycleNumber <= lastCycleNumber);
     }
 
     /**

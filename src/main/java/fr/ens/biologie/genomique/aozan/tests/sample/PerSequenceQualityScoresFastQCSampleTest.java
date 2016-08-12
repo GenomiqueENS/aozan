@@ -37,8 +37,8 @@ import uk.ac.babraham.FastQC.Modules.PerSequenceQualityScores;
  * @since 0.8
  * @author Laurent Jourdren
  */
-public class PerSequenceQualityScoresFastQCSampleTest extends
-    AbstractFastQCSampleTest {
+public class PerSequenceQualityScoresFastQCSampleTest
+    extends AbstractFastQCSampleTest {
 
   private static final String FASTQC_MODULE_NAME =
       new PerSequenceQualityScores().name();

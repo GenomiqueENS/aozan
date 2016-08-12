@@ -76,9 +76,8 @@ public class ExtractionMetricsCollector extends AbstractMetricsCollector {
     for (final ExtractionMetrics iim : reader.getSetIlluminaMetrics()) {
 
       // key : number read, value(pair:first number cycle, last number cycle)
-      keyMap =
-          getKeyMap(iim.getLaneNumber(),
-              getReadFromCycleNumber(iim.getCycleNumber()));
+      keyMap = getKeyMap(iim.getLaneNumber(),
+          getReadFromCycleNumber(iim.getCycleNumber()));
 
       this.intensityMetrics.get(keyMap).addMetric(iim);
     }
@@ -209,7 +208,8 @@ public class ExtractionMetricsCollector extends AbstractMetricsCollector {
 
       final RunData data = new RunData();
 
-      final String key = READ_DATA_PREFIX + ".read" + this.readNumber + ".lane" + this.laneNumber;
+      final String key = READ_DATA_PREFIX
+          + ".read" + this.readNumber + ".lane" + this.laneNumber;
 
       data.put(key + ".first.cycle.int.pf", this.intensityCycle1);
       data.put(key + ".first.cycle.int.pf.sd", this.intensityCycle1SD);
@@ -273,8 +273,8 @@ public class ExtractionMetricsCollector extends AbstractMetricsCollector {
 
       this.firstCycleNumber = readData.getFirstCycleNumber();
 
-      this.twentiethCycleNumber =
-          (readData.getNumberCycles() >= 20 ? this.firstCycleNumber + STEP : -1);
+      this.twentiethCycleNumber = (readData.getNumberCycles() >= 20
+          ? this.firstCycleNumber + STEP : -1);
 
       this.intensityCycle1ValuesPerTile = new TreeMap<>();
       this.intensityCycle20ValuesPerTile = new TreeMap<>();

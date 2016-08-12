@@ -33,7 +33,7 @@ from fr.ens.biologie.genomique.aozan.Settings import FASTQ_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
 
 
-def run_id_sorted_by_priority(run_ids,priority_ids):
+def run_id_sorted_by_priority(run_ids, priority_ids):
     """Get a sorted.
 
     Arguments:
@@ -44,6 +44,7 @@ def run_id_sorted_by_priority(run_ids,priority_ids):
         return list(run_ids)
 
     return list(priority_ids & run_ids) + list(run_ids - priority_ids)
+
 
 def create_lock_file(lock_file_path):
     """Create the lock file.
@@ -274,14 +275,15 @@ def launch_steps(conf):
 
     # Load run with higher priority
     prioritized_run_ids = common.load_prioritized_run_ids(conf)
-    
-    
+
     # Get the list of run available on HiSeq output
     if sync_run.is_sync_step_enable(conf):
 
         try:
             sync_denied_run_ids = sync_run.load_denied_run_ids(conf)
-            for run_id in run_id_sorted_by_priority(hiseq_run_ids_done - sync_run_ids_done - hiseq_run_ids_do_not_process - sync_denied_run_ids, prioritized_run_ids):
+            for run_id in run_id_sorted_by_priority(
+                                            hiseq_run_ids_done - sync_run_ids_done - hiseq_run_ids_do_not_process - sync_denied_run_ids,
+                                            prioritized_run_ids):
 
                 # print 'DEBUG sync launch on '+ str(run_id)
 
@@ -320,7 +322,8 @@ def launch_steps(conf):
     if common.is_conf_value_equals_true(DEMUX_STEP_KEY, conf):
         try:
             demux_denied_run_ids = demux_run.load_denied_run_ids(conf)
-            for run_id in run_id_sorted_by_priority(sync_run_ids_done - demux_run_ids_done - demux_denied_run_ids, prioritized_run_ids):
+            for run_id in run_id_sorted_by_priority(sync_run_ids_done - demux_run_ids_done - demux_denied_run_ids,
+                                                    prioritized_run_ids):
 
                 # print 'DEBUG demux launch on ' + str(run_id)
 
@@ -348,14 +351,15 @@ def launch_steps(conf):
     #
     # Quality control
     #
-    #print("QC part")
+    # print("QC part")
     qc_run_ids_done = qc_run.load_processed_run_ids(conf)
 
     if common.is_conf_value_equals_true(QC_STEP_KEY, conf):
 
         try:
             qc_denied_run_ids = qc_run.load_denied_run_ids(conf)
-            for run_id in run_id_sorted_by_priority(demux_run_ids_done - qc_run_ids_done - qc_denied_run_ids, prioritized_run_ids):
+            for run_id in run_id_sorted_by_priority(demux_run_ids_done - qc_run_ids_done - qc_denied_run_ids,
+                                                    prioritized_run_ids):
                 # print 'DEBUG: check type on run id ', type(run_id), '|'+run_id+'|', len(run_id)
                 # print 'DEBUG qc launch on ' + str(run_id)
                 if lock_qc_step(conf, run_id):

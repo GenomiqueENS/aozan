@@ -92,9 +92,9 @@ public class HTMLReportArchiveAozan extends HTMLReportArchive {
 
       BufferedInputStream bis =
           new BufferedInputStream(zipFile.getInputStream(entry));
-      BufferedOutputStream bos =
-          new BufferedOutputStream(new FileOutputStream(file.getParent()
-              + "/" + entry.getName()), buffer.length);
+      BufferedOutputStream bos = new BufferedOutputStream(
+          new FileOutputStream(file.getParent() + "/" + entry.getName()),
+          buffer.length);
       while ((size = bis.read(buffer, 0, buffer.length)) != -1) {
         bos.write(buffer, 0, size);
       }
@@ -271,7 +271,8 @@ public class HTMLReportArchiveAozan extends HTMLReportArchive {
 
   private void closeDocument() {
 
-    html.append("</div><div class=\"footer\">Produced by <a href=\"http://www.bioinformatics.babraham.ac.uk/projects/fastqc/\">FastQC</a> (version ");
+    html.append(
+        "</div><div class=\"footer\">Produced by <a href=\"http://www.bioinformatics.babraham.ac.uk/projects/fastqc/\">FastQC</a> (version ");
     html.append(FastQCApplication.VERSION);
     html.append(")</div>\n");
 
@@ -288,10 +289,10 @@ public class HTMLReportArchiveAozan extends HTMLReportArchive {
 
     // VERSION FastQC 0.10.0
     BufferedReader br =
-        new BufferedReader(
-            new InputStreamReader(ClassLoader
+        new BufferedReader(new InputStreamReader(
+            ClassLoader
                 .getSystemResourceAsStream("Templates/header_template.html"),
-                Globals.DEFAULT_FILE_ENCODING));
+            Globals.DEFAULT_FILE_ENCODING));
 
     String line;
     while ((line = br.readLine()) != null) {

@@ -84,7 +84,8 @@ public class DockerUtils {
   public void run() {
     // Create connection
 
-    try (DockerClient docker = new DefaultDockerClient("unix:///var/run/docker.sock")) {
+    try (DockerClient docker =
+        new DefaultDockerClient("unix:///var/run/docker.sock")) {
 
       final String image = buildImageName();
       LOGGER.warning("BUILD docker image name " + image);
@@ -94,7 +95,7 @@ public class DockerUtils {
 
       // Create container
       final HostConfig hostConfig =
-              HostConfig.builder().binds(this.mountArgument).build();
+          HostConfig.builder().binds(this.mountArgument).build();
 
       List<String> cmd = this.commandLine;
 
@@ -103,15 +104,14 @@ public class DockerUtils {
 
       // // Create container
       LOGGER.warning("Docker create config "
-              + "\n\tdocker " + docker + "\n\t imagename " + image
-              + "\n\t host Configure is  " + hostConfig + "\n\tcommend line "
-              + Joiner.on(" ").join(cmd) + "\n\twork directory " + workDir
-              + "\n\tpermission " + permission);
+          + "\n\tdocker " + docker + "\n\t imagename " + image
+          + "\n\t host Configure is  " + hostConfig + "\n\tcommend line "
+          + Joiner.on(" ").join(cmd) + "\n\twork directory " + workDir
+          + "\n\tpermission " + permission);
 
       final ContainerConfig config =
-              ContainerConfig.builder().image(image).cmd(cmd)
-                      .hostConfig(hostConfig).user(permission).workingDir(workDir)
-                      .build();
+          ContainerConfig.builder().image(image).cmd(cmd).hostConfig(hostConfig)
+              .user(permission).workingDir(workDir).build();
 
       ContainerCreation creation;
       creation = docker.createContainer(config);
@@ -126,9 +126,8 @@ public class DockerUtils {
       docker.startContainer(id);
 
       // Redirect stdout and stderr
-      final LogStream logStream =
-              docker.logs(id, LogsParameter.FOLLOW, LogsParameter.STDERR,
-                      LogsParameter.STDOUT);
+      final LogStream logStream = docker.logs(id, LogsParameter.FOLLOW,
+          LogsParameter.STDERR, LogsParameter.STDOUT);
       redirect(logStream, this.stdoutFile, this.stderrFile);
 
       // Kill container
@@ -146,7 +145,6 @@ public class DockerUtils {
 
     }
     // Close connection
-
 
   }
 
@@ -176,8 +174,9 @@ public class DockerUtils {
             + localDirectoryPath);
 
     // Check it is absolute path
-    checkArgument(localDirectoryPath.trim().charAt(0) == SEPARATOR
-        || dockerDirectoryPath.trim().charAt(0) == SEPARATOR,
+    checkArgument(
+        localDirectoryPath.trim().charAt(0) == SEPARATOR
+            || dockerDirectoryPath.trim().charAt(0) == SEPARATOR,
         "Error Docker: directories path must be absolute local "
             + localDirectoryPath + " docker directory " + dockerDirectoryPath);
 
@@ -248,8 +247,7 @@ public class DockerUtils {
    */
   private HostConfig initHostConfig() {
 
-    checkArgument(
-        !this.mountArgument.isEmpty(),
+    checkArgument(!this.mountArgument.isEmpty(),
         "Error Docker: no mount directory settings to configure hostConfig for Docker Client");
 
     return HostConfig.builder().binds(this.mountArgument).build();
@@ -282,22 +280,18 @@ public class DockerUtils {
     if (Strings.isNullOrEmpty(this.permission)) {
       System.out.println(" * config without permission");
 
-      config =
-          ContainerConfig.builder().image(imageName).cmd(this.commandLine)
-              .hostConfig(hostConfig).workingDir(this.workDirectoryDocker)
-              .build();
+      config = ContainerConfig.builder().image(imageName).cmd(this.commandLine)
+          .hostConfig(hostConfig).workingDir(this.workDirectoryDocker).build();
     } else {
       System.out.println(" * config with permission -> " + this.permission);
-      config =
-          ContainerConfig.builder().image(imageName).cmd(this.commandLine)
-              .hostConfig(hostConfig).user(this.permission)
-              .workingDir(this.workDirectoryDocker).build();
+      config = ContainerConfig.builder().image(imageName).cmd(this.commandLine)
+          .hostConfig(hostConfig).user(this.permission)
+          .workingDir(this.workDirectoryDocker).build();
 
     }
 
-    config =
-        ContainerConfig.builder().image(imageName).cmd(this.commandLine)
-            .user(this.permission).workingDir(this.workDirectoryDocker).build();
+    config = ContainerConfig.builder().image(imageName).cmd(this.commandLine)
+        .user(this.permission).workingDir(this.workDirectoryDocker).build();
 
     System.out.println(" * Create container " + config);
     try {
@@ -322,9 +316,8 @@ public class DockerUtils {
   private void initLoggerStream(final DockerClient docker, final String id)
       throws DockerException, InterruptedException {
     // Redirect stdout and stderr
-    final LogStream logStream =
-        docker.logs(id, LogsParameter.FOLLOW, LogsParameter.STDERR,
-            LogsParameter.STDOUT);
+    final LogStream logStream = docker.logs(id, LogsParameter.FOLLOW,
+        LogsParameter.STDERR, LogsParameter.STDOUT);
     redirect(logStream, this.stdoutFile, this.stderrFile);
   }
 
@@ -424,8 +417,9 @@ public class DockerUtils {
       @Override
       public void run() {
 
-        try (WritableByteChannel stdoutChannel =
-            Channels.newChannel(new FileOutputStream(stderr));
+        try (
+            WritableByteChannel stdoutChannel =
+                Channels.newChannel(new FileOutputStream(stderr));
             WritableByteChannel stderrChannel =
                 Channels.newChannel(new FileOutputStream(stdout))) {
 

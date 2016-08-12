@@ -64,8 +64,8 @@ public class Common {
    * @throws SecurityException if an error occurs while initializing the logger
    * @throws IOException if cannot open/create the log file
    */
-  public static void initLogger(final String logPath) throws SecurityException,
-      IOException, AozanException {
+  public static void initLogger(final String logPath)
+      throws SecurityException, IOException, AozanException {
 
     initLogger(logPath, (String) null);
   }
@@ -80,10 +80,8 @@ public class Common {
   public static void initLogger(final String logPath, final String logLevel)
       throws SecurityException, IOException, AozanException {
 
-    initLogger(
-        logPath,
-        logLevel == null ? Globals.LOG_LEVEL : Level.parse(logLevel
-            .toUpperCase()));
+    initLogger(logPath, logLevel == null
+        ? Globals.LOG_LEVEL : Level.parse(logLevel.toUpperCase()));
   }
 
   /**

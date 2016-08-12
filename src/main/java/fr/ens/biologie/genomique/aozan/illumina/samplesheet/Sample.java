@@ -324,13 +324,13 @@ public class Sample {
 
     // Do no use switch for string for GWT dependency
     return LANE_FIELD_NAME.equals(fieldName)
-            || SAMPLE_ID_FIELD_NAME.equals(fieldName)
-            || SAMPLE_NAME_FIELD_NAME.equals(fieldName)
-            || DESCRIPTION_FIELD_NAME.equals(fieldName)
-            || PROJECT_FIELD_NAME.equals(fieldName)
-            || INDEX1_FIELD_NAME.equals(fieldName)
-            || INDEX2_FIELD_NAME.equals(fieldName)
-            || SAMPLE_REF_FIELD_NAME.equals(fieldName);
+        || SAMPLE_ID_FIELD_NAME.equals(fieldName)
+        || SAMPLE_NAME_FIELD_NAME.equals(fieldName)
+        || DESCRIPTION_FIELD_NAME.equals(fieldName)
+        || PROJECT_FIELD_NAME.equals(fieldName)
+        || INDEX1_FIELD_NAME.equals(fieldName)
+        || INDEX2_FIELD_NAME.equals(fieldName)
+        || SAMPLE_REF_FIELD_NAME.equals(fieldName);
 
   }
 

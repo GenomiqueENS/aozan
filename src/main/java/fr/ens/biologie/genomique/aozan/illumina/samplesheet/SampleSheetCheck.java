@@ -171,7 +171,8 @@ public class SampleSheetCheck {
     checkSampleInLanes(sampleInLanes, warnings);
 
     // Return unique warnings
-    final List<String> result = new ArrayList<String>(new HashSet<String>(warnings));
+    final List<String> result =
+        new ArrayList<String>(new HashSet<String>(warnings));
     Collections.sort(result);
 
     return result;
@@ -385,7 +386,7 @@ public class SampleSheetCheck {
       final String projectName, final int lane,
       final Map<String, Set<Integer>> sampleInLanes,
       final Map<String, String> samplesProjects, final List<String> warnings)
-          throws AozanException {
+      throws AozanException {
 
     // Check if two or more project use the same sample
     if (samplesProjects.containsKey(sampleId)

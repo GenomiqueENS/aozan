@@ -511,13 +511,14 @@ doctype-system="about:legacy-compat"/>
 	</xsl:if>
   
   <xsl:if test="/QCReport[SamplesStatsReport]">
-  <h2>Samples statistics report</h2>
+  <h2>Samples statistics report (first read only)</h2>
 	<div>
    <table class="projectData">
   <tr class="headerColumns">
-	<th>Samples</th>
+	<th>Sample name</th>
 	<th>Description</th>
 	<th>Index</th>
+	<th>Project</th>
     <xsl:for-each select="/QCReport/SamplesStatsReport/Columns/Column">
       <th><xsl:value-of select="."/><xsl:if test="@unit!=''"> (<xsl:value-of select="@unit"/>)</xsl:if></th>
     </xsl:for-each>
@@ -527,6 +528,7 @@ doctype-system="about:legacy-compat"/>
   	<td><xsl:value-of select="@name"/></td>
   	<td><xsl:value-of select="@description"/></td>
   	<td><xsl:value-of select="@index"/></td>
+  	<td><xsl:value-of select="@project"/></td>
     <xsl:for-each select="Test">
       <td class="score{@score}">
         <xsl:if test="@type='int'"><xsl:value-of select="format-number(.,'### ### ### ### ###','aozan')"/></xsl:if>

@@ -105,18 +105,18 @@ public class ReDemux {
 
         switch (anArray) {
 
-          case 'A':
-          case 'T':
-          case 'G':
-          case 'C':
-          case 'N':
-          case '.':
-            break;
+        case 'A':
+        case 'T':
+        case 'G':
+        case 'C':
+        case 'N':
+        case '.':
+          break;
 
-          default:
-            throw new IllegalArgumentException(
-                    "Invalid character found for index, 'A', 'T', 'G', 'C', 'N' and '.' are only allowed: "
-                            + index);
+        default:
+          throw new IllegalArgumentException(
+              "Invalid character found for index, 'A', 'T', 'G', 'C', 'N' and '.' are only allowed: "
+                  + index);
         }
       }
 
@@ -348,7 +348,7 @@ public class ReDemux {
      */
     private Map<Pattern, FastqWriter> createWriters(final int read,
         final CompressionType compression)
-            throws FileNotFoundException, IOException {
+        throws FileNotFoundException, IOException {
 
       final Map<Pattern, FastqWriter> result = Maps.newHashMap();
 
@@ -387,7 +387,7 @@ public class ReDemux {
 
     private Map<String, Entity> createWriters2(final int read,
         final CompressionType compression)
-            throws FileNotFoundException, IOException {
+        throws FileNotFoundException, IOException {
 
       final Map<String, Entity> result = new HashMap<>();
 
@@ -559,7 +559,8 @@ public class ReDemux {
     final ReDemuxLane reDemuxLane;
 
     if (!this.lanesToRedemux.containsKey(lane)) {
-      reDemuxLane = new ReDemuxLane(sampleSheet, lane, inputDir, this.outputDir);
+      reDemuxLane =
+          new ReDemuxLane(sampleSheet, lane, inputDir, this.outputDir);
       this.lanesToRedemux.put(lane, reDemuxLane);
     } else
       reDemuxLane = this.lanesToRedemux.get(lane);
@@ -618,7 +619,8 @@ public class ReDemux {
   public ReDemux(final File baseDir, final SampleSheet samplesheet,
       final File outputDir) {
 
-    Preconditions.checkNotNull(samplesheet, "samplesheet argument cannot be null");
+    Preconditions.checkNotNull(samplesheet,
+        "samplesheet argument cannot be null");
     Preconditions.checkNotNull(baseDir, "baseDir argument cannot be null");
     this.sampleSheet = samplesheet;
     this.inputDir = baseDir;
@@ -632,17 +634,20 @@ public class ReDemux {
   public static void redemultiplex(final File samplesheetFile,
       final String bcl2fastqVersion, final List<String> lanesAndIndex,
       final File outputDir) throws FileNotFoundException, IOException,
-          AozanException, BadBioEntryException {
+      AozanException, BadBioEntryException {
 
-    Preconditions.checkNotNull(samplesheetFile, "samplesheetFile cannot be null");
+    Preconditions.checkNotNull(samplesheetFile,
+        "samplesheetFile cannot be null");
     Preconditions.checkNotNull(lanesAndIndex, "laneAndIndex cannot be null");
     Preconditions.checkNotNull(outputDir, "output directory cannot be null");
 
     // Load samplesheet
-    final SampleSheet samplesheet = new SampleSheetCSVReader(samplesheetFile).read();
+    final SampleSheet samplesheet =
+        new SampleSheetCSVReader(samplesheetFile).read();
 
     // Create ReDemux object
-    ReDemux rd = new ReDemux(samplesheetFile.getParentFile(), samplesheet, outputDir);
+    ReDemux rd =
+        new ReDemux(samplesheetFile.getParentFile(), samplesheet, outputDir);
 
     for (String s : lanesAndIndex) {
 

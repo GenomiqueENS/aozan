@@ -695,6 +695,21 @@
 			<action dev="jourdren" type="update">
                                  The samplesheet in the FASTQ output directory is now always name "SampleSheet.csv".
 			</action>
+			<action dev="firmo" type="fix">
+                                 The Phasing and Prephasing calculations from Aozan are now similar to Illumina calculations.
+			</action>
+			<action dev="firmo" type="update">
+                                 Aozan JUnit tests have now migrated from JUnit 3 to JUnit 4.11 .
+			</action>
+			<action dev="firmo" type="add">
+                                 Can now set prioritized runs using the "runs.priority" file.
+			</action>
+			<action dev="firmo" type="add">
+                                 Can now deny runs from performing an Aozan test using the "*.deny" file.
+			</action>
+			<action dev="firmo" type="update">
+                                 The "*.done" files telling which run succesfully finished a step are now locked and protected from multiple process trying to modify these files simultaneously.
+			</action>
 		</release>
 
 	</body>

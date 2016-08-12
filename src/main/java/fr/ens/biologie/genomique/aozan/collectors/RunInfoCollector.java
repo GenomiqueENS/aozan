@@ -101,7 +101,6 @@ public class RunInfoCollector implements Collector {
       this.runParametersFile = new File(parentFile, "RunParameters.xml");
     }
 
-    
   }
 
   @Override
@@ -197,7 +196,7 @@ public class RunInfoCollector implements Collector {
 
     final String key = "sequencer.name." + runInfo.getInstrument();
 
-    if (this.settings !=null && this.settings.containsKey(key)) {
+    if (this.settings != null && this.settings.containsKey(key)) {
       return this.settings.get(key);
     }
 

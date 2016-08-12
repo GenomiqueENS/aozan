@@ -74,7 +74,8 @@ public class RawClustersPhixMeanGlobalTest extends AbstractSimpleGlobalTest {
    */
   public RawClustersPhixMeanGlobalTest() {
 
-    super("global.globalrawclustersphixmean", "", "PhiX Raw Clusters Mean Est.");
+    super("global.globalrawclustersphixmean", "",
+        "PhiX Raw Clusters Mean Est.");
   }
 
 }

@@ -134,8 +134,7 @@ public class ExtractionMetrics {
     // Read date/time for CIF creation, not used
     // TODO get date create cif file to finalize
     @SuppressWarnings("unused")
-    final
-    ByteBuffer buf = bb.get(new byte[8]);
+    final ByteBuffer buf = bb.get(new byte[8]);
 
   }
 }

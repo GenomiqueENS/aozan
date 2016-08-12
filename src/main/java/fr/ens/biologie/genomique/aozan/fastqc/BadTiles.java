@@ -62,8 +62,7 @@ public class BadTiles extends AbstractQCModule {
   private static final double MIN_MEDIAN_SCORE = 20.0;
 
   // public QualityCount[] qualityCounts = new QualityCount[0];
-  private final Map<Integer, QualityCount[]> tiles =
-      new HashMap<>();
+  private final Map<Integer, QualityCount[]> tiles = new HashMap<>();
   private final List<BadTile> badTiles = new ArrayList<>();
   private final Set<Integer> tilesWithOneOrMoreDefect = new HashSet<>();
 
@@ -71,8 +70,7 @@ public class BadTiles extends AbstractQCModule {
   private boolean calculated = false;
 
   private static class QualityCount {
-    private final HashMap<Character, Long> counts =
-        new HashMap<>();
+    private final HashMap<Character, Long> counts = new HashMap<>();
 
     private long totalCounts = 0;
 
@@ -294,7 +292,8 @@ public class BadTiles extends AbstractQCModule {
      * @param cycle cycle of the bad tile
      * @param medianScore median score of the tile
      */
-    public BadTile(final int tileId, final int cycle, final double medianScore) {
+    public BadTile(final int tileId, final int cycle,
+        final double medianScore) {
 
       this.lane = tileId / LANE_OFFSET;
       this.tile = tileId % LANE_OFFSET;
@@ -340,8 +339,8 @@ public class BadTiles extends AbstractQCModule {
   }
 
   @Override
-  public void makeReport(HTMLReportArchive report) throws IOException,
-      XMLStreamException {
+  public void makeReport(HTMLReportArchive report)
+      throws IOException, XMLStreamException {
 
     if (!calculated)
       computeResults();
@@ -370,9 +369,8 @@ public class BadTiles extends AbstractQCModule {
 
     if (this.badTiles.size() > 0) {
 
-      final double ratio =
-          (double) this.tilesWithOneOrMoreDefect.size()
-              / (double) this.tiles.size();
+      final double ratio = (double) this.tilesWithOneOrMoreDefect.size()
+          / (double) this.tiles.size();
 
       return ratio > 0.25;
 
@@ -417,9 +415,8 @@ public class BadTiles extends AbstractQCModule {
     }
 
     // Encode in a integer the lane number and the tile number
-    final int tileId =
-        this.irid.getFlowCellLane()
-            * LANE_OFFSET + this.irid.getTileNumberInFlowCellLane();
+    final int tileId = this.irid.getFlowCellLane() * LANE_OFFSET
+        + this.irid.getTileNumberInFlowCellLane();
 
     // Get the quality of each cycle in an array
     final char[] qual = sequence.getQualityString().toCharArray();

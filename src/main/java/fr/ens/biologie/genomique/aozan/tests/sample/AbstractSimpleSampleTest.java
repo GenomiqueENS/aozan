@@ -51,8 +51,8 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
    * @param undetermined true if the sample is an undetermined sample
    * @return a String with the required key
    */
-  protected abstract String getKey(final int read, int readSample, int sampleId, int lane,
-      boolean undetermined);
+  protected abstract String getKey(final int read, int readSample, int sampleId,
+      int lane, boolean undetermined);
 
   /**
    * Transform the value.

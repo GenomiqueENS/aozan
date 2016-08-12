@@ -125,8 +125,8 @@ public class LongInterval implements Interval {
     this(min, true, max, true);
   }
 
-  public LongInterval(final long min, final boolean minIncluded,
-      final long max, final boolean maxIncluded) {
+  public LongInterval(final long min, final boolean minIncluded, final long max,
+      final boolean maxIncluded) {
 
     this.min = Math.min(min, max);
     this.minInclude = minIncluded;
