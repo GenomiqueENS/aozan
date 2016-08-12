@@ -1,24 +1,24 @@
 Building Aozan from source
 ---------------------------
 
-  Aozan requires to be built from source. Maven is project management from
-the Apache Software Foundation.
+Aozan requires to be built from source using Maven.
+Maven is a project management tool from the Apache Software Foundation.
 
-  You can download it at the following URL:
+You can download it at the following URL:
 
-    http://maven.apache.org
+http://maven.apache.org
 
-  After installing maven, you can :
-
+After installing maven, you can :
   * Compile Aozan: type 'mvn'
   * Build source and binary distribution: type 'mvn install'
   * Build the website: type 'mvn site'
   * Clean the build directory (target): type 'mvn clean'
 
-  You'll find the generated files in the 'target' directory.
-  To run Aozan you only need to unpack one of the Aozan binary archives and
-see the instruction in the running section of the INSTALL file.
+You'll find the generated files in the 'target' directory.
+To run Aozan you only need to unpack one of the Aozan binary archives and
+read the instructions in the running section of the INSTALL.txt file.
 
-  You can download the latest version of Aozan on our website :
-
-    http://transcriptome.ens.fr/aozan
+You can download the latest version of Aozan on our website :
+https://github.com/GenomicParisCentre/aozan
+or
+http://outils.genomique.biologie.ens.fr/aozan
