@@ -75,6 +75,8 @@
 	    	<td>Enable percentsampleinrun test</td></tr>
         <tr><td>qc.test.samplestats.percentsampleinproject.enable</td><td>boolean</td><td>False</td>
         	<td>Enable percentsampleinproject test</td></tr>
+        <tr><td>qc.test.samplestats.samplestats.pooled.sample.number.enable</td><td>boolean</td><td>False</td>
+        	<td>Enable samplestats.pooled.sample.number test</td></tr>
        </table>
 
        
