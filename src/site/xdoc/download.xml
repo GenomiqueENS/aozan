@@ -25,7 +25,7 @@
 -->
 <document>
   <properties>
-    <title>Download latest Aozan version</title>
+    <title>Download the latest Aozan version</title>
     <author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
   </properties>
   <body>
@@ -67,27 +67,25 @@
 		  </tr>
 		  <tr>
 		    <td>Operating system</td>
-		    <td>Currently Aozan runs only under Linux (due to mappers binaries dependencies).</td>
+		    <td>Currently Aozan runs only under Linux (due to mapper binary dependencies).</td>
 		  </tr>
 		  <tr>
 	        <td>Memory</td>
 	        <td>By default 2048 MiB are allocated to the JVM for running Aozan.
-	        	You can edit this value in the <code>aozan.sh</code> file with the 
-	         	<b>-Xmx</b> option of the JVM. However Aozan use external tools 
-	            like bcl2fastq or Bowtie that also need memory, 8 GiB seem to be
-	            a good amount of memory to run Aozan.
+	You can edit this value in the <code>aozan.sh</code> file with the <b>-Xmx</b> option of the JVM.
+			Aozan launches external tools like bcl2fastq or Bowtie that also required memory.
+			In the end, 8 GiB seems to be a good amount of memory to run Aozan.
 	         </td>
 	      </tr>
 		  <tr>
 	      	<td>Processor architecture</td>
-	        <td>Currently Aozan can only run under x86-64 architecture (due to mappers requirements). 
-	        	Multi processors or multi cores system (SMP) are strongly recommended.</td>
+		<td>Aozan can run only under x86-64 architecture (due to mappers requirements).
+			Multi processors or multi core systems (SMP) are highly recommended.</td>
 		  </tr>
 		  <tr>
 	        <td>Java Runtime Environment (J2SE)</td>
-	        <td>6.0 or above. We strongly recommend 
-	            the sun/oracle version of the jre (or openJDK). 
-	            You can check your installed jre version with: <source>$ java -version</source></td>
+	        <td>7 or above. We strongly recommend the sun/oracle version of the jre (or openJDK).
+	            You can check your installed jre version typing: <source>$ java -version</source></td>
 	      </tr>
 		  <!--tr>
 	        <td>Hadoop</td>
@@ -104,11 +102,11 @@
 	      </tr>
   	      <tr>
 	        <td>Docker</td>
-	        <td>version 1.7.1, optional used in step demultiplexing or to launch Aozan.</td>
+	        <td>version 1.7.1, optional use in the demultiplexing step or to launch Aozan.</td>
 	      </tr>
 	      <tr>
 	        <td>blastall</td>
-	        <td>version 2.2.26, optional used in step quality control.</td>
+	        <td>version 2.2.26, optional use in the quality control step.</td>
 	      </tr>
 	    </table>
       </subsection>

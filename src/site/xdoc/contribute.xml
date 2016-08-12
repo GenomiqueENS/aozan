@@ -31,18 +31,18 @@
 
   <body>
 
-   <section name="How I can contact the authors">
+    <section name="How can I contact the authors">
    
       <!-- aozan 0 biologie ens fr -->	 
       <p>You can contact the authors of Aozan by <a href="mailto:%61%6f%7a%61%6e%40%62%69%6f%6c%6f%67%69%65%2e%65%6e%73%2e%66%72">mail</a> 
-      or using the the <a href="http://groups.google.com/group/aozan"> aozan group</a> on Google group.</p>
+      or using the <a href="http://groups.google.com/group/aozan"> aozan group</a> on the Google group.</p>
     
     </section>
     
     <section name="How can I contribute to Aozan">
     
 
-      <p>Aozan is a free software project. Everybody is encouraged to contribute to Aozan. There are lots of ways in which you can help to continue Aozan:</p>
+      <p>Aozan is a free software project. Everybody is encouraged to contribute to Aozan. You can help continuing Aozan in many ways such as:</p>
 
 
       <ul>
@@ -52,21 +52,21 @@
         <li>Programming new <a href="./writingstepplugin.html">Aozan plugins</a> and redistributing them (by yourself or in Aozan source repository)</li>
          -->
         <li>Submitting patches</li>
-        <li>Writing developer documentation on <a href="https://github.com/GenomicParisCentre/aozan/wiki">Aozan Wiki</a> if you become Aozan committer</li>
+        <li>Writing developer documentation on <a href="https://github.com/GenomicParisCentre/aozan/wiki">Aozan Wiki</a> if you become an Aozan committer</li>
       </ul>
 
-      <p>There are several places to look for more information if you want to get involved in the development. The first step is to subscribe to the aozan group. You will soon see something that can be improved or added.</p>
+      <p>There are several places to look for more information if you want to get involved in the development. The first step is to subscribe to the aozan group. You will certainly see something that can be improved or added quickly.</p>
 
     </section>
     
 
     <section name="How do I commit a bug report?">
-      <p>As Aozan code is hosting by GitHub, you can use the <a href="https://github.com/GenomicParisCentre/aozan/issues">issue tracker</a> bind to our project.</p>
+      <p>As Aozan code is hosted by GitHub, you can use the <a href="https://github.com/GenomicParisCentre/aozan/issues">issue tracker</a> bound to our project.</p>
     </section>
 
    <section name="How do I get access to the code repository ?">
-      <p>The Aozan project uses the Git system to develop the core parts of the software. To facilitate contributions to our project,
-      Aozan code is hosted by GitHub. You can freely access to the
+      <p>The Aozan project uses the Git system to develop the core parts of the software. To ease the contributions to our project,
+      Aozan code is hosted by GitHub. Feel free to go to the
       <a href="https://github.com/GenomicParisCentre/aozan">main page of the project</a> and to the
       <a href="https://github.com/GenomicParisCentre/aozan">git repository.</a></p>
     </section>
