@@ -88,7 +88,7 @@ def check_end_run(run_id, conf):
         return False
 
     prefix, suffix = ('Basecalling_Netcopy_complete_Read', '.txt') if (
-    common.get_rta_major_version(run_id, conf) == 1) else (
+        common.get_rta_major_version(run_id, conf) == 1) else (
         'RTARead', 'Complete.txt')
 
     # File generate only by HiSeq sequencer

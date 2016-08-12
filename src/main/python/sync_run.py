@@ -18,6 +18,7 @@ DENY_FILE = 'sync.deny'
 DONE_FILE = 'sync.done'
 LASTERR_FILE = 'sync.lasterr'
 
+
 def load_denied_run_ids(conf):
     """Load the list of the denied run ids.
 
