@@ -106,6 +106,28 @@ def du(path):
     return long(lines[0].split('\t')[0])
 
 
+def is_file_readable(path):
+    """Test if a file is readable.
+
+    Arguments:
+        path: path of the directory
+    Return:
+        boolean: true if the file is readable
+    """
+
+    if not os.path.isfile(path):
+        return False
+
+    try:
+        fp = open(path, 'r')
+        fp.close()
+
+    except:
+        return False
+
+    return True
+
+
 def is_conf_value_equals_true(settings_key, conf):
     """Check a property exists in configuration object and value equals 'true'
 
