@@ -710,6 +710,9 @@
 			<action dev="firmo" type="update">
                                  The "*.done" files telling which run succesfully finished a step are now locked and protected from multiple process trying to modify these files simultaneously.
 			</action>
+			<action dev="firmo" type="add">
+                                 new test giving sum of pooled samples used.
+			</action>
 		</release>
 
 	</body>
