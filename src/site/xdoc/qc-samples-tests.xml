@@ -203,70 +203,23 @@ especially the <a href="http://transcriptome.ens.fr/eoulsan/datarepositories.htm
 
 		<table>
 		  <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
-		  <tr><td>qc.conf.fastqscreen.settings.genomes.alias.path</td><td>string</td>
-			  <td>Not set</td>
-			  <td>Path to the file which make the correspondence between genome name in casava samplesheet file and the genome name reference used for
+		  <tr><td>qc.conf.fastqscreen.genome.aliases.path</td><td>string</td><td>Not set</td> <td>Path to the file which make the correspondence between genome name in casava samplesheet file and the genome name reference used for
 					identified index of bowtie. If a genome's name doesn't exist in the alias file, it is added at the end of the file</td></tr>
-		  <tr><td>qc.conf.fastqscreen.settings.genomes.desc.path</td><td>string</td>
-			  <td>Not set</td>
-			  <td>Path to the genomes descriptions repository. The genome description file contains some basic informations about the genome
-					like the chromosome length. The repository allow to avoid useless genome sequence parsing once it has been already parsed in a
-					previous run</td>
-		  </tr>
-		  <tr><td>qc.conf.fastqscreen.settings.genomes</td><td>string</td><td>Not set</td><td>Path to the genomes repository</td></tr>
-		  <tr><td>qc.conf.fastqscreen.settings.mappers.indexes.path</td><td>string</td><td>Not set</td><td>Path to the genomes indexes repository</td></tr>
+		  <tr><td>qc.conf.fastqscreen.genome.descs.path</td><td>string</td><td>Not set</td><td>Path to the genomes descriptions repository. The genome description file contains some basic informations about the genome
+					like the chromosome length. The repository allow to avoid useless genome sequence parsing once it has been already parsed in a previous run</td></tr>
+		  <tr><td>qc.conf.fastqscreen.genomes.path</td><td>string</td><td>Not set</td><td>Path to the genomes repository</td></tr>
+		  <tr><td>qc.conf.fastqscreen.mapper.indexes.path</td><td>string</td><td>Not set</td><td>Path to the genomes indexes repository</td></tr>
 		  <tr><td>qc.conf.fastqscreen.genomes</td><td>string</td><td>phix, adapters</td><td>List of reference genomes used per default for fastqscreen</td></tr>
-		  <tr>
-			<td>qc.conf.fastqscreen.mapper</td>
-			<td>string</td>
-			<td>bowtie</td>
-			<td>In a next version, it will be  possible to choice between bowtie and bowtie2. Per default, call bowtie.</td>
-		  </tr>
-		  <tr>
-			<td>qc.conf.fastqscreen.mapper.argument</td>
-			<td>string</td>
-			<td>-l 20 -k 2 --chunkmbs 512</td>
-			<td>Arguments of the mapper, in mode paired added &#145;--maxins 1000&#146;</td>
-		  </tr>
-		  <tr>
-			<td>qc.conf.fastqscreen.mapping.skip.control.lane</td>
-			<td>boolean</td>
-			<td>True</td>
-			<td>No of contamination detection on control lane</td>
-		  </tr>
-
-		  <tr>
-			<td>qc.conf.fastqscreen.mapping.ignore.paired.mode</td>
-			<td>boolean</td>
-			<td>True</td>
-			<td>If true for a run paired-end, the detection contamination concerns only the reads R1, same value are assigned for reads R2</td>
-		  </tr>
-		  <tr>
-			<td>qc.conf.fastqscreen.fastq.max.reads.parsed</td>
-			<td>integer</td>
-			<td>200000</td>
-			<td>Number of reads included in temporary FASTQ files create for the mapping.
-				Only the reads with passing filtered illumina are selected. If value is set to -1, all reads in the FASTQ files will be used</td>
-		  </tr>
-		  <tr>
-			<td>qc.conf.fastqscreen.fastq.reads.pf.used</td>
-			<td>integer</td>
-			<td>30000000</td>
-			<td>The temporary FASTQ files are created by parsing at most this maximum number of reads in the FASTQ file source.
-			If value is set to -1, it browses all the entries of the FASTQ files</td>
-		  </tr>
-		  <tr>
-			<td>qc.conf.fastqscreen.xsl.file</td>
-			<td>string</td>
-			<td>Not set</td>
-			<td>Path to a specific stylesheet file to edit the fastqscreen report html, instead of the file per default</td>
-		  </tr>
-		  <tr>
-			<td>qc.conf.fastqscreen.process.undetermined.samples</td>
-			<td>boolean</td>
-			<td>false</td>
-			<td>Run FastqScreen on undetermined indices samples on all genomes available for the run</td>
-		  </tr>
+		  <tr><td>qc.conf.fastqscreen.mapper</td><td>string</td><td>bowtie</td><td>In a next version, it will be  possible to choice between bowtie and bowtie2. Per default, call bowtie.</td></tr>
+		  <tr><td>qc.conf.fastqscreen.mapper.arguments</td><td>string</td><td>-l 20 -k 2 --chunkmbs 512</td><td>Arguments of the mapper, in mode paired added &#145;--maxins 1000&#146;</td></tr>
+		  <tr><td>qc.conf.fastqscreen.mapping.skip.control.lane</td><td>boolean</td><td>True</td><td>No of contamination detection on control lane</td></tr>
+		  <tr><td>qc.conf.fastqscreen.mapping.ignore.paired.end.mode</td><td>boolean</td><td>True</td><td>If true for a run paired-end, the detection contamination concerns only the reads R1, same value are assigned for reads R2</td></tr>
+		  <tr><td>qc.conf.fastqscreen.fastq.max.reads.parsed</td><td>integer</td><td>200000</td><td>Number of reads included in temporary FASTQ files create for the mapping.
+                                        Only the reads with passing filtered illumina are selected. If value is set to -1, all reads in the FASTQ files will be used</td></tr>
+		  <tr><td>qc.conf.fastqscreen.fastq.reads.pf.used</td> <td>integer</td> <td>30000000</td> <td>The temporary FASTQ files are created by parsing at most this maximum number of reads in the FASTQ file source.
+	                                If value is set to -1, it browses all the entries of the FASTQ files</td></tr>
+                  <tr><td>qc.conf.fastqscreen.xsl.file</td><td>string</td><td>Not set</td><td>Path to a specific stylesheet file to edit the fastqscreen report html, instead of the file per default</td></tr>
+		  <tr><td>qc.conf.fastqscreen.process.undetermined.samples</td><td>boolean</td><td>false</td><td>Run FastqScreen on undetermined indices samples on all genomes available for the run</td></tr>
 		</table>
 
 		<a name="fqstests"/>

@@ -257,7 +257,7 @@ public class FastqScreenGenomes {
         "testConfiguration argument cannot be null");
 
     final File aliasGenomesFile = new File(testConfiguration
-        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
+        .get(Settings.QC_CONF_FASTQSCREEN_GENOMES_ALIAS_PATH_KEY));
     final File sampleshettFile =
         new File(testConfiguration.get(QC.BCL2FASTQ_SAMPLESHEET_PATH));
     final String contaminantGenomeNames =

@@ -233,26 +233,26 @@ public final class Settings {
   public static final String QC_CONF_FASTQSCREEN_MAPPER_KEY =
       "qc.conf.fastqscreen.mapper";
   /** Collector fastqscreen mapper argument. */
-  public static final String QC_CONF_FASTQSCREEN_MAPPER_ARGUMENT_KEY =
-      "qc.conf.fastqscreen.mapper.argument";
+  public static final String QC_CONF_FASTQSCREEN_MAPPER_ARGUMENTS_KEY =
+      "qc.conf.fastqscreen.mapper.arguments";
   /** Collector fastqscreen mapping ignore paired mode. */
-  public static final String QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY =
-      "qc.conf.fastqscreen.mapping.ignore.paired.mode";
+  public static final String QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_END_MODE_KEY =
+      "qc.conf.fastqscreen.mapping.ignore.paired.end.mode";
   /** Collector fastqscreen mapping skip control lane. */
   public static final String QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY =
       "qc.conf.fastqscreen.mapping.skip.control.lane";
   /** Collector fastqscreen settings genomes. */
-  public static final String QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY =
-      "qc.conf.fastqscreen.settings.genomes";
+  public static final String QC_CONF_FASTQSCREEN_GENOMES_PATH_KEY =
+      "qc.conf.fastqscreen.genomes.path";
   /** Collector fastqscreen settings genomes alias path. */
-  public static final String QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY =
-      "qc.conf.fastqscreen.settings.genomes.alias.path";
+  public static final String QC_CONF_FASTQSCREEN_GENOMES_ALIAS_PATH_KEY =
+      "qc.conf.fastqscreen.genome.aliases.path";
   /** Collector fastqscreen settings genomes description path. */
-  public static final String QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY =
-      "qc.conf.fastqscreen.settings.genomes.desc.path";
+  public static final String QC_CONF_FASTQSCREEN_GENOMES_DESC_PATH_KEY =
+      "qc.conf.fastqscreen.genome.descs.path";
   /** Collector fastqscreen settings mappers indexes path. */
-  public static final String QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY =
-      "qc.conf.fastqscreen.settings.mappers.indexes.path";
+  public static final String QC_CONF_FASTQSCREEN_MAPPERS_INDEXES_PATH_KEY =
+      "qc.conf.fastqscreen.mapper.indexes.path";
   /** Collector fastqscreen xsl file. */
   public static final String QC_CONF_FASTQSCREEN_XSL_FILE_KEY =
       "qc.conf.fastqscreen.xsl.file";

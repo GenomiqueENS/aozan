@@ -121,7 +121,7 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
 
     try {
       this.ignorePairedMode = Boolean.parseBoolean(conf
-          .get(Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY));
+          .get(Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_END_MODE_KEY));
 
     } catch (final Exception e) {
       // Default value

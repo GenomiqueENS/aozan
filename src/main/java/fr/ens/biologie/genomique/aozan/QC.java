@@ -699,18 +699,18 @@ public class QC {
         EoulsanRuntime.getSettings();
 
     final String genomeDescStoragePath = settings
-        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY);
+        .get(Settings.QC_CONF_FASTQSCREEN_GENOMES_DESC_PATH_KEY);
 
     final String genomeMapperIndexStoragePath = settings
-        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY);
+        .get(Settings.QC_CONF_FASTQSCREEN_MAPPERS_INDEXES_PATH_KEY);
 
     final String genomeStoragePath =
-        settings.get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY);
+        settings.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_PATH_KEY);
 
     if (genomeDescStoragePath == null
         || genomeDescStoragePath.trim().isEmpty()) {
       throw new AozanException("No "
-          + Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY
+          + Settings.QC_CONF_FASTQSCREEN_GENOMES_DESC_PATH_KEY
           + " property set in Aozan settings to define the path to "
           + "the genome description files");
     }
@@ -718,14 +718,14 @@ public class QC {
     if (genomeMapperIndexStoragePath == null
         || genomeMapperIndexStoragePath.trim().isEmpty()) {
       throw new AozanException("No "
-          + Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY
+          + Settings.QC_CONF_FASTQSCREEN_MAPPERS_INDEXES_PATH_KEY
           + " property set in Aozan settings to define the path to "
           + "the genome mapper index files");
     }
 
     if (genomeStoragePath == null || genomeStoragePath.trim().isEmpty()) {
       throw new AozanException("No "
-          + Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY
+          + Settings.QC_CONF_FASTQSCREEN_GENOMES_PATH_KEY
           + " property set in Aozan settings to define the path to "
           + "the genomes files");
     }
@@ -744,7 +744,7 @@ public class QC {
 
     // Initialize GenomeDescriptionCreator
     GenomeDescriptionCreator.initialize(settings
-        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY));
+        .get(Settings.QC_CONF_FASTQSCREEN_GENOMES_DESC_PATH_KEY));
   }
 
   /**

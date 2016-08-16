@@ -1104,6 +1104,13 @@ def load_conf(conf, conf_file_path):
     converting_table_key['qc.conf.fastqscreen.blast.version.expected'] = Settings.QC_CONF_FASTQC_BLAST_VERSION_EXPECTED_KEY
     converting_table_key['qc.conf.fastqscreen.blast.enable'] = Settings.QC_CONF_FASTQC_BLAST_ENABLE_KEY
 
+    converting_table_key['qc.conf.fastqscreen.settings.genomes'] = Settings.QC_CONF_FASTQSCREEN_GENOMES_PATH_KEY
+    converting_table_key['qc.conf.fastqscreen.settings.genomes.alias.path'] = Settings.QC_CONF_FASTQSCREEN_GENOMES_ALIAS_PATH_KEY
+    converting_table_key['qc.conf.fastqscreen.settings.genomes.desc.path'] = Settings.QC_CONF_FASTQSCREEN_GENOMES_DESC_PATH_KEY
+    converting_table_key['qc.conf.fastqscreen.settings.mappers.indexes.path'] = Settings.QC_CONF_FASTQSCREEN_MAPPERS_INDEXES_PATH_KEY
+    converting_table_key['qc.conf.fastqscreen.mapper.argument'] = Settings.QC_CONF_FASTQSCREEN_MAPPER_ARGUMENT_KEY
+    converting_table_key['qc.conf.fastqscreen.mapping.ignore.paired.mode'] = Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_END_MODE_KEY
+
     converting_table_key['qc.conf.ignore.paired.mode'] = Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY
     converting_table_key['qc.conf.max.reads.parsed'] = Settings.QC_CONF_FASTQSCREEN_FASTQ_MAX_READS_PARSED_KEY
     converting_table_key['qc.conf.reads.pf.used'] = Settings.QC_CONF_FASTQSCREEN_FASTQ_READS_PF_USED_KEY

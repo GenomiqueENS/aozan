@@ -191,7 +191,7 @@ public class FastqScreen {
 
     // Fields required to initialize fastqScreenGenomes
     this.aliasGenomesFile = new File(
-        conf.get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY));
+        conf.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_ALIAS_PATH_KEY));
     this.samplesheetFile = new File(conf.get(QC.BCL2FASTQ_SAMPLESHEET_PATH));
     this.contaminantGenomeNames =
         conf.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
@@ -199,7 +199,7 @@ public class FastqScreen {
     // Parameter mapper instead of default value
     this.mapperName = conf.get(Settings.QC_CONF_FASTQSCREEN_MAPPER_KEY);
     this.mapperArgument =
-        conf.get(Settings.QC_CONF_FASTQSCREEN_MAPPER_ARGUMENT_KEY);
+        conf.get(Settings.QC_CONF_FASTQSCREEN_MAPPER_ARGUMENTS_KEY);
 
   }
 }

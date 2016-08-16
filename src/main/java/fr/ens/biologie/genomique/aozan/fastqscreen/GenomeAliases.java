@@ -259,7 +259,7 @@ public class GenomeAliases {
   private GenomeAliases(final Settings settings) throws AozanException {
 
     final String genomeAliasesFilename = settings
-        .get(Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY);
+        .get(Settings.QC_CONF_FASTQSCREEN_GENOMES_ALIAS_PATH_KEY);
 
     this.genomeAliasesFile = Strings.emptyToNull(genomeAliasesFilename) == null
         ? null : new File(genomeAliasesFilename.trim());
