@@ -124,24 +124,24 @@ public class OverrepresentedSequencesBlast {
     }
 
     boolean stepEnabled = Boolean
-        .parseBoolean(conf.get(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY)
+        .parseBoolean(conf.get(Settings.QC_CONF_FASTQC_BLAST_ENABLE_KEY)
             .trim().toLowerCase());
 
     if (stepEnabled) {
 
       // Check parameters
       this.blastVersionExpected =
-          conf.get(Settings.QC_CONF_FASTQSCREEN_BLAST_VERSION_EXPECTED_KEY);
+          conf.get(Settings.QC_CONF_FASTQC_BLAST_VERSION_EXPECTED_KEY);
 
       this.tmpPath = conf.get(QC.TMP_DIR);
 
       // Path to blast executable
       final String blastPath =
-          conf.get(Settings.QC_CONF_FASTQSCREEN_BLAST_PATH_KEY).trim();
+          conf.get(Settings.QC_CONF_FASTQC_BLAST_PATH_KEY).trim();
 
       // Path to database for blast, need to add prefix filename used "nt"
       final String blastDBPath =
-          conf.get(Settings.QC_CONF_FASTQSCREEN_BLAST_DB_PATH_KEY).trim()
+          conf.get(Settings.QC_CONF_FASTQC_BLAST_DB_PATH_KEY).trim()
               + PREFIX_FILENAME_DATABASE;
 
       // Check paths needed in configuration aozan
@@ -166,7 +166,7 @@ public class OverrepresentedSequencesBlast {
         try {
           // Add arguments from configuration Aozan
           final String blastArguments =
-              conf.get(Settings.QC_CONF_FASTQSCREEN_BLAST_ARGUMENTS_KEY);
+              conf.get(Settings.QC_CONF_FASTQC_BLAST_ARGUMENTS_KEY);
 
           this.blastCommonCommandLine =
               createBlastCommandLine(blastPath, blastDBPath, blastArguments);

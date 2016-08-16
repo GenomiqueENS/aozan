@@ -1092,11 +1092,17 @@ def load_conf(conf, conf_file_path):
     converting_table_key['demux.use.docker.enable'] = Settings.BCL2FASTQ_USE_DOCKER_KEY
 
     converting_table_key['qc.conf.fastqc.threads'] = Settings.QC_CONF_THREADS_KEY
-    converting_table_key['qc.conf.blast.arguments'] = Settings.QC_CONF_FASTQSCREEN_BLAST_ARGUMENTS_KEY
-    converting_table_key['qc.conf.blast.db.path'] = Settings.QC_CONF_FASTQSCREEN_BLAST_DB_PATH_KEY
-    converting_table_key['qc.conf.blast.path'] = Settings.QC_CONF_FASTQSCREEN_BLAST_PATH_KEY
-    converting_table_key['qc.conf.blast.version.expected'] = Settings.QC_CONF_FASTQSCREEN_BLAST_VERSION_EXPECTED_KEY
-    converting_table_key['qc.conf.step.blast.enable'] = Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY
+
+    converting_table_key['qc.conf.blast.arguments'] = Settings.QC_CONF_FASTQC_BLAST_ARGUMENTS_KEY
+    converting_table_key['qc.conf.blast.db.path'] = Settings.QC_CONF_FASTQC_BLAST_DB_PATH_KEY
+    converting_table_key['qc.conf.blast.path'] = Settings.QC_CONF_FASTQC_BLAST_PATH_KEY
+    converting_table_key['qc.conf.blast.version.expected'] = Settings.QC_CONF_FASTQC_BLAST_VERSION_EXPECTED_KEY
+    converting_table_key['qc.conf.step.blast.enable'] = Settings.QC_CONF_FASTQC_BLAST_ENABLE_KEY
+    converting_table_key['qc.conf.fastqscreen.blast.arguments'] = Settings.QC_CONF_FASTQC_BLAST_ARGUMENTS_KEY
+    converting_table_key['qc.conf.fastqscreen.blast.db.path'] = Settings.QC_CONF_FASTQC_BLAST_DB_PATH_KEY
+    converting_table_key['qc.conf.fastqscreen.blast.path'] = Settings.QC_CONF_FASTQC_BLAST_PATH_KEY
+    converting_table_key['qc.conf.fastqscreen.blast.version.expected'] = Settings.QC_CONF_FASTQC_BLAST_VERSION_EXPECTED_KEY
+    converting_table_key['qc.conf.fastqscreen.blast.enable'] = Settings.QC_CONF_FASTQC_BLAST_ENABLE_KEY
 
     converting_table_key['qc.conf.ignore.paired.mode'] = Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY
     converting_table_key['qc.conf.max.reads.parsed'] = Settings.QC_CONF_FASTQSCREEN_FASTQ_MAX_READS_PARSED_KEY

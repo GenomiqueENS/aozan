@@ -680,7 +680,7 @@ public class QC {
 
     // Patch FastQC classes
     RuntimePatchFastQC.runPatchFastQC(Boolean
-        .valueOf(settings.get(Settings.QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY)));
+        .valueOf(settings.get(Settings.QC_CONF_FASTQC_BLAST_ENABLE_KEY)));
   }
 
   /**

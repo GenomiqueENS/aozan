@@ -200,24 +200,26 @@ public final class Settings {
    */
   public static final String QC_CONF_FASTQC_NANO_KEY = "qc.conf.fastqc.nano";
 
+  /** Collector fastqscreen blast arguments. */
+  public static final String QC_CONF_FASTQC_BLAST_ARGUMENTS_KEY =
+      "qc.conf.fastqc.blast.arguments";
+  /** Collector FastQC blast database path. */
+  public static final String QC_CONF_FASTQC_BLAST_DB_PATH_KEY =
+      "qc.conf.fastqc.blast.db.path";
+  /** Collector FastQC blast enable. */
+  public static final String QC_CONF_FASTQC_BLAST_ENABLE_KEY =
+      "qc.conf.fastqc.blast.enable";
+  /** Collector FastQC blast path. */
+  public static final String QC_CONF_FASTQC_BLAST_PATH_KEY =
+      "qc.conf.fastqc.blast.path";
+  /** Collector FastQC blast version expected. */
+  public static final String QC_CONF_FASTQC_BLAST_VERSION_EXPECTED_KEY =
+      "qc.conf.fastqc.blast.version.expected";
+
   /** Collector cluster density ratio. */
   public static final String QC_CONF_CLUSTER_DENSITY_RATIO_KEY =
       "qc.conf.cluster.density.ratio";
-  /** Collector fastqscreen blast arguments. */
-  public static final String QC_CONF_FASTQSCREEN_BLAST_ARGUMENTS_KEY =
-      "qc.conf.fastqscreen.blast.arguments";
-  /** Collector fastqscreen blast database path. */
-  public static final String QC_CONF_FASTQSCREEN_BLAST_DB_PATH_KEY =
-      "qc.conf.fastqscreen.blast.db.path";
-  /** Collector fastqscreen blast enable. */
-  public static final String QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY =
-      "qc.conf.fastqscreen.blast.enable";
-  /** Collector fastqscreen blast path. */
-  public static final String QC_CONF_FASTQSCREEN_BLAST_PATH_KEY =
-      "qc.conf.fastqscreen.blast.path";
-  /** Collector fastqscreen blast version expected. */
-  public static final String QC_CONF_FASTQSCREEN_BLAST_VERSION_EXPECTED_KEY =
-      "qc.conf.fastqscreen.blast.version.expected";
+
   /** Collector fastqscreen fastq max reads parsed. */
   public static final String QC_CONF_FASTQSCREEN_FASTQ_MAX_READS_PARSED_KEY =
       "qc.conf.fastqscreen.fastq.max.reads.parsed";
