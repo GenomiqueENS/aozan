@@ -134,8 +134,9 @@ public class RecoverableRawClusterPercentSampleTest extends AbstractSampleTest {
    * Public constructor.
    */
   public RecoverableRawClusterPercentSampleTest() {
-    super("sample.recoverablerawclusterssamplespercent", "",
-        "Recoverable raw clusters", "%");
+
+    super("sample.recoverable.raw.cluster.percent", "Recoverable Raw Cluster",
+        "Recoverable Raw Cluster", "%");
   }
 
 }

@@ -72,7 +72,7 @@ public class BaseCountGlobalTest extends AbstractSimpleGlobalTest {
    */
   public BaseCountGlobalTest() {
 
-    super("global.globalbasecount", "", "Base count", "Gb");
+    super("global.base.count", "Base Count", "Base Count", "Gb");
   }
 
 }

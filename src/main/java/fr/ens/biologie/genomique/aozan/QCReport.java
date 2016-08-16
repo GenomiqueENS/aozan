@@ -50,9 +50,9 @@ import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollecto
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 import fr.ens.biologie.genomique.aozan.tests.global.GlobalTest;
 import fr.ens.biologie.genomique.aozan.tests.lane.LaneTest;
-import fr.ens.biologie.genomique.aozan.tests.projectstats.ProjectTest;
+import fr.ens.biologie.genomique.aozan.tests.pooledsample.SampleStatsTest;
+import fr.ens.biologie.genomique.aozan.tests.project.ProjectTest;
 import fr.ens.biologie.genomique.aozan.tests.sample.SampleTest;
-import fr.ens.biologie.genomique.aozan.tests.samplestats.SampleStatsTest;
 import fr.ens.biologie.genomique.aozan.util.XMLUtilsWriter;
 
 /**

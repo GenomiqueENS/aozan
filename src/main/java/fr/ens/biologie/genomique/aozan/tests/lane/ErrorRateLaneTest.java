@@ -80,7 +80,7 @@ public class ErrorRateLaneTest extends AbstractSimpleLaneTest {
    */
   public ErrorRateLaneTest() {
 
-    super("lane.errorrate", "", "Error Rate", "%");
+    super("lane.error.rate", "Error Rate", "Error Rate", "%");
   }
 
 }

@@ -65,26 +65,26 @@
        <subsection name="Sample quality tests from demultiplexing step">
        <table>
          <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-         <tr><td>qc.test.sample.rawclusterssamples.enable</td><td>boolean</td><td>False</td><td>Enable rawclusterssamples test</td></tr>
-         <tr><td>qc.test.sample.rawclusterssamples.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of rawclusterssamples</td></tr>
-         <tr><td>qc.test.sample.pfclusterssamples.enable</td><td>boolean</td><td>False</td><td>Enable pfclusterssamples test</td></tr>
-         <tr><td>qc.test.sample.pfclusterssamples.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of pfclusterssamples</td></tr>
-         <tr><td>qc.test.sample.percentpfsample.enable</td><td>boolean</td><td>False</td><td>Enable percentpfsample test</td></tr>
-         <tr><td>qc.test.sample.percentpfsample.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of percentpfsample</td></tr>
-         <tr><td>qc.test.sample.percentinlanesample.enable</td><td>boolean</td><td>False</td><td>Enable percentinlanesample test</td></tr>
-         <tr><td>qc.test.sample.percentinlanesample.distance</td><td>double</td><td>0.05</td><td>Interval for valid values of percentinlanesample depend
+         <tr><td>qc.test.sample.raw.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable rawclusterssamples test</td></tr>
+         <tr><td>qc.test.sample.raw.cluster.count.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of rawclusterssamples</td></tr>
+         <tr><td>qc.test.sample.pf.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable pfclusterssamples test</td></tr>
+         <tr><td>qc.test.sample.pf.cluster.count.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of pfclusterssamples</td></tr>
+         <tr><td>qc.test.sample.pf.percent.enable</td><td>boolean</td><td>False</td><td>Enable percentpfsample test</td></tr>
+         <tr><td>qc.test.sample.pf.percent.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of percentpfsample</td></tr>
+         <tr><td>qc.test.sample.in.lane.percent.enable</td><td>boolean</td><td>False</td><td>Enable percentinlanesample test</td></tr>
+         <tr><td>qc.test.sample.in.lane.percent.distance</td><td>double</td><td>0.05</td><td>Interval for valid values of percentinlanesample depend
          	on sample count in lane. interval is set according to the theoretical percent (1.0/sampleCount)</td></tr>
-         <tr><td>qc.test.percentq30.sample.enable</td><td>boolean</td><td>False</td><td>Enable percentq30 test</td></tr>
-         <tr><td>qc.test.percentq30.sample.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of percentq30</td></tr>
-         <tr><td>qc.test.meanqualityscorepf.sample.enable</td><td>boolean</td><td>False</td><td>Enable meanqualityscorepf test</td></tr>
-         <tr><td>qc.test.meanqualityscorepf.sample.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of meanqualityscorepf</td></tr>
-         <tr><td>qc.test.recoverablerawclusterssamples.sample.enable</td><td>boolean</td><td>False</td>
+         <tr><td>qc.test.sample.q30.percent.sample.enable</td><td>boolean</td><td>False</td><td>Enable percentq30 test</td></tr>
+         <tr><td>qc.test.sample.q30.percent.sample.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of percentq30</td></tr>
+         <tr><td>qc.test.sample.base.pf.mean.quality.score.sample.enable</td><td>boolean</td><td>False</td><td>Enable meanqualityscorepf test</td></tr>
+         <tr><td>qc.test.sample.base.pf.mean.quality.score.sample.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of meanqualityscorepf</td></tr>
+         <tr><td>qc.test.sample.recoverable.raw.cluster.count.sample.enable</td><td>boolean</td><td>False</td>
          	<td>Enable recoverablerawclusterssamples test : compute raw cluster can be recovery from undetermined fastq file with more one mismatch that use for demultiplexing step (maximum at 2). </td></tr>
-         <tr><td>qc.test.recoverablerawclusterssamples.sample.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of recoverablerawclusterssamples</td></tr>
-         <tr><td>qc.test.recoverablepfclusterssamples.sample.enable</td><td>boolean</td><td>False</td>
+         <tr><td>qc.test.sample.recoverable.raw.cluster.count.sample.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of recoverablerawclusterssamples</td></tr>
+         <tr><td>qc.test.sample.recoverable.pf.cluster.count.sample.enable</td><td>boolean</td><td>False</td>
          	<td>Enable recoverablepfclusterssamples test : compute passing filter cluster can be recovery from undetermined fastq file with more one mismatch that use for demultiplexing step (maximum at 2). </td></tr>
-         <tr><td>qc.test.recoverablepfclusterssamples.sample.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of recoverablepfclusterssamples</td></tr>
-         <tr><td>qc.test.linkreportrecoverycluster.sample.enable</td><td>boolean</td><td>False</td><td>Enable linkreportrecoverycluster test: link to report HTML</td></tr>
+         <tr><td>qc.test.sample.recoverable.pf.cluster.count.sample.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of recoverablepfclusterssamples</td></tr>
+         <tr><td>qc.test.sample.cluster.recovery.report.sample.enable</td><td>boolean</td><td>False</td><td>Enable linkreportrecoverycluster test: link to report HTML</td></tr>
        </table>
        <p>The explanation to construct intervals is <a href="#syntax_interval">here.</a></p>
        </subsection>
@@ -118,21 +118,18 @@
         <H5>Configuration tests</H5>
         <table>
 	         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-	         <tr><td>qc.test.sample.basicstats.enable</td><td>boolean</td><td>False</td><td>Enable FastQC basicstats test</td></tr>
-	         <tr><td>qc.test.sample.perbasequalityscores.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perbasequalityscores test</td></tr>
-	         <tr><td>qc.test.sample.persequencequalityscores.enable</td><td>boolean</td><td>False</td><td>Enable FastQC persequencequalityscores test</td></tr>
-	         <tr><td>qc.test.sample.perbasesequencecontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perbasesequencecontent test</td></tr>
-		<!-- remove from FastQC v0.11.2
-       <tr><td>qc.test.sample.perbasegccontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perbasegccontent test</td></tr>
-       -->
-	         <tr><td>qc.test.sample.perSequencegccontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perSequencegccontent test</td></tr>
-	         <tr><td>qc.test.sample.ncontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC ncontent test</td></tr>
-	         <tr><td>qc.test.sample.sequencelengthdistribution.enable</td><td>boolean</td><td>False</td><td>Enable FastQC sequencelengthdistribution test</td></tr>
-	         <tr><td>qc.test.sample.duplicationlevel.enable</td><td>boolean</td><td>False</td><td>Enable FastQC duplicationlevel test</td></tr>
-	         <tr><td>qc.test.sample.overrepresentedseqs.enable</td><td>boolean</td><td>False</td><td>Enable FastQC overrepresentedseqs test</td></tr>
-	         <tr><td>qc.test.sample.kmercontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC kmercontent test</td></tr>
-	         <tr><td>qc.test.sample.pertilesequencequality.enable</td><td>boolean</td><td>False</td><td>Enable FastQC pertilesequencequality test</td></tr>
-	         <tr><td>qc.test.sample.adaptercontent.enable</td><td>boolean</td><td>False</td><td>Enable FastQC adaptercontent test</td></tr>
+	         <tr><td>qc.test.sample.fastqc.basic.stats.enable</td><td>boolean</td><td>False</td><td>Enable FastQC basicstats test</td></tr>
+	         <tr><td>qc.test.sample.fastqc.per.base.quality.scores.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perbasequalityscores test</td></tr>
+	         <tr><td>qc.test.sample.fastqc.per.sequence.quality.scores.enable</td><td>boolean</td><td>False</td><td>Enable FastQC persequencequalityscores test</td></tr>
+	         <tr><td>qc.test.sample.fastqc.per.base.sequence.content.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perbasesequencecontent test</td></tr>
+	         <tr><td>qc.test.sample.fastqc.per.sequence.gc.content.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perSequencegccontent test</td></tr>
+	         <tr><td>qc.test.sample.fastqc.n.content.enable</td><td>boolean</td><td>False</td><td>Enable FastQC ncontent test</td></tr>
+	         <tr><td>qc.test.sample.fastqc.sequence.length.distribution.enable</td><td>boolean</td><td>False</td><td>Enable FastQC sequencelengthdistribution test</td></tr>
+	         <tr><td>qc.test.sample.fastqc.duplication.level.enable</td><td>boolean</td><td>False</td><td>Enable FastQC duplicationlevel test</td></tr>
+	         <tr><td>qc.test.sample.fastqc.overrepresented.sequences.enable</td><td>boolean</td><td>False</td><td>Enable FastQC overrepresentedseqs test</td></tr>
+	         <tr><td>qc.test.sample.fastqc.kmer.content.enable</td><td>boolean</td><td>False</td><td>Enable FastQC kmercontent test</td></tr>
+	         <tr><td>qc.test.sample.fastqc.per.tile.sequence.quality.enable</td><td>boolean</td><td>False</td><td>Enable FastQC pertilesequencequality test</td></tr>
+	         <tr><td>qc.test.sample.fastqc.adapter.content.enable</td><td>boolean</td><td>False</td><td>Enable FastQC adaptercontent test</td></tr>
 		</table>
 
 
@@ -148,7 +145,7 @@
 
 		<table>
 	         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-	         <tr><td>qc.test.sample.badtiles.enable</td><td>boolean</td><td>False</td><td>Enable FastQC badtiles test</td></tr>
+	         <tr><td>qc.test.sample.fastqc.bad.tiles.enable</td><td>boolean</td><td>False</td><td>Enable FastQC badtiles test</td></tr>
 		</table>
 
 		<p>Example of module &#145;Bad tiles&#146;:</p>
@@ -233,33 +230,33 @@ especially the <a href="http://transcriptome.ens.fr/eoulsan/datarepositories.htm
 				<th>Description</th>
 			</tr>
 			<tr>
-				<td>qc.test.sample.hitnolibraries.enable</td>
+				<td>qc.test.sample.fastqscreen.mapped.except.ref.genome.percent.enable</td>
 				<td>boolean</td>
 				<td>False</td>
 				<td>The report of quality control contains a column with the percent
 				of reads mapped at least one reference genomes, except on genome sample test</td>
 			</tr>
 			<tr>
-				<td>qc.test.sample.hitnolibraries.interval</td>
+				<td>qc.test.sample.fastqscreen.mapped.except.ref.genome.percent.interval</td>
 				<td>double interval</td>
 				<td>[0, 0.1]</td>
 				<td>Interval of valid values</td>
 			</tr>
 			<tr>
-				<td>qc.test.sample.fsqmapped.enable</td>
+				<td>qc.test.sample.fastqscreen.mapped.percent.enable</td>
 				<td>boolean</td>
 				<td>False</td>
 				<td>The report of quality control contains a column with the percent of reads mapped for each reference genome test</td>
 			</tr>
 			<tr>
-				<td>qc.test.sample.fsqmapped.interval</td>
+				<td>qc.test.sample.fastqscreen.mapped.percent.interval</td>
 				<td>double interval</td>
 				<td>[0, 0.1]</td>
 				<td>Interval of valid values. If the genome is this of sample, the interval is reverse (ex: [0.9, 1])</td>
 			</tr>
 
 			<tr>
-				<td>qc.test.sample.linkreport.enable</td>
+				<td>qc.test.sample.fastqscreen.report.enable</td>
 				<td>boolean</td>
 				<td>False</td>
 				<td>The report of quality control contains a column with link to report fastqscreen file,
@@ -320,10 +317,10 @@ especially the <a href="http://transcriptome.ens.fr/eoulsan/datarepositories.htm
 
 		<table>
 		 <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-         <tr><td>qc.test.sample.recoverablepfclusterssamples.enable</td><td>boolean</td><td>False</td>
+         <tr><td>qc.test.sample.recoverable.pf.cluster.count.enable</td><td>boolean</td><td>False</td>
              <td>Compute the passing filter clusters that can be recovered from the undetermined FASTQ files with one more mismatch that the number of mismatches used in demultiplexing step (the maximum number of mismatches is 2)</td></tr>
-         <tr><td>qc.test.sample.recoverablepfclusterssamples.interval</td><td>interval</td><td>False</td><td>Interval for valid values for the recoverablepfclusterssamples test</td></tr>
-         <tr><td>qc.test.sample.linkreportrecoverycluster.enable</td><td>boolean</td><td>False</td><td>Link to the HTML recoverable clusters report</td></tr>
+         <tr><td>qc.test.sample.recoverable.pf.cluster.count.interval</td><td>interval</td><td>False</td><td>Interval for valid values for the recoverablepfclusterssamples test</td></tr>
+         <tr><td>qc.test.sample.cluster.recovery.report.enable</td><td>boolean</td><td>False</td><td>Link to the HTML recoverable clusters report</td></tr>
 		</table>
 		
 		<p>The two reports are generated in CSV and HTML formats:

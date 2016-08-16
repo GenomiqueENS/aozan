@@ -713,6 +713,9 @@
 			<action dev="firmo" type="add">
                                  new test giving sum of pooled samples used.
 			</action>
+			<action dev="firmo" type="update">
+                                 Fully renamed tests, doc and classes associated with qc-tests.
+			</action>
 		</release>
 
 	</body>
