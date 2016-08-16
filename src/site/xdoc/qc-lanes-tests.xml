@@ -62,35 +62,35 @@
        <h4>Configuration lanes quality tests</h4>
        <table>
          <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
-         <tr><td>qc.test.lane.rawclusters.enable</td><td>boolean</td><td>False</td><td>Enable rawcluster test</td></tr>
-         <tr><td>qc.test.lane.rawclusters.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of rawcluster</td></tr>
-         <tr><td>qc.test.lane.pfclusters.enable</td><td>boolean</td><td>False</td><td>Enable pfcluster test</td></tr>
-         <tr><td>qc.test.lane.pfclusters.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of pfclusters</td></tr>
-         <tr><td>qc.test.lane.pfclusterspercent.enable</td><td>boolean</td><td>False</td><td>Enable pfclusterspercent test</td></tr>
-         <tr><td>qc.test.lane.pfclusterspercent.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of pfclusterspercent</td></tr>
-         <tr><td>qc.test.lane.rawclusterphix.enable</td><td>boolean</td><td>False</td><td>Enable raw cluster Phix count test</td></tr>
-         <tr><td>qc.test.lane.rawclusterphix.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of raw cluster Phix count</td></tr>
-         <tr><td>qc.test.lane.clusterdensity.enable</td><td>boolean</td><td>False</td><td>Enable clusterdensity test</td></tr>
-         <tr><td>qc.test.lane.clusterdensity.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of clusterdensity</td></tr>
-         <tr><td>qc.test.lane.percentalign.enable</td><td>boolean</td><td>False</td><td>Enable percentalign test</td></tr>
-         <tr><td>qc.test.lane.percentalign.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of percentalign</td></tr>
-         <tr><td>qc.test.lane.errorrate.enable</td><td>boolean</td><td>False</td><td>Enable errorrate test</td></tr>
-         <tr><td>qc.test.lane.errorrate.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of errorrate</td></tr>
-         <tr><td>qc.test.lane.errorrate35cycle.enable</td><td>boolean</td><td>False</td><td>Enable errorrate35cycle test</td></tr>
-         <tr><td>qc.test.lane.errorrate35cycle.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of errorrate35cycle</td></tr>
-         <tr><td>qc.test.lane.errorrate75cycle.enable</td><td>boolean</td><td>False</td><td>Enable errorrate75cycle test</td></tr>
-         <tr><td>qc.test.lane.errorrate75cycle.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of errorrate75cycle</td></tr>
-         <tr><td>qc.test.lane.errorrate100cycle.enable</td><td>boolean</td><td>False</td><td>Enable errorrate100cycle test</td></tr>
-         <tr><td>qc.test.lane.errorrate100cycle.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of errorrate100cycle</td></tr>
-         <tr><td>qc.test.lane.firstcycleintensity.enable</td><td>boolean</td><td>False</td><td>Enable firstcycleintensity test</td></tr>
-         <tr><td>qc.test.lane.firstcycleintensity.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of firstcycleintensity</td></tr>
-         <tr><td>qc.test.lane.percentintensitycycle20.enable</td><td>boolean</td><td>False</td><td>Enable percentintensitycycle20 test</td></tr>
-         <tr><td>qc.test.lane.percentintensitycycle20.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of percentintensitycycle20</td></tr>
-         <tr><td>qc.test.lane.phasingprephasing.enable</td><td>boolean</td><td>False</td><td>Enable phasingprephasing test</td></tr>
-         <tr><td>qc.test.lane.phasingprephasing.phasing.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of phasing</td></tr>
-         <tr><td>qc.test.lane.phasingprephasing.prephasing.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of prephasing</td></tr>
-         <tr><td>qc.test.lane.lanepercentq30.enable</td><td>boolean</td><td>False</td><td>Enable lane Q30 percent test</td></tr>
-         <tr><td>qc.test.lane.lanepercentq30.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of lane Q30 percent</td></tr>       
+         <tr><td>qc.test.lane.raw.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable rawcluster test</td></tr>
+         <tr><td>qc.test.lane.raw.cluster.count.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of rawcluster</td></tr>
+         <tr><td>qc.test.lane.pf.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable pfcluster test</td></tr>
+         <tr><td>qc.test.lane.pf.cluster.count.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of pfclusters</td></tr>
+         <tr><td>qc.test.lane.pf.cluster.percent.enable</td><td>boolean</td><td>False</td><td>Enable pfclusterspercent test</td></tr>
+         <tr><td>qc.test.lane.pf.cluster.percent.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of pfclusterspercent</td></tr>
+         <tr><td>qc.test.lane.phix.raw.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable raw cluster Phix count test</td></tr>
+         <tr><td>qc.test.lane.phix.raw.cluster.count.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of raw cluster Phix count</td></tr>
+         <tr><td>qc.test.lane.cluster.density.enable</td><td>boolean</td><td>False</td><td>Enable clusterdensity test</td></tr>
+         <tr><td>qc.test.lane.cluster.density.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of clusterdensity</td></tr>
+         <tr><td>qc.test.lane.phix.align.percent.enable</td><td>boolean</td><td>False</td><td>Enable percentalign test</td></tr>
+         <tr><td>qc.test.lane.phix.align.percent.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of percentalign</td></tr>
+         <tr><td>qc.test.lane.error.rate.enable</td><td>boolean</td><td>False</td><td>Enable errorrate test</td></tr>
+         <tr><td>qc.test.lane.error.rate.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of errorrate</td></tr>
+         <tr><td>qc.test.lane.35.cycle.error.rate.enable</td><td>boolean</td><td>False</td><td>Enable errorrate35cycle test</td></tr>
+         <tr><td>qc.test.lane.35.cycle.error.rate.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of errorrate35cycle</td></tr>
+         <tr><td>qc.test.lane.75.cycle.error.rate.enable</td><td>boolean</td><td>False</td><td>Enable errorrate75cycle test</td></tr>
+         <tr><td>qc.test.lane.75.cycle.error.rate.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of errorrate75cycle</td></tr>
+         <tr><td>qc.test.lane.100.cycle.error.rate.enable</td><td>boolean</td><td>False</td><td>Enable errorrate100cycle test</td></tr>
+         <tr><td>qc.test.lane.100.cycle.error.rate.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of errorrate100cycle</td></tr>
+         <tr><td>qc.test.lane.first.cycle.intensity.enable</td><td>boolean</td><td>False</td><td>Enable firstcycleintensity test</td></tr>
+         <tr><td>qc.test.lane.first.cycle.intensity.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of firstcycleintensity</td></tr>
+         <tr><td>qc.test.lane.cycle.20.intensity.percent.enable</td><td>boolean</td><td>False</td><td>Enable percentintensitycycle20 test</td></tr>
+         <tr><td>qc.test.lane.cycle.20.intensity.percent.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of percentintensitycycle20</td></tr>
+         <tr><td>qc.test.lane.phasing.prephasing.percent.enable</td><td>boolean</td><td>False</td><td>Enable phasingprephasing test</td></tr>
+         <tr><td>qc.test.lane.phasing.prephasing.percent.phasing.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of phasing</td></tr>
+         <tr><td>qc.test.lane.phasing.prephasing.percent.prephasing.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of prephasing</td></tr>
+         <tr><td>qc.test.lane.q30.percent.enable</td><td>boolean</td><td>False</td><td>Enable lane Q30 percent test</td></tr>
+         <tr><td>qc.test.lane.q30.percent.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of lane Q30 percent</td></tr>       
 
  
        </table>

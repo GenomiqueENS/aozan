@@ -72,8 +72,8 @@ public class NonIndexedBaseCountGlobalTest extends AbstractSimpleGlobalTest {
    */
   public NonIndexedBaseCountGlobalTest() {
 
-    super("global.nonindexedglobalbasecount", "", "Non indexed base count",
-        "Gb");
+    super("global.non.indexed.base.count", "Non-Indexed Base Count",
+        "Non-Indexed Base Count", "Gb");
   }
 
 }

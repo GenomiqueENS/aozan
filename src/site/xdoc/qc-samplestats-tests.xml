@@ -51,32 +51,32 @@
        <h4>Configuration samples statistics quality tests</h4>
        <table>
         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
-		<tr><td>qc.test.samplestats.samplestatcountsample.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.samplestats.pooledsample.sample.count.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable sample count project test</td></tr>
-		<tr><td>qc.test.samplestats.samplestatsrawclustermin.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.samplestats.pooledsample.min.raw.cluster.count.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable raw cluster minimum count on replica samples</td></tr>
-		<tr><td>qc.test.samplestats.samplestatsrawclustermax.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.samplestats.pooledsample.max.raw.cluster.count.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable raw cluster maximum count on replica samples</td></tr>
-		<tr><td>qc.test.samplestats.samplestatrawclustersum.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.samplestats.pooledsample.raw.cluster.count.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable raw cluster sum on replica samples</td></tr>
-		<tr><td>qc.test.samplestats.samplestatspfclustermin.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.samplestats.pooledsample.min.pf.cluster.count.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable passing filter cluster minimum count on replica samples</td></tr>
-		<tr><td>qc.test.samplestats.samplestatspfclustermax.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.samplestats.pooledsample.max.pf.cluster.count.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable passing filter cluster minimum count on replica samples</td></tr>
-		<tr><td>qc.test.samplestats.samplestatpfclustersum.enable</td><td>integer interval</td><td>False</td>
+		<tr><td>qc.test.samplestats.pooledsample.pf.cluster.count.enable</td><td>integer interval</td><td>False</td>
 			<td>Enable passing filter cluster sum on replica samples</td></tr>
-        <tr><td>qc.test.samplestats.samplestatspercentq30basepf.enable</td><td>boolean</td><td>False</td>
+        <tr><td>qc.test.samplestats.pooledsample.q30.percent.enable</td><td>boolean</td><td>False</td>
         	<td>Enable samplestatspercentq30basepf test</td></tr>
      	<tr><td>qc.test.samplestats.samplestatsmeanqualityscorepf.enable</td><td>boolean</td><td>False</td>
          	<td>Enable samplestatsmeanqualityscorepf test</td></tr>
-		<tr><td>qc.test.samplestats.samplestatspassingfilterclusterpercent.enable</td><td>boolean</td><td>False</td>
+		<tr><td>qc.test.samplestats.pooledsample.pf.percent.enable</td><td>boolean</td><td>False</td>
 			<td>Enable samplestatspassingfilterclusterpercent test</td></tr>
-	    <tr><td>qc.test.samplestats.percentsampleinrun.enable</td><td>boolean</td><td>False</td>
+	    <tr><td>qc.test.samplestats.pooledsample.in.run.percent.enable</td><td>boolean</td><td>False</td>
 	    	<td>Enable percentsampleinrun test</td></tr>
-        <tr><td>qc.test.samplestats.percentsampleinproject.enable</td><td>boolean</td><td>False</td>
+        <tr><td>qc.test.samplestats.pooledsample.in.project.percent.enable</td><td>boolean</td><td>False</td>
         	<td>Enable percentsampleinproject test</td></tr>
-        <tr><td>qc.test.samplestats.samplestats.pooled.sample.number.enable</td><td>boolean</td><td>False</td>
-        	<td>Enable samplestats.pooled.sample.number test</td></tr>
+        <tr><td>qc.test.pooledsample.sample.in.pool.count.enable</td><td>boolean</td><td>False</td>
+        	<td>Enable pooledsample.sample.in.pool.count test</td></tr>
        </table>
 
        
@@ -87,14 +87,14 @@
        	
        <table>
        	<tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
-		<tr><td>qc.test.samplestatsrecoveryrawcluster.enable</td><td>integer</td><td>False</td>
+		<tr><td>qc.test.pooledsample.raw.cluster.recovery.count.enable</td><td>integer</td><td>False</td>
 			<td>Enable recoverable raw cluster in samples statistics test</td></tr>
-		<tr><td>qc.test.samplestatsrecoverablerawclusterpercent.enable</td><td>percent</td><td>False</td>
+		<tr><td>qc.test.pooledsample.recoverable.raw.cluster.percent.enable</td><td>percent</td><td>False</td>
 			<td>Enable recoverable raw cluster percent in samples statistics test</td></tr>
 		
-		<tr><td>qc.test.samplestatsrecoverypfcluster.enable</td><td>integer</td><td>False</td>
+		<tr><td>qc.test.pooledsample.pf.cluster.recovery.count.enable</td><td>integer</td><td>False</td>
 			<td>Enable recoverable passing filter cluster in samples statistics test</td></tr>
-		<tr><td>qc.test.samplestatsrecoverablepfclusterpercent.enable</td><td>percent</td><td>False</td>
+		<tr><td>qc.test.pooledsample.recoverable.pf.cluster.percent.enable</td><td>percent</td><td>False</td>
 			<td>Enable recoverable passing filter cluster percent in samples statistics test</td></tr>
 	  </table>
 		
@@ -104,17 +104,17 @@
        </p>
        <table>
        	<tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
-		<tr><td>qc.test.samplestatexceededcontaminationthreshold.enable</td><td>integer interval</td><td>False</td>
-			<td>Enable samples statistics on excedeed contamination threshold test. Use other quality control test (qc.test.fsqmapped.enable)</td></tr>
-		<tr><td>qc.test.linksamplereport.enable</td><td>link</td><td>False</td>
+		<tr><td>qc.test.pooledsample.fastqscreen.sample.overcontamination.count.enable</td><td>integer interval</td><td>False</td>
+			<td>Enable samples statistics on excedeed contamination threshold test. Use other quality control test (qc.test.sample.fastqscreen.mapped.percent.enable)</td></tr>
+		<tr><td>qc.test.pooledsample.fastqscreen.report.enable</td><td>link</td><td>False</td>
 			<td>Enable link to detection contamination project report compilation samples data</td></tr>
-		<tr><td>qc.test.samplestathitnolibrariessum.enable</td><td>boolean</td><td>False</td>
+		<tr><td>qc.test.pooledsample.fastqscreen.mapped.except.ref.percent.enable</td><td>boolean</td><td>False</td>
 			<td>The report of quality control contains a column with the percent
 				of reads mapped at least one reference genomes, except on genome sample test</td></tr>
-		<tr><td>qc.test.samplestatsfsqmapped.enable</td><td>boolean</td><td>False</td>
+		<tr><td>qc.test.pooledsample.fastqscreen.mapped.percent.enable</td><td>boolean</td><td>False</td>
 			<td>The report of quality control contains a column with the percent 
 				of reads mapped for each reference genome test</td></tr>		
-		<tr><td>qc.test.linksamplereport.enable</td><td>link</td><td>False</td>
+		<tr><td>qc.test.pooledsample.fastqscreen.report.enable</td><td>link</td><td>False</td>
 			<td>Enable link to detection contamination project report compilation samples data</td></tr>
 		</table>
 	

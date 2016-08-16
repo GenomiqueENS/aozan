@@ -55,9 +55,9 @@ import fr.ens.biologie.genomique.aozan.tests.AozanTestRegistry;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 import fr.ens.biologie.genomique.aozan.tests.global.GlobalTest;
 import fr.ens.biologie.genomique.aozan.tests.lane.LaneTest;
-import fr.ens.biologie.genomique.aozan.tests.projectstats.ProjectTest;
+import fr.ens.biologie.genomique.aozan.tests.pooledsample.SampleStatsTest;
+import fr.ens.biologie.genomique.aozan.tests.project.ProjectTest;
 import fr.ens.biologie.genomique.aozan.tests.sample.SampleTest;
-import fr.ens.biologie.genomique.aozan.tests.samplestats.SampleStatsTest;
 import fr.ens.biologie.genomique.eoulsan.EoulsanRuntime;
 import fr.ens.biologie.genomique.eoulsan.data.protocols.DataProtocolService;
 
@@ -300,7 +300,7 @@ public class QC {
    */
   public void writeReport(final QCReport report,
       final String stylesheetFilename, final String outputFilename)
-      throws AozanException {
+          throws AozanException {
 
     if (outputFilename == null) {
       throw new AozanException("The filename for the qc report is null");
@@ -431,7 +431,7 @@ public class QC {
 
           // Get the type of the test
           final String[] fields = testFullName.split("\\.");
-          if (fields.length != 2) {
+          if (fields.length < 2) {
             throw new AozanException("Invalid test name: " + testFullName);
           }
           final String testType = fields[0];
@@ -468,7 +468,7 @@ public class QC {
             }
             break;
 
-          case "samplestats":
+          case "pooledsample":
             for (final AozanTest t : tests) {
               this.samplesStatsTests.add((SampleStatsTest) t);
             }
@@ -876,7 +876,7 @@ public class QC {
    */
   public QC(final Settings settings, final String bclDir, final String fastqDir,
       final String qcDir, final String tmpDirname, final String runId)
-      throws AozanException {
+          throws AozanException {
 
     this(settings, bclDir, fastqDir, qcDir,
         tmpDirname == null ? null : new File(tmpDirname), runId);
@@ -894,7 +894,7 @@ public class QC {
    */
   public QC(final Settings settings, final String bclDir, final String fastqDir,
       final String qcDir, final File tmpDir, final String runId)
-      throws AozanException {
+          throws AozanException {
 
     this.settings = settings;
     this.bclDir = checkDir(bclDir);

@@ -129,8 +129,9 @@ public class RecoverablePFClusterPercentSampleTest extends AbstractSampleTest {
    * Public constructor.
    */
   public RecoverablePFClusterPercentSampleTest() {
-    super("sample.recoverablepfclusterssamplespercent", "",
-        "Recoverable PF clusters", "%");
+
+    super("sample.recoverable.pf.cluster.percent", "Recoverable PF Cluster",
+        "Recoverable PF Cluster", "%");
   }
 
 }
