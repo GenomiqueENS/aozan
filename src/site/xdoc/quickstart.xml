@@ -401,7 +401,6 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
 	   <tr><td>aozan.enable</td><td>boolean</td><td>False</td><td>Enable Aozan</td></tr>
 	   <tr><td>aozan.log.level</td><td>string</td><td>INFO</td><td>Log level (ALL, FINEST, FINER, FINE, CONFIG, INFO, WARNING, SEVERE, OFF)</td></tr>
 	   <tr><td>aozan.debug</td><td>boolean</td><td>False</td><td>mode debug</td></tr>
-	   <tr><td>hiseq.sn</td><td>string</td><td>Not set</td><td>HiSeq serial number (not yet used)</td></tr>
 	   <tr><td>lock.file</td><td>string</td><td>/var/lock/aozan.lock</td><td>Aozan lock file that prevent
 	     two instances of Aozan running at the same time</td></tr>
 	   <tr><td>index.html.template</td><td>string</td><td>Not set</td><td>HTML page template that

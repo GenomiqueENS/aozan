@@ -57,8 +57,6 @@ public final class Settings {
       "hiseq.critical.min.space";
   /** hiseq directory data path. */
   public static final String HISEQ_DATA_PATH_KEY = "hiseq.data.path";
-  /** Hiseq SN. */
-  public static final String HISEQ_SN_KEY = "hiseq.sn";
   /** Hiseq space factor. */
   public static final String HISEQ_SPACE_FACTOR_KEY = "hiseq.space.factor";
   /** Hiseq step. */
