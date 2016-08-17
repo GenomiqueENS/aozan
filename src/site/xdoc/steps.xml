@@ -36,15 +36,15 @@
 
 	<body>
 	
-		<p>Aozan works in 5 steps. It sends emails <b>at each step</b> of the pre-analysis workflow and 
+		<p>Aozan works in 5 steps. It sends mails <b>at each step</b> of the pre-analysis workflow and 
 		a <b>QC report</b> at the end of the quality control step.
-		The parameters for each step should be writing in Aozan configuration file, 
+		The parameters for each step should be written in Aozan configuration file, 
 		an example is <a href="./aozan-example.conf">here.</a>. The available steps are:</p>
 		<p/>
 		<ul>
 			<li><a href="new-run-discovering.html">New run discovering</a>
-               <ul><li>send an email, if a new run is currently running. 
-               	For HiSeq Illumina sequencer, send in attachment the first base report</li></ul>
+               <ul><li>sends an email, if a new run is currently running. 
+               	For HiSeq Illumina sequencer, sends in attachment the first base report</li></ul>
             </li>
 			<p/>
 			
@@ -73,11 +73,13 @@
 			
 			<li><p><a href="quality-control.html">Quality control and validation</a></p>
 				<ul>
-				    <li><a href="qc-global-tests.html">Globals quality tests</a> on general sequencing data</li>
-					<li><a href="qc-lanes-tests.html">Lanes quality tests</a> on demultiplexing steps data</li>
-					<li><a href="qc-samples-tests.html">Samples quality tests</a> on demultiplexing steps data,
+				    <li><a href="qc-global-tests.html">Global quality tests</a> on general sequencing data</li>
+					<li><a href="qc-lanes-tests.html">Lane quality tests</a> on demultiplexing step data</li>
+					<li><a href="qc-projects-tests.html">Project quality tests</a> on demultiplexing step data</li>
+					<li><a href="qc-samples-tests.html">Sample quality tests</a> on demultiplexing step data,
 					<a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC</a> results, and contamination detection results 
                                         (a reimplementation of <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/">FastQ Screen</a>)</li>
+					<li><a href="qc-pooledsamples-tests.html">Pooled sample quality tests</a> on demultiplexing step data</li>
 					<li>Creates a QC report file with thresholds for acceptable values</li>
 				</ul>
 			</li>

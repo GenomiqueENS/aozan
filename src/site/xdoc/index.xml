@@ -61,13 +61,13 @@
 		</section>
 		
 		<section name="Welcome to Aozan">
-			<p>Aozan has been developped in order to automatically handle raw data transfert, demultiplexing and
+			<p>Aozan has been developed in order to automatically handle raw data transfer, demultiplexing and
                         quality control of a sequencing run once a HiSeq or Nextseq run has been completed. This software is involved in the primary data analysis.
                        Aozan produces compressed FASTQ files and a quality report from an HiSeq or Nextseq sequencer output in order to evaluate
                         each sequencing parameter. Aozan can work on most computer infrastructures and only requires a samplesheet for each run.</p>
 
 			<p>Aozan greatly helps to improve the efficiency in the run data management and to keep tracks of the run statistics
-			through automatic emails and HTML report pages.</p>
+			through automatic mails and HTML report pages.</p>
 
 
 		</section>
@@ -120,7 +120,7 @@
 			</subsection>
 			
 			<subsection name="FastQC version 0.11.2">
-				<p>Aozan now use the lastest FastQC version (0.11.2) that includes two new modules:
+				<p>Aozan now use the latest FastQC version (0.11.2) that includes two new modules:
 				<ul>
 					<li>&quot;<b>Per tile sequence quality</b>&quot;;</li>
 					<li>&quot;<b>Adapter content</b>&quot;.</li>

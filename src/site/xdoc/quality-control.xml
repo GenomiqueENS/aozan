@@ -36,21 +36,21 @@
 	
 	<section name="Quality control step">
      
-     <p>This step allow to perform some quality controls on the output of the runs. To do this Aozan use Illumina reports, 
+     <p>This step allows to perform quality controls on the output runs. To do this Aozan uses Illumina reports, 
      <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/" target="_blank">FastQC</a> results 
      and contamination detection results (using <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/">FastQ Screen</a>). </p>  
 
      <p>This step creates a report file including the thresholds fixed for quality controls with : </p>
 	 <ul>
 	   <li><a href="./qc-global-tests.html">Global quality tests</a> with Illumina reports</li>
-	   <li><a href="./qc-lanes-tests.html">Lanes quality tests</a> with Illumina reports</li>
-	   <li><a href="./qc-projectstats-tests.html">Projects statistics quality tests</a> with Illumina reports, demultiplexage reports, 
+	   <li><a href="./qc-lanes-tests.html">Lane quality tests</a> with Illumina reports</li>
+	   <li><a href="./qc-projects-tests.html">Project quality tests</a> with Illumina reports, demultiplexage reports, 
 	   		optional samples reports</li>
-	   <li><a href="./qc-samplestats-tests.html">Samples statistics quality tests</a> with Illumina reports, demultiplexage reports, 
-	   		optional samples reports, compile data on replica by sample only if the run contains a single Project.</li>	   		
+	   <li><a href="./qc-pooledsamples-tests.html">Pooled sample quality tests</a> with Illumina reports, demultiplexage reports, 
+	   		optional samples reports, compiles data on replica by sample only if the run contains a single Project.</li>	   		
 	   <li><a href="./qc-samples-tests.html">Samples quality tests</a> with Illumina reports, 
 		 <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC, </a>a quality control tool for high throughput sequence data 
-				and a optional module for the contamination detection (reimplementation of FastqScreen).</li>
+				and an optional module for the contamination detection (reimplementation of FastQ Screen).</li>
 	  </ul>
     
      <h4>Configuration parameters</h4>

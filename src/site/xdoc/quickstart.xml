@@ -64,7 +64,7 @@
 					<a href="#hiseqdata">Accessing HiSeq Data</a>
 				</li>
 				<li>
-					<a href="#directoryAozan">Directories requiered by Aozan</a>
+					<a href="#directoryAozan">Directories required by Aozan</a>
 				</li>
                 <li>
                 	<a href="#configuration">General configuration</a>
@@ -79,25 +79,25 @@
 		<a name="introduction"/>
 		<section name="Introduction">
 
-		  <p>Aozan is a tool that automatically handle Illumina HiSeq generated data from the end of sequencing to the
-		  demultiplexing and quality control. The great strength  of Aozan is to not require user to process data.
+		  <p>Aozan is a tool that automatically handle Illumina HiSeq or NextSeq generated data from the end of sequencing to the
+		  demultiplexing while also performing quality control. One of the greatest strength of Aozan is that it doesn't require user action to process data.
 		  </p>
-		  <p>Each step of the post-sequencing data processing is quite easy to done. However
-		  the duration of the steps (data transfert, demultiplexing and quality control) is quite long and
-		  users must watch the end of each step to avoid loose time before getting data ready to analysis.
-		  Executing this tasks at the end of each sequencing is a quite off-putting job. Using Aozan allow to
-		  save time by automate all this tasks. In addition Aozan provide a Bcl2fastq CSV samplesheet generator
-		  from an XLS file that avoid common syntax errors in the CSV file and allow usage of alias for the index
-		  sequences. This tool is access <a href="http://transcriptome.ens.fr/designvalidator">here</a>.
+		  <p>Each step of the post-sequencing data processing is rather easy to do. However,
+		  the duration of each step (data transfer, demultiplexing and quality control) is quite long and before getting data ready to analysis,
+		  user must watch the end of each step to avoid waste of time.
+		  Executing these tasks after each sequencing process is a laborious job. Aozan allows to
+		  save time by automate all these tasks. In addition, Aozan provide a Bcl2fastq CSV samplesheet generator
+		  from an XLS file to avoid common syntax errors in the CSV file and to allow usage of alias for the index
+		  sequences. This tool is available <a href="http://transcriptome.ens.fr/designvalidator">here</a>.
 		  </p>
 		</section>
 
 		<a name="principles"/>
  <section name="Principles">
 
-   <p>Aozan is not an interactive tool, it communicate with users through emails. It is launched regulary (usually every hour)
-   through a cron job. There are 5 steps in Aozan, once the end of a run has been discovered, synchronization,
-   demultiplexing and quality control will be automatically executed. However if the end of another run is
+   <p>Aozan is not an interactive tool, it communicates with users through mails. It is launched regularly (usually every hour)
+   through a cron job. There are 5 steps in Aozan. Once the end of a run has been discovered, synchronization,
+   demultiplexing and quality control will be automatically executed. However, if the end of another run is
    discovered at the end of this last 3 steps, the synchronization of the new run will be launched before resuming
    the end of the analysis of the previous run.</p>
 
@@ -124,7 +124,7 @@
    <li>rsync 3.0.x or later</li>
  </ul>
 
- <p>On Ubuntu, you can install requirements (except Bcl2fastq) with the following command:</p>
+ <p>On Ubuntu, you can install requirements (except Bcl2fastq) using the 'apt-get' command, here is an example:</p>
 <source>
 $ sudo apt-get install openjdk-7-jre-headless rsync
 </source>
@@ -132,12 +132,12 @@ $ sudo apt-get install openjdk-7-jre-headless rsync
 
   <a name="bcl2fastq"/>
    <subsection name="Installing bcl2fastq">
-   <p>The Bcl2FastQ conversion software is a new tool to handle bcl conversion and demultiplexing of both unzipped and zipped bcl files.
+   <p>The Bcl2FastQ conversion software is a tool which handle bcl conversion and demultiplexing of both unzipped and zipped bcl files.
     bcl2fastq can be downloaded on the Illumina website
  <a href="http://support.illumina.com/downloads/bcl2fastq_conversion_software_183.ilmn">here</a>.</p>
 
- <p>Next, we download and install bcl2fastq 1.8.3 with the following lines. The install on ubuntu has failed.
-   So we had to recompile bcl2fastq in static mode on Centos 5.9, before make final installing. You can download
+ <p>Next, using the following lines we try to download and install bcl2fastq 1.8.3. , but since the installation on ubuntu has failed,
+    we have to recompile bcl2fastq in static mode on Centos 5.9, before finalizing installation. You can download 
  <a href="http://centos.mirror.fr.planethoster.net/5/isos/x86_64/">Centos 5.9 image iso here</a>.</p>
 
  <source>
@@ -173,8 +173,8 @@ COMPRESSIONSUFFIX:=.gz
  
 <a name="bcl2fastq2"/>
 <subsection name="Installing bcl2fastq2">
-	<p>Since September 2014, Illmunina publish a new version on bcl2fastq software, compatible with RTA version 2 (Real Time Analysis)
-		used on NextSeq 500 sequencer. This version is more simple to install.</p>
+	<p>Since September 2014, Illmunina published a new version on bcl2fastq software, compatible with RTA version 2 (Real Time Analysis)
+		used on NextSeq 500 sequencer. This version is easier to install.</p>
 <source> 
 $ cd /tmp 
 $ wget --no-check-certificate https://support.illumina.com/content/dam/illumina-support/documents/downloads/software/bcl2fastq/bcl2fastq2-v2.17.1.14-Linux-x86_64.rpm
@@ -196,7 +196,7 @@ $ yum install -y zip.x86_64
 	<p>Now with Aozan, you can launch demultiplexing step with a Docker image on bcl2fastq from repository of the platform here. 
 		<a href="https://hub.docker.com/u/genomicpariscentre/">
 			<img src="images/logo_docker.png" alt="link to the platform repository Docker" border="1" /></a>
-		Installation using Docker: <a href="https://docs.docker.com/installation/">look at documentation Docker web site</a> 
+		Installation using Docker: <a href="https://docs.docker.com/installation/">look at Docker documentation web site</a> 
 		</p>
 </subsection>
    	
@@ -205,7 +205,7 @@ $ yum install -y zip.x86_64
 
  <p>To installing ncbi-blast+ (or blastall) on your system (Ubuntu or centos), use the following command line: </p>
 	<source>$ sudo apt-get install ncbi-blast+</source>
-  <p>Now download the requiered &quot;nt&quot; database from NCBI : </p>
+  <p>Now download the required &quot;nt&quot; database from NCBI : </p>
 	<source>
 $ ftp ftp.ncbi.nlm.nih.gov
 login anonymous
@@ -217,7 +217,7 @@ $ mget nt*
 	</source>
 	  <p>Unzip all files, the first nt.00.tar.gz contains the file nt.nal.</p>
 	  <p>Use the perl script to update the database, you can consult <a href="http://www.ncbi.nlm.nih.gov/books/NBK1762/" target="_blank">the NCBI documentation.</a></p>
-	  <p>Like Aozan version 1.2, it is always possible to use blastall.</p>
+	  <p>Like Aozan version 1.2, it is still possible to use blastall.</p>
 	 </subsection>
    </section>
 
@@ -231,7 +231,7 @@ $ mget nt*
 $ tar xzf aozan-@@@VERSION@@@.tar.gz
 </source>
 
- <p>Aozan is written in Python and Java. It use the Java implementation of Python (Jython) that
+ <p>Aozan is written in Python and Java. It uses the Java implementation of Python (Jython) that
  is bundled in Aozan.</p>
 
   </section>
@@ -239,12 +239,12 @@ $ tar xzf aozan-@@@VERSION@@@.tar.gz
   <a name="launchingAozan"/>
   <section name="Launching Aozan">
 
- <p>Aozan is usually launched regulary as a cron job however Aozan can also be launched manually.
+ <p>Aozan is usually launched regularly as a cron job. However, Aozan can also be launched manually.
    In the following examples, Aozan is installed in <tt>/usr/local/aozan</tt> and the configuration file is
      <tt>/etc/aozan.conf</tt>.
     Note that it is better to configure your aozan.conf file before running Aozan.</p>
-    <p>The configuration file is a text file, the parameters correspond at key-value pairs.
-    See the <a href="steps.html">pages for steps</a> for more details.</p>
+    <p>The configuration file is a text file, the parameters corresponds at key-value pairs.
+    See the <a href="steps.html">pages about steps</a> for more details.</p>
 
  <subsection name="Launching Aozan manually">
 
@@ -292,20 +292,20 @@ $ sudo chmod 755 /etc/cron/daily/aozan &amp;&amp; sudo chmod root:root /etc/cron
  <section name="Accessing HiSeq Data">
 
  <p>Aozan can handle several HiSeq instruments. For each instruments you must allow Aozan computer
- to access to HiSeq output directories. On HiSeq 2000/2500, 2 hard drives are dedicated to each flow cell slot.
-   So you must sharing each hard drive with Aozan computer.</p>
+ to have access to HiSeq output directories. On HiSeq 2000/2500, 2 hard drives are dedicated to each flow cell slot.
+   So you must share each hard drive with Aozan computer.</p>
 
  <p>You can also choose to force HiSeq to directly write its data on a network storage like a NAS. In this
     case you must mount this network storage (using preferably an Unix network file system like NFS) on
-    computer where Aozan is installed.</p>
+    the computer where Aozan is installed.</p>
 
  <subsection name="Enable sharing on HiSeq computer">
 
  <p>First on the HiSeq computer, share the hard drive that contains generated data (usualy F: and G:).
  To do this, open the explorer and right-click on each Hard drive, share... The shares can be in read
-   only mode (recommanded).</p>
+   only mode (recommended).</p>
 
- <p><b>Security issues:</b> we recommand to shares HiSeq output directories in read only mode and
+ <p><b>Security issues:</b> we recommend to shares HiSeq output directories in read only mode and
    restrict the shares access to Aozan computer. To do this, you can configure the Windows firewall.</p>
 
  </subsection>
@@ -329,7 +329,7 @@ $ smbclient -U sbsuser 'smb://hiseq01.example.com/F$'
 //hiseq01.example.com/G$   /mnt/hiseq01_g    cifs    username=sbsuser,password=hiseqpassword       0       0
 </source>
 
- <li>Now create the mount points and process to mounting of the shares:</li>
+ <li>Now create the mount points and process the mounting of the shares:</li>
 <source>
 $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
    sudo mount /mnt/hiseq01_f &amp;&amp; \
@@ -347,7 +347,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
 <a name="directoryAozan"/>
  <section name="Directories requiered by Aozan">
 
- <p>To work, Aozan need the following directories. The path of this directories must be set in the Aozan
+ <p>To work, Aozan needs the following directories. The path of these directories must be set in the Aozan
  configuration file.</p>
  <p>An example of aozan configuration file is <a href="./aozan-example.conf" target="_blank">here.</a></p>
 
@@ -357,7 +357,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
      log files and history of processed runs</td></tr>
    <tr><td>aozan.log.path</td><td>/var/log/aozan</td><td>Path to the Aozan log files</td></tr>
    <tr><td>hiseq.data.path</td><td>/mnt/hiseq01_f:/mnt/hiseq01_g</td><td>Hiseq output directories.
-     Multplie values are allowed if there is several HiSeq or 2 output directories for each flow cell of
+     Multiple values are allowed if there is several HiSeq or 2 output directories for each flow cell of
      an HiSeq 2000 (paths separated by ':')</td></tr>
    <tr><td>bcl.data.path</td><td>/mnt/storage/bcl</td><td>Hiseq output data after synchronization. Usualy cif files
      are not copied in this directory</td></tr>
@@ -381,6 +381,11 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
 			<li><b>demux.done</b> : list of the run ids treated for the demuliplexing step;</li>
 			<li><b>qc.done</b> : list of the run ids treated for the quality control step;</li>
 		</ul>
+		The following files can also be created to set priority or disable specific runs.
+		<ul>
+			<li><b>runs.priority</b> : list of the run ids treated in priority by aozan when available;</li>
+			<li><b>[step].deny</b> : list of the run ids that won't be treated by a step;</li>
+		</ul>
 	</p>
 
 </section>
@@ -389,7 +394,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
  <section name="Aozan general configuration">
 
  <p>This section describe the Aozan global configuration settings. For the steps settings,
- 	see in the <a href="steps.html">steps documentation.</a></p>
+ 	check in the <a href="steps.html">steps documentation.</a></p>
  <p>An example of aozan configuration file is <a href="./aozan-example.conf" target="_blank">here.</a></p>
 
    <subsection name="General configuration">
@@ -431,8 +436,8 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
    </subsection>
 
     <subsection name="Illumina HiSeq configuration">
-	    <p>In the lastest versions of HSC (HSC-2.x.x), <tt>Status_Files/</tt> and <tt>reports/</tt> directories in <tt>Basecalls/Data</tt> are no more created by default.
-	    This files are useful to display run statistics of working run without requiering SAV.</p>
+	    <p>In the latest versions of HSC (HSC-2.x.x), <tt>Status_Files/</tt> and <tt>reports/</tt> directories in <tt>Basecalls/Data</tt> are no more created by default.
+	    This files are useful to display run statistics of working run without requiring SAV.</p>
 	    <p>You can force the creation of the directories by editing the <tt>C:\Illumina\RTA\Configs\HiSeq.Configuration.xml</tt> file and adding the following line :
 		<tt>&lt;SaveHtmReportFiles&gt;true&lt;/SaveHtmReportFiles&gt;</tt>. This can be added at the first level, within the <tt>&lt;RTAConfiguration&gt;</tt> tags.
 	</p>

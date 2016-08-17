@@ -74,9 +74,10 @@
 
 				<item name="Quality Control" href="/quality-control.html" collapse="true">
 					<item name="Global tests" href="/qc-global-tests.html"/>
-					<item name="Lanes tests" href="/qc-lanes-tests.html"/>
-					<item name="Projects tests" href="/qc-projects-tests.html"/>
-					<item name="Samples tests" href="/qc-samples-tests.html"/>
+					<item name="Lane tests" href="/qc-lanes-tests.html"/>
+					<item name="Project tests" href="/qc-projects-tests.html"/>
+					<item name="Sample tests" href="/qc-samples-tests.html"/>
+					<item name="Pooled sample tests" href="/qc-pooledsamples-tests.html"/>
 				</item>
 
 			</item>

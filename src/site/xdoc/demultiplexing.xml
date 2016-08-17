@@ -35,7 +35,7 @@
 	 <section name="The demultiplexing step">
 
      <p>This step allows to launch demultiplexing using bcl2fastq 2. Aozan can use samplesheets in XLS format or generated
-     by an external tool in addition of samplesheets in CSV format. Using samplesheet in XLS format allows
+     by an external tool in addition of samplesheets in CSV format. Using a samplesheet in XLS format allows
      to use aliases for adapter sequence indexes.
      <br/><a href="./samplesheet_SNL110_template.xls" target="_blank">Here is an example of a bcl2fastq samplesheet file.</a></p>
 
