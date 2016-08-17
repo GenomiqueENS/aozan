@@ -73,11 +73,6 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
     return COLLECTOR_NAME;
   }
 
-  @Override
-  public boolean isStatisticCollector() {
-    return false;
-  }
-
   /**
    * Collectors to execute before fastqscreen Collector.
    * @return list of names collector

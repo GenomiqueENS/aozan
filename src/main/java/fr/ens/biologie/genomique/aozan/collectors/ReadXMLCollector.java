@@ -247,11 +247,6 @@ class ReadXMLCollector implements Collector {
   }
 
   @Override
-  public boolean isStatisticCollector() {
-    return false;
-  }
-
-  @Override
   public List<String> getCollectorsNamesRequiered() {
     return ImmutableList.of(RunInfoCollector.COLLECTOR_NAME);
   }

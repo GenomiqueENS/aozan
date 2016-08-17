@@ -55,11 +55,6 @@ public class AozanCollector implements Collector {
   }
 
   @Override
-  public boolean isStatisticCollector() {
-    return false;
-  }
-
-  @Override
   public void configure(final QC qc, final CollectorConfiguration conf) {
     // Nothing to do
 

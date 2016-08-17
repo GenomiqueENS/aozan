@@ -67,11 +67,6 @@ public abstract class StatisticsCollector implements Collector {
   private Map<String, List<File>> fastqScreenReportFiles = new HashMap<>();
 
   @Override
-  public boolean isStatisticCollector() {
-    return true;
-  }
-
-  @Override
   public List<String> getCollectorsNamesRequiered() {
 
     // UndeterminedIndexesCollector and FastqScreenCollector is optional for
