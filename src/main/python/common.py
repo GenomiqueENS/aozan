@@ -1110,6 +1110,7 @@ def load_conf(conf, conf_file_path):
     converting_table_key['qc.conf.fastqscreen.settings.mappers.indexes.path'] = Settings.QC_CONF_FASTQSCREEN_MAPPERS_INDEXES_PATH_KEY
     converting_table_key['qc.conf.fastqscreen.mapper.argument'] = Settings.QC_CONF_FASTQSCREEN_MAPPER_ARGUMENT_KEY
     converting_table_key['qc.conf.fastqscreen.mapping.ignore.paired.mode'] = Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_END_MODE_KEY
+    converting_table_key['qc.conf.fastqscreen.percent.contamination.threshold'] = Settings.QC_CONF_FASTQSCREEN_PERCENT_PROJECT_CONTAMINATION_THRESHOLD_KEY
 
     converting_table_key['qc.conf.ignore.paired.mode'] = Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY
     converting_table_key['qc.conf.max.reads.parsed'] = Settings.QC_CONF_FASTQSCREEN_FASTQ_MAX_READS_PARSED_KEY

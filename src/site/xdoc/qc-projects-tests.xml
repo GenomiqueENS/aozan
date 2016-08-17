@@ -103,7 +103,7 @@
 	         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
 	         <tr><td>qc.conf.fastqscreen.project.xsl.file</td><td>string</td><td>Not set</td>
 	         	<td>Path to a specific stylesheet file to edit the fastqscreen report html, instead of the file per default</td></tr>
-	         <tr><td>qc.conf.fastqscreen.percent.contamination.threshold</td><td>double</td><td>0.10</td>
+	         <tr><td>qc.conf.fastqscreen.project.contamination.percent.threshold</td><td>double</td><td>0.10</td>
 	         	<td>Threshold to count sample with value for test (qc.test.sample.fastqscreen.mapped.percent.enable, mapped read on data set genome contamination.)</td></tr>
 	     </table>	
 	         	

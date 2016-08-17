@@ -67,11 +67,6 @@ public abstract class StatisticsCollector implements Collector {
   private Map<String, List<File>> fastqScreenReportFiles = new HashMap<>();
 
   @Override
-  public boolean isStatisticCollector() {
-    return true;
-  }
-
-  @Override
   public List<String> getCollectorsNamesRequiered() {
 
     // UndeterminedIndexesCollector and FastqScreenCollector is optional for
@@ -103,7 +98,7 @@ public abstract class StatisticsCollector implements Collector {
 
     // Extract threshold from property
     final String threshod = conf
-        .get(Settings.QC_CONF_FASTQSCREEN_PERCENT_CONTAMINATION_THRESHOLD_KEY);
+        .get(Settings.QC_CONF_FASTQSCREEN_PERCENT_PROJECT_CONTAMINATION_THRESHOLD_KEY);
 
     // Set the contaminant threshold
     if (threshod == null || threshod.isEmpty()) {
