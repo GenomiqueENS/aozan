@@ -262,7 +262,7 @@ def launch_steps(conf):
     """
 
     # Discover new runs
-    hiseq_run_ids_done = detection_new_run.discover_new_run(conf)
+    hiseq_run_ids_done = detection_new_run.discover_new_runs(conf)
 
     # Load run do not process
     hiseq_run_ids_do_not_process = hiseq_run.load_deny_run_ids(conf)

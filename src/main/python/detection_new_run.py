@@ -43,7 +43,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
     common.add_run_id(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + DONE_FILE, conf)
 
 
-def get_available_run_ids(conf):
+def get_available_new_run_ids(conf):
     """Get the list of the available runs.
 
     Arguments:
@@ -82,7 +82,7 @@ def get_available_run_ids(conf):
     return result
 
 
-def discover_new_run(conf):
+def discover_new_runs(conf):
     """Discover new runs.
 
     Arguments:
@@ -96,7 +96,7 @@ def discover_new_run(conf):
     run_already_discovered = load_processed_run_ids(conf)
 
     if common.is_conf_value_equals_true(FIRST_BASE_REPORT_STEP_KEY, conf):
-        for run_id in (get_available_run_ids(conf) - run_already_discovered):
+        for run_id in (get_available_new_run_ids(conf) - run_already_discovered):
             aozan.welcome(conf)
             common.log('INFO',
                        'First base report ' + run_id + ' on sequencer ' + common.get_instrument_name(run_id, conf),
@@ -112,7 +112,7 @@ def discover_new_run(conf):
     # Discover hiseq run done
     #
 
-    return detection_end_run.discovery_run(conf)
+    return detection_end_run.discover_termined_runs(conf)
 
 
 def send_report(run_id, conf):

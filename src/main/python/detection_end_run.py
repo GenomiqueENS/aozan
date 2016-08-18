@@ -49,7 +49,27 @@ def error(short_message, message, conf):
     common.error('[Aozan] hiseq done: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/hiseq.lasterr', conf)
 
 
-def discovery_run(conf):
+def get_available_terminated_run_ids(conf):
+    """Get the list of the available runs.
+
+    Arguments:
+        conf: configuration dictionary
+    """
+
+    result = set()
+
+    for hiseq_data_path in get_hiseq_data_paths(conf):
+
+        files = os.listdir(hiseq_data_path)
+        for f in files:
+            if os.path.isdir(hiseq_data_path + '/' + f) and \
+                    check_run_id(f, conf) and \
+                    check_end_run(f, conf):
+                result.add(f)
+
+    return result
+
+def discover_termined_runs(conf):
     """Discover new ended runs
 
     Arguments:
@@ -59,7 +79,7 @@ def discovery_run(conf):
     run_ids_done = load_processed_run_ids(conf)
 
     if common.is_conf_value_equals_true(HISEQ_STEP_KEY, conf):
-        for run_id in (hiseq_run.get_available_run_ids(conf) - run_ids_done):
+        for run_id in (get_available_terminated_run_ids(conf) - run_ids_done):
 
             if run_id is None or len(run_id) == 0:
                 # No run id found

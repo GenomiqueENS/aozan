@@ -130,27 +130,6 @@ def check_run_id(run_id, conf):
     return True
 
 
-def get_available_run_ids(conf):
-    """Get the list of the available runs.
-
-    Arguments:
-        conf: configuration dictionary
-    """
-
-    result = set()
-
-    for hiseq_data_path in get_hiseq_data_paths(conf):
-
-        files = os.listdir(hiseq_data_path)
-        for f in files:
-            if os.path.isdir(hiseq_data_path + '/' + f) and \
-                    check_run_id(f, conf) and \
-                    check_end_run(f, conf):
-                result.add(f)
-
-    return result
-
-
 def get_working_run_ids(conf):
     """Get the list of the workfing runs.
 
