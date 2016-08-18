@@ -78,10 +78,31 @@
 			</a></p>
 		</section>
 
+		<section name="Supported devices">
+			<p>Aozan can handle the output of many Illumina sequencer models, however not all the models of Illumina sequencers has been tested with Aozan. As Illumina sequencer outputs are very similar, Aozan may work with most of the Illumina sequencers.
+                           You can <a href="mailto:aozan@biologie.ens.fr">contact us</a> to tell us if your sequencer model is compatible with Aozan.</p>
+
+                        <table>
+                            <tr><th>Model</th><th>Support status</th></tr>
+                            <tr><td>HiSeq 1000</td><td>Supported and tested</td></tr>
+                            <tr><td>HiSeq 1500</td><td>Supported and tested</td></tr>
+                            <tr><td>HiSeq 2000</td><td>Supported and tested</td></tr>
+                            <tr><td>HiSeq 2500</td><td>Supported and tested</td></tr>
+                            <tr><td>NextSeq 500</td><td>Supported and tested</td></tr>
+                            <tr><td>HiSeq 3000</td><td>May work as output data is very similar to NextSeq 500</td></tr>
+                            <tr><td>HiSeq 4000</td><td>May work as output data is very similar to NextSeq 500</td></tr>
+                            <tr><td>HiSeq X</td><td>Unknown</td></tr>
+                            <tr><td>MySeq</td><td>Unknown</td></tr>
+                            <tr><td>MiniSeq</td><td>Unknown</td></tr>
+                        </table>
+		</section>
+
+
 		<section name="Sample sheet validator">
 			<p>We also provide a <a href="http://outils.genomique.biologie.ens.fr/samplesheetvalidator/" target="_blank">Bcl2fastq samplesheet validator</a>
 			to help the users in checking their run samplesheet. This tool uses only html and javascript. <u>Not a single  data is sent</u> to our servers when you use this tool.</p>
 		</section>
+
 
 		<section name="What's new in Aozan?">
 
