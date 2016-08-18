@@ -202,6 +202,15 @@ def send_mail_if_critical_free_space_available(conf):
 
 
 def get_hiseq_data_paths(conf):
+    """Get the hiseq data path from the Aozan configuration.
+
+    Arguments:
+        conf: configuration dictionary
+
+    Returns:
+        a list of strings with the path of the hiseq output directories
+    """
+
     paths = conf[HISEQ_DATA_PATH_KEY].split(':')
 
     for i in range(len(paths)):
@@ -211,6 +220,16 @@ def get_hiseq_data_paths(conf):
 
 
 def find_hiseq_run_path(run_id, conf):
+    """Find the path of run in the hiseq output directories.
+
+    Arguments:
+        run_id: the run id to search
+        conf: configuration dictionary
+
+    Returns:
+        The path of the run or None if not found
+    """
+
     for path in get_hiseq_data_paths(conf):
 
         path_to_test = path.strip() + '/' + run_id
@@ -245,7 +264,7 @@ def check_end_run(run_id, conf):
 
     # File generate only by HiSeq sequencer
     for i in range(reads_number):
-        file_to_test = hiseq_data_path + '/' + run_id + '/' + build_read_complete_filename(run_id, i, conf)
+        file_to_test = hiseq_data_path + '/' + run_id + '/' + _build_read_complete_filename(run_id, i, conf)
 
         if not os.path.exists(file_to_test):
             return False
@@ -273,7 +292,7 @@ def check_end_run_since(run_id, secs, conf):
     last = 0
 
     for i in range(reads_number):
-        file_to_test = hiseq_data_path + '/' + run_id + '/' + build_read_complete_filename(run_id, i, conf)
+        file_to_test = hiseq_data_path + '/' + run_id + '/' + _build_read_complete_filename(run_id, i, conf)
         if not os.path.exists(file_to_test):
             common.log('SEVERE', 'DEBUG: check file on end run is not found ' + str(file_to_test), conf)
             return -2
@@ -288,7 +307,7 @@ def check_end_run_since(run_id, secs, conf):
     return 0
 
 
-def build_read_complete_filename(run_id, i, conf):
+def _build_read_complete_filename(run_id, i, conf):
     if common.get_rta_major_version(run_id, conf) == 1:
         return 'Basecalling_Netcopy_complete_Read' + str(i + 1) + '.txt'
 

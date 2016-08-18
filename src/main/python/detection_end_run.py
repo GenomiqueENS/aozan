@@ -14,6 +14,7 @@ from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
 import cmd
 
 DONE_FILE = 'hiseq.done'
+MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL = 12 * 3600
 
 
 def load_processed_run_ids(conf):
@@ -90,7 +91,7 @@ def discover_termined_runs(conf):
                        conf)
 
             if create_run_summary_reports(run_id, conf):
-                send_mail_if_recent_run(run_id, 12 * 3600, conf)
+                send_mail_if_recent_run(run_id, MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL, conf)
                 add_run_id_to_processed_run_ids(run_id, conf)
                 run_ids_done.add(run_id)
             else:
@@ -100,6 +101,14 @@ def discover_termined_runs(conf):
 
 
 def send_mail_if_recent_run(run_id, secs, conf):
+    """Send an email to inform that a new run has been terminated.
+
+    Arguments:
+        run_id: run id
+        secs: maximum delay since the end of the run
+        conf: configuration object
+    """
+
     run_path = find_hiseq_run_path(run_id, conf)
     if run_path is False:
         return
