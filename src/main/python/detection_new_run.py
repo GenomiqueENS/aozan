@@ -74,7 +74,7 @@ def get_available_run_ids(conf):
                     not os.path.exists(hiseq_data_path + '/' + FIRST_BASE_REPORT_FILE):
                 continue
 
-            if not detection_end_run.check_end_run(f, conf):
+            if not hiseq_run.check_end_run(f, conf):
                 # TODO
                 # os.path.exists(hiseq_data_path + '/' + f + '/First_Base_Report.htm'):
                 result.add(f)

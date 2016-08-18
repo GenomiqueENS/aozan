@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os, time
+import os, os.path, time
 import stat, hiseq_run, aozan
 from xml.etree.ElementTree import ElementTree
 
@@ -12,7 +12,6 @@ from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
 import cmd
-from pickle import FALSE
 
 DONE_FILE = 'hiseq.done'
 
@@ -80,88 +79,12 @@ def discovery_run(conf):
     return run_ids_done
 
 
-def check_end_run(run_id, conf):
-    """Check the end of a run data transfer.
-
-    Arguments:
-        run_id: the run id
-        conf: configuration dictionary
-    """
-
-    hiseq_data_path = hiseq_run.find_hiseq_run_path(run_id, conf)
-    reads_number = hiseq_run.get_read_count(run_id, conf)
-
-    # TODO
-    if hiseq_data_path is False:
-        return False
-
-    # if reads_number equals -1, runParameters.xml is missing
-    if reads_number == -1:
-        return False
-
-    prefix, suffix = ('Basecalling_Netcopy_complete_Read', '.txt') if (
-        common.get_rta_major_version(run_id, conf) == 1) else (
-        'RTARead', 'Complete.txt')
-
-    # File generate only by HiSeq sequencer
-    for i in range(reads_number):
-        filename = prefix + str(i + 1) + suffix
-
-        if not os.path.exists(hiseq_data_path + '/' + run_id + '/' + filename):
-            return False
-
-    if not os.path.exists(hiseq_data_path + '/' + run_id + '/RTAComplete.txt'):
-        return False
-
-    return True
-
-
-def check_end_run_since(run_id, secs, conf):
-    """Check the end of a run data transfert since a number of seconds.
-
-    Arguments:
-        run_id: the run id
-        secs: maximal number of seconds
-        conf: configuration dictionary
-    """
-
-    hiseq_data_path = hiseq_run.find_hiseq_run_path(run_id, conf)
-    if hiseq_data_path is False:
-        return -1
-
-    reads_number = hiseq_run.get_read_count(run_id, conf)
-    last = 0
-
-    for i in range(reads_number):
-        file_to_test = hiseq_data_path + '/' + run_id + '/' + build_read_complete(run_id, i, conf)
-        if not os.path.exists(file_to_test):
-            print "DEBUG: check file on end run is not found " + str(file_to_test)
-            return -2
-        else:
-            m_time = os.stat(file_to_test).st_mtime
-            if m_time > last:
-                last = m_time
-
-    if (time.time() - last) < secs:
-        return last
-
-    return 0
-
-
-def build_read_complete(run_id, i, conf):
-    if common.get_rta_major_version(run_id, conf) == 1:
-        return 'Basecalling_Netcopy_complete_Read' + str(i + 1) + '.txt'
-
-    else:
-        return 'RTARead' + str(i + 1) + 'Complete.txt'
-
-
 def send_mail_if_recent_run(run_id, secs, conf):
     run_path = find_hiseq_run_path(run_id, conf)
     if run_path is False:
         return
 
-    last = detection_end_run.check_end_run_since(run_id, secs, conf)
+    last = hiseq_run.check_end_run_since(run_id, secs, conf)
 
     if last > 0:
         df = common.df(run_path) / (1024 * 1024 * 1024)
