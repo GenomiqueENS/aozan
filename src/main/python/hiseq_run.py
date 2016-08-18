@@ -234,7 +234,7 @@ def send_mail_if_recent_run(run_id, secs, conf):
         du = common.du(run_path + '/' + run_id) / (1024 * 1024 * 1024)
         common.send_msg('[Aozan] End of the run ' + run_id + ' on ' + common.get_instrument_name(run_id, conf),
                         'A new run (' + run_id + ') has been terminated on ' +
-                        common.get_instrument_name(run_id, conf) + 'at ' + common.time_to_human_readable(last) + '.\n' +
+                        common.get_instrument_name(run_id, conf) + ' at ' + common.time_to_human_readable(last) + '.\n' +
                         'Data for this run can be found at: ' + run_path +
                         '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df), False, conf)
 
