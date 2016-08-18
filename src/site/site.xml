@@ -30,7 +30,7 @@
 	<bannerLeft>
 		<name>ENS</name>
 		<src>images/logo_genomicpariscentre-90pxh.png</src>
-		<href>http://transcriptome.ens.fr/sgdb</href>
+		<href>https://www.genomique.biologie.ens.fr/</href>
 	</bannerLeft>
 	<bannerRight>
 		<name>Aozan</name>
@@ -40,7 +40,7 @@
 	<body>
 		<links>
 			<item name="Genomic Paris Centre"
-				href="http://transcriptome.ens.fr" />
+				href="https://www.genomique.biologie.ens.fr" />
 			<item name="École normale supérieure"
 				href="http://www.ens.fr" />
 		</links>

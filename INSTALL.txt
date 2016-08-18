@@ -3,4 +3,4 @@ INSTALLING Aozan
 
   To install Aozan, see the documentation on our website :
 
-    http://transcriptome.ens.fr/aozan
+    http://outils.genomique.biologie.ens.fr/aozan

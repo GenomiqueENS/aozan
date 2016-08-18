@@ -41,7 +41,7 @@
       <ul>
         <li><a href="download.html">Download Aozan</a> on our website.</li>
 
-		<source>$ wget http://transcriptome.ens.fr/aozan/aozan-@@@VERSION@@@.tar.gz</source>
+		<source>$ wget @@@WEBSITE@@@/aozan-@@@VERSION@@@.tar.gz</source>
 
         <li>Unzip the archive where you want install the software.</li>
 

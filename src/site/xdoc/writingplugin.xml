@@ -84,7 +84,7 @@ $ mvn archetype:generate \
   -DgroupId=com.example  \
   -DartifactId=myaozanplugin \
   -Dversion=0.1-alpha-1 \
-  -Durl=http://transcriptome.ens.fr/aozanplugin \
+  -Durl=http://example.com/aozanplugin \
   -DinteractiveMode=false
 </source>
 

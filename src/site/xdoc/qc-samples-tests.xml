@@ -190,8 +190,8 @@
 		<p>To avoid too long computation, the mapping on genomes is limited to a small set of the reads of the FASTQ files.
 		By default 200,000 reads PF (passing illumina filters) are used for each sample (It's enough for estimate the contamination in a sample).</p>
 
-		<p>Aozan reuses <a href="http://transcriptome.ens.fr/eoulsan"  target="_blank">Eoulsan</a> to handle alignments and
-especially the <a href="http://transcriptome.ens.fr/eoulsan/datarepositories.html" target="_blank">repository system for genomes and genomes indexes</a>.</p>
+		<p>Aozan reuses <a href="http://outils.genomique.biologie.ens.fr/eoulsan"  target="_blank">Eoulsan</a> to handle alignments and
+especially the <a href="http://outils.genomique.biologie.ens.fr/eoulsan/datarepositories.html" target="_blank">repository system for genomes and genomes indexes</a>.</p>
 
 		<p>If no FastQ Screen test property is set, FastQ Screen will not be launch on FASTQ data.</p>
 

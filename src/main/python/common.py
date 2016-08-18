@@ -727,12 +727,10 @@ def create_html_index_file(conf, run_id, sections):
             write_lines = True
 
         elif write_lines is True:
-            if '${RUN_ID}' in line:
-                result += line.replace('${RUN_ID}', run_id) + '\n'
-            elif '${VERSION}' in line:
-                result += line.replace('${VERSION}', Globals.APP_VERSION_STRING) + '\n'
-            else:
-                result += line + '\n'
+            result += line.replace('${RUN_ID}', run_id). \
+                           replace('${APP_NAME}', Globals.APP_NAME). \
+                           replace('${VERSION}', Globals.APP_VERSION_STRING). \
+                           replace('${WEBSITE}', Globals.WEBSITE_URL) + '\n'
 
     f_out = open(output_file_path, 'w')
     f_out.write(result)

@@ -88,7 +88,7 @@
 		  Executing these tasks after each sequencing process is a laborious job. Aozan allows to
 		  save time by automate all these tasks. In addition, Aozan provide a Bcl2fastq CSV samplesheet generator
 		  from an XLS file to avoid common syntax errors in the CSV file and to allow usage of alias for the index
-		  sequences. This tool is available <a href="http://transcriptome.ens.fr/designvalidator">here</a>.
+		  sequences. This tool is available <a href="http://outils.genomique.biologie.ens.fr/samplesheetvalidator/">here</a>.
 		  </p>
 		</section>
 
