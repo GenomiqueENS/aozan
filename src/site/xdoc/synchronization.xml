@@ -36,7 +36,7 @@
 
 <section name="Synchronization step">
 
-    <p>This step copy output run files from the HiSeq computer to another place (usually a safe storage).
+    <p>This step copies output run files from the HiSeq computer to another place (usually a safe storage).
     On a HiSeq sequencer, CIF files can be excluded from the copy.</p>
 
        <h4>Configuration parameters</h4>

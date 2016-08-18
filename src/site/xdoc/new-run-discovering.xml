@@ -33,10 +33,10 @@
 	<body>
 		<section name="New run discovering step">
      
-     	<p>This step check if a new run is currently running.
-     	   With a HiSeq sequencer if the first base report has been generated, if true send an email with the first base report. 
-     	   With a NextSeq sequencer, first base report has not been generated, Aozan check existence on first file created by sequence.
-     		If true send an email with main feature on the new run. 
+     	<p>This step checks if a new run is currently running.
+     	   With a HiSeq sequencer if the first base report has been generated, if true, sends an email with the first base report. 
+     	   With a NextSeq sequencer, first base report has not been generated, Aozan checks existence on first file created by sequence.
+     		If true sends an email with main feature on the new run. 
      		</p>
 
      	<h4>Configuration parameters</h4>
