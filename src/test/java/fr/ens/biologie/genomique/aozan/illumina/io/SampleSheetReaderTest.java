@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.python.google.common.base.Strings;
@@ -47,8 +48,8 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVWriter;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetXLSReader;
+import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetXLSXReader;
 import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
-import org.junit.Assert;
 
 public class SampleSheetReaderTest {
 
@@ -103,17 +104,29 @@ public class SampleSheetReaderTest {
           + "2015_068,TGACCA,Project_A2015,Description,arabidopsis,2,GATGTG,H9RLKADXX,N,R1,plateform\n"
           + "2015_069,GCCAAT,Project_A2015,Description,arabidopsis,2,TAGAGT,H9RLKADXX,N,R1,plateform";
 
-  private static final String SAMPLESHEET_BCL2FASTQ_V2_FILENAME =
+  private static final String SAMPLESHEET_XLS_BCL2FASTQ_V2_FILENAME =
       "samplesheet_version_bcl2fastq2.xls";
 
-  private static final String SAMPLESHEET_DUALINDEX_BCL2FASTQ_V2_FILENAME =
+  private static final String SAMPLESHEET_XLS_DUALINDEX_BCL2FASTQ_V2_FILENAME =
       "samplesheet_version_bcl2fastq2_v2.xls";
 
-  private static final String SAMPLESHEET_WITH_HEADER_BCL2FASTQ_V2_FILENAME =
+  private static final String SAMPLESHEET_XLS_WITH_HEADER_BCL2FASTQ_V2_FILENAME =
       "samplesheet_short_bcl2fastq2.xls";
 
-  private static final String SAMPLESHEET_BCL2FASTQ_V1_FILENAME =
+  private static final String SAMPLESHEET_XLS_BCL2FASTQ_V1_FILENAME =
       "design_version_bcl2fastq.xls";
+
+  private static final String SAMPLESHEET_XLSX_BCL2FASTQ_V2_FILENAME =
+      "samplesheet_version_bcl2fastq2.xlsx";
+
+  private static final String SAMPLESHEET_XLSX_DUALINDEX_BCL2FASTQ_V2_FILENAME =
+      "samplesheet_version_bcl2fastq2_v2.xlsx";
+
+  private static final String SAMPLESHEET_XLSX_WITH_HEADER_BCL2FASTQ_V2_FILENAME =
+      "samplesheet_short_bcl2fastq2.xlsx";
+
+  private static final String SAMPLESHEET_XLSX_BCL2FASTQ_V1_FILENAME =
+      "design_version_bcl2fastq.xlsx";
 
   private static final String SAMPLESHEET_CSV = "samplesheet.csv";
 
@@ -121,22 +134,30 @@ public class SampleSheetReaderTest {
   private File outputFile;
 
   @Test
-  public void testReadsWithHeaderVersion2() {
+  public void testReadsXLSWithHeaderVersion2() {
 
-    testSampleSheet(SAMPLESHEET_WITH_HEADER_BCL2FASTQ_V2_FILENAME, 2,
+    testSampleSheet(SAMPLESHEET_XLS_WITH_HEADER_BCL2FASTQ_V2_FILENAME, "xls", 2,
         EXPECTED_WIHTHEADER_SMALLER_CSV, false);
   }
 
+  @Test
+  public void testReadsXLSXWithHeaderVersion2() {
+
+    testSampleSheet(SAMPLESHEET_XLSX_WITH_HEADER_BCL2FASTQ_V2_FILENAME, "xlsx",
+        2, EXPECTED_WIHTHEADER_SMALLER_CSV, false);
+  }
+
   private void testSampleSheet(final String samplesheetFileToTest,
-      final int version, final String expectedDataName,
-      final boolean withLane) {
+      final String samplesheetType, final int version,
+      final String expectedDataName, final boolean withLane) {
 
     final File samplesheet = new File(path, samplesheetFileToTest);
 
     int laneNumber = (withLane ? 2 : -1);
 
     // Create CSV file
-    convertSamplesheetToCSV(samplesheet, outputFile, 0, version);
+    convertSamplesheetToCSV(samplesheet, samplesheetType, outputFile, 0,
+        version);
 
     // Load sample sheet CSV
     final SampleSheet samplesheetTested =
@@ -173,21 +194,48 @@ public class SampleSheetReaderTest {
   @Test
   public void testReadsXLSVersion2WithoutLaneColumnToCreate() {
 
-    testSampleSheet(SAMPLESHEET_BCL2FASTQ_V2_FILENAME, 2, EXPECTED_CSV, false);
+    testSampleSheet(SAMPLESHEET_XLS_BCL2FASTQ_V2_FILENAME, "xls", 2,
+        EXPECTED_CSV, false);
   }
 
   @Test
   public void testReadsXLSVersion2WithLaneColumnToCreate() {
 
-    testSampleSheet(SAMPLESHEET_BCL2FASTQ_V2_FILENAME, 2, EXPECTED_CSV_FULL,
-        true);
+    testSampleSheet(SAMPLESHEET_XLS_BCL2FASTQ_V2_FILENAME, "xls", 2,
+        EXPECTED_CSV_FULL, true);
 
   }
 
   @Test
   public void testReadsXLSVersion2DualIndexWithLaneColumnToCreate() {
 
-    testSampleSheet(SAMPLESHEET_DUALINDEX_BCL2FASTQ_V2_FILENAME, 2,
+    testSampleSheet(SAMPLESHEET_XLS_DUALINDEX_BCL2FASTQ_V2_FILENAME, "xls", 2,
+        EXPECTED_FULL_WITH_DUALINDEX_CSV, true);
+  }
+
+  /**
+   * Reads xlsx sample sheet file and check sample sheet instance is the same
+   * that expected, with right converting index sequences.
+   */
+  @Test
+  public void testReadsXLSXVersion2WithoutLaneColumnToCreate() {
+
+    testSampleSheet(SAMPLESHEET_XLSX_BCL2FASTQ_V2_FILENAME, "xlsx", 2,
+        EXPECTED_CSV, false);
+  }
+
+  @Test
+  public void testReadsXLSXVersion2WithLaneColumnToCreate() {
+
+    testSampleSheet(SAMPLESHEET_XLSX_BCL2FASTQ_V2_FILENAME, "xlsx", 2,
+        EXPECTED_CSV_FULL, true);
+
+  }
+
+  @Test
+  public void testReadsXLSXVersion2DualIndexWithLaneColumnToCreate() {
+
+    testSampleSheet(SAMPLESHEET_XLSX_DUALINDEX_BCL2FASTQ_V2_FILENAME, "xlsx", 2,
         EXPECTED_FULL_WITH_DUALINDEX_CSV, true);
   }
 
@@ -237,11 +285,12 @@ public class SampleSheetReaderTest {
   @Test
   public void testReadsXLSVersion1() {
 
-    final File samplesheet = new File(path, SAMPLESHEET_BCL2FASTQ_V1_FILENAME);
+    final File samplesheet =
+        new File(path, SAMPLESHEET_XLS_BCL2FASTQ_V1_FILENAME);
     final int laneCount = 2;
 
     // Create CSV file
-    convertSamplesheetToCSV(samplesheet, outputFile, laneCount, 1);
+    convertSamplesheetToCSV(samplesheet, "xls", outputFile, laneCount, 1);
 
     // Load samplesheet csv
     final SampleSheet samplesheetTested =
@@ -254,6 +303,30 @@ public class SampleSheetReaderTest {
     compareSamplesheetV1(samplesheetExpected, samplesheetTested);
   }
 
+  /**
+   * Reads xlsx samplesheet file and check samplesheet instance is the same that
+   * expected, with right converting index sequences.
+   */
+  @Test
+  public void testReadsXLSXVersion1() {
+
+    final File samplesheet =
+        new File(path, SAMPLESHEET_XLSX_BCL2FASTQ_V1_FILENAME);
+    final int laneCount = 2;
+
+    // Create CSV file
+    convertSamplesheetToCSV(samplesheet, "xlsx", outputFile, laneCount, 1);
+
+    // Load samplesheet csv
+    final SampleSheet samplesheetTested =
+        readSamplesheetCSV(outputFile, laneCount);
+
+    final Map<String, SampleSheetTest> samplesheetExpected =
+        buildSamplesheetExpected(EXPECTED_CSV_FULL, 1);
+
+    // Compare with expected content
+    compareSamplesheetV1(samplesheetExpected, samplesheetTested);
+  }
   //
   // Private methods
   //
@@ -393,14 +466,27 @@ public class SampleSheetReaderTest {
   }
 
   private void convertSamplesheetToCSV(final File samplesheet,
-      final File outputFile, final int laneCount, final int version) {
+      final String samplesheetType, final File outputFile, final int laneCount,
+      final int version) {
 
     try {
 
-      SampleSheetXLSReader reader = new SampleSheetXLSReader(samplesheet);
-      reader.setVersion(version);
+      SampleSheet result = null;
 
-      final SampleSheet result = reader.read();
+      if (samplesheetType.equals("xls")) {
+        SampleSheetXLSReader reader = new SampleSheetXLSReader(samplesheet);
+        reader.setVersion(version);
+        result = reader.read();
+
+      } else if (samplesheetType.equals("xlsx")) {
+        SampleSheetXLSXReader reader = new SampleSheetXLSXReader(samplesheet);
+        reader.setVersion(version);
+        result = reader.read();
+
+      } else {
+        throw new IOException(
+            samplesheet.getName() + " is not a " + samplesheetType + " file.");
+      }
 
       if (!result.isLaneSampleField() && laneCount > 0) {
         SampleSheetUtils.duplicateSamplesIfLaneFieldNotSet(result, laneCount);
