@@ -1094,12 +1094,10 @@ def load_conf(conf, conf_file_path):
     converting_table_key['qc.conf.blast.arguments'] = Settings.QC_CONF_FASTQC_BLAST_ARGUMENTS_KEY
     converting_table_key['qc.conf.blast.db.path'] = Settings.QC_CONF_FASTQC_BLAST_DB_PATH_KEY
     converting_table_key['qc.conf.blast.path'] = Settings.QC_CONF_FASTQC_BLAST_PATH_KEY
-    converting_table_key['qc.conf.blast.version.expected'] = Settings.QC_CONF_FASTQC_BLAST_VERSION_EXPECTED_KEY
     converting_table_key['qc.conf.step.blast.enable'] = Settings.QC_CONF_FASTQC_BLAST_ENABLE_KEY
     converting_table_key['qc.conf.fastqscreen.blast.arguments'] = Settings.QC_CONF_FASTQC_BLAST_ARGUMENTS_KEY
     converting_table_key['qc.conf.fastqscreen.blast.db.path'] = Settings.QC_CONF_FASTQC_BLAST_DB_PATH_KEY
     converting_table_key['qc.conf.fastqscreen.blast.path'] = Settings.QC_CONF_FASTQC_BLAST_PATH_KEY
-    converting_table_key['qc.conf.fastqscreen.blast.version.expected'] = Settings.QC_CONF_FASTQC_BLAST_VERSION_EXPECTED_KEY
     converting_table_key['qc.conf.fastqscreen.blast.enable'] = Settings.QC_CONF_FASTQC_BLAST_ENABLE_KEY
 
     converting_table_key['qc.conf.fastqscreen.settings.genomes'] = Settings.QC_CONF_FASTQSCREEN_GENOMES_PATH_KEY

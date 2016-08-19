@@ -210,9 +210,6 @@ public final class Settings {
   /** Collector FastQC blast path. */
   public static final String QC_CONF_FASTQC_BLAST_PATH_KEY =
       "qc.conf.fastqc.blast.path";
-  /** Collector FastQC blast version expected. */
-  public static final String QC_CONF_FASTQC_BLAST_VERSION_EXPECTED_KEY =
-      "qc.conf.fastqc.blast.version.expected";
 
   /** Collector cluster density ratio. */
   public static final String QC_CONF_CLUSTER_DENSITY_RATIO_KEY =

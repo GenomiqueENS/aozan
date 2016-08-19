@@ -162,8 +162,6 @@
 	         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
 			 <tr><td>qc.conf.fastqc.blast.enable</td><td>boolean</td><td>false</td><td>Enable the blast search if not hit found for an overrepresented sequence</td></tr>
 	         <tr><td>qc.conf.fastqc.blast.path</td><td>string</td><td>/usr/bin/blastn</td><td>Path to blastn, it can run blastn from ncbi-blast+ or blastall.</td></tr>
-	         <tr><td>qc.conf.fastqc.blast.version.expected</td><td>string</td><td>blastn 2.2.28+</td><td>Blast version: field &lt;BlastOutput_version&gt; in xml file.
-	         	In log file, an entry is added if it is different the local version</td></tr>
 	         <tr><td>qc.conf.fastqc.blast.db.path</td><td>string</td><td>/home/aozan/ncbi_database_nt/nt</td><td>Path to the database nt (where is located nt.nal file)</td></tr>
 	         <tr><td>qc.conf.fastqc.blast.arguments</td><td>string</td><td>Not set</td><td>Blast parameters. DO NOT use the following blast options: -d (blastn), -db (path to database),
 	         	-outfmt (output type, must be in xml) and -num-threads (number processor)</td></tr>

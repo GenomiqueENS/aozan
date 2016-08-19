@@ -90,7 +90,6 @@ public class OverrepresentedSequencesBlast {
   private static final String HIT_TAG = "Hit";
   private static final String QUERY_LENGTH_TAG = "Iteration_query-len";
   private static final String QUERY_DEF_TAG = "Iteration_query-def";
-  private static final String BLAST_VERSION_TAG = "BlastOutput_version";
 
   private static volatile OverrepresentedSequencesBlast singleton;
 
@@ -104,7 +103,6 @@ public class OverrepresentedSequencesBlast {
   private boolean firstCall = true;
 
   private CommandLine blastCommonCommandLine;
-  private String blastVersionExpected;
   private Set<String> submittedSequences = new HashSet<>();
 
   //
@@ -128,10 +126,6 @@ public class OverrepresentedSequencesBlast {
             .trim().toLowerCase());
 
     if (stepEnabled) {
-
-      // Check parameters
-      this.blastVersionExpected =
-          conf.get(Settings.QC_CONF_FASTQC_BLAST_VERSION_EXPECTED_KEY);
 
       this.tmpPath = conf.get(QC.TMP_DIR);
 
@@ -456,17 +450,6 @@ public class OverrepresentedSequencesBlast {
   private void parseHeaderDocument(final Document doc) {
 
     if (this.firstCall) {
-
-      final String version = extractFirstValueToString(doc, BLAST_VERSION_TAG);
-
-      // Check version xml file
-      if (!this.blastVersionExpected.equals(version)) {
-        LOGGER.warning("FastQC: the blast  version in the xml output file ("
-            + version + ") is not the expected version ("
-            + this.blastVersionExpected + ")");
-      } else {
-        LOGGER.info("FastQC-step blastn : blast version " + version);
-      }
 
       final String parameters = "Parameters_expect="
           + extractFirstValueToString(doc, "Parameters_expect")
