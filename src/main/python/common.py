@@ -56,8 +56,8 @@ from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_SAMPLESHEETS_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_COMPRESSION_KEY
 from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_USE_DOCKER_KEY
-from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_PATH_KEY
-from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY
+from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQC_BLAST_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQC_BLAST_ENABLE_KEY
 
 from fr.ens.biologie.genomique.aozan.util import StringUtils
 
@@ -840,10 +840,10 @@ def check_configuration(conf, configuration_file_path):
     # # For step QC
     if Settings.QC_STEP_KEY in steps_to_launch:
         # Check path to blast if step enable
-        if is_conf_value_equals_true(QC_CONF_FASTQSCREEN_BLAST_ENABLE_KEY, conf) and not is_file_exists(
-                QC_CONF_FASTQSCREEN_BLAST_PATH_KEY, conf):
+        if is_conf_value_equals_true(QC_CONF_FASTQC_BLAST_ENABLE_KEY, conf) and not is_file_exists(
+                QC_CONF_FASTQC_BLAST_PATH_KEY, conf):
             msg += '\n\t* Blast enabled but blast file path does not exists: ' + conf[
-                QC_CONF_FASTQSCREEN_BLAST_PATH_KEY]
+                QC_CONF_FASTQC_BLAST_PATH_KEY]
 
     if len(msg) > 0:
         msg = 'Error(s) found in Aozan configuration file (' + os.path.abspath(configuration_file_path) + '):' + msg
@@ -1108,21 +1108,21 @@ def load_conf(conf, conf_file_path):
     converting_table_key['qc.conf.fastqscreen.settings.genomes.alias.path'] = Settings.QC_CONF_FASTQSCREEN_GENOMES_ALIAS_PATH_KEY
     converting_table_key['qc.conf.fastqscreen.settings.genomes.desc.path'] = Settings.QC_CONF_FASTQSCREEN_GENOMES_DESC_PATH_KEY
     converting_table_key['qc.conf.fastqscreen.settings.mappers.indexes.path'] = Settings.QC_CONF_FASTQSCREEN_MAPPERS_INDEXES_PATH_KEY
-    converting_table_key['qc.conf.fastqscreen.mapper.argument'] = Settings.QC_CONF_FASTQSCREEN_MAPPER_ARGUMENT_KEY
+    converting_table_key['qc.conf.fastqscreen.mapper.argument'] = Settings.QC_CONF_FASTQSCREEN_MAPPER_ARGUMENTS_KEY
     converting_table_key['qc.conf.fastqscreen.mapping.ignore.paired.mode'] = Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_END_MODE_KEY
     converting_table_key['qc.conf.fastqscreen.percent.contamination.threshold'] = Settings.QC_CONF_FASTQSCREEN_PERCENT_PROJECT_CONTAMINATION_THRESHOLD_KEY
 
-    converting_table_key['qc.conf.ignore.paired.mode'] = Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY
+    converting_table_key['qc.conf.ignore.paired.mode'] = Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_END_MODE_KEY
     converting_table_key['qc.conf.max.reads.parsed'] = Settings.QC_CONF_FASTQSCREEN_FASTQ_MAX_READS_PARSED_KEY
     converting_table_key['qc.conf.reads.pf.used'] = Settings.QC_CONF_FASTQSCREEN_FASTQ_READS_PF_USED_KEY
     converting_table_key['qc.conf.skip.control.lane'] = Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY
 
-    converting_table_key['qc.conf.genome.alias.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_ALIAS_PATH_KEY
-    converting_table_key['qc.conf.settings.genomes'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_KEY
+    converting_table_key['qc.conf.genome.alias.path'] = Settings.QC_CONF_FASTQSCREEN_GENOMES_ALIAS_PATH_KEY
+    converting_table_key['qc.conf.settings.genomes'] = Settings.QC_CONF_FASTQSCREEN_GENOMES_PATH_KEY
     converting_table_key[
-        'qc.conf.settings.genomes.desc.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_GENOMES_DESC_PATH_KEY
+        'qc.conf.settings.genomes.desc.path'] = Settings.QC_CONF_FASTQSCREEN_GENOMES_DESC_PATH_KEY
     converting_table_key[
-        'qc.conf.settings.mappers.indexes.path'] = Settings.QC_CONF_FASTQSCREEN_SETTINGS_MAPPERS_INDEXES_PATH_KEY
+        'qc.conf.settings.mappers.indexes.path'] = Settings.QC_CONF_FASTQSCREEN_MAPPERS_INDEXES_PATH_KEY
 
     # Converting table between old and new test names
     test_name_converting_table = {}
@@ -1363,6 +1363,6 @@ def set_default_conf(conf):
     # no detection contamination for control lane
     conf[Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY] = 'true'
     # run paired : no paired mapping
-    conf[Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_MODE_KEY] = 'true'
+    conf[Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_END_MODE_KEY] = 'true'
     # Default mapper is bowtie
     conf[Settings.QC_CONF_FASTQSCREEN_MAPPER_KEY] = 'bowtie'

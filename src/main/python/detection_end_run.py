@@ -59,13 +59,13 @@ def get_available_terminated_run_ids(conf):
 
     result = set()
 
-    for hiseq_data_path in get_hiseq_data_paths(conf):
+    for hiseq_data_path in hiseq_run.get_hiseq_data_paths(conf):
 
         files = os.listdir(hiseq_data_path)
         for f in files:
             if os.path.isdir(hiseq_data_path + '/' + f) and \
-                    check_run_id(f, conf) and \
-                    check_end_run(f, conf):
+                    hiseq_run.check_run_id(f, conf) and \
+                    hiseq_run.check_end_run(f, conf):
                 result.add(f)
 
     return result
