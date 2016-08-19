@@ -47,10 +47,10 @@ class BlastResultHit {
   private static final int MAX_QUERYCOVERT_EXPECTED = 0;
 
   // print version blast BlastOutput_version
-  private static final String tag_hitDef = "Hit_def";
-  private static final String tag_hspEValue = "Hsp_evalue";
-  private static final String tag_hspIdentity = "Hsp_identity";
-  private static final String tag_hspAlignLen = "Hsp_align-len";
+  private static final String HIT_DEF_TAG = "Hit_def";
+  private static final String HSP_EVALUE_TAG = "Hsp_evalue";
+  private static final String HSP_IDENTITY_TAG = "Hsp_identity";
+  private static final String HSP_ALIGN_LEN_TAG = "Hsp_align-len";
 
   private final boolean htmlTypeOutput;
   private final String sequence;
@@ -80,10 +80,10 @@ class BlastResultHit {
     this.queryLength = queryLength;
     this.countHits = countHits;
 
-    this.result = extractFirstValueToString(firstHit, tag_hitDef);
-    this.hspEValue = extractFirstValueToString(firstHit, tag_hspEValue);
-    final int hspIdentity = extractFirstValueToInt(firstHit, tag_hspIdentity);
-    final int hspAlignLen = extractFirstValueToInt(firstHit, tag_hspAlignLen);
+    this.result = extractFirstValueToString(firstHit, HIT_DEF_TAG);
+    this.hspEValue = extractFirstValueToString(firstHit, HSP_EVALUE_TAG);
+    final int hspIdentity = extractFirstValueToInt(firstHit, HSP_IDENTITY_TAG);
+    final int hspAlignLen = extractFirstValueToInt(firstHit, HSP_ALIGN_LEN_TAG);
     final int countGap = queryLength - hspAlignLen;
 
     this.prcIdentity = (int) ((double) hspIdentity / this.queryLength * 100);
