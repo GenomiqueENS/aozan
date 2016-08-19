@@ -261,11 +261,13 @@ def launch_steps(conf):
         a boolean. True if launch_steps() is a success.
     """
 
-    # Discover new runs
-    hiseq_run_ids_done = detection_new_run.discover_new_runs(conf)
-
     # Load run do not process
     hiseq_run_ids_do_not_process = hiseq_run.load_deny_run_ids(conf)
+
+    # Discover new runs
+    detection_new_run.discover_new_runs(hiseq_run_ids_do_not_process, conf)
+    hiseq_run_ids_done = detection_end_run.discover_termined_runs(hiseq_run_ids_do_not_process, conf)
+
 
     #
     # Sync hiseq and storage

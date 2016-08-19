@@ -14,7 +14,17 @@ from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
 import cmd
 
 DONE_FILE = 'hiseq.done'
+DENY_FILE = 'hiseq.deny'
 MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL = 12 * 3600
+
+def send_failed_run_message(run_id, conf):
+    """Send a mail to inform about a failed run.
+
+    Arguments:
+        conf: configuration dictionary
+    """
+
+    common.send_msg("[Aozan] Detected Run in Error", 'A run (' + str(run_id) + ') has been detected in error.\n', False, conf)
 
 
 def load_processed_run_ids(conf):
@@ -36,6 +46,16 @@ def add_run_id_to_processed_run_ids(run_id, conf):
     """
 
     common.add_run_id(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + DONE_FILE, conf)
+
+def add_run_id_to_denied_run_ids(run_id, conf):
+    """Add a denied run id to the list of the run ids.
+
+    Arguments:
+        run_id: The run id
+        conf: configuration dictionary
+    """
+
+    common.add_run_id(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + DENY_FILE, conf)
 
 
 def error(short_message, message, conf):
@@ -70,7 +90,7 @@ def get_available_terminated_run_ids(conf):
 
     return result
 
-def discover_termined_runs(conf):
+def discover_termined_runs(denied_runs, conf):
     """Discover new ended runs
 
     Arguments:
@@ -80,7 +100,7 @@ def discover_termined_runs(conf):
     run_ids_done = load_processed_run_ids(conf)
 
     if common.is_conf_value_equals_true(HISEQ_STEP_KEY, conf):
-        for run_id in (get_available_terminated_run_ids(conf) - run_ids_done):
+        for run_id in (get_available_terminated_run_ids(conf) - run_ids_done - denied_runs):
 
             if run_id is None or len(run_id) == 0:
                 # No run id found
@@ -89,13 +109,19 @@ def discover_termined_runs(conf):
             aozan.welcome(conf)
             common.log('INFO', 'Discover end run ' + str(run_id) + ' on ' + common.get_instrument_name(run_id, conf),
                        conf)
-
-            if create_run_summary_reports(run_id, conf):
-                send_mail_if_recent_run(run_id, MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL, conf)
-                add_run_id_to_processed_run_ids(run_id, conf)
-                run_ids_done.add(run_id)
+            common.log('INFO', 'READCOUNT ! ' + str(hiseq_run.get_read_count(run_id, conf)),
+                       conf)
+            if hiseq_run.get_read_count(run_id, conf) == 0:
+                send_failed_run_message(run_id, conf)
+                add_run_id_to_denied_run_ids(run_id, conf)
             else:
-                raise Exception('Create run summary report for new discovery run ' + run_id)
+                if create_run_summary_reports(run_id, conf):
+                    send_mail_if_recent_run(run_id, MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL, conf)
+                    add_run_id_to_processed_run_ids(run_id, conf)
+                    run_ids_done.add(run_id)
+                else:
+                    raise Exception('Create run summary report for new discovery run ' + run_id)
+
 
     return run_ids_done
 
