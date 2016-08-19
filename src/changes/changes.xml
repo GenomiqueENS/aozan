@@ -716,6 +716,9 @@
 			<action dev="firmo" type="update">
                                  Fully renamed tests, doc and classes associated with qc-tests.
 			</action>
+			<action dev="firmo" type="add">
+                                 Samplesheet files can now also be in XLSX format.
+			</action>
 		</release>
 
 	</body>
