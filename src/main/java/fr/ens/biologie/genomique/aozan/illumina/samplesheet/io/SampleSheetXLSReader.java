@@ -114,6 +114,7 @@ public class SampleSheetXLSReader implements SampleSheetReader {
 
     }
 
+    wb.close();
     this.is.close();
 
     return parser.getSampleSheet();

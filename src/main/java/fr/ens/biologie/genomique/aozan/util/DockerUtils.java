@@ -191,9 +191,6 @@ public class DockerUtils {
   // Private methods for launch Docker
   //
 
-  private void checkOSCompatibilityDocker() {
-  }
-
   /**
    * Builds the image name in depot Docker.
    * @return image name
