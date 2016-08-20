@@ -109,7 +109,7 @@ def send_mail_if_recent_run(run_id, secs, conf):
         conf: configuration object
     """
 
-    run_path = find_hiseq_run_path(run_id, conf)
+    run_path = hiseq_run.find_hiseq_run_path(run_id, conf)
     if run_path is False:
         return
 
@@ -134,7 +134,7 @@ def create_run_summary_reports(run_id, conf):
         conf: configuration dictionary
     """
 
-    hiseq_data_path = find_hiseq_run_path(run_id, conf)
+    hiseq_data_path = hiseq_run.find_hiseq_run_path(run_id, conf)
     tmp_base_path = conf[TMP_PATH_KEY]
     reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
 
