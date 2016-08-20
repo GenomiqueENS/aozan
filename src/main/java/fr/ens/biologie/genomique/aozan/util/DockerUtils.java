@@ -151,6 +151,16 @@ public class DockerUtils {
   /**
    * Adds the mount directory.
    * @param localDirectoryPath the local directory
+   * @throws AozanException the Aozan exception
+   */
+  public void addMountDirectory(final String localDirectoryPath)
+      throws AozanException {
+    addMountDirectory(localDirectoryPath, localDirectoryPath);
+  }
+
+  /**
+   * Adds the mount directory.
+   * @param localDirectoryPath the local directory
    * @param dockerDirectoryPath the docker directory
    * @throws AozanException the Aozan exception
    */

@@ -210,6 +210,9 @@ public final class Settings {
   /** Collector FastQC blast path. */
   public static final String QC_CONF_FASTQC_BLAST_PATH_KEY =
       "qc.conf.fastqc.blast.path";
+  /** Use Docker for Blast. */
+  public static final String QC_CONF_FASTQC_BLAST_USE_DOCKER_KEY =
+      "qc.conf.fastqc.blast.use.docker";
 
   /** Collector cluster density ratio. */
   public static final String QC_CONF_CLUSTER_DENSITY_RATIO_KEY =

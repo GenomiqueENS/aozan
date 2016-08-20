@@ -28,15 +28,15 @@ import static fr.ens.biologie.genomique.aozan.util.StringUtils.stackTraceToStrin
 import static fr.ens.biologie.genomique.aozan.util.XMLUtilsParser.extractFirstValueToInt;
 import static fr.ens.biologie.genomique.aozan.util.XMLUtilsParser.extractFirstValueToString;
 import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.checkExistingFile;
+import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.createTempFile;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -64,7 +64,7 @@ import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
-import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
+import fr.ens.biologie.genomique.aozan.util.DockerUtils;
 import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
 
 /**
@@ -86,6 +86,10 @@ public class OverrepresentedSequencesBlast {
 
   private static final Object LOCK = new Object();
 
+  private static final String BLAST_EXECUTABLE_DOCKER = "blastall";
+  private static final String BLAST_DOCKER_IMAGE = "blast2";
+  private static final String BLAST_VERSION_DOCKER = "2.2.16";
+
   // Tag configuration general of blast
   private static final String HIT_TAG = "Hit";
   private static final String QUERY_LENGTH_TAG = "Iteration_query-len";
@@ -97,8 +101,9 @@ public class OverrepresentedSequencesBlast {
   private final Map<String, BlastResultHit> sequencesAlreadyAnalysis =
       new HashMap<>();
 
+  private boolean useDocker;
   private boolean configured;
-  private String tmpPath;
+  private File tmpDir;
 
   private boolean firstCall = true;
 
@@ -121,22 +126,37 @@ public class OverrepresentedSequencesBlast {
       return;
     }
 
-    boolean stepEnabled = Boolean
-        .parseBoolean(conf.get(Settings.QC_CONF_FASTQC_BLAST_ENABLE_KEY)
-            .trim().toLowerCase());
+    boolean stepEnabled = Boolean.parseBoolean(conf
+        .get(Settings.QC_CONF_FASTQC_BLAST_ENABLE_KEY).trim().toLowerCase());
 
-    if (stepEnabled) {
+    if (!stepEnabled) {
+      this.configured = true;
+      return;
+    }
 
-      this.tmpPath = conf.get(QC.TMP_DIR);
+    this.tmpDir = new File(conf.get(QC.TMP_DIR));
+
+    // Test Docker must be used for launching Blast
+    this.useDocker = Boolean
+        .getBoolean(conf.get(Settings.QC_CONF_FASTQC_BLAST_DB_PATH_KEY).trim());
+
+    // Add arguments from configuration Aozan
+    final String blastArguments =
+        conf.get(Settings.QC_CONF_FASTQC_BLAST_ARGUMENTS_KEY);
+
+    // Path to database for blast, need to add prefix filename used "nt"
+    final String blastDBPath =
+        conf.get(Settings.QC_CONF_FASTQC_BLAST_DB_PATH_KEY).trim()
+            + PREFIX_FILENAME_DATABASE;
+
+    final String blastPath;
+
+    if (useDocker) {
+      blastPath = BLAST_EXECUTABLE_DOCKER;
+    } else {
 
       // Path to blast executable
-      final String blastPath =
-          conf.get(Settings.QC_CONF_FASTQC_BLAST_PATH_KEY).trim();
-
-      // Path to database for blast, need to add prefix filename used "nt"
-      final String blastDBPath =
-          conf.get(Settings.QC_CONF_FASTQC_BLAST_DB_PATH_KEY).trim()
-              + PREFIX_FILENAME_DATABASE;
+      blastPath = conf.get(Settings.QC_CONF_FASTQC_BLAST_PATH_KEY).trim();
 
       // Check paths needed in configuration aozan
       if (blastPath == null
@@ -154,29 +174,26 @@ public class OverrepresentedSequencesBlast {
                 + blastPath);
         stepEnabled = false;
       }
+    }
 
-      if (stepEnabled) {
+    if (stepEnabled) {
 
-        try {
-          // Add arguments from configuration Aozan
-          final String blastArguments =
-              conf.get(Settings.QC_CONF_FASTQC_BLAST_ARGUMENTS_KEY);
+      try {
 
-          this.blastCommonCommandLine =
-              createBlastCommandLine(blastPath, blastDBPath, blastArguments);
+        this.blastCommonCommandLine =
+            createBlastCommandLine(blastPath, blastDBPath, blastArguments);
 
-          // Add in map all sequences to do not analysis, return a resultBlast
-          // with no hit
-          loadSequencesToIgnore();
+        // Add in map all sequences to do not analysis, return a resultBlast
+        // with no hit
+        loadSequencesToIgnore();
 
-          LOGGER.info("FASTQC: blast is enabled, command line = "
-              + this.blastCommonCommandLine);
+        LOGGER.info("FASTQC: blast is enabled, command line = "
+            + this.blastCommonCommandLine);
 
-        } catch (final IOException | AozanException e) {
-          LOGGER.warning(e.getMessage() + '\n' + stackTraceToString(e));
-          stepEnabled = false;
+      } catch (final IOException | AozanException e) {
+        LOGGER.warning(e.getMessage() + '\n' + stackTraceToString(e));
+        stepEnabled = false;
 
-        }
       }
     }
 
@@ -313,22 +330,37 @@ public class OverrepresentedSequencesBlast {
 
   private void blast() throws IOException, AozanException {
 
-    File resultXMLFile = null;
+    // Create temporary files
+    File inputFastaFile = createTempFile(this.tmpDir, "blast_", "_input.fast");
+    File resultXMLFile = createTempFile(this.tmpDir, "blast_", "_output.xml");
 
-    // Create temporary file
-    resultXMLFile = FileUtils.createTempFile(new File(this.tmpPath), "blast_",
-        "_result.xml");
+    // Create input file
+    final Map<String, String> mapIds = new HashMap<>();
+    try (FileWriter writer = new FileWriter(inputFastaFile)) {
 
-    // Check if the temporary file already exists
-    checkExistingFile(resultXMLFile, "FastQC: path of the Blast output file");
+      int count = 0;
+      for (String sequence : this.submittedSequences) {
 
-    // Set output file for this sequence
-    this.blastCommonCommandLine.setOutputFile(resultXMLFile);
+        final String seqId = "seq" + ++count;
+
+        writer.write(">" + seqId + "\n" + sequence + "\n");
+        mapIds.put(seqId, sequence);
+      }
+      writer.flush();
+    }
 
     // Launch blast
-    final Map<String, String> mapIds = launchBlastSearch(
-        this.blastCommonCommandLine.getComandLine(), this.submittedSequences);
+    LOGGER
+        .info("FASTQC: Launch " + this.submittedSequences.size() + " blast(s)");
 
+    if (this.useDocker) {
+      launchDockerBlast(this.blastCommonCommandLine, inputFastaFile,
+          resultXMLFile);
+    } else {
+
+      launchStandaloneBlast(this.blastCommonCommandLine, inputFastaFile,
+          resultXMLFile);
+    }
     // Wait writing xml file
     try {
       Thread.sleep(100);
@@ -341,7 +373,13 @@ public class OverrepresentedSequencesBlast {
       parseDocument(resultXMLFile, mapIds);
     }
 
-    // Remove XML file
+    // Remove temporary files
+    if (inputFastaFile.exists()) {
+      if (!inputFastaFile.delete()) {
+        LOGGER.warning("FASTQC: Cannot delete the Blast xml output file "
+            + inputFastaFile.getAbsolutePath());
+      }
+    }
     if (resultXMLFile.exists()) {
       if (!resultXMLFile.delete()) {
         LOGGER.warning("FASTQC: Cannot delete the Blast xml output file "
@@ -351,42 +389,23 @@ public class OverrepresentedSequencesBlast {
   }
 
   /**
-   * Process blastn, one instance at the same time.
-   * @param cmd command line
-   * @param sequence query blastn
-   * @return a map with the sequence ids and sequences
+   * Launch blast.
+   * @param commandLine the command line
+   * @param inputFile input FASTA file
+   * @param outputFile output XML file
    * @throws AozanException occurs if the process fails
    */
-  private static Map<String, String> launchBlastSearch(final List<String> cmd,
-      final Set<String> sequences) throws AozanException {
+  private static void launchStandaloneBlast(final CommandLine commandLine,
+      final File inputFile, final File outputFile) throws AozanException {
 
+    final List<String> cmd = commandLine.getComandLine(inputFile, outputFile);
     final ProcessBuilder builder = new ProcessBuilder(cmd);
-    final Map<String, String> result = new HashMap<>();
 
-    LOGGER.info("FASTQC: Launch " + sequences.size() + " blast(s)");
     LOGGER.fine("FASTQC: Blast command line: " + cmd);
 
-    Process process;
     try {
 
-      process = builder.start();
-
-      // Writing on standard input
-      final Writer os = new OutputStreamWriter(process.getOutputStream(),
-          Globals.DEFAULT_FILE_ENCODING);
-
-      int count = 0;
-      for (String sequence : sequences) {
-
-        final String seqId = "seq" + ++count;
-
-        os.write(">" + seqId + "\n" + sequence + "\n");
-        result.put(seqId, sequence);
-      }
-      os.flush();
-      os.close();
-
-      final int exitValue = process.waitFor();
+      final int exitValue = builder.start().waitFor();
       if (exitValue > 0) {
         LOGGER.warning(
             "FastQC: fail of blastn process, exit value is : " + exitValue);
@@ -395,8 +414,34 @@ public class OverrepresentedSequencesBlast {
     } catch (final IOException | InterruptedException e) {
       throw new AozanException(e);
     }
+  }
 
-    return Collections.unmodifiableMap(result);
+  /**
+   * Launch blast.
+   * @param commandLine the command line
+   * @param inputFile input FASTA file
+   * @param outputFile output XML file
+   * @throws AozanException occurs if the process fails
+   */
+  private static void launchDockerBlast(final CommandLine commandLine,
+      final File inputFile, final File outputFile) throws AozanException {
+
+    final List<String> cmd = commandLine.getComandLine(inputFile, outputFile);
+
+    DockerUtils du =
+        new DockerUtils(cmd, BLAST_DOCKER_IMAGE, BLAST_VERSION_DOCKER);
+    du.addMountDirectory(inputFile.getAbsolutePath());
+    du.addMountDirectory(outputFile.getAbsolutePath());
+    du.addMountDirectory(commandLine.blastDBPath);
+
+    LOGGER.fine("FASTQC: Blast command line: " + cmd);
+
+    du.run();
+    final int exitValue = du.getExitValue();
+    if (exitValue > 0) {
+      LOGGER.warning(
+          "FastQC: fail of blastn process, exit value is : " + exitValue);
+    }
   }
 
   //
@@ -564,7 +609,6 @@ public class OverrepresentedSequencesBlast {
     private final String blastPath;
     private final String blastDBPath;
     private final List<String> argBlast;
-    private File outputFile = null;
 
     //
     // Abstract methods
@@ -582,20 +626,14 @@ public class OverrepresentedSequencesBlast {
 
     abstract String getNumberThreadsArgumentName();
 
+    abstract String getInputFileArgumentName();
+
     abstract String getOutputFileArgumentName();
-
-    File getOutputFile() {
-      return this.outputFile;
-    }
-
-    void setOutputFile(final File resultXMLFile) {
-      this.outputFile = resultXMLFile;
-    }
 
     /**
      * Build the command line, part common to all sequences.
      */
-    List<String> getComandLine() {
+    List<String> getComandLine(final File inputFile, final File outputFile) {
 
       final List<String> result = new ArrayList<>();
 
@@ -610,9 +648,14 @@ public class OverrepresentedSequencesBlast {
       result.add(getAlignementViewOptionsArgumentName());
       result.add(getAlignementViewOptionsArgumentValue());
 
-      if (this.outputFile != null) {
+      if (inputFile != null) {
+        result.add(getInputFileArgumentName());
+        result.add(inputFile.getAbsolutePath());
+      }
+
+      if (outputFile != null) {
         result.add(getOutputFileArgumentName());
-        result.add(getOutputFile().getAbsolutePath());
+        result.add(outputFile.getAbsolutePath());
       }
 
       // Add arguments from configuration Aozan
@@ -621,7 +664,6 @@ public class OverrepresentedSequencesBlast {
       }
 
       return Collections.unmodifiableList(result);
-
     }
 
     /**
@@ -684,7 +726,7 @@ public class OverrepresentedSequencesBlast {
 
     @Override
     public String toString() {
-      return Joiner.on(' ').join(getComandLine());
+      return Joiner.on(' ').join(getComandLine(null, null));
     }
 
     //
@@ -752,6 +794,11 @@ public class OverrepresentedSequencesBlast {
     }
 
     @Override
+    String getInputFileArgumentName() {
+      return "-query";
+    }
+
+    @Override
     String getOutputFileArgumentName() {
       return "-out";
     }
@@ -800,6 +847,11 @@ public class OverrepresentedSequencesBlast {
     @Override
     String getNumberThreadsArgumentName() {
       return "-a";
+    }
+
+    @Override
+    String getInputFileArgumentName() {
+      return "-i";
     }
 
     @Override
