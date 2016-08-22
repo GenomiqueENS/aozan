@@ -511,7 +511,7 @@ doctype-system="about:legacy-compat"/>
 	</xsl:if>
   
   <xsl:if test="/QCReport[SamplesStatsReport]">
-  <h2>Samples statistics report (first read only)</h2>
+  <h2>Pooled Samples Quality report (first read only)</h2>
 	<div>
    <table class="projectData">
   <tr class="headerColumns">
