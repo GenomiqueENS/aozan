@@ -266,7 +266,7 @@ def launch_steps(conf):
 
     # Discover new runs
     detection_new_run.discover_new_runs(hiseq_run_ids_do_not_process, conf)
-    hiseq_run_ids_done = detection_end_run.discover_termined_runs(hiseq_run_ids_do_not_process, conf)
+    hiseq_run_ids_done = detection_end_run.discover_terminated_runs(hiseq_run_ids_do_not_process, conf)
 
 
     #
