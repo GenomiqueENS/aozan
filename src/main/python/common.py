@@ -618,7 +618,7 @@ def add_run_id(run_id, file_path, conf):
         raf.seek(f.length())
 
         # Add the run_id at the end of the file
-        raf.writeUTF(run_id + '\n')
+        raf.writeBytes(run_id.strip() + '\n')
 
         # Release locks
         if lock:
