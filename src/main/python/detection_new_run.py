@@ -130,11 +130,11 @@ def send_report(run_id, conf):
     # add warning in report if useful
 
     reads = run_info.getReads()
-    error_cycles_per_reads_not_indexes_count = 0
+    error_cycles_per_read_not_indexes_count = 0
     reads_indexed_count = 0
     reads_not_indexed_count = 0
     cycles_count = 0
-    cycles_per_reads_not_indexed = 0
+    cycles_per_read_not_indexed = 0
 
     for read in reads:
         cycles_count += read.getNumberCycles()
@@ -142,21 +142,21 @@ def send_report(run_id, conf):
             reads_indexed_count += 1
         else:
             reads_not_indexed_count += 1
-            if cycles_per_reads_not_indexed == 0:
-                cycles_per_reads_not_indexed = read.getNumberCycles()
+            if cycles_per_read_not_indexed == 0:
+                cycles_per_read_not_indexed = read.getNumberCycles()
 
             # Check same cycles count for each reads not indexed
-            error_cycles_per_reads_not_indexes_count = cycles_per_reads_not_indexed != read.getNumberCycles()
+            error_cycles_per_read_not_indexes_count = cycles_per_read_not_indexed != read.getNumberCycles()
 
     # Identification type run according to data in RunInfos.xml : SR or PE
     if reads_not_indexed_count == 1:
-        type_run_estimated = "SR-" + str(cycles_per_reads_not_indexed) + " with " + str(
+        type_run_estimated = "SR-" + str(cycles_per_read_not_indexed) + " with " + str(
             reads_indexed_count) + " index"
         if reads_indexed_count > 1:
             type_run_estimated += "es"
     elif reads_not_indexed_count == 2:
-        type_run_estimated = "PE-" + str(cycles_per_reads_not_indexed) + " with " + str(
-            reads_indexed_count) + " index(es)"
+        type_run_estimated = "PE-" + str(cycles_per_read_not_indexed) + " with " + str(
+            reads_indexed_count) + " index"
         if reads_indexed_count > 1:
             type_run_estimated += "es"
     else:
@@ -167,6 +167,7 @@ def send_report(run_id, conf):
         type_run_estimated += ")"
 
     description_run = "Informations about this run:\n"
+    description_run += "\t- Sequencer: " + common.get_instrument_name(run_id, conf) + "\n"
     description_run += "\t- " + str(run_info.getFlowCellLaneCount()) + " lanes with " + str(
         run_info.alignToPhix.size()) + " aligned to Phix.\n"
     description_run += "\t- " + str(reads_not_indexed_count) + " read"
@@ -177,14 +178,14 @@ def send_report(run_id, conf):
         description_run += "es"
     description_run += ".\n"
 
-    if error_cycles_per_reads_not_indexes_count or cycles_per_reads_not_indexed == 0:
-        description_run += "\t- ERROR : cycles count per reads different between reads (" + str(
+    if error_cycles_per_read_not_indexes_count or cycles_per_read_not_indexed == 0:
+        description_run += "\t- ERROR : cycles count per read different between reads (" + str(
             cycles_count) + " total cycles).\n"
     else:
-        description_run += "\t- " + str(cycles_per_reads_not_indexed) + " cycles per reads (" + str(
+        description_run += "\t- " + str(cycles_per_read_not_indexed) + " cycles per read (" + str(
             cycles_count) + " total cycles).\n"
 
-    description_run += "\t- " + "Estimated run type: " + type_run_estimated + ".\n"
+    description_run += "\t- Estimated run type: " + type_run_estimated + ".\n"
 
     attachment_file = str(hiseq_run.find_hiseq_run_path(run_id, conf)) + '/' + run_id + '/' + FIRST_BASE_REPORT_FILE
 
