@@ -58,6 +58,7 @@ from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_COMPRESSION_KEY
 from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_USE_DOCKER_KEY
 from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQC_BLAST_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQC_BLAST_ENABLE_KEY
+from fr.ens.biologie.genomique.aozan.Settings import HISEQ_DATA_PATH_KEY
 
 from fr.ens.biologie.genomique.aozan.util import StringUtils
 
@@ -773,6 +774,32 @@ def is_section_to_add_in_report(sections, section_name, version, run_id, conf):
     return True
 
 
+def _check_conf_key(conf, msg, key_name):
+
+    if not key_name in conf:
+        msg += '\n\t* Configuration setting not set: ' + key_name
+        return False
+
+    return True
+
+def _check_conf_dir(conf, msg, key_name, desc):
+
+    if _check_conf_key(conf, msg, key_name):
+        if not is_dir_exists(AOZAN_LOG_PATH_KEY, conf):
+            msg += '\n\t* ' + desc + ' directory does not exists: ' + conf[key_name]
+            return False
+
+    return True
+
+def _check_conf_file(conf, msg, key_name, desc):
+
+    if _check_conf_key(conf, msg, key_name):
+        if not is_file_exists(AOZAN_LOG_PATH_KEY, conf):
+            msg += '\n\t* ' + desc + ' file does not exists: ' + conf[key_name]
+            return False
+
+    return True
+
 def check_configuration(conf, configuration_file_path):
     """ Check if path useful exists
 
@@ -788,48 +815,46 @@ def check_configuration(conf, configuration_file_path):
 
     msg = ''
 
-    # # Path common on all steps
+    # Path common on all steps
 
     # Check log path
-    if not is_file_exists(AOZAN_LOG_PATH_KEY, conf):
-        msg += '\n\t* Aozan log file path does not exists : ' + conf[AOZAN_LOG_PATH_KEY]
+    _check_conf_file(conf, msg, AOZAN_LOG_PATH_KEY, 'Aozan log file')
 
     # Check if temporary directory exists
-    if not is_dir_exists(TMP_PATH_KEY, conf):
-        msg += '\n\t* Temporary directory does not exists: ' + conf[TMP_PATH_KEY]
+    _check_conf_dir(conf, msg, TMP_PATH_KEY, 'Temporary')
 
-    if not is_dir_exists(REPORTS_DATA_PATH_KEY, conf):
-        msg += '\n\t* Report run data directory does not exists: ' + conf[REPORTS_DATA_PATH_KEY]
+    # Check run data directory
+    _check_conf_dir(conf, msg, REPORTS_DATA_PATH_KEY, 'Report run data')
 
-    # # Step First_base_report and HiSeq
+    # Step First_base_report and HiSeq
     if Settings.HISEQ_STEP_KEY in steps_to_launch:
-        # Check if hiseq_data_path exists
-        for hiseq_output_path in hiseq_run.get_hiseq_data_paths(conf):
-            if not os.path.exists(hiseq_output_path):
-                msg += '\n\t* Sequencer output directory does not exists: ' + hiseq_output_path
 
-    # # For step SYNC
+        if _check_conf_key(conf, msg, HISEQ_DATA_PATH_KEY):
+            # Check if hiseq_data_path exists
+            for hiseq_output_path in hiseq_run.get_hiseq_data_paths(conf):
+                if not os.path.exists(hiseq_output_path):
+                    msg += '\n\t* Sequencer output directory does not exists: ' + hiseq_output_path
+
+    # For step SYNC
     if Settings.SYNC_STEP_KEY in steps_to_launch:
-        # Check if bcl_data_path exists
-        if not is_dir_exists(BCL_DATA_PATH_KEY, conf):
-            msg += '\n\t* Basecalling directory does not exists: ' + conf[BCL_DATA_PATH_KEY]
 
-    # # For step DEMUX
+        # Check if bcl_data_path exists
+        _check_conf_dir(conf, msg, BCL_DATA_PATH_KEY, 'Basecalling')
+
+    # For step DEMUX
     if Settings.DEMUX_STEP_KEY in steps_to_launch:
+
         # Check if bcl2fastq samplesheet path exists
-        if not is_dir_exists(BCL2FASTQ_SAMPLESHEETS_PATH_KEY, conf):
-            msg += '\n\t* Bcl2fastq sample sheets directory does not exists: ' + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY]
+        _check_conf_dir(conf, msg, BCL2FASTQ_SAMPLESHEETS_PATH_KEY, 'Bcl2fastq samplesheets')
 
         # Check if root input fastq data directory exists
-        if not is_dir_exists(FASTQ_DATA_PATH_KEY, conf):
-            msg += '\n\t* Fastq data directory does not exists: ' + conf[FASTQ_DATA_PATH_KEY]
+        _check_conf_dir(conf, msg, FASTQ_DATA_PATH_KEY, 'Fastq data')
 
         # Check if bcl2fastq samplesheet path exists
         if is_conf_value_equals_true(BCL2FASTQ_USE_DOCKER_KEY, conf):
             pass
         else:
-            if not is_dir_exists(BCL2FASTQ_PATH_KEY, conf):
-                msg += '\n\t* bcl2fastq path directory does not exists: ' + conf[BCL2FASTQ_PATH_KEY]
+            _check_conf_file(conf, msg, BCL2FASTQ_PATH_KEY, 'bcl2fastq executable')
 
         # Check compression type: three values None, gzip (default) bzip2
         if not is_fastq_compression_format_valid(conf):
@@ -838,10 +863,10 @@ def check_configuration(conf, configuration_file_path):
     # # For step QC
     if Settings.QC_STEP_KEY in steps_to_launch:
         # Check path to blast if step enable
-        if is_conf_value_equals_true(QC_CONF_FASTQC_BLAST_ENABLE_KEY, conf) and not is_file_exists(
-                QC_CONF_FASTQC_BLAST_PATH_KEY, conf):
-            msg += '\n\t* Blast enabled but blast file path does not exists: ' + conf[
-                QC_CONF_FASTQC_BLAST_PATH_KEY]
+        if is_conf_value_equals_true(QC_CONF_FASTQC_BLAST_ENABLE_KEY, conf):
+            _check_conf_file(conf, msg, QC_CONF_FASTQC_BLAST_PATH_KEY, 'Blast executable')
+            _check_conf_dir(conf, msg, QC_CONF_FASTQC_BLAST_DB_PATH_KEY, 'Blast database')
+
 
     if len(msg) > 0:
         msg = 'Error(s) found in Aozan configuration file (' + os.path.abspath(configuration_file_path) + '):' + msg
@@ -1312,7 +1337,7 @@ def set_default_conf(conf):
     conf[Settings.BCL2FASTQ_PATH_KEY] = '/usr/local/bcl2fastq'
     conf[Settings.BCL2FASTQ_COMPRESSION_KEY] = 'gzip'
     conf[Settings.BCL2FASTQ_FASTQ_CLUSTER_COUNT_KEY] = '0'
-    conf[Settings.BCL2FASTQ_COMPRESSION_KEY] = '9'
+    conf[Settings.BCL2FASTQ_COMPRESSION_LEVEL_KEY] = '9'
     conf[Settings.BCL2FASTQ_MISMATCHES_KEY] = '0'
     conf[Settings.BCL2FASTQ_THREADS_KEY] = str(Runtime.getRuntime().availableProcessors())
     conf[Settings.BCL2FASTQ_ADAPTER_FASTA_FILE_PATH_KEY] = ''
