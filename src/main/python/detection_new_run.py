@@ -167,7 +167,7 @@ def send_report(run_id, conf):
         type_run_estimated += ")"
 
     description_run = "Informations about this run:\n"
-    description_run += "\t- Sequencer: " + common.get_instrument_name(run_id, conf) + "\n"
+    description_run += "\t- Sequencer: " + common.get_instrument_name(run_id, conf) + ".\n"
     description_run += "\t- " + str(run_info.getFlowCellLaneCount()) + " lanes with " + str(
         run_info.alignToPhix.size()) + " aligned to Phix.\n"
     description_run += "\t- " + str(reads_not_indexed_count) + " read"
