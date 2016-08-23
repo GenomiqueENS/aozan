@@ -14,7 +14,28 @@ from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
 import cmd
 
 DONE_FILE = 'hiseq.done'
+DENY_FILE = 'hiseq.deny'
 MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL = 12 * 3600
+
+def send_failed_run_message(run_id, secs, conf):
+    """Send a mail to inform about a failed run.
+
+    Arguments:
+        conf: configuration dictionary
+    """
+
+    run_path = hiseq_run.find_hiseq_run_path(run_id, conf)
+    file_to_test = run_path + '/' + run_id + '/RTAComplete.txt'
+    last = os.stat(file_to_test).st_mtime
+
+    df = common.df(run_path) / (1024 * 1024 * 1024)
+    du = common.du(run_path + '/' + run_id) / (1024 * 1024 * 1024)
+
+    common.send_msg('[Aozan] Failed run ' + run_id + ' on ' + common.get_instrument_name(run_id, conf),
+                    'A run (' + run_id + ') has failed on ' + common.get_instrument_name(run_id, conf) +
+                    ' at ' + common.time_to_human_readable(last) + '.\n' + 'Data for this run can be found at: ' +
+                    run_path + '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df),
+                    False, conf)
 
 
 def load_processed_run_ids(conf):
@@ -36,6 +57,16 @@ def add_run_id_to_processed_run_ids(run_id, conf):
     """
 
     common.add_run_id(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + DONE_FILE, conf)
+
+def add_run_id_to_denied_run_ids(run_id, conf):
+    """Add a denied run id to the list of the run ids.
+
+    Arguments:
+        run_id: The run id
+        conf: configuration dictionary
+    """
+
+    common.add_run_id(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + DENY_FILE, conf)
 
 
 def error(short_message, message, conf):
@@ -70,7 +101,7 @@ def get_available_terminated_run_ids(conf):
 
     return result
 
-def discover_termined_runs(conf):
+def discover_terminated_runs(denied_runs, conf):
     """Discover new ended runs
 
     Arguments:
@@ -80,7 +111,7 @@ def discover_termined_runs(conf):
     run_ids_done = load_processed_run_ids(conf)
 
     if common.is_conf_value_equals_true(HISEQ_STEP_KEY, conf):
-        for run_id in (get_available_terminated_run_ids(conf) - run_ids_done):
+        for run_id in (get_available_terminated_run_ids(conf) - run_ids_done - denied_runs):
 
             if run_id is None or len(run_id) == 0:
                 # No run id found
@@ -90,12 +121,17 @@ def discover_termined_runs(conf):
             common.log('INFO', 'Discover end run ' + str(run_id) + ' on ' + common.get_instrument_name(run_id, conf),
                        conf)
 
-            if create_run_summary_reports(run_id, conf):
-                send_mail_if_recent_run(run_id, MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL, conf)
-                add_run_id_to_processed_run_ids(run_id, conf)
-                run_ids_done.add(run_id)
+            if hiseq_run.get_read_count(run_id, conf) == 0:
+                send_failed_run_message(run_id, MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL, conf)
+                add_run_id_to_denied_run_ids(run_id, conf)
             else:
-                raise Exception('Create run summary report for new discovery run ' + run_id)
+                if create_run_summary_reports(run_id, conf):
+                    send_mail_if_recent_run(run_id, MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL, conf)
+                    add_run_id_to_processed_run_ids(run_id, conf)
+                    run_ids_done.add(run_id)
+                else:
+                    raise Exception('Create run summary report for new discovery run ' + run_id)
+
 
     return run_ids_done
 
@@ -109,7 +145,7 @@ def send_mail_if_recent_run(run_id, secs, conf):
         conf: configuration object
     """
 
-    run_path = find_hiseq_run_path(run_id, conf)
+    run_path = hiseq_run.find_hiseq_run_path(run_id, conf)
     if run_path is False:
         return
 
@@ -134,7 +170,7 @@ def create_run_summary_reports(run_id, conf):
         conf: configuration dictionary
     """
 
-    hiseq_data_path = find_hiseq_run_path(run_id, conf)
+    hiseq_data_path = hiseq_run.find_hiseq_run_path(run_id, conf)
     tmp_base_path = conf[TMP_PATH_KEY]
     reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
 
