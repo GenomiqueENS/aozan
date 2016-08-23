@@ -784,19 +784,23 @@ def _check_conf_key(conf, msg, key_name):
 
 def _check_conf_dir(conf, msg, key_name, desc):
 
-    if _check_conf_key(conf, msg, key_name):
-        if not is_dir_exists(AOZAN_LOG_PATH_KEY, conf):
-            msg += '\n\t* ' + desc + ' directory does not exists: ' + conf[key_name]
-            return False
+    if not _check_conf_key(conf, msg, key_name):
+        return False
+
+    if not is_dir_exists(key_name, conf):
+        msg += '\n\t* ' + desc + ' directory does not exists: ' + conf[key_name]
+        return False
 
     return True
 
 def _check_conf_file(conf, msg, key_name, desc):
 
-    if _check_conf_key(conf, msg, key_name):
-        if not is_file_exists(AOZAN_LOG_PATH_KEY, conf):
-            msg += '\n\t* ' + desc + ' file does not exists: ' + conf[key_name]
-            return False
+    if not _check_conf_key(conf, msg, key_name):
+        return False
+
+    if not is_file_exists(key_name, conf):
+        msg += '\n\t* ' + desc + ' file does not exists: ' + conf[key_name]
+        return False
 
     return True
 
