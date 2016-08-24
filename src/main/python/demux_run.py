@@ -640,14 +640,16 @@ def archive_samplesheet(run_id, original_samplesheet_path, samplesheet_csv_path,
 
     Arguments:
         run_id: The run id
-        samplesheet_xls_path: samplesheet path in format xls if exists
+        original_samplesheet_path: samplesheet path in format xls if exists
         samplesheet_csv_path: samplesheet path in format csv
         conf: configuration dictionary
     """
 
     # Add samplesheet to the archive of samplesheets
-    if common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'xls', conf) \
-            and original_samplesheet_path.endswith(".xls"):
+    if (common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'xls', conf) \
+            and original_samplesheet_path.endswith(".xls")) or \
+            (common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'xlsx', conf) \
+            and original_samplesheet_path.endswith(".xlsx")):
 
         cmd = 'cp ' + original_samplesheet_path + ' ' + conf[TMP_PATH_KEY] + \
               ' && cd ' + conf[TMP_PATH_KEY] + \
@@ -668,8 +670,11 @@ def archive_samplesheet(run_id, original_samplesheet_path, samplesheet_csv_path,
 
     # Remove temporary samplesheet files
     os.remove(samplesheet_csv_path)
-    if common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'xls', conf):
-        os.remove(conf[TMP_PATH_KEY] + '/' + os.path.basename(samplesheet_xls_path))
+    if common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'xls', conf) or \
+       common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'xlsx', conf):
+        file_to_remove = conf[TMP_PATH_KEY] + '/' + os.path.basename(original_samplesheet_path)
+        if os.path.exists(file_to_remove):
+            os.remove(file_to_remove)
 
     return True
 
