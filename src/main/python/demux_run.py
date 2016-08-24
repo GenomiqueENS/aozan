@@ -669,7 +669,6 @@ def archive_samplesheet(run_id, original_samplesheet_path, samplesheet_csv_path,
         return False
 
     # Remove temporary samplesheet files
-    os.remove(samplesheet_csv_path)
     if common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'xls', conf) or \
        common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'xlsx', conf):
         file_to_remove = conf[TMP_PATH_KEY] + '/' + os.path.basename(original_samplesheet_path)
@@ -840,7 +839,8 @@ def demux(run_id, conf):
         return False
 
     # Remove temporary samplesheet files
-    os.remove(bcl2fastq_samplesheet_path)
+    if os.path.exists(bcl2fastq_samplesheet_path):
+        os.remove(bcl2fastq_samplesheet_path)
 
     # Create index.hml file
     common.create_html_index_file(conf, run_id, [Settings.HISEQ_STEP_KEY, Settings.DEMUX_STEP_KEY])
