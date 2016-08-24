@@ -464,8 +464,15 @@ def aozan_main():
     # Use default (US) locale
     Locale.setDefault(Globals.DEFAULT_LOCALE)
 
+    # Check if configuration file exists
+    conf_file = args[0]
+    if not os.path.isfile(conf_file):
+        sys.stderr.write('ERROR: Aozan can not be executed. Configuration file is missing: ' + \
+                         conf_file + '\n')
+        sys.exit(1)
+
     # Load Aozan conf file
-    common.load_conf(conf, args[0])
+    common.load_conf(conf, conf_file)
 
     # End of Aozan if aozan is not enable
     if common.is_conf_value_defined(AOZAN_ENABLE_KEY, 'false', conf):
@@ -478,7 +485,7 @@ def aozan_main():
         common.exception_msg(exp, conf)
 
     # Check main path file in configuration
-    if not common.check_configuration(conf, args[0]):
+    if not common.check_configuration(conf, conf_file):
         common.log('SEVERE',
                    'Aozan can not be executed. Configuration is invalid or missing, some useful directories ' +
                    'may be inaccessible. ',
@@ -527,7 +534,7 @@ def aozan_main():
             sys.exit(1)
     else:
         if not options.quiet:
-            sys.stderr.write('Error: A lock file exists.\n')
+            sys.stderr.write('ERROR: Aozan can not be executed. A lock file exists.\n')
         if not os.path.exists('/proc/%d' % (load_pid_in_lock_file(lock_file_path))):
             common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf[LOCK_FILE_KEY] +
                          ". Please investigate last error and then remove the lock file.", True,
