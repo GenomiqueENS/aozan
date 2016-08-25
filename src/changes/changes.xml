@@ -733,7 +733,7 @@
 			</action>
 		</release>
 
-		<release version="2.0-rc18" description="Aozan 2.0-rc18 release"  date="TBD">
+		<release version="2.0-rc18" description="Aozan 2.0-rc18 release"  date="2016-08-25">
 			<action dev="jourdren" type="fix">
                                  Entries in done files were written with the 2 byte of the Byte order mark.
 			</action>
@@ -754,6 +754,12 @@
 			</action>
 			<action dev="jourdren" type="fix">
                                  Fix non-existing variable Python error when archiving samplesheet.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 In demux step, the temporary samplesheet file used by bcl2fastq was removed twice.
+			</action>
+			<action dev="jourdren" type="update">
+                                 At startup of aozan.aozan_main(), now check if the configuration file exists..
 			</action>
 		</release>
 
