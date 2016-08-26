@@ -18,7 +18,6 @@ from fr.ens.biologie.genomique.aozan import Globals
 from fr.ens.biologie.genomique.aozan import Common
 from fr.ens.biologie.genomique.aozan import AozanException
 
-from fr.ens.biologie.genomique.aozan.Settings import HISEQ_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import DEMUX_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import RECOMPRESS_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import QC_STEP_KEY
@@ -395,7 +394,7 @@ def launch_steps(conf):
             exception_error('demux', 'Fail demultiplexing for run ' + run_id, conf)
 
     #
-    # Recompress
+    # Recompression
     #
 
     recompress_run_ids_done = recompress_run.load_processed_run_ids(conf)

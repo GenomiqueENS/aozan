@@ -7,16 +7,10 @@ import common
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_CRITICAL_MIN_SPACE_KEY
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_DATA_PATH_KEY
-from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
-from fr.ens.biologie.genomique.aozan.Settings import HISEQ_STEP_KEY
-from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
 from fr.ens.biologie.genomique.aozan.illumina import RunInfo
 
 # from pickle import FALSE
 # from macpath import pathsep
-
-DENY_FILE = 'hiseq.deny'
-
 
 def load_deny_run_ids(conf):
     """Load the list of the run ids to not process.
@@ -25,7 +19,7 @@ def load_deny_run_ids(conf):
         conf: configuration dictionary
     """
 
-    return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + DENY_FILE)
+    return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + common.HISEQ_DENY_FILE)
 
 
 def get_runinfos_file(run_id, conf):
