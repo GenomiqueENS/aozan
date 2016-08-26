@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+/*
+ *                  Aozan development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU General Public License version 3 or later 
+ * and CeCILL. This should be distributed with the code. If you 
+ * do not have a copy, see:
+ *
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+ *
+ * Copyright for this code is held jointly by the Genomic platform
+ * of the Institut de Biologie de l'École Normale Supérieure and
+ * the individual authors. These should be listed in @author doc
+ * comments.
+ *
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page at:
+ *
+ *      http://outils.genomique.biologie.ens.fr/aozan
+ *
+ */
+-->
+<document>
+
+	<properties>
+		<title>Recompression</title>
+		<author email="firmo@biologie.ens.fr">Cyril Firmo</author>
+	</properties>
+
+
+
+	<body>
+
+<section name="Recompression step">
+
+    <p>This step recompresses fastq and fastq-gzip files into fastq-bzip2 files. bzip2 files are more compressed than gzip files and thus take less disk space. They also are compatible with hadoop since they are chunked files.</p>
+
+       <h4>Configuration parameters</h4>
+
+	 <p>The next table contains the parameters of this step.</p>
+
+     <table>
+	   <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+	   <tr><td>recompress.step</td><td>boolean</td><td>False</td><td>Enable the step</td></tr>
+	   <tr><td>recompress.delete.original.fastq</td><td>boolean</td><td>True</td><td>Delete original files after recompression.</td></tr>
+	   <tr><td>recompress.compression.level</td><td>int</td><td>9</td><td>Set the compression level of the output bzip2 files. (between 1 and 9).</td></tr>
+    </table>
+
+     <p>An example of email sent at the end of recompression step.</p>
+       <div align="center">
+       		<img src="images/mail_recompress.png" alt="example of mail sent at the end on recompression" border="1"/>
+       </div>
+
+   </section>
+
+	</body>
+
+</document>

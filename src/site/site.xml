@@ -70,6 +70,7 @@
 				<item name="First base report" href="/new-run-discovering.html"/>
 				<item name="End run discovering" href="/end-run-discovering.html"/>
 				<item name="Synchronization" href="/synchronization.html"/>
+				<item name="Recompression" href="/recompression.html"/>
 				<item name="Demultiplexing" href="/demultiplexing.html"/>
 
 				<item name="Quality Control" href="/quality-control.html" collapse="true">
