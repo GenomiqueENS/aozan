@@ -864,7 +864,7 @@ def extract_steps_to_launch(update_logger, conf):
 
     steps = []
     for key in [Settings.FIRST_BASE_REPORT_STEP_KEY, Settings.HISEQ_STEP_KEY, Settings.SYNC_STEP_KEY,
-                Settings.DEMUX_STEP_KEY, Settings.QC_STEP_KEY]:
+                Settings.DEMUX_STEP_KEY, Settings.RECOMPRESS_STEP_KEY, Settings.QC_STEP_KEY]:
 
         if is_conf_value_equals_true(key, conf):
             steps.append(key)
@@ -1298,6 +1298,11 @@ def set_default_conf(conf):
     conf[Settings.SYNC_STEP_KEY] = 'True'
     conf[Settings.DEMUX_STEP_KEY] = 'True'
     conf[Settings.QC_STEP_KEY] = 'False'
+    conf[Settings.RECOMPRESS_STEP_KEY] = 'False'
+
+    # Recompression
+    conf[Settings.RECOMPRESS_DELETE_ORIGINAL_FASTQ_KEY] = 'False'
+    conf[Settings.RECOMPRESS_COMPRESSION_LEVEL_KEY] = '9'
 
     # Lock file
     conf[Settings.LOCK_FILE_KEY] = '/var/lock/aozan.lock'
