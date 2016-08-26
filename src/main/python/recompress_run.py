@@ -145,13 +145,15 @@ def recompress(run_id, conf):
     # process each fastq and fastq.gz recursively in each fastq directory
     for fq in load_fastqgz_list(fastq_input_dir) + load_fastq_list(fastq_input_dir):
         ext = os.path.splitext(fq)[-1]
-        base_fq = os.path.splitext(fq)[0]
-        bz2 = base_fq + ".bz2"
-        bz2_temp = bz2 + ".tmp"
-        if ext == "gz":
-            cat = "bzcat"
+        if ext == ".gz":
+            cat = "zcat"
+            base_fq = os.path.splitext(fq)[0]
         else:
             cat = "cat"
+            base_fq = fq
+
+        bz2 = base_fq + ".bz2"
+        bz2_temp = bz2 + ".tmp"
         # Skip if the bz2 already exists
         if not os.path.exists(bz2):
             # convert fq to bz2 then check md5sum before proceeding

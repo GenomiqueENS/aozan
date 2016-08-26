@@ -45,7 +45,7 @@
      <table>
 	   <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
 	   <tr><td>recompress.step</td><td>boolean</td><td>False</td><td>Enable the step</td></tr>
-	   <tr><td>recompress.delete.original.fastq</td><td>boolean</td><td>True</td><td>Delete original files after recompression.</td></tr>
+	   <tr><td>recompress.delete.original.fastq</td><td>boolean</td><td>False</td><td>Delete original files after recompression.</td></tr>
 	   <tr><td>recompress.compression.level</td><td>int</td><td>9</td><td>Set the compression level of the output bzip2 files. (between 1 and 9).</td></tr>
     </table>
 
