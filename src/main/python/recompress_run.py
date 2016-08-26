@@ -9,6 +9,7 @@ import demux_run, hiseq_run
 from subprocess import call
 import os
 import glob
+import multiprocessing
 
 from fr.ens.biologie.genomique.aozan.Settings import RECOMPRESS_DELETE_ORIGINAL_FASTQ_KEY
 from fr.ens.biologie.genomique.aozan.Settings import RECOMPRESS_COMPRESSION_LEVEL_KEY
@@ -19,11 +20,33 @@ from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
 
 
-
-
-DENY_FILE = 'recompress.deny'
-DONE_FILE = 'recompress.done'
-LASTERR_FILE = 'recompress.lasterr'
+def recompress_fastq_process(fq,conf):
+    ext = os.path.splitext(fq)[-1]
+    if ext == ".gz":
+        cat = "zcat"
+        base_fq = os.path.splitext(fq)[0]
+    else:
+        cat = "cat"
+        base_fq = fq
+    bz2 = base_fq + ".bz2"
+    bz2_temp = bz2 + ".tmp"
+    # Skip if the bz2 already exists
+    if not os.path.exists(bz2):
+        # convert fq to bz2 then check md5sum before proceeding
+        if convert_fastq_to_bzip2(fq,bz2_temp, cat, conf):
+            if check_md5sum(fq,bz2_temp,conf):
+                os.rename(bz2_temp,bz2)
+                remove_related_md5_file(fq)
+                remove_related_md5_file(bz2_temp)
+                if common.is_conf_value_equals_true(RECOMPRESS_DELETE_ORIGINAL_FASTQ_KEY, conf):
+                    common.log("INFO", "Removing " + fq + " since recompression is a success.", conf)
+                    os.remove(fq)
+            else:
+                error("Md5sum differs between initial file content and created file content.", "Md5sum differs between initial file "+ str(fq) +" content and created file "+ str(bz2) +" content.", conf)
+        else:
+            error("Failed to recompress a file successfully", "Failed to recompress the file " + str(fq) + "successfully.", conf)
+    else:
+        common.log("WARNING", "Recompress step: Skipping: The file " + bz2 + " already exists.", conf)
 
 def load_fastqgz_list(fastq_input_dir):
     r = list()
@@ -83,7 +106,7 @@ def load_denied_run_ids(conf):
     Arguments:
         conf: configuration dictionary
     """
-    return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + DENY_FILE)
+    return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + RECOMPRESS_DENY_FILE)
 
 
 def load_processed_run_ids(conf):
@@ -93,7 +116,7 @@ def load_processed_run_ids(conf):
         conf: configuration dictionary
     """
 
-    return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + DONE_FILE)
+    return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + RECOMPRESS_DONE_FILE)
 
 
 def add_run_id_to_processed_run_ids(run_id, conf):
@@ -103,7 +126,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         run_id: The run id
         conf: configuration dictionary
     """
-    common.add_run_id(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + DONE_FILE, conf)
+    common.add_run_id(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + RECOMPRESS_DONE_FILE, conf)
 
 
 def error(short_message, message, conf):
@@ -115,7 +138,7 @@ def error(short_message, message, conf):
         conf: configuration dictionary
     """
 
-    common.error('[Aozan] recompress: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/' + LASTERR_FILE, conf)
+    common.error('[Aozan] recompress: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/' + RECOMPRESS_LASTERR_FILE, conf)
 
 
 def recompress(run_id, conf):
@@ -143,35 +166,15 @@ def recompress(run_id, conf):
         return False
 
     # process each fastq and fastq.gz recursively in each fastq directory
-    for fq in load_fastqgz_list(fastq_input_dir) + load_fastq_list(fastq_input_dir):
-        ext = os.path.splitext(fq)[-1]
-        if ext == ".gz":
-            cat = "zcat"
-            base_fq = os.path.splitext(fq)[0]
-        else:
-            cat = "cat"
-            base_fq = fq
+    fqsproc = []
+    fqsnames = load_fastqgz_list(fastq_input_dir) + load_fastq_list(fastq_input_dir)
+    for fq in fqsnames:
+        p = multiprocessing.Process(target=recompress_fastq_process, args=(fq,conf))
+        fqsproc.append(p)
+        p.start()
 
-        bz2 = base_fq + ".bz2"
-        bz2_temp = bz2 + ".tmp"
-        # Skip if the bz2 already exists
-        if not os.path.exists(bz2):
-            # convert fq to bz2 then check md5sum before proceeding
-            if convert_fastq_to_bzip2(fq,bz2_temp, cat, conf):
-                if check_md5sum(fq,bz2_temp,conf):
-                    os.rename(bz2_temp,bz2)
-                    remove_related_md5_file(fq)
-                    remove_related_md5_file(bz2_temp)
-                    if common.is_conf_value_equals_true(RECOMPRESS_DELETE_ORIGINAL_FASTQ_KEY, conf):
-                        common.log("INFO", "Removing " + fq + " since recompression is a success.", conf)
-                        os.remove(fq)
-                else:
-                    error("Md5sum differs between initial file content and created file content.", "Md5sum differs between initial file "+ str(fq) +" content and created file "+ str(bz2) +" content.", conf)
-            else:
-                error("Failed to recompress a file successfully", "Failed to recompress the file " + str(fq) + "successfully.", conf)
-        else:
-            common.log("WARNING", "Recompress step: Skipping: The file " + bz2 + " already exists.", conf)
-
+    for proc in fqsproc:
+        proc.join()
 
     duration = time.time() - start_time
     msg = 'End of recompression for run ' + run_id + '.' + \
