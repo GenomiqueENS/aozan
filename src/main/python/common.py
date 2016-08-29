@@ -1329,6 +1329,7 @@ def set_default_conf(conf):
     conf[Settings.DEMUX_STEP_KEY] = 'True'
     conf[Settings.QC_STEP_KEY] = 'False'
     conf[Settings.RECOMPRESS_STEP_KEY] = 'False'
+    conf[Settings.RECOMPRESS_THREADS_KEY] = str(Runtime.getRuntime().availableProcessors())
 
     # Recompression
     conf[Settings.RECOMPRESS_DELETE_ORIGINAL_FASTQ_KEY] = 'False'
