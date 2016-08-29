@@ -125,8 +125,10 @@ public final class Settings {
   public static final String RECOMPRESS_DELETE_ORIGINAL_FASTQ_KEY = "recompress.delete.original.fastq";
   /** Erase input after recompression. */
 public static final String RECOMPRESS_COMPRESSION_LEVEL_KEY = "recompress.compression.level";
+/** Erase input after recompression. */
+public static final String RECOMPRESS_THREADS_KEY = "recompress.threads";
 
-  /** Index html template path. */
+/** Index html template path. */
   public static final String INDEX_HTML_TEMPLATE_KEY = "index.html.template";
   /** Index sequences path. */
   public static final String INDEX_SEQUENCES_KEY = "index.sequences";
