@@ -7,12 +7,17 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 
 import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
@@ -328,17 +333,26 @@ public class Bcl2FastqOutput {
     }
 
     int i = 0;
+    Multimap<Integer, String> sampleEntries = ArrayListMultimap.create();
 
     for (Sample sample : samplesheet) {
-
-      i++;
-
       // If sample id is not defined, use sample name
       final String sname = sample.getSampleId() != null
           ? sample.getSampleId() : sample.getSampleName();
 
-      if (sampleName.equals(sname)) {
-        return i;
+      sampleEntries.put(sample.getLane(), sname);
+    }
+
+    List<Integer> lanesSorted = new ArrayList<Integer>(sampleEntries.keySet());
+    Collections.sort(lanesSorted);
+
+    for (int lane : lanesSorted) {
+      Collection<String> extractedSampleNames = sampleEntries.get(lane);
+      for (String sample : extractedSampleNames) {
+        i++;
+        if (sampleName.equals(sample)) {
+          return i;
+        }
       }
     }
 
@@ -545,5 +559,4 @@ public class Bcl2FastqOutput {
     this.version = findBcl2FastqVersion(fastqDir);
     this.samplesheet = samplesheet;
   }
-
 }
