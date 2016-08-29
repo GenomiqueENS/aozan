@@ -129,9 +129,6 @@ def discover_terminated_runs(denied_runs, conf):
                     send_mail_if_recent_run(run_id, MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL, conf)
                     add_run_id_to_processed_run_ids(run_id, conf)
                     run_ids_done.add(run_id)
-                else:
-                    raise Exception('Create run summary report for new discovery run ' + run_id)
-
 
     return run_ids_done
 

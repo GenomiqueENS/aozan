@@ -733,5 +733,35 @@
 			</action>
 		</release>
 
+		<release version="2.0-rc18" description="Aozan 2.0-rc18 release"  date="2016-08-25">
+			<action dev="jourdren" type="fix">
+                                 Entries in done files were written with the 2 byte of the Byte order mark.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 Fix some typos in email messages.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 When a configuration key related to a path key did not exist, an exception was thrown when checking the path existance.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 The default compression level value was not set for the right configuration key.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 In detection_end_run.discover_terminated_runs(), do not raise an exception when create_run_summary_reports() failed because an error message has been already sent..
+			</action>
+			<action dev="jourdren" type="fix">
+                                 The samplesheet in XLSX format are now also saved in the zip archive.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 Fix non-existing variable Python error when archiving samplesheet.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 In demux step, the temporary samplesheet file used by bcl2fastq was removed twice.
+			</action>
+			<action dev="jourdren" type="update">
+                                 At startup of aozan.aozan_main(), now check if the configuration file exists..
+			</action>
+		</release>
+
 	</body>
 </document>

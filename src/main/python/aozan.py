@@ -116,8 +116,6 @@ def welcome(conf):
 
 
 something_to_do = False
-is_error_message = True
-is_not_error_message = False
 
 
 def lock_step(lock_file_path, step_name, conf):
@@ -252,6 +250,39 @@ def unlock_partial_sync_step(conf, run_id):
     return unlock_sync_step(conf, run_id)
 
 
+def exception_error(step, desc, conf):
+    """Handle an exception.
+
+    Arguments:
+        step: error step
+        desc: description of the section error
+        conf: configuration object
+        run_id: run_id
+    """
+    exp_info = sys.exc_info()
+    exception_msg = str(exp_info[0]) + ' (' + str(exp_info[1]) + ')'
+    traceback_msg = traceback.format_exc(exp_info[2])
+
+    short_message = desc + ', catch exception ' + exception_msg
+    message = desc + ', catch exception ' + exception_msg + \
+              '\n Stacktrace: \n' + traceback_msg
+
+    if step == 'sync':
+        sync_run.error(short_message, message, conf)
+    elif step == 'demux':
+        demux_run.error(short_message, message, conf)
+    elif step == 'qc':
+        qc_run.error(short_message, message, conf)
+    else:
+        # Log the exception
+        common.log('SEVERE', 'Exception: ' + exception_msg, conf)
+        common.log('WARNING', traceback_msg.replace('\n', ' '), conf)
+
+        # Send a mail with the exception
+        common.send_msg("[Aozan] Exception: " + exception_msg, traceback_msg,
+                        True, conf)
+
+
 def launch_steps(conf):
     """Launch steps.
 
@@ -303,12 +334,7 @@ def launch_steps(conf):
                     common.log('INFO', 'Synchronize ' + run_id + ' is locked.', conf)
 
         except:
-            exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
-            traceback_msg = traceback.format_exc(sys.exc_info()[2])
-
-            sync_run.error("Fail synchronization for run " + run_id + ", catch exception " + exception_msg,
-                           "Fail synchronization for run " + run_id + ", catch exception " + exception_msg +
-                           "\n Stacktrace : \n" + traceback_msg, conf)
+            exception_error('sync' , 'Fail synchronization for run ' + run_id, conf)
 
     #
     # Demultiplexing
@@ -343,12 +369,7 @@ def launch_steps(conf):
                     common.log('INFO', 'Demux ' + run_id + ' is locked.', conf)
 
         except:
-            exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
-            traceback_msg = traceback.format_exc(sys.exc_info()[2])
-
-            demux_run.error("Fail demultiplexing for run " + run_id + ", catch exception " + exception_msg,
-                            "Fail demultiplexing for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg,
-                            conf)
+            exception_error('demux', 'Fail demultiplexing for run ' + run_id, conf)
 
     #
     # Quality control
@@ -378,11 +399,7 @@ def launch_steps(conf):
                     common.log('INFO', 'Quality control ' + run_id + ' is locked.', conf)
 
         except:
-            exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
-            traceback_msg = traceback.format_exc(sys.exc_info()[2])
-            qc_run.error("Fail quality control for run " + run_id + ", catch exception " + exception_msg,
-                         "Fail quality control for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg,
-                         conf)
+            exception_error('qc', 'Fail quality control for run ' + run_id, conf)
 
     #
     # Partial synchronization
@@ -447,8 +464,15 @@ def aozan_main():
     # Use default (US) locale
     Locale.setDefault(Globals.DEFAULT_LOCALE)
 
+    # Check if configuration file exists
+    conf_file = args[0]
+    if not os.path.isfile(conf_file):
+        sys.stderr.write('ERROR: Aozan can not be executed. Configuration file is missing: ' + \
+                         conf_file + '\n')
+        sys.exit(1)
+
     # Load Aozan conf file
-    common.load_conf(conf, args[0])
+    common.load_conf(conf, conf_file)
 
     # End of Aozan if aozan is not enable
     if common.is_conf_value_defined(AOZAN_ENABLE_KEY, 'false', conf):
@@ -461,7 +485,7 @@ def aozan_main():
         common.exception_msg(exp, conf)
 
     # Check main path file in configuration
-    if not common.check_configuration(conf, args[0]):
+    if not common.check_configuration(conf, conf_file):
         common.log('SEVERE',
                    'Aozan can not be executed. Configuration is invalid or missing, some useful directories ' +
                    'may be inaccessible. ',
@@ -498,16 +522,7 @@ def aozan_main():
                 sys.exit(1)
 
         except:
-            # Get exception info
-            exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
-            traceback_msg = traceback.format_exc(sys.exc_info()[2]).replace('\n', ' ')
-
-            # Log the exception
-            common.log('SEVERE', 'Exception: ' + exception_msg, conf)
-            common.log('WARNING', traceback_msg, conf)
-
-            # Send a mail with the exception
-            common.send_msg("[Aozan] Exception: " + exception_msg, traceback_msg, is_not_error_message, conf)
+            exception_error(None, '', conf)
 
             common.log('INFO', 'End of Aozan', conf)
 
@@ -519,10 +534,10 @@ def aozan_main():
             sys.exit(1)
     else:
         if not options.quiet:
-            print "A lock file exists."
+            sys.stderr.write('ERROR: Aozan can not be executed. A lock file exists.\n')
         if not os.path.exists('/proc/%d' % (load_pid_in_lock_file(lock_file_path))):
             common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf[LOCK_FILE_KEY] +
-                         ". Please investigate last error and then remove the lock file.", is_error_message,
+                         ". Please investigate last error and then remove the lock file.", True,
                          conf[AOZAN_VAR_PATH_KEY] + '/aozan.lasterr', conf)
 
 
