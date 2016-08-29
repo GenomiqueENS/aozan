@@ -23,11 +23,6 @@ from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
 from java.lang import Runnable
 from java.util.concurrent import Executors
 
-DENY_FILE = "recompress.deny"
-DONE_FILE = "recompress.done"
-LASTERR_FILE = "recompress.lasterr"
-
-
 class Worker(Runnable):
     def __init__(self, fq, conf):
         self.fq = fq
