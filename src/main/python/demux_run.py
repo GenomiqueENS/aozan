@@ -24,11 +24,8 @@ from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_URL_KEY
 from fr.ens.biologie.genomique.aozan.Settings import DEMUX_SPACE_FACTOR_KEY
-from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_ADAPTER_FASTA_FILE_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY
-from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_COMPRESSION_KEY
 from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_COMPRESSION_LEVEL_KEY
-from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_FASTQ_CLUSTER_COUNT_KEY
 from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_MISMATCHES_KEY
 from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_SAMPLESHEET_FORMAT_KEY
@@ -49,20 +46,13 @@ from fr.ens.biologie.genomique.aozan.illumina.samplesheet.io import SampleSheetC
 from fr.ens.biologie.genomique.aozan.illumina.samplesheet.io import SampleSheetCSVReader
 from fr.ens.biologie.genomique.aozan.illumina.samplesheet.io import SampleSheetXLSXReader
 
-BCL2FASTQ2_VERSION = "latest"
-
-DENY_FILE = 'demux.deny'
-DONE_FILE = 'demux.done'
-LASTERR_FILE = 'demux.lasterr'
-
-
 def load_denied_run_ids(conf):
     """Load the list of the denied run ids.
 
     Arguments:
         conf: configuration dictionary
     """
-    return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + DENY_FILE)
+    return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + common.DEMUX_DENY_FILE)
 
 
 def load_processed_run_ids(conf):
@@ -72,7 +62,7 @@ def load_processed_run_ids(conf):
         conf: configuration dictionary
     """
 
-    return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + DONE_FILE)
+    return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + common.DEMUX_DONE_FILE)
 
 
 def add_run_id_to_processed_run_ids(run_id, conf):
@@ -83,7 +73,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-    common.add_run_id(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + DONE_FILE, conf)
+    common.add_run_id(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + common.DEMUX_DONE_FILE, conf)
 
 
 def error(short_message, message, conf):
@@ -95,7 +85,7 @@ def error(short_message, message, conf):
         conf: configuration dictionary
     """
 
-    common.error('[Aozan] demultiplexer: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/' + LASTERR_FILE,
+    common.error('[Aozan] demultiplexer: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/' + common.DEMUX_LASTERR_FILE,
                  conf)
 
 
@@ -535,7 +525,7 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
     try:
         # Set working in docker on parent demultiplexing run directory.
         # Demultiplexing run directory will create by bcl2fastq
-        docker = DockerUtils(['/bin/bash', '-c', cmd], 'bcl2fastq2', BCL2FASTQ2_VERSION)
+        docker = DockerUtils(['/bin/bash', '-c', cmd], 'bcl2fastq2', common.BCL2FASTQ2_VERSION)
         # docker = DockerUtils('touch /tmp/totot', 'bcl2fastq2', bcl2fastq_version)
 
         common.log("CONFIG", "bcl2fastq run with image docker from " + docker.getImageDockerName() +

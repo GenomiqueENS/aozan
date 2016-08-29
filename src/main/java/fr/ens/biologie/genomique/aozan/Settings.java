@@ -119,6 +119,13 @@ public final class Settings {
   public static final String FIRST_BASE_REPORT_STEP_KEY =
       "first.base.report.step";
 
+  /** Recompression step. */
+  public static final String RECOMPRESS_STEP_KEY = "recompress.step";
+    /** Erase input after recompression. */
+  public static final String RECOMPRESS_DELETE_ORIGINAL_FASTQ_KEY = "recompress.delete.original.fastq";
+  /** Erase input after recompression. */
+public static final String RECOMPRESS_COMPRESSION_LEVEL_KEY = "recompress.compression.level";
+
   /** Index html template path. */
   public static final String INDEX_HTML_TEMPLATE_KEY = "index.html.template";
   /** Index sequences path. */

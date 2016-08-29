@@ -9,7 +9,6 @@ import common, hiseq_run
 from java.io import File
 from xml.dom.minidom import parse
 
-from fr.ens.biologie.genomique.aozan.Settings import HISEQ_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
 
 

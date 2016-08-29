@@ -101,12 +101,13 @@
    discovered at the end of this last 3 steps, the synchronization of the new run will be launched before resuming
    the end of the analysis of the previous run.</p>
 
-   <p>The 5 steps of Aozan are:</p>
+   <p>The 6 native steps of Aozan are:</p>
    <ol>
      <li><a href="new-run-discovering.html">New run discovering step</a></li>
      <li><a href="end-run-discovering.html">End run discovering step</a></li>
      <li><a href="synchronization.html">Synchronization step</a></li>
      <li><a href="demultiplexing.html">Demultiplexing step</a></li>
+     <li><a href="recompression.html">Recompression step</a></li>
      <li><a href="quality-control.html">Quality control step</a></li>
    </ol>
  </section>
@@ -374,17 +375,18 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
 	<p>(*) The directory specified in field aozan.var.path contains the following files.
 	Aozan allows to process several runs at the same time. At the end of a step, it adds the run id of that run that has been processed in the step log file.
 		<ul>
-			<li><b>first_base_report.done</b> : list of the run ids treated for the first base report step;</li>
-			<li><b>hiseq.done</b> : list of the run ids treated for the end run discovering step;</li>
-			<li><b>hiseq.deny</b> : list of the run ids not to treat (in this file, manual entry);</li>
-			<li><b>sync.done</b> : list of the run ids treated for the synchronization step;</li>
-			<li><b>demux.done</b> : list of the run ids treated for the demuliplexing step;</li>
-			<li><b>qc.done</b> : list of the run ids treated for the quality control step;</li>
+			<li><b>first_base_report.done</b> : list of the run ids processed by the first base report step;</li>
+			<li><b>hiseq.done</b> : list of the run ids processed by the end run discovering step;</li>
+			<li><b>hiseq.deny</b> : list of the run ids for not to process (in this file, manual entry);</li>
+			<li><b>sync.done</b> : list of the run ids processed by the synchronization step;</li>
+			<li><b>recompress.done</b> : list of the run ids processed by the recompression step;</li>
+			<li><b>demux.done</b> : list of the run ids processed by the demuliplexing step;</li>
+			<li><b>qc.done</b> : list of the run ids processed by the quality control step;</li>
 		</ul>
 		The following files can also be created to set priority or disable specific runs.
 		<ul>
-			<li><b>runs.priority</b> : list of the run ids treated in priority by aozan when available;</li>
-			<li><b>[step].deny</b> : list of the run ids that won't be treated by a step;</li>
+			<li><b>runs.priority</b> : list of the run ids processed in priority by aozan when available;</li>
+			<li><b>[step].deny</b> : list of the run ids that won't be processed by a step;</li>
 		</ul>
 	</p>
 
@@ -449,7 +451,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
  <section name="Steps">
 
    <p>The quality control step is the longest step, it can last several days.
-   If Aozan is stopped before the end, it is possible to relaunch it. Restore points allow get back at the last sample treated.
+   If Aozan is stopped before the end, it is possible to relaunch it. Restore points allow get back at the last sample processed.
    The intermediary data are saved in the quality control directory in files with the extension <tt>&quot;.data&quot;</tt>.
    </p>
 
@@ -458,6 +460,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
      <li><a href="end-run-discovering.html">End run discovering step</a></li>
      <li><a href="synchronization.html">Synchronization step</a></li>
      <li><a href="demultiplexing.html">Demultiplexing step</a></li>
+     <li><a href="recompression.html">Recompression step</a></li>
      <li><a href="quality-control.html">Quality control step</a></li>
    </ul>
 

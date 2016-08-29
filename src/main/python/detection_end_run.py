@@ -6,16 +6,10 @@ from xml.etree.ElementTree import ElementTree
 
 import common
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
-from fr.ens.biologie.genomique.aozan.Settings import HISEQ_CRITICAL_MIN_SPACE_KEY
-from fr.ens.biologie.genomique.aozan.Settings import HISEQ_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
 import cmd
-
-DONE_FILE = 'hiseq.done'
-DENY_FILE = 'hiseq.deny'
-MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL = 12 * 3600
 
 def send_failed_run_message(run_id, secs, conf):
     """Send a mail to inform about a failed run.
@@ -45,7 +39,7 @@ def load_processed_run_ids(conf):
         conf: configuration dictionary
     """
 
-    return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + DONE_FILE)
+    return common.load_run_ids(conf[AOZAN_VAR_PATH_KEY] + '/' + common.HISEQ_DONE_FILE)
 
 
 def add_run_id_to_processed_run_ids(run_id, conf):
@@ -56,7 +50,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-    common.add_run_id(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + DONE_FILE, conf)
+    common.add_run_id(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + common.HISEQ_DONE_FILE, conf)
 
 def add_run_id_to_denied_run_ids(run_id, conf):
     """Add a denied run id to the list of the run ids.
@@ -122,11 +116,11 @@ def discover_terminated_runs(denied_runs, conf):
                        conf)
 
             if hiseq_run.get_read_count(run_id, conf) == 0:
-                send_failed_run_message(run_id, MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL, conf)
+                send_failed_run_message(run_id, common.MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL, conf)
                 add_run_id_to_denied_run_ids(run_id, conf)
             else:
                 if create_run_summary_reports(run_id, conf):
-                    send_mail_if_recent_run(run_id, MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL, conf)
+                    send_mail_if_recent_run(run_id, common.MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL, conf)
                     add_run_id_to_processed_run_ids(run_id, conf)
                     run_ids_done.add(run_id)
 

@@ -66,6 +66,32 @@ from fr.ens.biologie.genomique.aozan.util import StringUtils
 PRIORITY_FILE = 'runs.priority'
 
 
+
+FIRST_BASE_DONE_FILE = 'first_base_report.done'
+FIRST_BASE_REPORT_FILE = 'First_Base_Report.htm'
+
+HISEQ_DENY_FILE = 'hiseq.deny'
+HISEQ_DONE_FILE = 'hiseq.done'
+
+SYNC_DENY_FILE = 'sync.deny'
+SYNC_DONE_FILE = 'sync.done'
+SYNC_LASTERR_FILE = 'sync.lasterr'
+
+DEMUX_DENY_FILE = 'demux.deny'
+DEMUX_DONE_FILE = 'demux.done'
+DEMUX_LASTERR_FILE = 'demux.lasterr'
+
+RECOMPRESS_DENY_FILE = 'recompress.deny'
+RECOMPRESS_DONE_FILE = 'recompress.done'
+RECOMPRESS_LASTERR_FILE = 'recompress.lasterr'
+
+QC_DENY_FILE = 'qc.deny'
+QC_DONE_FILE = 'qc.done'
+QC_LASTERR_FILE = 'qc.lasterr'
+
+BCL2FASTQ2_VERSION = "latest"
+MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL = 12 * 3600
+
 def load_prioritized_run_ids(conf):
     """Load the list of the prioritized run ids.
 
@@ -894,7 +920,7 @@ def extract_steps_to_launch(update_logger, conf):
 
     steps = []
     for key in [Settings.FIRST_BASE_REPORT_STEP_KEY, Settings.HISEQ_STEP_KEY, Settings.SYNC_STEP_KEY,
-                Settings.DEMUX_STEP_KEY, Settings.QC_STEP_KEY]:
+                Settings.DEMUX_STEP_KEY, Settings.RECOMPRESS_STEP_KEY, Settings.QC_STEP_KEY]:
 
         if is_conf_value_equals_true(key, conf):
             steps.append(key)
@@ -1326,6 +1352,11 @@ def set_default_conf(conf):
     conf[Settings.SYNC_STEP_KEY] = 'True'
     conf[Settings.DEMUX_STEP_KEY] = 'True'
     conf[Settings.QC_STEP_KEY] = 'False'
+    conf[Settings.RECOMPRESS_STEP_KEY] = 'False'
+
+    # Recompression
+    conf[Settings.RECOMPRESS_DELETE_ORIGINAL_FASTQ_KEY] = 'False'
+    conf[Settings.RECOMPRESS_COMPRESSION_LEVEL_KEY] = '9'
 
     # Lock file
     conf[Settings.LOCK_FILE_KEY] = '/var/lock/aozan.lock'

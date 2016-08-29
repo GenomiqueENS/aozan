@@ -8,7 +8,7 @@ Created on 25 oct. 2011
 
 import sys, os, traceback
 from optparse import OptionParser
-import common, hiseq_run, sync_run, demux_run, qc_run
+import common, hiseq_run, sync_run, demux_run, qc_run, recompress_run
 import estimate_space_needed
 from java.util import Locale
 
@@ -18,8 +18,8 @@ from fr.ens.biologie.genomique.aozan import Globals
 from fr.ens.biologie.genomique.aozan import Common
 from fr.ens.biologie.genomique.aozan import AozanException
 
-from fr.ens.biologie.genomique.aozan.Settings import HISEQ_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import DEMUX_STEP_KEY
+from fr.ens.biologie.genomique.aozan.Settings import RECOMPRESS_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import QC_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import DEMUX_USE_HISEQ_OUTPUT_KEY
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_LOG_LEVEL_KEY
@@ -163,7 +163,7 @@ def unlock_step(lock_file_path):
 
 
 def lock_sync_step(conf, run_id):
-    """Lock the sync step step.
+    """Lock the sync step.
 
     Arguments:
         conf: configuration object
@@ -174,7 +174,7 @@ def lock_sync_step(conf, run_id):
 
 
 def lock_demux_step(conf, run_id):
-    """Lock the demux step step.
+    """Lock the demux step.
 
     Arguments:
         conf: configuration object
@@ -184,8 +184,19 @@ def lock_demux_step(conf, run_id):
     return lock_step(conf[FASTQ_DATA_PATH_KEY] + '/' + run_id + '.lock', 'demux', conf)
 
 
+def lock_recompress_step(conf, run_id):
+    """Lock the recompress step.
+
+    Arguments:
+        conf: configuration object
+        run_id: run_id
+    """
+
+    return lock_step(conf[FASTQ_DATA_PATH_KEY] + '/' + run_id + '.lock', 'recompress', conf)
+
+
 def lock_qc_step(conf, run_id):
-    """Lock the qc step step.
+    """Lock the qc step.
 
     Arguments:
         conf: configuration object
@@ -219,6 +230,17 @@ def unlock_sync_step(conf, run_id):
 
 def unlock_demux_step(conf, run_id):
     """Unlock the demux step.
+
+    Arguments:
+        conf: configuration object
+        run_id: run_id
+    """
+
+    return unlock_step(conf[FASTQ_DATA_PATH_KEY] + '/' + run_id + '.lock')
+
+
+def unlock_recompress_step(conf, run_id):
+    """Unlock the recompress step.
 
     Arguments:
         conf: configuration object
@@ -372,19 +394,50 @@ def launch_steps(conf):
             exception_error('demux', 'Fail demultiplexing for run ' + run_id, conf)
 
     #
+    # Recompression
+    #
+
+    recompress_run_ids_done = recompress_run.load_processed_run_ids(conf)
+
+    if common.is_conf_value_equals_true(RECOMPRESS_STEP_KEY, conf):
+
+        try:
+            recompress_denied_run_ids = recompress_run.load_denied_run_ids(conf)
+            for run_id in run_id_sorted_by_priority(demux_run_ids_done - recompress_run_ids_done - recompress_denied_run_ids,
+                                                    prioritized_run_ids):
+                if lock_recompress_step(conf, run_id):
+                    welcome(conf)
+                    common.log('INFO', 'Recompression ' + run_id, conf)
+                    if recompress_run.recompress(run_id, conf):
+                        recompress_run.add_run_id_to_processed_run_ids(run_id, conf)
+                        recompress_run_ids_done.add(run_id)
+                        unlock_recompress_step(conf, run_id)
+                    else:
+                        unlock_recompress_step(conf, run_id)
+                        return False
+                else:
+                    common.log('INFO', 'Recompression ' + run_id + ' is locked.', conf)
+
+        except:
+            exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
+            traceback_msg = traceback.format_exc(sys.exc_info()[2])
+            recompress_run.error("Fail recompression for run " + run_id + ", catch exception " + exception_msg,
+                         "Fail recompression for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg,
+                         conf)
+
+
+    #
     # Quality control
     #
-    # print("QC part")
+
     qc_run_ids_done = qc_run.load_processed_run_ids(conf)
 
     if common.is_conf_value_equals_true(QC_STEP_KEY, conf):
 
         try:
             qc_denied_run_ids = qc_run.load_denied_run_ids(conf)
-            for run_id in run_id_sorted_by_priority(demux_run_ids_done - qc_run_ids_done - qc_denied_run_ids,
+            for run_id in run_id_sorted_by_priority(recompress_run_ids_done - qc_run_ids_done - qc_denied_run_ids,
                                                     prioritized_run_ids):
-                # print 'DEBUG: check type on run id ', type(run_id), '|'+run_id+'|', len(run_id)
-                # print 'DEBUG qc launch on ' + str(run_id)
                 if lock_qc_step(conf, run_id):
                     welcome(conf)
                     common.log('INFO', 'Quality control ' + run_id, conf)
