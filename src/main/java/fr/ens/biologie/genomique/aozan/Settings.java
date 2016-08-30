@@ -173,6 +173,8 @@ public static final String RECOMPRESS_COMPRESSION_LEVEL_KEY = "recompress.compre
   public static final String SYNC_STEP_KEY = "sync.step";
   /** Directory tmp path. */
   public static final String TMP_PATH_KEY = "tmp.path";
+  /** Docker connection string. */
+  public static final String DOCKER_URI_KEY = "docker.uri";
 
   /** Configuration collector. */
   /** Collector FastQC contaminant file. */

@@ -95,6 +95,7 @@
        <table>
 	     <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
 	     <tr><td>bcl2fastq.use.docker</td><td>boolean</td><td>True</td><td>Enable to use Docker container to run bcl2fastq for demultiplexing.</td></tr>
+	     <tr><td>docker.uri</td><td>string</td><td>unix:///var/run/docker.sock</td><td>Docker deamon URI.</td></tr>
 	   </table>
 	   
 	   

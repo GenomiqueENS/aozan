@@ -33,12 +33,13 @@ import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import com.spotify.docker.client.DefaultDockerClient;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.DockerClient.LogsParameter;
 import com.spotify.docker.client.DockerException;
@@ -54,7 +55,12 @@ import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.eoulsan.EoulsanLogger;
 import fr.ens.biologie.genomique.eoulsan.util.ProcessUtils;
 
-public class DockerUtils {
+/**
+ * This class define a Docker command to execute.
+ * @author Sandrine Perrin
+ * @since 2.0
+ */
+public class DockerCommand {
 
   /** Logger. */
   private static final Logger LOGGER = Common.getLogger();
@@ -77,21 +83,22 @@ public class DockerUtils {
   private String permission;
   private String depotPublicName;
   private String workDirectoryDocker;
+  private Map<String, String> mountPoints = new HashMap<>();
 
   private int exitValue = -1;
   private Throwable exception = null;
+  private final DockerClient dockerClient;
 
   public void run() {
     // Create connection
 
-    try (DockerClient docker =
-        new DefaultDockerClient("unix:///var/run/docker.sock")) {
+    try {
 
       final String image = buildImageName();
-      LOGGER.warning("BUILD docker image name " + image);
+      LOGGER.warning("Pull docker image: " + image);
 
       // Pull image
-      docker.pull(image);
+      dockerClient.pull(image);
 
       // Create container
       final HostConfig hostConfig =
@@ -104,7 +111,7 @@ public class DockerUtils {
 
       // // Create container
       LOGGER.warning("Docker create config "
-          + "\n\tdocker " + docker + "\n\t imagename " + image
+          + "\n\tdocker " + dockerClient + "\n\t imagename " + image
           + "\n\t host Configure is  " + hostConfig + "\n\tcommend line "
           + Joiner.on(" ").join(cmd) + "\n\twork directory " + workDir
           + "\n\tpermission " + permission);
@@ -114,29 +121,29 @@ public class DockerUtils {
               .user(permission).workingDir(workDir).build();
 
       ContainerCreation creation;
-      creation = docker.createContainer(config);
+      creation = dockerClient.createContainer(config);
       final String id = creation.id();
 
       // Inspect container
-      final ContainerInfo info = docker.inspectContainer(id);
+      final ContainerInfo info = dockerClient.inspectContainer(id);
       LOGGER.info("Docker container id: " + id);
       LOGGER.info("Docker container info: " + info);
 
       // Start container
-      docker.startContainer(id);
+      dockerClient.startContainer(id);
 
       // Redirect stdout and stderr
-      final LogStream logStream = docker.logs(id, LogsParameter.FOLLOW,
+      final LogStream logStream = dockerClient.logs(id, LogsParameter.FOLLOW,
           LogsParameter.STDERR, LogsParameter.STDOUT);
       redirect(logStream, this.stdoutFile, this.stderrFile);
 
       // Kill container
-      LOGGER.info("Docker exit value " + docker.waitContainer(id));
+      LOGGER.info("Docker exit value " + dockerClient.waitContainer(id));
 
       this.exitValue = info.state().exitCode();
 
       // Remove container
-      docker.removeContainer(id);
+      dockerClient.removeContainer(id);
       LOGGER.info("Docker container successufully removed: " + id);
 
     } catch (DockerException | InterruptedException e) {
@@ -177,10 +184,10 @@ public class DockerUtils {
     final File localDir = new File(localDirectoryPath);
 
     checkArgument(localDir.exists(),
-        "local directory for partition Docker does not exist.-> "
+        "local directory for partition Docker does not exist: "
             + localDirectoryPath);
     checkArgument(localDir.isDirectory(),
-        "local directory for partition Docker is not a directory.-> "
+        "local directory for partition Docker is not a directory: "
             + localDirectoryPath);
 
     // Check it is absolute path
@@ -189,6 +196,18 @@ public class DockerUtils {
             || dockerDirectoryPath.trim().charAt(0) == SEPARATOR,
         "Error Docker: directories path must be absolute local "
             + localDirectoryPath + " docker directory " + dockerDirectoryPath);
+
+    // Do not mount the data twice
+    if (this.mountPoints.containsValue(dockerDirectoryPath)) {
+      if (!dockerDirectoryPath
+          .equals(this.mountPoints.get(localDirectoryPath))) {
+        throw new AozanException(
+            "The Docker mount point is already used: " + dockerDirectoryPath);
+      }
+      return;
+    }
+
+    this.mountPoints.put(localDirectoryPath, dockerDirectoryPath);
 
     this.mountArgument.add(localDirectoryPath + ":" + dockerDirectoryPath);
 
@@ -220,112 +239,6 @@ public class DockerUtils {
     }
 
     return String.format("%s:%s", name, this.imageDockerVersion);
-  }
-
-  /**
-   * Inits the Docker Client.
-   * @param imageName the image name
-   * @return the docker client
-   * @throws DockerException the docker exception
-   * @throws InterruptedException the interrupted exception
-   */
-  private DockerClient initDockerClient(final String imageName)
-      throws DockerException, InterruptedException, AozanException {
-
-    checkArgument(!Strings.isNullOrEmpty(imageName), "image Docker name");
-
-    // TODO
-    System.out.println(" * Create connection with image " + imageName);
-
-    final DockerClient docker =
-        new DefaultDockerClient("unix:///var/run/docker.sock");
-
-    // Pull image
-    System.out.println(" * Pull image");
-    docker.pull(imageName);
-
-    return docker;
-
-  }
-
-  /**
-   * Configure Docker.
-   * @return the host config for Docker
-   */
-  private HostConfig initHostConfig() {
-
-    checkArgument(!this.mountArgument.isEmpty(),
-        "Error Docker: no mount directory settings to configure hostConfig for Docker Client");
-
-    return HostConfig.builder().binds(this.mountArgument).build();
-  }
-
-  /**
-   * Creates the container.
-   * @param docker the docker
-   * @param imageName the image name
-   * @return the string
-   * @throws AozanException
-   */
-  private ContainerCreation buildContainerDocker(final DockerClient docker,
-      final HostConfig hostConfig, final String imageName)
-      throws AozanException {
-    // throws DockerException, InterruptedException {
-
-    checkNotNull(this.commandLine, "Docker image not command line setting.");
-    checkNotNull(this.workDirectoryDocker,
-        "Docker image not work directory setting.");
-
-    // Create container
-    System.out.println(" * Create config "
-        + "\n\tdocker " + docker + "\n\t imagename " + imageName
-        + "\n\t host Configure is  " + hostConfig + "\n\tcommend line "
-        + this.commandLine + "\n\twork directory " + this.workDirectoryDocker);
-
-    ContainerConfig config;
-
-    if (Strings.isNullOrEmpty(this.permission)) {
-      System.out.println(" * config without permission");
-
-      config = ContainerConfig.builder().image(imageName).cmd(this.commandLine)
-          .hostConfig(hostConfig).workingDir(this.workDirectoryDocker).build();
-    } else {
-      System.out.println(" * config with permission -> " + this.permission);
-      config = ContainerConfig.builder().image(imageName).cmd(this.commandLine)
-          .hostConfig(hostConfig).user(this.permission)
-          .workingDir(this.workDirectoryDocker).build();
-
-    }
-
-    config = ContainerConfig.builder().image(imageName).cmd(this.commandLine)
-        .user(this.permission).workingDir(this.workDirectoryDocker).build();
-
-    System.out.println(" * Create container " + config);
-    try {
-      return docker.createContainer(config);
-
-    } catch (DockerException | InterruptedException e) {
-      System.out.println("Docker exception");
-      e.printStackTrace();
-
-    }
-
-    throw new AozanException("FAIL creation container Docker ");
-  }
-
-  /**
-   * Inits the logger stream.
-   * @param docker the docker
-   * @param id the id
-   * @throws DockerException the docker exception
-   * @throws InterruptedException the interrupted exception
-   */
-  private void initLoggerStream(final DockerClient docker, final String id)
-      throws DockerException, InterruptedException {
-    // Redirect stdout and stderr
-    final LogStream logStream = docker.logs(id, LogsParameter.FOLLOW,
-        LogsParameter.STDERR, LogsParameter.STDOUT);
-    redirect(logStream, this.stdoutFile, this.stderrFile);
   }
 
   //
@@ -534,23 +447,29 @@ public class DockerUtils {
   // Constructor
   //
 
-  public DockerUtils(final List<String> commandLine, final String softwareName)
+  public DockerCommand(final String dockerConnectionString,
+      final List<String> commandLine, final String softwareName)
       throws AozanException {
-    this(commandLine, softwareName, DEFAULT_VERSION);
+    this(dockerConnectionString, commandLine, softwareName, DEFAULT_VERSION);
   }
 
   /**
    * Public constructor to initialize parameters to a docker images.
+   * @param dockerConnectionString Docker connection string
    * @param commandLine the command line
    * @param softwareName the software name
    * @param softwareVersion the software version
    * @throws AozanException
    */
-  public DockerUtils(final List<String> commandLine, final String softwareName,
+  public DockerCommand(final String dockerConnectionString,
+      final List<String> commandLine, final String softwareName,
       final String softwareVersion) throws AozanException {
 
     checkNotNull(commandLine, "commande line");
     checkNotNull(softwareName, "software image Docker");
+
+    this.dockerClient =
+        DockerConnection.getInstance(dockerConnectionString).getClient();
 
     this.commandLine = commandLine;
 

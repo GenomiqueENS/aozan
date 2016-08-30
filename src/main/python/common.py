@@ -1423,3 +1423,6 @@ def set_default_conf(conf):
     conf[Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_END_MODE_KEY] = 'true'
     # Default mapper is bowtie
     conf[Settings.QC_CONF_FASTQSCREEN_MAPPER_KEY] = 'bowtie'
+
+    # Docker URI
+    conf[Settings.DOCKER_URI_KEY] = 'unix:///var/run/docker.sock'

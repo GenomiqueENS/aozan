@@ -79,7 +79,8 @@ public class FastQCCollector extends AbstractFastqCollector {
         conf.get(Settings.QC_CONF_FASTQC_PROCESS_UNDETERMINED_SAMPLES_KEY));
 
     // Check if step blast needed and configure
-    OverrepresentedSequencesBlast.getInstance().configure(conf);
+    OverrepresentedSequencesBlast.getInstance().configure(conf,
+        qc.getSettings().get(Settings.DOCKER_URI_KEY));
 
   }
 

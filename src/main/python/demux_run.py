@@ -15,7 +15,7 @@ from java.lang import Runtime, Throwable, Exception
 from java.util import HashMap
 
 from fr.ens.biologie.genomique.aozan import AozanException
-from fr.ens.biologie.genomique.aozan.util import DockerUtils
+from fr.ens.biologie.genomique.aozan.util import DockerCommand
 from fr.ens.biologie.genomique.aozan.illumina.samplesheet import SampleSheetUtils, \
     SampleSheetCheck
 
@@ -525,7 +525,7 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
     try:
         # Set working in docker on parent demultiplexing run directory.
         # Demultiplexing run directory will create by bcl2fastq
-        docker = DockerUtils(['/bin/bash', '-c', cmd], 'bcl2fastq2', common.BCL2FASTQ2_VERSION)
+        docker = DockerCommand(['/bin/bash', '-c', cmd], 'bcl2fastq2', common.BCL2FASTQ2_VERSION)
         # docker = DockerUtils('touch /tmp/totot', 'bcl2fastq2', bcl2fastq_version)
 
         common.log("CONFIG", "bcl2fastq run with image docker from " + docker.getImageDockerName() +

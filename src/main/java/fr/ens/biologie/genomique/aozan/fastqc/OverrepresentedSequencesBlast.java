@@ -64,7 +64,7 @@ import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
-import fr.ens.biologie.genomique.aozan.util.DockerUtils;
+import fr.ens.biologie.genomique.aozan.util.DockerCommand;
 import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
 
 /**
@@ -88,7 +88,7 @@ public class OverrepresentedSequencesBlast {
 
   private static final String BLAST_EXECUTABLE_DOCKER = "blastall";
   private static final String BLAST_DOCKER_IMAGE = "blast2";
-  private static final String BLAST_VERSION_DOCKER = "2.2.16";
+  private static final String BLAST_VERSION_DOCKER = "2.2.26";
 
   // Tag configuration general of blast
   private static final String HIT_TAG = "Hit";
@@ -109,6 +109,7 @@ public class OverrepresentedSequencesBlast {
 
   private CommandLine blastCommonCommandLine;
   private Set<String> submittedSequences = new HashSet<>();
+  private String dockerConnectionString;
 
   //
   // Configuration
@@ -117,8 +118,10 @@ public class OverrepresentedSequencesBlast {
   /**
    * Configure and check that Blastn can be launched.
    * @param conf object with the collector configuration
+   * @param dockerConnectionString Docker connection URI
    */
-  public void configure(final CollectorConfiguration conf) {
+  public void configure(final CollectorConfiguration conf,
+      final String dockerConnectionString) {
 
     checkNotNull(conf, "conf argument cannot be null");
 
@@ -137,8 +140,8 @@ public class OverrepresentedSequencesBlast {
     this.tmpDir = new File(conf.get(QC.TMP_DIR));
 
     // Test Docker must be used for launching Blast
-    this.useDocker = Boolean
-        .getBoolean(conf.get(Settings.QC_CONF_FASTQC_BLAST_DB_PATH_KEY).trim());
+    this.useDocker = Boolean.parseBoolean(
+        conf.get(Settings.QC_CONF_FASTQC_BLAST_USE_DOCKER_KEY).trim());
 
     // Add arguments from configuration Aozan
     final String blastArguments =
@@ -153,6 +156,7 @@ public class OverrepresentedSequencesBlast {
 
     if (useDocker) {
       blastPath = BLAST_EXECUTABLE_DOCKER;
+      this.dockerConnectionString = conf.get(Settings.DOCKER_URI_KEY);
     } else {
 
       // Path to blast executable
@@ -181,7 +185,8 @@ public class OverrepresentedSequencesBlast {
       try {
 
         this.blastCommonCommandLine =
-            createBlastCommandLine(blastPath, blastDBPath, blastArguments);
+            createBlastCommandLine(new File(blastPath), new File(blastDBPath),
+                blastArguments, useDocker);
 
         // Add in map all sequences to do not analysis, return a resultBlast
         // with no hit
@@ -307,20 +312,23 @@ public class OverrepresentedSequencesBlast {
   // Methods to build command line
   //
 
-  private CommandLine createBlastCommandLine(final String blastPath,
-      final String blastDBPath, final String blastArguments)
-      throws IOException, AozanException {
+  private CommandLine createBlastCommandLine(final File blastPath,
+      final File blastDBPath, final String blastArguments,
+      final boolean useDocker) throws IOException, AozanException {
 
-    if (blastPath.endsWith("blastall")) {
-      return new BlastallCommandLine(blastPath, blastDBPath, blastArguments);
+    if ("blastall".equals(blastPath.getName())) {
+      return new BlastallCommandLine(blastPath, blastDBPath, blastArguments,
+          useDocker);
     }
 
-    if (blastPath.endsWith("blastn")) {
-      return new NbciBlastnCommandLine(blastPath, blastDBPath, blastArguments);
+    if ("blastn".equals(blastPath.getName())) {
+      return new NbciBlastnCommandLine(blastPath, blastDBPath, blastArguments,
+          useDocker);
     }
 
     throw new AozanException(
-        "Fail to build command line, only blastn (from ncbi-blast+) or blastall application are supported.");
+        "Fail to build command line, only blastn (from ncbi-blast+) or "
+            + "blastall application are supported.");
   }
 
   //
@@ -354,10 +362,9 @@ public class OverrepresentedSequencesBlast {
         .info("FASTQC: Launch " + this.submittedSequences.size() + " blast(s)");
 
     if (this.useDocker) {
-      launchDockerBlast(this.blastCommonCommandLine, inputFastaFile,
-          resultXMLFile);
+      launchDockerBlast(this.dockerConnectionString,
+          this.blastCommonCommandLine, inputFastaFile, resultXMLFile);
     } else {
-
       launchStandaloneBlast(this.blastCommonCommandLine, inputFastaFile,
           resultXMLFile);
     }
@@ -423,16 +430,18 @@ public class OverrepresentedSequencesBlast {
    * @param outputFile output XML file
    * @throws AozanException occurs if the process fails
    */
-  private static void launchDockerBlast(final CommandLine commandLine,
-      final File inputFile, final File outputFile) throws AozanException {
+  private static void launchDockerBlast(final String dockerConnectionString,
+      final CommandLine commandLine, final File inputFile,
+      final File outputFile) throws AozanException {
 
     final List<String> cmd = commandLine.getComandLine(inputFile, outputFile);
 
-    DockerUtils du =
-        new DockerUtils(cmd, BLAST_DOCKER_IMAGE, BLAST_VERSION_DOCKER);
-    du.addMountDirectory(inputFile.getAbsolutePath());
-    du.addMountDirectory(outputFile.getAbsolutePath());
-    du.addMountDirectory(commandLine.blastDBPath);
+    DockerCommand du = new DockerCommand(dockerConnectionString, cmd,
+        BLAST_DOCKER_IMAGE, BLAST_VERSION_DOCKER);
+    du.addMountDirectory(inputFile.getParentFile().getAbsolutePath());
+    du.addMountDirectory(outputFile.getParentFile().getAbsolutePath());
+    du.addMountDirectory(
+        commandLine.blastDBPath.getParentFile().getAbsolutePath());
 
     LOGGER.fine("FASTQC: Blast command line: " + cmd);
 
@@ -606,8 +615,8 @@ public class OverrepresentedSequencesBlast {
     /** Result file must be XML. */
     private static final String EVALUE_ARGUMENT = "0.0001";
 
-    private final String blastPath;
-    private final String blastDBPath;
+    private final File blastPath;
+    private final File blastDBPath;
     private final List<String> argBlast;
 
     //
@@ -637,13 +646,13 @@ public class OverrepresentedSequencesBlast {
 
       final List<String> result = new ArrayList<>();
 
-      result.add(this.blastPath);
+      result.add(this.blastPath.getPath());
 
       result.add(getProgramNameArgumentName());
       result.add("blastn");
 
       result.add(getDatabaseArgumentName());
-      result.add(this.blastDBPath);
+      result.add(this.blastDBPath.getPath());
 
       result.add(getAlignementViewOptionsArgumentName());
       result.add(getAlignementViewOptionsArgumentValue());
@@ -738,17 +747,22 @@ public class OverrepresentedSequencesBlast {
      * @param blastDBPath path to blastn database
      * @param blastArguments argument for blastn added in configuration Aozan,
      *          optional
+     * @param useDocker true if Docker must be used
      * @throws IOException an error occurs if application or database doesn't
      *           exist
      * @throws AozanException occurs if the parameters syntax is invalid.
      */
-    CommandLine(final String blastPath, final String blastDBPath,
-        final String blastArguments) throws IOException, AozanException {
+    CommandLine(final File blastPath, final File blastDBPath,
+        final String blastArguments, final boolean useDocker)
+        throws IOException, AozanException {
 
       this.blastPath = blastPath;
       this.blastDBPath = blastDBPath;
 
-      checkExistingFile(new File(blastPath), "FastQC: Blast path");
+      if (!useDocker) {
+        checkExistingFile(blastPath, "FastQC: Blast path");
+      }
+
       // Check nt.nal file exists
       checkExistingFile(new File(blastDBPath + ".nal"),
           " FastQC: Blast database path");
@@ -806,9 +820,10 @@ public class OverrepresentedSequencesBlast {
     /**
      * Constructor.
      */
-    NbciBlastnCommandLine(final String blastPath, final String blastDBPath,
-        final String blastArguments) throws IOException, AozanException {
-      super(blastPath, blastDBPath, blastArguments);
+    NbciBlastnCommandLine(final File blastPath, final File blastDBPath,
+        final String blastArguments, final boolean useDocker)
+        throws IOException, AozanException {
+      super(blastPath, blastDBPath, blastArguments, useDocker);
     }
 
   }
@@ -862,9 +877,10 @@ public class OverrepresentedSequencesBlast {
     /**
      * Constructor.
      */
-    BlastallCommandLine(final String blastPath, final String blastDBPath,
-        final String blastArguments) throws IOException, AozanException {
-      super(blastPath, blastDBPath, blastArguments);
+    BlastallCommandLine(final File blastPath, final File blastDBPath,
+        final String blastArguments, final boolean useDocker)
+        throws IOException, AozanException {
+      super(blastPath, blastDBPath, blastArguments, useDocker);
     }
   }
 
