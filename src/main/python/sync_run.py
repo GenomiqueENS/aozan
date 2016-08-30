@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import os, time
-import common, hiseq_run
+import os
+import time
 
+import common
+import hiseq_run
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import BCL_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_DATA_PATH_KEY
-from fr.ens.biologie.genomique.aozan.Settings import SYNC_STEP_KEY
-from fr.ens.biologie.genomique.aozan.Settings import SYNC_SPACE_FACTOR_KEY
-from fr.ens.biologie.genomique.aozan.Settings import SYNC_EXCLUDE_CIF_KEY
-from fr.ens.biologie.genomique.aozan.Settings import SYNC_CONTINUOUS_SYNC_MIN_AGE_FILES_KEY
-from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_URL_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SYNC_CONTINUOUS_SYNC_MIN_AGE_FILES_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SYNC_EXCLUDE_CIF_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SYNC_SPACE_FACTOR_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SYNC_STEP_KEY
+from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
 
 def load_denied_run_ids(conf):
     """Load the list of the denied run ids.
