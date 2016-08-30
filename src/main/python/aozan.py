@@ -430,6 +430,9 @@ def launch_steps(conf):
     # Quality control
     #
 
+    if not common.is_conf_value_equals_true(RECOMPRESS_STEP_KEY, conf):
+        recompress_run_ids_done = demux_run_ids_done
+
     qc_run_ids_done = qc_run.load_processed_run_ids(conf)
 
     if common.is_conf_value_equals_true(QC_STEP_KEY, conf):
