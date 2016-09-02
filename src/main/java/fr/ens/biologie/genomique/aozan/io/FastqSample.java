@@ -187,7 +187,8 @@ public class FastqSample {
    * beginning with this prefix.
    * @return an array of abstract pathnames
    */
-  private List<File> createListFastqFiles(final int read) {
+  private List<File> createListFastqFiles(final int read,
+      final boolean createEmptyFastq) {
 
     final List<File> result =
         this.bcl2fastqOutput.createListFastqFiles(this, read);
@@ -202,7 +203,7 @@ public class FastqSample {
           new File(this.tmpDir, filenamePrefix + "_empty.fastq");
 
       // Create empty file
-      if (!emptyFile.exists()) {
+      if (!emptyFile.exists() && createEmptyFastq) {
         try {
           if (!emptyFile.createNewFile()) {
             throw new IOException(
@@ -349,6 +350,15 @@ public class FastqSample {
   //
 
   /**
+   * Get a SampleSheetFile from a QC
+   * @return sampleSheetFile
+   */
+  private static File getSampleSheetFileFromQC(QC qc) {
+    checkNotNull(qc, "qc argument cannot be null");
+    return qc.getSampleSheetFile();
+  }
+
+  /**
    * Return the temporary if exists which correspond to the key.
    * @return File temporary file or null if it not exists
    */
@@ -393,30 +403,32 @@ public class FastqSample {
       final int lane, final String sampleName, final String projectName,
       final String descriptionSample, final String index) throws IOException {
 
-    checkNotNull(qc, "qc argument cannot be null");
-    checkArgument(read > 0, "read value cannot be lower than 1");
-    checkArgument(lane > 0, "read value cannot be lower than 1");
+    this(getSampleSheetFileFromQC(qc), qc.getFastqDir(), qc.getTmpDir(),
+        qc.getRunId(), sampleId, read, lane, sampleName, projectName,
+        descriptionSample, index);
 
-    this.sampleId = sampleId;
-    this.read = read;
-    this.lane = lane;
-    this.sampleName = sampleName;
-    this.projectName = projectName;
-    this.description = descriptionSample;
-    this.index = (index == null || index.isEmpty()) ? NO_INDEX : index;
-    this.undeterminedIndex = false;
+  }
 
-    this.bcl2fastqOutput =
-        new Bcl2FastqOutput(qc.getSampleSheetFile(), qc.getFastqDir());
-    this.tmpDir = qc.getTmpDir();
+  /**
+   * Public constructor corresponding of a technical replica sample.
+   * @param sampleId the sample Id
+   * @param read read number
+   * @param lane lane number
+   * @param sampleName name of the sample
+   * @param projectName name of the project
+   * @param descriptionSample description of the sample
+   * @param index value of index or if doesn't exists, NoIndex
+   * @throws IOException if an error occurs while reading bcl2fastq version
+   */
+  public FastqSample(final File sampleSheetFile, final File fastqDir,
+      final File tmpDir, final String runId, final int sampleId, final int read,
+      final int lane, final String sampleName, final String projectName,
+      final String descriptionSample, final String index) throws IOException {
 
-    this.fastqFiles = createListFastqFiles(this.read);
+    this(new Bcl2FastqOutput(sampleSheetFile, fastqDir), fastqDir, tmpDir,
+        runId, sampleId, read, lane, sampleName, projectName, descriptionSample,
+        index, true);
 
-    this.compressionType = getCompressionExtension(this.fastqFiles);
-    this.keyFastqSample = createKeyFastqSample();
-
-    this.subsetFastqFilename =
-        createSubsetFastqFilename(qc.getRunId(), this.keyFastqSample);
   }
 
   /**
@@ -429,30 +441,60 @@ public class FastqSample {
   public FastqSample(final QC qc, final int sampleId, final int read,
       final int lane) throws IOException {
 
-    checkNotNull(qc, "qc argument cannot be null");
+    this(getSampleSheetFileFromQC(qc), qc.getFastqDir(), qc.getTmpDir(),
+        qc.getRunId(), sampleId, read, lane);
+  }
+
+  /**
+   * Public constructor corresponding of a undetermined index sample.
+   * @param sampleId the sample Id
+   * @param read read number
+   * @param lane lane number
+   * @throws IOException if an error occurs while reading bcl2fastq version
+   */
+  public FastqSample(final File sampleSheetFile, final File fastqDir,
+      final File tmpDir, final String runId, final int sampleId, final int read,
+      final int lane) throws IOException {
+
+    this(new Bcl2FastqOutput(sampleSheetFile, fastqDir), fastqDir, tmpDir,
+        runId, sampleId, read, lane, "lane" + lane, "", "", NO_INDEX, true);
+  }
+
+  /**
+   * Public constructor corresponding of a undetermined index sample.
+   * @param sampleId the sample Id
+   * @param read read number
+   * @param lane lane number
+   * @throws IOException if an error occurs while reading bcl2fastq version
+   */
+  public FastqSample(final Bcl2FastqOutput bcl2FastqOutput, final File fastqDir,
+      final File tmpDir, final String runId, final int sampleId, final int read,
+      final int lane, final String sampleName, final String projectName,
+      final String descriptionSample, final String index,
+      final boolean createEmptyFastq) throws IOException {
+
     checkArgument(read > 0, "read value cannot be lower than 1");
     checkArgument(lane > 0, "read value cannot be lower than 1");
 
     this.sampleId = sampleId;
     this.read = read;
     this.lane = lane;
-    this.sampleName = "lane" + lane;
-    this.projectName = "";
-    this.description = "";
-    this.index = NO_INDEX;
-    this.undeterminedIndex = true;
+    this.sampleName = sampleName;
+    this.projectName = projectName;
+    this.description = descriptionSample;
+    this.index = (index == null || index.isEmpty()) ? NO_INDEX : index;
+    this.undeterminedIndex = this.index.equals(NO_INDEX);
+    this.bcl2fastqOutput = bcl2FastqOutput;
+    this.tmpDir = tmpDir;
 
-    this.bcl2fastqOutput =
-        new Bcl2FastqOutput(qc.getSampleSheetFile(), qc.getFastqDir());
-    this.tmpDir = qc.getTmpDir();
-
-    this.fastqFiles = createListFastqFiles(this.read);
+    this.fastqFiles = createListFastqFiles(this.read, createEmptyFastq);
 
     this.compressionType = getCompressionExtension(this.fastqFiles);
     this.keyFastqSample = createKeyFastqSample();
 
     this.subsetFastqFilename =
-        createSubsetFastqFilename(qc.getRunId(), this.keyFastqSample);
+        createSubsetFastqFilename(runId, this.keyFastqSample);
+
   }
 
 }

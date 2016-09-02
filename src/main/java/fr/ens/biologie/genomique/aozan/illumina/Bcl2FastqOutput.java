@@ -15,9 +15,8 @@ import java.util.List;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 
 import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
@@ -195,7 +194,6 @@ public class Bcl2FastqOutput {
 
       // Build sample name on fastq file according to version used
       final String fastqSampleName = buildFastqSampleName(fastqSample);
-
       return String.format("%s_S%d%s", fastqSampleName,
           extractSamplePositionInSampleSheetLane(this.samplesheet, fastqSample),
           getConstantFastqSuffix(fastqSample.getLane(), read));
@@ -250,7 +248,7 @@ public class Bcl2FastqOutput {
     final String filePrefix = getFilenamePrefix(fastqSample, read);
     final File fastqSampleDir = getFastqSampleParentDir(fastqSample);
 
-    return Arrays.asList(fastqSampleDir.listFiles(new FileFilter() {
+    final File[] result = fastqSampleDir.listFiles(new FileFilter() {
 
       @Override
       public boolean accept(final File file) {
@@ -261,7 +259,13 @@ public class Bcl2FastqOutput {
             && filename.startsWith(filePrefix)
             && filename.contains(FASTQ_EXTENSION);
       }
-    }));
+    });
+
+    if (result == null) {
+      return Collections.emptyList();
+    }
+    return Arrays.asList(result);
+
   }
 
   //
@@ -333,7 +337,7 @@ public class Bcl2FastqOutput {
     }
 
     int i = 0;
-    Multimap<Integer, String> sampleEntries = ArrayListMultimap.create();
+    TreeMultimap<Integer, String> sampleEntries = TreeMultimap.create();
 
     for (Sample sample : samplesheet) {
       // If sample id is not defined, use sample name
@@ -545,6 +549,19 @@ public class Bcl2FastqOutput {
   public Bcl2FastqOutput(final SampleSheet samplesheet, final File fastqDir)
       throws IOException {
 
+    this(samplesheet, fastqDir, findBcl2FastqVersion(fastqDir));
+  }
+
+  /**
+   * Constructor.
+   * @param samplesheet the samplesheet
+   * @param fastqDir the output directory of bcl2fastq
+   * @param version of bcl2fastq
+   * @throws IOException if an error occurs while reading bcl2fastq version
+   */
+  public Bcl2FastqOutput(final SampleSheet samplesheet, final File fastqDir,
+      Bcl2FastqVersion version) throws IOException {
+
     if (samplesheet == null) {
       throw new NullPointerException("samplesheet argument cannot be null");
     }
@@ -556,7 +573,8 @@ public class Bcl2FastqOutput {
     checkExistingDirectoryFile(fastqDir, "fastq directory");
 
     this.fastqDirectory = fastqDir;
-    this.version = findBcl2FastqVersion(fastqDir);
+    this.version = version;
     this.samplesheet = samplesheet;
   }
+
 }
