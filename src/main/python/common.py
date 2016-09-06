@@ -92,6 +92,18 @@ QC_LASTERR_FILE = 'qc.lasterr'
 BCL2FASTQ2_VERSION = "latest"
 MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL = 12 * 3600
 
+def exists_in_path(program):
+    """check if a program exists in PATH environnement variable
+
+    Arguments:
+        program: program name
+    """
+    path_env_var = os.environ['PATH']
+    for path in path_env_var.split(':'):
+        if os.path.exists(path + "/" + program):
+            return True
+    return False
+
 def load_prioritized_run_ids(conf):
     """Load the list of the prioritized run ids.
 
@@ -1358,7 +1370,7 @@ def set_default_conf(conf):
     # Recompression
     conf[Settings.RECOMPRESS_DELETE_ORIGINAL_FASTQ_KEY] = 'False'
     conf[Settings.RECOMPRESS_COMPRESSION_LEVEL_KEY] = '9'
-
+    conf[Settings.RECOMPRESS_COMPRESSION_KEY] = 'bzip2'
     # Lock file
     conf[Settings.LOCK_FILE_KEY] = '/var/lock/aozan.lock'
 
