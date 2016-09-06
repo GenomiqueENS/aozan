@@ -761,6 +761,9 @@
 			<action dev="jourdren" type="update">
                                  At startup of aozan.aozan_main(), now check if the configuration file exists..
 			</action>
+			<action dev="firmo" type="add">
+                                 Added recompression step.
+			</action>
 		</release>
 
 	</body>
