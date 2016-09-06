@@ -189,8 +189,8 @@ def qc(run_id, conf):
         return False
 
     # Archive the reports
-    cmd = 'cd ' + reports_data_path + '  && ' + \
-          'tar cjf qc_' + run_id + '.tar.bz2 qc_' + run_id
+    cmd = 'cd \'' + reports_data_path + '\'  && ' + \
+          'tar cjf \'qc_' + run_id + '.tar.bz2\' \'qc_' + run_id + '\''
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while saving the qc archive file for " + run_id,
@@ -206,7 +206,7 @@ def qc(run_id, conf):
         return False
 
     # The output directory must be read only
-    cmd = 'chmod -R ugo-w ' + qc_output_dir
+    cmd = 'chmod -R ugo-w \'' + qc_output_dir + '\''
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while setting read only the output qc directory for run " + run_id,

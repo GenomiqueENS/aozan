@@ -126,8 +126,8 @@ def recompress_fastq_process(input_file, output_file, input_decompression_comman
 
             # Rename and set previous time stamp and rights to output_file then remove md5sum files
             os.rename(temp_file, output_file)
-            call(["bash", "-c", "touch -r " + input_file + " " + output_file])
-            call(["bash", "-c", "chmod --reference " + input_file + " " + output_file])
+            call(["bash", "-c", "touch -r \'" + input_file + "\' \'" + output_file + '\''])
+            call(["bash", "-c", "chmod --reference \'" + input_file + "\' \'" + output_file + '\''])
             os.remove(input_file + ".md5")
             os.remove(temp_file + ".md5")
 

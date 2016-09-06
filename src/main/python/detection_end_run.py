@@ -219,12 +219,12 @@ def create_run_summary_reports(run_id, conf):
                    "Archive " + hiseq_log_archive_file + " not create: none file exists " + str(files) +
                    ' in ' + source_path, conf)
     else:
-        cmd = 'cd ' + source_path + ' && ' + \
-              'cp -rp ' + files_to_copy + tmp_path + ' && ' + \
-              'cd ' + tmp_base_path + ' && ' + \
-              'mv ' + run_id + ' ' + hiseq_log_prefix + run_id + ' && ' + \
-              'tar cjf ' + reports_data_path + '/' + hiseq_log_archive_file + ' ' + hiseq_log_prefix + run_id + \
-              ' && ' + 'rm -rf ' + tmp_path
+        cmd = 'cd \'' + source_path + '\' && ' + \
+              'cp -rp \'' + files_to_copy + tmp_path + '\' && ' + \
+              'cd \'' + tmp_base_path + '\' && ' + \
+              'mv \'' + run_id + '\' \'' + hiseq_log_prefix + run_id + '\' && ' + \
+              'tar cjf \'' + reports_data_path + '/' + hiseq_log_archive_file + '\' \'' + hiseq_log_prefix + run_id + \
+              '\' && ' + 'rm -rf \'' + tmp_path + '\''
         # + ' && rm -rf ' + hiseq_log_prefix + run_id
 
         common.log("INFO", "exec: " + cmd, conf)
@@ -235,7 +235,7 @@ def create_run_summary_reports(run_id, conf):
 
     # Save html reports
     if os.path.exists(tmp_path):
-        cmd = 'rm -rf ' + tmp_path
+        cmd = 'rm -rf \'' + tmp_path + '\''
 
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
@@ -256,13 +256,13 @@ def create_run_summary_reports(run_id, conf):
         common.log("WARNING", "Archive " + report_archive_file + " not create: none file exists " + str(
             files) + ' in ' + source_path, conf)
     else:
-        cmd = 'cd ' + source_path + ' && ' + \
-              'cp -rp ' + files_to_copy + tmp_path + ' && ' + \
-              'cd ' + tmp_base_path + ' && ' + \
-              'mv ' + run_id + ' ' + report_prefix + run_id + ' && ' + \
-              'tar cjf ' + reports_data_path + '/' + report_archive_file + ' ' + report_prefix + run_id + ' && ' + \
-              'chmod -R u=rwX,go=rX ' + report_prefix + run_id + ' && ' + \
-              'mv ' + report_prefix + run_id + ' ' + reports_data_path
+        cmd = 'cd \'' + source_path + '\' && ' + \
+              'cp -rp \'' + files_to_copy + tmp_path + '\' && ' + \
+              'cd \'' + tmp_base_path + '\' && ' + \
+              'mv \'' + run_id + '\' \'' + report_prefix + run_id + '\' && ' + \
+              'tar cjf \'' + reports_data_path + '/' + report_archive_file + '\' \'' + report_prefix + run_id + '\' && ' + \
+              'chmod -R u=rwX,go=rX \'' + report_prefix + run_id + '\' && ' + \
+              'mv \'' + report_prefix + run_id + '\' \'' + reports_data_path + '\''
 
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:

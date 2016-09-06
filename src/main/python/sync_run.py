@@ -182,19 +182,19 @@ def partial_sync(run_id, last_sync, conf):
     else:
         # Exclude files that will be rewritten severals times during the run
         exclude_files.extend(['*.bin', '*.txt', '*.xml'])
-        cmd = 'cd ' + input_path + ' && find . -type f -mmin +' + conf[SYNC_CONTINUOUS_SYNC_MIN_AGE_FILES_KEY]
+        cmd = 'cd \'' + input_path + '\' && find . -type f -mmin +' + conf[SYNC_CONTINUOUS_SYNC_MIN_AGE_FILES_KEY]
         for exclude_file in exclude_files:
-            cmd += " -not -name '" + exclude_file + "' "
-        cmd += ' > ' + rsync_manifest_path
+            cmd += " -not -name \'" + exclude_file + "\' "
+        cmd += ' > \'' + rsync_manifest_path + '\''
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
             error("error while executing rsync for run " + run_id, 'Error while executing find.\nCommand line:\n' + cmd,
                   conf)
             return False
-        rsync_params = '--files-from=' + rsync_manifest_path
+        rsync_params = '--files-from=\'' + rsync_manifest_path + '\''
 
     # Copy data from hiseq path to bcl path
-    cmd = 'rsync  -a --no-owner --no-group ' + rsync_params + ' ' + input_path + '/ ' + output_path
+    cmd = 'rsync  -a --no-owner --no-group ' + rsync_params + ' \'' + input_path + '/ ' + output_path + '\''
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("error while executing rsync for run " + run_id, 'Error while executing rsync.\nCommand line:\n' + cmd,
