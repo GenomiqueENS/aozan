@@ -477,7 +477,7 @@ def launch_steps(conf):
                 common.log('INFO', 'Partial synchronization of ' + run_id + ' is locked.', conf)
 
     # Close Docker connections
-    DockerConnection.getInstance().closeConnections()
+    DockerConnection.getInstance(conf[Settings.DOCKER_URI_KEY]).closeConnections()
 
     # Everything is OK
     return True

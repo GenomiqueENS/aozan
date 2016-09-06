@@ -525,8 +525,7 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
     try:
         # Set working in docker on parent demultiplexing run directory.
         # Demultiplexing run directory will create by bcl2fastq
-        docker = DockerCommand(['/bin/bash', '-c', cmd], 'bcl2fastq2', common.BCL2FASTQ2_VERSION)
-        # docker = DockerUtils('touch /tmp/totot', 'bcl2fastq2', bcl2fastq_version)
+        docker = DockerCommand([conf[Settings.DOCKER_URI_KEY], '/bin/bash', '-c', cmd], 'bcl2fastq2', common.BCL2FASTQ2_VERSION)
 
         common.log("CONFIG", "bcl2fastq run with image docker from " + docker.getImageDockerName() +
                    " with command line " + cmd, conf)
