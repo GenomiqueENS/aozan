@@ -9,33 +9,41 @@ import time
 from subprocess import call, CalledProcessError
 
 import common
+# noinspection PyUnresolvedReferences,PyUnresolvedReferences,PyUnresolvedReferences
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
+# noinspection PyUnresolvedReferences,PyUnresolvedReferences,PyUnresolvedReferences
 from fr.ens.biologie.genomique.aozan.Settings import FASTQ_DATA_PATH_KEY
+# noinspection PyUnresolvedReferences,PyUnresolvedReferences,PyUnresolvedReferences
 from fr.ens.biologie.genomique.aozan.Settings import RECOMPRESS_COMPRESSION_KEY
+# noinspection PyUnresolvedReferences,PyUnresolvedReferences,PyUnresolvedReferences
 from fr.ens.biologie.genomique.aozan.Settings import RECOMPRESS_COMPRESSION_LEVEL_KEY
+# noinspection PyUnresolvedReferences,PyUnresolvedReferences,PyUnresolvedReferences
 from fr.ens.biologie.genomique.aozan.Settings import RECOMPRESS_DELETE_ORIGINAL_FASTQ_KEY
+# noinspection PyUnresolvedReferences,PyUnresolvedReferences,PyUnresolvedReferences
 from fr.ens.biologie.genomique.aozan.Settings import RECOMPRESS_THREADS_KEY
+# noinspection PyUnresolvedReferences,PyUnresolvedReferences,PyUnresolvedReferences
 from java.lang import Runnable
+# noinspection PyUnresolvedReferences,PyUnresolvedReferences,PyUnresolvedReferences
 from java.util.concurrent import Executors
 
 
 class Worker(Runnable):
-    """Class to execute recompression in different threads.
-
-    Constructor:
-        input_file: input fastq or fastq.gz file
-        output_file
-        input_decompression_command
-        output_compression_command
-        output_decompression_command
-        compression_level_argument
-        delete_original_files: boolean
-    """
-
     def __init__(self, input_file, output_file, input_decompression_command, output_compression_command,
                  output_decompression_command,
                  compression_level_argument,
                  delete_original_files):
+        """Class to execute recompression in different threads.
+
+        Arguments:
+            input_file: input file to decompress
+            output_file: recompressed output file
+            input_decompression_command: command to decompress input file
+            output_compression_command: command to recompress input file
+            output_decompression_command: command to decompress output file
+            compression_level_argument: argument used in compression command
+            delete_original_files: boolean which tells if input file should be removed or not
+        """
+
         self.input_file = input_file
         self.output_file = output_file
         self.input_decompression_command = input_decompression_command
@@ -66,18 +74,6 @@ class Worker(Runnable):
         return self.success
 
 
-def program_list_exists_in_path(program_list):
-    """Check if a list of programs exist in PATH
-
-    Arguments:
-        program_list: list of programs
-    """
-    for program in program_list:
-        if not common.exists_in_path(program):
-            return False
-    return True
-
-
 def get_info_from_file_type(file_type, compression_level=None):
     """return a tuple of information about a file_type or extension
 
@@ -85,17 +81,23 @@ def get_info_from_file_type(file_type, compression_level=None):
         file_type: type or extension
         compression_level: Formats compression level argument for the type given (Optional)
     """
-    file_types = [
+    file_types = {
         # [type, extension, compression_command, decompression_command, compression_level_arg]
-        ["bzip2", "bz2", "bzip2", "bzcat", "-" + str(compression_level)],
-        ["gzip", "gz", "gzip", "zcat", "-" + str(compression_level)],
-        ["fastq", "", "", "cat", ""]
-    ]
-    for type_elements in file_types:
-        if type_elements.count(file_type) > 0:
-            return type_elements
-    else:
-        return
+        "bzip2": ["bzip2", "bz2", "bzip2", "bzcat", "-" + str(compression_level)],
+        "gzip": ["gzip", "gz", "gzip", "zcat", "-" + str(compression_level)],
+        "fastq": ["fastq", "", "", "cat", ""]
+
+    }
+    # aliases of ext to info
+    for type_key in file_types.keys():
+        file_types[file_types[type_key][1]] = file_types[type_key]
+
+    result = file_types[file_type]
+
+    if compression_level is None:
+        result[4] = ""
+
+    return result
 
 
 def recompress_fastq_process(input_file, output_file, input_decompression_command, output_compression_command,
@@ -104,30 +106,41 @@ def recompress_fastq_process(input_file, output_file, input_decompression_comman
     """process recompression for input fastq
 
     Arguments:
-        input_file: input fastq or fastq.gz file
-        output_file
-        input_decompression_command
-        output_compression_command
-        output_decompression_command
-        compression_level_argument
-        delete_original_files: boolean
+            input_file: input file to decompress
+            output_file: recompressed output file
+            input_decompression_command: command to decompress input file
+            output_compression_command: command to recompress input file
+            output_decompression_command: command to decompress output file
+            compression_level_argument: argument used in compression command
+            delete_original_files: boolean which tells if input file should be removed or not
     """
 
     # temporary output file name
     temp_file = output_file + ".tmp"
 
     # convert input_file to output_file
-    if convert_fastq_file(input_file, temp_file, input_decompression_command, compression_level_argument,
-                          output_compression_command,
-                          output_decompression_command):
+    if convert_fastq_file(input_file, temp_file, input_decompression_command, output_compression_command,
+                          output_decompression_command, compression_level_argument):
 
         #  Check md5sum before proceeding
         if compare_md5sum(input_file, temp_file):
 
             # Rename and set previous time stamp and rights to output_file then remove md5sum files
             os.rename(temp_file, output_file)
-            call(["bash", "-c", "touch -r " + input_file + " " + output_file])
-            call(["bash", "-c", "chmod --reference " + input_file + " " + output_file])
+            if call(["bash", "-c", "touch -r \'" + input_file + "\' \'" + output_file + "\'"]) != 0:
+                error_message = "Error while trying to edit metadata using touch command."
+                long_error_message = "Error while trying to edit metadata using touch command. Input file is " + str(
+                    input_file) + " and output file is " + str(
+                    output_file) + ""
+                return False, error_message, long_error_message
+
+            if call(["bash", "-c", "chmod --reference \'" + input_file + "\' \'" + output_file + "\'"]) != 0:
+                error_message = "Error while trying to edit rights using chmod command."
+                long_error_message = "Error while trying to edit right using touch command. Input file is " + str(
+                    input_file) + " and output file is " + str(
+                    output_file) + ""
+                return False, error_message, long_error_message
+
             os.remove(input_file + ".md5")
             os.remove(temp_file + ".md5")
 
@@ -166,20 +179,17 @@ def list_files(input_dir, extension):
     return r
 
 
-def convert_fastq_file(input_file, output_file, input_decompression_command, compression_level_argument,
-                       output_compression_command,
-                       output_decompression_command):
+def convert_fastq_file(input_file, output_file, input_decompression_command, output_compression_command,
+                       output_decompression_command, compression_level_argument):
     """covert input_file fastq into output_file
 
     Arguments:
-        input_file
-        output_file
-        input_decompression_command
-        compression_level_argument
-        output_compression_command
-        output_decompression_command
-
-
+            input_file: input file to decompress
+            output_file: recompressed output file
+            input_decompression_command: command to decompress input file
+            output_compression_command: command to recompress input file
+            output_decompression_command: command to decompress output file
+            compression_level_argument: argument used in compression command
     """
     # Doesn't process if input_file doesn't exist
     if os.path.exists(input_file):
@@ -189,7 +199,10 @@ def convert_fastq_file(input_file, output_file, input_decompression_command, com
 
         # Command a decompresses input file create md5sum for this file then compresses it
         # Whereas Command b decompresses output file just to check md5sum
-        command_a = input_decompression_command + " '" + input_file + "' |tee >(md5sum > '" + input_md5sum + "') | " + output_compression_command + " " + compression_level_argument + " > '" + output_file + "'"
+        # noinspection PyPep8
+        command_a = input_decompression_command + " '" + input_file + "' |tee >(md5sum > '" + input_md5sum + "') | " \
+                        + output_compression_command + " " + compression_level_argument + " > '" + output_file + "'"
+
         command_b = output_decompression_command + " '" + output_file + "' | md5sum > '" + output_md5sum + "'"
 
         # Actual commands execution
@@ -305,7 +318,8 @@ def recompress(run_id, conf):
 
     if compression_info_tuple is None:
         error("Unknown compression type",
-              "Unknown compression type " + compression_type, conf)
+              "Unknown compression type: " + compression_type, conf)
+        return False
 
     (compression_type_result, output_file_extension, output_compression_command, output_decompression_command,
      compression_level_argument) = compression_info_tuple
@@ -314,26 +328,29 @@ def recompress(run_id, conf):
     types_to_recompress = ["fastq.gz", "fastq"]
 
     # list of program to check if exists in path before execution
-    program_list = ["bash", "tee", "touch", "chmod", "md5sum", output_compression_command, output_decompression_command]
+    program_set = {"bash", "tee", "touch", "chmod", "md5sum", output_compression_command, output_decompression_command}
 
     # get list of file to process
     input_files = []
     for extension in types_to_recompress:
 
         input_files.extend(list_files(fastq_input_dir, extension))
-        simple_extension = os.path.splitext(extension)[-1].lstrip('.')
+        simple_extension = os.path.splitext(extension)[-1][1:]
         extension_info_tuple = get_info_from_file_type(simple_extension)
 
         if extension_info_tuple is None:
             error("Unknown extension type",
-                  "Unknown extension type " + extension, conf)
+                  "Unknown extension type: " + extension, conf)
+            return False
 
-        program_list.append(extension_info_tuple[3])
+        program_set.add(extension_info_tuple[3])
 
     # actual program list check
-    if not program_list_exists_in_path(program_list):
-        error("can't find all needed commands in PATH env var",
-              "can't find all needed commands in PATH env var. Commands are " + str(program_list), conf)
+    for program in program_set:
+        if not common.exists_in_path(program):
+            error("Can't find all needed commands in PATH env var",
+                  "Can't find all needed commands in PATH env var. Unable to find: " + program + " command.", conf)
+            return False
 
     # Create executor and for parallelization of processus
     executor = Executors.newFixedThreadPool(int(conf[RECOMPRESS_THREADS_KEY]))
@@ -342,24 +359,20 @@ def recompress(run_id, conf):
     # process each fastq and fastq.gz recursively in each fastq directory
     for input_file in input_files:
 
-        simple_extension = os.path.splitext(input_file)[-1].lstrip('.')
+        simple_extension = os.path.splitext(input_file)[-1][1:]
 
         # get info about the type of input file
         extension_info_tuple = get_info_from_file_type(simple_extension)
         if extension_info_tuple is None:
             error("Unknown extension type",
-                  "Unknown extension type " + simple_extension, conf)
+                  "Unknown extension type: " + simple_extension, conf)
+            return False
 
         input_decompression_command = extension_info_tuple[3]
-        input_file_extension = extension_info_tuple[1]
 
-        # get file base name and create output_file name, is file is already .fastq its ready to be base_input_file
-        if not input_file_extension == "":
-            base_input_file = os.path.splitext(input_file)[0]
-        else:
-            base_input_file = input_file
-
-        output_file = str(base_input_file) + "." + output_file_extension
+        # get file base name and create output_file name, if file is already .fastq its ready to be base_input_file
+        base_input_file = input_file[0: input_file.index(".fastq") + 6]
+        output_file = base_input_file + "." + output_file_extension
 
         # Skip if the output_file already exists
         if not os.path.exists(output_file):
@@ -385,6 +398,7 @@ def recompress(run_id, conf):
         if not worker.is_successful():
             error(worker.get_error_message(),
                   worker.get_long_error_message(), conf)
+            return False
 
     # check new disk usage
     df_in_bytes = common.df(fastq_input_dir)
