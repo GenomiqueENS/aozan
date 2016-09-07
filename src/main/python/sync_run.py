@@ -222,6 +222,12 @@ def sync(run_id, conf):
     reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
     output_path = bcl_data_path + '/' + run_id
 
+    # check if rsync exists in PATH
+    if not common.exists_in_path("rsync"):
+        error("Can't find all needed commands in PATH env var",
+              "Can't find all needed commands in PATH env var. Unable to find: rsync command.", conf)
+        return False
+
     # Check if reports_data_path exists
     if not os.path.exists(reports_data_base_path):
         error("Report directory does not exists", "Report directory does not exists: " + reports_data_base_path, conf)

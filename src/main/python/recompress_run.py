@@ -321,7 +321,7 @@ def recompress(run_id, conf):
     types_to_recompress = ["fastq.gz", "fastq"]
 
     # list of program to check if exists in path before execution
-    program_set = {"bash", "tee", "touch", "chmod", "md5sum", output_compression_command, output_decompression_command}
+    program_set = {"tee", "md5sum", output_compression_command, output_decompression_command}
 
     # get list of file to process
     input_files = []

@@ -17,6 +17,7 @@ from java.util import LinkedHashMap
 from fr.ens.biologie.genomique.aozan import Globals
 from fr.ens.biologie.genomique.aozan import Common
 from fr.ens.biologie.genomique.aozan import AozanException
+from fr.ens.biologie.genomique.eoulsan.util import SystemUtils
 
 from fr.ens.biologie.genomique.aozan.Settings import DEMUX_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import RECOMPRESS_STEP_KEY
@@ -526,6 +527,11 @@ def aozan_main():
     # Use default (US) locale
     Locale.setDefault(Globals.DEFAULT_LOCALE)
 
+    # Check if OS is Linux
+    if not SystemUtils.isLinux():
+        sys.stderr.write('ERROR: Aozan can not be executed. Operating system is not Linux\n')
+        sys.exit(1)
+
     # Check if configuration file exists
     conf_file = args[0]
     if not os.path.isfile(conf_file):
@@ -553,6 +559,14 @@ def aozan_main():
                    'may be inaccessible. ',
                    conf)
         sys.exit(1)
+
+    # check if global program set is available in PATH
+    global_program_set = {"bash", "du", "touch", "chmod", "cp", "mv", "rm", "find", "tar"}
+    for program in global_program_set:
+        if not common.exists_in_path(program):
+            common.log('SEVERE',
+                  "Can't find all needed commands in PATH env var. Unable to find: " + program + " command.", conf)
+            sys.exit(1)
 
     # Check critical free space available
     hiseq_run.send_mail_if_critical_free_space_available(conf)
