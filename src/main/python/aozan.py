@@ -22,6 +22,7 @@ from fr.ens.biologie.genomique.aozan.Settings import DEMUX_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import RECOMPRESS_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import QC_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import DEMUX_USE_HISEQ_OUTPUT_KEY
+from fr.ens.biologie.genomique.aozan.Settings import DOCKER_URI_KEY
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_LOG_LEVEL_KEY
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_LOG_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_ENABLE_KEY
@@ -477,7 +478,7 @@ def launch_steps(conf):
                 common.log('INFO', 'Partial synchronization of ' + run_id + ' is locked.', conf)
 
     # Close Docker connections
-    DockerConnection.getInstance(conf[Settings.DOCKER_URI_KEY]).closeConnections()
+    DockerConnection.getInstance(conf[DOCKER_URI_KEY]).closeConnections()
 
     # Everything is OK
     return True
