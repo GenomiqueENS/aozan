@@ -137,7 +137,7 @@ def du(path):
     if not os.path.exists(path):
         return 0L
 
-    cmd = 'du -b --max-depth=0 ' + path
+    cmd = 'du -b --max-depth=0 \'' + path + '\''
     child_stdin, child_stdout = os.popen2(cmd)
     lines = child_stdout.readlines()
     child_stdin.close()
