@@ -26,9 +26,11 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -42,6 +44,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
+import fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput;
+import fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput.Bcl2FastqVersion;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
@@ -49,6 +53,7 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVRea
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVWriter;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetXLSReader;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetXLSXReader;
+import fr.ens.biologie.genomique.aozan.io.FastqSample;
 import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
 
 public class SampleSheetReaderTest {
@@ -128,6 +133,21 @@ public class SampleSheetReaderTest {
   private static final String SAMPLESHEET_XLSX_BCL2FASTQ_V1_FILENAME =
       "design_version_bcl2fastq.xlsx";
 
+  private static final String SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SORTED =
+      "design_version_bcl2fastq2_sorted.csv";
+
+  private static final String SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SHUFFLED_LANE =
+      "design_version_bcl2fastq2_shuffled_lane.csv";
+
+  private static final String SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SHUFFLED_NOLANE =
+      "design_version_bcl2fastq2_shuffled_nolane.csv";
+
+  private static final String SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SHUFFLED_PROJECT =
+      "design_version_bcl2fastq2_shuffled_project.csv";
+
+  private static final String SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SHUFFLED_SAMPLE =
+      "design_version_bcl2fastq2_shuffled_sample.csv";
+
   private static final String SAMPLESHEET_CSV = "samplesheet.csv";
 
   private String path;
@@ -145,6 +165,41 @@ public class SampleSheetReaderTest {
 
     testSampleSheet(SAMPLESHEET_XLSX_WITH_HEADER_BCL2FASTQ_V2_FILENAME, "xlsx",
         2, EXPECTED_WIHTHEADER_SMALLER_CSV, false);
+  }
+
+  @Test
+  public void testSampleNumberUnsortedLanes() throws IOException {
+
+    List<String> files = new ArrayList<String>();
+
+    files.add(SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SORTED);
+    files.add(SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SHUFFLED_LANE);
+    files.add(SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SHUFFLED_NOLANE);
+    files.add(SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SHUFFLED_PROJECT);
+    files.add(SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SHUFFLED_SAMPLE);
+    int nbLanes = 4;
+
+    Map<String, Integer> sampleNames = new HashMap<String, Integer>();
+    sampleNames.put("2015_067", 1);
+    sampleNames.put("2015_068", 2);
+    sampleNames.put("2015_069", 3);
+    for (String filename : files) {
+
+      Bcl2FastqOutput bclfile = new Bcl2FastqOutput(
+          readSamplesheetCSV(new File(path, filename), nbLanes), new File("."),
+          Bcl2FastqVersion.BCL2FASTQ_2);
+      for (int lane = 1; lane <= nbLanes; lane++) {
+        for (String sampleName : sampleNames.keySet()) {
+          FastqSample fastqSample =
+              new FastqSample(bclfile, new File("."), new File("."), "", 1, 1,
+                  lane, sampleName, "Project_A2015", "desc", "Bindex", false);
+
+          Assert.assertEquals(sampleName
+              + "_S" + sampleNames.get(sampleName) + "_L00" + lane + "_R1_001",
+              bclfile.getFilenamePrefix(fastqSample, 1));
+        }
+      }
+    }
   }
 
   private void testSampleSheet(final String samplesheetFileToTest,
