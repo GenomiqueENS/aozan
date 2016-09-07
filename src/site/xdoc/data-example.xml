@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/*
+ *                  Aozan development code
+ *
+ * This code may be freely distributed and modified under the
+ * terms of the GNU General Public License version 3 or later
+ * and CeCILL. This should be distributed with the code. If you
+ * do not have a copy, see:
+ *
+ *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ *      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+ *
+ * Copyright for this code is held jointly by the Genomic platform
+ * of the Institut de Biologie de l'École Normale Supérieure and
+ * the individual authors. These should be listed in @author doc
+ * comments.
+ *
+ * For more information on the Aozan project and its aims,
+ * or to join the Aozan Google group, visit the home page at:
+ *
+ *      http://outils.genomique.biologie.ens.fr/aozan
+ *
+ */
+-->
+<document>
+
+    <properties>
+        <title>Example data</title>
+        <author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
+    </properties>
+
+
+    <body>
+        <link rel="alternate" type="application/rss+xml" title="Aozan updates" href="aozan.rss" />
+
+        <section name="Example data">
+
+            <p>We provide in this section all the required files to test Aozan. These raw data files have been produced during a mouse RNASeq experiment. The run was perform on an Illumina NextSeq 500 sequencer in paired-end 75 bases mode.</p>
+            <ul>
+                <li><a href="./data/aozan-example.conf">Aozan configuration</a></li>
+                <li><a href="http://outils.genomique.biologie.ens.fr/leburon/downloads/aozan-example/160617_NB500892_0097_AH7N2TAFXX.tar.bz2">NextSeq 500 Paired-end 75b raw data (3.5 GB)</a></li>
+                <li><a href="./data/SampleSheet.xls">Samplesheet</a></li>
+                <li><a href="./data/index-sequences.aliases">Indexes aliases</a></li>
+                <li>Genomes required for FastQ Screen:
+                    <ul>
+                        <li><a href="http://outils.genomique.biologie.ens.fr/leburon/downloads/aozan-example/adapters.fasta">Adapters sequences (11.2 KB)</a></li>
+                        <li><a href="http://outils.genomique.biologie.ens.fr/leburon/downloads/aozan-example/LSURef_111_tax_silva_trunc.fasta.bz2">LSURef 111 (10.4 MB)</a></li>
+                        <li><a href="http://outils.genomique.biologie.ens.fr/leburon/downloads/aozan-example/SSURef_111_tax_silva_trunc.fasta.bz2">SSURef 111 (100.3 MB)</a></li>
+                        <li><a href="http://outils.genomique.biologie.ens.fr/leburon/downloads/aozan-example/mm9.fasta.bz2">MM9 Mouse reference genome (698.8 MB)</a></li>
+                        <li><a href="http://outils.genomique.biologie.ens.fr/leburon/downloads/aozan-example/phix.fasta.bz2">PhiX (1.7 KB)</a></li>
+                    </ul>
+                </li>
+                <li><a href="ftp://ftp.ncbi.nlm.nih.gov/blast/db/">NCBI NT database (26.3 GB), used to identify "No Hit found" reads in the "Overrepresented Sequences" section of the FastQC report</a></li>
+            </ul>
+
+        </section>
+
+    </body>
+</document>

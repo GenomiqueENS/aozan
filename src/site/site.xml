@@ -64,7 +64,7 @@
 		<menu name="Documentation">
 
 			<item name="Quickstart Guide" href="/quickstart.html"/>
-			<item name="Configuration example" href="/aozan-example.conf"/>
+			<item name="Data example" href="/data-example.html"/>
 
 			<item name="Built-in steps" href="/steps.html" collapse="true">
 				<item name="First base report" href="/new-run-discovering.html"/>

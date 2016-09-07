@@ -39,7 +39,7 @@
 		<p>Aozan works in 5 steps. It sends mails <b>at each step</b> of the pre-analysis workflow and 
 		a <b>QC report</b> at the end of the quality control step.
 		The parameters for each step should be written in Aozan configuration file, 
-		an example is <a href="./aozan-example.conf">here.</a>. The available steps are:</p>
+		an example is <a href="./data/aozan-example.conf">here.</a>. The available steps are:</p>
 		<p/>
 		<ul>
 			<li><a href="new-run-discovering.html">New run discovering</a>
