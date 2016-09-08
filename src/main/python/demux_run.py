@@ -474,23 +474,6 @@ def demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesh
                   exit_code) + ').\nCommand line:\n' + cmd, conf)
         return False
 
-    cmd = 'cp ' + conf[TMP_PATH_KEY] + '/bcl2fastq_output_' + run_id + '.* ' + fastq_output_dir
-    common.log("INFO", "exec: " + cmd, conf)
-    if os.system(cmd) != 0:
-        error("error while setting read only the output fastq directory" + run_id_msg,
-              'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
-        return False
-
-    # The output directory must be read only
-    # cmd = 'chmod -R ugo-w ' + fastq_output_dir + '/Project_*'
-    cmd = 'find ' + fastq_output_dir + ' -type f -name "*.fastq.*" -exec chmod ugo-w {} \; '
-    common.log("INFO", "exec: " + cmd, conf)
-    if os.system(cmd) != 0:
-        error("error while setting read only the output fastq directory" + run_id_msg,
-              'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
-        return False
-
-    # All ok
     return True
 
 
@@ -540,7 +523,6 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
         docker.addMountDirectory(tmp, tmp_docker)
 
         docker.run()
-        # docker.runTest();
 
         if docker.getExitValue() != 0:
             error("error while demultiplexing run " + run_id, 'Error while demultiplexing run (exit code: ' +
@@ -551,21 +533,6 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
 
     except Throwable, exp:
         error("error while running image Docker ", common.exception_msg(exp, conf), conf)
-        return False
-
-    # The output directory must be read only
-    cmd = 'cp ' + tmp + '/bcl2fastq_output_' + run_id + '.* ' + fastq_output_dir
-    common.log("INFO", "exec: " + cmd, conf)
-    if os.system(cmd) != 0:
-        error("error while setting read only the output fastq directory for run " + run_id,
-              'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
-        return False
-
-    cmd = 'find ' + fastq_output_dir + ' -type f -name "*.fastq.*" -exec chmod ugo-w {} \; '
-    common.log("INFO", "exec: " + cmd, conf)
-    if os.system(cmd) != 0:
-        error("error while setting read only the output fastq directory" + run_id_msg,
-              'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
         return False
 
     return True
@@ -803,6 +770,36 @@ def demux(run_id, conf):
         if not demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, bcl2fastq_samplesheet_path,
                                     nb_mismatch, conf):
             return False
+
+    # Check if the output directory has been created
+    if not os.path.exists(fastq_output_dir):
+        error("error while demultiplexing run " + run_id + ' on ' + common.get_instrument_name(run_id, conf),
+              'Error while demultiplexing run ' + run_id + '.\n' +
+              'The output directory of bcl2fastq has been created: ' + fastq_output_dir, conf)
+        return False
+
+    # Check if the output directory has been created
+    if os.path.isfile(fastq_output_dir):
+        error("error while demultiplexing run " + run_id + ' on ' + common.get_instrument_name(run_id, conf),
+              'Error while demultiplexing run ' + run_id + '.\n' +
+              'The output directory of bcl2fastq is a file instead of a directory: ' + fastq_output_dir, conf)
+        return False
+
+    # Copy bcl2fastq log to output directory
+    cmd = 'cp ' + conf[TMP_PATH_KEY] + '/bcl2fastq_output_' + run_id + '.* ' + fastq_output_dir
+    common.log("INFO", "exec: " + cmd, conf)
+    if os.system(cmd) != 0:
+        error("error while copying bcl2fastq log to the output fastq directory" + run_id_msg,
+              'Error while copying bcl2fastq log to the output fastq directory.\nCommand line:\n' + cmd, conf)
+        return False
+
+    # The output directory must be read only
+    cmd = 'find ' + fastq_output_dir + ' -type f -name "*.fastq.*" -exec chmod ugo-w {} \; '
+    common.log("INFO", "exec: " + cmd, conf)
+    if os.system(cmd) != 0:
+        error("error while setting read only the output fastq directory" + run_id_msg,
+              'Error while setting read only the output fastq directory.\nCommand line:\n' + cmd, conf)
+        return False
 
     if not check_if_output_fastq_files_exists(fastq_output_dir):
         error("error with bcl2fastq execution for run " + run_id,
