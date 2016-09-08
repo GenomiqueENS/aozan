@@ -137,10 +137,9 @@ public class DockerCommand {
           LogsParameter.STDERR, LogsParameter.STDOUT);
       redirect(logStream, this.stdoutFile, this.stderrFile);
 
-      // Kill container
-      LOGGER.info("Docker exit value " + dockerClient.waitContainer(id));
-
-      this.exitValue = info.state().exitCode();
+      // Wait the end of container
+      this.exitValue = dockerClient.waitContainer(id).statusCode();
+      LOGGER.info("Docker exit value " + this.exitValue);
 
       // Remove container
       dockerClient.removeContainer(id);
@@ -149,10 +148,7 @@ public class DockerCommand {
     } catch (DockerException | InterruptedException e) {
 
       e.printStackTrace();
-
     }
-    // Close connection
-
   }
 
   /**
