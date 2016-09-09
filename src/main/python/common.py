@@ -1334,7 +1334,7 @@ def load_conf(conf, conf_file_path):
                 if key.startswith('qc.test.'):
                     for k in test_name_converting_table.keys():
                         prefix = 'qc.test.' + k + '.'
-                        if key.startswith(prefix):
+                        if key.lower().startswith(prefix.lower()):
                             key = 'qc.test.' + test_name_converting_table[k] + key[len(prefix) - 1:]
                             break
 
