@@ -544,6 +544,7 @@
                   <include name="**/*.jnlp"/>
                   <include name="**/*.html"/>
                   <include name="**/*.rss"/>
+                  <include name="**/configure-aozan-demo.sh"/>
                   <replacetoken>@@@VERSION@@@</replacetoken>
                 </replace>
                 <replace encoding="UTF-8" dir="${basedir}/target/site" value="${project.name}">
