@@ -172,7 +172,7 @@ public class LongInterval implements Interval {
 
     // Get the values of end points
     final String[] values =
-        trimmed.substring(1, trimmed.length() - 1).split(",");
+        (trimmed.substring(1, trimmed.length() - 1) + " ").split(",");
 
     if (values == null || values.length != 2) {
       throw new AozanException("Invalid interval: " + s);
