@@ -316,8 +316,8 @@ def recompress(run_id, conf):
 
     # Check if input root fastq root data exists
     if not common.is_dir_exists(FASTQ_DATA_PATH_KEY, conf):
-        error("Fastq data directory does not exists",
-              "Fastq data directory does not exists: " + conf[FASTQ_DATA_PATH_KEY], conf)
+        error("Fastq data directory does not exist",
+              "Fastq data directory does not exist: " + conf[FASTQ_DATA_PATH_KEY], conf)
         return False
 
     start_time = time.time()
@@ -401,7 +401,7 @@ def recompress(run_id, conf):
             executor.execute(worker)
 
         else:
-            common.log("WARNING", "Recompress step: Skipping: The file " + output_file + " already exists.", conf)
+            common.log("WARNING", "Recompress step: Skip: The file " + output_file + " already exists.", conf)
 
     # Wait for all thread to finish
     executor.shutdown()
@@ -430,12 +430,12 @@ def recompress(run_id, conf):
 
     msg = 'End of recompression for run ' + run_id + '.' + \
           '\nJob finished at ' + common.time_to_human_readable(time.time()) + \
-          ' with no error in ' + common.duration_to_human_readable(duration) + '. '
+          ' without error in ' + common.duration_to_human_readable(duration) + '. '
 
-    msg += '\n\nAfter recompress step fastq folder is now %.2f MB (previously %.2f MB) and %.2f GB still free.' % (
+    msg += '\n\nAfter recompress step FASTQ folder is now %.2f MB (previously %.2f MB) and %.2f GB still free.' % (
         du, previous_du, df)
 
     common.send_msg('[Aozan] End of recompress for run ' + run_id + ' on ' +
                     common.get_instrument_name(run_id, conf), msg, False, conf)
-    common.log('INFO', 'Recompress step: success in ' + common.duration_to_human_readable(duration), conf)
+    common.log('INFO', 'Recompress step: successful in ' + common.duration_to_human_readable(duration), conf)
     return True

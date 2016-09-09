@@ -330,7 +330,7 @@ def get_input_run_data_path(run_id, conf):
         path = hiseq_run.find_hiseq_run_path(run_id, conf)
 
     if path is None or path is False or not os.path.exists(path):
-        error("Sequencer data directory does not exists.", "Sequencer data data directory does not exists.",
+        error("Sequencer data directory does not exist.", "Sequencer data data directory does not exist.",
               get_last_error_file(conf), conf)
         return None
 
@@ -540,7 +540,7 @@ def error(short_message, message, last_error_file_path, conf):
         conf: configuration dictionary
     """
 
-    # No write in last error file, directory does not exists
+    # No write in last error file, directory does not exist
     if last_error_file_path is False:
         return
 
@@ -836,7 +836,7 @@ def is_section_to_add_in_report(sections, section_name, version, run_id, conf):
 def _check_conf_key(conf, msg, key_name):
 
     if not key_name in conf:
-        msg += '\n\t* Configuration setting not set: ' + key_name
+        msg += '\n\t* Configuration setting is not set: ' + key_name
         return False
 
     return True
@@ -847,7 +847,7 @@ def _check_conf_dir(conf, msg, key_name, desc):
         return False
 
     if not is_dir_exists(key_name, conf):
-        msg += '\n\t* ' + desc + ' directory does not exists: ' + conf[key_name]
+        msg += '\n\t* ' + desc + ' directory does not exist: ' + conf[key_name]
         return False
 
     return True
@@ -858,7 +858,7 @@ def _check_conf_file(conf, msg, key_name, desc):
         return False
 
     if not is_file_exists(key_name, conf):
-        msg += '\n\t* ' + desc + ' file does not exists: ' + conf[key_name]
+        msg += '\n\t* ' + desc + ' file does not exist: ' + conf[key_name]
         return False
 
     return True
@@ -896,7 +896,7 @@ def check_configuration(conf, configuration_file_path):
             # Check if hiseq_data_path exists
             for hiseq_output_path in hiseq_run.get_hiseq_data_paths(conf):
                 if not os.path.exists(hiseq_output_path):
-                    msg += '\n\t* Sequencer output directory does not exists: ' + hiseq_output_path
+                    msg += '\n\t* Sequencer output directory does not exist: ' + hiseq_output_path
 
     # For step SYNC
     if Settings.SYNC_STEP_KEY in steps_to_launch:
@@ -933,7 +933,7 @@ def check_configuration(conf, configuration_file_path):
 
     if len(msg) > 0:
         msg = 'Error(s) found in Aozan configuration file (' + os.path.abspath(configuration_file_path) + '):' + msg
-        error("[Aozan] check configuration: error(s) in configuration file.", msg, get_last_error_file(conf), conf)
+        error("[Aozan] Check configuration: error(s) in configuration file.", msg, get_last_error_file(conf), conf)
         return False
 
     return True

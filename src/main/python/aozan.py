@@ -131,7 +131,7 @@ def welcome(conf):
     """
     global something_to_do
     if not something_to_do:
-        common.log('INFO', 'Start ' + Globals.WELCOME_MSG, conf)
+        common.log('INFO', 'Starting ' + Globals.WELCOME_MSG, conf)
         something_to_do = True
 
         # Add list step selected
@@ -152,7 +152,7 @@ def lock_step(lock_file_path, step_name, conf):
 
     # Check if parent directory of the lock file exists
     if not os.path.isdir(os.path.dirname(lock_file_path)):
-        common.log('SEVERE', 'Parent directory of lock file does not exists. The lock file for ' + step_name +
+        common.log('SEVERE', 'Parent directory of lock file does not exist. The lock file for ' + step_name +
                    ' step has not been created: ' + lock_file_path, conf)
         return True
 
@@ -164,7 +164,7 @@ def lock_step(lock_file_path, step_name, conf):
     try:
         open(lock_file_path, 'w').close()
     except:
-        common.log('SEVERE', 'The lock file cannot not been created (' + sys.exc_info()[0] + ') for ' + step_name +
+        common.log('SEVERE', 'The lock file cannot be created (' + sys.exc_info()[0] + ') for ' + step_name +
                    ': ' + lock_file_path, conf)
         return True
 
@@ -367,7 +367,7 @@ def launch_steps(conf):
 
                 if lock_sync_step(conf, run_id):
                     welcome(conf)
-                    common.log('INFO', 'Synchronize ' + run_id, conf)
+                    common.log('INFO', 'Synchronizing ' + run_id, conf)
                     if sync_run.sync(run_id, conf):
                         sync_run.add_run_id_to_processed_run_ids(run_id, conf)
                         sync_run_ids_done.add(run_id)
@@ -379,7 +379,7 @@ def launch_steps(conf):
                     common.log('INFO', 'Synchronize ' + run_id + ' is locked.', conf)
 
         except:
-            exception_error('sync' , 'Fail synchronization for run ' + run_id, conf)
+            exception_error('sync' , 'Failed synchronization for run ' + run_id, conf)
 
     #
     # Demultiplexing
@@ -402,7 +402,7 @@ def launch_steps(conf):
 
                 if lock_demux_step(conf, run_id):
                     welcome(conf)
-                    common.log('INFO', 'Demux ' + run_id, conf)
+                    common.log('INFO', 'Demultiplexing ' + run_id, conf)
                     if demux_run.demux(run_id, conf):
                         demux_run.add_run_id_to_processed_run_ids(run_id, conf)
                         demux_run_ids_done.add(run_id)
@@ -411,10 +411,10 @@ def launch_steps(conf):
                         unlock_demux_step(conf, run_id)
                         return False
                 else:
-                    common.log('INFO', 'Demux ' + run_id + ' is locked.', conf)
+                    common.log('INFO', 'Demultiplexing ' + run_id + ' is locked.', conf)
 
         except:
-            exception_error('demux', 'Fail demultiplexing for run ' + run_id, conf)
+            exception_error('demux', 'Failed demultiplexing for run ' + run_id, conf)
 
     #
     # Recompression
@@ -439,13 +439,13 @@ def launch_steps(conf):
                         unlock_recompress_step(conf, run_id)
                         return False
                 else:
-                    common.log('INFO', 'Recompression ' + run_id + ' is locked.', conf)
+                    common.log('INFO', 'Recompress ' + run_id + ' is locked.', conf)
 
         except:
             exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
             traceback_msg = traceback.format_exc(sys.exc_info()[2])
-            recompress_run.error("Fail recompression for run " + run_id + ", catch exception " + exception_msg,
-                         "Fail recompression for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg,
+            recompress_run.error("Failed recompression for run " + run_id + ", catch exception " + exception_msg,
+                         "Failed recompression for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg,
                          conf)
 
 
@@ -478,7 +478,7 @@ def launch_steps(conf):
                     common.log('INFO', 'Quality control ' + run_id + ' is locked.', conf)
 
         except:
-            exception_error('qc', 'Fail quality control for run ' + run_id, conf)
+            exception_error('qc', 'Failed quality control for run ' + run_id, conf)
 
     #
     # Partial synchronization
@@ -618,7 +618,7 @@ def aozan_main():
         if not options.quiet:
             sys.stderr.write('ERROR: Aozan can not be executed. A lock file exists.\n')
         if not os.path.exists('/proc/%d' % (load_pid_in_lock_file(lock_file_path))):
-            common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf[LOCK_FILE_KEY] +
+            common.error('[Aozan] A lock file exists', 'A lock file exists at ' + conf[LOCK_FILE_KEY] +
                          ". Please investigate last error and then remove the lock file.", True,
                          conf[AOZAN_VAR_PATH_KEY] + '/aozan.lasterr', conf)
 

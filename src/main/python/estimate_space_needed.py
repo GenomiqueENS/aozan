@@ -127,7 +127,7 @@ def error(run_id, type_file, space_needed, space_free, dir_path, conf):
         space_free / 1024 / 1024 / 1024) + ' of free space is currently available on this storage.'
 
     # send warning mail
-    common.error('[Aozan] Estimate space needed : ' + short_message, message,
+    common.error('[Aozan] Estimation of space needed : ' + short_message, message,
                  conf[AOZAN_VAR_PATH_KEY] + '/space_estimated.lasterr', conf)
 
 
