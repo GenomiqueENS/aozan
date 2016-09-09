@@ -145,7 +145,7 @@ public class SampleSheetUtils {
     for (String section : samplesheet.getSections()) {
 
       sb.append('[');
-      sb.append(section);
+      sb.append(quoteStringWithComma(section));
       sb.append("]\n");
 
       for (Map.Entry<String, List<String>> e : samplesheet
@@ -158,7 +158,7 @@ public class SampleSheetUtils {
 
           if (!value.isEmpty()) {
             sb.append(SEPARATOR);
-            sb.append(value);
+            sb.append(quoteStringWithComma(value));
           }
 
           sb.append('\n');
@@ -183,7 +183,7 @@ public class SampleSheetUtils {
         sb.append(SEPARATOR);
       }
 
-      sb.append(convertFieldNameV2(fieldName));
+      sb.append(quoteStringWithComma(convertFieldNameV2(fieldName)));
     }
     sb.append('\n');
 
@@ -199,7 +199,7 @@ public class SampleSheetUtils {
           sb.append(SEPARATOR);
         }
 
-        sb.append(s.get(fieldName));
+        sb.append(quoteStringWithComma(s.get(fieldName)));
       }
       sb.append('\n');
     }
@@ -219,6 +219,23 @@ public class SampleSheetUtils {
       return '\"' + trimmed + '\"';
     }
     return trimmed;
+  }
+
+  /**
+   * Quote only string containing comma
+   * @param String string to process
+   */
+  private static String quoteStringWithComma(final String s) {
+
+    if (s == null) {
+      return "";
+    }
+
+    if (s.contains(",")) {
+      return "\"" + s + "\"";
+    }
+
+    return s;
   }
 
   /**
@@ -445,7 +462,7 @@ public class SampleSheetUtils {
    */
   public static void replaceIndexShortcutsBySequences(
       final SampleSheet samplesheet, final Map<String, String> sequences)
-      throws AozanException {
+          throws AozanException {
 
     if (samplesheet == null || sequences == null) {
       return;
