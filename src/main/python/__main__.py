@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #
 #                  Aozan development code
 #
@@ -24,7 +26,6 @@
 This script is a launcher for Aozan.
 '''
 
-import sys
 import aozan
 
 aozan.aozan_main()
