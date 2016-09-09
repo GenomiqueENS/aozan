@@ -1365,12 +1365,6 @@ def load_conf(conf, conf_file_path):
     # Save configuration file path
     conf[Settings.AOZAN_CONF_FILE_PATH] = conf_file_path
 
-    # Save completed configuration file
-    f = open(conf[TMP_PATH_KEY] + '/full_aozan.conf', 'w')
-    f.write('\n'.join(str(x + '=' + str(conf[x])) for x in conf))
-    f.flush()
-    f.close()
-
     return conf
 
 
