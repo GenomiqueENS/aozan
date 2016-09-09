@@ -64,7 +64,7 @@
 	     in the fastq directory for the run based on the amount of space used in the bcl directory by the run data</td></tr>
 	     <tr><td>demux.use.hiseq.output</td><td>boolean</td><td>False</td><td>If it is true and no synchronization step is needed, the Hiseq output will directly be used for the demultiplexage step</td></tr>
 	     <tr><td>index.sequences</td><td>string</td><td>Not set</td><td>Path to a file containing aliases
-	     for adapter sequence indexes. <a href="./indexes-sequences.txt" target="_blank">See an example.</a></td></tr>
+	     for adapter sequence indexes. <a href="./data/index-sequences.aliases" target="_blank">See an example.</a></td></tr>
 	     <tr><td>bcl2fastq.adapter.fasta.file.path</td><td>string</td><td>Not set</td><td>Adapter sequence file to use when bcl2fastq is launched</td></tr>
 	     <tr><td>bcl2fastq.samplesheet.format</td><td>string</td><td>xls</td><td>Bcl2fastq samplesheet format ("csv", "xls", "xlsx", or "command").</td></tr>
 	     <tr><td>bcl2fastq.samplesheet.prefix.filename</td><td>string</td><td>samplesheet</td><td>Prefix for Bcl2fastq samplesheet file <a href="./samplesheet_SNL110_template.xls" target="_blank">(example).</a></td></tr>

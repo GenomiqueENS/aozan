@@ -22,6 +22,7 @@ from fr.ens.biologie.genomique.aozan.Settings import DEMUX_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import RECOMPRESS_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import QC_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import DEMUX_USE_HISEQ_OUTPUT_KEY
+from fr.ens.biologie.genomique.aozan.Settings import DOCKER_URI_KEY
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_LOG_LEVEL_KEY
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_LOG_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_ENABLE_KEY

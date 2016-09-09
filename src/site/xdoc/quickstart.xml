@@ -350,7 +350,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
 
  <p>To work, Aozan needs the following directories. The path of these directories must be set in the Aozan
  configuration file.</p>
- <p>An example of aozan configuration file is <a href="./aozan-example.conf" target="_blank">here.</a></p>
+ <p>An example of aozan configuration file is <a href="./data/aozan-example.conf" target="_blank">here.</a></p>
 
  <table>
    <tr><th>Aozan property</th><th>Sample value</th><th>description</th></tr>
@@ -397,7 +397,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
 
  <p>This section describe the Aozan global configuration settings. For the steps settings,
  	check in the <a href="steps.html">steps documentation.</a></p>
- <p>An example of aozan configuration file is <a href="./aozan-example.conf" target="_blank">here.</a></p>
+ <p>An example of aozan configuration file is <a href="./data/aozan-example.conf" target="_blank">here.</a></p>
 
    <subsection name="General configuration">
 
