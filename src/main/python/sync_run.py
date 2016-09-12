@@ -69,7 +69,7 @@ def is_sync_step_enable(conf):
             for path in hiseq_run.get_hiseq_data_paths(conf):
                 if path == bcl_path:
                     error('Configuration error.',
-                          'Basecalling path and hiseq output data path are the same: ' + bcl_path, conf)
+                          'Basecalling path and hiseq output data path must be different: ' + bcl_path, conf)
                     return False
 
             return True
@@ -242,7 +242,7 @@ def sync(run_id, conf):
     """
 
     start_time = time.time()
-    common.log('INFO', 'Sync step: start', conf)
+    common.log('INFO', 'Sync step: Starting', conf)
 
     bcl_data_path = conf[BCL_DATA_PATH_KEY]
     reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
@@ -279,7 +279,7 @@ def sync(run_id, conf):
 
     duration = time.time() - start_time
 
-    msg = 'End of synchronization for run ' + run_id + '.\n' + \
+    msg = 'Ending synchronization for run ' + run_id + '.\n' + \
           'Job finished at ' + common.time_to_human_readable(time.time()) + \
           ' without error in ' + common.duration_to_human_readable(duration) + '.\n\n' + \
           'Run output files (without .cif files) can be found in the following directory:\n  ' + output_path
@@ -290,7 +290,7 @@ def sync(run_id, conf):
 
     msg += '\n\nFor this task %.2f GB has been used and %.2f GB is still free.' % (du, df)
 
-    common.send_msg('[Aozan] End of synchronization for run ' + run_id + ' on ' +
+    common.send_msg('[Aozan] Ending synchronization for run ' + run_id + ' on ' +
                     common.get_instrument_name(run_id, conf), msg, False, conf)
     common.log('INFO', 'sync step: successful in ' + common.duration_to_human_readable(duration), conf)
     return True

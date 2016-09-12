@@ -662,7 +662,7 @@ def add_run_id(run_id, file_path, conf):
         file_path: path of the file
         conf: configuration dictionary
     """
-    log('INFO', 'Add ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(file_path),
+    log('INFO', 'Adding ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(file_path),
         conf)
 
     f = File(file_path);

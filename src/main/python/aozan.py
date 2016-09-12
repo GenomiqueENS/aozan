@@ -376,7 +376,7 @@ def launch_steps(conf):
                         unlock_sync_step(conf, run_id)
                         return False
                 else:
-                    common.log('INFO', 'Synchronize ' + run_id + ' is locked.', conf)
+                    common.log('INFO', 'Synchronizing ' + run_id + ' is locked.', conf)
 
         except:
             exception_error('sync' , 'Failed synchronization for run ' + run_id, conf)
@@ -430,7 +430,7 @@ def launch_steps(conf):
                                                     prioritized_run_ids):
                 if lock_recompress_step(conf, run_id):
                     welcome(conf)
-                    common.log('INFO', 'Recompression ' + run_id, conf)
+                    common.log('INFO', 'Recompressing ' + run_id, conf)
                     if recompress_run.recompress(run_id, conf):
                         recompress_run.add_run_id_to_processed_run_ids(run_id, conf)
                         recompress_run_ids_done.add(run_id)
@@ -439,7 +439,7 @@ def launch_steps(conf):
                         unlock_recompress_step(conf, run_id)
                         return False
                 else:
-                    common.log('INFO', 'Recompress ' + run_id + ' is locked.', conf)
+                    common.log('INFO', 'Recompressing ' + run_id + ' is locked.', conf)
 
         except:
             exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
@@ -490,13 +490,13 @@ def launch_steps(conf):
         for run_id in (working_run_ids - sync_run_ids_done - hiseq_run_ids_do_not_process):
             if lock_partial_sync_step(conf, run_id):
                 welcome(conf)
-                common.log('INFO', 'Partial synchronization of ' + run_id, conf)
+                common.log('INFO', 'Partial synchronizing ' + run_id, conf)
                 if not sync_run.partial_sync(run_id, False, conf):
                     unlock_partial_sync_step(conf, run_id)
                     return False
                 unlock_partial_sync_step(conf, run_id)
             else:
-                common.log('INFO', 'Partial synchronization of ' + run_id + ' is locked.', conf)
+                common.log('INFO', 'Partial synchronizing ' + run_id + ' is locked.', conf)
 
     # Close Docker connections
     DockerConnection.getInstance(conf[DOCKER_URI_KEY]).closeConnections()
@@ -517,7 +517,7 @@ def aozan_main():
     parser.add_option('-e', '--exit-code', action='store_true', dest='exit_code',
                       help='Returns non zero exit code if a step fails')
     parser.add_option('-c', '--conf', action='store_true', dest='conf',
-                      help='Default Aozan configuration Aozan, load before configuration file.')
+                      help='Default Aozan configuration, loads before configuration file.')
 
     # Parse command line arguments
     (options, args) = parser.parse_args()
@@ -595,7 +595,7 @@ def aozan_main():
             # TODO remove *.lasterr files
 
             if something_to_do:
-                common.log('INFO', 'End of Aozan', conf)
+                common.log('INFO', 'Ending Aozan', conf)
 
                 # Cancel logger, in case not be cancel properly
                 Common.cancelLogger()
@@ -606,7 +606,7 @@ def aozan_main():
         except:
             exception_error(None, '', conf)
 
-            common.log('INFO', 'End of Aozan', conf)
+            common.log('INFO', 'Ending Aozan', conf)
 
             # Remove lock file
             delete_lock_file(lock_file_path)

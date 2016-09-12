@@ -83,7 +83,7 @@ def error(short_message, message, conf):
         conf: configuration dictionary
     """
 
-    common.error('[Aozan] qc: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/' + common.QC_LASTERR_FILE, conf)
+    common.error('[Aozan] QC: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/' + common.QC_LASTERR_FILE, conf)
 
 
 def qc(run_id, conf):
@@ -107,7 +107,7 @@ def qc(run_id, conf):
     qc_output_dir = reports_data_path + '/qc_' + run_id
     tmp_extension = '.tmp'
 
-    common.log('INFO', 'QC step: start', conf)
+    common.log('INFO', 'QC step: Starting', conf)
 
     # Check if input run data data exists
     if input_run_data_path is None:
@@ -116,8 +116,8 @@ def qc(run_id, conf):
 
     # Check if input root fastq root data exists
     if not common.is_dir_exists(FASTQ_DATA_PATH_KEY, conf):
-        error("Fastq data directory does not exist",
-              "Fastq data directory does not exist: " + conf[FASTQ_DATA_PATH_KEY], conf)
+        error("FASTQ data directory does not exist",
+              "FASTQ data directory does not exist: " + conf[FASTQ_DATA_PATH_KEY], conf)
         return False
 
     # Create if not exist report directory for the run
@@ -162,19 +162,19 @@ def qc(run_id, conf):
         # Compute the report
         report = qc.computeReport()
     except AozanException, exp:
-        error("Error while computing qc report for run " + run_id + ".", common.exception_msg(exp, conf), conf)
+        error("Error while computing QC report for run " + run_id + ".", common.exception_msg(exp, conf), conf)
         return False
     except Throwable, exp:
-        error("Error while computing qc report for run " + run_id + ".", common.exception_msg(exp, conf), conf)
+        error("Error while computing QC report for run " + run_id + ".", common.exception_msg(exp, conf), conf)
         return False
 
-    # Remove qc data if not demand
+    # Remove QC data if not demand
     if common.is_conf_value_defined(QC_REPORT_SAVE_RAW_DATA_KEY, 'false', conf):
         try:
             os.remove(qc_output_dir + '/data-' + run_id + '.txt')
             # qc.writeRawData(report, qc_output_dir + '/data-' + run_id + '.txt')
         except AozanException, exp:
-            error("Error while removing qc raw data for run " + run_id + ".", exp.getMessage(), conf)
+            error("Error while removing QC raw data for run " + run_id + ".", exp.getMessage(), conf)
             return False
 
     # Write the XML report
@@ -182,13 +182,13 @@ def qc(run_id, conf):
         try:
             qc.writeXMLReport(report, qc_output_dir + '/' + run_id + '.xml')
         except AozanException, exp:
-            error("Error while computing qc XML report for run " + run_id + ".", common.exception_msg(exp, conf), conf)
+            error("Error while computing QC XML report for run " + run_id + ".", common.exception_msg(exp, conf), conf)
             return False
         except Throwable, exp:
-            error("Error while computing qc XML report for run " + run_id + ".", common.exception_msg(exp, conf), conf)
+            error("Error while computing QC XML report for run " + run_id + ".", common.exception_msg(exp, conf), conf)
             return False
 
-    # Remove tmp extension of temporary qc directory
+    # Remove tmp extension of temporary QC directory
     os.rename(qc_output_dir, qc_output_dir[:-len(tmp_extension)])
     qc_output_dir = qc_output_dir[:-len(tmp_extension)]
 
@@ -200,15 +200,15 @@ def qc(run_id, conf):
         else:
             qc.writeReport(report, conf[QC_REPORT_STYLESHEET_KEY], html_report_file)
     except AozanException, exp:
-        error("Error while computing qc HTML report for run " + run_id + ".", common.exception_msg(exp, conf), conf)
+        error("Error while computing QC HTML report for run " + run_id + ".", common.exception_msg(exp, conf), conf)
         return False
     except Throwable, exp:
-        error("error while computing qc HTML report for run " + run_id + ".", common.exception_msg(exp, conf), conf)
+        error("error while computing QC HTML report for run " + run_id + ".", common.exception_msg(exp, conf), conf)
         return False
 
     # Check if the report has been generated
     if not os.path.exists(html_report_file):
-        error("Error while computing qc report for run " + run_id + ".", "No HTML report generated", conf)
+        error("Error while computing QC report for run " + run_id + ".", "No HTML report generated", conf)
         return False
 
     # Archive the reports
@@ -216,8 +216,8 @@ def qc(run_id, conf):
           'tar cjf qc_' + run_id + '.tar.bz2 qc_' + run_id
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
-        error("Error while saving the qc archive file for " + run_id,
-              'Error while saving the  qc archive file.\nCommand line:\n' + cmd, conf)
+        error("Error while saving the QC archive file for " + run_id,
+              'Error while saving the  QC archive file.\nCommand line:\n' + cmd, conf)
         return False
 
     # Set read only basecall stats archives files
@@ -225,15 +225,15 @@ def qc(run_id, conf):
 
     # Check if the report has been generated
     if not os.path.exists(html_report_file):
-        error("Error while computing qc report for run " + run_id + ".", "No HTML report generated", conf)
+        error("Error while computing QC report for run " + run_id + ".", "No HTML report generated", conf)
         return False
 
     # The output directory must be read only
     cmd = 'chmod -R ugo-w ' + qc_output_dir
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
-        error("Error while setting the output qc directory to read only for run " + run_id,
-              'Error while setting the output qc directory to read only.\nCommand line:\n' + cmd, conf)
+        error("Error while setting the output QC directory to read only for run " + run_id,
+              'Error while setting the output QC directory to read only.\nCommand line:\n' + cmd, conf)
         return False
 
     # Create index.hml file
@@ -245,12 +245,12 @@ def qc(run_id, conf):
     df = df_in_bytes / (1024 * 1024 * 1024)
     du = du_in_bytes / (1024 * 1024)
 
-    common.log("WARNING", "QC step: output disk free after qc: " + str(df_in_bytes), conf)
-    common.log("WARNING", "QC step: space used by qc: " + str(du_in_bytes), conf)
+    common.log("WARNING", "QC step: output disk free after QC: " + str(df_in_bytes), conf)
+    common.log("WARNING", "QC step: space used by QC: " + str(du_in_bytes), conf)
 
     duration = time.time() - start_time
 
-    msg = 'End of quality control for run ' + run_id + '.' + \
+    msg = 'Ending quality control for run ' + run_id + '.' + \
           '\nJob finished at ' + common.time_to_human_readable(time.time()) + \
           ' without error in ' + common.duration_to_human_readable(duration) + '. ' + \
           'You will find attached to this message the quality control report.\n\n' + \
@@ -263,7 +263,7 @@ def qc(run_id, conf):
 
     msg += '\n\nFor this task %.2f MB has been used and %.2f GB still free.' % (du, df)
 
-    common.send_msg_with_attachment('[Aozan] End of quality control for run ' + run_id + ' on ' +
+    common.send_msg_with_attachment('[Aozan] Ending quality control for run ' + run_id + ' on ' +
                                     common.get_instrument_name(run_id, conf), msg, html_report_file, conf)
     common.log('INFO', 'QC step: successful in ' + common.duration_to_human_readable(duration), conf)
     return True

@@ -179,7 +179,7 @@ def load_samplesheet_using_extension(conf,samplesheet_filename,extension,input_r
         input_samplesheet_csv_path = input_run_data_path + '/SampleSheet.csv'
 
         if not os.path.exists(input_samplesheet_csv_path):
-            error("no bcl2fastq samplesheet found for run " + run_id,
+            error("No bcl2fastq samplesheet found for run " + run_id,
                   "No bcl2fastq samplesheet found for " + run_id + " run.\n" +
                   'You must provide a ' + samplesheet_filename + '.' + extension + ' file in ' + conf[
                       BCL2FASTQ_SAMPLESHEETS_PATH_KEY] +
@@ -280,12 +280,12 @@ def load_samplesheet(run_id, input_run_data_path, samplesheet_filename, conf):
     except AozanException, exp:
         print StringUtils.stackTraceToString(exp)
 
-        error("error reading samplesheet: " + samplesheet_filename, exp.getMessage(), conf)
+        error("Error reading samplesheet: " + samplesheet_filename, exp.getMessage(), conf)
         return None, None
     except Exception, exp:
         print StringUtils.stackTraceToString(exp)
 
-        error("error reading samplesheet: " + samplesheet_filename, exp.getMessage(), conf)
+        error("Error reading samplesheet: " + samplesheet_filename, exp.getMessage(), conf)
         return None, None
 
     return None, None
@@ -305,12 +305,12 @@ def update_samplesheet(samplesheet, run_id, lane_count, conf):
     except AozanException, exp:
         print StringUtils.stackTraceToString(exp)
 
-        error("error while updating samplesheet for run " + run_id, exp.getMessage(), conf)
+        error("Error while updating samplesheet for run " + run_id, exp.getMessage(), conf)
         return False
     except Exception, exp:
         print StringUtils.stackTraceToString(exp)
 
-        error("error while updating samplesheet for run " + run_id, exp.getMessage(), conf)
+        error("Error while updating samplesheet for run " + run_id, exp.getMessage(), conf)
         return False
 
     return True
@@ -327,10 +327,10 @@ def check_samplesheet(samplesheet, run_id, flow_cell_id, conf):
         # TODO: remove lock
 
     except IOException, exp:
-        error("error while checking samplesheet for run " + run_id, exp.getMessage(), conf)
+        error("Error while checking samplesheet for run " + run_id, exp.getMessage(), conf)
         return False, samplesheet_warnings
     except AozanException, exp:
-        error("error while checking samplesheet for run " + run_id, exp.getMessage(), conf)
+        error("Error while checking samplesheet for run " + run_id, exp.getMessage(), conf)
         return False, samplesheet_warnings
 
     # Log Bcl2fastq samplesheet warning
@@ -343,7 +343,7 @@ def check_samplesheet(samplesheet, run_id, flow_cell_id, conf):
             else:
                 msg += ' '
             msg += warn
-        common.log("WARNING", "bcl2fastq samplesheet warnings: " + msg, conf)
+        common.log("WARNING", "Bcl2fastq samplesheet warnings: " + msg, conf)
 
     # Return samplesheet
     return True, samplesheet_warnings
@@ -377,12 +377,12 @@ def write_bcl2fastq_samplesheet(samplesheet, samplesheet_path, conf):
     except AozanException, exp:
         print StringUtils.stackTraceToString(exp)
 
-        error("error while writing Bcl2fastq samplesheet: " + samplesheet_path, exp.getMessage(), conf)
+        error("Error while writing Bcl2fastq samplesheet: " + samplesheet_path, exp.getMessage(), conf)
         return False
     except Exception, exp:
         print StringUtils.stackTraceToString(exp)
 
-        error("error while writing Bcl2fastq samplesheet: " + samplesheet_path, exp.getMessage(), conf)
+        error("Error while writing Bcl2fastq samplesheet: " + samplesheet_path, exp.getMessage(), conf)
         return False
 
     return True
@@ -534,7 +534,7 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
         common.log("CONFIG", "Demultiplexing using docker image from " + docker.getImageDockerName() +
                    " with command line " + cmd, conf)
 
-        common.log("CONFIG", "bcl2fastq docker mount: " +
+        common.log("CONFIG", "Bcl2fastq docker mount: " +
                    str(os.path.dirname(fastq_output_dir)) + ":" + str(output_docker) + "; " +
                    input_run_data_path + ":" + input_docker + "; " + tmp + ":" + tmp_docker, conf)
 
@@ -664,7 +664,7 @@ def demux(run_id, conf):
     """
 
     start_time = time.time()
-    common.log('INFO', 'Demux step: start', conf)
+    common.log('INFO', 'Demux step: Starting', conf)
 
     reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
     reports_data_path = common.get_report_run_data_path(run_id, conf)
@@ -690,20 +690,20 @@ def demux(run_id, conf):
 
     # Check if root input fastq data directory exists
     if not common.is_dir_exists(FASTQ_DATA_PATH_KEY, conf):
-        error("Fastq data directory does not exist",
-              "Fastq data directory does not exist: " + conf[FASTQ_DATA_PATH_KEY], conf)
+        error("FASTQ data directory does not exist",
+              "FASTQ data directory does not exist: " + conf[FASTQ_DATA_PATH_KEY], conf)
         return False
 
     # Check if bcl2fastq samplesheets path exists
     if not common.is_dir_exists(BCL2FASTQ_SAMPLESHEETS_PATH_KEY, conf):
-        error("bcl2fastq samplesheet directory does not exist",
+        error("Bcl2fastq samplesheet directory does not exist",
               "Bcl2fastq samplesheet directory does not exist: " + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY], conf)
         return False
 
     # Check if bcl2fastq basedir path exists
     if not common.is_conf_value_equals_true(BCL2FASTQ_USE_DOCKER_KEY, conf):
         if not common.is_dir_exists(BCL2FASTQ_PATH_KEY, conf):
-            error("bcl2fastq directory does not exist",
+            error("Bcl2fastq directory does not exist",
                   "Bcl2fastq directory does not exist: " + conf[BCL2FASTQ_PATH_KEY], conf)
             return False
 
@@ -731,8 +731,8 @@ def demux(run_id, conf):
 
     # Check if the output directory already exists
     if os.path.exists(fastq_output_dir):
-        error("Fastq output directory already exists for run " + run_id,
-              'The FASTQ output directory already exists for run ' + run_id + ': ' + fastq_output_dir, conf)
+        error("FASTQ output directory already exists for run " + run_id,
+              'FASTQ output directory already exists for run ' + run_id + ': ' + fastq_output_dir, conf)
         return False
 
     # Compute disk usage and disk free to check if enough disk space is available
@@ -832,7 +832,7 @@ def demux(run_id, conf):
     cmd = 'cp -p "' + bcl2fastq_samplesheet_path + '" "' + fastq_output_dir + '/SampleSheet.csv"'
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
-        error("Error while copying samplesheet file to the FASTQ directory for run " + run_id,
+        error("Error while copying samplesheet file to FASTQ directory for run " + run_id,
               'Error while copying samplesheet file to FASTQ directory.\nCommand line:\n' + cmd, conf)
         return False
 
@@ -862,10 +862,10 @@ def demux(run_id, conf):
 
     duration = time.time() - start_time
 
-    msg = 'End of demultiplexing with ' + nb_mismatch + ' mismatch(es) for run ' + run_id + '.' + \
+    msg = 'Ending demultiplexing with ' + nb_mismatch + ' mismatch(es) for run ' + run_id + '.' + \
           '\nJob finished at ' + common.time_to_human_readable(time.time()) + \
           ' without error in ' + common.duration_to_human_readable(duration) + '.\n\n' + \
-          'Fastq files for this run ' + \
+          'FASTQ files for this run ' + \
           'can be found in the following directory:\n  ' + fastq_output_dir
 
     if samplesheet_warnings.size() > 0:
@@ -879,7 +879,7 @@ def demux(run_id, conf):
 
     msg += '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df)
 
-    common.send_msg('[Aozan] End of demultiplexing for run ' + run_id + ' on ' +
+    common.send_msg('[Aozan] Ending demultiplexing for run ' + run_id + ' on ' +
                     common.get_instrument_name(run_id, conf), msg, False, conf)
     common.log('INFO', 'Demux step: successful in ' + common.duration_to_human_readable(duration), conf)
 

@@ -142,7 +142,7 @@ def discover_terminated_runs(denied_runs, conf):
                 return []
 
             aozan.welcome(conf)
-            common.log('INFO', 'End run detection ' + str(run_id) + ' on ' + common.get_instrument_name(run_id, conf),
+            common.log('INFO', 'Ending run detection ' + str(run_id) + ' on ' + common.get_instrument_name(run_id, conf),
                        conf)
 
             if hiseq_run.get_read_count(run_id, conf) == 0:
@@ -176,7 +176,7 @@ def send_mail_if_recent_run(run_id, secs, conf):
     if last > 0:
         df = common.df(run_path) / (1024 * 1024 * 1024)
         du = common.du(run_path + '/' + run_id) / (1024 * 1024 * 1024)
-        common.send_msg('[Aozan] End of the run ' + run_id + ' on ' + common.get_instrument_name(run_id, conf),
+        common.send_msg('[Aozan] Ending run ' + run_id + ' on ' + common.get_instrument_name(run_id, conf),
                         'A new run (' + run_id + ') is finished on ' +
                         common.get_instrument_name(run_id, conf) + ' at ' + common.time_to_human_readable(
                             last) + '.\n' +
@@ -248,7 +248,7 @@ def create_run_summary_reports(run_id, conf):
 
     if files_to_copy is None:
         common.log("WARNING",
-                   "Archive " + hiseq_log_archive_file + " not create: none file exists " + str(files) +
+                   "Archive " + hiseq_log_archive_file + " not created: none file exists " + str(files) +
                    ' in ' + source_path, conf)
     else:
         cmd = 'cd ' + source_path + ' && ' + \
@@ -285,7 +285,7 @@ def create_run_summary_reports(run_id, conf):
 
     files_to_copy = common.list_existing_files(source_path, files)
     if files_to_copy is None:
-        common.log("WARNING", "Archive " + report_archive_file + " not create: none file exists " + str(
+        common.log("WARNING", "Archive " + report_archive_file + " not created: none file exists " + str(
             files) + ' in ' + source_path, conf)
     else:
         cmd = 'cd ' + source_path + ' && ' + \
