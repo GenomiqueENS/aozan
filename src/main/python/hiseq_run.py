@@ -214,7 +214,7 @@ def send_mail_if_critical_free_space_available(conf):
             df = common.df(path)
             free_space_threshold = long(conf[HISEQ_CRITICAL_MIN_SPACE_KEY])
             if df < free_space_threshold:
-                common.send_msg('[Aozan] Critical: Not enough disk space on Hiseq storage for current run',
+                common.send_msg('[Aozan] Critical: Not enough disk space on sequencer storage for current run',
                                 'There is only %.2f' % (df / (1024 * 1024 * 1024)) +
                                 ' Gb left for run storage in ' + path + '. ' +
                                 ' The current warning threshold is set to %.2f' % (

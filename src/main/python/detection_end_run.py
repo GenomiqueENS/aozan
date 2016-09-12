@@ -142,7 +142,7 @@ def discover_terminated_runs(denied_runs, conf):
                 return []
 
             aozan.welcome(conf)
-            common.log('INFO', 'Discover end run ' + str(run_id) + ' on ' + common.get_instrument_name(run_id, conf),
+            common.log('INFO', 'Ending run detection ' + str(run_id) + ' on ' + common.get_instrument_name(run_id, conf),
                        conf)
 
             if hiseq_run.get_read_count(run_id, conf) == 0:
@@ -176,8 +176,8 @@ def send_mail_if_recent_run(run_id, secs, conf):
     if last > 0:
         df = common.df(run_path) / (1024 * 1024 * 1024)
         du = common.du(run_path + '/' + run_id) / (1024 * 1024 * 1024)
-        common.send_msg('[Aozan] End of the run ' + run_id + ' on ' + common.get_instrument_name(run_id, conf),
-                        'A new run (' + run_id + ') has been terminated on ' +
+        common.send_msg('[Aozan] Ending run ' + run_id + ' on ' + common.get_instrument_name(run_id, conf),
+                        'A new run (' + run_id + ') is finished on ' +
                         common.get_instrument_name(run_id, conf) + ' at ' + common.time_to_human_readable(
                             last) + '.\n' +
                         'Data for this run can be found at: ' + run_path +
@@ -209,14 +209,14 @@ def create_run_summary_reports(run_id, conf):
 
     # Check if reports_data_path exists
     if not os.path.exists(reports_data_base_path):
-        error("Failed to create report archive: Report directory does not exists",
-              "Failed to create report archive: Report directory does not exists: " + reports_data_base_path, conf)
+        error("Failed to create report archive: Report directory does not exist",
+              "Failed to create report archive: Report directory does not exist: " + reports_data_base_path, conf)
         return False
 
     # Check if temporary directory exists
     if not os.path.exists(tmp_base_path):
-        error("Failed to create report archive: Temporary directory does not exists",
-              "Failed to create report archive: Temporary directory does not exists: " + tmp_base_path, conf)
+        error("Failed to create report archive: Temporary directory does not exist",
+              "Failed to create report archive: Temporary directory does not exist: " + tmp_base_path, conf)
         return False
 
     # Check if reports archive exists
@@ -231,7 +231,7 @@ def create_run_summary_reports(run_id, conf):
               "Failed to create report archive: Hiseq log archive already exists for run " + run_id + " : " + hiseq_log_archive_file, conf)
         return False
 
-    # Create if not exists archive directory for the run
+    # Create if not exist archive directory for the run
     if not os.path.exists(reports_data_path):
         os.mkdir(reports_data_path)
 
@@ -248,7 +248,7 @@ def create_run_summary_reports(run_id, conf):
 
     if files_to_copy is None:
         common.log("WARNING",
-                   "Archive " + hiseq_log_archive_file + " not create: none file exists " + str(files) +
+                   "Archive " + hiseq_log_archive_file + " not created: none file exists " + str(files) +
                    ' in ' + source_path, conf)
     else:
         cmd = 'cd ' + source_path + ' && ' + \
@@ -261,7 +261,7 @@ def create_run_summary_reports(run_id, conf):
 
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
-            error("Failed to create report archive: error while saving Illumina quality control for run " + run_id,
+            error("Failed to create report archive: Error while saving Illumina quality control for run " + run_id,
                   "Failed to create report archive: Error saving Illumina quality control.\nCommand line:\n" + cmd, conf)
             return False
 
@@ -285,7 +285,7 @@ def create_run_summary_reports(run_id, conf):
 
     files_to_copy = common.list_existing_files(source_path, files)
     if files_to_copy is None:
-        common.log("WARNING", "Archive " + report_archive_file + " not create: none file exists " + str(
+        common.log("WARNING", "Archive " + report_archive_file + " not created: none file exists " + str(
             files) + ' in ' + source_path, conf)
     else:
         cmd = 'cd ' + source_path + ' && ' + \
@@ -298,8 +298,8 @@ def create_run_summary_reports(run_id, conf):
 
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
-            error("Failed to create report archive: error while saving Illumina html reports for run " + run_id,
-                  "Failed to create report archive: Error saving Illumina html reports.\nCommand line:\n" + cmd, conf)
+            error("Failed to create report archive: Error while saving Illumina HTML reports for run " + run_id,
+                  "Failed to create report archive: Error saving Illumina HTML reports.\nCommand line:\n" + cmd, conf)
             return False
 
     # Create index.hml file
