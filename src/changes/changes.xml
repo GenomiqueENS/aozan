@@ -766,5 +766,10 @@
 			</action>
 		</release>
 
+		<release version="2.0-rc19" description="Aozan 2.0-rc19 release"  date="2016-09-12">
+			<action dev="firmo" type="add">
+                                 Parameter files for failed runs are now also archived.
+			</action>
+		</release>
 	</body>
 </document>
