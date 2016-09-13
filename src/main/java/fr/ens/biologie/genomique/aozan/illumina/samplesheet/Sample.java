@@ -178,6 +178,22 @@ public class Sample {
     return this.samplesheet;
   }
 
+  /**
+   * Get the demultiplexing name of the sample.
+   * @return the demultiplexing name of the sample
+   */
+  public String getDemultiplexingName() {
+
+    final String sampleName = getSampleName();
+    final String sampleIdentifier = getSampleId();
+
+    if (sampleName != null && !sampleName.isEmpty()) {
+      return sampleName;
+    }
+
+    return sampleIdentifier;
+  }
+
   //
   // Setters
   //

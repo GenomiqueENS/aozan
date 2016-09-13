@@ -341,10 +341,7 @@ public class Bcl2FastqOutput {
 
     for (Sample sample : samplesheet) {
       // If sample id is not defined, use sample name
-      final String sname = sample.getSampleId() != null
-          ? sample.getSampleId() : sample.getSampleName();
-
-      sampleEntries.put(sample.getLane(), sname);
+      sampleEntries.put(sample.getLane(), sample.getDemultiplexingName());
     }
 
     List<Integer> lanesSorted = new ArrayList<Integer>(sampleEntries.keySet());

@@ -355,7 +355,7 @@ public class ReDemux {
       for (Map.Entry<Pattern, Sample> e : this.newIndexes.entrySet()) {
 
         final String sampleProject = e.getValue().getSampleProject();
-        final String sampleName = e.getValue().getSampleId();
+        final String sampleName = e.getValue().getDemultiplexingName();
         final String sampleIndex = e.getValue().getIndex1();
 
         // Define the output directory
@@ -394,7 +394,7 @@ public class ReDemux {
       for (Map.Entry<Pattern, Sample> e : this.newIndexes.entrySet()) {
 
         final String sampleProject = e.getValue().getSampleProject();
-        final String sampleName = e.getValue().getSampleId();
+        final String sampleName = e.getValue().getDemultiplexingName();
         final String sampleIndex = e.getValue().getIndex1();
 
         // Define the output directory
