@@ -136,14 +136,14 @@ public class DemultiplexingCollector implements Collector {
 
       final int lane = data.getSampleLane(sampleId);
       final boolean undetermined = data.isUndeterminedSample(sampleId);
-      final String sampleName = data.getSampleDemuxName(sampleId);
+      final String demuxName = data.getSampleDemuxName(sampleId);
 
       final String oldPrefix = "demux.lane"
-          + lane + ".sample." + (undetermined ? "undetermined" : sampleName)
+          + lane + ".sample." + (undetermined ? "undetermined" : demuxName)
           + '.';
       final String newPrefix = "demux.sample" + sampleId + '.';
 
-      prefixes.put(oldPrefix, newPrefix);
+      prefixes.put(oldPrefix.toLowerCase(), newPrefix);
     }
 
     // Add the new keys
