@@ -106,6 +106,47 @@
 
 		<section name="What's new in Aozan?">
 
+			<!--subsection name="New Samplesheet Validator v2"><p>
+				A new samplesheet validator for is available. With its new design it can now manage samplesheet v2.
+				[IMAGE] + [LINK]
+				</p>
+			</subsection-->
+
+			<subsection name="Aozan can now fully be executed using a Docker image."><p>
+				Aozan can now fully be executed using a Docker image. Thus you don't need to install all dependancies on your computer before using it.
+				</p>
+			</subsection>
+
+			<subsection name="New built-in step to automatically recompress all your fastq files."><p>
+				Aozan has now a new built-in step which recompresses fastq and fastq-gzip files into fastq-bzip2 files. bzip2 files are more compressed than gzip files and thus take less disk space.
+				They also are compatible with hadoop since they are chunked files. Please check <a href="recompression.html">here</a>.
+				</p>
+			</subsection>
+
+			<subsection name="Define denied runs and prioritized runs and automatically deny runs in error"><p>
+				In the aozan.var.path, you can specify [step].deny file (qc.deny, demux.deny, ...).
+				Runs specified in these files won't be processed by the step.
+				In the aozan.var.path, you can also specify runs.priority file.
+				Runs specified in this file are processed in priority by aozan when available
+				Furthermore, on detection of a run in error, automatically add it to hiseq.deny
+				</p>
+			</subsection>
+
+			<subsection name="Easy samplesheet auto usage"><p>
+				Aozan can now automatically check and use a samplesheet when available in run root folder if no samplesheet is given in input.
+				</p>
+			</subsection>
+
+			<subsection name="True Illumina values for metrics like phasing and prephasing"><p>
+				Phasing/prephasing values are now extracted directly from Illumina InterOps binary files. Thus gives exactly the same values as sequencers.
+				</p>
+			</subsection>
+
+			<subsection name="Choose the number of mismatch for demultiplexing"><p>
+				Samplesheet can now contain the number of allowed mismatch for demultiplexing
+				</p>
+			</subsection>
+
 			<subsection name="Aozan 2.0 manage HiSeq and NextSeq sequencers">
 				<p>Aozan can manage several sequencers, and now handles the latest versions of illumina sequencers (HiSeq and NextSeq).
 				</p>
