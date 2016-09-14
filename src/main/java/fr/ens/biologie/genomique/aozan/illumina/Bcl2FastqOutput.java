@@ -131,10 +131,10 @@ public class Bcl2FastqOutput {
 
       if (fastqSample.isUndeterminedIndex()) {
 
-        final File projectDir =
+        final File undeterminedDir =
             new File(getFastqDirectory(), UNDETERMINED_DIR_NAME);
 
-        return new File(projectDir,
+        return new File(undeterminedDir,
             UNDETERMINED_PREFIX + fastqSample.getLane());
       }
 
@@ -150,7 +150,19 @@ public class Bcl2FastqOutput {
         return getFastqDirectory();
       }
 
-      return new File(getFastqDirectory(), fastqSample.getProjectName());
+      final File projectV2Dir =
+          new File(getFastqDirectory(), fastqSample.getProjectName());
+
+      // Check if there is a sub directory for each sample
+      if ("".equals(fastqSample.getSampleDirectoryName())) {
+
+        // No sample sub directory
+        return projectV2Dir;
+      } else {
+
+        // Sample sub directory
+        return new File(projectV2Dir, fastqSample.getSampleDirectoryName());
+      }
 
     default:
       throw new IllegalStateException(

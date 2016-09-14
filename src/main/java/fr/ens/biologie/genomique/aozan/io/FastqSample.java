@@ -56,6 +56,7 @@ public class FastqSample {
   private final int sampleId;
   private final int read;
   private final int lane;
+  private final String sampleDirname;
   private final String sampleName;
   private final String projectName;
   private final String description;
@@ -265,6 +266,15 @@ public class FastqSample {
   }
 
   /**
+   * Get the directory name of the sample. The value can be empty if there is
+   * not dedicated directory for the sample.
+   * @return the directory name of the sample
+   */
+  public String getSampleDirectoryName() {
+    return this.sampleDirname;
+  }
+
+  /**
    * Get the project name from the sample in run.
    * @return project name
    */
@@ -385,14 +395,16 @@ public class FastqSample {
   }
 
   //
-  // Constructor
+  // Constructors
   //
 
   /**
    * Public constructor corresponding of a technical replica sample.
+   * @param qc QC object
    * @param sampleId the sample Id
    * @param read read number
    * @param lane lane number
+   * @param sampleDirname sample directory name
    * @param sampleName name of the sample
    * @param projectName name of the project
    * @param descriptionSample description of the sample
@@ -400,20 +412,25 @@ public class FastqSample {
    * @throws IOException if an error occurs while reading bcl2fastq version
    */
   public FastqSample(final QC qc, final int sampleId, final int read,
-      final int lane, final String sampleName, final String projectName,
-      final String descriptionSample, final String index) throws IOException {
+      final int lane, final String sampleDirname, final String sampleName,
+      final String projectName, final String descriptionSample,
+      final String index) throws IOException {
 
     this(getSampleSheetFileFromQC(qc), qc.getFastqDir(), qc.getTmpDir(),
-        qc.getRunId(), sampleId, read, lane, sampleName, projectName,
-        descriptionSample, index);
-
+        qc.getRunId(), sampleId, read, lane, sampleDirname, sampleName,
+        projectName, descriptionSample, index);
   }
 
   /**
    * Public constructor corresponding of a technical replica sample.
+   * @param sampleSheetFile samplesheet file
+   * @param fastqDir FASTQ directory
+   * @param tmpDir temporary directory
+   * @param runId the run id
    * @param sampleId the sample Id
    * @param read read number
    * @param lane lane number
+   * @param sampleDirname sample directory name
    * @param sampleName name of the sample
    * @param projectName name of the project
    * @param descriptionSample description of the sample
@@ -422,17 +439,19 @@ public class FastqSample {
    */
   public FastqSample(final File sampleSheetFile, final File fastqDir,
       final File tmpDir, final String runId, final int sampleId, final int read,
-      final int lane, final String sampleName, final String projectName,
-      final String descriptionSample, final String index) throws IOException {
+      final int lane, final String sampleDirname, final String sampleName,
+      final String projectName, final String descriptionSample,
+      final String index) throws IOException {
 
     this(new Bcl2FastqOutput(sampleSheetFile, fastqDir), fastqDir, tmpDir,
-        runId, sampleId, read, lane, sampleName, projectName, descriptionSample,
-        index, true);
+        runId, sampleId, read, lane, sampleDirname, sampleName, projectName,
+        descriptionSample, index, true);
 
   }
 
   /**
    * Public constructor corresponding of a undetermined index sample.
+   * @param qc QC object
    * @param sampleId the sample Id
    * @param read read number
    * @param lane lane number
@@ -457,21 +476,32 @@ public class FastqSample {
       final int lane) throws IOException {
 
     this(new Bcl2FastqOutput(sampleSheetFile, fastqDir), fastqDir, tmpDir,
-        runId, sampleId, read, lane, "lane" + lane, "", "", NO_INDEX, true);
+        runId, sampleId, read, lane, null, "lane" + lane, "", "", NO_INDEX,
+        true);
   }
 
   /**
    * Public constructor corresponding of a undetermined index sample.
+   * @param bcl2FastqOutput Bcl2FastqOutput object
+   * @param fastqDir FASTQ directory
+   * @param tmpDir temporary directory
+   * @param runId the run id
    * @param sampleId the sample Id
    * @param read read number
    * @param lane lane number
+   * @param sampleDirname sample dir name
+   * @param sampleName name of the sample
+   * @param projectName name of the project
+   * @param descriptionSample description of the sample
+   * @param index value of index or if doesn't exists, NoIndex
+   * @param createEmptyFastq enable the creation of empty FASTQ files
    * @throws IOException if an error occurs while reading bcl2fastq version
    */
   public FastqSample(final Bcl2FastqOutput bcl2FastqOutput, final File fastqDir,
       final File tmpDir, final String runId, final int sampleId, final int read,
-      final int lane, final String sampleName, final String projectName,
-      final String descriptionSample, final String index,
-      final boolean createEmptyFastq) throws IOException {
+      final int lane, final String sampleDirname, final String sampleName,
+      final String projectName, final String descriptionSample,
+      final String index, final boolean createEmptyFastq) throws IOException {
 
     checkArgument(read > 0, "read value cannot be lower than 1");
     checkArgument(lane > 0, "read value cannot be lower than 1");
@@ -479,6 +509,7 @@ public class FastqSample {
     this.sampleId = sampleId;
     this.read = read;
     this.lane = lane;
+    this.sampleDirname = sampleDirname == null ? "" : sampleDirname.trim();
     this.sampleName = sampleName;
     this.projectName = projectName;
     this.description = descriptionSample;
