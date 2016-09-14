@@ -766,9 +766,33 @@
 			</action>
 		</release>
 
-		<release version="2.0-rc19" description="Aozan 2.0-rc19 release"  date="2016-09-12">
+		<release version="2.0-rc19" description="Aozan 2.0-rc19 release"  date="TDB">
+			<action dev="jourdren" type="fix">
+                                 Fix issue when using old configuration keys in upper case.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 Fix issue when parsing intervals for QC tests in configuration file.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 Fix missing collector dependencies of some QC tests.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 Aozan can now handle FASTQ files for QC when samples of a project are in a dedicated subdirectory directory of the project directory.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 Fix missing collector dependencies of some QC tests.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 Fix issue with sample in upper case in the demultiplexing collector in QC.
+			</action>
 			<action dev="firmo" type="add">
                                  Parameter files for failed runs are now also archived.
+			</action>
+			<action dev="jourdren" type="update">
+                                 Docker can now be used to launch Blast in the Overrepresented sequences module of FastQC.
+			</action>
+			<action dev="jourdren" type="add">
+                                 Add a script that allows to create an Aozan demo configuration file and downloads all required files.
 			</action>
 		</release>
 	</body>
