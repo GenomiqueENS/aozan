@@ -104,7 +104,7 @@ def error(short_message, message, conf):
     common.error('[Aozan] hiseq done: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/hiseq.lasterr', conf)
 
 
-def get_available_terminated_run_ids(conf):
+def get_available_finished_run_ids(conf):
     """Get the list of the available runs.
 
     Arguments:
@@ -125,7 +125,7 @@ def get_available_terminated_run_ids(conf):
     return result
 
 
-def discover_terminated_runs(denied_runs, conf):
+def discover_finished_runs(denied_runs, conf):
     """Discover new ended runs
 
     Arguments:
@@ -135,7 +135,7 @@ def discover_terminated_runs(denied_runs, conf):
     run_ids_done = load_processed_run_ids(conf)
 
     if common.is_conf_value_equals_true(HISEQ_STEP_KEY, conf):
-        for run_id in (get_available_terminated_run_ids(conf) - run_ids_done - denied_runs):
+        for run_id in (get_available_finished_run_ids(conf) - run_ids_done - denied_runs):
 
             if run_id is None or len(run_id) == 0:
                 # No run id found
@@ -159,7 +159,7 @@ def discover_terminated_runs(denied_runs, conf):
 
 
 def send_mail_if_recent_run(run_id, secs, conf):
-    """Send an email to inform that a new run has been terminated.
+    """Send an email to inform that a new run is finished.
 
     Arguments:
         run_id: run id
