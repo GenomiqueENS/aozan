@@ -27,11 +27,11 @@ import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 
 /**
- * This interface define a test on lane.
+ * This interface define a test on a pooled sample.
  * @since 1.3
  * @author Laurent Jourdren
  */
-public interface SampleStatsTest extends AozanTest {
+public interface PooledSampleTest extends AozanTest {
 
   /**
    * Do a test.

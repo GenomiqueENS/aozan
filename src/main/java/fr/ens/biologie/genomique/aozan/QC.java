@@ -55,7 +55,7 @@ import fr.ens.biologie.genomique.aozan.tests.AozanTestRegistry;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 import fr.ens.biologie.genomique.aozan.tests.global.GlobalTest;
 import fr.ens.biologie.genomique.aozan.tests.lane.LaneTest;
-import fr.ens.biologie.genomique.aozan.tests.pooledsample.SampleStatsTest;
+import fr.ens.biologie.genomique.aozan.tests.pooledsample.PooledSampleTest;
 import fr.ens.biologie.genomique.aozan.tests.project.ProjectTest;
 import fr.ens.biologie.genomique.aozan.tests.sample.SampleTest;
 import fr.ens.biologie.genomique.eoulsan.EoulsanRuntime;
@@ -106,7 +106,7 @@ public class QC {
   private final List<GlobalTest> globalTests = new ArrayList<>();
   private final List<LaneTest> laneTests = new ArrayList<>();
   private final List<ProjectTest> projectStatsTests = new ArrayList<>();
-  private final List<SampleStatsTest> samplesStatsTests = new ArrayList<>();
+  private final List<PooledSampleTest> samplesStatsTests = new ArrayList<>();
   private final List<SampleTest> sampleTests = new ArrayList<>();
   private final Map<String, String> globalConf = new LinkedHashMap<>();
 
@@ -470,7 +470,7 @@ public class QC {
 
           case "pooledsample":
             for (final AozanTest t : tests) {
-              this.samplesStatsTests.add((SampleStatsTest) t);
+              this.samplesStatsTests.add((PooledSampleTest) t);
             }
             break;
 
@@ -502,7 +502,7 @@ public class QC {
     for (final ProjectTest test : this.projectStatsTests) {
       test.init();
     }
-    for (final SampleStatsTest test : this.samplesStatsTests) {
+    for (final PooledSampleTest test : this.samplesStatsTests) {
       test.init();
     }
   }
@@ -528,7 +528,7 @@ public class QC {
     for (final ProjectTest st : this.projectStatsTests) {
       testsList.add(st);
     }
-    for (final SampleStatsTest st : this.samplesStatsTests) {
+    for (final PooledSampleTest st : this.samplesStatsTests) {
       testsList.add(st);
     }
 

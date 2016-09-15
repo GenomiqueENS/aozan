@@ -39,7 +39,7 @@ import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 
-public class FastQScreenReportPooledSampleTest extends AbstractSampleStatsTest {
+public class FastQScreenReportPooledSampleTest extends AbstractPooledSampleTest {
 
   @Override
   public List<AozanTest> configure(final TestConfiguration conf)

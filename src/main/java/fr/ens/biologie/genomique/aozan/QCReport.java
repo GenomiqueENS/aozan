@@ -50,7 +50,7 @@ import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollecto
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 import fr.ens.biologie.genomique.aozan.tests.global.GlobalTest;
 import fr.ens.biologie.genomique.aozan.tests.lane.LaneTest;
-import fr.ens.biologie.genomique.aozan.tests.pooledsample.SampleStatsTest;
+import fr.ens.biologie.genomique.aozan.tests.pooledsample.PooledSampleTest;
 import fr.ens.biologie.genomique.aozan.tests.project.ProjectTest;
 import fr.ens.biologie.genomique.aozan.tests.sample.SampleTest;
 import fr.ens.biologie.genomique.aozan.util.XMLUtilsWriter;
@@ -67,7 +67,7 @@ public class QCReport {
   private final List<GlobalTest> globalTests = new ArrayList<>();
   private final List<LaneTest> laneTests = new ArrayList<>();
   private final List<ProjectTest> projectStatsTests = new ArrayList<>();
-  private final List<SampleStatsTest> samplesStatsTests = new ArrayList<>();
+  private final List<PooledSampleTest> samplesStatsTests = new ArrayList<>();
   private final List<SampleTest> sampleTests = new ArrayList<>();
   private Document doc;
 
@@ -241,7 +241,7 @@ public class QCReport {
     final Element columns = doc.createElement("Columns");
     root.appendChild(columns);
 
-    for (final SampleStatsTest test : this.samplesStatsTests) {
+    for (final PooledSampleTest test : this.samplesStatsTests) {
       final Element columnElement = doc.createElement("Column");
       columnElement.setAttribute("testname", test.getName());
       columnElement.setAttribute("description", test.getDescription());
@@ -270,7 +270,7 @@ public class QCReport {
           this.data.getPooledSampleProjectName(pooledSampleId));
       samplesStatsElement.appendChild(sampleStatsElement);
 
-      for (final SampleStatsTest test : this.samplesStatsTests) {
+      for (final PooledSampleTest test : this.samplesStatsTests) {
         final TestResult result = test.test(this.data, pooledSampleId);
 
         final Element testElement = doc.createElement("Test");
@@ -657,7 +657,7 @@ public class QCReport {
    */
   public QCReport(final RunData data, final List<GlobalTest> globalTests,
       final List<LaneTest> laneTests, final List<ProjectTest> projectStatsTests,
-      final List<SampleStatsTest> samplesStatsTests,
+      final List<PooledSampleTest> samplesStatsTests,
       final List<SampleTest> sampleTests) {
 
     this.data = data;

@@ -40,7 +40,7 @@ import fr.ens.biologie.genomique.aozan.tests.TestResult;
  * @author Cyril Firmo
  * @since 2.0
  */
-public class SampleInPoolCountPooledSampleTest extends AbstractSampleStatsTest {
+public class SampleInPoolCountPooledSampleTest extends AbstractPooledSampleTest {
 
   @Override
   public List<AozanTest> configure(final TestConfiguration conf)

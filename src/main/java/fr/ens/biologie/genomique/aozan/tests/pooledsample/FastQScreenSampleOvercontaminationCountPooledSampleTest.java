@@ -48,7 +48,7 @@ import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
  * @since 1.4
  */
 public class FastQScreenSampleOvercontaminationCountPooledSampleTest
-    extends AbstractSampleStatsTest {
+    extends AbstractPooledSampleTest {
 
   private final ScoreInterval interval = new ScoreInterval();
 

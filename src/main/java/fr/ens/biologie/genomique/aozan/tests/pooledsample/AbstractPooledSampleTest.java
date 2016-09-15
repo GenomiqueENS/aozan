@@ -28,7 +28,7 @@ package fr.ens.biologie.genomique.aozan.tests.pooledsample;
  * @since 1.3
  * @author Laurent Jourdren
  */
-public abstract class AbstractSampleStatsTest implements SampleStatsTest {
+public abstract class AbstractPooledSampleTest implements PooledSampleTest {
 
   private final String name;
   private final String description;
@@ -81,7 +81,7 @@ public abstract class AbstractSampleStatsTest implements SampleStatsTest {
    * @param description description of the test
    * @param columnName column name of the test
    */
-  protected AbstractSampleStatsTest(final String name, final String description,
+  protected AbstractPooledSampleTest(final String name, final String description,
       final String columnName) {
 
     this(name, description, columnName, "");
@@ -94,7 +94,7 @@ public abstract class AbstractSampleStatsTest implements SampleStatsTest {
    * @param columnName column name of the test
    * @param unit unit of the test
    */
-  protected AbstractSampleStatsTest(final String name, final String description,
+  protected AbstractPooledSampleTest(final String name, final String description,
       final String columnName, final String unit) {
 
     this.name = name;
