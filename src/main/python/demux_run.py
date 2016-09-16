@@ -492,6 +492,7 @@ def demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesh
     common.log('INFO', 'Demultiplexing in standalone mode using the following command line: ' + str(cmd), conf)
 
     exit_code = os.system(cmd)
+
     if exit_code != 0:
         error("Error while executing bcl2fastq " + run_id_msg,
               'Error while executing bcl2fastq (exit code: ' + str(
@@ -561,22 +562,23 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
 
         docker.run()
         exit_code = docker.getExitValue()
+
         if exit_code != 0:
             error("Error while demultiplexing run " + run_id, 'Error while demultiplexing run (exit code: ' +
                   str(exit_code) + ').\nCommand line:\n' + cmd, conf)
 
-        msg = 'Error while executing bcl2fastq ' + run_id_msg + ' (exit code: ' + str(
+            msg = 'Error while executing bcl2fastq ' + run_id_msg + ' (exit code: ' + str(
                   exit_code) + ').\nCommand line:\n' + cmd
 
-        # Check if the log file has been generated
-        if not os.path.exists(bcl2fastq_log_file):
-            error("Error with bcl2fastq log for run " + run_id + ".", "No bcl2fastq log available " + bcl2fastq_log_file, conf)
-            common.send_msg('[Aozan] Failed demultiplexing ' + run_id_msg, msg, True, conf)
-        else:
-            msg += "\n\nPlease check the attached bcl2fastq output error file."
-            common.send_msg_with_attachment('[Aozan] Failed demultiplexing ' + run_id_msg, msg, bcl2fastq_log_file, True, conf)
+            # Check if the log file has been generated
+            if not os.path.exists(bcl2fastq_log_file):
+                error("Error with bcl2fastq log for run " + run_id + ".", "No bcl2fastq log available " + bcl2fastq_log_file, conf)
+                common.send_msg('[Aozan] Failed demultiplexing ' + run_id_msg, msg, True, conf)
+            else:
+                msg += "\n\nPlease check the attached bcl2fastq output error file."
+                common.send_msg_with_attachment('[Aozan] Failed demultiplexing ' + run_id_msg, msg, bcl2fastq_log_file, True, conf)
 
-        return False
+            return False
 
     except Throwable, exp:
         error("Error while running Docker image", common.exception_msg(exp, conf), conf)
