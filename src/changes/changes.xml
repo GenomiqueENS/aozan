@@ -794,6 +794,26 @@
 			<action dev="jourdren" type="add">
                                  Add a script that allows to create an Aozan demo configuration file and downloads all required files.
 			</action>
+			
+			
+			<action dev="firmo" type="fix">
+								Fixed errors when samples in samplesheet are unsorted.
+			</action>
+			<action dev="firmo" type="add">
+								Now checks if system is linux type.
+			</action>
+			<action dev="firmo" type="add">
+								Now checks if programs are availables in PATH before execution.
+			</action>
+			<action dev="firmo" type="update">
+								Can now provide samplesheets xls where field contains ',' character.
+			</action>
+			<action dev="firmo" type="fix">
+								Fixed some typo in aozan error messages.
+			</action>
+			<action dev="firmo" type="update">
+								When bcl2fastq execution fails, send error log attached in mail 
+			</action>
 		</release>
 	</body>
 </document>
