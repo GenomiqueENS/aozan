@@ -177,13 +177,16 @@ public class SampleSheetUtils {
     boolean firstHeader = true;
     for (String fieldName : fieldNames) {
 
-      if (firstHeader) {
-        firstHeader = false;
-      } else {
-        sb.append(SEPARATOR);
-      }
+      if (!fieldName.isEmpty()) {
 
-      sb.append(quoteStringWithComma(convertFieldNameV2(fieldName)));
+        if (firstHeader) {
+          firstHeader = false;
+        } else {
+          sb.append(SEPARATOR);
+        }
+
+        sb.append(quoteStringWithComma(convertFieldNameV2(fieldName)));
+      }
     }
     sb.append('\n');
 
@@ -193,13 +196,16 @@ public class SampleSheetUtils {
 
       for (String fieldName : fieldNames) {
 
-        if (first) {
-          first = false;
-        } else {
-          sb.append(SEPARATOR);
-        }
+        if (!fieldName.isEmpty()) {
 
-        sb.append(quoteStringWithComma(s.get(fieldName)));
+          if (first) {
+            first = false;
+          } else {
+            sb.append(SEPARATOR);
+          }
+
+          sb.append(quoteStringWithComma(s.get(fieldName)));
+        }
       }
       sb.append('\n');
     }
