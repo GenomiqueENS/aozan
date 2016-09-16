@@ -398,15 +398,24 @@ def send_msg(subject, message, is_error, conf):
         print '-------------'
 
 
-def send_msg_with_attachment(subject, message, attachment_file, conf):
+def send_msg_with_attachment(subject, message, attachment_file, is_error, conf):
     """Send a message to the user about the data extraction."""
 
     send_mail = is_conf_value_equals_true(SEND_MAIL_KEY, conf)
     smtp_server = conf[SMTP_SERVER_KEY]
-    mail_to = conf[MAIL_TO_KEY]
     mail_from = conf[MAIL_FROM_KEY]
     mail_cc = None
     mail_bcc = None
+
+    # Specific receiver for error message
+    if is_error:
+        mail_to = conf[MAIL_ERROR_TO_KEY]
+
+        # Mail error not define
+        if mail_to is None or mail_to == '':
+            mail_to = conf[MAIL_TO_KEY]
+    else:
+        mail_to = conf[MAIL_TO_KEY]
 
     if mail_to is not None:
         if type(mail_to) == str or type(mail_to) == unicode:
