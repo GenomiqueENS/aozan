@@ -472,7 +472,10 @@ def demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesh
     """
 
     bcl2fastq_executable_path = conf[BCL2FASTQ_PATH_KEY]
+    tmp = conf[TMP_PATH_KEY]
+
     run_id_msg = " for run " + run_id + ' on ' + common.get_instrument_name(run_id, conf)
+    bcl2fastq_log_file = tmp + "/bcl2fastq_output_" + run_id + ".err"
 
     # Check if the bcl2fastq path is OK
     if os.path.isdir(bcl2fastq_executable_path):
@@ -484,7 +487,7 @@ def demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesh
         return False
 
     cmd = create_bcl2fastq_command_line(run_id, bcl2fastq_executable_path, input_run_data_path, fastq_output_dir,
-                                        samplesheet_csv_path, conf[TMP_PATH_KEY], nb_mismatch, conf)
+                                        samplesheet_csv_path, tmp, nb_mismatch, conf)
 
     common.log('INFO', 'Demultiplexing in standalone mode using the following command line: ' + str(cmd), conf)
 
@@ -493,6 +496,18 @@ def demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesh
         error("Error while executing bcl2fastq " + run_id_msg,
               'Error while executing bcl2fastq (exit code: ' + str(
                   exit_code) + ').\nCommand line:\n' + cmd, conf)
+
+        msg = 'Error while executing bcl2fastq ' + run_id_msg + ' (exit code: ' + str(
+                  exit_code) + ').\nCommand line:\n' + cmd
+
+        # Check if the log file has been generated
+        if not os.path.exists(bcl2fastq_log_file):
+            error("Error with bcl2fastq log for run " + run_id + ".", "No bcl2fastq log available", conf)
+            common.send_msg('[Aozan] Failed demultiplexing ' + run_id_msg, msg, True, conf)
+        else:
+            msg += "\n\nPlease check the attached bcl2fastq output error file."
+            common.send_msg_with_attachment('[Aozan] Failed demultiplexing ' + run_id_msg, msg, bcl2fastq_log_file, True, conf)
+
         return False
 
     return True
@@ -521,6 +536,7 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
     tmp = conf[TMP_PATH_KEY]
     tmp_docker = '/tmp'
 
+    bcl2fastq_log_file = tmp + "/bcl2fastq_output_" + run_id + ".err"
     samplesheet_csv_docker = tmp_docker + '/' + os.path.basename(samplesheet_csv_path)
 
     cmd = create_bcl2fastq_command_line(run_id, None, input_run_data_path_in_docker, fastq_data_path_in_docker,
@@ -544,13 +560,23 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
         docker.addMountDirectory(tmp, tmp_docker)
 
         docker.run()
-
-        if docker.getExitValue() != 0:
+        exit_code = docker.getExitValue()
+        if exit_code != 0:
             error("Error while demultiplexing run " + run_id, 'Error while demultiplexing run (exit code: ' +
-                  str(docker.getExitValue()) + ').\nCommand line:\n' + cmd, conf)
+                  str(exit_code) + ').\nCommand line:\n' + cmd, conf)
 
-            # TODO add exception message in log file
-            return False
+        msg = 'Error while executing bcl2fastq ' + run_id_msg + ' (exit code: ' + str(
+                  exit_code) + ').\nCommand line:\n' + cmd
+
+        # Check if the log file has been generated
+        if not os.path.exists(bcl2fastq_log_file):
+            error("Error with bcl2fastq log for run " + run_id + ".", "No bcl2fastq log available " + bcl2fastq_log_file, conf)
+            common.send_msg('[Aozan] Failed demultiplexing ' + run_id_msg, msg, True, conf)
+        else:
+            msg += "\n\nPlease check the attached bcl2fastq output error file."
+            common.send_msg_with_attachment('[Aozan] Failed demultiplexing ' + run_id_msg, msg, bcl2fastq_log_file, True, conf)
+
+        return False
 
     except Throwable, exp:
         error("Error while running Docker image", common.exception_msg(exp, conf), conf)
