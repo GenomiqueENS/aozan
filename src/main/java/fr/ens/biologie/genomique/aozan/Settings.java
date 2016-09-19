@@ -122,7 +122,7 @@ public final class Settings {
   /** Recompression step. */
   public static final String RECOMPRESS_STEP_KEY = "recompress.step";
     /** Erase input after recompression. */
-  public static final String RECOMPRESS_DELETE_ORIGINAL_FASTQ_KEY = "recompress.delete.original.fastq";
+  public static final String RECOMPRESS_DELETE_ORIGINAL_FASTQ_KEY = "recompress.delete.original.fastq.files";
   /** Erase input after recompression. */
 public static final String RECOMPRESS_COMPRESSION_LEVEL_KEY = "recompress.compression.level";
 /** Erase input after recompression. */

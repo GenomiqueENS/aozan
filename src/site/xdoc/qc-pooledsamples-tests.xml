@@ -67,14 +67,14 @@
 			<td>Enable passing filter cluster sum on replica samples</td></tr>
         <tr><td>qc.test.pooledsample.q30.percent.enable</td><td>boolean</td><td>False</td>
         	<td>Enable samplestatspercentq30basepf test</td></tr>
-     	<tr><td>qc.test.samplestats.samplestatsmeanqualityscorepf.enable</td><td>boolean</td><td>False</td>
-         	<td>Enable samplestatsmeanqualityscorepf test</td></tr>
+        <!--tr><td>qc.test.samplestats.samplestatsmeanqualityscorepf.enable</td><td>boolean</td><td>False</td>
+            <td>Enable mean quality score pf test</td></tr-->
 		<tr><td>qc.test.pooledsample.pf.percent.enable</td><td>boolean</td><td>False</td>
-			<td>Enable samplestatspassingfilterclusterpercent test</td></tr>
+			<td>Enable passing filter cluster percent test</td></tr>
 	    <tr><td>qc.test.pooledsample.in.run.percent.enable</td><td>boolean</td><td>False</td>
-	    	<td>Enable percentsampleinrun test</td></tr>
+	        <td>Enable percent sample in run test</td></tr>
         <tr><td>qc.test.pooledsample.in.project.percent.enable</td><td>boolean</td><td>False</td>
-        	<td>Enable percentsampleinproject test</td></tr>
+            <td>Enable percent sample in project test</td></tr>
         <tr><td>qc.test.pooledsample.sample.in.pool.count.enable</td><td>boolean</td><td>False</td>
         	<td>Enable pooledsample.sample.in.pool.count test</td></tr>
        </table>

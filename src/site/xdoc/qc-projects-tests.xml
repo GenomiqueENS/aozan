@@ -75,12 +75,12 @@
        </p>
        <table>
        	<tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
-		<tr><td>qc.test.recoverablerawcluster.enable</td><td>integer</td><td>False</td>
-			<td>Enable recoverable raw cluster in samples test</td></tr>
+		<!--tr><td>qc.test.recoverablerawcluster.enable</td><td>integer</td><td>False</td>
+			<td>Enable recoverable raw cluster in samples test</td></tr-->
 		<tr><td>qc.test.project.recoverable.raw.cluster.percent.enable</td><td>percent</td><td>False</td>
 			<td>Enable recoverable raw cluster in samples test</td></tr>
-		<tr><td>qc.test.recoverablepfcluster.enable</td><td>integer</td><td>False</td>
-			<td>Enable recoverable passing filter cluster in samples test</td></tr>
+		<!--tr><td>qc.test.recoverablepfcluster.enable</td><td>integer</td><td>False</td>
+			<td>Enable recoverable passing filter cluster in samples test</td></tr-->
 		<tr><td>qc.test.project.recoverable.pf.cluster.percent.enable</td><td>percent</td><td>False</td>
 			<td>Enable recoverable passing filter cluster in samples test</td></tr>
 	  </table>
