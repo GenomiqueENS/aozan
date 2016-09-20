@@ -51,7 +51,7 @@
          <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
 
 		<tr><td>qc.test.project.sample.count.enable</td><td>integer interval</td><td>False</td><td>Enable sample count project test</td></tr>
-		<tr><td>qc.test.project.genome.count.enable</td><td>string</td><td>False</td><td>Enable genomes projects test</td></tr>
+		<tr><td>qc.test.project.genome.names.enable</td><td>string</td><td>False</td><td>Enable genomes projects test</td></tr>
 		<tr><td>qc.test.project.lane.count.enable</td><td>string</td><td>False</td><td>Enable lanes number on run test</td></tr>
 		<tr><td>qc.test.project.is.indexed.enable</td><td>string</td><td>False</td><td>Enable global base count test</td></tr>
 		<tr><td>qc.test.project.min.raw.cluster.count.enable</td><td>integer interval</td><td>False</td>

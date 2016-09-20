@@ -20,33 +20,33 @@
  *      http://outils.genomique.biologie.ens.fr/aozan
  *
  */
-package fr.ens.biologie.genomique.aozan.tests.pooledsample;
+package fr.ens.biologie.genomique.aozan.tests.project;
 
-import static fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector.COLLECTOR_PREFIX;
+import static fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector.COLLECTOR_PREFIX;
 
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
-import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector;
+import fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector;
 
 /**
  * The Class GenomesProjectTest.
  * @author Sandrine Perrin
  * @since 2.4
  */
-public class GenomeCountPooledSampleTest extends AbstractSimpleSampleTest {
+public class GenomeNamesProjectTest extends AbstractSimpleProjectTest {
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(SampleStatisticsCollector.COLLECTOR_NAME);
+    return ImmutableList.of(ProjectStatisticsCollector.COLLECTOR_NAME);
   }
 
   @Override
-  protected String getKey(final int pooledSampleId) {
+  protected String getKey(final int projectId) {
 
-    return COLLECTOR_PREFIX + ".pooledsample" + pooledSampleId + ".ref";
+    return COLLECTOR_PREFIX + ".project" + projectId + ".genomes.ref";
   }
 
   @Override
@@ -62,9 +62,9 @@ public class GenomeCountPooledSampleTest extends AbstractSimpleSampleTest {
   /**
    * Public constructor.
    */
-  public GenomeCountPooledSampleTest() {
+  public GenomeNamesProjectTest() {
 
-    super("pooledsample.genome.count", "Genome Count", "Genome Count");
+    super("project.genome.names", "Genome(s)", "Genome(s)");
   }
 
 }

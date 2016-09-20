@@ -64,7 +64,7 @@ public class LaneCountProjectTest extends AbstractSimpleProjectTest {
    */
   public LaneCountProjectTest() {
 
-    super("project.lane.count", "Lane Count", "Lane Count");
+    super("project.lane.count", "Lane(s)", "Lane(s)");
   }
 
 }
