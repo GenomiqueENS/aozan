@@ -794,8 +794,6 @@
 			<action dev="jourdren" type="add">
                                  Add a script that allows to create an Aozan demo configuration file and downloads all required files.
 			</action>
-			
-			
 			<action dev="firmo" type="fix">
 								Fixed errors when samples in samplesheet are unsorted.
 			</action>
@@ -813,6 +811,9 @@
 			</action>
 			<action dev="firmo" type="update">
 								When bcl2fastq execution fails, send error log attached in mail 
+			</action>
+			<action dev="firmo" type="fix">
+								Fixed errors when converting samplesheet to CSV leave empty column.
 			</action>
 		</release>
 	</body>
