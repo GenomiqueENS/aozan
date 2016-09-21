@@ -158,7 +158,7 @@ fi
 
 echo -e "\nDownloads:"
 echo -e "  - Aozan binary (163 MB)\t: Yes"
-echo -e "  - Aozan demo run (3.5 GB)\t:" $(yes_or_no $BLAST_ENABLED)
+echo -e "  - Aozan demo run (3.5 GB)\t: Yes"
 echo -e "  - FastQ Screen genomes\t:" $(yes_or_no $FASTQ_SCREEN_ENABLED)
 echo -e "     - Mouse (698.8 MB)\t\t:" $(yes_or_no $FASTQ_SCREEN_ENABLED)
 echo -e "     - Adapters (11.2 KB)\t:" $(yes_or_no $FASTQ_SCREEN_ENABLED)
@@ -271,7 +271,6 @@ sed -i "s#tmp.path=/tmp#tmp.path=$AOZAN_DIR/tmp#" "$AOZAN_DIR"/conf/aozan.conf
 sed -i "s#aozan.lock.file=/var/lock/aozan.lock#aozan.lock.file=$AOZAN_DIR/var/aozan.lock#" "$AOZAN_DIR"/conf/aozan.conf
 
 
-
 # Path to a specific contaminants list, replace list per default
 sed -i "s#qc.conf.fastqc.contaminant.file=/path/to/aozan/resources/contaminants_fastqc.txt#qc.conf.fastqc.contaminant.file=$AOZAN_DIR/conf/resources/contaminants_fastqc.txt##" "$AOZAN_DIR"/conf/aozan.conf
 
@@ -280,7 +279,6 @@ sed -i "s#qc.conf.fastqc.adapter.file=/path/to/aozan/resources/adapters.txt#qc.c
 
 # Path to a specific limits file, replace default file
 sed -i "s#qc.conf.fastqc.limits.file=/path/to/aozan/resources/limits_modules.txt#qc.conf.fastqc.limits.file=$AOZAN_DIR/conf/limits_modules.txt#" "$AOZAN_DIR"/conf/aozan.conf
-
 
 
 # Path to the file which make the correspondence between genome name in bcl2fastq samplesheet and the reference genome name
@@ -295,11 +293,11 @@ sed -i "s#qc.conf.fastqscreen.genomes.path=/path/to/aozan/resources/genomes#qc.c
 # Path to the genomes indexes repository
 sed -i "s#qc.conf.fastqscreen.mapper.indexes.path=/path/to/aozan/resources/mappers_indexes#qc.conf.fastqscreen.mapper.indexes.path=$AOZAN_DIR/resources/mapper-indexes#" "$AOZAN_DIR"/conf/aozan.conf
 
-
-
 # Path to the database nt, access to nt.pal file
 sed -i "s#qc.conf.fastqc.blast.db.path=/path/to/ncbi_database_nt#qc.conf.fastqc.blast.db.path=$AOZAN_DIR/resources/ncbi-database-nt#" "$AOZAN_DIR"/conf/aozan.conf
 
+# Add ribosomes genomes to the contamination search
+sed -i "s#qc.conf.fastqscreen.genomes=phix,adapters#qc.conf.fastqscreen.genomes=phix,adapters,lsuref,ssuref#" "$AOZAN_DIR"/conf/aozan.conf
 
 # Set Bcl2fastq2 path
 if [ "$BCL2FASTQ2_DIR" != "" ]; then
@@ -307,17 +305,29 @@ if [ "$BCL2FASTQ2_DIR" != "" ]; then
 fi
 
 # Enable Blast
-if [ "$EMAIL_ENABLED" -eq 1 ]; then
+if [ "$BLAST_ENABLED" -eq 1 ]; then
     sed -i "s#qc.conf.fastqc.blast.enable=False#qc.conf.fastqc.blast.enable=True#" "$AOZAN_DIR"/conf/aozan.conf
     sed -i "s#qc.conf.fastqc.blast.path=/usr/bin/blastall#qc.conf.fastqc.blast.path=$BLAST_PATH#" "$AOZAN_DIR"/conf/aozan.conf
 fi
 
+# Disable FastQ Screen related tests if FastQ Screen is disabled by user
+if [ "$FASTQ_SCREEN_ENABLED" -eq 0 ]; then
 
-# Disable FastQ Screen
-if [ "$EMAIL_ENABLED" -eq 1 ]; then
-    sed -i "s#qc.test.sample.fastqscreen.mapped.except.ref.genome.percent.enable=True#qc.test.sample.fastqscreen.mapped.except.ref.genome.percent.enable=False#" "$AOZAN_DIR"/conf/aozan.conf
-    sed -i "s#qc.test.sample.fastqscreen.mapped.percent.enable=True#qc.test.sample.fastqscreen.mapped.percent.enable=False#" "$AOZAN_DIR"/conf/aozan.conf
-    sed -i "s#qc.test.sample.fastqscreen.report.enable=True#qc.test.sample.fastqscreen.report.enable=False#" "$AOZAN_DIR"/conf/aozan.conf
+sed -i "s#qc.test.sample.fastqscreen.mapped.except.ref.genome.percent.enable=True#qc.test.sample.fastqscreen.mapped.except.ref.genome.percent.enable=False#" "$AOZAN_DIR"/conf/aozan.conf
+sed -i "s#qc.test.sample.fastqscreen.mapped.percent.enable=True#qc.test.sample.fastqscreen.mapped.percent.enable=False#" "$AOZAN_DIR"/conf/aozan.conf
+sed -i "s#qc.test.sample.fastqscreen.report.enable=True#qc.test.sample.fastqscreen.report.enable=False#" "$AOZAN_DIR"/conf/aozan.conf
+
+sed -i "s#qc.test.pooledsample.fastqscreen.sample.overcontamination.count.enable=True#qc.test.pooledsample.fastqscreen.sample.overcontamination.count.enable=False#" "$AOZAN_DIR"/conf/aozan.conf
+sed -i "s#qc.test.pooledsample.fastqscreen.report.enable=True#qc.test.pooledsample.fastqscreen.report.enable=False#" "$AOZAN_DIR"/conf/aozan.conf
+sed -i "s#qc.test.pooledsample.fastqscreen.mapped.except.ref.percent.enable=True#qc.test.pooledsample.fastqscreen.mapped.except.ref.percent.enable=False#" "$AOZAN_DIR"/conf/aozan.conf
+
+
+sed -i "s#qc.test.pooledsample.fastqscreen.mapped.percent.enable=True#qc.test.pooledsample.fastqscreen.mapped.percent.enable=False#" "$AOZAN_DIR"/conf/aozan.conf
+sed -i "s#qc.test.pooledsample.fastqscreen.report.enable=True#qc.test.pooledsample.fastqscreen.report.enable=False#" "$AOZAN_DIR"/conf/aozan.conf
+
+sed -i "s#qc.test.project.fastqscreen.sample.overcontamination.count.enable=True#qc.test.project.fastqscreen.sample.overcontamination.count.enable=False#" "$AOZAN_DIR"/conf/aozan.conf
+sed -i "s#qc.test.project.fastqscreen.report.enable=True#qc.test.project.fastqscreen.report.enable=False#" "$AOZAN_DIR"/conf/aozan.conf
+
 fi
 
 if [ "$DOCKER_INSTALLED" -eq 1 ]; then
