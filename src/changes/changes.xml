@@ -815,6 +815,9 @@
 			<action dev="firmo" type="fix">
 								Fixed errors when converting samplesheet to CSV leave empty column.
 			</action>
+			<action dev="firmo" type="update">
+								Now supports bcl2fastq 2.18
+			</action>
 		</release>
 	</body>
 </document>
