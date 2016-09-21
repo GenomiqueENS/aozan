@@ -1342,7 +1342,11 @@ def load_conf(conf, conf_file_path):
         else:
             fields = s.split('=')
             key = fields[0].strip()
-            value = fields[1].strip()
+
+            if len(fields) == 1:
+                value = ''
+            else :
+                value = fields[1].strip()
 
             if len(fields) == 2:
 
