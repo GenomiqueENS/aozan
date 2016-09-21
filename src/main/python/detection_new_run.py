@@ -208,7 +208,7 @@ def send_report(run_id, conf):
                   run_id + '.\n\n' + description_run
         common.send_msg_with_attachment('[Aozan] First base report for the run ' + type_run_estimated + '  ' + run_id +
                                         ' on ' + common.get_instrument_name(run_id, conf),
-                                        message, attachment_file, conf)
+                                        message, attachment_file, False, conf)
     else:
         # With other no attachment file
         message = 'You will find below the parameters of the run ' + run_id + '.\n\n' + description_run

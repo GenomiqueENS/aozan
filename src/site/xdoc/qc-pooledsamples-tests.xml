@@ -53,6 +53,7 @@
         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
 		<tr><td>qc.test.pooledsample.sample.count.enable</td><td>boolean</td><td>False</td><td>Enable sample count project test</td></tr>
 		<tr><td>qc.test.pooledsample.sample.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
+		<tr><td>qc.test.pooledsample.genome.names.enable</td><td>string</td><td>False</td> <td>Enable genome names test</td></tr>
 		<tr><td>qc.test.pooledsample.min.raw.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable raw cluster minimum count on replica samples</td></tr>
 		<tr><td>qc.test.pooledsample.min.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 		<tr><td>qc.test.pooledsample.max.raw.cluster.count.enable</td><td>boolean</td><td>False</td> <td>Enable raw cluster maximum count on replica samples</td></tr>

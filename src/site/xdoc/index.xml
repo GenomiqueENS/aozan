@@ -112,6 +112,11 @@
 				</p>
 			</subsection-->
 
+			<subsection name="bcl2fastq 2.18 in Aozan"><p>
+				Aozan now supports bcl2fastq 2.18
+				</p>
+			</subsection>
+
 			<subsection name="Aozan can now fully be executed using a Docker image."><p>
 				Aozan can now fully be executed using a Docker image. Thus you don't need to install all dependancies on your computer before using it.
 				</p>
