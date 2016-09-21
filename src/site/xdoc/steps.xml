@@ -36,7 +36,7 @@
 
 	<body>
 	
-		<p>Aozan works in 5 steps. It sends mails <b>at each step</b> of the pre-analysis workflow and 
+		<p>Aozan works in 6 steps. It sends mails <b>at each step</b> of the pre-analysis workflow and
 		a <b>QC report</b> at the end of the quality control step.
 		The parameters for each step should be written in Aozan configuration file, 
 		an example is <a href="./data/aozan-example.conf">here.</a>. The available steps are:</p>
@@ -59,6 +59,9 @@
 				<ul><li>Uses rsync</li>
 				    <li>Does not copy CIF files (optional)</li></ul>
 			</li>
+			<p/>
+
+			<li><a href="recompression.html">Recompress FASTQ files</a> from gzip format to bzip2 format to save disk space. </li>
 			<p/>
 			
 			<li><a href="demultiplexing.html">Demultiplexing</a>

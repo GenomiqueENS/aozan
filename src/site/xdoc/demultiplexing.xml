@@ -34,10 +34,13 @@
 
 	 <section name="The demultiplexing step">
 
+     <p><b>Warning:</b> The last version of bcl2fastq 2 (2.18) published in september 2016 is not currently supported by Aozan.
+     However, we plan to support this version soon.</p>
+
      <p>This step allows to launch demultiplexing using bcl2fastq 2. Aozan can use samplesheets in XLS or XLSX format or generated
      by an external tool in addition of samplesheets in CSV format. Using a samplesheet in XLS or XLSX format allows
      to use aliases for adapter sequence indexes.
-     <br/><a href="./samplesheet_SNL110_template.xls" target="_blank">Here is an example of a bcl2fastq samplesheet file.</a></p>
+     <br/><a href="./samplesheet_bcl2fastq2_template.xls" target="_blank">Here is an example of a bcl2fastq samplesheet file.</a></p>
 
      <p>If not using an external tool to build the samplesheet, the samplesheet must be created
 	in a dedicated directory using a standardized name (e.g. <tt>samplesheet_SNL177_0153.xls</tt> where SNL177 is the name of
