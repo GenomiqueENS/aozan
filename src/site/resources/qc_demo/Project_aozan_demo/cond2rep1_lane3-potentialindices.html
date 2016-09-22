@@ -1,0 +1,406 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>cond2rep1
+					Recovery clusters
+				</title>
+<style TYPE="text/css">
+
+					img {
+					width: 150px;
+					}
+					body{
+					font-family: sans-serif;
+					font-size: 80%;
+					margin:0;
+					}
+					h1{
+					color: #234CA5;
+					font-style : italic;
+					font-size : 20px;
+					}
+					h2{}
+					h3{
+					color:black;
+					font-style : italic;
+					}
+
+					table {
+					border: medium solid #000000;
+					font-size: 95%;
+					border-collapse:collapse;
+					}
+
+					td {
+					text-align: right;
+					width: 100px;
+					border: 1px solid black;
+
+					padding-left:3px;
+					padding-right:3px;
+					padding-top:1px;
+					padding-bottom:1px;
+					position : static;
+					background-clip: padding-box;
+					}
+					th {
+					background-color:#E7EAF1;
+					color:black;
+					border: thin solid black;
+					border-bottom-width: 2px;
+					width: 50px;
+					font-size: 100%;
+					}
+
+					#data tr:hover {
+					z-index:2;
+					box-shadow:0 0
+					12px rgba(0, 0, 0, 1);
+					background:#F6F6B4;
+					}
+					tr.total{
+					background:#82D482;
+					font-style : bold;
+					}
+					tr.conflict{
+					background:#FFFFA3;
+					font-style : bold;
+					}
+					#data td:first-child{
+					text-align:center;
+					font-style : bold;
+					background-color:#D7A1A3;
+					font-family:Courier New;
+					font-size:120%;
+					}
+					#data td:last-child{
+					width: 200px;
+					text-align: left;
+					font-style : italic;
+					}
+
+					div.header {
+					background-color: #C1C4CA;
+					border:0;
+					margin:0;
+					padding: 0.5em;
+					font-size: 175%;
+					font-weight: bold;
+					width:100%;
+					height: 2em;
+					position:
+					fixed;
+					vertical-align: middle;
+					z-index:2;
+					}
+
+					#header_title {
+					display:inline-block;
+					float:left;
+					clear:left;
+					font-size: 85%;
+					}
+
+					#header_right {
+					display:inline-block;
+					float:right;
+					clear:right;
+					font-size: 55%;
+					margin-right:2em;
+					text-align: right;
+					vertical-align:middle;
+					}
+					div.report {
+					display:block;
+					position:absolute;
+					width:100%;
+					top:6em;
+					bottom:5px;
+					left:0;
+					right:0;
+					padding:0 0 0 1em;
+					background-color: white;
+					}
+
+					div.footer {
+					background-color: #C1C4CA;
+					border:0;
+					margin:0;
+					padding:0.5em;
+					height: 1.3em;
+					overflow:hidden;
+					font-size: 100%;
+					font-weight: bold;
+					position:fixed;
+					bottom:0;
+					width:100%;
+					z-index:2;
+					}
+					#topPage{
+					text-align: left;
+					}
+
+
+					a.linkFilterActivate:link, a.linkFilterInactivate:link{
+					color:#ffffff;
+					}
+
+					.linkFilterActivate {
+					border-top-left-radius:24px;
+					border-top-right-radius:24px;
+					border-bottom-right-radius:24px;
+					border-bottom-left-radius:24px;
+
+					background-color:#002447;
+					text-indent:0px;
+					border:3px solid #000000;
+					display:inline-block;
+					font-family:Arial;
+					font-size:15px;
+					font-weight:bold;
+					font-style:normal;
+					line-height:29px;
+					text-decoration:none;
+					text-align:center;
+					padding-left:5px;
+					padding-right:5px;
+
+					}
+
+					.linkFilterInactivate {
+					border-top-left-radius:24px;
+					border-top-right-radius:24px;
+					border-bottom-right-radius:24px;
+					border-bottom-left-radius:24px;
+
+					background-color:#ffffff;
+					text-indent:0px;
+					border:3px solid #000000;
+					display:inline-block;
+					font-family:Arial;
+					font-size:15px;
+					font-weight:bold;
+					font-style:normal;
+					line-height:29px;
+					text-decoration:none;
+					text-align:center;
+					padding-left:5px;
+					padding-right:5px;
+					}
+
+					a.linkFilterActivate:link{
+						color:#ffffff;
+					}
+					a.linkFilterInactivate:link{
+						color:#000000;
+					}
+					.linkFilterInactivate:hover, .linkFilterActivate:hover {
+						background-color:#9A1319;
+						color:#000000;
+					}
+
+					#filterSample td{
+					border:#ffffff;
+					border-style:hidden;
+					}
+
+
+				</style>
+<script type="text/javascript">
+<!--
+				
+				function filterRow(samples, elemLink) {
+					//alert('hello '+ samples.length);
+					init_all('none');
+
+					for (var n=0; n < samples.length; n++){
+					var tab = document.getElementById('data').getElementsByClassName(samples[n]);
+
+						for (var i=0; i < tab.length; i++){
+							tab[i].style.display ="table-row";
+						}
+					}
+							
+		        	// Change class link
+			        // Inactivate link
+			        document.getElementsByClassName('linkFilterActivate')[0].setAttribute('class', 'linkFilterInactivate');
+			        // Activate new element
+			        elemLink.setAttribute('class', 'linkFilterActivate');
+		
+				}
+
+				function init_all(display_val){
+					//alert('hello ' + display_val);
+					var tab1 = document.getElementById('data').getElementsByTagName('tr');
+
+					//alert('read1 : '+tab1.length);
+					for (var i=0; i < tab1.length; i++){
+						tab1[i].style.display = display_val;
+					}
+
+					var header = document.getElementsByClassName('headerColumns');
+					//alert('header '+header.length);
+					for (var i=0; i < header.length; i++){
+						header[i].style.display = "table-row";
+					}
+					var total = document.getElementsByClassName('total');
+					//alert('total'+total.length);
+					for (var i=0; i < total.length; i++){
+						total[i].style.display = "table-row";
+					}
+				}
+
+				--></script>
+</head>
+<body>
+<div class="header">
+<div id="header_title">
+<img src="http://outils.genomique.biologie.ens.fr/aozan/images/logo_aozan_qc.png" alt="Aozan">
+						Clusters recoverable in
+						cond2rep1
+							for project
+							aozan_demo</div>
+<div id="header_right">
+<a href="javascript:void(0);" onclick="window.scrollTo(0,0);">
+							Top of page
+						</a>
+</div>
+</div>
+<div class="report">
+<ul>
+<li>
+<b>Sequencer Type: </b>
+</li>
+<li>
+<b>Run Id: </b>160617_NB500892_0097_AH7N2TAFXX</li>
+<li>
+<b>Flow cell: </b>H7N2TAFXX</li>
+<li>
+<b>Run started: </b>Fri 17 Jun 2016</li>
+<li>
+<b>Instrument S/N: </b>NB500892</li>
+<li>
+<b>Instrument run number: </b>97</li>
+<li>
+<b>Generated by: </b>Aozan
+							version
+							2.0-rc19-SNAPSHOT
+							(revision
+							heads/master-0-ge631b27
+							)
+						</li>
+<li>
+<b>Creation date: </b>Wed 21 Sep 2016</li>
+</ul>
+<ul>
+<li>
+<b>Project : </b>aozan_demo</li>
+<li>
+<b>Sample : </b>cond2rep1</li>
+<li>
+<b>Description : </b>Condition 2</li>
+<li>
+<b>Condition : </b>Compile results on recovery clusters in undetermined fastq with 1 mismatch(es).</li>
+</ul>
+<p></p>
+<div id="table">
+<table id="data">
+<tr class="headerColumns">
+<th>Index</th><th>Raw cluster count</th><th>PF cluster count</th><th>PF %</th><th>Raw cluster in sample %</th><th>PF cluster count in sample %</th><th>Comment</th>
+</tr>
+<tr class="">
+<td>TGACCA</td><td>1 982 511</td><td>1 982 511</td><td>100.00%</td><td>100.00%</td><td>100.00%</td><td>Demultiplexing result 16</td>
+</tr>
+<tr class="total">
+<td>Total recoverable indices</td><td>33 469</td><td>33 469</td><td>100.00%</td><td>1.69%</td><td>1.69%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TGCCCA</td><td>5 606</td><td>5 606</td><td>100.00%</td><td>0.28%</td><td>0.28%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TGACAA</td><td>3 174</td><td>3 174</td><td>100.00%</td><td>0.16%</td><td>0.16%</td><td></td>
+</tr>
+<tr class="entry">
+<td>AGACCA</td><td>2 611</td><td>2 611</td><td>100.00%</td><td>0.13%</td><td>0.13%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TGAGCA</td><td>2 297</td><td>2 297</td><td>100.00%</td><td>0.12%</td><td>0.12%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TGACCC</td><td>2 065</td><td>2 065</td><td>100.00%</td><td>0.10%</td><td>0.10%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TGACCT</td><td>1 976</td><td>1 976</td><td>100.00%</td><td>0.10%</td><td>0.10%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TGAACA</td><td>1 967</td><td>1 967</td><td>100.00%</td><td>0.10%</td><td>0.10%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TGATCA</td><td>1 900</td><td>1 900</td><td>100.00%</td><td>0.10%</td><td>0.10%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TGGCCA</td><td>1 814</td><td>1 814</td><td>100.00%</td><td>0.09%</td><td>0.09%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TGACTA</td><td>1 658</td><td>1 658</td><td>100.00%</td><td>0.08%</td><td>0.08%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TTACCA</td><td>1 514</td><td>1 514</td><td>100.00%</td><td>0.08%</td><td>0.08%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TGACGA</td><td>1 461</td><td>1 461</td><td>100.00%</td><td>0.07%</td><td>0.07%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TGACCG</td><td>1 399</td><td>1 399</td><td>100.00%</td><td>0.07%</td><td>0.07%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TGTCCA</td><td>1 268</td><td>1 268</td><td>100.00%</td><td>0.06%</td><td>0.06%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TAACCA</td><td>1 126</td><td>1 126</td><td>100.00%</td><td>0.06%</td><td>0.06%</td><td></td>
+</tr>
+<tr class="entry">
+<td>GGACCA</td><td>417</td><td>417</td><td>100.00%</td><td>0.02%</td><td>0.02%</td><td></td>
+</tr>
+<tr class="entry">
+<td>CGACCA</td><td>394</td><td>394</td><td>100.00%</td><td>0.02%</td><td>0.02%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TCACCA</td><td>337</td><td>337</td><td>100.00%</td><td>0.02%</td><td>0.02%</td><td></td>
+</tr>
+<tr class="entry">
+<td>NGACCA</td><td>257</td><td>257</td><td>100.00%</td><td>0.01%</td><td>0.01%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TGNCCA</td><td>106</td><td>106</td><td>100.00%</td><td>0.01%</td><td>0.01%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TGACCN</td><td>78</td><td>78</td><td>100.00%</td><td>0.00%</td><td>0.00%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TGANCA</td><td>23</td><td>23</td><td>100.00%</td><td>0.00%</td><td>0.00%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TGACNA</td><td>17</td><td>17</td><td>100.00%</td><td>0.00%</td><td>0.00%</td><td></td>
+</tr>
+<tr class="entry">
+<td>TNACCA</td><td>4</td><td>4</td><td>100.00%</td><td>0.00%</td><td>0.00%</td><td></td>
+</tr>
+</table>
+</div>
+<p>_</p>
+</div>
+<div class="footer">
+<span>
+						Generated by
+						<a href="http://outils.genomique.biologie.ens.fr/aozan">
+							Aozan
+						</a>
+						(version
+						2.0-rc19-SNAPSHOT
+						)
+					</span>
+</div>
+</body>
+</html>
