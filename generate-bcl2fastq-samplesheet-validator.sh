@@ -580,21 +580,27 @@ public class $PROJECT_NAME implements EntryPoint {
 
     // Set the layouts
     final TabLayoutPanel tp = new TabLayoutPanel(1.5, Unit.EM);
-    tp.add(new ScrollPanel(inputTextarea), "[Input bcl2fastq samplesheet]");
-    tp.add(outputHTML, "[CSV bcl2fastq samplesheet]");
+    tp.add(new ScrollPanel(inputTextarea), "[Input Samplesheet]");
     tp.add(new ScrollPanel(indexesTextarea), "[Indexes Aliases]");
     tp.add(new ScrollPanel(genomesTextarea), "[References Aliases]");
-    tp.add(new ScrollPanel(helpTextarea), "[Help]");
+
+
+    final TabLayoutPanel tpo = new TabLayoutPanel(1.5, Unit.EM);
+    tpo.add(new ScrollPanel(helpTextarea), "[Help]");
+    tpo.add(outputHTML, "[Output Samplesheet (CSV)]");
 
     tp.setHeight("100%");
     tp.setWidth("100%");
+    tpo.setHeight("100%");
+    tpo.setWidth("100%");
 
     //RootLayoutPanel rp = RootLayoutPanel.get();
     //rp.add(dlp);
 
-    RootPanel.get("flowcellidFieldContainer").add(flowcellTextBox);
+    //RootPanel.get("flowcellidFieldContainer").add(flowcellTextBox);
     RootPanel.get("sendButtonContainer").add(button);
     RootPanel.get("tabsContainer").add(tp);
+    RootPanel.get("tabsContainerOutput").add(tpo);
 
     retrieveIndexesList(Window.Location.getParameter("indexesaliaseslist"), Window.Location.getParameter("indexesaliasesurl"));
 
@@ -617,7 +623,7 @@ public class $PROJECT_NAME implements EntryPoint {
     helpTextarea.setSize("99%","100%");
     loadTextHelp();
 
-    flowcellTextBox.setText(Window.Location.getParameter("id"));
+    // flowcellTextBox.setText(Window.Location.getParameter("id"));
 
     inputTextarea.setText("[Paste here your bcl2fastq samplesheet]");
     //inputTextarea.setCharacterWidth(150);
@@ -669,7 +675,7 @@ public class $PROJECT_NAME implements EntryPoint {
 
             outputHTML.setHTML("<pre>"
                 + SampleSheetUtils.toSampleSheetV2CSV(design) + "</pre>");
-            tp.selectTab(1);
+            tpo.selectTab(1);
           }
         } catch (IOException e) {
           Window.alert("Invalid samplesheet: " + e.getMessage());
@@ -718,8 +724,25 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
     <!--                                           -->
     <!-- Any title is fine                         -->
     <!--                                           -->
-    <title>CASAVA/BCL2FASTQ version 1.8 samplesheet validator</title>
 
+
+<style type="text/css">
+    div.header {
+		background-color: #C1C4CA;
+        border:0;
+        margin:0;
+        padding: 2em;
+        font-size: 175%;
+        font-weight: bold;
+        width:100%;
+        height: 4em;
+        position: top;
+        vertical-align: top;
+        z-index:0;
+
+    }
+    <title>Bcl2Fastq version 2 Samplesheet Validator</title>
+  </style>
     <!--                                           -->
     <!-- This script loads your compiled module.   -->
     <!-- If you add any GWT meta tags, they must   -->
@@ -749,19 +772,21 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
       </div>
     </noscript>
 
-<h4 align="right">__VERSION__</h4>
-    <div>
-      <a href="https://www.genomique.biologie.ens.fr" ><img src="http://outils.genomique.biologie.ens.fr/aozan/images/logo_genomicpariscentre-90pxh.png" alt="logo genomic paris centre" align="left"/></a>
-      <h1>CASAVA/BCL2FASTQ version 1.8 samplesheet validator</h1>
+
+    <div class="header">
+      <a href="https://www.genomique.biologie.ens.fr" ><img src="http://tools.genomique.biologie.ens.fr/aozan/images/logo_genomicpariscentre-90pxh.png" alt="logo genomic paris centre" align="left"/></a>
+      <a href="http://www.tools.genomique.biologie.ens.fr/aozan/" ><img src="http://tools.genomique.biologie.ens.fr/aozan/images/aozan.png" alt="logo aozan" align="right"/></a>
+      <h1>Bcl2fastq version 2 samplesheet validator</h1>
     </div>
+    <div>
     <table align="center">
       <!--tr>
         <td colspan="2" style="font-weight:bold;">Please enter your name:</td>
       </tr-->
       <tr>
-        <td>Flow cell id or run id (optional):</td>
-        <td id="flowcellidFieldContainer"></td>
-        <td id="nameFieldContainer"></td>
+        <!--td>Flow cell id or run id (optional):</td>
+        <td id="flowcellidFieldContainer"></td-->
+        <!--td id="nameFieldContainer"></td-->
         <td id="sendButtonContainer"></td>
       </tr>
       <tr>
@@ -772,15 +797,17 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
     <!--p/-->
 
     <table align="center" width="90%" >
-      <tr><td id="tabsContainer" height="700px"/></tr>
+      <tr><td id="tabsContainer" height="700px"/><td id="tabsContainerOutput" height="700px"/></tr>
     </table>
 
     <!--p/-->
 
+<h4 align="left">No data is sent to our servers when you use this tool.</h4>
+<h4 align="center">__VERSION__</h4>
     <!--table align="center" >
       <tr><td id="sendButtonContainer/></tr>
     </table-->
-
+    <div>
 
 
   </body>
