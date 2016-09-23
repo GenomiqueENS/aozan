@@ -176,23 +176,14 @@ public class FastqScreen {
 
     checkNotNull(conf, "properties argument cannot be null");
 
-    this.tmpDir = new File(conf.get(QC.TMP_DIR));
+    this.tmpDir = conf.getFile(QC.TMP_DIR);
 
-    if (conf.containsKey(Settings.QC_CONF_THREADS_KEY)) {
-      int threads = 1;
-      try {
-        threads = Integer.parseInt(conf.get(Settings.QC_CONF_THREADS_KEY));
-      } catch (final NumberFormatException e) {
-      }
-      this.confThreads = threads;
-    } else {
-      this.confThreads = 1;
-    }
+    this.confThreads = conf.getInt(Settings.QC_CONF_THREADS_KEY, 1);
 
     // Fields required to initialize fastqScreenGenomes
-    this.aliasGenomesFile = new File(
-        conf.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_ALIAS_PATH_KEY));
-    this.samplesheetFile = new File(conf.get(QC.BCL2FASTQ_SAMPLESHEET_PATH));
+    this.aliasGenomesFile =
+        conf.getFile(Settings.QC_CONF_FASTQSCREEN_GENOMES_ALIAS_PATH_KEY);
+    this.samplesheetFile = conf.getFile(QC.BCL2FASTQ_SAMPLESHEET_PATH);
     this.contaminantGenomeNames =
         conf.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
 

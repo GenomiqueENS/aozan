@@ -83,7 +83,7 @@ public class RunInfoCollector implements Collector {
 
     if (qc == null) {
       // Unit Test
-      parentFile = new File(conf.get(QC.RTA_OUTPUT_DIR));
+      parentFile = conf.getFile(QC.RTA_OUTPUT_DIR);
     } else {
       parentFile = qc.getBclDir();
       this.settings = qc.getSettings();

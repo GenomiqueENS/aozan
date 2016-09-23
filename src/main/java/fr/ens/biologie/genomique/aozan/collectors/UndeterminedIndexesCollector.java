@@ -95,8 +95,7 @@ public class UndeterminedIndexesCollector extends AbstractFastqCollector {
     if (conf.containsKey(Settings.QC_CONF_THREADS_KEY)) {
 
       try {
-        int confThreads =
-            Integer.parseInt(conf.get(Settings.QC_CONF_THREADS_KEY).trim());
+        int confThreads = conf.getInt(Settings.QC_CONF_THREADS_KEY, -1);
         if (confThreads > 0)
           this.numberThreads = confThreads;
 
@@ -106,10 +105,10 @@ public class UndeterminedIndexesCollector extends AbstractFastqCollector {
 
     // Set external xsl file to write report html instead of default version
     try {
-      String filename =
-          conf.get(Settings.QC_CONF_UNDETERMINED_INDEXED_XSL_FILE_KEY);
-      if (new File(filename).exists())
-        this.undeterminedIndexedXSLFile = new File(filename);
+      File file =
+          conf.getFile(Settings.QC_CONF_UNDETERMINED_INDEXED_XSL_FILE_KEY);
+      if (file != null && file.exists())
+        this.undeterminedIndexedXSLFile = file;
     } catch (Exception e) {
       // Call default xsl file
       this.undeterminedIndexedXSLFile = null;
