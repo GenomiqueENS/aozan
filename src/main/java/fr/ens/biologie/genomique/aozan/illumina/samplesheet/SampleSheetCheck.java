@@ -1,6 +1,5 @@
 package fr.ens.biologie.genomique.aozan.illumina.samplesheet;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -559,51 +558,4 @@ public class SampleSheetCheck {
     return s == null || s.isEmpty();
   }
 
-  public static void main(String[] args) throws IOException, AozanException {
-
-    String inputText = "[Header]\n"
-        + "IEMFileVersion,4\n" + "Experiment Name,C9PNDANXX\n"
-        + "Date,17/08/2016\n" + "Workflow,GenerateFASTQ\n"
-        + "Application,HiSeq FASTQ Only\n" + "Assay,TruSeq HT and LT\n"
-        + "Description,C9PNDANXX\n" + "Chemistry,Amplicon\n" + "\n"
-        + "[Reads]\n" + "125\n" + "125\n" + "\n" + "[Settings]\n"
-        + "ReverseComplement,0\n" + "\n" + "[Data],,,,,\n"
-        + "Lane,Sample_Name,Sample_ID,Sample_Well,Sample_Plate,I7_Index_ID,index,Sample_Project,Description,sample_Ref\n"
-        + "1,,2015_339,,,A001,ATCACG,STD,,Mus Musculus\n"
-        + "1,,2015_341,,,A002,CGATGT,STD,,Mus Musculus\n"
-        + "1,,2015_343,,,A004,TTAGGC,STD,,Mus Musculus\n"
-        + "1,,2015_345,,,A006,TGACCA,STD,,Mus Musculus\n"
-        + "1,,2015_347,,,A007,ACAGTG,STD,,Mus Musculus\n"
-        + "1,,2015_351,,,A012,GCCAAT,STD,,Mus Musculus\n"
-        + "2,,2015_339,,,A016,ATCACG,STD,,Mus Musculus\n"
-        + "2,,2015_341,,,A022,CGATGT,STD,,Mus Musculus\n"
-        + "2,,2015_343,,,A023,TTAGGC,STD,,Mus Musculus\n"
-        + "2,,2015_345,,,A001,TGACCA,STD,,Mus Musculus\n"
-        + "2,,2015_347,,,A002,ACAGTG,STD,,Mus Musculus\n"
-        + "2,,2015_351,,,A004,GCCAAT,STD,,Mus Musculus\n"
-        + "3,,2015_339,,,A006,ATCACG,STD,,Mus Musculus\n"
-        + "3,,2015_341,,,A007,CGATGT,STD,,Mus Musculus\n"
-        + "3,,2015_343,,,A012,TTAGGC,STD,,Mus Musculus\n"
-        + "3,,2015_345,,,A001,TGACCA,STD,,Mus Musculus\n"
-        + "3,,2015_347,,,A002,ACAGTG,STD,,Mus Musculus\n"
-        + "3,,2015_351,,,A004,GCCAAT,STD,,Mus Musculus\n"
-        + "4,,2015_339,,,A006,ATCACG,STD,,Mus Musculus\n"
-        + "4,,2015_341,,,A007,CGATGT,STD,,Mus Musculus\n"
-        + "4,,2015_343,,,A012,TTAGGC,STD,,Mus Musculus\n"
-        + "4,,2015_345,,,A016,TGACCA,STD,,Mus Musculus\n"
-        + "4,,2015_347,,,A022,ACAGTG,STD,,Mus Musculus\n"
-        + "4,,2015_351,,,A023,GCCAAT,STD,,Mus Musculus\n";
-
-    SampleSheet samplesheet = SampleSheetUtils.parseCSVSamplesheet(inputText);
-
-    System.out.println(SampleSheetUtils.toSampleSheetV2CSV(samplesheet));
-
-    final List<String> warnings =
-        SampleSheetCheck.checkSampleSheet(samplesheet);
-
-    for (String warning : warnings) {
-      System.out.println(warning);
-    }
-    System.out.println("OK");
-  }
 }
