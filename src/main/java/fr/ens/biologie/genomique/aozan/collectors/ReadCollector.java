@@ -71,8 +71,8 @@ public class ReadCollector implements Collector {
     }
 
     // Use ReadXMLCollector, if specified in aozan.conf
-    final String readXMLCollectorUsed = conf
-        .get(Settings.QC_CONF_READ_XML_COLLECTOR_USED_KEY).trim().toLowerCase();
+    final String readXMLCollectorUsed =
+        conf.getTrimmedLowerCase(Settings.QC_CONF_READ_XML_COLLECTOR_USED_KEY);
 
     // Build the list of sub-collector
     if (readXMLCollectorUsed.equals("true")) {

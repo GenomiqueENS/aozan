@@ -107,7 +107,7 @@ public class ClusterDensityGlobalTest extends AbstractGlobalTest {
    */
   public ClusterDensityGlobalTest() {
     
-    super("global.cluster.density", "Cluster Density", "Cluster Density");
+    super("global.cluster.density", "Cluster Density", "Cluster Density","k/mm2");
   }
 
 }

@@ -36,7 +36,7 @@ fr.ens.biologie.genomique.aozan.tests.lane.PFClusterPercentLaneTest
 fr.ens.biologie.genomique.aozan.tests.lane.PhasingPrephasingPercentLaneTest
 fr.ens.biologie.genomique.aozan.tests.lane.RawClusterCountLaneTest
 fr.ens.biologie.genomique.aozan.tests.lane.PhiXRawClusterCountLaneTest
-fr.ens.biologie.genomique.aozan.tests.project.GenomeCountProjectTest
+fr.ens.biologie.genomique.aozan.tests.project.GenomeNamesProjectTest
 fr.ens.biologie.genomique.aozan.tests.project.IsIndexedProjectTest
 fr.ens.biologie.genomique.aozan.tests.project.LaneCountProjectTest
 fr.ens.biologie.genomique.aozan.tests.project.FastQScreenReportProjectTest
@@ -78,7 +78,7 @@ fr.ens.biologie.genomique.aozan.tests.sample.RecoverableRawClusterPercentSampleT
 fr.ens.biologie.genomique.aozan.tests.sample.RecoverableRawClusterCountSampleTest
 fr.ens.biologie.genomique.aozan.tests.sample.FastQCSequenceLengthDistributionSampleTest
 fr.ens.biologie.genomique.aozan.tests.pooledsample.FastQScreenMappedPercentPooledSampleTest
-fr.ens.biologie.genomique.aozan.tests.pooledsample.GenomeCountPooledSampleTest
+fr.ens.biologie.genomique.aozan.tests.pooledsample.GenomeNamesPooledSampleTest
 fr.ens.biologie.genomique.aozan.tests.pooledsample.FastQScreenMappedExceptRefPercentPooledSampleTest
 fr.ens.biologie.genomique.aozan.tests.pooledsample.IsIndexedPooledSampleTest
 fr.ens.biologie.genomique.aozan.tests.pooledsample.LaneCountPooledSampleTest

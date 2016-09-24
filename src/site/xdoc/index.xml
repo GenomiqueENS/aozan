@@ -73,7 +73,7 @@
 		</section>
 
 		<section name="Quality control report example">
-			<p><a href="./quality_control_example_report.html" target="_blank">
+			<p><a href="./qc_demo/160617_NB500892_0097_AH7N2TAFXX.html" target="_blank">
 				<img src="images/quality_control_example_report_300px.png" alt="Example on quality control run report"/>
 			</a></p>
 		</section>
@@ -111,6 +111,11 @@
 				[IMAGE] + [LINK]
 				</p>
 			</subsection-->
+
+			<subsection name="bcl2fastq 2.18 in Aozan"><p>
+				Aozan now supports bcl2fastq 2.18
+				</p>
+			</subsection>
 
 			<subsection name="Aozan can now fully be executed using a Docker image."><p>
 				Aozan can now fully be executed using a Docker image. Thus you don't need to install all dependancies on your computer before using it.

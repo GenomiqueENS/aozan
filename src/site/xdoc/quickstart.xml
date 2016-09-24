@@ -25,158 +25,97 @@
 -->
 <document>
 
-	<properties>
-		<title>Quickstart</title>
-		<author email="jourdren@biologie.ens.fr">
-			Laurent Jourdren
-		</author>
+  <properties>
+    <title>Quickstart</title>
+    <author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
+  </properties>
 
-	</properties>
+  <body>
+    <link rel="alternate" type="application/rss+xml" title="Aozan updates" href="aozan.rss" />
 
+    <section name="Quickstart Guide">
 
-	<body>
-	        <link rel="alternate" type="application/rss+xml" title="Aozan updates" href="aozan.rss" />
+      <ul>
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#principles">Principles</a></li>
+        <li><a href="#requirements">Requirements</a></li>
+        <ul>
+          <li><a href="#bcl2fastq2">Installing bcl2fastq2</a></li>
+          <li><a href="#docker">Installing docker (optional)</a></li>
+          <li><a href="#blastall">Installing ncbi-blast+ (optional)</a></li>
+        </ul>
+        <li> <a href="#installation">Installation</a> </li>
+        <li> <a href="#launchingAozan">Launching Aozan</a> </li>
+        <li> <a href="#hiseqdata">Accessing sequencer Data</a> </li>
+        <li> <a href="#directoryAozan">Directories required by Aozan</a> </li>
+        <li> <a href="#configuration">General configuration</a> </li>
+        <li> <a href="#steps">Steps</a> </li>
+      </ul>
 
-		<section name="Quickstart Guide">
-			<ul>
-				<li>
-					<a href="#introduction">Introduction</a>
-				</li>
-				<li>
-					<a href="#principles">Principles</a>
-				</li>
-				<li>
-					<a href="#requirements">Requirements</a>
-				</li>
-                    <ul>
-	                      <li><a href="#bcl2fastq">Installing bcl2fastq</a></li>
-	                      <li><a href="#bcl2fastq2">Installing bcl2fastq2</a></li>
-	                      <li><a href="#docker">Installing docker (optional)</a></li>
-	                      <li><a href="#blastall">Installing ncbi-blast+ (optional)</a></li>
-                    </ul>
-	            <li>
-					<a href="#installation">Installation</a>
-				</li>
-				<li>
-					<a href="#launchingAozan">Launching Aozan</a>
-				</li>
-				<li>
-					<a href="#hiseqdata">Accessing HiSeq Data</a>
-				</li>
-				<li>
-					<a href="#directoryAozan">Directories required by Aozan</a>
-				</li>
-                <li>
-                	<a href="#configuration">General configuration</a>
-                </li>
-                <li>
-                	<a href="#steps">Steps</a>
-                </li>
-			</ul>
+    </section>
 
-		</section>
+    <a name="introduction"/>
+    <section name="Introduction">
 
-		<a name="introduction"/>
-		<section name="Introduction">
+      <p>Aozan is a tool that automatically handle Illumina sequencer generated data from the end of sequencing to the
+      demultiplexing while also performing quality control. One of the greatest strength of Aozan is that it doesn't require user action to process data.
+      </p>
+      <p>Each step of the post-sequencing data processing is rather easy to do. However,
+      the duration of each step (data transfer, demultiplexing and quality control) is quite long and before getting data ready to analysis,
+      user must watch the end of each step to avoid waste of time.
+      Executing these tasks after each sequencing process is a laborious job. Aozan allows to
+      save time by automate all these tasks. In addition, Aozan provide a Bcl2fastq CSV samplesheet generator
+      from an XLS or XLSX file to avoid common syntax errors in the CSV file and to allow usage of alias for the index
+      sequences. This tool is available <a href="http://outils.genomique.biologie.ens.fr/samplesheetvalidator/">here</a>.
+      </p>
+    </section>
 
-		  <p>Aozan is a tool that automatically handle Illumina HiSeq or NextSeq generated data from the end of sequencing to the
-		  demultiplexing while also performing quality control. One of the greatest strength of Aozan is that it doesn't require user action to process data.
-		  </p>
-		  <p>Each step of the post-sequencing data processing is rather easy to do. However,
-		  the duration of each step (data transfer, demultiplexing and quality control) is quite long and before getting data ready to analysis,
-		  user must watch the end of each step to avoid waste of time.
-		  Executing these tasks after each sequencing process is a laborious job. Aozan allows to
-		  save time by automate all these tasks. In addition, Aozan provide a Bcl2fastq CSV samplesheet generator
-		  from an XLS or XLSX file to avoid common syntax errors in the CSV file and to allow usage of alias for the index
-		  sequences. This tool is available <a href="http://outils.genomique.biologie.ens.fr/samplesheetvalidator/">here</a>.
-		  </p>
-		</section>
+    <a name="principles"/>
+    <section name="Principles">
 
-		<a name="principles"/>
- <section name="Principles">
+      <p>Aozan is not an interactive tool, it communicates with users through mails. It is launched regularly (usually every hour)
+      through a cron job. There are 6 steps in Aozan. Once the end of a run has been discovered, synchronization,
+      demultiplexing, recompression and quality control will be automatically executed. However, if the end of another run is
+      discovered at the end of this last 4 steps, the synchronization of the new run will be launched before resuming
+      the end of the analysis of the previous run.</p>
 
-   <p>Aozan is not an interactive tool, it communicates with users through mails. It is launched regularly (usually every hour)
-   through a cron job. There are 5 steps in Aozan. Once the end of a run has been discovered, synchronization,
-   demultiplexing and quality control will be automatically executed. However, if the end of another run is
-   discovered at the end of this last 3 steps, the synchronization of the new run will be launched before resuming
-   the end of the analysis of the previous run.</p>
+      <p>The 6 native steps of Aozan are:</p>
+      <ol>
+        <li><a href="new-run-discovering.html">New run discovering step</a></li>
+        <li><a href="end-run-discovering.html">End run discovering step</a></li>
+        <li><a href="synchronization.html">Synchronization step (Optional)</a></li>
+        <li><a href="demultiplexing.html">Demultiplexing step</a></li>
+        <li><a href="recompression.html">Recompression step (Optional)</a></li>
+        <li><a href="quality-control.html">Quality control step</a></li>
+      </ol>
+    </section>
 
-   <p>The 6 native steps of Aozan are:</p>
-   <ol>
-     <li><a href="new-run-discovering.html">New run discovering step</a></li>
-     <li><a href="end-run-discovering.html">End run discovering step</a></li>
-     <li><a href="synchronization.html">Synchronization step</a></li>
-     <li><a href="demultiplexing.html">Demultiplexing step</a></li>
-     <li><a href="recompression.html">Recompression step</a></li>
-     <li><a href="quality-control.html">Quality control step</a></li>
-   </ol>
- </section>
-
- <a name="requirements"/>
- <section name="Requirements">
+    <a name="requirements"/>
+    <section name="Requirements">
 
 
- <p>To run Aozan, you need to install the following software:</p>
- <ul>
-   <li>Java 7 or above (tested with Oracle JRE and OpenJDK)</li>
-   <li>Docker 1.7.1 or above, for demultiplexing step or launching Aozan</li>
-   <li>bcl2fastq 1.8.2 or above</li>
-   <li>bcl2fastq 2, in preference to version 2.17.1.14</li>
-   <li>rsync 3.0.x or later</li>
- </ul>
+      <p>To run Aozan, you need to install the following software:</p>
+      <ul>
+        <li>Java 7 or above (tested with Oracle JRE and OpenJDK)</li>
+        <li>bcl2fastq 2 (tested with bcl2fastq 2.17.1.14)</li>
+        <li>rsync 3.0.x or later</li>
+      </ul>
 
- <p>On Ubuntu, you can install requirements (except Bcl2fastq) using the 'apt-get' command, here is an example:</p>
+      <p>On Debian/Ubuntu, you can install requirements (except Bcl2fastq) using the 'apt-get' command, here is an example:</p>
 <source>
 $ sudo apt-get install openjdk-7-jre-headless rsync
 </source>
 
 
-  <a name="bcl2fastq"/>
-   <subsection name="Installing bcl2fastq">
-   <p>The Bcl2FastQ conversion software is a tool which handle bcl conversion and demultiplexing of both unzipped and zipped bcl files.
-    bcl2fastq can be downloaded on the Illumina website
- <a href="http://support.illumina.com/downloads/bcl2fastq_conversion_software_183.ilmn">here</a>.</p>
+      <a name="bcl2fastq2"/>
+      <subsection name="Installing bcl2fastq2">
+        <p>The Bcl2FastQ conversion software is a tool which handle bcl conversion and demultiplexing of both unzipped and zipped bcl files.
+        bcl2fastq 2 can be downloaded on the Illumina website
+        <a href="http://support.illumina.com/downloads/bcl2fastq-conversion-software-v217.html">here</a>.</p>
 
- <p>Next, using the following lines we try to download and install bcl2fastq 1.8.3. , but since the installation on ubuntu has failed,
-    we have to recompile bcl2fastq in static mode on Centos 5.9, before finalizing installation. You can download 
- <a href="http://centos.mirror.fr.planethoster.net/5/isos/x86_64/">Centos 5.9 image iso here</a>.</p>
 
- <source>
-# Download bcl2fastq 1.8.3
-$ wget support.illumina.com/documents/MyIllumina/ce203f99-aad6-449e-938c-daa7501089a4/bcl2fastq-1.8.3-Linux-x86_64.rpm
-
-# Install runtime and compilation depenencies
-$ yum install make perl libxml2-devel libxml2 libxslt libxslt-devel gcc gcc-c++ bzip2 bzip2-devel zlib zlib-devel
-
-# Launch static compilation
-$ tar -xjf bcl2fastq-1.8.3.tar.bz2
-$ mkdir BclToFast-build
-$ cd BclToFastq-build
-$ ../BclToFastq/src/configure --static --prefix=/usr/local/bcl2fastq-1.8.3
-$ make
-$ su
-$ make install
-
-# Launch installation
-$ tar -cvjf /usr/local/bcl2fastq-1.8.3.tar.bz2 bcl2fastq-1.8.3/
-</source>
-
-<h4>Patching bcl2fastq to allow bzip2 compression of fastq files</h4>
-
-    <p>To enable bzip2 compression in bcl2fastq 1.8.3, you need to comment with a '<tt>#</tt>' the next lines in
-      the  <tt>/usr/local/bcl2fastq-1.8.3/share/bcl2fastq-1.8.3/makefiles/Config.mk</tt>:</p>
-		<source>
-COMPRESSION:=gzip
-COMPRESSIONSUFFIX:=.gz
-		</source>
-
- </subsection>
- 
-<a name="bcl2fastq2"/>
-<subsection name="Installing bcl2fastq2">
-	<p>Since September 2014, Illmunina published a new version on bcl2fastq software, compatible with RTA version 2 (Real Time Analysis)
-		used on NextSeq 500 sequencer. This version is easier to install.</p>
-<source> 
+        <p>On CentOS, you can install Bcl2fastq using the following commands:</p>
+        <source>
 $ cd /tmp 
 $ wget --no-check-certificate https://support.illumina.com/content/dam/illumina-support/documents/downloads/software/bcl2fastq/bcl2fastq2-v2.17.1.14-Linux-x86_64.rpm
 
@@ -190,55 +129,87 @@ $ ln -s ../share/
 # Install requiered dependencies
 $ yum install -y zip.x86_64
 </source>
-</subsection>
-   	
-<a name="docker"/>
-<subsection name="Installing docker">
-	<p>Now with Aozan, you can launch demultiplexing step with a Docker image on bcl2fastq from repository of the platform here. 
-		<a href="https://hub.docker.com/u/genomicpariscentre/">
-			<img src="images/logo_docker.png" alt="link to the platform repository Docker" border="1" /></a>
-		Installation using Docker: <a href="https://docs.docker.com/installation/">look at Docker documentation web site</a> 
-		</p>
-</subsection>
-   	
-   	<a name="ncbi-blast+"/>
- <subsection name="Installing ncbi-blast+, optional for quality control">
 
- <p>To installing ncbi-blast+ (or blastall) on your system (Ubuntu or centos), use the following command line: </p>
-	<source>$ sudo apt-get install ncbi-blast+</source>
-  <p>Now download the required &quot;nt&quot; database from NCBI : </p>
-	<source>
-$ ftp ftp.ncbi.nlm.nih.gov
-login anonymous
-pwd
-$ cd blast/db
-$ bin
-$ prompt
-$ mget nt*
-	</source>
-	  <p>Unzip all files, the first nt.00.tar.gz contains the file nt.nal.</p>
-	  <p>Use the perl script to update the database, you can consult <a href="http://www.ncbi.nlm.nih.gov/books/NBK1762/" target="_blank">the NCBI documentation.</a></p>
-	  <p>Like Aozan version 1.2, it is still possible to use blastall.</p>
-	 </subsection>
-   </section>
+        <p>As Bcl2fastq 2 is a static binary, you can also use the RPM package on Debian/Ubuntu using the following commands:</p>
+        <source>
+$ cd /tmp
+$ wget --no-check-certificate https://support.illumina.com/content/dam/illumina-support/documents/downloads/software/bcl2fastq/bcl2fastq2-v2.17.1.14-Linux-x86_64.rpm
+TODO
+</source>
+
+      </subsection>
+
+      <a name="ncbi-blast+"/>
+      <subsection name="Installing ncbi-blast+ (optional requireement for quality control)">
+
+        <p>In Aozan, the output of the "Overrepresented Sequences" module from FastQC has been improved.
+        For sequences labelled as not found, we launch a blast on the NR databank and report its best hit.
+        This greatly helps for the discovery of contaminating sequences.</p>
+
+        <p>Aozan can use Blast2 ou Blast+ to perform the blast.</p>
+
+        <p>To installing ncbi-blast+ on your system (Debian or Ubuntu), use the following command line: </p>
+<source>
+$ sudo apt-get install ncbi-blast+</source>
+        <p>Now download the required &quot;nt&quot; database from NCBI : </p>
+        <source>
+$ wget ftp://ftp.ncbi.nlm.nih.gov/blast/db/nt.??.tar.gz*
+</source>
+	<p>Unzip all files, the first nt.00.tar.gz contains the file nt.nal.</p>
+	<p>Use the perl script to update the database, you can consult <a href="http://www.ncbi.nlm.nih.gov/books/NBK1762/" target="_blank">the NCBI documentation.</a></p>
+      </subsection>
+
+    </section>
 
 
-  <a name="installation"/>
-  <section name="Installation">
+    <a name="installation"/>
+    <section name="Installation">
 
- <p>The installation of Aozan is very easy, you just had to uncompress the archive:</p>
+      <p>The installation of Aozan is very easy, you just had to uncompress the archive:</p>
 
 <source>
 $ tar xzf aozan-@@@VERSION@@@.tar.gz
 </source>
 
- <p>Aozan is written in Python and Java. It uses the Java implementation of Python (Jython) that
- is bundled in Aozan.</p>
+      <p>Aozan is written in Python and Java. It uses the Java implementation of Python (Jython) that
+      is bundled in Aozan.</p>
 
-  </section>
+    </section>
 
-  <a name="launchingAozan"/>
-  <section name="Launching Aozan">
+
+    <a name="docker"/>
+    <section name="Installing using Docker">
+
+      <p>Aozan and its dependancies are available throw Docker images. You can:</p>
+      <ul>
+        <li>Use a Docker image with Aozan and all its optional dependencies</li>
+        <li>Use Docker only for Bcl2fastq or blast executables</li>
+      </ul>
+
+      <p>To see how install docker on your system, go to the <a href="https://docs.docker.com/installation/">Docker website</a>.
+      Even if Docker can run in virtual machines in Windows or macOS, we recommand to only run Aozan on a Linux host.</p>
+
+
+      <subsection name="Aozan Docker image">
+
+        <p>You can use a Docker image with Aozan and all its optional dependencies (Bc2fastq and Blast) instead of installating manually Aozan.
+        This image is named <tt><a href="https://hub.docker.com/u/genomicpariscentre/aozan">genomicpariscentre/aozan:@@@VERSION@@@</a></tt>.
+        When you use this Docker image you need to mount all the required directories by Aozan in the Docker container.</p>
+
+      </subsection>
+
+      <subsection name="Bcl2fastq and Blast Docker images">
+
+        <p>If you had installed manually Aozan, you can launch bcl2fastq and/or blast inside a Docker container.
+        To do this, you only need to set the Aozan <tt>bcl2fastq.use.docker</tt> configuration property to True for bcl2fastq and <tt>qc.conf.fastqc.blast.use.docker</tt> to True for Blast.
+        If you do not use the <tt>/var/run/docker.sock</tt> socket to communicate with Docker deamon, you must change the value of the <tt>docker.uri</tt> setting in the Aozan configuration.</p>
+
+      </subsection>
+
+    </section>
+
+    <a name="launchingAozan"/>
+    <section name="Launching Aozan">
 
  <p>Aozan is usually launched regularly as a cron job. However, Aozan can also be launched manually.
    In the following examples, Aozan is installed in <tt>/usr/local/aozan</tt> and the configuration file is
@@ -290,7 +261,7 @@ $ sudo chmod 755 /etc/cron/daily/aozan &amp;&amp; sudo chmod root:root /etc/cron
 </section>
 
   <a name="hiseqdata"/>
- <section name="Accessing HiSeq Data">
+ <section name="Accessing Sequencer Data">
 
  <p>Aozan can handle several HiSeq instruments. For each instruments you must allow Aozan computer
  to have access to HiSeq output directories. On HiSeq 2000/2500, 2 hard drives are dedicated to each flow cell slot.

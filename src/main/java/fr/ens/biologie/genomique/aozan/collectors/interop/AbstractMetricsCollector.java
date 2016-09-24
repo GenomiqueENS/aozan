@@ -70,7 +70,7 @@ abstract class AbstractMetricsCollector implements Collector {
   public void configure(final QC qc, final CollectorConfiguration conf) {
 
     if (qc == null) {
-      this.interOpDir = new File(conf.get(QC.RTA_OUTPUT_DIR), "InterOp");
+      this.interOpDir = new File(conf.getFile(QC.RTA_OUTPUT_DIR), "InterOp");
     } else {
       this.interOpDir = new File(qc.getBclDir(), "InterOp");
     }

@@ -49,10 +49,10 @@ public class SampleStatisticsCollector extends StatisticsCollector {
   // TODO Check the RunData keys names
 
   /** Collector name. */
-  public static final String COLLECTOR_NAME = "samplestats";
+  public static final String COLLECTOR_NAME = "pooledsample";
 
   /** Collector prefix for updating rundata */
-  public static final String COLLECTOR_PREFIX = "samplestats";
+  public static final String COLLECTOR_PREFIX = "pooledsample";
 
   public static final String UNDETERMINED_SAMPLE = "undetermined";
 

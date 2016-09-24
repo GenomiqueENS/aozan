@@ -109,7 +109,7 @@ QC_DENY_FILE = 'qc.deny'
 QC_DONE_FILE = 'qc.done'
 QC_LASTERR_FILE = 'qc.lasterr'
 
-BCL2FASTQ2_VERSION = "latest"
+BCL2FASTQ2_VERSION = "2.18.0.12"
 MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL = 12 * 3600
 
 def exists_in_path(program):
@@ -398,15 +398,24 @@ def send_msg(subject, message, is_error, conf):
         print '-------------'
 
 
-def send_msg_with_attachment(subject, message, attachment_file, conf):
+def send_msg_with_attachment(subject, message, attachment_file, is_error, conf):
     """Send a message to the user about the data extraction."""
 
     send_mail = is_conf_value_equals_true(SEND_MAIL_KEY, conf)
     smtp_server = conf[SMTP_SERVER_KEY]
-    mail_to = conf[MAIL_TO_KEY]
     mail_from = conf[MAIL_FROM_KEY]
     mail_cc = None
     mail_bcc = None
+
+    # Specific receiver for error message
+    if is_error:
+        mail_to = conf[MAIL_ERROR_TO_KEY]
+
+        # Mail error not define
+        if mail_to is None or mail_to == '':
+            mail_to = conf[MAIL_TO_KEY]
+    else:
+        mail_to = conf[MAIL_TO_KEY]
 
     if mail_to is not None:
         if type(mail_to) == str or type(mail_to) == unicode:
@@ -1248,7 +1257,7 @@ def load_conf(conf, conf_file_path):
     test_name_converting_table[ 'phasingprephasing' ] = 'lane.phasing.prephasing.percent'
     test_name_converting_table[ 'rawclusters' ] = 'lane.raw.cluster.count'
     test_name_converting_table[ 'rawclusterphix' ] = 'lane.phix.raw.cluster.count'
-    test_name_converting_table[ 'genomesproject' ] = 'project.genome.count'
+    test_name_converting_table[ 'genomesproject' ] = 'project.genome.names'
     test_name_converting_table[ 'isindexedproject' ] = 'project.is.indexed'
     test_name_converting_table[ 'lanesrunproject' ] = 'project.lane.count'
     test_name_converting_table[ 'linkprojectreport' ] = 'project.fastqscreen.report'
@@ -1290,7 +1299,7 @@ def load_conf(conf, conf_file_path):
     test_name_converting_table[ 'recoverablerawclusterssamples' ] = 'sample.recoverable.raw.cluster.count'
     test_name_converting_table[ 'sequencelengthdistribution' ] = 'sample.fastqc.sequence.length.distribution'
     test_name_converting_table[ 'samplestatsfsqmapped' ] = 'pooledsample.fastqscreen.mapped.percent'
-    test_name_converting_table[ 'genomessample' ] = 'pooledsample.genome.count'
+    test_name_converting_table[ 'genomessample' ] = 'pooledsample.genome.names'
     test_name_converting_table[ 'samplestathitnolibrariessum' ] = 'pooledsample.fastqscreen.mapped.except.ref.percent'
     test_name_converting_table[ 'isindexedsample' ] = 'pooledsample.is.indexed'
     test_name_converting_table[ 'lanesrunsample' ] = 'pooledsample.lane.count'
@@ -1342,7 +1351,11 @@ def load_conf(conf, conf_file_path):
         else:
             fields = s.split('=')
             key = fields[0].strip()
-            value = fields[1].strip()
+
+            if len(fields) == 1:
+                value = ''
+            else :
+                value = fields[1].strip()
 
             if len(fields) == 2:
 

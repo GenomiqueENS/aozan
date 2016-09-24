@@ -65,8 +65,7 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
 
     super.configure(qc, conf);
 
-    this.densityRatio = Double
-        .parseDouble(conf.get(Settings.QC_CONF_CLUSTER_DENSITY_RATIO_KEY));
+    this.densityRatio = conf.getDouble(Settings.QC_CONF_CLUSTER_DENSITY_RATIO_KEY, 0.3472222);
   }
 
   /**
