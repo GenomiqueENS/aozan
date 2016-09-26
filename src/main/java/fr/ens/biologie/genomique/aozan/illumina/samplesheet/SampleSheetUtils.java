@@ -441,6 +441,7 @@ public class SampleSheetUtils {
     return result;
   }
 
+
   /**
    * Custom splitter for Bcl2fastq tabulated file.
    * @param line line to parse

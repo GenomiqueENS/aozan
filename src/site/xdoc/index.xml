@@ -106,11 +106,10 @@
 
 		<section name="What's new in Aozan?">
 
-			<!--subsection name="New Samplesheet Validator v2"><p>
-				A new samplesheet validator for is available. With its new design it can now manage samplesheet v2.
-				[IMAGE] + [LINK]
+			<subsection name="New Samplesheet Validator v2"><p>
+				A new samplesheet validator for is available. With its new design it manages samplesheet v2 from bcl2fastq2.
 				</p>
-			</subsection-->
+			</subsection>
 
 			<subsection name="bcl2fastq 2.18 in Aozan"><p>
 				Aozan now supports bcl2fastq 2.18

@@ -50,6 +50,7 @@ public class SampleSheetCheck {
     final Map<Integer, Set<String>> indexes =
         new HashMap<Integer, Set<String>>();
     final Set<String> sampleIds = new HashSet<String>();
+    final Set<String> sampleNames = new HashSet<String>();
     final Set<Integer> laneWithIndexes = new HashSet<Integer>();
     final Set<Integer> laneWithoutIndexes = new HashSet<Integer>();
     final Map<String, Set<Integer>> sampleInLanes =
@@ -80,6 +81,11 @@ public class SampleSheetCheck {
       // Check if the sample is null or empty
       checkSampleId(sample.getSampleId(), sampleIds);
 
+      // Check if the sample is null or empty
+      if (sample.isSampleNameField()) {
+        checkSampleName(sample.getSampleName(), sampleNames, true, warnings);
+      }
+
       // Check sample reference
       if (sample.isSampleRefField()) {
         checkSampleRef(sample.getSampleId(), sample.getSampleRef());
@@ -99,7 +105,8 @@ public class SampleSheetCheck {
 
       // Check the description
       if (sample.isDescriptionField()) {
-        checkSampleDescription(sample.getSampleId(), sample.getDescription());
+        checkSampleDescription(sample.getSampleId(), sample.getDescription(),
+            true, warnings);
       }
 
       // Check sample project
@@ -246,17 +253,67 @@ public class SampleSheetCheck {
     checkCharset(sampleId);
 
     // Check for forbidden characters
-    for (int i = 0; i < sampleId.length(); i++) {
-
-      final char c = sampleId.charAt(i);
-      if (!(Character.isLetterOrDigit(c) || c == '_' || c == '-')) {
-        throw new AozanException(
-            "Invalid sample id, only letters, digits, '-' or '_' characters are allowed : "
-                + sampleId + ".");
-      }
+    if (hasForbiddenCharacter(sampleId)) {
+      throw new AozanException(
+          "Invalid sample id, only letters, digits, '-' or '_' characters are allowed : "
+              + sampleId + ".");
     }
 
     sampleIds.add(sampleId);
+  }
+
+  /**
+   * Check if a string has a forbidden character in samplesheet
+   * @param s the string to test
+   */
+  public static Boolean hasForbiddenCharacter(String s) {
+
+    for (int i = 0; i < s.length(); i++) {
+
+      final char c = s.charAt(i);
+
+      if (!(Character.isLetterOrDigit(c) || c == '_' || c == '-')) {
+
+        return true;
+
+      }
+    }
+
+    return false;
+
+  }
+
+  /**
+   * Check sample name.
+   * @param sampleName the sample name
+   * @param sampleNames the sample names
+   * @throws AozanException the aozan exception
+   */
+  private static void checkSampleName(final String sampleName,
+      final Set<String> sampleNames, Boolean isBcl2Fastq2,
+      final List<String> warnings) throws AozanException {
+
+    if (isNullOrEmpty(sampleName)) {
+
+      if (!isBcl2Fastq2) {
+        throw new AozanException("Sample Name is null or empty.");
+
+      } else {
+        warnings.add("Empty or null Sample Name detected.");
+
+      }
+    }
+    // Check charset
+    checkCharset(sampleName);
+
+    // Check for forbidden characters
+    if (hasForbiddenCharacter(sampleName)) {
+      throw new AozanException(
+          "Invalid sample id, only letters, digits, '-' or '_' characters are allowed : "
+              + sampleName + ".");
+    }
+
+    sampleNames.add(sampleName);
   }
 
   /**
@@ -327,12 +384,20 @@ public class SampleSheetCheck {
    * @throws AozanException the aozan exception
    */
   private static void checkSampleDescription(final String sampleId,
-      final String sampleDescription) throws AozanException {
+      final String sampleDescription, Boolean isBcl2Fastq2,
+      final List<String> warnings) throws AozanException {
 
     // Check if null of empty
     if (isNullOrEmpty(sampleDescription)) {
-      throw new AozanException(
-          "Found a null or empty description for sample: " + sampleId);
+
+      if (!isBcl2Fastq2) {
+        throw new AozanException(
+            "Found a null or empty description for sample: " + sampleId);
+
+      } else {
+        warnings
+            .add("Found a null or empty description for sample: " + sampleId);
+      }
     }
 
     // Check charset
@@ -386,7 +451,7 @@ public class SampleSheetCheck {
       final String projectName, final int lane,
       final Map<String, Set<Integer>> sampleInLanes,
       final Map<String, String> samplesProjects, final List<String> warnings)
-      throws AozanException {
+          throws AozanException {
 
     // Check if two or more project use the same sample
     if (samplesProjects.containsKey(sampleId)
