@@ -732,12 +732,12 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
         border:0;
         margin:0;
         padding: 2em;
-        font-size: 175%;
+        font-size: 180%;
         font-weight: bold;
         width:100%;
         height: 4em;
-        position: top;
-        vertical-align: top;
+        position: middle;
+        vertical-align: middle;
         z-index:0;
 
     }
@@ -775,8 +775,8 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
 
     <div class="header">
       <a href="https://www.genomique.biologie.ens.fr" ><img src="http://tools.genomique.biologie.ens.fr/aozan/images/logo_genomicpariscentre-90pxh.png" alt="logo genomic paris centre" align="left"/></a>
-      <a href="http://www.tools.genomique.biologie.ens.fr/aozan/" ><img src="http://tools.genomique.biologie.ens.fr/aozan/images/aozan.png" alt="logo aozan" align="right"/></a>
-      <h1>Bcl2fastq version 2 samplesheet validator</h1>
+      <a href="http://www.tools.genomique.biologie.ens.fr/aozan/" ><img src="http://tools.genomique.biologie.ens.fr/aozan/images/aozan_qc_logo.png" alt="logo aozan" align="right"/></a>
+      <h1 align="center">Bcl2fastq version 2 samplesheet validator</h1>
     </div>
     <div>
     <table align="center">
