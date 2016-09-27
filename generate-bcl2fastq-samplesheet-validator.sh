@@ -370,13 +370,12 @@ public class $PROJECT_NAME implements EntryPoint {
     }
 
     Set<String> genomesDesign = new HashSet<String>();
-    for (Sample sample : design) {
+     for (Sample sample : design) {
       genomesDesign.add(sample.getSampleRef());
-    }
-
+     }
 
     for (String genomeSample : genomesDesign) {
-      if (!(availableGenomes.contains(trimSpecificString(genomeSample)))){
+      if (genomeSample != null && !(availableGenomes.contains(trimSpecificString(genomeSample)))){
         warnings.add("No genome found for '" + genomeSample + "' (optional for Fastq Screen)");
       }
     }
