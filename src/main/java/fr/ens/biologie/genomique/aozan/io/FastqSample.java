@@ -445,7 +445,7 @@ public class FastqSample {
 
     this(new Bcl2FastqOutput(sampleSheetFile, fastqDir), fastqDir, tmpDir,
         runId, sampleId, read, lane, sampleDirname, sampleName, projectName,
-        descriptionSample, index, true);
+        descriptionSample, index, false, true);
 
   }
 
@@ -476,7 +476,7 @@ public class FastqSample {
       final int lane) throws IOException {
 
     this(new Bcl2FastqOutput(sampleSheetFile, fastqDir), fastqDir, tmpDir,
-        runId, sampleId, read, lane, null, "lane" + lane, "", "", NO_INDEX,
+        runId, sampleId, read, lane, null, "lane" + lane, "", "", NO_INDEX, true,
         true);
   }
 
@@ -494,6 +494,7 @@ public class FastqSample {
    * @param projectName name of the project
    * @param descriptionSample description of the sample
    * @param index value of index or if doesn't exists, NoIndex
+   * @param boolean undeterminedIndex undetermined index
    * @param createEmptyFastq enable the creation of empty FASTQ files
    * @throws IOException if an error occurs while reading bcl2fastq version
    */
@@ -501,7 +502,8 @@ public class FastqSample {
       final File tmpDir, final String runId, final int sampleId, final int read,
       final int lane, final String sampleDirname, final String sampleName,
       final String projectName, final String descriptionSample,
-      final String index, final boolean createEmptyFastq) throws IOException {
+      final String index, final boolean undeterminedIndex,
+      final boolean createEmptyFastq) throws IOException {
 
     checkArgument(read > 0, "read value cannot be lower than 1");
     checkArgument(lane > 0, "read value cannot be lower than 1");
@@ -514,7 +516,7 @@ public class FastqSample {
     this.projectName = projectName;
     this.description = descriptionSample;
     this.index = (index == null || index.isEmpty()) ? NO_INDEX : index;
-    this.undeterminedIndex = this.index.equals(NO_INDEX);
+    this.undeterminedIndex = undeterminedIndex;
     this.bcl2fastqOutput = bcl2FastqOutput;
     this.tmpDir = tmpDir;
 

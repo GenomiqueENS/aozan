@@ -410,9 +410,7 @@ public class Bcl2FastqOutput {
     // underscore character in FASTQ filenames
     final int count = countUnderscoreInFastqFilename(fastqDir, 0);
 
-    if (count == 4) {
-      return Bcl2FastqVersion.BCL2FASTQ_2_15;
-    } else if (count > 4) {
+    if (count >= 4) {
       return Bcl2FastqVersion.BCL2FASTQ_2;
     }
 
@@ -438,7 +436,7 @@ public class Bcl2FastqOutput {
         final String filename = pathname.getName();
 
         return filename.startsWith("bcl2fastq_output_")
-            && filename.endsWith(".out");
+            && filename.endsWith(".err");
 
       }
     });

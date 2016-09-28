@@ -192,7 +192,8 @@ public class SampleSheetReaderTest {
         for (String sampleName : sampleNames.keySet()) {
           FastqSample fastqSample =
               new FastqSample(bclfile, new File("."), new File("."), "", 1, 1,
-                  lane, null, sampleName, "Project_A2015", "desc", "Bindex", false);
+                  lane, null, sampleName, "Project_A2015", "desc", "Bindex",
+                  false, false);
 
           Assert.assertEquals(sampleName
               + "_S" + sampleNames.get(sampleName) + "_L00" + lane + "_R1_001",
