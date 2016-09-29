@@ -293,7 +293,6 @@ def create_run_summary_reports(run_id, conf):
               'cd ' + tmp_base_path + ' && ' + \
               'mv ' + run_id + ' ' + report_prefix + run_id + ' && ' + \
               'tar cjf ' + reports_data_path + '/' + report_archive_file + ' ' + report_prefix + run_id + ' && ' + \
-              'chmod -R u=rwX,go=rX ' + report_prefix + run_id + ' && ' + \
               'mv ' + report_prefix + run_id + ' ' + reports_data_path
 
         common.log("INFO", "exec: " + cmd, conf)
@@ -305,8 +304,11 @@ def create_run_summary_reports(run_id, conf):
     # Create index.hml file
     common.create_html_index_file(conf, run_id, [HISEQ_STEP_KEY])
 
+    # Set read only the report directory
+    common.chmod_files_in_dir(reports_data_path + '/' + report_prefix, None, conf)
+
     # Set read only archives files
-    os.chmod(reports_data_path + '/' + report_archive_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
-    os.chmod(reports_data_path + '/' + hiseq_log_archive_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+    common.chmod(reports_data_path + '/' + report_archive_file, conf)
+    common.chmod(reports_data_path + '/' + hiseq_log_archive_file, conf)
 
     return True

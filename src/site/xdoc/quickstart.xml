@@ -386,6 +386,7 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
 	   <tr><td>reports.url</td><td>string</td><td>Not set</td><td>Run reports URL</td></tr>
 	   <tr><td>hiseq.critical.min.space</td><td>integer</td><td>1099511627776</td><td>Threshold before sending
 	     a email at each Aozan start if not enough space is available on HiSeq output disk, the value corresponds 1 Tb in bytes</td></tr>
+	   <tr><td>read.only.output.files</td><td>boolean</td><td>True</td><td>Set rights of output files to read only</td></tr>
 
 	 </table>
 
