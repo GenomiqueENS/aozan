@@ -800,6 +800,9 @@
 			<action dev="jourdren" type="fix">
                                  When the value of a setting entry in the configuration was empty, an error was thrown.
 			</action>
+			<action dev="jourdren" type="fix">
+                                 The version of bcl2fastq was read from the right log file in QC step.
+			</action>
 			<action dev="firmo" type="add">
                                  Parameter files for failed runs are now also archived.
 			</action>
@@ -826,6 +829,9 @@
 			</action>
 			<action dev="jourdren" type="update">
                                  Update the QC demo example.
+			</action>
+			<action dev="jourdren" type="update">
+                                 The change of the rights of output files to read only can now be disabled using the "read.only.output.files" configuration property.
 			</action>
 		</release>
 	</body>
