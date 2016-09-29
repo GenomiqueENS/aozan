@@ -27,7 +27,7 @@ This script contains all common functions in all Aozan python scripts
 '''
 
 import hiseq_run, sync_run, demux_run
-import smtplib, os.path, time, sys, os
+import smtplib, os.path, time, sys, os, stat
 import mimetypes
 from email.utils import formatdate
 from glob import glob
