@@ -21,7 +21,7 @@ RUN cd /usr/local && \
                    zip.x86_64 \
                    wget.x86_64 && \
     cd /tmp && \
-    wget -q http://transcriptome.ens.fr/leburon/downloads/illumina/bcl2fastq2-v2.17.1.14-Linux-x86_64.rpm && \
+    wget -q http://transcriptome.ens.fr/leburon/downloads/illumina/bcl2fastq2-v2.18.0.12-Linux-x86_64.rpm && \
     wget -q ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.4.0/ncbi-blast-2.4.0+-2.x86_64.rpm && \
     yum install -y --nogpgcheck localinstall /tmp/bcl2fastq2-*.rpm \
                                              /tmp/ncbi-blast-*.rpm && \
