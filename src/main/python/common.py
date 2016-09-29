@@ -198,7 +198,7 @@ def chmod_files_in_dir(path, pattern, conf):
         for root, dirs, files in os.walk(path):
 
             for f in files:
-                if pattern is None or pattern == "" or motif in f:
+                if pattern is None or pattern == "" or pattern in f:
                     if not chmod(root + '/' + f, conf):
                         return False
 
