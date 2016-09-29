@@ -635,7 +635,7 @@ def archive_demux_stat(run_id, fastq_output_dir, reports_data_path, basecall_sta
         return False
 
     # Set read only basecall stats archives files
-    common.chmod(archive_run_tar_file, conf):
+    common.chmod(archive_run_tar_file, conf)
 
 
     return True
