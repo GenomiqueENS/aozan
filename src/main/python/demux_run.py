@@ -635,7 +635,8 @@ def archive_demux_stat(run_id, fastq_output_dir, reports_data_path, basecall_sta
         return False
 
     # Set read only basecall stats archives files
-    os.chmod(archive_run_tar_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+    common.chmod(archive_run_tar_file, conf):
+
 
     return True
 
@@ -843,12 +844,11 @@ def demux(run_id, conf):
         return False
 
     # The output directory must be read only
-    cmd = 'find ' + fastq_output_dir + ' -type f -name "*.fastq.*" -exec chmod ugo-w {} \; '
-    common.log("INFO", "exec: " + cmd, conf)
-    if os.system(cmd) != 0:
+    if not common.chmod_files_in_dir(fastq_output_dir, ".fastq", conf):
         error("Error while setting the output FASTQ directory to read only" + run_id_msg,
               'Error while setting the output FASTQ directory to read only.\nCommand line:\n' + cmd, conf)
         return False
+
 
     if not check_if_output_fastq_files_exists(fastq_output_dir):
         error("Error with bcl2fastq execution for run " + run_id,

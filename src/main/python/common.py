@@ -27,7 +27,7 @@ This script contains all common functions in all Aozan python scripts
 '''
 
 import hiseq_run, sync_run, demux_run
-import smtplib, os.path, time, sys
+import smtplib, os.path, time, sys, os
 import mimetypes
 from email.utils import formatdate
 from glob import glob
@@ -80,6 +80,7 @@ from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQC_BLAST_PATH_K
 from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQC_BLAST_ENABLE_KEY
 from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQC_BLAST_DB_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_DATA_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import READ_ONLY_OUTPUT_FILES_KEY
 
 from fr.ens.biologie.genomique.aozan.util import StringUtils
 
@@ -164,6 +165,44 @@ def du(path):
     child_stdout.close()
 
     return long(lines[0].split('\t')[0])
+
+
+def chmod(path, conf):
+    """Change the rights of a file.
+
+    Arguments:
+        path: path of the file
+        conf: Aozan configuration
+    """
+
+    if is_conf_value_equals_true(READ_ONLY_OUTPUT_FILES_KEY, conf):
+        try:
+            os.chmod(path, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+        except OSError:
+            return False
+
+    return True
+
+
+def chmod_files_in_dir(path, pattern, conf):
+    """Change the rights of files in a directory.
+
+    Arguments:
+        path: path of the directory
+        motif: file motif
+        conf: Aozan configuration
+    """
+
+    if is_conf_value_equals_true(READ_ONLY_OUTPUT_FILES_KEY, conf):
+
+        for root, dirs, files in os.walk(path):
+
+            for f in files:
+                if pattern is None or pattern == "" or motif in f:
+                    if not chmod(root + '/' + f, conf):
+                        return False
+
+    return True
 
 
 def is_file_readable(path):
@@ -1466,3 +1505,6 @@ def set_default_conf(conf):
 
     # Docker URI
     conf[Settings.DOCKER_URI_KEY] = 'unix:///var/run/docker.sock'
+
+    # Change output file rights
+    conf[READ_ONLY_OUTPUT_FILES_KEY] = 'true'

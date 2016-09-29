@@ -221,7 +221,7 @@ def qc(run_id, conf):
         return False
 
     # Set read only basecall stats archives files
-    os.chmod(reports_data_path + '/qc_' + run_id + '.tar.bz2', stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+    common.chmod(reports_data_path + '/qc_' + run_id + '.tar.bz2', conf)
 
     # Check if the report has been generated
     if not os.path.exists(html_report_file):
@@ -229,9 +229,7 @@ def qc(run_id, conf):
         return False
 
     # The output directory must be read only
-    cmd = 'chmod -R ugo-w ' + qc_output_dir
-    common.log("INFO", "exec: " + cmd, conf)
-    if os.system(cmd) != 0:
+    if not common.chmod_files_in_dir(qc_output_dir, None, conf):
         error("Error while setting the output QC directory to read only for run " + run_id,
               'Error while setting the output QC directory to read only.\nCommand line:\n' + cmd, conf)
         return False
