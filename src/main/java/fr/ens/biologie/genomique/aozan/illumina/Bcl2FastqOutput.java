@@ -385,12 +385,22 @@ public class Bcl2FastqOutput {
   private static Bcl2FastqVersion findBcl2FastqVersion(final File fastqDir)
       throws IOException {
 
+    // Check if bcl2fastq 1 files exists
     for (String filename : Arrays.asList("DemultiplexedBustardConfig.xml",
         "DemultiplexedBustardSummary.xml", "SampleSheet.mk", "support.txt",
         "DemultiplexConfig.xml", "Makefile", "make.err", "make.out", "Temp")) {
 
       if (new File(fastqDir, filename).exists()) {
         return Bcl2FastqVersion.BCL2FASTQ_1;
+      }
+    }
+
+    // Check if bcl2fastq 2 files exists
+    for (String filename : Arrays.asList("DemultiplexingStats.xml",
+        "ConversionStats.xml")) {
+
+      if (new File(new File(fastqDir, "Stats"), filename).exists()) {
+        return Bcl2FastqVersion.BCL2FASTQ_2;
       }
     }
 
@@ -436,7 +446,8 @@ public class Bcl2FastqOutput {
         final String filename = pathname.getName();
 
         return filename.startsWith("bcl2fastq_output_")
-            && filename.endsWith(".err");
+            && (filename.endsWith(".out")
+                || filename.endsWith(".err") && pathname.length() > 0);
 
       }
     });
