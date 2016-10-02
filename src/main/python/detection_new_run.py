@@ -83,7 +83,7 @@ def get_available_new_run_ids(conf):
                 continue
 
             if common.get_rta_major_version(f, conf) == 1 and \
-                    not os.path.exists(hiseq_data_path + '/' + FIRST_BASE_REPORT_FILE):
+                    not os.path.exists(hiseq_data_path + '/' + common.FIRST_BASE_REPORT_FILE):
                 continue
 
             if not hiseq_run.check_end_run(f, conf):
@@ -199,7 +199,7 @@ def send_report(run_id, conf):
 
     description_run += "\t- Estimated run type: " + type_run_estimated + ".\n"
 
-    attachment_file = str(hiseq_run.find_hiseq_run_path(run_id, conf)) + '/' + run_id + '/' + FIRST_BASE_REPORT_FILE
+    attachment_file = str(hiseq_run.find_hiseq_run_path(run_id, conf)) + '/' + run_id + '/' + common.FIRST_BASE_REPORT_FILE
 
     # If the First base report file exists, send it by email
     if common.is_file_readable(attachment_file):
