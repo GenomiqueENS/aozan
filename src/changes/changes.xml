@@ -766,7 +766,7 @@
 			</action>
 		</release>
 
-		<release version="2.0-rc19" description="Aozan 2.0-rc19 release"  date="TDB">
+		<release version="2.0-rc19" description="Aozan 2.0-rc19 release"  date="2016-10-03">
 			<action dev="jourdren" type="fix">
                                  Fix issue when using old configuration keys in upper case.
 			</action>

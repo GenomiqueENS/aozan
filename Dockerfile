@@ -9,7 +9,7 @@ FROM centos:6
 MAINTAINER Laurent Jourdren <jourdren@biologie.ens.fr>
 
 # Install Aozan public version
-ADD https://github.com/GenomicParisCentre/aozan/releases/download/v2.0-rc18/aozan-2.0-rc18.tar.gz /tmp/
+ADD https://github.com/GenomicParisCentre/aozan/releases/download/v2.0-rc19/aozan-2.0-rc19.tar.gz /tmp/
 
 RUN cd /usr/local && \
     tar xzf /tmp/aozan-*.tar.gz && \
