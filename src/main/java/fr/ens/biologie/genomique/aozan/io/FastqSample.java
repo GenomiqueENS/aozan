@@ -494,7 +494,7 @@ public class FastqSample {
    * @param projectName name of the project
    * @param descriptionSample description of the sample
    * @param index value of index or if doesn't exists, NoIndex
-   * @param boolean undeterminedIndex undetermined index
+   * @param undeterminedIndex undetermined index
    * @param createEmptyFastq enable the creation of empty FASTQ files
    * @throws IOException if an error occurs while reading bcl2fastq version
    */
