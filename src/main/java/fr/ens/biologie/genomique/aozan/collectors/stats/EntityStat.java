@@ -29,10 +29,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
@@ -287,7 +287,7 @@ public class EntityStat {
   @Override
   public String toString() {
 
-    return Objects.toStringHelper(this).add("genomes", this.genomes)
+    return com.google.common.base.Objects.toStringHelper(this).add("genomes", this.genomes)
         .add("samples", this.samples).add("lanes", this.lanes)
         .add("statisticsCollector", this.statisticsCollector)
         .add("rawClusterSamples", this.rawClusterSamples)
@@ -303,7 +303,7 @@ public class EntityStat {
   @Override
   public int hashCode() {
 
-    return Objects.hashCode(genomes, isIndexed, lanes, projectId, sampleId,
+    return Objects.hash(genomes, isIndexed, lanes, projectId, sampleId,
         samples);
   }
 
@@ -323,12 +323,12 @@ public class EntityStat {
 
     EntityStat that = (EntityStat) obj;
 
-    return Objects.equal(this.genomes, that.genomes)
-        && Objects.equal(this.isIndexed, that.isIndexed)
-        && Objects.equal(this.lanes, that.lanes)
-        && Objects.equal(this.projectId, that.projectId)
-        && Objects.equal(this.sampleId, that.sampleId)
-        && Objects.equal(this.samples, that.samples);
+    return Objects.equals(this.genomes, that.genomes)
+        && Objects.equals(this.isIndexed, that.isIndexed)
+        && Objects.equals(this.lanes, that.lanes)
+        && Objects.equals(this.projectId, that.projectId)
+        && Objects.equals(this.sampleId, that.sampleId)
+        && Objects.equals(this.samples, that.samples);
   }
 
   //

@@ -31,8 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-
-import com.google.common.base.Charsets;
+import java.nio.charset.StandardCharsets;
 
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
@@ -45,7 +44,7 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
 public class SampleSheetCSVReader implements SampleSheetReader {
 
   /* Default Charset. */
-  private static final Charset CHARSET = Charsets.UTF_8;
+  private static final Charset CHARSET = StandardCharsets.UTF_8;
 
   private final BufferedReader reader;
   private int version = -1;

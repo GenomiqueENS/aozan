@@ -6,6 +6,7 @@ import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.checkExistingDire
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +14,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.TreeMultimap;
@@ -465,7 +465,7 @@ public class Bcl2FastqOutput {
 
     // Parse log file
     for (String line : Files.readAllLines(logFiles[0].toPath(),
-        Charsets.UTF_8)) {
+        StandardCharsets.UTF_8)) {
 
       line = line.toLowerCase().trim();
 
