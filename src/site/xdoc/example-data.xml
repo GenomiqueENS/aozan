@@ -56,5 +56,25 @@
 
         </section>
 
+        <section name="Create a demo configuration">
+
+            <p>To simply the launch of an Aozan demo, we now provide a <a href="data/configure-aozan-demo.sh">shell script</a>, that allow to create all directories required by Aozan and a valid configuration file. This script can also download all the files required by the demo (raw data and reference data).</p>
+            <p>You can perform a full Aozan demo computation using the following command lines:</p>
+            <ul>
+                <li>Download the script.
+                    <source>$ wget @@@WEBSITE@@@/data/configure-aozan-demo.sh</source>
+                </li>
+                <li>Set the execute attribute on script
+                    <source> $ chmod +x configure-aozan-demo.sh</source></li>
+                <li>Launch the script and the download of the required files
+                    <source> $ ./configure-aozan-demo.sh</source>
+                </li>
+                <li>Launch Aozan
+                    <source> $ ./aozan-demo/aozan-@@@VERSION@@@/aozan.sh ./aozan-demo/conf/aozan.conf</source>
+                </li>
+            </ul>
+
+        </section>
+
     </body>
 </document>
