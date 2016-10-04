@@ -726,19 +726,15 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
 
 
 <style type="text/css">
+    body {
+        width: 1280px;
+    }
     div.header {
-		background-color: #C1C4CA;
-        border:0;
-        margin:0;
-        padding: 2em;
-        font-size: 180%;
+	background-color: #C1C4CA;
+        padding: 15px;
+        height: 90px;
+        font-size: 120%;
         font-weight: bold;
-        width:100%;
-        height: 4em;
-        position: middle;
-        vertical-align: middle;
-        z-index:0;
-
     }
     <title>Bcl2Fastq version 2 Samplesheet Validator</title>
   </style>
@@ -758,7 +754,7 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
   <!-- you can leave the body empty if you want  -->
   <!-- to create a completely dynamic UI.        -->
   <!--                                           -->
-  <body>
+  <body style="margin:auto;">
 
     <!-- OPTIONAL: include this if you want history support -->
     <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
@@ -774,8 +770,8 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
 
     <div class="header">
       <a href="https://www.genomique.biologie.ens.fr" ><img src="http://tools.genomique.biologie.ens.fr/aozan/images/logo_genomicpariscentre-90pxh.png" alt="logo genomic paris centre" align="left"/></a>
-      <a href="http://www.tools.genomique.biologie.ens.fr/aozan/" ><img src="http://tools.genomique.biologie.ens.fr/aozan/images/aozan_qc_logo.png" alt="logo aozan" align="right"/></a>
-      <h1 align="center">Bcl2fastq version 2 samplesheet validator</h1>
+      <a href="http://www.tools.genomique.biologie.ens.fr/aozan/" ><img src="http://tools.genomique.biologie.ens.fr/aozan/images/aozan_qc_logo.png" alt="logo aozan" align="right" height="70px" style="padding-top:10px;"/></a>
+      <h1 align="center">Bcl2fastq 2 samplesheet validator</h1>
     </div>
     <div>
     <table align="center">
