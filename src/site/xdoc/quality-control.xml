@@ -52,7 +52,12 @@
 		 <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC, </a>a quality control tool for high throughput sequence data 
 				and an optional module for the contamination detection (reimplementation of FastQ Screen).</li>
 	  </ul>
-    
+
+     <p><b>Note:</b> The quality control step is the longest step, it can last several hours/days.
+     If Aozan is stopped before the end of this step, it is possible to relaunch it.
+     Restore points allow get back at the last sample processed.
+     The intermediary data are saved in the quality control directory in files with the extension <tt>&quot;.data&quot;</tt>.</p>
+
      <h4>Configuration parameters</h4>
      <p>The next table contains the globals parameters of this step.</p>
 
@@ -68,7 +73,7 @@
      
      <p>An example of email sent to the end of Aozan with the quality control summary as attachment and an example of all data built for one run in quality control step.</p>
    	 <div align="center">
-   	 	<img src="images/mail_end_qc_450px.png" alt="example of mail sent at the end on quality control" border="1"/>
+                <a href="./qc_demo/160617_NB500892_0097_AH7N2TAFXX.html" target="_blank"><img src="images/quality_control_example_report_300px.png" alt="Example on quality control run report"/></a>
    	 	
    	 	<p>Aozan creates a html page to navigate in all documents and archives from a run.</p>
         <img src="images/page_index_run_v1-2.png" alt="page to navigate in all document from a run" border="1"/>
