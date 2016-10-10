@@ -191,13 +191,13 @@ public class SampleSheetReaderTest {
       for (int lane = 1; lane <= nbLanes; lane++) {
         for (String sampleName : sampleNames.keySet()) {
           FastqSample fastqSample =
-              new FastqSample(bclfile, new File("."), new File("."), "", 1, 1,
+              new FastqSample(bclfile, new File("."), "", 1, 1,
                   lane, null, sampleName, "Project_A2015", "desc", "Bindex",
                   false, false);
 
           Assert.assertEquals(sampleName
               + "_S" + sampleNames.get(sampleName) + "_L00" + lane + "_R1_001",
-              bclfile.getFilenamePrefix(fastqSample, 1));
+              fastqSample.getFilenamePrefix());
         }
       }
     }

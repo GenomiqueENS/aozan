@@ -72,21 +72,14 @@ public class FastqSampleUtils {
           final String sampleName = data.getSampleName(sampleId);
 
           // Get sample sub directory if exists
-          final String dirName;
-          if (sampleIdentifier != null
-              && !"".equals(sampleIdentifier.trim()) && sampleName != null
-              && !"".equals(sampleName.trim())) {
-            dirName = sampleIdentifier;
-          } else {
-            // No sub directory
-            dirName = "";
-          }
+          final String sampleSubDirName =
+              FastqSample.defineSampleSubDirName(sampleIdentifier, sampleName);
 
           // Get description on sample
           final String descriptionSample = data.getSampleDescription(sampleId);
 
           result.add(new FastqSample(qc, sampleId, readIndexedCount, lane,
-              dirName, demuxName, projectName, descriptionSample, index));
+              sampleSubDirName, demuxName, projectName, descriptionSample, index));
         }
 
         if (undetermined && processUndeterminedSamples) {

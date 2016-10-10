@@ -24,7 +24,7 @@
 package fr.ens.biologie.genomique.aozan.tests.pooledsample;
 
 import static fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector.UNDETERMINED_SAMPLE;
-import static fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput.UNDETERMINED_DIR_NAME;
+import static fr.ens.biologie.genomique.aozan.io.FastqSample.UNDETERMINED_DIR_NAME;
 
 import java.util.Collections;
 import java.util.List;

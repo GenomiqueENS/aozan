@@ -23,7 +23,7 @@
 
 package fr.ens.biologie.genomique.aozan.collectors;
 
-import static fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput.UNDETERMINED_DIR_NAME;
+import static fr.ens.biologie.genomique.aozan.io.FastqSample.UNDETERMINED_DIR_NAME;
 
 import java.io.File;
 import java.io.IOException;

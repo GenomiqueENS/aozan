@@ -1,6 +1,5 @@
 package fr.ens.biologie.genomique.aozan.illumina;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.checkExistingDirectoryFile;
 
 import java.io.File;
@@ -8,21 +7,15 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.google.common.collect.TreeMultimap;
 
 import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
-import fr.ens.biologie.genomique.aozan.io.FastqSample;
 import fr.ens.biologie.genomique.eoulsan.core.Version;
 
 /**
@@ -33,21 +26,7 @@ import fr.ens.biologie.genomique.eoulsan.core.Version;
  */
 public class Bcl2FastqOutput {
 
-  /** The Constant FASTQ_EXTENSION. */
-  public static final String FASTQ_EXTENSION = ".fastq";
-
-  /** The Constant UNDETERMINED_DIR_NAME. */
-  public static final String UNDETERMINED_DIR_NAME = "Undetermined_indices";
-
-  /** The Constant PROJECT_PREFIX. */
-  public static final String PROJECT_PREFIX = "Project_";
-
-  /** The Constant SAMPLE_PREFIX. */
-  public static final String SAMPLE_PREFIX = "Sample_";
-
-  /** The Constant UNDETERMINED_PREFIX. */
-  public static final String UNDETERMINED_PREFIX = SAMPLE_PREFIX + "lane";
-
+  /** The Bcl2fastq version. */
   private final Bcl2FastqVersion version;
 
   /** The fastq directory. */
@@ -93,7 +72,7 @@ public class Bcl2FastqOutput {
   }
 
   //
-  // Other methods
+  // Getters
   //
 
   /**
@@ -111,265 +90,16 @@ public class Bcl2FastqOutput {
    */
   public File getFastqDirectory() {
 
-    return fastqDirectory;
+    return this.fastqDirectory;
   }
 
   /**
-   * Find fastq parent directory.
-   * @param fastqSample the fast sample
-   * @return the fastq output directory.
+   * Get the sample sheet.
+   * @return the sample sheet
    */
-  public File getFastqSampleParentDir(final FastqSample fastqSample) {
+  public SampleSheet getSampleSheet() {
 
-    if (fastqSample == null) {
-      throw new NullPointerException("fastqSample argument cannot be null");
-    }
-
-    switch (this.version) {
-
-    case BCL2FASTQ_1:
-
-      if (fastqSample.isUndeterminedIndex()) {
-
-        final File undeterminedDir =
-            new File(getFastqDirectory(), UNDETERMINED_DIR_NAME);
-
-        return new File(undeterminedDir,
-            UNDETERMINED_PREFIX + fastqSample.getLane());
-      }
-
-      final File projectDir = new File(getFastqDirectory(),
-          PROJECT_PREFIX + fastqSample.getProjectName());
-
-      return new File(projectDir, SAMPLE_PREFIX + fastqSample.getSampleName());
-
-    case BCL2FASTQ_2:
-    case BCL2FASTQ_2_15:
-
-      if (fastqSample.isUndeterminedIndex()) {
-        return getFastqDirectory();
-      }
-
-      final File projectV2Dir =
-          new File(getFastqDirectory(), fastqSample.getProjectName());
-
-      // Check if there is a sub directory for each sample
-      if ("".equals(fastqSample.getSampleDirectoryName())) {
-
-        // No sample sub directory
-        return projectV2Dir;
-      } else {
-
-        // Sample sub directory
-        return new File(projectV2Dir, fastqSample.getSampleDirectoryName());
-      }
-
-    default:
-      throw new IllegalStateException(
-          "Unhandled Bcl2FastqVersion enum value: " + this.version);
-    }
-
-  }
-
-  /**
-   * Set the prefix of the fastq file of read for a fastq on a sample.
-   * @return prefix fastq files for this fastq on asample
-   */
-  public String getFilenamePrefix(final FastqSample fastqSample,
-      final int read) {
-
-    switch (this.version) {
-
-    case BCL2FASTQ_1:
-
-      if (fastqSample.isUndeterminedIndex()) {
-
-        return String.format("lane%d_Undetermined%s", fastqSample.getLane(),
-            getConstantFastqSuffix(fastqSample.getLane(), read));
-      }
-
-      return String.format("%s_%s%s", fastqSample.getSampleName(),
-          fastqSample.getIndex(),
-          getConstantFastqSuffix(fastqSample.getLane(), read));
-
-    case BCL2FASTQ_2:
-    case BCL2FASTQ_2_15:
-
-      if (fastqSample.isUndeterminedIndex()) {
-
-        return String.format("Undetermined_S0%s",
-            getConstantFastqSuffix(fastqSample.getLane(), read));
-      }
-
-      checkNotNull(this.samplesheet,
-          "sample sheet on version 2 instance not initialize.");
-
-      // Build sample name on fastq file according to version used
-      final String fastqSampleName = buildFastqSampleName(fastqSample);
-      return String.format("%s_S%d%s", fastqSampleName,
-          extractSamplePositionInSampleSheetLane(this.samplesheet, fastqSample),
-          getConstantFastqSuffix(fastqSample.getLane(), read));
-
-    default:
-      throw new IllegalStateException(
-          "Unhandled Bcl2FastqVersion enum value: " + this.version);
-    }
-  }
-
-  /**
-   * Build the prefix report filename.
-   * @param fastqSample the fastq sample
-   * @param read the read number
-   * @return the prefix report filename
-   */
-  public String buildPrefixReport(final FastqSample fastqSample,
-      final int read) {
-
-    if (fastqSample.isUndeterminedIndex()) {
-      return String.format("lane%s_Undetermined%s", fastqSample.getLane(),
-          getConstantFastqSuffix(fastqSample.getLane(), read));
-    }
-
-    return String.format("%s_%s%s", fastqSample.getSampleName(),
-        fastqSample.getIndex(),
-        getConstantFastqSuffix(fastqSample.getLane(), read));
-
-  }
-
-  /**
-   * Build the prefix report filename.
-   * @param fastqSample the fastq sample
-   * @return the prefix report filename
-   */
-  public String buildPrefixReport(final FastqSample fastqSample) {
-
-    return buildPrefixReport(fastqSample, fastqSample.getRead());
-
-  }
-
-  /**
-   * Keep files that satisfy the specified filter in this directory and
-   * beginning with this prefix.
-   * @param fastqSample the fastq sample
-   * @param read the read number
-   * @return an array of abstract pathnames
-   */
-  public List<File> createListFastqFiles(final FastqSample fastqSample,
-      final int read) {
-
-    final String filePrefix = getFilenamePrefix(fastqSample, read);
-    final File fastqSampleDir = getFastqSampleParentDir(fastqSample);
-
-    final File[] result = fastqSampleDir.listFiles(new FileFilter() {
-
-      @Override
-      public boolean accept(final File file) {
-
-        final String filename = file.getName();
-
-        return file.length() > 0
-            && filename.startsWith(filePrefix)
-            && filename.contains(FASTQ_EXTENSION);
-      }
-    });
-
-    if (result == null) {
-      return Collections.emptyList();
-    }
-    return Arrays.asList(result);
-
-  }
-
-  //
-  // Other methods
-  //
-
-  private String buildFastqSampleName(final FastqSample fastqSample) {
-
-    switch (this.version) {
-
-    case BCL2FASTQ_2:
-      return fastqSample.getSampleName();
-
-    case BCL2FASTQ_2_15:
-      return fastqSample.getSampleName().replace("_", "-");
-
-    default:
-      throw new IllegalStateException(
-          "Unhandled Bcl2FastqVersion enum value: " + this.version);
-    }
-  }
-
-  /**
-   * Gets the constant fastq suffix.
-   * @param lane the lane
-   * @param read the read
-   * @return the constant fastq suffix
-   */
-  private static String getConstantFastqSuffix(final int lane, final int read) {
-
-    return String.format("_L%03d_R%d_001", lane, read);
-  }
-
-  /**
-   * Extract sample position in a lane of the samplesheet.
-   * @param fastqSample the fastq sample
-   * @return the position of the sample in the samplesheet lane
-   */
-  private static int extractSamplePositionInSampleSheetLane(
-      final SampleSheet samplesheet, final FastqSample fastqSample) {
-
-    if (fastqSample == null) {
-      throw new NullPointerException("fastqSample argument cannot be null");
-    }
-
-    // Undetermined cases always return 0
-    if (fastqSample.isUndeterminedIndex()) {
-      return 0;
-    }
-
-    return extractSamplePositionInSampleSheetLane(samplesheet,
-        fastqSample.getSampleName());
-  }
-
-  /**
-   * Extract sample position in a lane of the samplesheet.
-   * @param sampleName the sample sample
-   * @return the position of the sample in the samplesheet lane
-   */
-  private static int extractSamplePositionInSampleSheetLane(
-      final SampleSheet samplesheet, final String sampleName) {
-
-    if (samplesheet == null) {
-      throw new NullPointerException("samplesheet argument cannot be null");
-    }
-
-    if (sampleName == null) {
-      throw new NullPointerException("sampleName argument cannot be null");
-    }
-
-    int i = 0;
-    TreeMultimap<Integer, String> sampleEntries = TreeMultimap.create();
-
-    for (Sample sample : samplesheet) {
-      // If sample id is not defined, use sample name
-      sampleEntries.put(sample.getLane(), sample.getDemultiplexingName());
-    }
-
-    List<Integer> lanesSorted = new ArrayList<Integer>(sampleEntries.keySet());
-    Collections.sort(lanesSorted);
-
-    for (int lane : lanesSorted) {
-      Collection<String> extractedSampleNames = sampleEntries.get(lane);
-      for (String sample : extractedSampleNames) {
-        i++;
-        if (sampleName.equals(sample)) {
-          return i;
-        }
-      }
-    }
-
-    return -1;
+    return this.samplesheet;
   }
 
   //
