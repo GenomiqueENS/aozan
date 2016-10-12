@@ -356,11 +356,12 @@
           </dependency>
           <!-- override plexus-compiler-javac-errorprone's dependency on
              Error Prone with the latest version -->
-          <dependency>
+          <!-- Enable for Java 8 -->
+          <!--dependency>
             <groupId>com.google.errorprone</groupId>
             <artifactId>error_prone_core</artifactId>
             <version>2.0.13</version>
-          </dependency>
+          </dependency-->
         </dependencies>
       </plugin>
       <plugin>
@@ -713,7 +714,9 @@
 		<plugin>
 		  <groupId>org.gaul</groupId>
 		  <artifactId>modernizer-maven-plugin</artifactId>
-		  <version>1.4.0</version>
+		  <version>1.1.0</version>
+                  <!-- Use 1.4.0 with Java 8 -->
+		  <!--version>1.4.0</version-->
                   <executions>
                     <execution>
                      <id>modernizer</id>
