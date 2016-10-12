@@ -772,7 +772,6 @@ public class FastqSample {
   /**
    * Public constructor corresponding of a undetermined index sample.
    * @param bcl2FastqOutput Bcl2FastqOutput object
-   * @param fastqDir FASTQ directory
    * @param tmpDir temporary directory
    * @param runId the run id
    * @param sampleId the sample Id
