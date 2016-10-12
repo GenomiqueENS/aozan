@@ -297,7 +297,7 @@ public class Bcl2FastqOutput {
   public Bcl2FastqOutput(final SampleSheet samplesheet, final File fastqDir)
       throws IOException {
 
-    this(samplesheet, fastqDir, findBcl2FastqVersion(fastqDir));
+    this(samplesheet, fastqDir, findBcl2FastqVersion(fastqDir), true);
   }
 
   /**
@@ -305,10 +305,11 @@ public class Bcl2FastqOutput {
    * @param samplesheet the samplesheet
    * @param fastqDir the output directory of bcl2fastq
    * @param version of bcl2fastq
+   * @param checkFastqDirectory check if the FASTQ directory exists
    * @throws IOException if an error occurs while reading bcl2fastq version
    */
   public Bcl2FastqOutput(final SampleSheet samplesheet, final File fastqDir,
-      Bcl2FastqVersion version) throws IOException {
+      Bcl2FastqVersion version, boolean checkFastqDirectory) throws IOException {
 
     if (samplesheet == null) {
       throw new NullPointerException("samplesheet argument cannot be null");
@@ -318,7 +319,9 @@ public class Bcl2FastqOutput {
       throw new NullPointerException("fastqDir argument cannot be null");
     }
 
-    checkExistingDirectoryFile(fastqDir, "fastq directory");
+    if (checkFastqDirectory) {
+      checkExistingDirectoryFile(fastqDir, "fastq directory");
+    }
 
     this.fastqDirectory = fastqDir;
     this.version = version;

@@ -175,7 +175,6 @@ public class SampleSheetReaderTest {
     files.add(SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SORTED);
     files.add(SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SHUFFLED_LANE);
     files.add(SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SHUFFLED_NOLANE);
-    files.add(SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SHUFFLED_PROJECT);
     files.add(SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SHUFFLED_SAMPLE);
     int nbLanes = 4;
 
@@ -187,7 +186,7 @@ public class SampleSheetReaderTest {
 
       Bcl2FastqOutput bclfile = new Bcl2FastqOutput(
           readSamplesheetCSV(new File(path, filename), nbLanes), new File("."),
-          Bcl2FastqVersion.BCL2FASTQ_2);
+          Bcl2FastqVersion.BCL2FASTQ_2, false);
       for (int lane = 1; lane <= nbLanes; lane++) {
         for (String sampleName : sampleNames.keySet()) {
           FastqSample fastqSample =

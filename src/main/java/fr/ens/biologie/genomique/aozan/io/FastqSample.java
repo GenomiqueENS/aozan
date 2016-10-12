@@ -33,7 +33,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.TreeMultimap;
@@ -604,10 +606,18 @@ public class FastqSample {
     List<Integer> lanesSorted = new ArrayList<Integer>(sampleEntries.keySet());
     Collections.sort(lanesSorted);
 
+    final Set<String> samplesFound = new HashSet<>();
+
     for (int lane : lanesSorted) {
       Collection<String> extractedSampleNames = sampleEntries.get(lane);
+
       for (String sample : extractedSampleNames) {
-        i++;
+
+        if (!samplesFound.contains(sample)) {
+          i++;
+          samplesFound.add(sample);
+        }
+
         if (sampleName.equals(sample)) {
           return i;
         }
@@ -709,8 +719,7 @@ public class FastqSample {
 
   /**
    * Public constructor (used only for tests)
-   * @param sampleSheet the samplesheet
-   * @param fastqDir the FASTQ directory
+   * @param bcl2FastqOutput the output of bcl2fastq
    * @param tmpDir the temporary directory
    * @param runId the run id
    * @param sampleId the sampleId
@@ -718,12 +727,12 @@ public class FastqSample {
    * @param sample the sample
    * @throws IOException if an error occurs while reading bcl2fastq version
    */
-  public FastqSample(SampleSheet sampleSheet, final File fastqDir,
+  public FastqSample(Bcl2FastqOutput bcl2FastqOutput,
       final File tmpDir, final String runId, final int sampleId, final int read,
       final Sample sample) throws IOException {
 
-    this(new Bcl2FastqOutput(sampleSheet, fastqDir), tmpDir, runId, sampleId,
-        read, sample.getLane(),
+    this(bcl2FastqOutput, tmpDir, runId, sampleId, read,
+        sample.getLane() != -1 ? sample.getLane() : 1,
         defineSampleSubDirName(sample.getSampleId(), sample.getSampleName()),
         sample.getDemultiplexingName(), sample.getSampleProject(),
         sample.getDescription(), "", false, true);
@@ -786,7 +795,7 @@ public class FastqSample {
       final boolean createEmptyFastq) throws IOException {
 
     checkArgument(read > 0, "read value cannot be lower than 1");
-    checkArgument(lane > 0, "read value cannot be lower than 1");
+    checkArgument(lane > 0, "lane value cannot be lower than 1");
 
     this.sampleId = sampleId;
     this.read = read;
