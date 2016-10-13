@@ -31,31 +31,30 @@
 
   <body>
 
-  <section name="End run discovering step">
+    <section name="End run discovering step">
 
-     <p>This step tests if a run is completed by checking if a file called <tt>Basecalling_Netcopy_complete_ReadX.txt</tt>
-     exists at the root of the run output directory where X is the maximal read number of the run (e.g. for an indexed
-       paired end run, X is equals to 3). </p>
+      <p>This step tests if a run is completed by checking if a file called <tt>Basecalling_Netcopy_complete_ReadX.txt</tt> exists at the root of the run output directory where X is the maximal read number of the run (e.g. for an indexed paired end run, X is equals to 3). </p>
 
-       <h4>Configuration parameters</h4>
+      <h4>Configuration parameters</h4>
 
-   <p>The following table contains the parameters used for this step.</p>
+      <p>The following table contains the parameters used for this step.</p>
 
-     <table>
-     <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
-     <tr><td>hiseq.step</td><td>boolean</td><td>True</td><td>Enables the step,
-         checks all Hiseq or NextSeq run through all run data path directories.</td></tr>
-     <!--tr><td>hiseq.step</td><td>integer</td><td>12</td><td>Set the maximal number of hour since the end of sequencing
-       to send an email to inform users of the end of the run.</td></tr-->
-     </table>
+      <table>
+        <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
+        <tr><td>hiseq.step</td><td>boolean</td><td>True</td><td>Enables the step, checks all Hiseq or NextSeq run through all run data path directories.</td></tr>
+        <!--tr><td>hiseq.step</td><td>integer</td><td>12</td><td>Set the maximal number of hour since the end of sequencing to send an email to inform users of the end of the run.</td></tr-->
+      </table>
 
-     <p>Here is an example of email sent at the end of an Aozan run, containing the quality control summary as attachment.</p>
-      <div align="center">
-        <img src="images/mail_end_run.png" alt="example of mail sent at the end of a run" border="1"/>
-     </div>
+      <p>Here is an example of email sent at the end of a sequencer run.</p>
 
+      <ul>
+        <li>
+          <p>Example on HiSeq 1500</p>
+          <img src="images/mail_end_run.png" alt="example of mail sent at the end of a run" />
+        </li>
+      </ul>
 
-   </section>
+    </section>
 
   </body>
 

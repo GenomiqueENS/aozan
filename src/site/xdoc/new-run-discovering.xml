@@ -31,35 +31,38 @@
   </properties>
 
   <body>
+
     <section name="New run discovering step">
 
-       <p>This step checks if a new run is currently running.
-          With a HiSeq sequencer if the first base report has been generated, if true, sends an email with the first base report.
-          With a NextSeq sequencer, first base report has not been generated, Aozan checks existence on first file created by sequence.
-         If true sends an email with main feature on the new run.
-         </p>
+      <p>This step checks if a new run is currently running.
+       Once a new run has been discovered, an email is sent to you.   
+       If your sequencer is using RTA 1.x, the email will also contains the first base report.</p>
 
-       <h4>Configuration parameters</h4>
+      <h4>Configuration parameters</h4>
 
-     <p>The next table contains the parameters of this step.</p>
+      <p>The next table contains the parameters of this step.</p>
 
-       <table>
-         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-         <tr><td>first.base.report.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
-     </table>
-       <p>Example of email sent for the new run discovering step</p>
-      <div align="center">
       <table>
-        <tr><th>Example on HiSeq run with First base report</th><th>Example on NextSeq run</th></tr>
-        <tr style="text-align:center; background-color: #FFFFFF"><td>
-        <img src="images/mail_firstbasereport_450px.png" alt="example mail on HiSeq run with First base report" style="vertical-align:middle"/>
-        </td><td>
-           <img src="images/mail_newrun_nextseq.png"
-           alt="example mail on NextSeq run"  border="1"/>
-          </td></tr></table>
-        </div>
+        <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+        <tr><td>first.base.report.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
+      </table>
 
-       </section>
+      <p>Example of emails sent for the new run discovering step</p>
+
+
+      <ul>
+        <li>
+          <p>Example on HiSeq 1500 (RTA 1.x) run with First base report</p>
+          <img src="images/mail_firstbasereport_450px.png" alt="example email on HiSeq 1500 run with First base report" />
+          <p/>
+        </li>
+        <li>
+          <p>Example on NextSeq 500 (RTA 2.x) run</p>
+          <img src="images/mail_newrun_nextseq.png" alt="example email on NextSeq 500 run without First base report" />
+        </li>
+      </ul>
+
+    </section>
 
   </body>
 
