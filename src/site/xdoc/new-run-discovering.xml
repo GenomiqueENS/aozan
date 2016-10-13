@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<!--
 /*
  *                  Aozan development code
  *
  * This code may be freely distributed and modified under the
- * terms of the GNU General Public License version 3 or later 
- * and CeCILL. This should be distributed with the code. If you 
+ * terms of the GNU General Public License version 3 or later
+ * and CeCILL. This should be distributed with the code. If you
  * do not have a copy, see:
  *
  *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
@@ -25,42 +25,42 @@
 -->
 <document>
 
-	<properties>
-		<title>New run discovering</title>
-		<author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
-	</properties>
+  <properties>
+    <title>New run discovering</title>
+    <author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
+  </properties>
 
-	<body>
-		<section name="New run discovering step">
-     
-     	<p>This step checks if a new run is currently running.
-     	   With a HiSeq sequencer if the first base report has been generated, if true, sends an email with the first base report. 
-     	   With a NextSeq sequencer, first base report has not been generated, Aozan checks existence on first file created by sequence.
-     		If true sends an email with main feature on the new run. 
-     		</p>
+  <body>
+    <section name="New run discovering step">
 
-     	<h4>Configuration parameters</h4>
-	 
-	 	<p>The next table contains the parameters of this step.</p>
-	 
-     	<table>
-	   		<tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-	   		<tr><td>first.base.report.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
-	 	</table>
-     	<p>Example of email sent for the new run discovering step</p>
-    	<div align="center">
-		  <table>
-		  	<tr><th>Example on HiSeq run with First base report</th><th>Example on NextSeq run</th></tr>
-		  	<tr style="text-align:center; background-color: #FFFFFF"><td>
-				<img src="images/mail_firstbasereport_450px.png" alt="example mail on HiSeq run with First base report" style="vertical-align:middle"/>
-    		</td><td>
-    	 		<img src="images/mail_newrun_nextseq.png" 
-    	 		alt="example mail on NextSeq run"  border="1"/>
-        	</td></tr></table>
+       <p>This step checks if a new run is currently running.
+          With a HiSeq sequencer if the first base report has been generated, if true, sends an email with the first base report.
+          With a NextSeq sequencer, first base report has not been generated, Aozan checks existence on first file created by sequence.
+         If true sends an email with main feature on the new run.
+         </p>
+
+       <h4>Configuration parameters</h4>
+
+     <p>The next table contains the parameters of this step.</p>
+
+       <table>
+         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+         <tr><td>first.base.report.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
+     </table>
+       <p>Example of email sent for the new run discovering step</p>
+      <div align="center">
+      <table>
+        <tr><th>Example on HiSeq run with First base report</th><th>Example on NextSeq run</th></tr>
+        <tr style="text-align:center; background-color: #FFFFFF"><td>
+        <img src="images/mail_firstbasereport_450px.png" alt="example mail on HiSeq run with First base report" style="vertical-align:middle"/>
+        </td><td>
+           <img src="images/mail_newrun_nextseq.png"
+           alt="example mail on NextSeq run"  border="1"/>
+          </td></tr></table>
         </div>
-       
-   		</section>
 
-	</body>
+       </section>
+
+  </body>
 
 </document>

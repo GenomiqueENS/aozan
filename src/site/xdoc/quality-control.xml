@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<!--
 /*
  *                  Aozan development code
  *
  * This code may be freely distributed and modified under the
- * terms of the GNU General Public License version 3 or later 
- * and CeCILL. This should be distributed with the code. If you 
+ * terms of the GNU General Public License version 3 or later
+ * and CeCILL. This should be distributed with the code. If you
  * do not have a copy, see:
  *
  *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
@@ -25,33 +25,33 @@
 -->
 <document>
 
-	<properties>
-		<title>Quality Control</title>
-		<author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
-	</properties>
+  <properties>
+    <title>Quality Control</title>
+    <author email="jourdren@biologie.ens.fr">Laurent Jourdren</author>
+  </properties>
 
 
 
-	<body>
-	
-	<section name="Quality control step">
-     
-     <p>This step allows to perform quality controls on the output runs. To do this Aozan uses Illumina reports, 
-     <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/" target="_blank">FastQC</a> results 
-     and contamination detection results (using <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/">FastQ Screen</a>). </p>  
+  <body>
+
+  <section name="Quality control step">
+
+     <p>This step allows to perform quality controls on the output runs. To do this Aozan uses Illumina reports,
+     <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/" target="_blank">FastQC</a> results
+     and contamination detection results (using <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/">FastQ Screen</a>). </p>
 
      <p>This step creates a report file including the thresholds fixed for quality controls with : </p>
-	 <ul>
-	   <li><a href="./qc-global-tests.html">Global quality tests</a> with Illumina reports</li>
-	   <li><a href="./qc-lanes-tests.html">Lane quality tests</a> with Illumina reports</li>
-	   <li><a href="./qc-projects-tests.html">Project quality tests</a> with Illumina reports, demultiplexage reports, 
-	   		optional samples reports</li>
-	   <li><a href="./qc-pooledsamples-tests.html">Pooled sample quality tests</a> with Illumina reports, demultiplexage reports, 
-	   		optional samples reports, compiles data on replica by sample only if the run contains a single Project.</li>	   		
-	   <li><a href="./qc-samples-tests.html">Samples quality tests</a> with Illumina reports, 
-		 <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC, </a>a quality control tool for high throughput sequence data 
-				and an optional module for the contamination detection (reimplementation of FastQ Screen).</li>
-	  </ul>
+   <ul>
+     <li><a href="./qc-global-tests.html">Global quality tests</a> with Illumina reports</li>
+     <li><a href="./qc-lanes-tests.html">Lane quality tests</a> with Illumina reports</li>
+     <li><a href="./qc-projects-tests.html">Project quality tests</a> with Illumina reports, demultiplexage reports,
+         optional samples reports</li>
+     <li><a href="./qc-pooledsamples-tests.html">Pooled sample quality tests</a> with Illumina reports, demultiplexage reports,
+         optional samples reports, compiles data on replica by sample only if the run contains a single Project.</li>
+     <li><a href="./qc-samples-tests.html">Samples quality tests</a> with Illumina reports,
+     <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC, </a>a quality control tool for high throughput sequence data
+        and an optional module for the contamination detection (reimplementation of FastQ Screen).</li>
+    </ul>
 
      <p><b>Note:</b> The quality control step is the longest step, it can last several hours/days.
      If Aozan is stopped before the end of this step, it is possible to relaunch it.
@@ -70,17 +70,17 @@
          <tr><td>qc.conf.threads</td><td>integer</td><td>The number of core available on the system</td><td>The number of thread to use when running FastQC if
          tests that need FastQC are enable</td></tr>
        </table>
-     
+
      <p>An example of email sent to the end of Aozan with the quality control summary as attachment and an example of all data built for one run in quality control step.</p>
-   	 <div align="center">
+      <div align="center">
                 <a href="./qc_demo/160617_NB500892_0097_AH7N2TAFXX.html" target="_blank"><img src="images/quality_control_example_report_300px.png" alt="Example on quality control run report"/></a>
-   	 	
-   	 	<p>Aozan creates a html page to navigate in all documents and archives from a run.</p>
+
+        <p>Aozan creates a html page to navigate in all documents and archives from a run.</p>
         <img src="images/page_index_run_v1-2.png" alt="page to navigate in all document from a run" border="1"/>
      </div>
-      
-   </section>  
-   
+
+   </section>
+
   </body>
 
 </document>

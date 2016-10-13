@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<!--
 /*
  *                  Aozan development code
  *
  * This code may be freely distributed and modified under the
- * terms of the GNU General Public License version 3 or later 
- * and CeCILL. This should be distributed with the code. If you 
+ * terms of the GNU General Public License version 3 or later
+ * and CeCILL. This should be distributed with the code. If you
  * do not have a copy, see:
  *
  *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
@@ -44,7 +44,7 @@
             <code>.tar.bz2</code> archive
           </a>
         </li>
-	<li>
+  <li>
           <a href="@@@APPNAMEMIN@@@-src-@@@VERSION@@@.zip">
             <code>.zip</code> archive
           </a>
@@ -56,14 +56,14 @@
       </p>
 
       <subsection name="Code repository">
-        <p>You can also download the Aozan source from our 
-		<a href="https://github.com/GenomicParisCentre/aozan">code repository</a>
-		hosted by <a href="https://github.com">GitHub</a>.
-		On the <a href="https://github.com/GenomicParisCentre/aozan">main page of Aozan on this forge</a>
-		(<a href="https://github.com/GenomicParisCentre/aozan">https://github.com/GenomicParisCentre/aozan</a>)
-		you have access to the <a href="https://github.com/GenomicParisCentre/aozan/issues">issue tracker</a>,
-		to the <a href="https://github.com/GenomicParisCentre/aozan">source browser</a> of the project and to the
-		<a href="https://github.com/GenomicParisCentre/aozan/wiki">wiki dedicated to developers</a>.</p>
+        <p>You can also download the Aozan source from our
+    <a href="https://github.com/GenomicParisCentre/aozan">code repository</a>
+    hosted by <a href="https://github.com">GitHub</a>.
+    On the <a href="https://github.com/GenomicParisCentre/aozan">main page of Aozan on this forge</a>
+    (<a href="https://github.com/GenomicParisCentre/aozan">https://github.com/GenomicParisCentre/aozan</a>)
+    you have access to the <a href="https://github.com/GenomicParisCentre/aozan/issues">issue tracker</a>,
+    to the <a href="https://github.com/GenomicParisCentre/aozan">source browser</a> of the project and to the
+    <a href="https://github.com/GenomicParisCentre/aozan/wiki">wiki dedicated to developers</a>.</p>
       </subsection>
 
       <subsection name="Compilation">

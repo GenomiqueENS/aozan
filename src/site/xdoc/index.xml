@@ -25,61 +25,61 @@
 -->
 <document>
 
-	<properties>
-		<title>Welcome on the Aozan page</title>
-		<author email="jourdren@biologie.ens.fr">
-			Laurent Jourdren
-		</author>
+  <properties>
+    <title>Welcome on the Aozan page</title>
+    <author email="jourdren@biologie.ens.fr">
+      Laurent Jourdren
+    </author>
 
-	</properties>
+  </properties>
 
 
-	<body>
+  <body>
         <link rel="alternate" type="application/rss+xml" title="Aozan updates" href="aozan.rss" />
 
-		<section name="">
-			<div style="float: right; margin: 0 10px 20px 20px; padding: 5px; background-color: #eee;">
-				<h5 style="margin: 0; border-bottom: 1px solid #aaaaaa">
-					Get Aozan @@@VERSION@@@
-				</h5>
-				<p style="font-size: smaller">
-					<img valign="top"
-						src="http://maven.apache.org/images/folder-open.gif" border="0"
-						alt="" title="Download Aozan" />
-					<a href="aozan-@@@VERSION@@@.tar.gz">Download </a>Aozan Application<br />
-				</p>
-				<ul style="margin-top: 0; list-style-type: disc">
-					<li style="font-size: smaller">
-						<a href="download.html#requirements">System Requirements</a>
-						and <a href="installing.html">Installation Instructions</a>.
-					</li>
-					<li style="font-size: smaller">
-						<a href="quickstart.html">QuickStart tutorial</a>
-					</li>
-				</ul>
-			</div>
-		</section>
-		
-		<section name="Welcome to Aozan">
-			<p>Aozan has been developed in order to automatically handle raw data transfer, demultiplexing and
+    <section name="">
+      <div style="float: right; margin: 0 10px 20px 20px; padding: 5px; background-color: #eee;">
+        <h5 style="margin: 0; border-bottom: 1px solid #aaaaaa">
+          Get Aozan @@@VERSION@@@
+        </h5>
+        <p style="font-size: smaller">
+          <img valign="top"
+            src="http://maven.apache.org/images/folder-open.gif" border="0"
+            alt="" title="Download Aozan" />
+          <a href="aozan-@@@VERSION@@@.tar.gz">Download </a>Aozan Application<br />
+        </p>
+        <ul style="margin-top: 0; list-style-type: disc">
+          <li style="font-size: smaller">
+            <a href="download.html#requirements">System Requirements</a>
+            and <a href="installing.html">Installation Instructions</a>.
+          </li>
+          <li style="font-size: smaller">
+            <a href="quickstart.html">QuickStart tutorial</a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section name="Welcome to Aozan">
+      <p>Aozan has been developed in order to automatically handle raw data transfer, demultiplexing and
                         quality control of a sequencing run once a HiSeq or Nextseq run has been completed. This software is involved in the primary data analysis.
                        Aozan produces compressed FASTQ files and a quality report from an HiSeq or Nextseq sequencer output in order to evaluate
                         each sequencing parameter. Aozan can work on most computer infrastructures and only requires a samplesheet for each run.</p>
 
-			<p>Aozan greatly helps to improve the efficiency in the run data management and to keep tracks of the run statistics
-			through automatic mails and HTML report pages.</p>
+      <p>Aozan greatly helps to improve the efficiency in the run data management and to keep tracks of the run statistics
+      through automatic mails and HTML report pages.</p>
 
 
-		</section>
+    </section>
 
-		<section name="Quality control report example">
-			<p><a href="./qc_demo/160617_NB500892_0097_AH7N2TAFXX.html" target="_blank">
-				<img src="images/quality_control_example_report_300px.png" alt="Example on quality control run report"/>
-			</a></p>
-		</section>
+    <section name="Quality control report example">
+      <p><a href="./qc_demo/160617_NB500892_0097_AH7N2TAFXX.html" target="_blank">
+        <img src="images/quality_control_example_report_300px.png" alt="Example on quality control run report"/>
+      </a></p>
+    </section>
 
-		<section name="Supported devices">
-			<p>Aozan can handle the output of many Illumina sequencer models, however not all the models of Illumina sequencers has been tested with Aozan. As Illumina sequencer outputs are very similar, Aozan may work with most of the Illumina sequencers.
+    <section name="Supported devices">
+      <p>Aozan can handle the output of many Illumina sequencer models, however not all the models of Illumina sequencers has been tested with Aozan. As Illumina sequencer outputs are very similar, Aozan may work with most of the Illumina sequencers.
                            You can <a href="mailto:aozan@biologie.ens.fr">contact us</a> to tell us if your sequencer model is compatible with Aozan.</p>
 
                         <table>
@@ -95,200 +95,200 @@
                             <tr><td>MySeq</td><td>Unknown</td></tr>
                             <tr><td>MiniSeq</td><td>Unknown</td></tr>
                         </table>
-		</section>
+    </section>
 
 
-		<section name="Sample sheet validator">
-			<p>We also provide a <a href="http://outils.genomique.biologie.ens.fr/samplesheetvalidator/" target="_blank">Bcl2fastq samplesheet validator</a>
-			to help the users in checking their run samplesheet. This tool uses only html and javascript. <u>Not a single  data is sent</u> to our servers when you use this tool.</p>
-		</section>
+    <section name="Sample sheet validator">
+      <p>We also provide a <a href="http://outils.genomique.biologie.ens.fr/samplesheetvalidator/" target="_blank">Bcl2fastq samplesheet validator</a>
+      to help the users in checking their run samplesheet. This tool uses only html and javascript. <u>Not a single  data is sent</u> to our servers when you use this tool.</p>
+    </section>
 
 
-		<section name="What's new in Aozan?">
+    <section name="What's new in Aozan?">
 
-			<subsection name="New Samplesheet Validator v2"><p>
-				A new samplesheet validator for is available. With its new design it manages samplesheet v2 from bcl2fastq2.
-				</p>
-			</subsection>
+      <subsection name="New Samplesheet Validator v2"><p>
+        A new samplesheet validator for is available. With its new design it manages samplesheet v2 from bcl2fastq2.
+        </p>
+      </subsection>
 
-			<subsection name="bcl2fastq 2.18 in Aozan"><p>
-				Aozan now supports bcl2fastq 2.18
-				</p>
-			</subsection>
+      <subsection name="bcl2fastq 2.18 in Aozan"><p>
+        Aozan now supports bcl2fastq 2.18
+        </p>
+      </subsection>
 
-			<subsection name="Aozan can now fully be executed using a Docker image."><p>
-				Aozan can now fully be executed using a Docker image. Thus you don't need to install all dependancies on your computer before using it.
-				</p>
-			</subsection>
+      <subsection name="Aozan can now fully be executed using a Docker image."><p>
+        Aozan can now fully be executed using a Docker image. Thus you don't need to install all dependancies on your computer before using it.
+        </p>
+      </subsection>
 
-			<subsection name="New built-in step to automatically recompress all your fastq files."><p>
-				Aozan has now a new built-in step which recompresses fastq and fastq-gzip files into fastq-bzip2 files. bzip2 files are more compressed than gzip files and thus take less disk space.
-				They also are compatible with hadoop since they are chunked files. Please check <a href="recompression.html">here</a>.
-				</p>
-			</subsection>
+      <subsection name="New built-in step to automatically recompress all your fastq files."><p>
+        Aozan has now a new built-in step which recompresses fastq and fastq-gzip files into fastq-bzip2 files. bzip2 files are more compressed than gzip files and thus take less disk space.
+        They also are compatible with hadoop since they are chunked files. Please check <a href="recompression.html">here</a>.
+        </p>
+      </subsection>
 
-			<subsection name="Define denied runs and prioritized runs and automatically deny runs in error"><p>
-				In the aozan.var.path, you can specify [step].deny file (qc.deny, demux.deny, ...).
-				Runs specified in these files won't be processed by the step.
-				In the aozan.var.path, you can also specify runs.priority file.
-				Runs specified in this file are processed in priority by aozan when available
-				Furthermore, on detection of a run in error, automatically add it to hiseq.deny
-				</p>
-			</subsection>
+      <subsection name="Define denied runs and prioritized runs and automatically deny runs in error"><p>
+        In the aozan.var.path, you can specify [step].deny file (qc.deny, demux.deny, ...).
+        Runs specified in these files won't be processed by the step.
+        In the aozan.var.path, you can also specify runs.priority file.
+        Runs specified in this file are processed in priority by aozan when available
+        Furthermore, on detection of a run in error, automatically add it to hiseq.deny
+        </p>
+      </subsection>
 
-			<subsection name="Easy samplesheet auto usage"><p>
-				Aozan can now automatically check and use a samplesheet when available in run root folder if no samplesheet is given in input.
-				</p>
-			</subsection>
+      <subsection name="Easy samplesheet auto usage"><p>
+        Aozan can now automatically check and use a samplesheet when available in run root folder if no samplesheet is given in input.
+        </p>
+      </subsection>
 
-			<subsection name="True Illumina values for metrics like phasing and prephasing"><p>
-				Phasing/prephasing values are now extracted directly from Illumina InterOps binary files. Thus gives exactly the same values as sequencers.
-				</p>
-			</subsection>
+      <subsection name="True Illumina values for metrics like phasing and prephasing"><p>
+        Phasing/prephasing values are now extracted directly from Illumina InterOps binary files. Thus gives exactly the same values as sequencers.
+        </p>
+      </subsection>
 
-			<subsection name="Choose the number of mismatch for demultiplexing"><p>
-				Samplesheet can now contain the number of allowed mismatch for demultiplexing
-				</p>
-			</subsection>
+      <subsection name="Choose the number of mismatch for demultiplexing"><p>
+        Samplesheet can now contain the number of allowed mismatch for demultiplexing
+        </p>
+      </subsection>
 
-			<subsection name="Aozan 2.0 manage HiSeq and NextSeq sequencers">
-				<p>Aozan can manage several sequencers, and now handles the latest versions of illumina sequencers (HiSeq and NextSeq).
-				</p>
-			</subsection>
+      <subsection name="Aozan 2.0 manage HiSeq and NextSeq sequencers">
+        <p>Aozan can manage several sequencers, and now handles the latest versions of illumina sequencers (HiSeq and NextSeq).
+        </p>
+      </subsection>
 
-			<subsection name="bcl2fastq 2 software management">
-				<p>bcl2fastq version 2 deals with the data demultiplexing from Hiseq or either NextSeq runs.
-					Aozan can manage the new sample sheet file format from bcl2fastq version 2.
-				</p>
-			</subsection>
+      <subsection name="bcl2fastq 2 software management">
+        <p>bcl2fastq version 2 deals with the data demultiplexing from Hiseq or either NextSeq runs.
+          Aozan can manage the new sample sheet file format from bcl2fastq version 2.
+        </p>
+      </subsection>
 
-			<subsection name="Demultiplexing using docker">
-				<p>Aozan can run the demultiplexing step using a bcl2fastq 2 docker image.
-					bcl2fastq 2 images are available <a href="https://hub.docker.com/r/genomicpariscentre">on our dockerhub</a>.
-				</p>
-			</subsection>
-			
-						
-			<subsection name="FastQC version 0.11.3">
-				<p>Aozan now uses FastQC version 0.11.3.
-					Aozan still contains previous Aozan enhancements to FastQC (the &quot;<b>Bad tiles</b>&quot; module
-				and the optional blast in the &quot;<b>Overrepresented sequences</b>&quot; module).</p>
-			</subsection>
-			
-			<subsection name="New projects tests in quality control report">
-				<p>Enhancement of the quality control report, with a new table on projects test: listing data on all projects in run
-					<a href="./qc-projects-tests.html">more details here.</a>
-					 <p>An example of table built with projects tests.</p>
-				       <div align="center">
-				       		<a href="./qc-projects-tests.html"><img src="images/qc_project_test_650px.png" alt="example on report with run data" border="1"/></a>
-				       </div>
-				  </p>
-			</subsection>
-			
-			<subsection name="FastQC version 0.11.2">
-				<p>Aozan now use the latest FastQC version (0.11.2) that includes two new modules:
-				<ul>
-					<li>&quot;<b>Per tile sequence quality</b>&quot;;</li>
-					<li>&quot;<b>Adapter content</b>&quot;.</li>
-				</ul>
-				</p>
-				<p>Example of a report of the new &quot;<b>Per tile sequence quality</b>&quot; module:</p>
-				<div align="center">
-						<a href="qc-samples-tests.html#fastqc">
-							<img src="images/qc_factq_tile_sequence_quality.png" alt="FastQC: new per tile sequence quality module" border="1"/></a>
-				</div>
-				<p>Of course, this new FastQC version bundled in Aozan still contains previous Aozan enhancements to FastQC (the &quot;<b>Bad tiles</b>&quot; module
-				and the optional blast in the &quot;<b>Overrepresented sequences</b>&quot; module).</p>
+      <subsection name="Demultiplexing using docker">
+        <p>Aozan can run the demultiplexing step using a bcl2fastq 2 docker image.
+          bcl2fastq 2 images are available <a href="https://hub.docker.com/r/genomicpariscentre">on our dockerhub</a>.
+        </p>
+      </subsection>
 
-			</subsection>
 
-			<subsection name="New globals tests in quality control report">
-				<p>
-					Enhancement of the quality control report, with a new table on globals test: listing data on all lanes in run
-					<a href="./qc-global-tests.html">more details here.</a>
-					<p>An example of table built with lanes global tests.</p>
-			       <div align="center">
-			       		<a href="./qc-global-tests.html"><img src="images/qc_global_tests_part1.png" alt="example on report with run data" border="1"/></a>
-			       		<a href="./qc-global-tests.html"><img src="images/qc_global_tests_part2.png" alt="example on report with run data" border="1"/></a>
-			       </div>
-				</p>
+      <subsection name="FastQC version 0.11.3">
+        <p>Aozan now uses FastQC version 0.11.3.
+          Aozan still contains previous Aozan enhancements to FastQC (the &quot;<b>Bad tiles</b>&quot; module
+        and the optional blast in the &quot;<b>Overrepresented sequences</b>&quot; module).</p>
+      </subsection>
 
-			</subsection>
+      <subsection name="New projects tests in quality control report">
+        <p>Enhancement of the quality control report, with a new table on projects test: listing data on all projects in run
+          <a href="./qc-projects-tests.html">more details here.</a>
+           <p>An example of table built with projects tests.</p>
+               <div align="center">
+                   <a href="./qc-projects-tests.html"><img src="images/qc_project_test_650px.png" alt="example on report with run data" border="1"/></a>
+               </div>
+          </p>
+      </subsection>
 
-			<subsection name="Analysis of the indices of reads in the undetermined FASTQ files">
-				<p>Aozan now provide a QC module that analyzes indices of reads in the undetermined FASTQ files. For each indices,
-					this module suggest the sample(s) and the number of reads that can be recovered using a demultiplexing step with
-					one more mismatch that the number of mismatches has been used. See for more information about this feature the
-					<a href="qc-samples-tests.html#recoveryclusters">sample	tests section of the documentation</a>.</p>
+      <subsection name="FastQC version 0.11.2">
+        <p>Aozan now use the latest FastQC version (0.11.2) that includes two new modules:
+        <ul>
+          <li>&quot;<b>Per tile sequence quality</b>&quot;;</li>
+          <li>&quot;<b>Adapter content</b>&quot;.</li>
+        </ul>
+        </p>
+        <p>Example of a report of the new &quot;<b>Per tile sequence quality</b>&quot; module:</p>
+        <div align="center">
+            <a href="qc-samples-tests.html#fastqc">
+              <img src="images/qc_factq_tile_sequence_quality.png" alt="FastQC: new per tile sequence quality module" border="1"/></a>
+        </div>
+        <p>Of course, this new FastQC version bundled in Aozan still contains previous Aozan enhancements to FastQC (the &quot;<b>Bad tiles</b>&quot; module
+        and the optional blast in the &quot;<b>Overrepresented sequences</b>&quot; module).</p>
 
-				<p>The reports generated by this module show for each sample, the list of indices and read counts that can be recovered.</p>
-				<div align="center">
-					<a href="./qc-samples-tests.html#recoveryclusters">
-				  		<img src="images/qc_report_html_recovery_cluster.png" alt="the sample report html for recovering clusters" border="1"/>
-					</a>				  		
-				</div>
+      </subsection>
 
-			</subsection>
+      <subsection name="New globals tests in quality control report">
+        <p>
+          Enhancement of the quality control report, with a new table on globals test: listing data on all lanes in run
+          <a href="./qc-global-tests.html">more details here.</a>
+          <p>An example of table built with lanes global tests.</p>
+             <div align="center">
+                 <a href="./qc-global-tests.html"><img src="images/qc_global_tests_part1.png" alt="example on report with run data" border="1"/></a>
+                 <a href="./qc-global-tests.html"><img src="images/qc_global_tests_part2.png" alt="example on report with run data" border="1"/></a>
+             </div>
+        </p>
 
-			<subsection name="FastQC and contamination dectection on undetermined FASTQ files">
+      </subsection>
 
-				<p>Two parameters have been added in the Aozan configuration file to run FastQC and contamination detection on the undetermined FASTQ files.
-				For this module, all available genomes related to the run are used for contamination detection.</p>
-			</subsection>
+      <subsection name="Analysis of the indices of reads in the undetermined FASTQ files">
+        <p>Aozan now provide a QC module that analyzes indices of reads in the undetermined FASTQ files. For each indices,
+          this module suggest the sample(s) and the number of reads that can be recovered using a demultiplexing step with
+          one more mismatch that the number of mismatches has been used. See for more information about this feature the
+          <a href="qc-samples-tests.html#recoveryclusters">sample  tests section of the documentation</a>.</p>
 
-			<subsection name="Using Aozan in multi-servers context">
-				<p>The Aozan configuration file has been improved with a new "<code>include</code>" directive. With this enhancement, it will be easier to
-				   use Aozan in a multi-servers context using the same core configuration file by all Aozan instances.</p>
-			</subsection>
+        <p>The reports generated by this module show for each sample, the list of indices and read counts that can be recovered.</p>
+        <div align="center">
+          <a href="./qc-samples-tests.html#recoveryclusters">
+              <img src="images/qc_report_html_recovery_cluster.png" alt="the sample report html for recovering clusters" border="1"/>
+          </a>
+        </div>
 
-			<subsection name="Enhancements to FastQC">
-				<p>The control quality steps contains an additional FastQC module named &quot;<b>Bad tiles</b>&quot; that search tiles with BMS
-				   (Bottom Middle Swath) issues with Illumina flowcell v3.</p>
+      </subsection>
 
-		        <p>Optionally, Aozan adds a sub-step in FastQC to enhance the Overrepresented sequences module. For sequences with &quot;no hit&quot;,
-		           a blastn can be launch to estimate the source.
-		           Blastn results with 100% identity and 0% gap will be included in report.</p>
-		    	<div align="center">
-	    		  <table><tr style="text-align:center; background-color: #FFFFFF"><td>
-		    			<a href="qc-samples-tests.html#badtiles">
-		    				<img src="images/qc_fastqc_bad_tiles_height.png" alt="module bad tiles" style="vertical-align:middle"/></a>
-		    		</td><td>
-		        		<a href="qc-samples-tests.html#overrepresented">
-		        	 		<img src="images/qc_fastqc_overrepresented_blast_h350px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></a>
-		        	</td></tr></table>
-		        </div>
-			</subsection>
+      <subsection name="FastQC and contamination dectection on undetermined FASTQ files">
 
-			<subsection name="Contamination detection with FastQ-Screen">
+        <p>Two parameters have been added in the Aozan configuration file to run FastQC and contamination detection on the undetermined FASTQ files.
+        For this module, all available genomes related to the run are used for contamination detection.</p>
+      </subsection>
+
+      <subsection name="Using Aozan in multi-servers context">
+        <p>The Aozan configuration file has been improved with a new "<code>include</code>" directive. With this enhancement, it will be easier to
+           use Aozan in a multi-servers context using the same core configuration file by all Aozan instances.</p>
+      </subsection>
+
+      <subsection name="Enhancements to FastQC">
+        <p>The control quality steps contains an additional FastQC module named &quot;<b>Bad tiles</b>&quot; that search tiles with BMS
+           (Bottom Middle Swath) issues with Illumina flowcell v3.</p>
+
+            <p>Optionally, Aozan adds a sub-step in FastQC to enhance the Overrepresented sequences module. For sequences with &quot;no hit&quot;,
+               a blastn can be launch to estimate the source.
+               Blastn results with 100% identity and 0% gap will be included in report.</p>
+          <div align="center">
+            <table><tr style="text-align:center; background-color: #FFFFFF"><td>
+              <a href="qc-samples-tests.html#badtiles">
+                <img src="images/qc_fastqc_bad_tiles_height.png" alt="module bad tiles" style="vertical-align:middle"/></a>
+            </td><td>
+                <a href="qc-samples-tests.html#overrepresented">
+                   <img src="images/qc_fastqc_overrepresented_blast_h350px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></a>
+              </td></tr></table>
+            </div>
+      </subsection>
+
+      <subsection name="Contamination detection with FastQ-Screen">
                 <p>Aozan now include a fast Java FastQ Screen implementation. This module maps reads samples on a list of reference genomes
-					for assessing sample contamination and the ratio of the expected genome in the sample.
+          for assessing sample contamination and the ratio of the expected genome in the sample.
                     It creates a report file with values for each genome.</p>
-		    	<div align="center">
-		        	<a href="qc-samples-tests.html#contamination"><img src="images/qc_report_html_fastqscreen_400px.png" alt="example on report fastqscreen"/></a>
-		    	</div>
-			</subsection>
+          <div align="center">
+              <a href="qc-samples-tests.html#contamination"><img src="images/qc_report_html_fastqscreen_400px.png" alt="example on report fastqscreen"/></a>
+          </div>
+      </subsection>
 
-			<subsection name="Reading Illumina InterOp binary files">
-				<p>Run data are now retrieved by parsing Illumina InterOp Binary Metric files as Illumina XML run files are now deprecated.</p>
-	       		<div align="center"><a href="qc-lanes-tests.html"><img src="images/qc_lane_test_read1_600px.png" alt="example on report with run data" border="1"/></a></div>
-			</subsection>
+      <subsection name="Reading Illumina InterOp binary files">
+        <p>Run data are now retrieved by parsing Illumina InterOp Binary Metric files as Illumina XML run files are now deprecated.</p>
+             <div align="center"><a href="qc-lanes-tests.html"><img src="images/qc_lane_test_read1_600px.png" alt="example on report with run data" border="1"/></a></div>
+      </subsection>
 
-			<subsection name="Continuous synchronization of HiSeq data">
-				<p>Aozan can now perform continuous synchronizations of working runs to avoid a big synchronizations at the end of the runs.</p>
-			</subsection>
+      <subsection name="Continuous synchronization of HiSeq data">
+        <p>Aozan can now perform continuous synchronizations of working runs to avoid a big synchronizations at the end of the runs.</p>
+      </subsection>
 
-		</section>
+    </section>
 
-		<section name="Availability">
-			<p>Aozan is distributed under the <a href="license.html">General Public License</a> and <a href="license.html">CeCill</a>.</p>
-		</section>
+    <section name="Availability">
+      <p>Aozan is distributed under the <a href="license.html">General Public License</a> and <a href="license.html">CeCill</a>.</p>
+    </section>
 
-		<section name="Funding">
-			<p>This work was supported by the Infrastructures en Biologie Santé et Agronomie (IBiSA) and France Génomique.</p>
-			<a href="http://www.ibisa.net/"><img src="images/logo_ibisa-40pxh.png"/></a>&#160;&#160;
-			<a href="https://www.france-genomique.org/"><img src="images/logo_francegenomique-40pxh.png"/></a>&#160;&#160;
-		</section>
+    <section name="Funding">
+      <p>This work was supported by the Infrastructures en Biologie Santé et Agronomie (IBiSA) and France Génomique.</p>
+      <a href="http://www.ibisa.net/"><img src="images/logo_ibisa-40pxh.png"/></a>&#160;&#160;
+      <a href="https://www.france-genomique.org/"><img src="images/logo_francegenomique-40pxh.png"/></a>&#160;&#160;
+    </section>
 
-		<p><a href="./aozan.rss">Subscribe to Aozan RSS feed <img src="images/feed-icon-14x14.png"/></a></p>
-	</body>
+    <p><a href="./aozan.rss">Subscribe to Aozan RSS feed <img src="images/feed-icon-14x14.png"/></a></p>
+  </body>
 </document>

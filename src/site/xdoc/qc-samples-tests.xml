@@ -43,22 +43,22 @@
 
        <p>For the quality control sample test, the report brings together three source of data :</p>
        <ul>
-       		<li><a href="#data_illumina">Data supplied by the demultiplexing step</a></li>
-       		<li><a href="#fastqc">FastQC</a>
-       			<ul>
-       				<li><a href="#fcconfiguration">General configuration</a></li>
-       				<li><a href="#fctests">Configuration tests</a></li>
-       				<li><a href="#badtiles">New module for Bad tiles</a></li>
-       				<li><a href="#overrepresented">Enhancement of module Overrepresented sequences</a></li>
-       			</ul>
-       		</li>
-       		<li><a href="#contamination">Contamination detection with FastQ Screen</a>
-       			<ul>
-       		       	<li><a href="#fqsconfiguration">General configuration</a></li>
-       				<li><a href="#fqstests">Configuration tests</a></li>
-       			</ul>
-       		</li>
-       		<li><a href="#recoveryclusters">Analysis undetermined clusters from demultiplexing.</a></li>
+           <li><a href="#data_illumina">Data supplied by the demultiplexing step</a></li>
+           <li><a href="#fastqc">FastQC</a>
+             <ul>
+               <li><a href="#fcconfiguration">General configuration</a></li>
+               <li><a href="#fctests">Configuration tests</a></li>
+               <li><a href="#badtiles">New module for Bad tiles</a></li>
+               <li><a href="#overrepresented">Enhancement of module Overrepresented sequences</a></li>
+             </ul>
+           </li>
+           <li><a href="#contamination">Contamination detection with FastQ Screen</a>
+             <ul>
+                    <li><a href="#fqsconfiguration">General configuration</a></li>
+               <li><a href="#fqstests">Configuration tests</a></li>
+             </ul>
+           </li>
+           <li><a href="#recoveryclusters">Analysis undetermined clusters from demultiplexing.</a></li>
        </ul>
 
        <a name="data_illumina"/>
@@ -73,16 +73,16 @@
          <tr><td>qc.test.sample.pf.percent.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of percentpfsample</td></tr>
          <tr><td>qc.test.sample.in.lane.percent.enable</td><td>boolean</td><td>False</td><td>Enable percentinlanesample test</td></tr>
          <tr><td>qc.test.sample.in.lane.percent.distance</td><td>double</td><td>0.05</td><td>Interval for valid values of percentinlanesample depend
-         	on sample count in lane. interval is set according to the theoretical percent (1.0/sampleCount)</td></tr>
+           on sample count in lane. interval is set according to the theoretical percent (1.0/sampleCount)</td></tr>
          <tr><td>qc.test.sample.q30.percent.sample.enable</td><td>boolean</td><td>False</td><td>Enable percentq30 test</td></tr>
          <tr><td>qc.test.sample.q30.percent.sample.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of percentq30</td></tr>
          <tr><td>qc.test.sample.base.pf.mean.quality.score.sample.enable</td><td>boolean</td><td>False</td><td>Enable meanqualityscorepf test</td></tr>
          <tr><td>qc.test.sample.base.pf.mean.quality.score.sample.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of meanqualityscorepf</td></tr>
          <tr><td>qc.test.sample.recoverable.raw.cluster.count.sample.enable</td><td>boolean</td><td>False</td>
-         	<td>Enable recoverablerawclusterssamples test : compute raw cluster can be recovery from undetermined fastq file with more one mismatch that use for demultiplexing step (maximum at 2). </td></tr>
+           <td>Enable recoverablerawclusterssamples test : compute raw cluster can be recovery from undetermined fastq file with more one mismatch that use for demultiplexing step (maximum at 2). </td></tr>
          <tr><td>qc.test.sample.recoverable.raw.cluster.count.sample.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of recoverablerawclusterssamples</td></tr>
          <tr><td>qc.test.sample.recoverable.pf.cluster.count.sample.enable</td><td>boolean</td><td>False</td>
-         	<td>Enable recoverablepfclusterssamples test : compute passing filter cluster can be recovery from undetermined fastq file with more one mismatch that use for demultiplexing step (maximum at 2). </td></tr>
+           <td>Enable recoverablepfclusterssamples test : compute passing filter cluster can be recovery from undetermined fastq file with more one mismatch that use for demultiplexing step (maximum at 2). </td></tr>
          <tr><td>qc.test.sample.recoverable.pf.cluster.count.sample.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values of recoverablepfclusterssamples</td></tr>
          <tr><td>qc.test.sample.cluster.recovery.report.sample.enable</td><td>boolean</td><td>False</td><td>Enable linkreportrecoverycluster test: link to report HTML</td></tr>
        </table>
@@ -94,257 +94,257 @@
        <p> Aozan launch <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/" target="_blank">FastQC</a> on each sample (using parallel computation)
        and creates a report file including the thresholds fixed for quality controls.</p>
 
-		<a name="fcconfiguration"/>
+    <a name="fcconfiguration"/>
         <h5>General configuration for launch FastQC</h5>
         <p>If no FastQC test property is set, FastQC will not be launch on FastQ data.</p>
         <table>
-	         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-	         <tr><td>qc.conf.fastqc.contaminant.file</td><td>string</td><td>Not set</td><td>Specifies a file path which contains the list of contaminants
-	         	to screen overrepresented sequences against that override the default list of contaminants.
-	         	The file must contain sets of named contaminants in the form name[tab]sequence. Lines prefixed with a hash will be ignored. (FastQC parameter)</td></tr>
-	         <tr><td>qc.conf.fastqc.kmer.size</td><td>integer</td><td>7</td><td>Specifies the length of Kmer to look for in the Kmer content module.
-	         	Specified Kmer length must be between 2 and 10 (FastQC parameter)</td></tr>
-	         <tr><td>qc.conf.fastqc.nogroup</td><td>boolean</td><td>False</td><td>Disable grouping of bases for reads &gt;50bp. (FastQC parameter)</td></tr>
-	         <tr><td>qc.conf.fastqc.adapter.file</td><td>string</td><td>No set</td><td>Path to a specific adapter file, replace default file. (FastQC parameter)</td></tr>
-	         <tr><td>qc.conf.fastqc.limits.file</td><td>string</td><td>No set</td><td>Path to a specific limits file, replace default file. (FastQC parameter)</td></tr>
-	         <tr><td>qc.conf.fastqc.expgroup</td><td>boolean</td><td>False</td><td>Use exponential base groups in graph. (FastQC parameter)</td></tr>
-	         <tr><td>qc.conf.fastqc.casava</td><td>boolean</td><td>False</td><td>Illumina FASTQ file. (FastQC parameter)</td></tr>
-	         <tr><td>qc.conf.fastqc.nofilter</td><td>boolean</td><td>False</td><td>Option for filtering bad Illumina FASTQ entries. (FastQC parameter)</td></tr>
-	         <tr><td>qc.conf.fastqc.process.undetermined.samples</td><td>boolean</td><td>True</td><td>Run FastQC on undetermined indices samples, default at false.</td></tr>
-	         <tr><td>qc.conf.fastqc.nano</td><td>boolean</td><td>False</td><td>Run FastQC on nanopore technology which use Fast5 format file instead of FASTQ, default at false.</td></tr>
-	    </table>
+           <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+           <tr><td>qc.conf.fastqc.contaminant.file</td><td>string</td><td>Not set</td><td>Specifies a file path which contains the list of contaminants
+             to screen overrepresented sequences against that override the default list of contaminants.
+             The file must contain sets of named contaminants in the form name[tab]sequence. Lines prefixed with a hash will be ignored. (FastQC parameter)</td></tr>
+           <tr><td>qc.conf.fastqc.kmer.size</td><td>integer</td><td>7</td><td>Specifies the length of Kmer to look for in the Kmer content module.
+             Specified Kmer length must be between 2 and 10 (FastQC parameter)</td></tr>
+           <tr><td>qc.conf.fastqc.nogroup</td><td>boolean</td><td>False</td><td>Disable grouping of bases for reads &gt;50bp. (FastQC parameter)</td></tr>
+           <tr><td>qc.conf.fastqc.adapter.file</td><td>string</td><td>No set</td><td>Path to a specific adapter file, replace default file. (FastQC parameter)</td></tr>
+           <tr><td>qc.conf.fastqc.limits.file</td><td>string</td><td>No set</td><td>Path to a specific limits file, replace default file. (FastQC parameter)</td></tr>
+           <tr><td>qc.conf.fastqc.expgroup</td><td>boolean</td><td>False</td><td>Use exponential base groups in graph. (FastQC parameter)</td></tr>
+           <tr><td>qc.conf.fastqc.casava</td><td>boolean</td><td>False</td><td>Illumina FASTQ file. (FastQC parameter)</td></tr>
+           <tr><td>qc.conf.fastqc.nofilter</td><td>boolean</td><td>False</td><td>Option for filtering bad Illumina FASTQ entries. (FastQC parameter)</td></tr>
+           <tr><td>qc.conf.fastqc.process.undetermined.samples</td><td>boolean</td><td>True</td><td>Run FastQC on undetermined indices samples, default at false.</td></tr>
+           <tr><td>qc.conf.fastqc.nano</td><td>boolean</td><td>False</td><td>Run FastQC on nanopore technology which use Fast5 format file instead of FASTQ, default at false.</td></tr>
+      </table>
 
         <a name="fctests"/>
         <H5>Configuration tests</H5>
         <table>
-	         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-	         <tr><td>qc.test.sample.fastqc.basic.stats.enable</td><td>boolean</td><td>False</td><td>Enable FastQC basicstats test</td></tr>
-	         <tr><td>qc.test.sample.fastqc.per.base.quality.scores.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perbasequalityscores test</td></tr>
-	         <tr><td>qc.test.sample.fastqc.per.sequence.quality.scores.enable</td><td>boolean</td><td>False</td><td>Enable FastQC persequencequalityscores test</td></tr>
-	         <tr><td>qc.test.sample.fastqc.per.base.sequence.content.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perbasesequencecontent test</td></tr>
-	         <tr><td>qc.test.sample.fastqc.per.sequence.gc.content.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perSequencegccontent test</td></tr>
-	         <tr><td>qc.test.sample.fastqc.n.content.enable</td><td>boolean</td><td>False</td><td>Enable FastQC ncontent test</td></tr>
-	         <tr><td>qc.test.sample.fastqc.sequence.length.distribution.enable</td><td>boolean</td><td>False</td><td>Enable FastQC sequencelengthdistribution test</td></tr>
-	         <tr><td>qc.test.sample.fastqc.duplication.level.enable</td><td>boolean</td><td>False</td><td>Enable FastQC duplicationlevel test</td></tr>
-	         <tr><td>qc.test.sample.fastqc.overrepresented.sequences.enable</td><td>boolean</td><td>False</td><td>Enable FastQC overrepresentedseqs test</td></tr>
-	         <tr><td>qc.test.sample.fastqc.kmer.content.enable</td><td>boolean</td><td>False</td><td>Enable FastQC kmercontent test</td></tr>
-	         <tr><td>qc.test.sample.fastqc.per.tile.sequence.quality.enable</td><td>boolean</td><td>False</td><td>Enable FastQC pertilesequencequality test</td></tr>
-	         <tr><td>qc.test.sample.fastqc.adapter.content.enable</td><td>boolean</td><td>False</td><td>Enable FastQC adaptercontent test</td></tr>
-		</table>
+           <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+           <tr><td>qc.test.sample.fastqc.basic.stats.enable</td><td>boolean</td><td>False</td><td>Enable FastQC basicstats test</td></tr>
+           <tr><td>qc.test.sample.fastqc.per.base.quality.scores.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perbasequalityscores test</td></tr>
+           <tr><td>qc.test.sample.fastqc.per.sequence.quality.scores.enable</td><td>boolean</td><td>False</td><td>Enable FastQC persequencequalityscores test</td></tr>
+           <tr><td>qc.test.sample.fastqc.per.base.sequence.content.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perbasesequencecontent test</td></tr>
+           <tr><td>qc.test.sample.fastqc.per.sequence.gc.content.enable</td><td>boolean</td><td>False</td><td>Enable FastQC perSequencegccontent test</td></tr>
+           <tr><td>qc.test.sample.fastqc.n.content.enable</td><td>boolean</td><td>False</td><td>Enable FastQC ncontent test</td></tr>
+           <tr><td>qc.test.sample.fastqc.sequence.length.distribution.enable</td><td>boolean</td><td>False</td><td>Enable FastQC sequencelengthdistribution test</td></tr>
+           <tr><td>qc.test.sample.fastqc.duplication.level.enable</td><td>boolean</td><td>False</td><td>Enable FastQC duplicationlevel test</td></tr>
+           <tr><td>qc.test.sample.fastqc.overrepresented.sequences.enable</td><td>boolean</td><td>False</td><td>Enable FastQC overrepresentedseqs test</td></tr>
+           <tr><td>qc.test.sample.fastqc.kmer.content.enable</td><td>boolean</td><td>False</td><td>Enable FastQC kmercontent test</td></tr>
+           <tr><td>qc.test.sample.fastqc.per.tile.sequence.quality.enable</td><td>boolean</td><td>False</td><td>Enable FastQC pertilesequencequality test</td></tr>
+           <tr><td>qc.test.sample.fastqc.adapter.content.enable</td><td>boolean</td><td>False</td><td>Enable FastQC adaptercontent test</td></tr>
+    </table>
 
 
-	    <p>An example of table built with sample quality tests</p>
-	    <div align="center">
-	    	<img src="images/qc_sample_test_800px.png" alt="example on report with demultiplexing and fastqc data" />
-	    </div>
+      <p>An example of table built with sample quality tests</p>
+      <div align="center">
+        <img src="images/qc_sample_test_800px.png" alt="example on report with demultiplexing and fastqc data" />
+      </div>
 
-		<a name="badtiles"/>
-		<p><b>New module for &#145;Bad tiles&#146;</b></p>
-		<p>It contains an additional FastQC step named "<b>Bad tiles</b>" that search tiles with BMS (Bottom Middle Swath) issues with Illumina flowcell v3.
-    	During the Quality Control development phase of the project with the new V3 chemistry, we set up a new FastQC module in order to detect bad tiles caused by the BMS problem.</p>
+    <a name="badtiles"/>
+    <p><b>New module for &#145;Bad tiles&#146;</b></p>
+    <p>It contains an additional FastQC step named "<b>Bad tiles</b>" that search tiles with BMS (Bottom Middle Swath) issues with Illumina flowcell v3.
+      During the Quality Control development phase of the project with the new V3 chemistry, we set up a new FastQC module in order to detect bad tiles caused by the BMS problem.</p>
 
-		<table>
-	         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-	         <tr><td>qc.test.sample.fastqc.bad.tiles.enable</td><td>boolean</td><td>False</td><td>Enable FastQC badtiles test</td></tr>
-		</table>
+    <table>
+           <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+           <tr><td>qc.test.sample.fastqc.bad.tiles.enable</td><td>boolean</td><td>False</td><td>Enable FastQC badtiles test</td></tr>
+    </table>
 
-		<p>Example of module &#145;Bad tiles&#146;:</p>
-		<div align="center"><img src="images/qc_fastqc_bad_tiles_300px.png" alt="module bad tiles"/></div>
+    <p>Example of module &#145;Bad tiles&#146;:</p>
+    <div align="center"><img src="images/qc_fastqc_bad_tiles_300px.png" alt="module bad tiles"/></div>
 
-		 <a name="overrepresented"/>
-		<p><b>Enhancement to module &#145;Overrepresented sequences&#146;</b></p>
-	    <p>The module overrepresented sequences in FastQC.
-	      The output of &#145;Overrepresented Sequences&#146; module from FastQC has been improved for sequences not found in contaminant list.
-	      We (optionally) launch a blast on sequences with &#145;no hit&#146; source. The report prints the best hit.
-	    </p>
+     <a name="overrepresented"/>
+    <p><b>Enhancement to module &#145;Overrepresented sequences&#146;</b></p>
+      <p>The module overrepresented sequences in FastQC.
+        The output of &#145;Overrepresented Sequences&#146; module from FastQC has been improved for sequences not found in contaminant list.
+        We (optionally) launch a blast on sequences with &#145;no hit&#146; source. The report prints the best hit.
+      </p>
 
-	    <table>
-	         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-			 <tr><td>qc.conf.fastqc.blast.enable</td><td>boolean</td><td>false</td><td>Enable the blast search if not hit found for an overrepresented sequence</td></tr>
-	         <tr><td>qc.conf.fastqc.blast.path</td><td>string</td><td>/usr/bin/blastn</td><td>Path to blastn, it can run blastn from ncbi-blast+ or blastall</td></tr>
-	         <tr><td>qc.conf.fastqc.blast.db.path</td><td>string</td><td>/home/aozan/ncbi_database_nt/nt</td><td>Path to the database nt (where is located nt.nal file)</td></tr>
-	         <tr><td>qc.conf.fastqc.blast.arguments</td><td>string</td><td>Not set</td><td>Blast parameters. DO NOT use the following blast options: -d (blastn), -db (path to database),
-	         	-outfmt (output type, must be in xml) and -num-threads (number processor)</td></tr>
-		</table>
+      <table>
+           <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+       <tr><td>qc.conf.fastqc.blast.enable</td><td>boolean</td><td>false</td><td>Enable the blast search if not hit found for an overrepresented sequence</td></tr>
+           <tr><td>qc.conf.fastqc.blast.path</td><td>string</td><td>/usr/bin/blastn</td><td>Path to blastn, it can run blastn from ncbi-blast+ or blastall</td></tr>
+           <tr><td>qc.conf.fastqc.blast.db.path</td><td>string</td><td>/home/aozan/ncbi_database_nt/nt</td><td>Path to the database nt (where is located nt.nal file)</td></tr>
+           <tr><td>qc.conf.fastqc.blast.arguments</td><td>string</td><td>Not set</td><td>Blast parameters. DO NOT use the following blast options: -d (blastn), -db (path to database),
+             -outfmt (output type, must be in xml) and -num-threads (number processor)</td></tr>
+    </table>
 
             <p>A Docker container can be use to launch Blast. When the Docker usage is enable for Blasted, Blast2 2.2.26 will be use.</p>
 
-	    <table>
-	         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-	         <tr><td>qc.conf.fastqc.blast.use.docker</td><td>boolean</td><td>false</td><td>Use Docker container to launch Blast</td></tr>
-	         <tr><td>docker.uri</td><td>string</td><td>unix:///var/run/docker.sock</td><td>Docker deamon URI</td></tr>
-		</table>
+      <table>
+           <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+           <tr><td>qc.conf.fastqc.blast.use.docker</td><td>boolean</td><td>false</td><td>Use Docker container to launch Blast</td></tr>
+           <tr><td>docker.uri</td><td>string</td><td>unix:///var/run/docker.sock</td><td>Docker deamon URI</td></tr>
+    </table>
 
-		<p>Example of new module &#145;Overrepresented sequences&#146;: </p>
-	    <div align="center"><img src="images/qc_fastqc_overrepresented_blast_700px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></div>
-	 </subsection>
+    <p>Example of new module &#145;Overrepresented sequences&#146;: </p>
+      <div align="center"><img src="images/qc_fastqc_overrepresented_blast_700px.png" alt="module overrepresented sequences with results from blastn"  border="1"/></div>
+   </subsection>
 
      <a name="contamination"/>
      <subsection name="Sample quality tests from contamination detection">
         <p>Aozan includes a fast Java FastQ Screen implementation. This module maps reads samples on a list of reference genomes for assessing sample contamination
-   		and the ratio of the excepted genome in the sample. It creates a report file with values for each genome.</p>
-   		<p>This step assesses the sample contamination from the FASTQ files. To do this, Aozan uses the
-		<a href="http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/"  target="_blank">FastQ Screen</a> strategy.
-		FastQ Screen allows to screen a library of sequences in Fastq format against a set of sequence databases. </p>
+       and the ratio of the excepted genome in the sample. It creates a report file with values for each genome.</p>
+       <p>This step assesses the sample contamination from the FASTQ files. To do this, Aozan uses the
+    <a href="http://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/"  target="_blank">FastQ Screen</a> strategy.
+    FastQ Screen allows to screen a library of sequences in Fastq format against a set of sequence databases. </p>
 
-		<p>The FastQ Screen code has been rewritten for Aozan and additional values are now calculated.
-		Here we use <a href="http://bowtie-bio.sourceforge.net/manual.shtml"  target="_blank">bowtie</a> to align reads
-		on genomes or on contaminant databases like adapter sequences, PhiX and <a href="http://www.arb-silva.de/no_cache/download/archive/release_111/Exports">ribosomes databases</a>.
-		Moreover it aligns reads samples on the genome defined in the casava sample sheet file.
-		</p>
+    <p>The FastQ Screen code has been rewritten for Aozan and additional values are now calculated.
+    Here we use <a href="http://bowtie-bio.sourceforge.net/manual.shtml"  target="_blank">bowtie</a> to align reads
+    on genomes or on contaminant databases like adapter sequences, PhiX and <a href="http://www.arb-silva.de/no_cache/download/archive/release_111/Exports">ribosomes databases</a>.
+    Moreover it aligns reads samples on the genome defined in the casava sample sheet file.
+    </p>
 
-		<p>To avoid too long computation, the mapping on genomes is limited to a small set of the reads of the FASTQ files.
-		By default 200,000 reads PF (passing illumina filters) are used for each sample (It's enough for estimate the contamination in a sample).</p>
+    <p>To avoid too long computation, the mapping on genomes is limited to a small set of the reads of the FASTQ files.
+    By default 200,000 reads PF (passing illumina filters) are used for each sample (It's enough for estimate the contamination in a sample).</p>
 
-		<p>Aozan reuses <a href="http://outils.genomique.biologie.ens.fr/eoulsan"  target="_blank">Eoulsan</a> to handle alignments and
+    <p>Aozan reuses <a href="http://outils.genomique.biologie.ens.fr/eoulsan"  target="_blank">Eoulsan</a> to handle alignments and
 especially the <a href="http://outils.genomique.biologie.ens.fr/eoulsan/datarepositories.html" target="_blank">repository system for genomes and genomes indexes</a>.</p>
 
-		<p>If no FastQ Screen test property is set, FastQ Screen will not be launch on FASTQ data.</p>
+    <p>If no FastQ Screen test property is set, FastQ Screen will not be launch on FASTQ data.</p>
 
-		<a name="fqsconfiguration"/>
-		<h5>General configuration for launch the mapper</h5>
+    <a name="fqsconfiguration"/>
+    <h5>General configuration for launch the mapper</h5>
 
-		<table>
-		  <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
-		  <tr><td>qc.conf.fastqscreen.genome.aliases.path</td><td>string</td><td>Not set</td> <td>Path to the file which make the correspondence between genome name in casava samplesheet file and the genome name reference used for
-					identified index of bowtie. If a genome's name doesn't exist in the alias file, it is added at the end of the file</td></tr>
-		  <tr><td>qc.conf.fastqscreen.genome.descs.path</td><td>string</td><td>Not set</td><td>Path to the genomes descriptions repository. The genome description file contains some basic informations about the genome
-					like the chromosome length. The repository allow to avoid useless genome sequence parsing once it has been already parsed in a previous run</td></tr>
-		  <tr><td>qc.conf.fastqscreen.genomes.path</td><td>string</td><td>Not set</td><td>Path to the genomes repository</td></tr>
-		  <tr><td>qc.conf.fastqscreen.mapper.indexes.path</td><td>string</td><td>Not set</td><td>Path to the genomes indexes repository</td></tr>
-		  <tr><td>qc.conf.fastqscreen.genomes</td><td>string</td><td>phix, adapters</td><td>List of reference genomes used per default for fastqscreen</td></tr>
-		  <tr><td>qc.conf.fastqscreen.mapper</td><td>string</td><td>bowtie</td><td>In a next version, it will be  possible to choice between bowtie and bowtie2. Per default, call bowtie.</td></tr>
-		  <tr><td>qc.conf.fastqscreen.mapper.arguments</td><td>string</td><td>-l 20 -k 2 --chunkmbs 512</td><td>Arguments of the mapper, in mode paired added &#145;--maxins 1000&#146;</td></tr>
-		  <tr><td>qc.conf.fastqscreen.mapping.skip.control.lane</td><td>boolean</td><td>True</td><td>No of contamination detection on control lane</td></tr>
-		  <tr><td>qc.conf.fastqscreen.mapping.ignore.paired.end.mode</td><td>boolean</td><td>True</td><td>If true for a run paired-end, the detection contamination concerns only the reads R1, same value are assigned for reads R2</td></tr>
-		  <tr><td>qc.conf.fastqscreen.fastq.max.reads.parsed</td><td>integer</td><td>200000</td><td>Number of reads included in temporary FASTQ files create for the mapping.
+    <table>
+      <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
+      <tr><td>qc.conf.fastqscreen.genome.aliases.path</td><td>string</td><td>Not set</td> <td>Path to the file which make the correspondence between genome name in casava samplesheet file and the genome name reference used for
+          identified index of bowtie. If a genome's name doesn't exist in the alias file, it is added at the end of the file</td></tr>
+      <tr><td>qc.conf.fastqscreen.genome.descs.path</td><td>string</td><td>Not set</td><td>Path to the genomes descriptions repository. The genome description file contains some basic informations about the genome
+          like the chromosome length. The repository allow to avoid useless genome sequence parsing once it has been already parsed in a previous run</td></tr>
+      <tr><td>qc.conf.fastqscreen.genomes.path</td><td>string</td><td>Not set</td><td>Path to the genomes repository</td></tr>
+      <tr><td>qc.conf.fastqscreen.mapper.indexes.path</td><td>string</td><td>Not set</td><td>Path to the genomes indexes repository</td></tr>
+      <tr><td>qc.conf.fastqscreen.genomes</td><td>string</td><td>phix, adapters</td><td>List of reference genomes used per default for fastqscreen</td></tr>
+      <tr><td>qc.conf.fastqscreen.mapper</td><td>string</td><td>bowtie</td><td>In a next version, it will be  possible to choice between bowtie and bowtie2. Per default, call bowtie.</td></tr>
+      <tr><td>qc.conf.fastqscreen.mapper.arguments</td><td>string</td><td>-l 20 -k 2 --chunkmbs 512</td><td>Arguments of the mapper, in mode paired added &#145;--maxins 1000&#146;</td></tr>
+      <tr><td>qc.conf.fastqscreen.mapping.skip.control.lane</td><td>boolean</td><td>True</td><td>No of contamination detection on control lane</td></tr>
+      <tr><td>qc.conf.fastqscreen.mapping.ignore.paired.end.mode</td><td>boolean</td><td>True</td><td>If true for a run paired-end, the detection contamination concerns only the reads R1, same value are assigned for reads R2</td></tr>
+      <tr><td>qc.conf.fastqscreen.fastq.max.reads.parsed</td><td>integer</td><td>200000</td><td>Number of reads included in temporary FASTQ files create for the mapping.
                                         Only the reads with passing filtered illumina are selected. If value is set to -1, all reads in the FASTQ files will be used</td></tr>
-		  <tr><td>qc.conf.fastqscreen.fastq.reads.pf.used</td> <td>integer</td> <td>30000000</td> <td>The temporary FASTQ files are created by parsing at most this maximum number of reads in the FASTQ file source.
-	                                If value is set to -1, it browses all the entries of the FASTQ files</td></tr>
+      <tr><td>qc.conf.fastqscreen.fastq.reads.pf.used</td> <td>integer</td> <td>30000000</td> <td>The temporary FASTQ files are created by parsing at most this maximum number of reads in the FASTQ file source.
+                                  If value is set to -1, it browses all the entries of the FASTQ files</td></tr>
                   <tr><td>qc.conf.fastqscreen.xsl.file</td><td>string</td><td>Not set</td><td>Path to a specific stylesheet file to edit the fastqscreen report html, instead of the file per default</td></tr>
-		  <tr><td>qc.conf.fastqscreen.process.undetermined.samples</td><td>boolean</td><td>false</td><td>Run FastqScreen on undetermined indices samples on all genomes available for the run</td></tr>
-		</table>
+      <tr><td>qc.conf.fastqscreen.process.undetermined.samples</td><td>boolean</td><td>false</td><td>Run FastqScreen on undetermined indices samples on all genomes available for the run</td></tr>
+    </table>
 
-		<a name="fqstests"/>
-		<H5>Configuration tests</H5>
+    <a name="fqstests"/>
+    <H5>Configuration tests</H5>
 
-		<table>
-			<tr>
-				<th>Aozan property</th>
-				<th>Type</th>
-				<th>Default value</th>
-				<th>Description</th>
-			</tr>
-			<tr>
-				<td>qc.test.sample.fastqscreen.mapped.except.ref.genome.percent.enable</td>
-				<td>boolean</td>
-				<td>False</td>
-				<td>The report of quality control contains a column with the percent
-				of reads mapped at least one reference genomes, except on genome sample test</td>
-			</tr>
-			<tr>
-				<td>qc.test.sample.fastqscreen.mapped.except.ref.genome.percent.interval</td>
-				<td>double interval</td>
-				<td>[0, 0.1]</td>
-				<td>Interval of valid values</td>
-			</tr>
-			<tr>
-				<td>qc.test.sample.fastqscreen.mapped.percent.enable</td>
-				<td>boolean</td>
-				<td>False</td>
-				<td>The report of quality control contains a column with the percent of reads mapped for each reference genome test</td>
-			</tr>
-			<tr>
-				<td>qc.test.sample.fastqscreen.mapped.percent.interval</td>
-				<td>double interval</td>
-				<td>[0, 0.1]</td>
-				<td>Interval of valid values. If the genome is this of sample, the interval is reverse (ex: [0.9, 1])</td>
-			</tr>
+    <table>
+      <tr>
+        <th>Aozan property</th>
+        <th>Type</th>
+        <th>Default value</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>qc.test.sample.fastqscreen.mapped.except.ref.genome.percent.enable</td>
+        <td>boolean</td>
+        <td>False</td>
+        <td>The report of quality control contains a column with the percent
+        of reads mapped at least one reference genomes, except on genome sample test</td>
+      </tr>
+      <tr>
+        <td>qc.test.sample.fastqscreen.mapped.except.ref.genome.percent.interval</td>
+        <td>double interval</td>
+        <td>[0, 0.1]</td>
+        <td>Interval of valid values</td>
+      </tr>
+      <tr>
+        <td>qc.test.sample.fastqscreen.mapped.percent.enable</td>
+        <td>boolean</td>
+        <td>False</td>
+        <td>The report of quality control contains a column with the percent of reads mapped for each reference genome test</td>
+      </tr>
+      <tr>
+        <td>qc.test.sample.fastqscreen.mapped.percent.interval</td>
+        <td>double interval</td>
+        <td>[0, 0.1]</td>
+        <td>Interval of valid values. If the genome is this of sample, the interval is reverse (ex: [0.9, 1])</td>
+      </tr>
 
-			<tr>
-				<td>qc.test.sample.fastqscreen.report.enable</td>
-				<td>boolean</td>
-				<td>False</td>
-				<td>The report of quality control contains a column with link to report fastqscreen file,
-					save in quality control directory</td>
-			</tr>
-		</table>
-		<p>The explanation to construct intervals is <a href="#syntax_interval">here.</a></p>
+      <tr>
+        <td>qc.test.sample.fastqscreen.report.enable</td>
+        <td>boolean</td>
+        <td>False</td>
+        <td>The report of quality control contains a column with link to report fastqscreen file,
+          save in quality control directory</td>
+      </tr>
+    </table>
+    <p>The explanation to construct intervals is <a href="#syntax_interval">here.</a></p>
 
         <p>The last column contains a link to the report html fastqscreen. An example of a report html of quality control with major values of fastqscreen :
-			<div align="center"><img src="images/qc_sample_fqs_500px.png" alt="example on report with fastqscreen data"/></div>
-		</p>
+      <div align="center"><img src="images/qc_sample_fqs_500px.png" alt="example on report with fastqscreen data"/></div>
+    </p>
 
-		<p>An example of a report html fastqscreen with four reference genomes and the genome sample (mm10) :
-			<div align="center"><img src="images/qc_report_html_fastqscreen_500px.png" alt="example report html fastqscreen"/></div>
-		</p>
-		<p>The report exists in csv format.</p>
+    <p>An example of a report html fastqscreen with four reference genomes and the genome sample (mm10) :
+      <div align="center"><img src="images/qc_report_html_fastqscreen_500px.png" alt="example report html fastqscreen"/></div>
+    </p>
+    <p>The report exists in csv format.</p>
 
-		<p>List of values for each genome :
-		<ul>
-			<li><b>%Mapped</b> : percent of reads which are mapped on this genome.
-				It must be low for the genome reference of contamination and high for the genome of the sample).</li>
-			<li><b>%Unmapped</b> : percent of reads which are not mapped on this genome.</li>
-			<li><b>%One_hit_one_library</b> : percent of reads which are mapped with one hit on one genome.</li>
-			<li><b>%Multiple_hits_one_library</b> : percent of reads which are multi-mapped on this genome.</li>
-			<li><b>%One_hit_multiple_libraries</b> : percent of reads which are mapped with one hit on several genomes.</li>
-			<li><b>%Multiple_hits_multiple_libraries</b> : percent of reads which are multi-mapped on several genomes.</li>
-		</ul></p>
-	<p>NB : The genome of the sample serves as positive control.
-	</p>
+    <p>List of values for each genome :
+    <ul>
+      <li><b>%Mapped</b> : percent of reads which are mapped on this genome.
+        It must be low for the genome reference of contamination and high for the genome of the sample).</li>
+      <li><b>%Unmapped</b> : percent of reads which are not mapped on this genome.</li>
+      <li><b>%One_hit_one_library</b> : percent of reads which are mapped with one hit on one genome.</li>
+      <li><b>%Multiple_hits_one_library</b> : percent of reads which are multi-mapped on this genome.</li>
+      <li><b>%One_hit_multiple_libraries</b> : percent of reads which are mapped with one hit on several genomes.</li>
+      <li><b>%Multiple_hits_multiple_libraries</b> : percent of reads which are multi-mapped on several genomes.</li>
+    </ul></p>
+  <p>NB : The genome of the sample serves as positive control.
+  </p>
 
-	<p>List of values for all genomes :
-	<ul>
-		<li><b>% reads_unmapped_none_genome</b> : percent of reads which are not mapped on none genomes tested.
-		It must be high if the genome of the sample isn't used and low if it is used).</li>
-		<li><b>% reads_mapped_at_least_one_genome</b> : percent of reads which are mapped on at least one genome.</li>
-		<li><b>% reads_mapped_except_genome_sample</b> : percent of reads which are mapped on the genomes references of contamination,
-		the genome of the sample is excluded.</li>
-		<li> X reads mapped / 200 000 reads processed.</li>
-	</ul>
-	</p>
+  <p>List of values for all genomes :
+  <ul>
+    <li><b>% reads_unmapped_none_genome</b> : percent of reads which are not mapped on none genomes tested.
+    It must be high if the genome of the sample isn't used and low if it is used).</li>
+    <li><b>% reads_mapped_at_least_one_genome</b> : percent of reads which are mapped on at least one genome.</li>
+    <li><b>% reads_mapped_except_genome_sample</b> : percent of reads which are mapped on the genomes references of contamination,
+    the genome of the sample is excluded.</li>
+    <li> X reads mapped / 200 000 reads processed.</li>
+  </ul>
+  </p>
     </subsection>
 
 
-	<a name="recoveryclusters"/>
-	<subsection name="Analysis undetermined clusters from demultiplexing.">
+  <a name="recoveryclusters"/>
+  <subsection name="Analysis undetermined clusters from demultiplexing.">
 
-		<p>The undetermined FASTQ files created by the demultiplexing step can be analyzed using 3 modules:</p>
-		<ul>
-		  <li>The recoverable sample clusters module can suggest for each indices, the sample(s) and the
-		  number of clusters that can be recovered using a demultiplexing step with one more mismatch that the number
-		  of mismatches has been used in the demultiplexing step. This module create two files (one for the lanes,
-		  the other for the samples) that display for each index the potential sample(s) and the number of
-		  recoverable clusters found.</li>
+    <p>The undetermined FASTQ files created by the demultiplexing step can be analyzed using 3 modules:</p>
+    <ul>
+      <li>The recoverable sample clusters module can suggest for each indices, the sample(s) and the
+      number of clusters that can be recovered using a demultiplexing step with one more mismatch that the number
+      of mismatches has been used in the demultiplexing step. This module create two files (one for the lanes,
+      the other for the samples) that display for each index the potential sample(s) and the number of
+      recoverable clusters found.</li>
 
-		  <li>The FastQC module. Use the "<code>qc.conf.fastqc.process.undetermined.samples</code>" property to enable this module.</li>
-		  <li>The FastqScreen module. Use the "<code>qc.conf.fastqscreen.process.undetermined.samples</code>" property to enable this module.</li>
-		</ul>
+      <li>The FastQC module. Use the "<code>qc.conf.fastqc.process.undetermined.samples</code>" property to enable this module.</li>
+      <li>The FastqScreen module. Use the "<code>qc.conf.fastqscreen.process.undetermined.samples</code>" property to enable this module.</li>
+    </ul>
 
-		<table>
-		 <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+    <table>
+     <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
          <tr><td>qc.test.sample.recoverable.pf.cluster.count.enable</td><td>boolean</td><td>False</td>
              <td>Compute the passing filter clusters that can be recovered from the undetermined FASTQ files with one more mismatch that the number of mismatches used in demultiplexing step (the maximum number of mismatches is 2)</td></tr>
          <tr><td>qc.test.sample.recoverable.pf.cluster.count.interval</td><td>interval</td><td>False</td><td>Interval for valid values for the recoverablepfclusterssamples test</td></tr>
          <tr><td>qc.test.sample.cluster.recovery.report.enable</td><td>boolean</td><td>False</td><td>Link to the HTML recoverable clusters report</td></tr>
-		</table>
-		
-		<p>The two reports are generated in CSV and HTML formats:
-		  <ul>
-			<li>Example of a recoverable clusters lanes report:</li>
-			<br/>
-			<div align="center">
-	       		<img src="images/qc_lane_undetermined_report.png" alt="example on lane recovery cluster report" border="1"/>
-	       </div>
+    </table>
 
-		   <br/>
-	       <li>Example of a recoverable clusters sample report:</li>
-	       <br/>
-			<div align="center">
-	       		<img src="images/qc_sample_recovery_cluster_report.png" alt="example on sample recovery cluster report" border="1"/>
-	       </div>
+    <p>The two reports are generated in CSV and HTML formats:
+      <ul>
+      <li>Example of a recoverable clusters lanes report:</li>
+      <br/>
+      <div align="center">
+             <img src="images/qc_lane_undetermined_report.png" alt="example on lane recovery cluster report" border="1"/>
+         </div>
 
-	      </ul>
+       <br/>
+         <li>Example of a recoverable clusters sample report:</li>
+         <br/>
+      <div align="center">
+             <img src="images/qc_sample_recovery_cluster_report.png" alt="example on sample recovery cluster report" border="1"/>
+         </div>
+
+        </ul>
        </p>
     </subsection>
 

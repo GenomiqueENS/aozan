@@ -43,20 +43,20 @@
 
      <h4>Parameters for collect data to lanes quality tests</h4>
        <table>
-       		<tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
-       		<tr>
-       			<td>qc.conf.read.xml.collector.used</td>
-       			<td>boolean</td>
-       			<td>False</td>
-       			<td>Use XML files to collect quality lane data instead of InterOp binary files
-	       			(it is possible to use files read1.xml available with version 1.17.20 RTA and previous)</td>
-       		</tr>
-       		<tr>
-       			<td>qc.conf.cluster.density.ratio</td>
-       			<td>integer</td>
-       			<td>0.3472222</td>
-       			<td>Value necessary for compute the cluster density in the lane quality tests</td>
-       		</tr>
+           <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
+           <tr>
+             <td>qc.conf.read.xml.collector.used</td>
+             <td>boolean</td>
+             <td>False</td>
+             <td>Use XML files to collect quality lane data instead of InterOp binary files
+               (it is possible to use files read1.xml available with version 1.17.20 RTA and previous)</td>
+           </tr>
+           <tr>
+             <td>qc.conf.cluster.density.ratio</td>
+             <td>integer</td>
+             <td>0.3472222</td>
+             <td>Value necessary for compute the cluster density in the lane quality tests</td>
+           </tr>
        </table>
 
        <h4>Configuration lanes quality tests</h4>
@@ -90,14 +90,14 @@
          <tr><td>qc.test.lane.phasing.prephasing.percent.phasing.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of phasing</td></tr>
          <tr><td>qc.test.lane.phasing.prephasing.percent.prephasing.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of prephasing</td></tr>
          <tr><td>qc.test.lane.q30.percent.enable</td><td>boolean</td><td>False</td><td>Enable lane Q30 percent test</td></tr>
-         <tr><td>qc.test.lane.q30.percent.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of lane Q30 percent</td></tr>       
+         <tr><td>qc.test.lane.q30.percent.interval</td><td>double interval</td><td>False</td><td>Interval for valid values of lane Q30 percent</td></tr>
 
- 
+
        </table>
 
        <p>An example of table built with lanes quality tests.</p>
        <div align="center">
-       		<img src="images/qc_lane_test_800px.png" alt="example on report with run data" border="1"/>
+           <img src="images/qc_lane_test_800px.png" alt="example on report with run data" border="1"/>
        </div>
 
 

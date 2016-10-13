@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<!--
 /*
  *                  Aozan development code
  *
  * This code may be freely distributed and modified under the
- * terms of the GNU General Public License version 3 or later 
- * and CeCILL. This should be distributed with the code. If you 
+ * terms of the GNU General Public License version 3 or later
+ * and CeCILL. This should be distributed with the code. If you
  * do not have a copy, see:
  *
  *      http://www.gnu.org/licenses/gpl-3.0-standalone.html
@@ -25,14 +25,14 @@
 -->
 <document>
 
-	<properties>
-		<title>Recompression</title>
-		<author email="firmo@biologie.ens.fr">Cyril Firmo</author>
-	</properties>
+  <properties>
+    <title>Recompression</title>
+    <author email="firmo@biologie.ens.fr">Cyril Firmo</author>
+  </properties>
 
 
 
-	<body>
+  <body>
 
 <section name="Recompression step">
 
@@ -40,24 +40,24 @@
 
        <h4>Configuration parameters</h4>
 
-	 <p>The next table contains the parameters of this step.</p>
+   <p>The next table contains the parameters of this step.</p>
 
      <table>
-	   <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-	   <tr><td>recompress.step</td><td>boolean</td><td>False</td><td>Enable the step</td></tr>
-	   <tr><td>recompress.delete.original.fastq.files</td><td>boolean</td><td>False</td><td>Delete original files after recompression.</td></tr>
-	   <tr><td>recompress.compression.level</td><td>int</td><td>9</td><td>Set the compression level of the output bzip2 files. (between 1 and 9).</td></tr>
-	   <tr><td>recompress.compression</td><td>string</td><td>bzip2</td><td>Set the compression type. (bzip2 only).</td></tr>
-	   <tr><td>recompress.threads</td><td>integer</td><td>Number of computer cores</td><td>Number of threads to use for recompression</td></tr>
+     <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+     <tr><td>recompress.step</td><td>boolean</td><td>False</td><td>Enable the step</td></tr>
+     <tr><td>recompress.delete.original.fastq.files</td><td>boolean</td><td>False</td><td>Delete original files after recompression.</td></tr>
+     <tr><td>recompress.compression.level</td><td>int</td><td>9</td><td>Set the compression level of the output bzip2 files. (between 1 and 9).</td></tr>
+     <tr><td>recompress.compression</td><td>string</td><td>bzip2</td><td>Set the compression type. (bzip2 only).</td></tr>
+     <tr><td>recompress.threads</td><td>integer</td><td>Number of computer cores</td><td>Number of threads to use for recompression</td></tr>
     </table>
 
      <p>An example of email sent at the end of recompression step.</p>
        <div align="center">
-       		<img src="images/mail_recompress.png" alt="example of mail sent at the end on recompression" border="1"/>
+           <img src="images/mail_recompress.png" alt="example of mail sent at the end on recompression" border="1"/>
        </div>
 
    </section>
 
-	</body>
+  </body>
 
 </document>

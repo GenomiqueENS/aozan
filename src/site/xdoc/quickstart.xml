@@ -126,17 +126,17 @@ $ sudo apt-get install openjdk-7-jre-headless rsync
 
         <p>On CentOS, you can install Bcl2fastq using the following commands:</p>
         <source>
-$ cd /tmp 
+$ cd /tmp
 $ wget http://support.illumina.com/content/dam/illumina-support/documents/downloads/software/bcl2fastq/bcl2fastq2-v2-18-0-12-linux-x86-64.zip
 
 # Install
 $ unzip bcl2fastq2-*.zip
 $ yum -y --nogpgcheck localinstall /tmp/bcl2fastq2-*.rpm
 
-# Patch a punctual error to search css file for create the final report html 
-$ cd /usr/local/bin 
+# Patch a punctual error to search css file for create the final report html
+$ cd /usr/local/bin
 $ ln -s ../share/
-			
+
 # Install requiered dependencies
 $ yum install -y zip.x86_64
 </source>
@@ -167,8 +167,8 @@ $ sudo apt-get install ncbi-blast+</source>
         <source>
 $ wget ftp://ftp.ncbi.nlm.nih.gov/blast/db/nt.??.tar.gz*
 </source>
-	<p>Unzip all files, the first nt.00.tar.gz contains the file nt.nal.</p>
-	<p>Use the perl script to update the database, you can consult <a href="http://www.ncbi.nlm.nih.gov/books/NBK1762/" target="_blank">the NCBI documentation.</a></p>
+  <p>Unzip all files, the first nt.00.tar.gz contains the file nt.nal.</p>
+  <p>Use the perl script to update the database, you can consult <a href="http://www.ncbi.nlm.nih.gov/books/NBK1762/" target="_blank">the NCBI documentation.</a></p>
       </subsection>
 
     </section>
@@ -343,24 +343,24 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
    <tr><td>tmp.path</td><td>/tmp</td><td>Temporary directory</td></tr>
  </table>
 
-	<p>(*) The directory specified in field aozan.var.path contains the following files.
-	Aozan allows to process several runs at the same time. At the end of a step, it adds the run id of that run that has been processed in the step log file.
-		<ul>
-			<li><b>first_base_report.done</b> : list of the run ids processed by the first base report step;</li>
-			<li><b>hiseq.done</b> : list of the run ids processed by the end run discovering step;</li>
-			<li><b>hiseq.deny</b> : list of the run ids to not process (user created file);</li>
-			<li><b>sync.done</b> : list of the run ids processed by the synchronization step;</li>
-			<li><b>sync.deny</b> : list of the run ids processed by the synchronization step;</li>
-			<li><b>recompress.done</b> : list of the run ids processed by the recompression step;</li>
-			<li><b>demux.done</b> : list of the run ids processed by the demuliplexing step;</li>
-			<li><b>qc.done</b> : list of the run ids processed by the quality control step;</li>
-		</ul>
-		The following files can also be created to set priority or disable specific runs.
-		<ul>
-			<li><b>runs.priority</b> : list of the run ids processed in priority by aozan when available;</li>
-			<li><b>[step].deny</b> : list of the run ids that won't be processed by a step;</li>
-		</ul>
-	</p>
+  <p>(*) The directory specified in field aozan.var.path contains the following files.
+  Aozan allows to process several runs at the same time. At the end of a step, it adds the run id of that run that has been processed in the step log file.
+    <ul>
+      <li><b>first_base_report.done</b> : list of the run ids processed by the first base report step;</li>
+      <li><b>hiseq.done</b> : list of the run ids processed by the end run discovering step;</li>
+      <li><b>hiseq.deny</b> : list of the run ids to not process (user created file);</li>
+      <li><b>sync.done</b> : list of the run ids processed by the synchronization step;</li>
+      <li><b>sync.deny</b> : list of the run ids processed by the synchronization step;</li>
+      <li><b>recompress.done</b> : list of the run ids processed by the recompression step;</li>
+      <li><b>demux.done</b> : list of the run ids processed by the demuliplexing step;</li>
+      <li><b>qc.done</b> : list of the run ids processed by the quality control step;</li>
+    </ul>
+    The following files can also be created to set priority or disable specific runs.
+    <ul>
+      <li><b>runs.priority</b> : list of the run ids processed in priority by aozan when available;</li>
+      <li><b>[step].deny</b> : list of the run ids that won't be processed by a step;</li>
+    </ul>
+  </p>
 
     </section>
 
@@ -375,19 +375,19 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
       <subsection name="General configuration">
 
      <table>
-	   <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-	   <tr><td>include</td><td>string</td><td>No set</td><td>Load the configuration entries from another configuration file path. The values
-	   loaded from this new configuration file override existing values</td></tr>
-	   <tr><td>aozan.enable</td><td>boolean</td><td>False</td><td>Enable Aozan</td></tr>
-	   <tr><td>aozan.log.level</td><td>string</td><td>INFO</td><td>Log level (ALL, FINEST, FINER, FINE, CONFIG, INFO, WARNING, SEVERE, OFF)</td></tr>
-	   <tr><td>aozan.debug</td><td>boolean</td><td>False</td><td>Enable debug mode</td></tr>
-	   <tr><td>lock.file</td><td>string</td><td>/var/lock/aozan.lock</td><td>Aozan lock file path. This file that prevent two instances of Aozan running at the same time</td></tr>
-	   <tr><td>index.html.template</td><td>string</td><td>Not set</td><td>HTML page template that describe a run. If not set, the default template included in the aozan jar file will be used</td></tr>
-	   <tr><td>reports.url</td><td>string</td><td>Not set</td><td>Run reports URL</td></tr>
-	   <tr><td>hiseq.critical.min.space</td><td>integer</td><td>1099511627776</td><td>Threshold before sending a email at each Aozan start if not enough space is available on HiSeq output disk, the value corresponds 1 Tb in bytes</td></tr>
-	   <tr><td>read.only.output.files</td><td>boolean</td><td>True</td><td>Set rights of output files to read only</td></tr>
+     <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+     <tr><td>include</td><td>string</td><td>No set</td><td>Load the configuration entries from another configuration file path. The values
+     loaded from this new configuration file override existing values</td></tr>
+     <tr><td>aozan.enable</td><td>boolean</td><td>False</td><td>Enable Aozan</td></tr>
+     <tr><td>aozan.log.level</td><td>string</td><td>INFO</td><td>Log level (ALL, FINEST, FINER, FINE, CONFIG, INFO, WARNING, SEVERE, OFF)</td></tr>
+     <tr><td>aozan.debug</td><td>boolean</td><td>False</td><td>Enable debug mode</td></tr>
+     <tr><td>lock.file</td><td>string</td><td>/var/lock/aozan.lock</td><td>Aozan lock file path. This file that prevent two instances of Aozan running at the same time</td></tr>
+     <tr><td>index.html.template</td><td>string</td><td>Not set</td><td>HTML page template that describe a run. If not set, the default template included in the aozan jar file will be used</td></tr>
+     <tr><td>reports.url</td><td>string</td><td>Not set</td><td>Run reports URL</td></tr>
+     <tr><td>hiseq.critical.min.space</td><td>integer</td><td>1099511627776</td><td>Threshold before sending a email at each Aozan start if not enough space is available on HiSeq output disk, the value corresponds 1 Tb in bytes</td></tr>
+     <tr><td>read.only.output.files</td><td>boolean</td><td>True</td><td>Set rights of output files to read only</td></tr>
 
-	 </table>
+   </table>
 
       </subsection>
 
@@ -398,14 +398,14 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
          Aozan currently only support sending email using SMTP without authentification and encryption.</p>
 
        <table>
-	     <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-	     <tr><td>send.mail</td><td>boolean</td><td>False</td><td>Enable sending email</td></tr>
-	     <tr><td>smtp.server</td><td>string</td><td>Not set</td><td>SMTP server address</td></tr>
-	     <tr><td>mail.from</td><td>string</td><td>Not set</td><td>Email of the sender</td></tr>
-	     <tr><td>mail.to</td><td>string</td><td>Not set</td><td>Email recipient</td></tr>
-	     <tr><td>mail.error.to</td><td>string</td><td>Not set</td><td>Email recipient when an error occurs during Aozan</td></tr>
-	     <tr><td>mail.header</td><td>string</td><td>THIS IS AN AUTOMATED MESSAGE.\n\n</td><td>Email header</td></tr>
-	     <tr><td>mail.footer</td><td>string</td><td>\n\nThe Aozan team.\n</td><td>Email footer</td></tr>
+       <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+       <tr><td>send.mail</td><td>boolean</td><td>False</td><td>Enable sending email</td></tr>
+       <tr><td>smtp.server</td><td>string</td><td>Not set</td><td>SMTP server address</td></tr>
+       <tr><td>mail.from</td><td>string</td><td>Not set</td><td>Email of the sender</td></tr>
+       <tr><td>mail.to</td><td>string</td><td>Not set</td><td>Email recipient</td></tr>
+       <tr><td>mail.error.to</td><td>string</td><td>Not set</td><td>Email recipient when an error occurs during Aozan</td></tr>
+       <tr><td>mail.header</td><td>string</td><td>THIS IS AN AUTOMATED MESSAGE.\n\n</td><td>Email header</td></tr>
+       <tr><td>mail.footer</td><td>string</td><td>\n\nThe Aozan team.\n</td><td>Email footer</td></tr>
        </table>
 
       </subsection>
