@@ -102,13 +102,18 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
         final Sequence seq = seqFile.next();
 
+        boolean processed = false;
+
         for (final QCModule module : modules) {
 
           if (ignoreFiltered && module.ignoreFilteredSequences()) {
             continue;
           }
-          this.processedReads++;
+          processed = true;
           module.processSequence(seq);
+        }
+        if (processed) {
+          this.processedReads++;
         }
       }
 
