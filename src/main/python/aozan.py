@@ -118,9 +118,13 @@ def load_pid_in_lock_file(lock_file_path):
     """
 
     f = open(lock_file_path, 'r')
-    pid = int(f.readline().strip())
+    line = f.readline().strip()
     f.close()
-    return pid
+
+    try:
+        return int(line)
+    except ValueError:
+        return -1
 
 
 def welcome(conf):
