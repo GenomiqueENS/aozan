@@ -834,5 +834,23 @@
                                  The change of the rights of output files to read only can now be disabled using the "read.only.output.files" configuration property.
 			</action>
 		</release>
+
+		<release version="2.0-rc20" description="Aozan 2.0-rc20 release"  date="TDB">
+			<action dev="jourdren" type="fix">
+                                 Fix some Java 8 compilation errors.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 The sample id in the FASTQ filenames was not corretly sometimes guessed.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 For large FASTQ files, the FastQC report was not generated.
+			</action>
+			<action dev="jourdren" type="update">
+                                 The default amount of memory allocated by Aozan is now 4096 instead of 2048MiB.
+			</action>
+			<action dev="jourdren" type="update">
+                                 Update documentation.
+			</action>
+		</release>
 	</body>
 </document>
