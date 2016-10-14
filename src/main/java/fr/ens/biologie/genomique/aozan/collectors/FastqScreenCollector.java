@@ -125,7 +125,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     if (fastqSample.getFastqFiles() == null
         || fastqSample.getFastqFiles().isEmpty()) {
 
-      throw new AozanException("No fastq files defined for fastqSample "
+      throw new AozanException("No FASTQ file defined for the fastqSample: "
           + fastqSample.getKeyFastqSample());
     }
 

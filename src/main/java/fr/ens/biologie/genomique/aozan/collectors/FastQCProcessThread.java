@@ -133,8 +133,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
    * Process results after the end of the thread.
    * @throws AozanException if an error occurs while generate FastQC reports
    */
-  @Override
-  protected void processResults() throws AozanException {
+  private void processResults() throws AozanException {
 
     // Set the prefix for the run data entries
     final String prefix = "fastqc" + getFastqSample().getRundataPrefix();

@@ -26,6 +26,7 @@ package fr.ens.biologie.genomique.aozan.collectors;
 import java.io.File;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
+import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
@@ -88,8 +89,13 @@ public class FastQCCollector extends AbstractFastqCollector {
       final FastqSample fastqSample, final File reportDir, final boolean runPE)
       throws AozanException {
 
-    if (fastqSample.getFastqFiles().isEmpty()) {
-      return null;
+    Common.getLogger().info("Process sample for FastQC: " + fastqSample.toString());
+
+    if (fastqSample.getFastqFiles() == null
+        || fastqSample.getFastqFiles().isEmpty()) {
+
+      throw new AozanException("No FASTQ file defined for the fastqSample: "
+          + fastqSample.getKeyFastqSample());
     }
 
     // Create the thread object

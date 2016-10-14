@@ -110,8 +110,12 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
         + getFastqSample().getPrefixReport() + " report fastqscreen");
   }
 
-  @Override
-  protected void processResults() throws AozanException {
+  /**
+   * Process results after the end of the thread.
+   * @throws AozanException if an error occurs while generate FastQ Screen
+   *           reports
+   */
+  private void processResults() throws AozanException {
 
     final File read1 = getFastqSample().getSubsetFastqFile();
     final String sampleDescription = getFastqSample().getKeyFastqSample();
