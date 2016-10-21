@@ -178,7 +178,7 @@ public class FastqScreen {
 
     this.tmpDir = conf.getFile(QC.TMP_DIR);
 
-    this.confThreads = conf.getInt(Settings.QC_CONF_THREADS_KEY, 1);
+    this.confThreads = conf.getInt(Settings.QC_CONF_THREADS_KEY, -1);
 
     // Fields required to initialize fastqScreenGenomes
     this.aliasGenomesFile =
