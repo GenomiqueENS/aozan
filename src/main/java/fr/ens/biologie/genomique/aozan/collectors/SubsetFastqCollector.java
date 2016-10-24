@@ -200,9 +200,8 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
 
     // Retrieve number of passing filter Illumina reads for this fastq
     // files
-    final String prefix = "demux.lane"
-        + fastqSample.getLane() + ".sample." + fastqSample.getSampleName()
-        + ".read" + fastqSample.getRead();
+    final String prefix = "demux.sample"
+        + fastqSample.getSampleId() + ".read" + fastqSample.getRead();
 
     LOGGER.fine(COLLECTOR_NAME.toUpperCase()
         + " collector found: " + prefix + ".pf.cluster.count="

@@ -97,8 +97,14 @@ class ConversionStatsCollector extends DemultiplexingCollector {
               + demuxSummaryPath);
     }
 
+    collect(data, new File(demuxSummaryPath));
+  }
+
+  void collect(final RunData data, final File demuxSummaryFile)
+      throws AozanException {
+
     // Create the input stream
-    try (InputStream is = new FileInputStream(demuxSummaryPath)) {
+    try (InputStream is = new FileInputStream(demuxSummaryFile)) {
 
       final DocumentBuilder dBuilder =
           DocumentBuilderFactory.newInstance().newDocumentBuilder();
