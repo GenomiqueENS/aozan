@@ -425,7 +425,7 @@ def create_bcl2fastq_command_line(run_id, command_path, input_run_data_path, fas
     args.extend(['--barcode-mismatches', nb_mismatch])
 
     # Common parameter, setting per default
-    args.extend(['--input-dir', '\'' + input_run_data_path + '\'/Data/Intensities/BaseCalls'])
+    args.extend(['--input-dir', '\'' + input_run_data_path + '/Data/Intensities/BaseCalls\''])
     args.extend(['--output-dir', '\'' + fastq_output_dir + '\''])
 
     if common.is_conf_value_equals_true(BCL2FASTQ_WITH_FAILED_READS_KEY, conf):
@@ -433,7 +433,7 @@ def create_bcl2fastq_command_line(run_id, command_path, input_run_data_path, fas
 
     # Specific parameter
     args.extend(['--runfolder-dir', '\'' + input_run_data_path + '\''])
-    args.extend(['--interop-dir', '\'' + fastq_output_dir + '\'/InterOp'])
+    args.extend(['--interop-dir', '\'' + fastq_output_dir + '/InterOp\''])
     args.extend(['--min-log-level', 'TRACE'])
     # args.extend(['--stats-dir', fastq_output_dir + '/Stats'])
     # args.extend(['--reports-dir', fastq_output_dir + '/Reports'])
@@ -454,8 +454,8 @@ def create_bcl2fastq_command_line(run_id, command_path, input_run_data_path, fas
         args.extends(additional_args.split(' '))
 
     # Retrieve output in file
-    args.extend(['>', '\'' + tmp_path + '\'/bcl2fastq_output_' + run_id + '.out'])
-    args.extend(['2>', '\'' + tmp_path + '\'/bcl2fastq_output_' + run_id + '.err'])
+    args.extend(['>', '\'' + tmp_path + '/bcl2fastq_output_' + run_id + '.out\''])
+    args.extend(['2>', '\'' + tmp_path + '/bcl2fastq_output_' + run_id + '.err\''])
 
     return " ".join(args)
 
@@ -659,13 +659,13 @@ def archive_samplesheet(run_id, original_samplesheet_path, samplesheet_csv_path,
 
         cmd = 'cp \'' + original_samplesheet_path + '\' \'' + conf[TMP_PATH_KEY] + \
               '\' && cd \'' + conf[TMP_PATH_KEY] + \
-              '\' && zip -q \'' + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] + '\'/\'' + conf[
-                  BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip\' \'' + \
+              '\' && zip -q \'' + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] + '\'/\'' + \
+              conf[BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip\' \'' + \
               os.path.basename(samplesheet_csv_path) + '\' \'' + os.path.basename(original_samplesheet_path) + '\''
     else:
         cmd = 'cd \'' + conf[TMP_PATH_KEY] + \
-              '\' && zip -q \'' + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] + '\'/\'' + conf[
-                  BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip\' \'' + \
+              '\' && zip -q \'' + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] + '\'/\'' + \
+              conf[BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip\' \'' + \
               os.path.basename(samplesheet_csv_path) + '\''
 
     common.log("INFO", "exec: " + cmd, conf)
