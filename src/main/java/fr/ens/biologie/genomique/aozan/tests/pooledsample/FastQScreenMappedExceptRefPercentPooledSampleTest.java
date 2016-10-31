@@ -43,7 +43,8 @@ public class FastQScreenMappedExceptRefPercentPooledSampleTest
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
-    return ImmutableList.of(FastqScreenCollector.COLLECTOR_NAME);
+    return ImmutableList.of(FastqScreenCollector.COLLECTOR_NAME,
+        FastqScreenCollector.COLLECTOR_NAME);
   }
 
   @Override

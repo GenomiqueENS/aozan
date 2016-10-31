@@ -120,34 +120,120 @@ public class DemultiplexingCollector implements Collector {
     // Init collector
     subCollector.configure(qc, this.conf);
 
-    // Collect data
-    subCollector.collect(data);
+    // Create a temporary RunData object
+    final RunData tmp = new RunData();
 
-    // Add the new keys here
-    addNewKeys(data);
+    // Put in the temporary RunData object the required keys
+    tmp.put("run.info.read.count", data.getReadCount());
+    for (int read = 1; read <= data.getReadCount(); read++) {
+      tmp.put("run.info.read" + read + ".indexed", data.isReadIndexed(read));
+    }
+
+    // Collect data
+    subCollector.collect(tmp);
+
+    // Convert temporary RunData
+    convert(tmp, data);
   }
 
-  private void addNewKeys(final RunData data) {
+  /**
+   * Check the right prefix.
+   * @param data RunData object
+   * @param index the index for the sample
+   * @param oldPrefix1 the first old prefix to check
+   * @param oldPrefix2 the second old prefix to check
+   * @return the old prefix that exists in the RunData object
+   */
+  private String checkOldPrefix(final RunData data, final String index,
+      final String oldPrefix1, final String oldPrefix2) {
+
+    final String barcodeKey1 = oldPrefix1 + "barcode";
+    final String barcodeKey2 = oldPrefix2 + "barcode";
+
+    final String defaultResult = oldPrefix1;
+
+    if (data.contains(barcodeKey1) && !data.contains(barcodeKey2)) {
+      return oldPrefix1;
+    }
+    if (!data.contains(barcodeKey1) && data.contains(barcodeKey2)) {
+      return oldPrefix2;
+    }
+
+    final String val1 = data.get(barcodeKey1);
+    final String val2 = data.get(barcodeKey2);
+
+    if (val1 != null && val2 != null) {
+
+      final String barcode = "".equals(index) ? "all" : index;
+
+      if (val1.equals(barcode)) {
+        return oldPrefix1;
+      }
+
+      if (val2.equals(barcode)) {
+        return oldPrefix2;
+      }
+
+      if (val1.startsWith(barcode)) {
+        return oldPrefix1;
+      }
+
+      if (val2.startsWith(barcode)) {
+        return oldPrefix2;
+      }
+    }
+
+    for (String key : data.getMap().keySet()) {
+
+      if (key.startsWith(oldPrefix1)) {
+        return oldPrefix1;
+      }
+
+      if (key.startsWith(oldPrefix2)) {
+        return oldPrefix2;
+      }
+
+    }
+
+    return defaultResult;
+  }
+
+  /**
+   * Convert the keys with old prefix to new keys with a new prefix.
+   * @param inputData the input RunData object
+   * @param outputData the output RunData object
+   */
+  private void convert(final RunData inputData, final RunData outputData) {
 
     final Map<String, String> prefixes = new HashMap<>();
+    final int laneCount = outputData.getLaneCount();
 
     // Compute the prefix convertion table
-    for (int sampleId : data.getAllSamples()) {
+    for (int sampleId : outputData.getAllSamples()) {
 
-      final int lane = data.getSampleLane(sampleId);
-      final boolean undetermined = data.isUndeterminedSample(sampleId);
-      final String sampleName = data.getSampleDemuxName(sampleId);
+      final int lane = outputData.getSampleLane(sampleId);
+      final boolean undetermined = outputData.isUndeterminedSample(sampleId);
+      final String demuxName = outputData.getSampleDemuxName(sampleId);
+      final String identifier = outputData.getSampleIdentifier(sampleId);
+      final String barcode = outputData.getSampleIndex(sampleId);
 
-      final String oldPrefix = "demux.lane"
-          + lane + ".sample." + (undetermined ? "undetermined" : sampleName)
+      final String oldPrefix216 = "demux.lane"
+          + lane + ".sample." + (undetermined ? "unknown" : identifier) + '.';
+
+      final String oldPrefix217 = "demux.lane"
+          + lane + ".sample." + (undetermined ? "undetermined" : demuxName)
           + '.';
-      final String newPrefix = "demux.sample" + sampleId + '.';
 
-      prefixes.put(oldPrefix, newPrefix);
+      // Handle Bcl2fastq 2.16
+      final String oldPrefix =
+          checkOldPrefix(inputData, barcode, oldPrefix216, oldPrefix217);
+
+      final String newPrefix = "demux.sample" + sampleId + '.';
+      prefixes.put(oldPrefix.toLowerCase(), newPrefix);
     }
 
     // Add the new keys
-    for (String key : new LinkedHashSet<>(data.getMap().keySet())) {
+    for (String key : new LinkedHashSet<>(inputData.getMap().keySet())) {
 
       for (Map.Entry<String, String> e : prefixes.entrySet()) {
 
@@ -155,11 +241,19 @@ public class DemultiplexingCollector implements Collector {
         if (key.startsWith(oldPrefixKey)) {
 
           final String newKey = key.replace(oldPrefixKey, e.getValue());
+          outputData.put(newKey, inputData.get(key));
+          break;
+        }
+      }
 
-          data.put(newKey, data.get(key));
+      // Keep lane old keys
+      for (int lane = 1; lane <= laneCount; lane++) {
+        if (key.startsWith("demux.lane" + lane + ".all.")) {
+          outputData.put(key, inputData.get(key));
         }
       }
     }
+
   }
 
   @Override

@@ -85,8 +85,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     this.fastqscreen = new FastqScreen(conf);
 
     try {
-      this.ignorePairedMode = Boolean.parseBoolean(conf
-          .get(Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_END_MODE_KEY));
+      this.ignorePairedMode = conf.getBoolean(
+          Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_END_MODE_KEY);
 
     } catch (final Exception e) {
       // Default value
@@ -94,18 +94,17 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     }
 
     try {
-      this.skipControlLane = Boolean.parseBoolean(
-          conf.get(Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY));
+      this.skipControlLane = conf.getBoolean(
+          Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY);
     } catch (final Exception e) {
       // Default value
       this.skipControlLane = true;
     }
 
     try {
-      final String filename =
-          conf.get(Settings.QC_CONF_FASTQSCREEN_XSL_FILE_KEY);
-      if (new File(filename).exists()) {
-        this.fastqscreenXSLFile = new File(filename);
+      final File file = conf.getFile(Settings.QC_CONF_FASTQSCREEN_XSL_FILE_KEY);
+      if (file != null && file.exists()) {
+        this.fastqscreenXSLFile = file;
       }
     } catch (final Exception e) {
       // Call default xsl file
@@ -114,8 +113,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
 
     // Check if process undetermined indices samples specify in Aozan
     // configuration
-    this.isProcessUndeterminedIndicesSamples = Boolean.parseBoolean(conf
-        .get(Settings.QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY));
+    this.isProcessUndeterminedIndicesSamples = conf.getBoolean(
+        Settings.QC_CONF_FASTQSCREEN_PROCESS_UNDETERMINED_SAMPLES_KEY);
   }
 
   @Override
@@ -126,7 +125,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     if (fastqSample.getFastqFiles() == null
         || fastqSample.getFastqFiles().isEmpty()) {
 
-      throw new AozanException("No fastq files defined for fastqSample "
+      throw new AozanException("No FASTQ file defined for the fastqSample: "
           + fastqSample.getKeyFastqSample());
     }
 

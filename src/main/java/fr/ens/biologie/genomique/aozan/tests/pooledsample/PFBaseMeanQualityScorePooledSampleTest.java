@@ -43,7 +43,7 @@ import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
  * @since 2.0
  */
 public class PFBaseMeanQualityScorePooledSampleTest
-    extends AbstractSampleStatsTest {
+    extends AbstractPooledSampleTest {
 
   private final ScoreInterval interval = new ScoreInterval();
 

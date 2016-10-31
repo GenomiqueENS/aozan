@@ -106,14 +106,15 @@ public class RunDataGenerator {
     // Timer
     final Stopwatch timerGlobal = Stopwatch.createStarted();
 
-    LOGGER.info("Step collector start");
+    LOGGER.info("Starting step collector");
 
     // For all collectors
     for (final Collector collector : this.collectors) {
 
       final Stopwatch timerCollector = Stopwatch.createStarted();
-      LOGGER.info(collector.getName().toUpperCase()
-          + " collector start for run " + this.runId);
+      LOGGER.info("Starting "
+          + collector.getName().toUpperCase() + " collector for run "
+          + this.runId);
 
       // Configure
       collector.configure(qc,
@@ -122,8 +123,9 @@ public class RunDataGenerator {
       // And collect data
       collector.collect(data);
 
-      LOGGER.info(collector.getName().toUpperCase()
-          + " collector end for run " + this.runId + " in "
+      LOGGER.info("Ended "
+          + collector.getName().toUpperCase() + " collector for run "
+          + this.runId + " in "
           + toTimeHumanReadable(timerCollector.elapsed(TimeUnit.MILLISECONDS)));
 
       final File qcDir =
@@ -131,7 +133,7 @@ public class RunDataGenerator {
       final File dataFile = new File(qcDir, collector.getName()
           + '-' + System.currentTimeMillis() + ".snapshot.data");
 
-      LOGGER.fine("Write rundata to " + dataFile);
+      LOGGER.fine("Writing rundata to " + dataFile);
 
       try {
         data.createRunDataFile(dataFile);
@@ -145,7 +147,7 @@ public class RunDataGenerator {
       collector.clear();
     }
 
-    LOGGER.info("Step collector end in "
+    LOGGER.info("Step collector ended in "
         + toTimeHumanReadable(timerGlobal.elapsed(TimeUnit.MILLISECONDS)));
     timerGlobal.stop();
 

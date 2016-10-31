@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
+import fr.ens.biologie.genomique.aozan.collectors.FastqScreenCollector;
 import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
@@ -47,14 +48,15 @@ import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
  * @since 1.4
  */
 public class FastQScreenSampleOvercontaminationCountPooledSampleTest
-    extends AbstractSampleStatsTest {
+    extends AbstractPooledSampleTest {
 
   private final ScoreInterval interval = new ScoreInterval();
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(SampleStatisticsCollector.COLLECTOR_NAME);
+    return ImmutableList.of(FastqScreenCollector.COLLECTOR_NAME,
+        SampleStatisticsCollector.COLLECTOR_NAME);
   }
 
   @Override

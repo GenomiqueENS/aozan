@@ -55,15 +55,15 @@
               <a href="http://fedoraproject.org/">Fedora</a>...).
                 You can develop on other operating systems but your system will not run Aozan</li>
             <li>A <a href="http://www.oracle.com/technetwork/java/index.html">Java 7</a> SDK (Oracle JDK or OpenJDK are recommended)</li>
-            <li><a href="http://maven.apache.org/">Maven 2.2.x</a></li>
-            <li>An IDE like <a href="http://www.eclipse.org/">Eclipse</a> (Optional)</li>
+            <li><a href="http://maven.apache.org/">Maven 3.2.x</a></li>
+            <li>An IDE like <a href="http://www.eclipse.org/">Eclipse</a> or <a href="https://www.jetbrains.com/idea/">Intellij IDEA</a> (Optional)</li>
             <li>An Internet connection</li>
           </ul>
 
           <p>If you use Ubuntu 14.04 (Trusty Tahr), you can install all the
              requirements with the next command line:</p>
 <source>
-$ sudo apt-get install openjdk-7-jdk maven2 eclipse-jdt
+$ sudo apt-get install openjdk-7-jdk maven eclipse-jdt
 </source>
 
     </subsection>

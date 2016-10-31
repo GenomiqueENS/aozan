@@ -1,8 +1,31 @@
-"""
-Created on 22 aug. 2016
+# -*- coding: utf-8 -*-
 
-@author: firmo
-"""
+#
+#                  Aozan development code
+#
+# This code may be freely distributed and modified under the
+# terms of the GNU General Public License version 3 or later
+# and CeCILL. This should be distributed with the code. If you
+# do not have a copy, see:
+#
+#      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+#      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+#
+# Copyright for this code is held jointly by the Genomic platform
+# of the Institut de Biologie de l'École Normale Supérieure and
+# the individual authors.
+#
+# For more information on the Aozan project and its aims,
+# or to join the Aozan Google group, visit the home page at:
+#
+#      http://outils.genomique.biologie.ens.fr/aozan
+#
+#
+
+'''
+This script executes recompression step.
+'''
+
 import glob
 import os
 import time
@@ -290,12 +313,12 @@ def recompress(run_id, conf):
         conf: configuration dictionary
     """
 
-    common.log('INFO', 'Recompress step: start', conf)
+    common.log('INFO', 'Recompress step: Starting', conf)
 
     # Check if input root fastq root data exists
     if not common.is_dir_exists(FASTQ_DATA_PATH_KEY, conf):
-        error("Fastq data directory does not exists",
-              "Fastq data directory does not exists: " + conf[FASTQ_DATA_PATH_KEY], conf)
+        error("FASTQ data directory does not exist",
+              "FASTQ data directory does not exist: " + conf[FASTQ_DATA_PATH_KEY], conf)
         return False
 
     start_time = time.time()
@@ -379,7 +402,7 @@ def recompress(run_id, conf):
             executor.execute(worker)
 
         else:
-            common.log("WARNING", "Recompress step: Skipping: The file " + output_file + " already exists.", conf)
+            common.log("WARNING", "Recompress step: Omitting processing file " + input_file + ". The associated output file " + output_file + " already exists.", conf)
 
     # Wait for all thread to finish
     executor.shutdown()
@@ -406,14 +429,14 @@ def recompress(run_id, conf):
 
     duration = time.time() - start_time
 
-    msg = 'End of recompression for run ' + run_id + '.' + \
+    msg = 'Ending recompression for run ' + run_id + '.' + \
           '\nJob finished at ' + common.time_to_human_readable(time.time()) + \
-          ' with no error in ' + common.duration_to_human_readable(duration) + '. '
+          ' without error in ' + common.duration_to_human_readable(duration) + '. '
 
-    msg += '\n\nAfter recompress step fastq folder is now %.2f MB (previously %.2f MB) and %.2f GB still free.' % (
+    msg += '\n\nAfter recompress step FASTQ folder is now %.2f MB (previously %.2f MB) and %.2f GB still free.' % (
         du, previous_du, df)
 
-    common.send_msg('[Aozan] End of recompress for run ' + run_id + ' on ' +
+    common.send_msg('[Aozan] Ending recompress for run ' + run_id + ' on ' +
                     common.get_instrument_name(run_id, conf), msg, False, conf)
-    common.log('INFO', 'Recompress step: success in ' + common.duration_to_human_readable(duration), conf)
+    common.log('INFO', 'Recompress step: successful in ' + common.duration_to_human_readable(duration), conf)
     return True

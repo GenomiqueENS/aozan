@@ -30,6 +30,7 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
+import fr.ens.biologie.genomique.aozan.collectors.FastqScreenCollector;
 import fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
@@ -59,7 +60,8 @@ public class FastQScreenReportProjectTest extends AbstractProjectTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(ProjectStatisticsCollector.COLLECTOR_NAME);
+    return ImmutableList.of(FastqScreenCollector.COLLECTOR_NAME,
+        ProjectStatisticsCollector.COLLECTOR_NAME);
   }
 
   //

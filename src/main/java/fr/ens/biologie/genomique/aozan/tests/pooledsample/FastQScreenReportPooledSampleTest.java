@@ -24,7 +24,7 @@
 package fr.ens.biologie.genomique.aozan.tests.pooledsample;
 
 import static fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector.UNDETERMINED_SAMPLE;
-import static fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput.UNDETERMINED_DIR_NAME;
+import static fr.ens.biologie.genomique.aozan.io.FastqSample.UNDETERMINED_DIR_NAME;
 
 import java.util.Collections;
 import java.util.List;
@@ -33,12 +33,13 @@ import com.google.common.collect.ImmutableList;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
+import fr.ens.biologie.genomique.aozan.collectors.FastqScreenCollector;
 import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 
-public class FastQScreenReportPooledSampleTest extends AbstractSampleStatsTest {
+public class FastQScreenReportPooledSampleTest extends AbstractPooledSampleTest {
 
   @Override
   public List<AozanTest> configure(final TestConfiguration conf)
@@ -67,7 +68,8 @@ public class FastQScreenReportPooledSampleTest extends AbstractSampleStatsTest {
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(SampleStatisticsCollector.COLLECTOR_NAME);
+    return ImmutableList.of(FastqScreenCollector.COLLECTOR_NAME,
+        SampleStatisticsCollector.COLLECTOR_NAME);
   }
 
   //

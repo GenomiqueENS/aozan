@@ -175,7 +175,6 @@ public class SampleSheetReaderTest {
     files.add(SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SORTED);
     files.add(SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SHUFFLED_LANE);
     files.add(SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SHUFFLED_NOLANE);
-    files.add(SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SHUFFLED_PROJECT);
     files.add(SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SHUFFLED_SAMPLE);
     int nbLanes = 4;
 
@@ -187,16 +186,17 @@ public class SampleSheetReaderTest {
 
       Bcl2FastqOutput bclfile = new Bcl2FastqOutput(
           readSamplesheetCSV(new File(path, filename), nbLanes), new File("."),
-          Bcl2FastqVersion.BCL2FASTQ_2);
+          Bcl2FastqVersion.BCL2FASTQ_2, false);
       for (int lane = 1; lane <= nbLanes; lane++) {
         for (String sampleName : sampleNames.keySet()) {
           FastqSample fastqSample =
-              new FastqSample(bclfile, new File("."), new File("."), "", 1, 1,
-                  lane, sampleName, "Project_A2015", "desc", "Bindex", false);
+              new FastqSample(bclfile, new File("."), "", 1, 1,
+                  lane, null, sampleName, "Project_A2015", "desc", "Bindex",
+                  false, false);
 
           Assert.assertEquals(sampleName
               + "_S" + sampleNames.get(sampleName) + "_L00" + lane + "_R1_001",
-              bclfile.getFilenamePrefix(fastqSample, 1));
+              fastqSample.getFilenamePrefix());
         }
       }
     }

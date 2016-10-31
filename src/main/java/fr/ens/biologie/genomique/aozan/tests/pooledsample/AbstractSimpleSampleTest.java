@@ -38,7 +38,7 @@ import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
  * @since 0.8
  * @author Laurent Jourdren
  */
-public abstract class AbstractSimpleSampleTest extends AbstractSampleStatsTest {
+public abstract class AbstractSimpleSampleTest extends AbstractPooledSampleTest {
 
   private final ScoreInterval interval = new ScoreInterval();
 

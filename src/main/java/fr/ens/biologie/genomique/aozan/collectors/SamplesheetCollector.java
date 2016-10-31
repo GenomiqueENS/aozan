@@ -173,7 +173,7 @@ public class SamplesheetCollector implements Collector {
 
         final String id = s.getSampleId();
         final String name = s.getSampleName();
-        final String demuxName = demuxName(id, name);
+        final String demuxName = s.getDemultiplexingName();
         final int lane = s.getLane();
         final String project = Strings.nullToEmpty(s.getSampleProject());
         final String index1 = Strings.nullToEmpty(s.getIndex1());
@@ -373,22 +373,6 @@ public class SamplesheetCollector implements Collector {
           Joiner.on(",").join(projectSamples.get(projectName)));
     }
     data.put(SAMPLESHEET_DATA_PREFIX + ".project.count", projectNumber);
-  }
-
-  /**
-   * Get the demultiplexing name of the sample.
-   * @param sampleIdentifier the sample identifier
-   * @param sampleName the sample name
-   * @return the demultiplexing name of the sample
-   */
-  private String demuxName(final String sampleIdentifier,
-      final String sampleName) {
-
-    if (sampleName != null && !sampleName.isEmpty()) {
-      return sampleName;
-    }
-
-    return sampleIdentifier;
   }
 
   @Override

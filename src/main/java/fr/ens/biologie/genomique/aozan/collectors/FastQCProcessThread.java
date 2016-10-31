@@ -102,13 +102,18 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
         final Sequence seq = seqFile.next();
 
+        boolean processed = false;
+
         for (final QCModule module : modules) {
 
           if (ignoreFiltered && module.ignoreFilteredSequences()) {
             continue;
           }
-          this.processedReads++;
+          processed = true;
           module.processSequence(seq);
+        }
+        if (processed) {
+          this.processedReads++;
         }
       }
 
@@ -128,8 +133,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
    * Process results after the end of the thread.
    * @throws AozanException if an error occurs while generate FastQC reports
    */
-  @Override
-  protected void processResults() throws AozanException {
+  private void processResults() throws AozanException {
 
     // Set the prefix for the run data entries
     final String prefix = "fastqc" + getFastqSample().getRundataPrefix();

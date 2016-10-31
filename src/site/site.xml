@@ -58,20 +58,20 @@
 			<item name="Installing" href="/installing.html" />
 			<item name="Release Notes" href="/changes-report.html" />
 			<item name="Samplesheet validator" href="http://outils.genomique.biologie.ens.fr/samplesheetvalidator" target="_blank"/>
-			<item name="Quality report example" href="./quality_control_example_report.html" target="_blank"/>
+			<item name="Quality report example" href="./qc_demo/160617_NB500892_0097_AH7N2TAFXX.html" target="_blank"/>
 		</menu>
 
 		<menu name="Documentation">
 
 			<item name="Quickstart Guide" href="/quickstart.html"/>
-			<item name="Configuration example" href="/aozan-example.conf"/>
+			<item name="Example data" href="/example-data.html"/>
 
 			<item name="Built-in steps" href="/steps.html" collapse="true">
 				<item name="First base report" href="/new-run-discovering.html"/>
 				<item name="End run discovering" href="/end-run-discovering.html"/>
 				<item name="Synchronization" href="/synchronization.html"/>
-				<item name="Recompression" href="/recompression.html"/>
 				<item name="Demultiplexing" href="/demultiplexing.html"/>
+				<item name="Recompression" href="/recompression.html"/>
 
 				<item name="Quality Control" href="/quality-control.html" collapse="true">
 					<item name="Global tests" href="/qc-global-tests.html"/>

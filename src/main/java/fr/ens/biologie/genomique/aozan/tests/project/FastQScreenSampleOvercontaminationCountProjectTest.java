@@ -29,6 +29,7 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
+import fr.ens.biologie.genomique.aozan.collectors.FastqScreenCollector;
 import fr.ens.biologie.genomique.aozan.collectors.stats.ProjectStatisticsCollector;
 
 /**
@@ -45,7 +46,8 @@ public class FastQScreenSampleOvercontaminationCountProjectTest
   @Override
   public List<String> getCollectorsNamesRequiered() {
 
-    return ImmutableList.of(ProjectStatisticsCollector.COLLECTOR_NAME);
+    return ImmutableList.of(FastqScreenCollector.COLLECTOR_NAME,
+        ProjectStatisticsCollector.COLLECTOR_NAME);
   }
 
   @Override

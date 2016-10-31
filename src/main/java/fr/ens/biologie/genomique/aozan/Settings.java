@@ -121,16 +121,23 @@ public final class Settings {
 
   /** Recompression step. */
   public static final String RECOMPRESS_STEP_KEY = "recompress.step";
-    /** Erase input after recompression. */
-  public static final String RECOMPRESS_DELETE_ORIGINAL_FASTQ_KEY = "recompress.delete.original.fastq";
   /** Erase input after recompression. */
-public static final String RECOMPRESS_COMPRESSION_LEVEL_KEY = "recompress.compression.level";
-/** Erase input after recompression. */
-public static final String RECOMPRESS_THREADS_KEY = "recompress.threads";
-/** Erase input after recompression. */
-public static final String RECOMPRESS_COMPRESSION_KEY = "recompress.compression";
+  public static final String RECOMPRESS_DELETE_ORIGINAL_FASTQ_KEY =
+      "recompress.delete.original.fastq.files";
+  /** Erase input after recompression. */
+  public static final String RECOMPRESS_COMPRESSION_LEVEL_KEY =
+      "recompress.compression.level";
+  /** Erase input after recompression. */
+  public static final String RECOMPRESS_THREADS_KEY = "recompress.threads";
+  /** Erase input after recompression. */
+  public static final String RECOMPRESS_COMPRESSION_KEY =
+      "recompress.compression";
 
-/** Index html template path. */
+  /** Change the output file rights. */
+  public static final String READ_ONLY_OUTPUT_FILES_KEY =
+      "read.only.output.files";
+
+  /** Index html template path. */
   public static final String INDEX_HTML_TEMPLATE_KEY = "index.html.template";
   /** Index sequences path. */
   public static final String INDEX_SEQUENCES_KEY = "index.sequences";

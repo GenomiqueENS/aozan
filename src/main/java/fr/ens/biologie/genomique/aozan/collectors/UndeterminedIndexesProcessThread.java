@@ -607,7 +607,10 @@ public class UndeterminedIndexesProcessThread
     }
   }
 
-  @Override
+  /**
+   * Process results after the end of the thread.
+   * @throws AozanException if an error occurs while generate report
+   */
   protected void processResults() throws AozanException {
 
     int recoverableRawClusterCount = 0;

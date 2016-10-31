@@ -1,9 +1,29 @@
 # -*- coding: utf-8 -*-
-'''
-Aozan main file.
-Created on 25 oct. 2011
 
-@author: Laurent Jourdren
+#
+#                  Aozan development code
+#
+# This code may be freely distributed and modified under the
+# terms of the GNU General Public License version 3 or later
+# and CeCILL. This should be distributed with the code. If you
+# do not have a copy, see:
+#
+#      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+#      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+#
+# Copyright for this code is held jointly by the Genomic platform
+# of the Institut de Biologie de l'École Normale Supérieure and
+# the individual authors.
+#
+# For more information on the Aozan project and its aims,
+# or to join the Aozan Google group, visit the home page at:
+#
+#      http://outils.genomique.biologie.ens.fr/aozan
+#
+#
+
+'''
+This script is Aozan main file, it executes the steps.
 '''
 
 import sys, os, traceback
@@ -23,6 +43,7 @@ from fr.ens.biologie.genomique.aozan.Settings import DEMUX_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import RECOMPRESS_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import QC_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import DEMUX_USE_HISEQ_OUTPUT_KEY
+from fr.ens.biologie.genomique.aozan.Settings import DOCKER_URI_KEY
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_LOG_LEVEL_KEY
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_LOG_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_ENABLE_KEY
@@ -99,9 +120,13 @@ def load_pid_in_lock_file(lock_file_path):
     """
 
     f = open(lock_file_path, 'r')
-    pid = int(f.readline().strip())
+    line = f.readline().strip()
     f.close()
-    return pid
+
+    try:
+        return int(line)
+    except ValueError:
+        return -1
 
 
 def welcome(conf):
@@ -112,7 +137,7 @@ def welcome(conf):
     """
     global something_to_do
     if not something_to_do:
-        common.log('INFO', 'Start ' + Globals.WELCOME_MSG, conf)
+        common.log('INFO', 'Starting ' + Globals.WELCOME_MSG, conf)
         something_to_do = True
 
         # Add list step selected
@@ -133,7 +158,7 @@ def lock_step(lock_file_path, step_name, conf):
 
     # Check if parent directory of the lock file exists
     if not os.path.isdir(os.path.dirname(lock_file_path)):
-        common.log('SEVERE', 'Parent directory of lock file does not exists. The lock file for ' + step_name +
+        common.log('SEVERE', 'Parent directory of lock file does not exist. The lock file for ' + step_name +
                    ' step has not been created: ' + lock_file_path, conf)
         return True
 
@@ -145,7 +170,7 @@ def lock_step(lock_file_path, step_name, conf):
     try:
         open(lock_file_path, 'w').close()
     except:
-        common.log('SEVERE', 'The lock file cannot not been created (' + sys.exc_info()[0] + ') for ' + step_name +
+        common.log('SEVERE', 'The lock file cannot be created (' + sys.exc_info()[0] + ') for ' + step_name +
                    ': ' + lock_file_path, conf)
         return True
 
@@ -323,7 +348,7 @@ def launch_steps(conf):
 
     # Discover new runs
     detection_new_run.discover_new_runs(hiseq_run_ids_do_not_process, conf)
-    hiseq_run_ids_done = detection_end_run.discover_terminated_runs(hiseq_run_ids_do_not_process, conf)
+    hiseq_run_ids_done = detection_end_run.discover_finished_runs(hiseq_run_ids_do_not_process, conf)
 
 
     #
@@ -348,7 +373,7 @@ def launch_steps(conf):
 
                 if lock_sync_step(conf, run_id):
                     welcome(conf)
-                    common.log('INFO', 'Synchronize ' + run_id, conf)
+                    common.log('INFO', 'Synchronizing ' + run_id, conf)
                     if sync_run.sync(run_id, conf):
                         sync_run.add_run_id_to_processed_run_ids(run_id, conf)
                         sync_run_ids_done.add(run_id)
@@ -357,10 +382,10 @@ def launch_steps(conf):
                         unlock_sync_step(conf, run_id)
                         return False
                 else:
-                    common.log('INFO', 'Synchronize ' + run_id + ' is locked.', conf)
+                    common.log('INFO', 'Synchronizing ' + run_id + ' is locked.', conf)
 
         except:
-            exception_error('sync' , 'Fail synchronization for run ' + run_id, conf)
+            exception_error('sync' , 'Failed synchronization for run ' + run_id, conf)
 
     #
     # Demultiplexing
@@ -383,7 +408,7 @@ def launch_steps(conf):
 
                 if lock_demux_step(conf, run_id):
                     welcome(conf)
-                    common.log('INFO', 'Demux ' + run_id, conf)
+                    common.log('INFO', 'Demultiplexing ' + run_id, conf)
                     if demux_run.demux(run_id, conf):
                         demux_run.add_run_id_to_processed_run_ids(run_id, conf)
                         demux_run_ids_done.add(run_id)
@@ -392,10 +417,10 @@ def launch_steps(conf):
                         unlock_demux_step(conf, run_id)
                         return False
                 else:
-                    common.log('INFO', 'Demux ' + run_id + ' is locked.', conf)
+                    common.log('INFO', 'Demultiplexing ' + run_id + ' is locked.', conf)
 
         except:
-            exception_error('demux', 'Fail demultiplexing for run ' + run_id, conf)
+            exception_error('demux', 'Failed demultiplexing for run ' + run_id, conf)
 
     #
     # Recompression
@@ -411,7 +436,7 @@ def launch_steps(conf):
                                                     prioritized_run_ids):
                 if lock_recompress_step(conf, run_id):
                     welcome(conf)
-                    common.log('INFO', 'Recompression ' + run_id, conf)
+                    common.log('INFO', 'Recompressing ' + run_id, conf)
                     if recompress_run.recompress(run_id, conf):
                         recompress_run.add_run_id_to_processed_run_ids(run_id, conf)
                         recompress_run_ids_done.add(run_id)
@@ -420,13 +445,13 @@ def launch_steps(conf):
                         unlock_recompress_step(conf, run_id)
                         return False
                 else:
-                    common.log('INFO', 'Recompression ' + run_id + ' is locked.', conf)
+                    common.log('INFO', 'Recompressing ' + run_id + ' is locked.', conf)
 
         except:
             exception_msg = str(sys.exc_info()[0]) + ' (' + str(sys.exc_info()[1]) + ')'
             traceback_msg = traceback.format_exc(sys.exc_info()[2])
-            recompress_run.error("Fail recompression for run " + run_id + ", catch exception " + exception_msg,
-                         "Fail recompression for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg,
+            recompress_run.error("Failed recompression for run " + run_id + ", catch exception " + exception_msg,
+                         "Failed recompression for run " + run_id + ", catch exception " + exception_msg + "\n Stacktrace : \n" + traceback_msg,
                          conf)
 
 
@@ -459,7 +484,7 @@ def launch_steps(conf):
                     common.log('INFO', 'Quality control ' + run_id + ' is locked.', conf)
 
         except:
-            exception_error('qc', 'Fail quality control for run ' + run_id, conf)
+            exception_error('qc', 'Failed quality control for run ' + run_id, conf)
 
     #
     # Partial synchronization
@@ -471,13 +496,13 @@ def launch_steps(conf):
         for run_id in (working_run_ids - sync_run_ids_done - hiseq_run_ids_do_not_process):
             if lock_partial_sync_step(conf, run_id):
                 welcome(conf)
-                common.log('INFO', 'Partial synchronization of ' + run_id, conf)
+                common.log('INFO', 'Partial synchronizing ' + run_id, conf)
                 if not sync_run.partial_sync(run_id, False, conf):
                     unlock_partial_sync_step(conf, run_id)
                     return False
                 unlock_partial_sync_step(conf, run_id)
             else:
-                common.log('INFO', 'Partial synchronization of ' + run_id + ' is locked.', conf)
+                common.log('INFO', 'Partial synchronizing ' + run_id + ' is locked.', conf)
 
     # Close Docker connections
     DockerConnection.getInstance(conf[DOCKER_URI_KEY]).closeConnections()
@@ -498,7 +523,7 @@ def aozan_main():
     parser.add_option('-e', '--exit-code', action='store_true', dest='exit_code',
                       help='Returns non zero exit code if a step fails')
     parser.add_option('-c', '--conf', action='store_true', dest='conf',
-                      help='Default Aozan configuration Aozan, load before configuration file.')
+                      help='Default Aozan configuration, loads before configuration file.')
 
     # Parse command line arguments
     (options, args) = parser.parse_args()
@@ -589,7 +614,7 @@ def aozan_main():
             # TODO remove *.lasterr files
 
             if something_to_do:
-                common.log('INFO', 'End of Aozan', conf)
+                common.log('INFO', 'Ending Aozan', conf)
 
                 # Cancel logger, in case not be cancel properly
                 Common.cancelLogger()
@@ -600,7 +625,7 @@ def aozan_main():
         except:
             exception_error(None, '', conf)
 
-            common.log('INFO', 'End of Aozan', conf)
+            common.log('INFO', 'Ending Aozan', conf)
 
             # Remove lock file
             delete_lock_file(lock_file_path)
@@ -612,7 +637,7 @@ def aozan_main():
         if not options.quiet:
             sys.stderr.write('ERROR: Aozan can not be executed. A lock file exists.\n')
         if not os.path.exists('/proc/%d' % (load_pid_in_lock_file(lock_file_path))):
-            common.error('[Aozan] A lock file exists', 'A lock file exist at ' + conf[LOCK_FILE_KEY] +
+            common.error('[Aozan] A lock file exists', 'A lock file exists at ' + conf[LOCK_FILE_KEY] +
                          ". Please investigate last error and then remove the lock file.", True,
                          conf[AOZAN_VAR_PATH_KEY] + '/aozan.lasterr', conf)
 

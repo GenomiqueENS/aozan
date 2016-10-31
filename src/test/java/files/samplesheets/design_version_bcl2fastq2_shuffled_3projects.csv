@@ -1,0 +1,14 @@
+[Data]
+Lane,Sample_ID,index,Sample_Project,Description,Sample_Ref
+1,2015_067,CGATGT,Project_B2015,Description,arabidopsis
+1,2015_068,TGACCA,Project_B2015,Description,arabidopsis
+1,2015_069,GCCAAT,Project_B2015,Description,arabidopsis
+2,2015_167,CGATGT,Project_A2015,Description,arabidopsis
+2,2015_168,TGACCA,Project_A2015,Description,arabidopsis
+2,2015_169,GCCAAT,Project_A2015,Description,arabidopsis
+3,2015_067,CGATGT,Project_B2015,Description,arabidopsis
+3,2015_068,TGACCA,Project_B2015,Description,arabidopsis
+3,2015_069,GCCAAT,Project_B2015,Description,arabidopsis
+4,2015_267,CGATGT,Project_C2015,Description,arabidopsis
+4,2015_268,TGACCA,Project_C2015,Description,arabidopsis
+4,2015_269,GCCAAT,Project_C2015,Description,arabidopsis

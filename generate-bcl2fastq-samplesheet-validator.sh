@@ -65,57 +65,55 @@ do
 done
 
 cat > $PROJECT_NAME/war/$HELP_TEXT_PATH << EOF
-Help page for validator sample-sheet for bcl2fastq-1.8.x tool (Illumina: http://support.illumina.com/downloads/bcl2fastq_conversion_software_184.ilmn):
+Help page for validator sample-sheet for bcl2fastq-2.x tool (Illumina: http://support.illumina.com/downloads/bcl2fastq-conversion-software-v217.html):
 
-The CASAVA/bcl2fastq version 1.8 sample sheet validator helps users to check their run design. This tool uses only html and javascript. No data is sent to our servers when you use this tool.
-This tool generates a sample sheet only in csv format with a very strict syntax.
-It ensures you that the demultiplexing will not fail because the sample sheet is no correct.
+The bcl2fastq 2.x sample sheet validator helps users to check their run design. This tool uses only HTML and Javascript. No data are sent to our servers when you use this tool.
+This tool generates a sample sheet only in CSV format with a very strict syntax.
+It ensures you that the demultiplexing will not fail because the sample sheet is not correct.
 
-You can use the validator in association with Aozan, a tool that automatically handles data transfer, demultiplexing conversion and quality control once a HiSeq run is over (developed by Genomic Paris Centre and available at http://outils.genomique.biologie.ens.fr/aozan/).
+You can use the validator in association with Aozan, a tool that automatically handles data transfer, demultiplexing conversion and quality control once an Illumina sequencer run is over (developed by the genomics facility of the Institut de biologie de l'École normale supérieure and available at http://outils.genomique.biologie.ens.fr/aozan/).
 
 The validator is very simple to use:
-1/ copy the sample sheet from your spreadsheet or csv/tsv format in the first tab with the column headers;
-2/ optional: indicate the flow cell id or the run id the text box;
-3/ launch check & convert to csv (the cvs output appears in the second tab).
+1/ copy the sample sheet from your spreadsheet or CSV/TSV format in the first tab of the left panel with the column headers;
+2/ click on the "Check bcl2fastq samplesheet" to check and convert to CSV (the CSV output appears in the second tab).
 
 The verification step opens an alert window in two cases :
 - error message : the conversion is stopped, the sample sheet format is invalid;
-- warning message : the conversion is finalized and it alerts on any potential input error.
+- warning message : the conversion has been performed and some warnings exits about your sample sheet.
 
-The sample sheet input format is very strict. No field can be null or empty.
-- 10 columns in this exact order with these headers :
-        1- FCID: flow cell ID;
-        2- Lane: lane number between 1 and 8;
-        3- SampleID: name used in the fastq file;
-        4- SampleRef: reference name. You can use aliases like index, you can put a key-value list (ex mm10=Mus musculus), available in the 'References Aliases' tab, the program checks if each value exists in the list; if not, it generates a warning message;
-        5- Index: sequence of index or an alias, in case multi-indexes like TCGAAG-TCGGCA or E1-E2. You can put a key-value list (ex B1=CGATGT), available in the 'Indexes Aliases' tab, the program replaces the aliases by the real value in csv output;
-        6- Description;
-        7- Control: only N or Y, to identify the control sample if you need a control lane (ex: PhiX);
-        8- Recipe;
-        9- Operator;
-        10- SampleProject,
+The sample sheet input format is strict. Some fields can't be null or empty.
+- a line containing only '[Data]' must be included in the header your sample sheet.
+- Some column must have specific values:
+        - Sample_ID: name used in the FASTQ file (THIS COLUMN IS MANDATORY);
+        - Lane: lane number between 1 and 8;
+        - Sample_Name: descriptive name used in the FASTQ file;
+        - Sample_Ref: reference name. You can use aliases defined in the "Reference aliases" tab. You can put a key-value list  (e.g. mm10=Mus musculus) in this tab to define the allowed aliases. If the value does not exists in the list, a warning message will be thrown;
+        - index: sequence of the first index or an alias. You can use aliases defined in the "Index aliases" tab. You must put a key-value list (e.g. B1=CGATGT) in this tab to define the allowed aliases.
+        - index2: sequence of the second index or an alias, like the index field (Optional);
+        - Description (Optional);
+        - Sample_Project: sample project;
 
 Possible reasons for error/warning messages :
-- column headers missing in the first line;
-- invalid header name;
-- null or empty field;
-- the flow cell ID is not unique or does not match with the one copied in text box, (if present);
-- lane number not in range [1,8];
-- same sampleID defined with different indexes;
-- same sampleID defined in several projects;
-- same sampleID defined in several lanes;
-- misspelled fields : SampleID, SampleRef or SampleProject should be written only with letters, digits, '-' or '_';
+- missing [Data] line in the header;
+- column headers missing in the line next to [Data] line;
+- invalid mandatory header name;
+- missing or empty mandatory field;
+- lane number not in expected range [1,8];
+- same sample_ID defined with different indexes;
+- same sample_ID defined in several projects;
+- same sample_ID defined in several lanes;
+- misspelled fields : Sample_ID, Sample_Ref, Sample_Name or Sample_Project values should be written only with letters, digits, '-' or '_';
 - misspelled index : the index sequence should be written only with the letters A, T, C and G;
-- same sampleID defined in several lanes, but index is not the same;
+- same sample_ID defined in several lanes, but not using the same index.
 
 Using the aliases tab (optional) :
-There are two tabs that allow you to copy a key-value list used to check the sample-sheet for the following fields : index and SampleRef.
-For the index, you can use the aliases to replace them by the real value in the csv output.
-For the SampleRef, you can use the aliases to check that one reference is always written the same way. It is not required by CASAVA/bcl2fastq. If a sampleRef is not found in the list, the program prints a warning message, sometimes with a proposition to fix it.
+There are two tabs that allow you to copy a key-value list used to check the sample-sheet for the following fields : index, index2 and Sample_Ref.
+For the index, you can use the aliases to replace them by the real value in the CSV output.
+For the Sample_Ref, you can use the aliases to check that one reference is always written the same way. It is not required by bcl2fastq 2.x. If a Sample_Ref is not found in the list, the program prints a warning message, sometimes with a proposition to fix it.
 
 
-NB : the code of this tool is available at:
-https://code.google.com/p/eoulsan/source/browse/generate-casava-design-validator.sh
+NB: the code of this tool is available on GitHub at:
+https://github.com/GenomicParisCentre/aozan/blob/master/generate-bcl2fastq-samplesheet-validator.sh
 
 EOF
 
@@ -371,13 +369,12 @@ public class $PROJECT_NAME implements EntryPoint {
     }
 
     Set<String> genomesDesign = new HashSet<String>();
-    for (Sample sample : design) {
+     for (Sample sample : design) {
       genomesDesign.add(sample.getSampleRef());
-    }
-
+     }
 
     for (String genomeSample : genomesDesign) {
-      if (!(availableGenomes.contains(trimSpecificString(genomeSample)))){
+      if (genomeSample != null && !(availableGenomes.contains(trimSpecificString(genomeSample)))){
         warnings.add("No genome found for '" + genomeSample + "' (optional for Fastq Screen)");
       }
     }
@@ -581,21 +578,27 @@ public class $PROJECT_NAME implements EntryPoint {
 
     // Set the layouts
     final TabLayoutPanel tp = new TabLayoutPanel(1.5, Unit.EM);
-    tp.add(new ScrollPanel(inputTextarea), "[Input bcl2fastq samplesheet]");
-    tp.add(outputHTML, "[CSV bcl2fastq samplesheet]");
-    tp.add(new ScrollPanel(indexesTextarea), "[Indexes Aliases]");
-    tp.add(new ScrollPanel(genomesTextarea), "[References Aliases]");
-    tp.add(new ScrollPanel(helpTextarea), "[Help]");
+    tp.add(new ScrollPanel(inputTextarea), "[Input Samplesheet]");
+    tp.add(new ScrollPanel(indexesTextarea), "[Index Aliases]");
+    tp.add(new ScrollPanel(genomesTextarea), "[Reference Aliases]");
+
+
+    final TabLayoutPanel tpo = new TabLayoutPanel(1.5, Unit.EM);
+    tpo.add(new ScrollPanel(helpTextarea), "[Help]");
+    tpo.add(outputHTML, "[Output Samplesheet (CSV)]");
 
     tp.setHeight("100%");
     tp.setWidth("100%");
+    tpo.setHeight("100%");
+    tpo.setWidth("100%");
 
     //RootLayoutPanel rp = RootLayoutPanel.get();
     //rp.add(dlp);
 
-    RootPanel.get("flowcellidFieldContainer").add(flowcellTextBox);
+    //RootPanel.get("flowcellidFieldContainer").add(flowcellTextBox);
     RootPanel.get("sendButtonContainer").add(button);
     RootPanel.get("tabsContainer").add(tp);
+    RootPanel.get("tabsContainerOutput").add(tpo);
 
     retrieveIndexesList(Window.Location.getParameter("indexesaliaseslist"), Window.Location.getParameter("indexesaliasesurl"));
 
@@ -618,7 +621,7 @@ public class $PROJECT_NAME implements EntryPoint {
     helpTextarea.setSize("99%","100%");
     loadTextHelp();
 
-    flowcellTextBox.setText(Window.Location.getParameter("id"));
+    // flowcellTextBox.setText(Window.Location.getParameter("id"));
 
     inputTextarea.setText("[Paste here your bcl2fastq samplesheet]");
     //inputTextarea.setCharacterWidth(150);
@@ -644,9 +647,9 @@ public class $PROJECT_NAME implements EntryPoint {
           final SampleSheet design;
 
           if (inputText.indexOf('\t')!=-1)
-            design = SampleSheetUtils.parseTabulatedDesign(inputText);
+            design = SampleSheetUtils.parseTabulatedSamplesheet(inputText);
           else
-            design = SampleSheetUtils.parseCSVDesign(inputText);
+            design = SampleSheetUtils.parseCSVSamplesheet(inputText);
 
           updateDesignWithIndexes(design,
               indexesTextarea.getText());
@@ -670,7 +673,7 @@ public class $PROJECT_NAME implements EntryPoint {
 
             outputHTML.setHTML("<pre>"
                 + SampleSheetUtils.toSampleSheetV2CSV(design) + "</pre>");
-            tp.selectTab(1);
+            tpo.selectTab(1);
           }
         } catch (IOException e) {
           Window.alert("Invalid samplesheet: " + e.getMessage());
@@ -719,8 +722,21 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
     <!--                                           -->
     <!-- Any title is fine                         -->
     <!--                                           -->
-    <title>CASAVA/BCL2FASTQ version 1.8 samplesheet validator</title>
 
+
+<style type="text/css">
+    body {
+        width: 1280px;
+    }
+    div.header {
+	background-color: #C1C4CA;
+        padding: 15px;
+        height: 90px;
+        font-size: 120%;
+        font-weight: bold;
+    }
+    <title>Bcl2Fastq version 2 Samplesheet Validator</title>
+  </style>
     <!--                                           -->
     <!-- This script loads your compiled module.   -->
     <!-- If you add any GWT meta tags, they must   -->
@@ -729,7 +745,7 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
     <script language="javascript">
       document.domain = "idunn.ens.fr";
     </script>
-    <script type="text/javascript" language="javascript" src="designvalidator/designvalidator.nocache.js"></script>
+    <script type="text/javascript" language="javascript" src="samplesheetvalidator/samplesheetvalidator.nocache.js"></script>
   </head>
 
   <!--                                           -->
@@ -737,7 +753,7 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
   <!-- you can leave the body empty if you want  -->
   <!-- to create a completely dynamic UI.        -->
   <!--                                           -->
-  <body>
+  <body style="margin:auto;">
 
     <!-- OPTIONAL: include this if you want history support -->
     <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
@@ -750,19 +766,21 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
       </div>
     </noscript>
 
-<h4 align="right">__VERSION__</h4>
-    <div>
-      <a href="https://www.genomique.biologie.ens.fr" ><img src="http://outils.genomique.biologie.ens.fr/aozan/images/logo_genomicpariscentre-90pxh.png" alt="logo genomic paris centre" align="left"/></a>
-      <h1>CASAVA/BCL2FASTQ version 1.8 samplesheet validator</h1>
+
+    <div class="header">
+      <a href="https://www.genomique.biologie.ens.fr" ><img src="http://tools.genomique.biologie.ens.fr/aozan/images/logo_genomicpariscentre-90pxh.png" alt="logo genomic paris centre" align="left"/></a>
+      <a href="http://www.tools.genomique.biologie.ens.fr/aozan/" ><img src="http://tools.genomique.biologie.ens.fr/aozan/images/aozan_qc_logo.png" alt="logo aozan" align="right" height="70px" style="padding-top:10px;"/></a>
+      <h1 align="center">Bcl2fastq 2 samplesheet validator</h1>
     </div>
+    <div>
     <table align="center">
       <!--tr>
         <td colspan="2" style="font-weight:bold;">Please enter your name:</td>
       </tr-->
       <tr>
-        <td>Flow cell id or run id (optional):</td>
-        <td id="flowcellidFieldContainer"></td>
-        <td id="nameFieldContainer"></td>
+        <!--td>Flow cell id or run id (optional):</td>
+        <td id="flowcellidFieldContainer"></td-->
+        <!--td id="nameFieldContainer"></td-->
         <td id="sendButtonContainer"></td>
       </tr>
       <tr>
@@ -773,15 +791,17 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
     <!--p/-->
 
     <table align="center" width="90%" >
-      <tr><td id="tabsContainer" height="700px"/></tr>
+      <tr><td id="tabsContainer" height="700px"/><td id="tabsContainerOutput" height="700px"/></tr>
     </table>
 
     <!--p/-->
 
+<h4 align="left">No data is sent to our servers when you use this tool.</h4>
+<h4 align="center">__VERSION__</h4>
     <!--table align="center" >
       <tr><td id="sendButtonContainer/></tr>
     </table-->
-
+    <div>
 
 
   </body>

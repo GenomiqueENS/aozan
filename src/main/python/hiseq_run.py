@@ -1,5 +1,31 @@
 # -*- coding: utf-8 -*-
 
+#
+#                  Aozan development code
+#
+# This code may be freely distributed and modified under the
+# terms of the GNU General Public License version 3 or later
+# and CeCILL. This should be distributed with the code. If you
+# do not have a copy, see:
+#
+#      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+#      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+#
+# Copyright for this code is held jointly by the Genomic platform
+# of the Institut de Biologie de l'École Normale Supérieure and
+# the individual authors.
+#
+# For more information on the Aozan project and its aims,
+# or to join the Aozan Google group, visit the home page at:
+#
+#      http://outils.genomique.biologie.ens.fr/aozan
+#
+#
+
+'''
+This script checks all informations about a run.
+'''
+
 import os, os.path, time
 import stat, detection_end_run
 import common
@@ -188,7 +214,7 @@ def send_mail_if_critical_free_space_available(conf):
             df = common.df(path)
             free_space_threshold = long(conf[HISEQ_CRITICAL_MIN_SPACE_KEY])
             if df < free_space_threshold:
-                common.send_msg('[Aozan] Critical: Not enough disk space on Hiseq storage for current run',
+                common.send_msg('[Aozan] Critical: Not enough disk space on sequencer storage for current run',
                                 'There is only %.2f' % (df / (1024 * 1024 * 1024)) +
                                 ' Gb left for run storage in ' + path + '. ' +
                                 ' The current warning threshold is set to %.2f' % (

@@ -326,6 +326,15 @@ public class SampleSheet implements Iterable<Sample> {
   }
 
   /**
+   * Get the samples of the samplesheet.
+   * @return a list of samples
+   */
+  public List<Sample> getSamples() {
+
+    return Collections.unmodifiableList(this.samples);
+  }
+
+  /**
    * Get the number of samples.
    * @return the number of samples
    */

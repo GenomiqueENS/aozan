@@ -129,19 +129,19 @@ public class OverrepresentedSequencesBlast {
       return;
     }
 
-    boolean stepEnabled = Boolean.parseBoolean(conf
-        .get(Settings.QC_CONF_FASTQC_BLAST_ENABLE_KEY).trim().toLowerCase());
+    boolean stepEnabled = conf
+        .getBoolean(Settings.QC_CONF_FASTQC_BLAST_ENABLE_KEY);
 
     if (!stepEnabled) {
       this.configured = true;
       return;
     }
 
-    this.tmpDir = new File(conf.get(QC.TMP_DIR));
+    this.tmpDir = conf.getFile(QC.TMP_DIR);
 
     // Test Docker must be used for launching Blast
-    this.useDocker = Boolean.parseBoolean(
-        conf.get(Settings.QC_CONF_FASTQC_BLAST_USE_DOCKER_KEY).trim());
+    this.useDocker =
+        conf.getBoolean(Settings.QC_CONF_FASTQC_BLAST_USE_DOCKER_KEY);
 
     // Add arguments from configuration Aozan
     final String blastArguments =
@@ -149,7 +149,7 @@ public class OverrepresentedSequencesBlast {
 
     // Path to database for blast, need to add prefix filename used "nt"
     final String blastDBPath =
-        conf.get(Settings.QC_CONF_FASTQC_BLAST_DB_PATH_KEY).trim()
+        conf.get(Settings.QC_CONF_FASTQC_BLAST_DB_PATH_KEY)
             + PREFIX_FILENAME_DATABASE;
 
     final String blastPath;
@@ -160,7 +160,7 @@ public class OverrepresentedSequencesBlast {
     } else {
 
       // Path to blast executable
-      blastPath = conf.get(Settings.QC_CONF_FASTQC_BLAST_PATH_KEY).trim();
+      blastPath = conf.get(Settings.QC_CONF_FASTQC_BLAST_PATH_KEY);
 
       // Check paths needed in configuration aozan
       if (blastPath == null

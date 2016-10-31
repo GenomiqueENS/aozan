@@ -24,8 +24,8 @@ BASEDIR=`dirname $REAL_PATH`
 LIBDIR=$BASEDIR/lib
 
 # Set the memory in MiB needed by Aozan (only Java part, not external tools)
-# By Default 2048
-MEMORY=2048
+# By Default 4096
+MEMORY=4096
 
 # Additional JVM options
 JVM_OPTS="-server"

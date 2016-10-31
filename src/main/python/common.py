@@ -1,13 +1,33 @@
 # -*- coding: utf-8 -*-
 
-'''
-Created on 25 oct. 2011
+#
+#                  Aozan development code
+#
+# This code may be freely distributed and modified under the
+# terms of the GNU General Public License version 3 or later
+# and CeCILL. This should be distributed with the code. If you
+# do not have a copy, see:
+#
+#      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+#      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+#
+# Copyright for this code is held jointly by the Genomic platform
+# of the Institut de Biologie de l'École Normale Supérieure and
+# the individual authors.
+#
+# For more information on the Aozan project and its aims,
+# or to join the Aozan Google group, visit the home page at:
+#
+#      http://outils.genomique.biologie.ens.fr/aozan
+#
+#
 
-@author: Laurent Jourdren
+'''
+This script contains all common functions in all Aozan python scripts
 '''
 
 import hiseq_run, sync_run, demux_run
-import smtplib, os.path, time, sys
+import smtplib, os.path, time, sys, os, stat
 import mimetypes
 from email.utils import formatdate
 from glob import glob
@@ -60,6 +80,7 @@ from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQC_BLAST_PATH_K
 from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQC_BLAST_ENABLE_KEY
 from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQC_BLAST_DB_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_DATA_PATH_KEY
+from fr.ens.biologie.genomique.aozan.Settings import READ_ONLY_OUTPUT_FILES_KEY
 
 from fr.ens.biologie.genomique.aozan.util import StringUtils
 
@@ -89,7 +110,7 @@ QC_DENY_FILE = 'qc.deny'
 QC_DONE_FILE = 'qc.done'
 QC_LASTERR_FILE = 'qc.lasterr'
 
-BCL2FASTQ2_VERSION = "latest"
+BCL2FASTQ2_VERSION = "2.18.0.12"
 MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL = 12 * 3600
 
 def exists_in_path(program):
@@ -144,6 +165,44 @@ def du(path):
     child_stdout.close()
 
     return long(lines[0].split('\t')[0])
+
+
+def chmod(path, conf):
+    """Change the rights of a file.
+
+    Arguments:
+        path: path of the file
+        conf: Aozan configuration
+    """
+
+    if is_conf_value_equals_true(READ_ONLY_OUTPUT_FILES_KEY, conf):
+        try:
+            os.chmod(path, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+        except OSError:
+            return False
+
+    return True
+
+
+def chmod_files_in_dir(path, pattern, conf):
+    """Change the rights of files in a directory.
+
+    Arguments:
+        path: path of the directory
+        motif: file motif
+        conf: Aozan configuration
+    """
+
+    if is_conf_value_equals_true(READ_ONLY_OUTPUT_FILES_KEY, conf):
+
+        for root, dirs, files in os.walk(path):
+
+            for f in files:
+                if pattern is None or pattern == "" or pattern in f:
+                    if not chmod(root + '/' + f, conf):
+                        return False
+
+    return True
 
 
 def is_file_readable(path):
@@ -310,7 +369,7 @@ def get_input_run_data_path(run_id, conf):
         path = hiseq_run.find_hiseq_run_path(run_id, conf)
 
     if path is None or path is False or not os.path.exists(path):
-        error("Sequencer data directory does not exists.", "Sequencer data data directory does not exists.",
+        error("Sequencer data directory does not exist.", "Sequencer data data directory does not exist.",
               get_last_error_file(conf), conf)
         return None
 
@@ -378,15 +437,24 @@ def send_msg(subject, message, is_error, conf):
         print '-------------'
 
 
-def send_msg_with_attachment(subject, message, attachment_file, conf):
+def send_msg_with_attachment(subject, message, attachment_file, is_error, conf):
     """Send a message to the user about the data extraction."""
 
     send_mail = is_conf_value_equals_true(SEND_MAIL_KEY, conf)
     smtp_server = conf[SMTP_SERVER_KEY]
-    mail_to = conf[MAIL_TO_KEY]
     mail_from = conf[MAIL_FROM_KEY]
     mail_cc = None
     mail_bcc = None
+
+    # Specific receiver for error message
+    if is_error:
+        mail_to = conf[MAIL_ERROR_TO_KEY]
+
+        # Mail error not define
+        if mail_to is None or mail_to == '':
+            mail_to = conf[MAIL_TO_KEY]
+    else:
+        mail_to = conf[MAIL_TO_KEY]
 
     if mail_to is not None:
         if type(mail_to) == str or type(mail_to) == unicode:
@@ -520,7 +588,7 @@ def error(short_message, message, last_error_file_path, conf):
         conf: configuration dictionary
     """
 
-    # No write in last error file, directory does not exists
+    # No write in last error file, directory does not exist
     if last_error_file_path is False:
         return
 
@@ -642,7 +710,7 @@ def add_run_id(run_id, file_path, conf):
         file_path: path of the file
         conf: configuration dictionary
     """
-    log('INFO', 'Add ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(file_path),
+    log('INFO', 'Adding ' + run_id + ' on ' + get_instrument_name(run_id, conf) + ' to ' + os.path.basename(file_path),
         conf)
 
     f = File(file_path);
@@ -816,7 +884,7 @@ def is_section_to_add_in_report(sections, section_name, version, run_id, conf):
 def _check_conf_key(conf, msg, key_name):
 
     if not key_name in conf:
-        msg += '\n\t* Configuration setting not set: ' + key_name
+        msg += '\n\t* Configuration setting is not set: ' + key_name
         return False
 
     return True
@@ -827,7 +895,7 @@ def _check_conf_dir(conf, msg, key_name, desc):
         return False
 
     if not is_dir_exists(key_name, conf):
-        msg += '\n\t* ' + desc + ' directory does not exists: ' + conf[key_name]
+        msg += '\n\t* ' + desc + ' directory does not exist: ' + conf[key_name]
         return False
 
     return True
@@ -838,7 +906,7 @@ def _check_conf_file(conf, msg, key_name, desc):
         return False
 
     if not is_file_exists(key_name, conf):
-        msg += '\n\t* ' + desc + ' file does not exists: ' + conf[key_name]
+        msg += '\n\t* ' + desc + ' file does not exist: ' + conf[key_name]
         return False
 
     return True
@@ -876,7 +944,7 @@ def check_configuration(conf, configuration_file_path):
             # Check if hiseq_data_path exists
             for hiseq_output_path in hiseq_run.get_hiseq_data_paths(conf):
                 if not os.path.exists(hiseq_output_path):
-                    msg += '\n\t* Sequencer output directory does not exists: ' + hiseq_output_path
+                    msg += '\n\t* Sequencer output directory does not exist: ' + hiseq_output_path
 
     # For step SYNC
     if Settings.SYNC_STEP_KEY in steps_to_launch:
@@ -913,7 +981,7 @@ def check_configuration(conf, configuration_file_path):
 
     if len(msg) > 0:
         msg = 'Error(s) found in Aozan configuration file (' + os.path.abspath(configuration_file_path) + '):' + msg
-        error("[Aozan] check configuration: error(s) in configuration file.", msg, get_last_error_file(conf), conf)
+        error("[Aozan] Check configuration: error(s) in configuration file.", msg, get_last_error_file(conf), conf)
         return False
 
     return True
@@ -1228,7 +1296,7 @@ def load_conf(conf, conf_file_path):
     test_name_converting_table[ 'phasingprephasing' ] = 'lane.phasing.prephasing.percent'
     test_name_converting_table[ 'rawclusters' ] = 'lane.raw.cluster.count'
     test_name_converting_table[ 'rawclusterphix' ] = 'lane.phix.raw.cluster.count'
-    test_name_converting_table[ 'genomesproject' ] = 'project.genome.count'
+    test_name_converting_table[ 'genomesproject' ] = 'project.genome.names'
     test_name_converting_table[ 'isindexedproject' ] = 'project.is.indexed'
     test_name_converting_table[ 'lanesrunproject' ] = 'project.lane.count'
     test_name_converting_table[ 'linkprojectreport' ] = 'project.fastqscreen.report'
@@ -1270,7 +1338,7 @@ def load_conf(conf, conf_file_path):
     test_name_converting_table[ 'recoverablerawclusterssamples' ] = 'sample.recoverable.raw.cluster.count'
     test_name_converting_table[ 'sequencelengthdistribution' ] = 'sample.fastqc.sequence.length.distribution'
     test_name_converting_table[ 'samplestatsfsqmapped' ] = 'pooledsample.fastqscreen.mapped.percent'
-    test_name_converting_table[ 'genomessample' ] = 'pooledsample.genome.count'
+    test_name_converting_table[ 'genomessample' ] = 'pooledsample.genome.names'
     test_name_converting_table[ 'samplestathitnolibrariessum' ] = 'pooledsample.fastqscreen.mapped.except.ref.percent'
     test_name_converting_table[ 'isindexedsample' ] = 'pooledsample.is.indexed'
     test_name_converting_table[ 'lanesrunsample' ] = 'pooledsample.lane.count'
@@ -1322,7 +1390,11 @@ def load_conf(conf, conf_file_path):
         else:
             fields = s.split('=')
             key = fields[0].strip()
-            value = fields[1].strip()
+
+            if len(fields) == 1:
+                value = ''
+            else :
+                value = fields[1].strip()
 
             if len(fields) == 2:
 
@@ -1334,7 +1406,7 @@ def load_conf(conf, conf_file_path):
                 if key.startswith('qc.test.'):
                     for k in test_name_converting_table.keys():
                         prefix = 'qc.test.' + k + '.'
-                        if key.startswith(prefix):
+                        if key.lower().startswith(prefix.lower()):
                             key = 'qc.test.' + test_name_converting_table[k] + key[len(prefix) - 1:]
                             break
 
@@ -1344,12 +1416,6 @@ def load_conf(conf, conf_file_path):
 
     # Save configuration file path
     conf[Settings.AOZAN_CONF_FILE_PATH] = conf_file_path
-
-    # Save completed configuration file
-    f = open(conf[TMP_PATH_KEY] + '/full_aozan.conf', 'w')
-    f.write('\n'.join(str(x + '=' + str(conf[x])) for x in conf))
-    f.flush()
-    f.close()
 
     return conf
 
@@ -1439,3 +1505,6 @@ def set_default_conf(conf):
 
     # Docker URI
     conf[Settings.DOCKER_URI_KEY] = 'unix:///var/run/docker.sock'
+
+    # Change output file rights
+    conf[READ_ONLY_OUTPUT_FILES_KEY] = 'true'

@@ -105,8 +105,28 @@ public class ReadingInteropBinaryFileTest {
       final String key = line.substring(0, pos);
       final String value = line.substring(pos + 1);
       // Compare runData test and original for each line
-      Assert.assertEquals("For " + runName + " : " + key + " must be same ? ",
-          value, dataTest.get(key));
+
+      try {
+        // Try to cast value to int
+        int intValue = Integer.parseInt(value);
+        Assert.assertEquals("For " + runName + " : " + key + " must be same ? ",
+            intValue, dataTest.getInt(key));
+      } catch (NumberFormatException e1) {
+
+        try {
+          // Try to cast value to double
+          double doubleValue = Double.parseDouble(value);
+          Assert.assertEquals(
+              "For " + runName + " : " + key + " must be same ? ", doubleValue,
+              dataTest.getDouble(key), 1e-16);
+        } catch (NumberFormatException e2) {
+          // The value is a string
+          Assert.assertEquals(
+              "For " + runName + " : " + key + " must be same ? ", value,
+              dataTest.get(key));
+        }
+      }
+
     }
     br.close();
   }

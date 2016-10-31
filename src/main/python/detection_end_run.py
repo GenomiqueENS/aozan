@@ -1,15 +1,43 @@
 # -*- coding: utf-8 -*-
 
-import os, os.path, time
-import stat, hiseq_run, aozan
-from xml.etree.ElementTree import ElementTree
+#
+#                  Aozan development code
+#
+# This code may be freely distributed and modified under the
+# terms of the GNU General Public License version 3 or later
+# and CeCILL. This should be distributed with the code. If you
+# do not have a copy, see:
+#
+#      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+#      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+#
+# Copyright for this code is held jointly by the Genomic platform
+# of the Institut de Biologie de l'École Normale Supérieure and
+# the individual authors.
+#
+# For more information on the Aozan project and its aims,
+# or to join the Aozan Google group, visit the home page at:
+#
+#      http://outils.genomique.biologie.ens.fr/aozan
+#
+#
+
+'''
+This script checks if a run has ended sequencing.
+'''
+
+import aozan
+import hiseq_run
+import os
+import os.path
+import stat
 
 import common
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
-from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_STEP_KEY
+from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
-import cmd
+
 
 def send_failed_run_message(run_id, secs, conf):
     """Send a mail to inform about a failed run.
@@ -52,6 +80,7 @@ def add_run_id_to_processed_run_ids(run_id, conf):
 
     common.add_run_id(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + common.HISEQ_DONE_FILE, conf)
 
+
 def add_run_id_to_denied_run_ids(run_id, conf):
     """Add a denied run id to the list of the run ids.
 
@@ -60,7 +89,7 @@ def add_run_id_to_denied_run_ids(run_id, conf):
         conf: configuration dictionary
     """
 
-    common.add_run_id(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + DENY_FILE, conf)
+    common.add_run_id(run_id, conf[AOZAN_VAR_PATH_KEY] + '/' + common.HISEQ_DENY_FILE, conf)
 
 
 def error(short_message, message, conf):
@@ -75,7 +104,7 @@ def error(short_message, message, conf):
     common.error('[Aozan] hiseq done: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/hiseq.lasterr', conf)
 
 
-def get_available_terminated_run_ids(conf):
+def get_available_finished_run_ids(conf):
     """Get the list of the available runs.
 
     Arguments:
@@ -95,7 +124,8 @@ def get_available_terminated_run_ids(conf):
 
     return result
 
-def discover_terminated_runs(denied_runs, conf):
+
+def discover_finished_runs(denied_runs, conf):
     """Discover new ended runs
 
     Arguments:
@@ -105,19 +135,20 @@ def discover_terminated_runs(denied_runs, conf):
     run_ids_done = load_processed_run_ids(conf)
 
     if common.is_conf_value_equals_true(HISEQ_STEP_KEY, conf):
-        for run_id in (get_available_terminated_run_ids(conf) - run_ids_done - denied_runs):
+        for run_id in (get_available_finished_run_ids(conf) - run_ids_done - denied_runs):
 
             if run_id is None or len(run_id) == 0:
                 # No run id found
                 return []
 
             aozan.welcome(conf)
-            common.log('INFO', 'Discover end run ' + str(run_id) + ' on ' + common.get_instrument_name(run_id, conf),
+            common.log('INFO', 'Ending run detection ' + str(run_id) + ' on ' + common.get_instrument_name(run_id, conf),
                        conf)
 
             if hiseq_run.get_read_count(run_id, conf) == 0:
                 send_failed_run_message(run_id, common.MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL, conf)
                 add_run_id_to_denied_run_ids(run_id, conf)
+                create_run_summary_reports(run_id, conf)
             else:
                 if create_run_summary_reports(run_id, conf):
                     send_mail_if_recent_run(run_id, common.MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL, conf)
@@ -128,7 +159,7 @@ def discover_terminated_runs(denied_runs, conf):
 
 
 def send_mail_if_recent_run(run_id, secs, conf):
-    """Send an email to inform that a new run has been terminated.
+    """Send an email to inform that a new run is finished.
 
     Arguments:
         run_id: run id
@@ -145,9 +176,10 @@ def send_mail_if_recent_run(run_id, secs, conf):
     if last > 0:
         df = common.df(run_path) / (1024 * 1024 * 1024)
         du = common.du(run_path + '/' + run_id) / (1024 * 1024 * 1024)
-        common.send_msg('[Aozan] End of the run ' + run_id + ' on ' + common.get_instrument_name(run_id, conf),
-                        'A new run (' + run_id + ') has been terminated on ' +
-                        common.get_instrument_name(run_id, conf) + ' at ' + common.time_to_human_readable(last) + '.\n' +
+        common.send_msg('[Aozan] Ending run ' + run_id + ' on ' + common.get_instrument_name(run_id, conf),
+                        'A new run (' + run_id + ') is finished on ' +
+                        common.get_instrument_name(run_id, conf) + ' at ' + common.time_to_human_readable(
+                            last) + '.\n' +
                         'Data for this run can be found at: ' + run_path +
                         '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df), False, conf)
 
@@ -177,36 +209,36 @@ def create_run_summary_reports(run_id, conf):
 
     # Check if reports_data_path exists
     if not os.path.exists(reports_data_base_path):
-        error("Report directory does not exists",
-              "Report directory does not exists: " + reports_data_base_path, conf)
+        error("Failed to create report archive: Report directory does not exist",
+              "Failed to create report archive: Report directory does not exist: " + reports_data_base_path, conf)
         return False
 
     # Check if temporary directory exists
     if not os.path.exists(tmp_base_path):
-        error("Temporary directory does not exists",
-              "Temporary directory does not exists: " + tmp_base_path, conf)
+        error("Failed to create report archive: Temporary directory does not exist",
+              "Failed to create report archive: Temporary directory does not exist: " + tmp_base_path, conf)
         return False
 
     # Check if reports archive exists
     if os.path.exists(reports_data_path + '/' + report_archive_file):
-        error('Report archive already exists for run ' + run_id,
-              'Report archive already exists for run ' + run_id + ' : ' + report_archive_file, conf)
+        error("Failed to create report archive: Report archive already exists for run " + run_id,
+              "Failed to create report archive: Report archive already exists for run " + run_id + " : " + report_archive_file, conf)
         return False
 
     # Check if hiseq log archive exists
     if os.path.exists(reports_data_path + '/' + hiseq_log_archive_file):
-        error('Hiseq log archive already exists for run ' + run_id,
-              'Hiseq log archive already exists for run ' + run_id + ' : ' + hiseq_log_archive_file, conf)
+        error("Failed to create report archive: Hiseq log archive already exists for run " + run_id,
+              "Failed to create report archive: Hiseq log archive already exists for run " + run_id + " : " + hiseq_log_archive_file, conf)
         return False
 
-    # Create if not exists archive directory for the run
+    # Create if not exist archive directory for the run
     if not os.path.exists(reports_data_path):
         os.mkdir(reports_data_path)
 
     # Create run tmp  directory
     if os.path.exists(tmp_path):
-        error('Temporary run data directory already exists for run ' + run_id,
-              'Temporary run data directory already exists for run ' + run_id + ' : ' + hiseq_log_archive_file, conf)
+        error("Failed to create report archive: Temporary run data directory already exists for run " + run_id,
+              "Failed to create report archive: Temporary run data directory already exists for run " + run_id + " : " + hiseq_log_archive_file, conf)
     else:
         os.mkdir(tmp_path)
 
@@ -216,7 +248,7 @@ def create_run_summary_reports(run_id, conf):
 
     if files_to_copy is None:
         common.log("WARNING",
-                   "Archive " + hiseq_log_archive_file + " not create: none file exists " + str(files) +
+                   "Archive " + hiseq_log_archive_file + " not created: none file exists " + str(files) +
                    ' in ' + source_path, conf)
     else:
         cmd = 'cd \'' + source_path + '\' && ' + \
@@ -229,8 +261,8 @@ def create_run_summary_reports(run_id, conf):
 
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
-            error("error while saving Illumina quality control for run " + run_id,
-                  'Error saving Illumina quality control.\nCommand line:\n' + cmd, conf)
+            error("Failed to create report archive: Error while saving Illumina quality control for run " + run_id,
+                  "Failed to create report archive: Error saving Illumina quality control.\nCommand line:\n" + cmd, conf)
             return False
 
     # Save html reports
@@ -239,8 +271,8 @@ def create_run_summary_reports(run_id, conf):
 
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
-            error("error while removing existing temporary directory",
-                  'Error while removing existing temporary directory.\nCommand line:\n' + cmd, conf)
+            error("Failed to create report archive: Error while removing existing temporary directory",
+                  "Failed to create report archive: Error while removing existing temporary directory.\nCommand line:\n" + cmd, conf)
             return False
 
     os.mkdir(tmp_path)
@@ -253,7 +285,7 @@ def create_run_summary_reports(run_id, conf):
 
     files_to_copy = common.list_existing_files(source_path, files)
     if files_to_copy is None:
-        common.log("WARNING", "Archive " + report_archive_file + " not create: none file exists " + str(
+        common.log("WARNING", "Archive " + report_archive_file + " not created: none file exists " + str(
             files) + ' in ' + source_path, conf)
     else:
         cmd = 'cd \'' + source_path + '\' && ' + \
@@ -261,21 +293,22 @@ def create_run_summary_reports(run_id, conf):
               'cd \'' + tmp_base_path + '\' && ' + \
               'mv \'' + run_id + '\' \'' + report_prefix + run_id + '\' && ' + \
               'tar cjf \'' + reports_data_path + '/' + report_archive_file + '\' \'' + report_prefix + run_id + '\' && ' + \
-              'chmod -R u=rwX,go=rX \'' + report_prefix + run_id + '\' && ' + \
               'mv \'' + report_prefix + run_id + '\' \'' + reports_data_path + '\''
 
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
-            error("error while saving Illumina html reports for run " + run_id,
-                  'Error saving Illumina html reports.\nCommand line:\n' + cmd, conf)
+            error("Failed to create report archive: Error while saving Illumina HTML reports for run " + run_id,
+                  "Failed to create report archive: Error saving Illumina HTML reports.\nCommand line:\n" + cmd, conf)
             return False
 
     # Create index.hml file
     common.create_html_index_file(conf, run_id, [HISEQ_STEP_KEY])
 
+    # Set read only the report directory
+    common.chmod_files_in_dir(reports_data_path + '/' + report_prefix, None, conf)
+
     # Set read only archives files
-    os.chmod(reports_data_path + '/' + report_archive_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
-    os.chmod(reports_data_path + '/' + hiseq_log_archive_file, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+    common.chmod(reports_data_path + '/' + report_archive_file, conf)
+    common.chmod(reports_data_path + '/' + hiseq_log_archive_file, conf)
 
     return True
-

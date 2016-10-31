@@ -44,7 +44,7 @@ import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
  * @author Sandrine Perrin
  * @since 2.0
  */
-public class PFPercentPooledSampleTest extends AbstractSampleStatsTest {
+public class PFPercentPooledSampleTest extends AbstractPooledSampleTest {
 
   private final ScoreInterval interval = new ScoreInterval();
 

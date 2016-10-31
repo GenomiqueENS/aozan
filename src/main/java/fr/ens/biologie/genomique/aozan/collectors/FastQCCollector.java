@@ -26,6 +26,7 @@ package fr.ens.biologie.genomique.aozan.collectors;
 import java.io.File;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
+import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
@@ -63,8 +64,7 @@ public class FastQCCollector extends AbstractFastqCollector {
     if (conf.containsKey(Settings.QC_CONF_THREADS_KEY)) {
 
       try {
-        final int confThreads =
-            Integer.parseInt(conf.get(Settings.QC_CONF_THREADS_KEY).trim());
+        final int confThreads = conf.getInt(Settings.QC_CONF_THREADS_KEY, -1);
 
         if (confThreads > 0) {
           this.numberThreads = confThreads;
@@ -75,8 +75,8 @@ public class FastQCCollector extends AbstractFastqCollector {
 
     // Check if process undetermined indices samples specify in Aozan
     // configuration
-    this.isProcessUndeterminedIndicesSamples = Boolean.parseBoolean(
-        conf.get(Settings.QC_CONF_FASTQC_PROCESS_UNDETERMINED_SAMPLES_KEY));
+    this.isProcessUndeterminedIndicesSamples = conf
+        .getBoolean(Settings.QC_CONF_FASTQC_PROCESS_UNDETERMINED_SAMPLES_KEY);
 
     // Check if step blast needed and configure
     OverrepresentedSequencesBlast.getInstance().configure(conf,
@@ -89,8 +89,13 @@ public class FastQCCollector extends AbstractFastqCollector {
       final FastqSample fastqSample, final File reportDir, final boolean runPE)
       throws AozanException {
 
-    if (fastqSample.getFastqFiles().isEmpty()) {
-      return null;
+    Common.getLogger().info("Process sample for FastQC: " + fastqSample.toString());
+
+    if (fastqSample.getFastqFiles() == null
+        || fastqSample.getFastqFiles().isEmpty()) {
+
+      throw new AozanException("No FASTQ file defined for the fastqSample: "
+          + fastqSample.getKeyFastqSample());
     }
 
     // Create the thread object

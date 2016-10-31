@@ -43,7 +43,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
@@ -67,7 +66,7 @@ public class ReDemux {
   private final File inputDir;
   private final File outputDir;
   private final SampleSheet sampleSheet;
-  private final Map<Integer, ReDemuxLane> lanesToRedemux = Maps.newHashMap();
+  private final Map<Integer, ReDemuxLane> lanesToRedemux = new HashMap<>();
 
   @SuppressWarnings("unused")
   private String bcl2fastqVersion;
@@ -82,7 +81,7 @@ public class ReDemux {
     private final List<Integer> reads;
     private final File inputDir;
     private final File outputDir;
-    private final Map<Pattern, Sample> newIndexes = Maps.newHashMap();
+    private final Map<Pattern, Sample> newIndexes = new HashMap<>();
 
     /**
      * Add an index for the re-demultiplexing.
@@ -350,12 +349,12 @@ public class ReDemux {
         final CompressionType compression)
         throws FileNotFoundException, IOException {
 
-      final Map<Pattern, FastqWriter> result = Maps.newHashMap();
+      final Map<Pattern, FastqWriter> result = new HashMap<>();
 
       for (Map.Entry<Pattern, Sample> e : this.newIndexes.entrySet()) {
 
         final String sampleProject = e.getValue().getSampleProject();
-        final String sampleName = e.getValue().getSampleId();
+        final String sampleName = e.getValue().getDemultiplexingName();
         final String sampleIndex = e.getValue().getIndex1();
 
         // Define the output directory
@@ -394,7 +393,7 @@ public class ReDemux {
       for (Map.Entry<Pattern, Sample> e : this.newIndexes.entrySet()) {
 
         final String sampleProject = e.getValue().getSampleProject();
-        final String sampleName = e.getValue().getSampleId();
+        final String sampleName = e.getValue().getDemultiplexingName();
         final String sampleIndex = e.getValue().getIndex1();
 
         // Define the output directory

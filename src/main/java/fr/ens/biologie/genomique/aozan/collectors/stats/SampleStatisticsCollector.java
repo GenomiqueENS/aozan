@@ -23,7 +23,7 @@
 
 package fr.ens.biologie.genomique.aozan.collectors.stats;
 
-import static fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput.UNDETERMINED_DIR_NAME;
+import static fr.ens.biologie.genomique.aozan.io.FastqSample.UNDETERMINED_DIR_NAME;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -49,10 +49,10 @@ public class SampleStatisticsCollector extends StatisticsCollector {
   // TODO Check the RunData keys names
 
   /** Collector name. */
-  public static final String COLLECTOR_NAME = "samplestats";
+  public static final String COLLECTOR_NAME = "pooledsample";
 
   /** Collector prefix for updating rundata */
-  public static final String COLLECTOR_PREFIX = "samplestats";
+  public static final String COLLECTOR_PREFIX = "pooledsample";
 
   public static final String UNDETERMINED_SAMPLE = "undetermined";
 

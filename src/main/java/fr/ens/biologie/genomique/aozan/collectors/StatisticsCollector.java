@@ -23,7 +23,7 @@
 
 package fr.ens.biologie.genomique.aozan.collectors;
 
-import static fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput.UNDETERMINED_DIR_NAME;
+import static fr.ens.biologie.genomique.aozan.io.FastqSample.UNDETERMINED_DIR_NAME;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,10 +86,10 @@ public abstract class StatisticsCollector implements Collector {
 
     // Set stylesheet file to build project report
     try {
-      final String filename =
-          conf.get(Settings.QC_CONF_FASTQSCREEN_PROJECT_XSL_FILE_KEY);
-      if (new File(filename).exists()) {
-        this.fastqscreenXSLFile = new File(filename);
+      final File file =
+          conf.getFile(Settings.QC_CONF_FASTQSCREEN_PROJECT_XSL_FILE_KEY);
+      if (file != null && file.exists()) {
+        this.fastqscreenXSLFile = file;
       }
     } catch (final Exception e) {
       // Call default xsl file
@@ -97,20 +97,9 @@ public abstract class StatisticsCollector implements Collector {
     }
 
     // Extract threshold from property
-    final String threshod = conf
-        .get(Settings.QC_CONF_FASTQSCREEN_PERCENT_PROJECT_CONTAMINATION_THRESHOLD_KEY);
-
-    // Set the contaminant threshold
-    if (threshod == null || threshod.isEmpty()) {
-      // Use default threshold
-      this.contaminationThreshold = DEFAULT_CONTAMINATION_PERCENT_THRESHOLD;
-    } else {
-      try {
-        this.contaminationThreshold = Double.parseDouble(threshod);
-      } catch (Exception e) {
-        this.contaminationThreshold = DEFAULT_CONTAMINATION_PERCENT_THRESHOLD;
-      }
-    }
+    this.contaminationThreshold = conf.getDouble(
+        Settings.QC_CONF_FASTQSCREEN_PERCENT_PROJECT_CONTAMINATION_THRESHOLD_KEY,
+        DEFAULT_CONTAMINATION_PERCENT_THRESHOLD);
 
     // Check optional collector selected
     final List<String> collectorNames = Splitter.on(',').trimResults()

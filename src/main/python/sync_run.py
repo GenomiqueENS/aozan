@@ -1,5 +1,31 @@
 # -*- coding: utf-8 -*-
 
+#
+#                  Aozan development code
+#
+# This code may be freely distributed and modified under the
+# terms of the GNU General Public License version 3 or later
+# and CeCILL. This should be distributed with the code. If you
+# do not have a copy, see:
+#
+#      http://www.gnu.org/licenses/gpl-3.0-standalone.html
+#      http://www.cecill.info/licences/Licence_CeCILL_V2-en.html
+#
+# Copyright for this code is held jointly by the Genomic platform
+# of the Institut de Biologie de l'École Normale Supérieure and
+# the individual authors.
+#
+# For more information on the Aozan project and its aims,
+# or to join the Aozan Google group, visit the home page at:
+#
+#      http://outils.genomique.biologie.ens.fr/aozan
+#
+#
+
+'''
+This script synchronize a run.
+'''
+
 import os
 import time
 
@@ -42,8 +68,8 @@ def is_sync_step_enable(conf):
             # Check bcl not same hiseq output path
             for path in hiseq_run.get_hiseq_data_paths(conf):
                 if path == bcl_path:
-                    error('error configuration.',
-                          'Basecalling path and hiseq output data path are the same: ' + bcl_path, conf)
+                    error('Configuration error.',
+                          'Basecalling path and hiseq output data path must be different: ' + bcl_path, conf)
                     return False
 
             return True
@@ -81,7 +107,7 @@ def error(short_message, message, conf):
         conf: configuration dictionary
     """
 
-    common.error('[Aozan] synchronizer: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/' + common.SYNC_LASTERR_FILE, conf)
+    common.error('[Aozan] Synchronizer: ' + short_message, message, conf[AOZAN_VAR_PATH_KEY] + '/' + common.SYNC_LASTERR_FILE, conf)
 
 
 def get_exclude_files_list(run_id, conf):
@@ -125,12 +151,12 @@ def partial_sync(run_id, last_sync, conf):
 
     # Check if hiseq_data_path exists
     if not os.path.exists(hiseq_data_path):
-        error("Sequencer directory does not exists", "Sequencer directory does not exists: " + hiseq_data_path, conf)
+        error("Sequencer directory does not exist", "Sequencer directory does not exist: " + hiseq_data_path, conf)
         return False
 
     # Check if bcl_data_path exists
     if not os.path.exists(bcl_data_path):
-        error("Basecalling directory does not exists", "Basecalling directory does not exists: " + bcl_data_path, conf)
+        error("Basecalling directory does not exist", "Basecalling directory does not exist: " + bcl_data_path, conf)
         return False
 
     # Check if final output path already exists
@@ -142,7 +168,7 @@ def partial_sync(run_id, last_sync, conf):
     input_path = hiseq_data_path + '/' + run_id
     output_path = bcl_data_path + '/' + run_id + '.tmp'
 
-    # Create output path for run if not exists
+    # Create output path for run if not exist
     if not os.path.exists(output_path):
         os.mkdir(output_path)
 
@@ -188,7 +214,7 @@ def partial_sync(run_id, last_sync, conf):
         cmd += ' > \'' + rsync_manifest_path + '\''
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
-            error("error while executing rsync for run " + run_id, 'Error while executing find.\nCommand line:\n' + cmd,
+            error("Error while executing rsync for run " + run_id, 'Error while executing find.\nCommand line:\n' + cmd,
                   conf)
             return False
         rsync_params = '--files-from=\'' + rsync_manifest_path + '\''
@@ -197,7 +223,7 @@ def partial_sync(run_id, last_sync, conf):
     cmd = 'rsync  -a --no-owner --no-group ' + rsync_params + ' \'' + input_path + '/ ' + output_path + '\''
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
-        error("error while executing rsync for run " + run_id, 'Error while executing rsync.\nCommand line:\n' + cmd,
+        error("Error while executing rsync for run " + run_id, 'Error while executing rsync.\nCommand line:\n' + cmd,
               conf)
         return False
 
@@ -216,7 +242,7 @@ def sync(run_id, conf):
     """
 
     start_time = time.time()
-    common.log('INFO', 'Sync step: start', conf)
+    common.log('INFO', 'Sync step: Starting', conf)
 
     bcl_data_path = conf[BCL_DATA_PATH_KEY]
     reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
@@ -230,7 +256,7 @@ def sync(run_id, conf):
 
     # Check if reports_data_path exists
     if not os.path.exists(reports_data_base_path):
-        error("Report directory does not exists", "Report directory does not exists: " + reports_data_base_path, conf)
+        error("Report directory does not exist", "Report directory does not exist: " + reports_data_base_path, conf)
         return False
 
     # Check if enough space to store reports
@@ -259,18 +285,18 @@ def sync(run_id, conf):
 
     duration = time.time() - start_time
 
-    msg = 'End of synchronization for run ' + run_id + '.\n' + \
+    msg = 'Ending synchronization for run ' + run_id + '.\n' + \
           'Job finished at ' + common.time_to_human_readable(time.time()) + \
-          ' with no error in ' + common.duration_to_human_readable(duration) + '.\n\n' + \
+          ' without error in ' + common.duration_to_human_readable(duration) + '.\n\n' + \
           'Run output files (without .cif files) can be found in the following directory:\n  ' + output_path
 
     # Add path to report if reports.url exists
     if common.is_conf_key_exists(REPORTS_URL_KEY, conf):
         msg += '\n\nRun reports can be found at following location:\n  ' + conf[REPORTS_URL_KEY] + '/' + run_id
 
-    msg += '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df)
+    msg += '\n\nFor this task %.2f GB has been used and %.2f GB is still free.' % (du, df)
 
-    common.send_msg('[Aozan] End of synchronization for run ' + run_id + ' on ' +
+    common.send_msg('[Aozan] Ending synchronization for run ' + run_id + ' on ' +
                     common.get_instrument_name(run_id, conf), msg, False, conf)
-    common.log('INFO', 'sync step: success in ' + common.duration_to_human_readable(duration), conf)
+    common.log('INFO', 'sync step: successful in ' + common.duration_to_human_readable(duration), conf)
     return True

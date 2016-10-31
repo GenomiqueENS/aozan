@@ -98,8 +98,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
    * Create a temporary partial file from a array of fastq files.
    * @throws AozanException if an error occurs while creating file
    */
-  @Override
-  protected void processResults() throws AozanException {
+  private void processResults() throws AozanException {
 
     if (!getFastqSample().getSubsetFastqFile().exists()) {
 
