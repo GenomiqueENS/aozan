@@ -224,7 +224,7 @@ mkdir "$AOZAN_DIR"/runs
 
 echo "* Download example configuration file"
 cd "$AOZAN_DIR"/conf
-wget -q "$AOZAN_WEBITE/aozan-example.conf"
+wget -q "$AOZAN_WEBITE/data/aozan-example.conf"
 mv aozan-example.conf aozan.conf
 cd "$AOZAN_DIR"
 
