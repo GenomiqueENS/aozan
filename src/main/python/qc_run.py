@@ -27,6 +27,7 @@ This script executes quality control step.
 '''
 
 import os.path, stat
+from pipes import quote
 import common, time
 import demux_run, hiseq_run
 
@@ -212,8 +213,8 @@ def qc(run_id, conf):
         return False
 
     # Archive the reports
-    cmd = 'cd \'' + reports_data_path + '\'  && ' + \
-          'tar cjf \'qc_' + run_id + '.tar.bz2\' \'qc_' + run_id + '\''
+    cmd = 'cd ' + quote(reports_data_path) + ' && ' + \
+          'tar cjf qc_' + run_id + '.tar.bz2 qc_' + run_id
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("Error while saving the QC archive file for " + run_id,

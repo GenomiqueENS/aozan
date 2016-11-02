@@ -30,6 +30,7 @@ import glob
 import os
 import time
 from subprocess import call, CalledProcessError
+from pipes import quote
 
 import common
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
@@ -143,14 +144,14 @@ def recompress_fastq_process(input_file, output_file, input_decompression_comman
             # Rename and set previous time stamp and rights to output_file then remove md5sum files
             os.rename(temp_file, output_file)
 
-            if call(["bash", "-c", "touch -r \'" + input_file + "\' \'" + output_file + "\'"]) != 0:
+            if call(["bash", "-c", "touch -r " + quote(input_file) + " " + quote(output_file) ]) != 0:
                 error_message = "Error while trying to edit metadata using touch command."
                 long_error_message = "Error while trying to edit metadata using touch command. Input file is " + str(
                     input_file) + " and output file is " + str(
                     output_file) + ""
                 return False, error_message, long_error_message
 
-            if call(["bash", "-c", "chmod --reference \'" + input_file + "\' \'" + output_file + "\'"]) != 0:
+            if call(["bash", "-c", "chmod --reference " + quote(input_file) + " " + quote(output_file)]) != 0:
                 error_message = "Error while trying to edit rights using chmod command."
                 long_error_message = "Error while trying to edit right using touch command. Input file is " + str(
                     input_file) + " and output file is " + str(

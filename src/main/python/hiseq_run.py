@@ -27,7 +27,7 @@ This script checks all informations about a run.
 '''
 
 import os, os.path, time
-import stat, detection_end_run
+import stat
 import common
 
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY

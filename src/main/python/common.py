@@ -26,8 +26,9 @@
 This script contains all common functions in all Aozan python scripts
 '''
 
-import hiseq_run, sync_run, demux_run
+import hiseq_run, sync_run
 import smtplib, os.path, time, sys, os, stat
+from pipes import quote
 import mimetypes
 from email.utils import formatdate
 from glob import glob
@@ -163,7 +164,7 @@ def du(path):
     if not os.path.exists(path):
         return 0L
 
-    cmd = 'du -b --max-depth=0 \'' + path + '\''
+    cmd = 'du -b --max-depth=0 ' + quote(path)
     child_stdin, child_stdout = os.popen2(cmd)
     lines = child_stdout.readlines()
     child_stdin.close()

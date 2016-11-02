@@ -27,6 +27,7 @@ This script executes demultiplexing step.
 '''
 
 import os.path, stat, sys
+from pipes import quote
 import common, hiseq_run, time
 import glob
 import re
@@ -251,7 +252,7 @@ def load_samplesheet(run_id, input_run_data_path, samplesheet_filename, conf):
             input_samplesheet_generated_path = conf[TMP_PATH_KEY] + '/' + samplesheet_filename + 'generated.csv'
 
             cmd = conf[
-                      BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY] + ' ' + run_id + ' \'' + input_samplesheet_generated_path + '\''
+                      BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY] + ' ' + run_id + ' ' + quote(input_samplesheet_generated_path)
             common.log("INFO", "exec: " + cmd, conf)
             if os.system(cmd) != 0:
                 error(action_error_msg + ' for run ' + run_id,
@@ -425,15 +426,15 @@ def create_bcl2fastq_command_line(run_id, command_path, input_run_data_path, fas
     args.extend(['--barcode-mismatches', nb_mismatch])
 
     # Common parameter, setting per default
-    args.extend(['--input-dir', '\'' + input_run_data_path + '/Data/Intensities/BaseCalls\''])
-    args.extend(['--output-dir', '\'' + fastq_output_dir + '\''])
+    args.extend(['--input-dir', quote(input_run_data_path + '/Data/Intensities/BaseCalls')])
+    args.extend(['--output-dir', quote(fastq_output_dir)])
 
     if common.is_conf_value_equals_true(BCL2FASTQ_WITH_FAILED_READS_KEY, conf):
         args.append('--with-failed-reads')
 
     # Specific parameter
-    args.extend(['--runfolder-dir', '\'' + input_run_data_path + '\''])
-    args.extend(['--interop-dir', '\'' + fastq_output_dir + '/InterOp\''])
+    args.extend(['--runfolder-dir', quote(input_run_data_path)])
+    args.extend(['--interop-dir', quote(fastq_output_dir + '/InterOp')])
     args.extend(['--min-log-level', 'TRACE'])
     # args.extend(['--stats-dir', fastq_output_dir + '/Stats'])
     # args.extend(['--reports-dir', fastq_output_dir + '/Reports'])
@@ -454,8 +455,8 @@ def create_bcl2fastq_command_line(run_id, command_path, input_run_data_path, fas
         args.extends(additional_args.split(' '))
 
     # Retrieve output in file
-    args.extend(['>', '\'' + tmp_path + '/bcl2fastq_output_' + run_id + '.out\''])
-    args.extend(['2>', '\'' + tmp_path + '/bcl2fastq_output_' + run_id + '.err\''])
+    args.extend(['>', quote(tmp_path + '/bcl2fastq_output_' + run_id + '.out')])
+    args.extend(['2>', quote(tmp_path + '/bcl2fastq_output_' + run_id + '.err')])
 
     return " ".join(args)
 
@@ -621,10 +622,10 @@ def archive_demux_stat(run_id, fastq_output_dir, reports_data_path, basecall_sta
 
     # With bcl2fastq 2
     cmd_list = []
-    cmd_list.extend(['cd', '\'' + fastq_output_dir + '\'', '&&'])
-    cmd_list.extend(['mkdir', '\'' + archive_run_dir + '\'', '&&'])
-    cmd_list.extend(['cp', '-r', 'Reports', 'Stats', 'InterOp', '\'' + samplesheet_csv_path + '\'', '\'' + archive_run_dir + '\'', '&&'])
-    cmd_list.extend(['tar cjf', '\'' + archive_run_tar_file + '\'', '-C', '\'' + reports_data_path + '\'', '\'' + archive_run_dirname + '\''])
+    cmd_list.extend(['cd', quote(fastq_output_dir), '&&'])
+    cmd_list.extend(['mkdir', quote(archive_run_dir), '&&'])
+    cmd_list.extend(['cp', '-r', 'Reports', 'Stats', 'InterOp', quote(samplesheet_csv_path), quote(archive_run_dir), '&&'])
+    cmd_list.extend(['tar cjf', quote(archive_run_tar_file), '-C', quote(reports_data_path), quote(archive_run_dirname)])
 
     cmd = " ".join(cmd_list)
 
@@ -657,16 +658,16 @@ def archive_samplesheet(run_id, original_samplesheet_path, samplesheet_csv_path,
             (common.is_conf_value_defined(BCL2FASTQ_SAMPLESHEET_FORMAT_KEY, 'xlsx', conf) \
             and original_samplesheet_path.endswith(".xlsx")):
 
-        cmd = 'cp \'' + original_samplesheet_path + '\' \'' + conf[TMP_PATH_KEY] + \
-              '\' && cd \'' + conf[TMP_PATH_KEY] + \
-              '\' && zip -q \'' + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] + '\'/\'' + \
-              conf[BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip\' \'' + \
-              os.path.basename(samplesheet_csv_path) + '\' \'' + os.path.basename(original_samplesheet_path) + '\''
+        cmd = 'cp ' + quote(original_samplesheet_path) + ' ' + quote(conf[TMP_PATH_KEY]) + \
+              ' && cd ' + quote(conf[TMP_PATH_KEY]) + \
+              ' && zip -q ' + quote(conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] + '/' + \
+              conf[BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip') + ' ' + \
+              quote(os.path.basename(samplesheet_csv_path)) + ' ' + quote(os.path.basename(original_samplesheet_path))
     else:
-        cmd = 'cd \'' + conf[TMP_PATH_KEY] + \
-              '\' && zip -q \'' + conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] + '\'/\'' + \
-              conf[BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip\' \'' + \
-              os.path.basename(samplesheet_csv_path) + '\''
+        cmd = 'cd ' + quote(conf[TMP_PATH_KEY]) + \
+              ' && zip -q ' + quote(conf[BCL2FASTQ_SAMPLESHEETS_PATH_KEY] + '/' + \
+              conf[BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY] + 's.zip') + ' ' + \
+              quote(os.path.basename(samplesheet_csv_path))
 
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
@@ -836,7 +837,7 @@ def demux(run_id, conf):
         return False
 
     # Copy bcl2fastq log to output directory
-    cmd = 'cp ' + conf[TMP_PATH_KEY] + '/bcl2fastq_output_' + run_id + '.* ' + fastq_output_dir
+    cmd = 'cp ' + quote(conf[TMP_PATH_KEY]) + '/bcl2fastq_output_' + run_id + '.* ' + quote(fastq_output_dir)
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("Error while copying bcl2fastq log to the output FASTQ directory" + run_id_msg,
@@ -857,7 +858,7 @@ def demux(run_id, conf):
         return False
 
     # Copy samplesheet to output directory
-    cmd = 'cp -p \'' + bcl2fastq_samplesheet_path + '\' \'' + fastq_output_dir + '/SampleSheet.csv\''
+    cmd = 'cp -p ' + quote(bcl2fastq_samplesheet_path) + ' ' + quote(fastq_output_dir + '/SampleSheet.csv')
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("Error while copying samplesheet file to FASTQ directory for run " + run_id,

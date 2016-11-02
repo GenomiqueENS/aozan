@@ -33,6 +33,7 @@ import os.path
 import stat
 
 import common
+from pipes import quote
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
@@ -195,7 +196,7 @@ def list_existing_files(path, files_array):
     filename_list = []
     for filename in files_array:
         if os.path.exists(path + '/' + filename):
-            filename_list.append('\'' + filename + '\'')
+            filename_list.append(quote(filename))
 
     return ' '.join(filename_list)
 
@@ -267,12 +268,12 @@ def create_run_summary_reports(run_id, conf):
                    "Archive " + hiseq_log_archive_file + " not created: none file exists " + str(files) +
                    ' in ' + source_path, conf)
     else:
-        cmd = 'cd \'' + source_path + '\' && ' + \
-              'cp -rp ' + files_to_copy + ' \'' + tmp_path + '\' && ' + \
-              'cd \'' + tmp_base_path + '\' && ' + \
-              'mv \'' + run_id + '\' \'' + hiseq_log_prefix + run_id + '\' && ' + \
-              'tar cjf \'' + reports_data_path + '/' + hiseq_log_archive_file + '\' \'' + hiseq_log_prefix + run_id + \
-              '\' && ' + 'rm -rf \'' + tmp_path + '\''
+        cmd = 'cd ' + quote(source_path) + ' && ' + \
+              'cp -rp ' + files_to_copy + ' ' + quote(tmp_path) + ' && ' + \
+              'cd ' + quote(tmp_base_path) + ' && ' + \
+              'mv ' + quote(run_id) + ' ' + quote(hiseq_log_prefix + run_id) + ' && ' + \
+              'tar cjf ' + quote(reports_data_path + '/' + hiseq_log_archive_file) + ' ' + quote(hiseq_log_prefix + run_id) + ' && ' +\
+              'rm -rf ' + quote(tmp_path)
         # + ' && rm -rf ' + hiseq_log_prefix + run_id
 
         common.log("INFO", "exec: " + cmd, conf)
@@ -283,7 +284,7 @@ def create_run_summary_reports(run_id, conf):
 
     # Save html reports
     if os.path.exists(tmp_path):
-        cmd = 'rm -rf \'' + tmp_path + '\''
+        cmd = 'rm -rf ' + quote(tmp_path)
 
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
@@ -299,17 +300,17 @@ def create_run_summary_reports(run_id, conf):
     else:
         files = ['./Config', './Recipe', './RTALogs', './RTAConfiguration.xml', './RunCompletionStatus.xml']
 
-    files_to_copy = common.list_existing_files(source_path, files)
+    files_to_copy = list_existing_files(source_path, files)
     if len(files_to_copy) == 0:
         common.log("WARNING", "Archive " + report_archive_file + " not created: none file exists " + str(
             files) + ' in ' + source_path, conf)
     else:
-        cmd = 'cd \'' + source_path + '\' && ' + \
-              'cp -rp ' + files_to_copy + ' \'' + tmp_path + '\' && ' + \
-              'cd \'' + tmp_base_path + '\' && ' + \
-              'mv \'' + run_id + '\' \'' + report_prefix + run_id + '\' && ' + \
-              'tar cjf \'' + reports_data_path + '/' + report_archive_file + '\' \'' + report_prefix + run_id + '\' && ' + \
-              'mv \'' + report_prefix + run_id + '\' \'' + reports_data_path + '\''
+        cmd = 'cd ' + quote(source_path) + ' && ' + \
+              'cp -rp ' + files_to_copy + ' ' + quote(tmp_path) + ' && ' + \
+              'cd ' + quote(tmp_base_path) + ' && ' + \
+              'mv ' + quote(run_id) + ' ' + quote(report_prefix + run_id) + ' && ' + \
+              'tar cjf ' + quote(reports_data_path + '/' + report_archive_file) + ' ' + quote(report_prefix + run_id) + ' && ' + \
+              'mv ' + quote(report_prefix + run_id) + ' ' + quote(reports_data_path)
 
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
