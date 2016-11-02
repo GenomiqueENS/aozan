@@ -171,6 +171,16 @@ public final class Settings {
   public static final String SEND_MAIL_KEY = "send.mail";
   /** SMTP server. */
   public static final String SMTP_SERVER_KEY = "smtp.server";
+  /** SMTP port. */
+  public static final String SMTP_PORT_KEY = "smtp.port";
+  /** SMTP use starttls. */
+  public static final String SMTP_USE_STARTTLS_KEY = "smtp.use.starttls";
+  /** SMTP use SSL. */
+  public static final String SMTP_USE_SSL_KEY = "smtp.use.ssl";
+  /** SMTP login. */
+  public static final String SMTP_LOGIN_KEY = "smtp.login";
+  /** SMTP password. */
+  public static final String SMTP_PASSWORD_KEY = "smtp.password";
   /** Synchronization continuous. */
   public static final String SYNC_CONTINUOUS_SYNC_KEY = "sync.continuous.sync";
   /** Synchronization continuous minimum ages files. */
