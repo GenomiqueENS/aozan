@@ -218,10 +218,10 @@ def convert_fastq_file(input_file, output_file, input_decompression_command, out
         # Command a decompresses input file create md5sum for this file then compresses it
         # Whereas Command b decompresses output file just to check md5sum
         # noinspection PyPep8
-        command_a = input_decompression_command + " '" + input_file + "' |tee >(md5sum > '" + input_md5sum + "') | " \
-                        + output_compression_command + " " + compression_level_argument + " > '" + output_file + "'"
+        command_a = input_decompression_command + " " + quote(input_file) + " | tee >( md5sum > " + quote(input_md5sum) + " ) | " \
+                        + output_compression_command + " " + compression_level_argument + " > " + quote(output_file)
 
-        command_b = output_decompression_command + " '" + output_file + "' | md5sum > '" + output_md5sum + "'"
+        command_b = output_decompression_command + " " + quote(output_file) + " | md5sum > " + quote(output_md5sum)
 
         # Actual commands execution
         try:
