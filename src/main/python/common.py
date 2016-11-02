@@ -58,6 +58,11 @@ from java.io import RandomAccessFile;
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_DEBUG_KEY
 from fr.ens.biologie.genomique.aozan.Settings import SEND_MAIL_KEY
 from fr.ens.biologie.genomique.aozan.Settings import SMTP_SERVER_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SMTP_PORT_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SMTP_USE_STARTTLS_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SMTP_USE_SSL_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SMTP_LOGIN_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SMTP_PASSWORD_KEY
 from fr.ens.biologie.genomique.aozan.Settings import MAIL_ERROR_TO_KEY
 from fr.ens.biologie.genomique.aozan.Settings import MAIL_FOOTER_KEY
 from fr.ens.biologie.genomique.aozan.Settings import MAIL_FROM_KEY
@@ -387,7 +392,6 @@ def send_msg(subject, message, is_error, conf):
     """
 
     send_mail = is_conf_value_equals_true(SEND_MAIL_KEY, conf)
-    smtp_server = conf[SMTP_SERVER_KEY]
 
     # Specific receiver for error message
     if is_error:
@@ -422,7 +426,7 @@ def send_msg(subject, message, is_error, conf):
     composed = msg.as_string()
 
     if send_mail:
-        server = smtplib.SMTP(smtp_server)
+        server = _connect_smtp_server(conf)
         dests = []
         dests.extend(mail_to)
         if mail_cc is not None:
@@ -441,7 +445,6 @@ def send_msg_with_attachment(subject, message, attachment_file, is_error, conf):
     """Send a message to the user about the data extraction."""
 
     send_mail = is_conf_value_equals_true(SEND_MAIL_KEY, conf)
-    smtp_server = conf[SMTP_SERVER_KEY]
     mail_from = conf[MAIL_FROM_KEY]
     mail_cc = None
     mail_bcc = None
@@ -508,7 +511,7 @@ def send_msg_with_attachment(subject, message, attachment_file, is_error, conf):
     composed = msg.as_string()
 
     if send_mail:
-        server = smtplib.SMTP(smtp_server)
+        server = _connect_smtp_server(conf)
         dests = []
         dests.extend(mail_to)
         if mail_cc is not None:
@@ -521,6 +524,42 @@ def send_msg_with_attachment(subject, message, attachment_file, is_error, conf):
         print '-------------'
         print composed
         print '-------------'
+
+
+def _connect_smtp_server(conf):
+    """Configure the connection to the SMTP server.
+
+    Arguments:
+        conf: configuration object
+    """
+
+    smtp_server = conf[SMTP_SERVER_KEY]
+
+    # Define default port
+    if is_conf_value_equals_true(SMTP_USE_SSL_KEY, conf):
+        smtp_port = 465
+    else:
+        smtp_port = 25
+
+    # Change the port if required
+    if is_conf_key_exists(SMTP_PORT_KEY, conf):
+        smtp_port = int(conf[SMTP_PORT_KEY])
+
+    # Connect to the server using SSL or not
+    if is_conf_value_equals_true(SMTP_USE_SSL_KEY, conf):
+        server = smtplib.SMTP_SSL(smtp_server, smtp_port)
+    else:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+
+    # Enable StartTLS
+    if is_conf_value_equals_true(SMTP_USE_STARTTLS_KEY, conf):
+        server.starttls()
+
+    # Use a login and a password if required
+    if is_conf_key_exists(SMTP_LOGIN_KEY, conf) and is_conf_key_exists(SMTP_PASSWORD_KEY, conf):
+        server.login(conf[SMTP_LOGIN_KEY], conf[SMTP_PASSWORD_KEY])
+
+    return server
 
 
 def create_msg(mail_from, mail_to, mail_cc, mail_bcc, subject, message, conf):
