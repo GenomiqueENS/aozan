@@ -861,5 +861,16 @@
                                  Update documentation.
 			</action>
 		</release>
+
+		<release version="2.0-rc21" description="Aozan 2.0-rc21 release"  date="TBD">
+			<action dev="jourdren" type="fix">
+                                 Spaces, simple and double quotes can now be used in paths to the Aozan input and output files.
+			</action>
+			<action dev="jourdren" type="update">
+                                 StartTTLS, SSL, and login/password can now be used to configure the connection to the SMTP server to send emails.
+			</action>
+			<action dev="jourdren" type="update">
+                                 Update documentation.
+			</action>
 	</body>
 </document>
