@@ -33,6 +33,7 @@ from subprocess import call, CalledProcessError
 from pipes import quote
 
 import common
+
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import FASTQ_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import RECOMPRESS_COMPRESSION_KEY

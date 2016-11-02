@@ -26,12 +26,18 @@
 This script executes demultiplexing step.
 '''
 
-import os.path, stat, sys
-from pipes import quote
-import common, hiseq_run, time
+import os.path
+import stat
+import sys
+import time
 import glob
 import re
 from xml.etree.ElementTree import ElementTree
+from pipes import quote
+
+import common
+import hiseq_run
+
 from java.io import IOException
 from java.lang import Runtime, Throwable, Exception
 from java.util import HashMap
@@ -40,7 +46,6 @@ from fr.ens.biologie.genomique.aozan import AozanException
 from fr.ens.biologie.genomique.aozan.util import DockerCommand
 from fr.ens.biologie.genomique.aozan.illumina.samplesheet import SampleSheetUtils, \
     SampleSheetCheck
-
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
@@ -60,13 +65,13 @@ from fr.ens.biologie.genomique.aozan.Settings import INDEX_SEQUENCES_KEY
 from fr.ens.biologie.genomique.aozan.Settings import FASTQ_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY
 from fr.ens.biologie.genomique.aozan import Settings
-
 from fr.ens.biologie.genomique.aozan.util import StringUtils
 from fr.ens.biologie.genomique.aozan.illumina import RunInfo
 from fr.ens.biologie.genomique.aozan.illumina.samplesheet.io import SampleSheetXLSReader
 from fr.ens.biologie.genomique.aozan.illumina.samplesheet.io import SampleSheetCSVWriter
 from fr.ens.biologie.genomique.aozan.illumina.samplesheet.io import SampleSheetCSVReader
 from fr.ens.biologie.genomique.aozan.illumina.samplesheet.io import SampleSheetXLSXReader
+
 
 def load_denied_run_ids(conf):
     """Load the list of the denied run ids.

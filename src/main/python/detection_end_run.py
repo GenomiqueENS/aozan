@@ -26,14 +26,15 @@
 This script checks if a run has ended sequencing.
 '''
 
-import aozan
-import hiseq_run
 import os
 import os.path
 import stat
+from pipes import quote
 
 import common
-from pipes import quote
+import aozan
+import hiseq_run
+
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY

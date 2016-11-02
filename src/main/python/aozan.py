@@ -26,19 +26,28 @@
 This script is Aozan main file, it executes the steps.
 '''
 
-import sys, os, traceback
+import sys
+import os
+import traceback
 from optparse import OptionParser
-import common, hiseq_run, sync_run, demux_run, qc_run, recompress_run
-import estimate_space_needed
-from java.util import Locale
 
-import detection_new_run, detection_end_run
+import common
+import hiseq_run
+import sync_run
+import demux_run
+import qc_run
+import recompress_run
+import estimate_space_needed
+import detection_new_run
+import detection_end_run
+
+from java.util import Locale
 from java.util import LinkedHashMap
+
 from fr.ens.biologie.genomique.aozan import Globals
 from fr.ens.biologie.genomique.aozan import Common
 from fr.ens.biologie.genomique.aozan import AozanException
 from fr.ens.biologie.genomique.eoulsan.util import SystemUtils
-
 from fr.ens.biologie.genomique.aozan.Settings import DEMUX_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import RECOMPRESS_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import QC_STEP_KEY
@@ -54,7 +63,6 @@ from fr.ens.biologie.genomique.aozan.Settings import BCL_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import FASTQ_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import DOCKER_URI_KEY
-
 from fr.ens.biologie.genomique.aozan.util import DockerConnection
 
 

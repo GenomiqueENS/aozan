@@ -26,16 +26,19 @@
 This script executes quality control step.
 '''
 
-import os.path, stat
+import os.path
+import stat
+import time
 from pipes import quote
-import common, time
-import demux_run, hiseq_run
 
-from fr.ens.biologie.genomique.aozan import QC, Settings
-from fr.ens.biologie.genomique.aozan import AozanException
+import common
+import demux_run
+import hiseq_run
 
 from java.lang import Throwable
 
+from fr.ens.biologie.genomique.aozan import QC, Settings
+from fr.ens.biologie.genomique.aozan import AozanException
 from fr.ens.biologie.genomique.aozan.Settings import FASTQ_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_URL_KEY
@@ -44,6 +47,7 @@ from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import QC_REPORT_STYLESHEET_KEY
 from fr.ens.biologie.genomique.aozan.Settings import QC_REPORT_SAVE_REPORT_DATA_KEY
 from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
+
 
 def load_denied_run_ids(conf):
     """Load the list of the denied run ids.

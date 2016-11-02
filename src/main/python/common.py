@@ -26,24 +26,32 @@
 This script contains all common functions in all Aozan python scripts
 '''
 
-import hiseq_run, sync_run
-import smtplib, os.path, time, sys, os, stat
-from pipes import quote
+
+import smtplib
+import os.path
+import time
+import sys
+import os
+import stat
 import mimetypes
 from email.utils import formatdate
 from glob import glob
 from xml.etree.ElementTree import ElementTree
-
-from java.io import File
-from java.lang import Runtime
-from java.util import LinkedHashMap
-from java.util.logging import Level
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.audio import MIMEAudio
 from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
 from email import encoders
+from pipes import quote
+
+import hiseq_run
+import sync_run
+
+from java.io import File
+from java.lang import Runtime
+from java.util import LinkedHashMap
+from java.util.logging import Level
 
 from fr.ens.biologie.genomique.aozan import Common
 from fr.ens.biologie.genomique.aozan import Globals
@@ -87,7 +95,6 @@ from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQC_BLAST_ENABLE
 from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQC_BLAST_DB_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import READ_ONLY_OUTPUT_FILES_KEY
-
 from fr.ens.biologie.genomique.aozan.util import StringUtils
 
 PRIORITY_FILE = 'runs.priority'

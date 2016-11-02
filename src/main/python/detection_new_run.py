@@ -26,9 +26,13 @@
 This script checks if a new run is available.
 '''
 
-import common, aozan, hiseq_run, detection_end_run
-import estimate_space_needed
 import os
+
+import common
+import aozan
+import hiseq_run
+import detection_end_run
+import estimate_space_needed
 
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import FIRST_BASE_REPORT_STEP_KEY
