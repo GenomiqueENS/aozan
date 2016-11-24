@@ -278,6 +278,11 @@ public class SamplesheetCollector implements Collector {
             Joiner.on(",").join(e.getValue()));
       }
 
+      // List indexed lanes
+      for (int lane : lanes) {
+        data.put(SAMPLESHEET_DATA_PREFIX + ".lane.indexed", indexedLanes.contains(lane));
+      }
+
       data.put(SAMPLESHEET_DATA_PREFIX + ".sample.count", sampleNumber);
 
       // Add all projects name in data
