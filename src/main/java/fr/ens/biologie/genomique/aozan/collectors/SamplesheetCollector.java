@@ -280,8 +280,12 @@ public class SamplesheetCollector implements Collector {
 
       // List indexed lanes
       for (int lane : lanes) {
+<<<<<<< HEAD
         data.put(SAMPLESHEET_DATA_PREFIX + ".lane" + lane + ".indexed",
             indexedLanes.contains(lane));
+=======
+        data.put(SAMPLESHEET_DATA_PREFIX + ".lane.indexed", indexedLanes.contains(lane));
+>>>>>>> 6f89ce403f5347c1b63999992d44c0d67a5f6740
       }
 
       data.put(SAMPLESHEET_DATA_PREFIX + ".sample.count", sampleNumber);
