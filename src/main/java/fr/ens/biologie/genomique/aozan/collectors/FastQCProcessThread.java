@@ -63,7 +63,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
   @Override
   protected void logThreadStart() {
-    LOGGER.fine("FASTQC: start for " + getFastqSample().getKeyFastqSample());
+    LOGGER.fine("FASTQC: start for " + getFastqSample().getFilenamePrefix());
   }
 
   @Override
@@ -76,7 +76,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
   protected void logThreadEnd(final String duration) {
 
     LOGGER.fine("FASTQC: end for "
-        + getFastqSample().getKeyFastqSample() + " in " + duration);
+        + getFastqSample().getFilenamePrefix() + " in " + duration);
   }
 
   /**
@@ -155,7 +155,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
       // Create report
       try {
-        createReportFile();
+        createReportFile(prefix);
       } catch (final IOException e) {
         throw new AozanException(e);
       }
@@ -168,13 +168,16 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
    * @throws AozanException if an error occurs while processing data
    * @throws IOException if an error occurs while processing data
    */
-  @Override
-  protected void createReportFile() throws AozanException, IOException {
+  private void createReportFile(final String keyPrefix) throws AozanException, IOException {
 
     // Set the name of the prefix of the report file
-    final String filename = getFastqSample().getPrefixReport() + "-fastqc.html";
+    final String filename = getFastqSample().getFilenamePrefix() + "-fastqc.html";
 
     final File reportFile = new File(this.reportDir, filename);
+
+    // Save the filename of the report in RunData
+    getResults().put(keyPrefix + ".report.file.name",
+        getFastqSample().getFilenamePrefix() + "-fastqc");
 
     try {
       new HTMLReportArchive(this.seqFile,
@@ -186,7 +189,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
     }
 
     LOGGER.fine("FASTQC: create the html QC report for "
-        + getFastqSample().getPrefixReport());
+        + getFastqSample().getFilenamePrefix());
 
     // Keep only the uncompressed data
     if (reportFile.exists()) {

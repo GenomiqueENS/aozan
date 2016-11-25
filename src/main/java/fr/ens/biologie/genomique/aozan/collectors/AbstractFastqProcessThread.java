@@ -25,7 +25,6 @@ package fr.ens.biologie.genomique.aozan.collectors;
 
 import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Stopwatch;
@@ -84,13 +83,6 @@ abstract class AbstractFastqProcessThread implements Runnable {
   protected abstract void logThreadStart();
 
   protected abstract void process() throws AozanException;
-
-  /**
-   * Create a report file for the sample treated.
-   * @throws AozanException
-   * @throws IOException
-   */
-  protected abstract void createReportFile() throws AozanException, IOException;
 
   //
   // Getters

@@ -95,7 +95,7 @@ public class FastQCCollector extends AbstractFastqCollector {
         || fastqSample.getFastqFiles().isEmpty()) {
 
       throw new AozanException("No FASTQ file defined for the fastqSample: "
-          + fastqSample.getKeyFastqSample());
+          + fastqSample.getFilenamePrefix());
     }
 
     // Create the thread object

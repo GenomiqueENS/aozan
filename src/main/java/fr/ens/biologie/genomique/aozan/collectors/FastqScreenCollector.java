@@ -126,7 +126,7 @@ public class FastqScreenCollector extends AbstractFastqCollector {
         || fastqSample.getFastqFiles().isEmpty()) {
 
       throw new AozanException("No FASTQ file defined for the fastqSample: "
-          + fastqSample.getKeyFastqSample());
+          + fastqSample.getFilenamePrefix());
     }
 
     // Create the thread object only if the fastq sample correspond to a R1
@@ -198,11 +198,11 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     // together.
     if (isPairedMode) {
       // Search fasqtSample which corresponding to fastqSample R1
-      final String prefixRead2 = fastqSample.getPrefixRead2();
+      final String prefixRead2 = fastqSample.getFilenamePrefix(2);
 
       // Search FastSample instance corresponding to read2 for the sample
       for (final FastqSample fastqSampleR2 : getFastqSamples()) {
-        if (fastqSampleR2.getKeyFastqSample().equals(prefixRead2)) {
+        if (fastqSampleR2.getFilenamePrefix().equals(prefixRead2)) {
 
           return new FastqScreenProcessThread(fastqSample, fastqSampleR2,
               this.fastqscreen, data, genomes, sampleGenomeName, reportDir,

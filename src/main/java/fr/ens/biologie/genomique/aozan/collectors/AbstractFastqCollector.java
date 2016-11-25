@@ -263,7 +263,7 @@ public abstract class AbstractFastqCollector implements Collector {
           // TODO
 
           LOGGER.severe("FASTQ Collect: fastq is null or empty, key fq is "
-              + fs.getKeyFastqSample() + " tmp fq "
+              + fs.getFilenamePrefix() + " tmp fq "
               + fs.getSubsetFastqFilename() + " sample name "
               + fs.getSampleName() + " prefix rundata "
               + fs.getRundataPrefix());
@@ -416,14 +416,14 @@ public abstract class AbstractFastqCollector implements Collector {
 
       LOGGER.fine("For the "
           + this.getName().toUpperCase() + " : Restore data file for "
-          + fastqSample.getKeyFastqSample());
+          + fastqSample.getFilenamePrefix());
 
     } catch (final IOException io) {
 
       LOGGER.warning("In "
           + this.getName().toUpperCase()
           + " : Error during reading data file for the sample "
-          + fastqSample.getKeyFastqSample());
+          + fastqSample.getFilenamePrefix());
 
       return null;
     }
@@ -446,14 +446,14 @@ public abstract class AbstractFastqCollector implements Collector {
       data.createRunDataFile(dataFile);
 
       LOGGER.fine(this.getName().toUpperCase()
-          + ": " + fastqSample.getKeyFastqSample() + " save data file");
+          + ": " + fastqSample.getFilenamePrefix() + " save data file");
 
     } catch (final IOException ae) {
 
       LOGGER.warning("For the "
           + this.getName()
           + " collector: Error during writing data file for the sample "
-          + fastqSample.getKeyFastqSample() + "(" + ae.getMessage() + ")");
+          + fastqSample.getFilenamePrefix() + "(" + ae.getMessage() + ")");
     }
   }
 
@@ -475,7 +475,7 @@ public abstract class AbstractFastqCollector implements Collector {
 
     // Define the part result file
     return new File(dataFileDir, this.getName()
-        + "_" + fastqSample.getKeyFastqSample() + Globals.QC_DATA_EXTENSION);
+        + "_" + fastqSample.getFilenamePrefix() + Globals.QC_DATA_EXTENSION);
 
   }
 

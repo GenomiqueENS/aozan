@@ -47,15 +47,11 @@ public class FastQScreenReportSampleTest extends AbstractSampleTest {
   public TestResult test(final RunData data, final int read,
       final int readSample, final int sampleId) {
 
-    final int lane = data.getSampleLane(sampleId);
+    final String filename = data.get("fastqscreen.sample" + sampleId + ".read" + read + ".report.file.name");
 
     if (data.isUndeterminedSample(sampleId)) {
 
       final String projectName = "Undetermined_indices";
-
-      final String filename =
-          String.format("lane%s_Undetermined_L%03d_R%d_001-fastqscreen.html",
-              lane, lane, readSample);
 
       final String url = projectName + "/" + filename;
 
@@ -72,11 +68,6 @@ public class FastQScreenReportSampleTest extends AbstractSampleTest {
 
     // Get HTML report URL
     final String projectName = data.getProjectSample(sampleId);
-    final String index = data.getIndexSample(sampleId);
-    final String demuxName = data.getSampleDemuxName(sampleId);
-
-    final String filename = String.format("%s_%s_L%03d_R1_001-fastqscreen.html",
-        demuxName, "".equals(index) ? "NoIndex" : index, lane);
 
     final String url = "Project_" + projectName + "/" + filename;
 
