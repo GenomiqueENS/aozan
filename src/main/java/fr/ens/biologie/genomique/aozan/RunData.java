@@ -361,7 +361,7 @@ public class RunData {
    */
   public boolean isLaneIndexed(final int lane) {
 
-    return getBoolean(SAMPLESHEET_DATA_PREFIX + ".lane.indexed");
+    return getBoolean(SAMPLESHEET_DATA_PREFIX + ".lane" + lane + ".indexed");
   }
 
   /**
