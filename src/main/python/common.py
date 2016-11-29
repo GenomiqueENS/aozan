@@ -971,7 +971,7 @@ def check_configuration(conf, configuration_file_path):
         if _check_conf_key(conf, msg, HISEQ_DATA_PATH_KEY):
             # Check if hiseq_data_path exists
             for hiseq_output_path in hiseq_run.get_hiseq_data_paths(conf):
-                if not os.path.exists(hiseq_output_path):
+                if not os.path.isdir(hiseq_output_path):
                     msg += '\n\t* Sequencer output directory does not exist: ' + hiseq_output_path
 
     # For step SYNC
