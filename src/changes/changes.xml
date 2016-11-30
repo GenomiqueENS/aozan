@@ -870,7 +870,12 @@
                                  StartTTLS, SSL, and login/password can now be used to configure the connection to the SMTP server to send emails.
 			</action>
 			<action dev="jourdren" type="update">
-                                 Update documentation.
+                                 The FastQC and Fastq Screen reports have now the same prefix as the FASTQ files.
 			</action>
+			<action dev="jourdren" type="update">
+                                 Eoulsan 2.0-beta4.
+			</action>
+		</release>
+
 	</body>
 </document>
