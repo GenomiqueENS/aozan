@@ -307,6 +307,15 @@ public final class Settings {
    */
   public static final String QC_CONF_FASTQC_PROCESS_UNDETERMINED_SAMPLES_KEY =
       "qc.conf.fastqc.process.undetermined.samples";
+
+  /** Collector FastQC, unzip report file. */
+  public static final String QC_CONF_FASTQC_UNZIP_REPORT_FILE_KEY =
+      "qc.conf.fastqc.unzip.report.file";
+
+  /** Collector FastQC, keep zip report file. */
+  public static final String QC_CONF_FASTQC_KEEP_ZIP_REPORT_FILE_KEY =
+      "qc.conf.fastqc.keep.zip.report.file";
+
   /**
    * Collector FastqScreen, process on undetermined indices samples, default at
    * false.

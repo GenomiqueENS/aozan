@@ -43,7 +43,7 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
       final int readSample, final int sampleId) {
 
     final boolean undetermined = data.isUndeterminedSample(sampleId);
-    final String dirname = data.get("fastqc.sample" + sampleId + ".read" + read + ".report.file.name");
+    final String filename = data.get("fastqc.sample" + sampleId + ".read" + read + ".report.file.name");
 
     // Check indetermined indexed sample
     if (undetermined) {
@@ -51,7 +51,7 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
       final String projectName = "Undetermined_indices";
 
       final String url = projectName
-          + "/" + dirname + "/fastqc_report.html#M" + getHTMLAnchorIndex();
+          + "/" + filename + ".html#M" + getHTMLAnchorIndex();
 
       // Set score test at -1
       return new TestResult(-1, url, "url");
@@ -73,7 +73,7 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
     final String projectName = data.getProjectSample(sampleId);
 
     final String url = "Project_"
-        + projectName + "/" + dirname + "/fastqc_report.html#M"
+        + projectName + "/" + filename + ".html#M"
         + getHTMLAnchorIndex();
 
     return new TestResult(score, url, "url");

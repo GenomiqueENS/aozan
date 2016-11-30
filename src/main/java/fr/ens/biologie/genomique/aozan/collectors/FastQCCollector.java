@@ -48,6 +48,7 @@ public class FastQCCollector extends AbstractFastqCollector {
 
   private int numberThreads = Runtime.getRuntime().availableProcessors();
   private boolean isProcessUndeterminedIndicesSamples = false;
+  private boolean keepZipReportFile;
 
   @Override
   public String getName() {
@@ -78,6 +79,9 @@ public class FastQCCollector extends AbstractFastqCollector {
     this.isProcessUndeterminedIndicesSamples = conf
         .getBoolean(Settings.QC_CONF_FASTQC_PROCESS_UNDETERMINED_SAMPLES_KEY);
 
+    this.keepZipReportFile =
+        conf.getBoolean(Settings.QC_CONF_FASTQC_KEEP_ZIP_REPORT_FILE_KEY, true);
+
     // Check if step blast needed and configure
     OverrepresentedSequencesBlast.getInstance().configure(conf,
         qc.getSettings().get(Settings.DOCKER_URI_KEY));
@@ -100,7 +104,7 @@ public class FastQCCollector extends AbstractFastqCollector {
 
     // Create the thread object
     return new FastQCProcessThread(fastqSample, INGORE_FILTERED_SEQUENCES,
-        reportDir);
+        reportDir, this.keepZipReportFile);
   }
 
   //

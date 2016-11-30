@@ -59,6 +59,8 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
   private final boolean ignoreFilteredSequences;
   private final List<QCModule> moduleList;
   private final File reportDir;
+  private final boolean keepZipReportFile;
+
   private int processedReads;
 
   @Override
@@ -191,21 +193,12 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
     LOGGER.fine("FASTQC: create the html QC report for "
         + getFastqSample().getFilenamePrefix());
 
-    // Keep only the uncompressed data
-    if (reportFile.exists()) {
-
-      if (!reportFile.delete()) {
-        LOGGER.warning(
-            "FASTQC: fail to delete report " + reportFile.getAbsolutePath());
-      }
-    }
-
     // Remove zip file
     final File reportZip =
         new File(this.reportDir, filename.replaceAll("\\.html$", ".zip"));
     if (reportZip.exists()) {
 
-      if (!reportZip.delete()) {
+      if (!this.keepZipReportFile && !reportZip.delete()) {
         LOGGER.warning(
             "FASTQC: fail to delete report " + reportZip.getAbsolutePath());
       }
@@ -222,13 +215,14 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
    *           FastQC
    */
   public FastQCProcessThread(final FastqSample fastqSample,
-      final boolean ignoreFilteredSequences, final File reportDir)
-      throws AozanException {
+      final boolean ignoreFilteredSequences, final File reportDir,
+      final boolean keepZipReportFile) throws AozanException {
 
     super(fastqSample);
 
     this.ignoreFilteredSequences = ignoreFilteredSequences;
     this.reportDir = reportDir;
+    this.keepZipReportFile = keepZipReportFile;
 
     try {
       this.seqFile = SequenceFactory.getSequenceFile(fastqSample.getFastqFiles()

@@ -123,7 +123,9 @@
           <tr><td>qc.conf.fastqc.casava</td><td>boolean</td><td>False</td><td>Illumina FASTQ file. (FastQC <tt>--casava</tt> parameter)</td></tr>
           <tr><td>qc.conf.fastqc.nofilter</td><td>boolean</td><td>False</td><td>Option for filtering bad Illumina FASTQ entries. (FastQC parameter)</td></tr>
           <tr><td>qc.conf.fastqc.process.undetermined.samples</td><td>boolean</td><td>True</td><td>Run FastQC on undetermined indices samples, default at false.</td></tr>
-          <tr><td>qc.conf.fastqc.nano</td><td>boolean</td><td>False</td><td>Run FastQC on nanopore technology which use Fast5 format file instead of FASTQ, default at false.</td></tr>
+          <!--tr><td>qc.conf.fastqc.nano</td><td>boolean</td><td>False</td><td>Run FastQC on nanopore technology which use Fast5 format file instead of FASTQ, default at false.</td></tr-->
+          <tr><td>qc.conf.fastqc.unzip.report.file</td><td>boolean</td><td>False</td><td>Unzip the FastQC Zip report file.</td></tr>
+          <tr><td>qc.conf.fastqc.keep.zip.report.file</td><td>boolean</td><td>True</td><td>Keep the FastQC Zip report file.</td></tr>
         </table>
 
         <p>An example of table built with sample quality tests</p>

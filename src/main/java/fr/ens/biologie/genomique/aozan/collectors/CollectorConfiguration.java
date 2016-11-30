@@ -105,10 +105,21 @@ public class CollectorConfiguration {
    */
   public boolean getBoolean(final String key) {
 
+    return getBoolean(key, false);
+  }
+
+  /**
+   * Get a setting value.
+   * @param key the setting key
+   * @param defaultValue default value
+   * @return the boolean value of the setting
+   */
+  public boolean getBoolean(final String key, final boolean defaultValue) {
+
     String value = get(key);
 
     if (value == null) {
-      return false;
+      return defaultValue;
     }
 
     return Boolean.parseBoolean(value.trim());
