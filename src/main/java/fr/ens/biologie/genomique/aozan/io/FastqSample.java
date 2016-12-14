@@ -38,7 +38,8 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.TreeMultimap;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
 import fr.ens.biologie.genomique.aozan.Globals;
@@ -542,7 +543,7 @@ public class FastqSample {
     }
 
     int i = 0;
-    TreeMultimap<Integer, String> sampleEntries = TreeMultimap.create();
+    Multimap<Integer, String> sampleEntries = ArrayListMultimap.create();
 
     for (Sample sample : samplesheet) {
       // If sample id is not defined, use sample name
