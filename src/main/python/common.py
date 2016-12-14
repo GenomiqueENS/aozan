@@ -742,30 +742,27 @@ def add_run_id(run_id, file_path, conf):
         conf)
 
     f = File(file_path);
-    try:
-        # Open file
-        raf = RandomAccessFile(f, 'rws')
 
-        # Creating lock
-        channel = raf.getChannel()
-        lock = channel.lock()
+    # Open file
+    raf = RandomAccessFile(f, 'rws')
 
-        # Set position at the end of the file
-        raf.seek(f.length())
+    # Creating lock
+    channel = raf.getChannel()
+    lock = channel.lock()
 
-        # Add the run_id at the end of the file
-        raf.writeBytes(run_id.strip() + '\n')
+    # Set position at the end of the file
+    raf.seek(f.length())
 
-        # Release locks
-        if lock:
-            lock.release()
+    # Add the run_id at the end of the file
+    raf.writeBytes(run_id.strip() + '\n')
 
-        # Close file
-        channel.close()
-        raf.close()
+    # Release locks
+    if lock:
+        lock.release()
 
-    except:
-        raise Exception("Can't write " + run_id + " to " + file_path)
+    # Close file
+    channel.close()
+    raf.close()
 
 
 def get_report_run_data_path(run_id, conf):

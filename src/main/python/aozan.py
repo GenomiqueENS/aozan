@@ -355,8 +355,16 @@ def launch_steps(conf):
     hiseq_run_ids_do_not_process = hiseq_run.load_deny_run_ids(conf)
 
     # Discover new runs
-    detection_new_run.discover_new_runs(hiseq_run_ids_do_not_process, conf)
-    hiseq_run_ids_done = detection_end_run.discover_finished_runs(hiseq_run_ids_do_not_process, conf)
+    try:
+        detection_new_run.discover_new_runs(hiseq_run_ids_do_not_process, conf)
+    except:
+        exception_error(None , 'Failed to discover new runs', conf)
+
+    # Discover finished runs
+    try:
+        hiseq_run_ids_done = detection_end_run.discover_finished_runs(hiseq_run_ids_do_not_process, conf)
+    except:
+        exception_error(None , 'Failed to discover finished runs', conf)
 
 
     #
