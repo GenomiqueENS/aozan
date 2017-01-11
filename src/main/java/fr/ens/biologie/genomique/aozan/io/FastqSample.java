@@ -28,11 +28,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -48,6 +50,7 @@ import fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput;
 import fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput.Bcl2FastqVersion;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 import fr.ens.biologie.genomique.eoulsan.io.CompressionType;
 
 /**
@@ -585,7 +588,7 @@ public class FastqSample {
 
     if (sampleId != null
         && !"".equals(sampleId.trim()) && sampleName != null
-        && !"".equals(sampleName.trim())) {
+        && !"".equals(sampleName.trim()) && !sampleId.equals(sampleName)) {
       return sampleId.trim();
     }
 
