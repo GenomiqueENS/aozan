@@ -41,7 +41,8 @@ public class QualityMetricsCollector extends AbstractMetricsCollector {
   /** The sub-collector name from ReadCollector. */
   public static final String COLLECTOR_NAME = "QualityMetricsCollector";
   public static final String DATA_PREFIX = "qualitymetrics";
-  public static final String FORK_VERSION = "1.18.64";
+  public static final String FORK_VERSION_5 = "1.18.64";
+  public static final String FORK_VERSION_6 = "2.7.1";
 
   @Override
   public String getName() {
@@ -56,15 +57,17 @@ public class QualityMetricsCollector extends AbstractMetricsCollector {
   public void collect(final RunData data) throws AozanException {
 
     super.collect(data);
-    final QualityMetricsReader reader;
+    final QMetricsVersion4Reader reader;
     final Version rtaVersion = new Version(data.get("run.info.rta.version"));
 
-    if (rtaVersion.greaterThanOrEqualTo(new Version(FORK_VERSION))) {
-      reader = new QMetricsReader(getInterOpDir());
-
+    if (rtaVersion.greaterThanOrEqualTo(new Version(FORK_VERSION_5))) {
+      if (rtaVersion.greaterThanOrEqualTo(new Version(FORK_VERSION_6))) {
+        reader = new QMetricsVersion6Reader(getInterOpDir());
+      } else {
+        reader = new QMetricsVersion5Reader(getInterOpDir());
+      }
     } else {
-      reader = new QualityMetricsReader(getInterOpDir());
-
+      reader = new QMetricsVersion4Reader(getInterOpDir());
     }
 
     final long[][][] lanes = new long[data.getLaneCount()][][];

@@ -92,10 +92,6 @@ abstract class AbstractBinaryFileReader<M> {
     final ByteBuffer buf;
     final byte[] header = new byte[HEADER_SIZE];
 
-    final byte[] element = new byte[getExpectedRecordSize()];
-    final ByteBuffer recordBuf = ByteBuffer.wrap(element);
-    recordBuf.order(ByteOrder.LITTLE_ENDIAN);
-
     try {
       FileUtils.checkExistingFile(getMetricsFile(),
           "Error binary file " + getMetricsFile().getAbsolutePath());
@@ -113,6 +109,7 @@ abstract class AbstractBinaryFileReader<M> {
     } catch (final IOException e) {
       throw new AozanException(e);
     }
+
     // check version file
     if (HEADER_SIZE > 0) {
       ByteBuffer b = ByteBuffer.allocate(HEADER_SIZE);
@@ -120,9 +117,14 @@ abstract class AbstractBinaryFileReader<M> {
       b = buf.get(header);
       b.position(0);
 
-      checkVersionFile(b);
+      final int recordSize = checkVersionFile(b);
       readOptionalFlag(b);
+      checkRecordSize(recordSize);
     }
+
+    final byte[] element = new byte[getExpectedRecordSize()];
+    final ByteBuffer recordBuf = ByteBuffer.wrap(element);
+    recordBuf.order(ByteOrder.LITTLE_ENDIAN);
 
     // Build collection of illumina metrics
     while (buf.limit() - buf.position() >= getExpectedRecordSize()) {
@@ -153,26 +155,39 @@ abstract class AbstractBinaryFileReader<M> {
   /**
    * Check version file corresponding to the implemented code
    * @param header header file.
+   * @return record size in bytes
    * @throws AozanException occurs if the checking fails
    */
-  private void checkVersionFile(final ByteBuffer header) throws AozanException {
+  private int checkVersionFile(final ByteBuffer header) throws AozanException {
 
-    // Get the version, should be EXPECTED_VERSION
+    // Read byte 0: file version number
     final int actualVersion = uByteToInt(header.get());
+
+    // Check if is the expected version
     if (actualVersion != getExpectedVersion()) {
       throw new AozanException(getName()
           + " expects the version number to be " + getExpectedVersion()
           + ".  Actual Version in Header(" + actualVersion + ")");
     }
 
+    // Read byte 1: length of each record
+    return uByteToInt(header.get());
+  }
+
+  /**
+   * Check version file corresponding to the implemented code
+   * @param header header file.
+   * @return record size in bytes
+   * @throws AozanException occurs if the checking fails
+   */
+  private void checkRecordSize(final int recordSize) throws AozanException {
+
     // Check the size record needed
-    final int actualRecordSize = uByteToInt(header.get());
-    if (getExpectedRecordSize() != actualRecordSize) {
+    if (getExpectedRecordSize() != recordSize) {
       throw new AozanException(getName()
           + " expects the record size to be " + getExpectedRecordSize()
-          + ".  Actual Record Size in Header(" + actualRecordSize + ")");
+          + ". Actual Record Size in Header(" + recordSize + ")");
     }
-
   }
 
   //

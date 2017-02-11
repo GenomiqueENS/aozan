@@ -30,12 +30,12 @@ import java.util.List;
 import fr.ens.biologie.genomique.aozan.AozanException;
 
 /**
- * This class define a specified iterator for reading the binary file :
- * QMetricsOut.bin.
+ * This class define a specified iterator for reading the binary file
+ * QMetricsOut.bin in its version 5.
  * @author Cyril Firmo
  * @since 2.0
  */
-public class QMetricsReader extends QualityMetricsReader {
+public class QMetricsVersion5Reader extends QMetricsVersion4Reader {
 
   public static final String NAME = "QualityMetricsOut";
 
@@ -76,9 +76,7 @@ public class QMetricsReader extends QualityMetricsReader {
       for (int i = 0; i < qualityScoreBinNumber; i++) {
         this.remappedScoreQuality[i] = uByteToInt(bb.get());
       }
-
     }
-
   }
 
   @Override
@@ -100,7 +98,7 @@ public class QMetricsReader extends QualityMetricsReader {
   protected void addIlluminaMetricsInCollection(
       final List<QualityMetrics> collection, final ByteBuffer bb) {
 
-    collection.add(new QualityMetrics(bb));
+    collection.add(new QualityMetrics(bb, -1, null));
   }
 
   /**
@@ -188,7 +186,7 @@ public class QMetricsReader extends QualityMetricsReader {
   // Constructor
   //
 
-  QMetricsReader(final File dirPath) throws AozanException {
+  QMetricsVersion5Reader(final File dirPath) throws AozanException {
 
     super(dirPath);
 

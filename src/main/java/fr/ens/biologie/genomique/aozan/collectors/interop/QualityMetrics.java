@@ -114,15 +114,27 @@ public class QualityMetrics {
    * Constructor. One record countReads on the ByteBuffer.
    * @param bb ByteBuffer who read one record
    */
-  QualityMetrics(final ByteBuffer bb) {
+  QualityMetrics(final ByteBuffer bb, final int binCount, final int [] remappedScoreQuality) {
 
     this.laneNumber = uShortToInt(bb.getShort());
     this.tileNumber = uShortToInt(bb.getShort());
     this.cycleNumber = uShortToInt(bb.getShort());
-    for (int i = 0; i < 50; i++) {
-      this.clustersScore[i] = uIntToLong(bb.getInt());
-    }
 
+    if (binCount > 0) {
+
+      // Read cluster count in each bin if version 6 but do nothing with this
+      // information
+      for (int i = 0; i < binCount; i++) {
+        this.clustersScore[remappedScoreQuality[i] - 1] =
+            uIntToLong(bb.getInt());
+      }
+    } else {
+
+      // Read cluster count for each Phred score
+      for (int i = 0; i < 50; i++) {
+        this.clustersScore[i] = uIntToLong(bb.getInt());
+      }
+    }
   }
 
 }
