@@ -873,7 +873,10 @@
                                  The FastQC and Fastq Screen reports have now the same prefix as the FASTQ files.
 			</action>
 			<action dev="jourdren" type="update">
-                                 Eoulsan 2.0-beta4.
+                                 Aozan now use Eoulsan 2.0-beta4 as dependency.
+			</action>
+			<action dev="jourdren" type="add">
+                                 Aozan now supports Illumina HiSeq 3/4000 and HiSeq X.
 			</action>
 		</release>
 

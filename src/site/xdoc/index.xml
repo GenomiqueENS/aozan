@@ -70,17 +70,10 @@
       You can <a href="mailto:aozan@biologie.ens.fr">contact us</a> to tell us if your sequencer model is compatible with Aozan.</p>
 
       <table>
-        <tr><th>Model</th><th>Support status</th></tr>
-        <tr><td>HiSeq 1000</td><td>Supported and tested</td></tr>
-        <tr><td>HiSeq 1500</td><td>Supported and tested</td></tr>
-        <tr><td>HiSeq 2000</td><td>Supported and tested</td></tr>
-        <tr><td>HiSeq 2500</td><td>Supported and tested</td></tr>
-        <tr><td>NextSeq 500</td><td>Supported and tested</td></tr>
-        <tr><td>HiSeq 3000</td><td>May work as output data is very similar to NextSeq 500</td></tr>
-        <tr><td>HiSeq 4000</td><td>May work as output data is very similar to NextSeq 500</td></tr>
-        <tr><td>HiSeq X</td><td>Unknown</td></tr>
-        <tr><td>MySeq</td><td>Unknown</td></tr>
-        <tr><td>MiniSeq</td><td>Unknown</td></tr>
+        <tr><th>RTA version</th><th>Model</th><th>Support status</th></tr>
+        <tr><td>&lt;1.18.64</td><td>HiSeq 1000, HiSeq 1500, HiSeq 2000, HiSeq 2500, MiSeq</td><td>Supported and tested (HiSeq 1000 and HiSeq 1500)</td></tr>
+        <tr><td>1.18.64 and 2.1.x&nbsp;-&nbsp;2.6.x</td><td>NextSeq 500, HiSeq X, HiSeq 1000, HiSeq 1500, HiSeq 2000, HiSeq 2500</td><td>Supported and tested (NextSeq 500 and HiSeq 1500)</td></tr>
+        <tr><td>2.7.x</td><td>HiSeq 3000, HiSeq 4000, HiSeq X, MiniSeq</td><td>Supported and tested (HiSeq 3000)</td></tr>
       </table>
     </section>
 
