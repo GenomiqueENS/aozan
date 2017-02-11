@@ -59,11 +59,13 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
   private final boolean ignoreFilteredSequences;
   private final List<QCModule> moduleList;
   private final File reportDir;
+  private final boolean keepZipReportFile;
+
   private int processedReads;
 
   @Override
   protected void logThreadStart() {
-    LOGGER.fine("FASTQC: start for " + getFastqSample().getKeyFastqSample());
+    LOGGER.fine("FASTQC: start for " + getFastqSample().getFilenamePrefix());
   }
 
   @Override
@@ -76,7 +78,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
   protected void logThreadEnd(final String duration) {
 
     LOGGER.fine("FASTQC: end for "
-        + getFastqSample().getKeyFastqSample() + " in " + duration);
+        + getFastqSample().getFilenamePrefix() + " in " + duration);
   }
 
   /**
@@ -102,13 +104,18 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
         final Sequence seq = seqFile.next();
 
+        boolean processed = false;
+
         for (final QCModule module : modules) {
 
           if (ignoreFiltered && module.ignoreFilteredSequences()) {
             continue;
           }
-          this.processedReads++;
+          processed = true;
           module.processSequence(seq);
+        }
+        if (processed) {
+          this.processedReads++;
         }
       }
 
@@ -128,8 +135,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
    * Process results after the end of the thread.
    * @throws AozanException if an error occurs while generate FastQC reports
    */
-  @Override
-  protected void processResults() throws AozanException {
+  private void processResults() throws AozanException {
 
     // Set the prefix for the run data entries
     final String prefix = "fastqc" + getFastqSample().getRundataPrefix();
@@ -151,7 +157,7 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
       // Create report
       try {
-        createReportFile();
+        createReportFile(prefix);
       } catch (final IOException e) {
         throw new AozanException(e);
       }
@@ -164,13 +170,16 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
    * @throws AozanException if an error occurs while processing data
    * @throws IOException if an error occurs while processing data
    */
-  @Override
-  protected void createReportFile() throws AozanException, IOException {
+  private void createReportFile(final String keyPrefix) throws AozanException, IOException {
 
     // Set the name of the prefix of the report file
-    final String filename = getFastqSample().getPrefixReport() + "-fastqc.html";
+    final String filename = getFastqSample().getFilenamePrefix() + "-fastqc.html";
 
     final File reportFile = new File(this.reportDir, filename);
+
+    // Save the filename of the report in RunData
+    getResults().put(keyPrefix + ".report.file.name",
+        getFastqSample().getFilenamePrefix() + "-fastqc");
 
     try {
       new HTMLReportArchive(this.seqFile,
@@ -182,23 +191,14 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
     }
 
     LOGGER.fine("FASTQC: create the html QC report for "
-        + getFastqSample().getPrefixReport());
-
-    // Keep only the uncompressed data
-    if (reportFile.exists()) {
-
-      if (!reportFile.delete()) {
-        LOGGER.warning(
-            "FASTQC: fail to delete report " + reportFile.getAbsolutePath());
-      }
-    }
+        + getFastqSample().getFilenamePrefix());
 
     // Remove zip file
     final File reportZip =
         new File(this.reportDir, filename.replaceAll("\\.html$", ".zip"));
     if (reportZip.exists()) {
 
-      if (!reportZip.delete()) {
+      if (!this.keepZipReportFile && !reportZip.delete()) {
         LOGGER.warning(
             "FASTQC: fail to delete report " + reportZip.getAbsolutePath());
       }
@@ -215,13 +215,14 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
    *           FastQC
    */
   public FastQCProcessThread(final FastqSample fastqSample,
-      final boolean ignoreFilteredSequences, final File reportDir)
-      throws AozanException {
+      final boolean ignoreFilteredSequences, final File reportDir,
+      final boolean keepZipReportFile) throws AozanException {
 
     super(fastqSample);
 
     this.ignoreFilteredSequences = ignoreFilteredSequences;
     this.reportDir = reportDir;
+    this.keepZipReportFile = keepZipReportFile;
 
     try {
       this.seqFile = SequenceFactory.getSequenceFile(fastqSample.getFastqFiles()

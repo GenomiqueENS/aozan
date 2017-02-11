@@ -26,18 +26,28 @@
 This script is Aozan main file, it executes the steps.
 '''
 
-import sys, os, traceback
+import sys
+import os
+import traceback
 from optparse import OptionParser
-import common, hiseq_run, sync_run, demux_run, qc_run, recompress_run
-import estimate_space_needed
-from java.util import Locale
 
-import detection_new_run, detection_end_run
+import common
+import hiseq_run
+import sync_run
+import demux_run
+import qc_run
+import recompress_run
+import estimate_space_needed
+import detection_new_run
+import detection_end_run
+
+from java.util import Locale
 from java.util import LinkedHashMap
+
 from fr.ens.biologie.genomique.aozan import Globals
 from fr.ens.biologie.genomique.aozan import Common
 from fr.ens.biologie.genomique.aozan import AozanException
-
+from fr.ens.biologie.genomique.eoulsan.util import SystemUtils
 from fr.ens.biologie.genomique.aozan.Settings import DEMUX_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import RECOMPRESS_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import QC_STEP_KEY
@@ -118,9 +128,13 @@ def load_pid_in_lock_file(lock_file_path):
     """
 
     f = open(lock_file_path, 'r')
-    pid = int(f.readline().strip())
+    line = f.readline().strip()
     f.close()
-    return pid
+
+    try:
+        return int(line)
+    except ValueError:
+        return -1
 
 
 def welcome(conf):
@@ -341,8 +355,16 @@ def launch_steps(conf):
     hiseq_run_ids_do_not_process = hiseq_run.load_deny_run_ids(conf)
 
     # Discover new runs
-    detection_new_run.discover_new_runs(hiseq_run_ids_do_not_process, conf)
-    hiseq_run_ids_done = detection_end_run.discover_finished_runs(hiseq_run_ids_do_not_process, conf)
+    try:
+        detection_new_run.discover_new_runs(hiseq_run_ids_do_not_process, conf)
+    except:
+        exception_error(None , 'Failed to discover new runs', conf)
+
+    # Discover finished runs
+    try:
+        hiseq_run_ids_done = detection_end_run.discover_finished_runs(hiseq_run_ids_do_not_process, conf)
+    except:
+        exception_error(None , 'Failed to discover finished runs', conf)
 
 
     #
@@ -546,6 +568,11 @@ def aozan_main():
     # Use default (US) locale
     Locale.setDefault(Globals.DEFAULT_LOCALE)
 
+    # Check if OS is Linux
+    if not SystemUtils.isLinux():
+        sys.stderr.write('ERROR: Aozan can not be executed. Operating system is not Linux\n')
+        sys.exit(1)
+
     # Check if configuration file exists
     conf_file = args[0]
     if not os.path.isfile(conf_file):
@@ -573,6 +600,14 @@ def aozan_main():
                    'may be inaccessible. ',
                    conf)
         sys.exit(1)
+
+    # check if global program set is available in PATH
+    global_program_set = {"bash", "du", "touch", "chmod", "cp", "mv", "rm", "find", "tar"}
+    for program in global_program_set:
+        if not common.exists_in_path(program):
+            common.log('SEVERE',
+                  "Can't find all needed commands in PATH env var. Unable to find: " + program + " command.", conf)
+            sys.exit(1)
 
     # Check critical free space available
     hiseq_run.send_mail_if_critical_free_space_available(conf)

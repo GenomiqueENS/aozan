@@ -54,47 +54,47 @@
          <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
 
          <tr><td>qc.test.lane.raw.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable lane raw cluster count test</td></tr>
-         <tr><td>qc.test.lane.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of lane raw cluster count</td></tr>
+         <tr><td>qc.test.lane.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
          <tr><td>qc.test.lane.pf.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable lane passing filter cluster count test</td></tr>
-         <tr><td>qc.test.lane.pf.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of lane passing filter cluster count</td></tr>
+         <tr><td>qc.test.lane.pf.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
          <tr><td>qc.test.lane.pf.cluster.percent.enable</td><td>boolean</td><td>False</td><td>Enable lane passing filter cluster percent test</td></tr>
-         <tr><td>qc.test.lane.pf.cluster.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values of lane passing filter cluster percent</td></tr>
+         <tr><td>qc.test.lane.pf.cluster.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
          <tr><td>qc.test.lane.phix.raw.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable lane PhiX raw cluster count test</td></tr>
-         <tr><td>qc.test.lane.phix.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of lane Phix raw cluster count</td></tr>
+         <tr><td>qc.test.lane.phix.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
          <tr><td>qc.test.lane.cluster.density.enable</td><td>boolean</td><td>False</td><td>Enable lane cluster density test</td></tr>
-         <tr><td>qc.test.lane.cluster.density.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values of lane cluster density</td></tr>
+         <tr><td>qc.test.lane.cluster.density.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
          <tr><td>qc.test.lane.phix.align.percent.enable</td><td>boolean</td><td>False</td><td>Enable lane PhiX align percent test</td></tr>
-         <tr><td>qc.test.lane.phix.align.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values of lane PhiX align percent</td></tr>
+         <tr><td>qc.test.lane.phix.align.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
          <tr><td>qc.test.lane.error.rate.enable</td><td>boolean</td><td>False</td><td>Enable lane error rate test</td></tr>
          <tr><td>qc.test.lane.error.rate.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values of lane error rate</td></tr>
 
          <tr><td>qc.test.lane.35.cycle.error.rate.enable</td><td>boolean</td><td>False</td><td>Enable lane 35 cycle error rate test</td></tr>
-         <tr><td>qc.test.lane.35.cycle.error.rate.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values of lane 35 cycle error rate</td></tr>
+         <tr><td>qc.test.lane.35.cycle.error.rate.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
          <tr><td>qc.test.lane.75.cycle.error.rate.enable</td><td>boolean</td><td>False</td><td>Enable lane 75 cycle error rate test</td></tr>
-         <tr><td>qc.test.lane.75.cycle.error.rate.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values of lane 75 cycle error rate</td></tr>
+         <tr><td>qc.test.lane.75.cycle.error.rate.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
          <tr><td>qc.test.lane.100.cycle.error.rate.enable</td><td>boolean</td><td>False</td><td>Enable lane 100 cycle error test</td></tr>
-         <tr><td>qc.test.lane.100.cycle.error.rate.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values of lane 100 cycle error rate</td></tr>
+         <tr><td>qc.test.lane.100.cycle.error.rate.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
          <tr><td>qc.test.lane.first.cycle.intensity.enable</td><td>boolean</td><td>False</td><td>Enable lane first cycle intensity test</td></tr>
-         <tr><td>qc.test.lane.first.cycle.intensity.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of lane first cycle intensity</td></tr>
+         <tr><td>qc.test.lane.first.cycle.intensity.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
          <tr><td>qc.test.lane.cycle.20.intensity.percent.enable</td><td>boolean</td><td>False</td><td>Enable lane cycle 20 intensity percent test</td></tr>
-         <tr><td>qc.test.lane.cycle.20.intensity.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values of lane cycle 20 intensity</td></tr>
+         <tr><td>qc.test.lane.cycle.20.intensity.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
          <tr><td>qc.test.lane.phasing.prephasing.percent.enable</td><td>boolean</td><td>False</td><td>Enable lane phasing prephasing percent test</td></tr>
          <tr><td>qc.test.lane.phasing.prephasing.percent.phasing.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values of lane phasing percent</td></tr>
-         <tr><td>qc.test.lane.phasing.prephasing.percent.prephasing.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values of prephasing percent</td></tr>
+         <tr><td>qc.test.lane.phasing.prephasing.percent.prephasing.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values of lane prephasing percent</td></tr>
 
          <tr><td>qc.test.lane.q30.percent.enable</td><td>boolean</td><td>False</td><td>Enable lane Q30 percent test</td></tr>
-         <tr><td>qc.test.lane.q30.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values of lane Q30 percent</td></tr>
+         <tr><td>qc.test.lane.q30.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
        </table>
 
        <p>An example of table built with lanes quality tests.</p>

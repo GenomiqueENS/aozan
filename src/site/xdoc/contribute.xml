@@ -51,7 +51,7 @@
         <!--
         <li>Programming new <a href="./writingstepplugin.html">Aozan plugins</a> and redistributing them (by yourself or in Aozan source repository)</li>
          -->
-        <li>Submitting patches</li>
+        <li>Submitting patches or pull requests</li>
         <li>Writing developer documentation on <a href="https://github.com/GenomicParisCentre/aozan/wiki">Aozan Wiki</a> if you become an Aozan committer</li>
       </ul>
 

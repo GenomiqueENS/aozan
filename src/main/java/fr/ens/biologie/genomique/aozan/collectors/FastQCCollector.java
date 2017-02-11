@@ -26,6 +26,7 @@ package fr.ens.biologie.genomique.aozan.collectors;
 import java.io.File;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
+import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
@@ -47,6 +48,7 @@ public class FastQCCollector extends AbstractFastqCollector {
 
   private int numberThreads = Runtime.getRuntime().availableProcessors();
   private boolean isProcessUndeterminedIndicesSamples = false;
+  private boolean keepZipReportFile;
 
   @Override
   public String getName() {
@@ -77,6 +79,9 @@ public class FastQCCollector extends AbstractFastqCollector {
     this.isProcessUndeterminedIndicesSamples = conf
         .getBoolean(Settings.QC_CONF_FASTQC_PROCESS_UNDETERMINED_SAMPLES_KEY);
 
+    this.keepZipReportFile =
+        conf.getBoolean(Settings.QC_CONF_FASTQC_KEEP_ZIP_REPORT_FILE_KEY, true);
+
     // Check if step blast needed and configure
     OverrepresentedSequencesBlast.getInstance().configure(conf,
         qc.getSettings().get(Settings.DOCKER_URI_KEY));
@@ -88,13 +93,18 @@ public class FastQCCollector extends AbstractFastqCollector {
       final FastqSample fastqSample, final File reportDir, final boolean runPE)
       throws AozanException {
 
-    if (fastqSample.getFastqFiles().isEmpty()) {
-      return null;
+    Common.getLogger().info("Process sample for FastQC: " + fastqSample.toString());
+
+    if (fastqSample.getFastqFiles() == null
+        || fastqSample.getFastqFiles().isEmpty()) {
+
+      throw new AozanException("No FASTQ file defined for the fastqSample: "
+          + fastqSample.getFilenamePrefix());
     }
 
     // Create the thread object
     return new FastQCProcessThread(fastqSample, INGORE_FILTERED_SEQUENCES,
-        reportDir);
+        reportDir, this.keepZipReportFile);
   }
 
   //

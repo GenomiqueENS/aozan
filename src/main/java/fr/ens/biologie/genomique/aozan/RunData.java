@@ -355,6 +355,16 @@ public class RunData {
   }
 
   /**
+   * Checks if is lane indexed.
+   * @param lane the lane
+   * @return true, if is lane indexed
+   */
+  public boolean isLaneIndexed(final int lane) {
+
+    return getBoolean(SAMPLESHEET_DATA_PREFIX + ".lane" + lane + ".indexed");
+  }
+
+  /**
    * Check if the lane related to the sample name is a control lane.
    * @param sampleId the sample Id
    * @return true if the lane is a control otherwise false
@@ -705,20 +715,6 @@ public class RunData {
   //
   // Demux getters
   //
-
-  /**
-   * Checks if is lane indexed.
-   * @param lane the lane
-   * @return true, if is lane indexed
-   */
-  public boolean isLaneIndexed(final int lane) {
-    final String res =
-        get("demux.lane" + lane + ".sample.lane" + lane + ".barcode");
-
-    return (res == null
-        ? false : res.trim().toLowerCase(Globals.DEFAULT_LOCALE)
-            .equals("undetermined"));
-  }
 
   /**
    * Get the raw cluster count for a sample.

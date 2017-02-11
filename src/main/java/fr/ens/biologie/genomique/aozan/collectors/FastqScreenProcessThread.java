@@ -74,7 +74,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   @Override
   protected void logThreadStart() {
     LOGGER
-        .fine("FASTQSCREEN: start for " + getFastqSample().getKeyFastqSample());
+        .fine("FASTQSCREEN: start for " + getFastqSample().getFilenamePrefix());
   }
 
   @Override
@@ -87,7 +87,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   protected void logThreadEnd(final String duration) {
 
     LOGGER.fine("FASTQSCREEN: end for "
-        + getFastqSample().getKeyFastqSample() + " in mode "
+        + getFastqSample().getFilenamePrefix() + " in mode "
         + (this.isPairedEndMode ? "paired" : "single")
         + (isSuccess()
             ? " on genome(s) " + this.genomes + " in " + duration
@@ -95,26 +95,43 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
   }
 
-  @Override
-  protected void createReportFile() throws AozanException, IOException {
+  /**
+   * Create the report file.
+   * @throws AozanException if an error occurs while processing data
+   * @throws IOException if an error occurs while processing data
+   */
+  private void createReportFile() throws AozanException, IOException {
 
-    final String report = this.reportDir.getAbsolutePath()
-        + "/" + getFastqSample().getPrefixReport() + "-fastqscreen";
+    final String reportFilename =
+        getFastqSample().getFilenamePrefix() + "-fastqscreen";
 
-    writeCSV(report);
+    final File csvFile = new File(this.reportDir, reportFilename + ".csv");
+    final File htmlFile = new File(this.reportDir, reportFilename + ".html");
+
+    writeCSV(csvFile);
 
     // Report with a link in qc html page
-    writeHtml(report);
+    writeHtml(htmlFile);
+
+    // Save the filename of the report in RunData
+    this.data.put(
+        "fastqscreen"
+            + super.getFastqSample().getRundataPrefix() + ".report.file.name",
+        htmlFile.getName());
 
     LOGGER.fine("FASTQSCREEN: save "
-        + getFastqSample().getPrefixReport() + " report fastqscreen");
+        + getFastqSample().getFilenamePrefix() + " report fastqscreen");
   }
 
-  @Override
-  protected void processResults() throws AozanException {
+  /**
+   * Process results after the end of the thread.
+   * @throws AozanException if an error occurs while generate FastQ Screen
+   *           reports
+   */
+  private void processResults() throws AozanException {
 
     final File read1 = getFastqSample().getSubsetFastqFile();
-    final String sampleDescription = getFastqSample().getKeyFastqSample();
+    final String sampleDescription = getFastqSample().getFilenamePrefix();
 
     if (!read1.exists()) {
       LOGGER.warning("No partial file for " + getFastqSample() + ": " + read1);
@@ -169,14 +186,12 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   //
 
   /**
-   * Create a report fastqScreen for a sample in csv format.
-   * @param fileName name of the report file in csv format
+   * Create a report fastqScreen for a sample in CSV format.
+   * @param file report file in CSV format
    * @throws IOException if an error occurs during writing file
    */
-  private void writeCSV(final String fileName)
+  private void writeCSV(final File file)
       throws AozanException, IOException {
-
-    final File file = new File(fileName + ".csv");
 
     final BufferedWriter br = Files.newWriter(file, StandardCharsets.UTF_8);
     br.append(this.resultsFastqscreen.reportToCSV(getFastqSample(),
@@ -187,7 +202,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     // Run paired-end: copy file for read R2
     if (this.isRunPE) {
       final File fileR2 = new File(this.reportDir.getAbsolutePath()
-          + "/" + getFastqSample().getPrefixReport(2) + "-fastqscreen.csv");
+          + "/" + getFastqSample().getFilenamePrefix(2) + "-fastqscreen.csv");
 
       if (fileR2.exists()) {
         if (!fileR2.delete()) {
@@ -203,21 +218,19 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
   /**
    * Create a report fastqScreen for a sample in html format.
-   * @param fileName name of the report file in html format
+   * @param file report file in html format
    * @throws IOException if an error occurs during writing file
    */
-  private void writeHtml(final String fileName)
+  private void writeHtml(final File file)
       throws AozanException, IOException {
 
-    final File outputReportR1 = new File(fileName + ".html");
-
     this.resultsFastqscreen.reportToHtml(getFastqSample(), this.data,
-        this.sampleGenome, outputReportR1, this.fastqscreenXSLFile);
+        this.sampleGenome, file, this.fastqscreenXSLFile);
 
     // Run paired-end: copy file for read R2
     if (this.isRunPE) {
       final File outputReportR2 = new File(this.reportDir.getAbsolutePath()
-          + "/" + getFastqSample().getPrefixReport(2) + "-fastqscreen.html");
+          + "/" + getFastqSample().getFilenamePrefix(2) + "-fastqscreen.html");
 
       if (outputReportR2.exists()) {
         if (!outputReportR2.delete()) {
@@ -226,7 +239,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
         }
       }
 
-      FileUtils.copyFile(outputReportR1, outputReportR2);
+      FileUtils.copyFile(file, outputReportR2);
     }
   }
 

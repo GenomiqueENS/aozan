@@ -26,13 +26,15 @@
 This script checks if a run has ended sequencing.
 '''
 
-import aozan
-import hiseq_run
 import os
 import os.path
 import stat
+from pipes import quote
 
 import common
+import aozan
+import hiseq_run
+
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
@@ -184,6 +186,22 @@ def send_mail_if_recent_run(run_id, secs, conf):
                         '\n\nFor this task %.2f GB has been used and %.2f GB still free.' % (du, df), False, conf)
 
 
+def list_existing_files(path, files_array):
+    """Return string with existing files from array
+
+    Arguments:
+        path: path to directory
+        files_array: all files to check
+    """
+
+    filename_list = []
+    for filename in files_array:
+        if os.path.exists(path + '/' + filename):
+            filename_list.append(quote(filename))
+
+    return ' '.join(filename_list)
+
+
 def create_run_summary_reports(run_id, conf):
     """ Copy main files and directory from hiseq run directory to save in report run data directory.
         Save data in two distinct directory on hiseq and on report, and tar.bz2 version
@@ -244,19 +262,19 @@ def create_run_summary_reports(run_id, conf):
 
     # Define set file to copy in report archive, check if exists (depend on parameters Illumina)
     files = ['InterOp', 'RunInfo.xml', 'runParameters.xml', 'RunParameters.xml']
-    files_to_copy = common.list_existing_files(source_path, files)
+    files_to_copy = list_existing_files(source_path, files)
 
-    if files_to_copy is None:
+    if len(files_to_copy) == 0:
         common.log("WARNING",
                    "Archive " + hiseq_log_archive_file + " not created: none file exists " + str(files) +
                    ' in ' + source_path, conf)
     else:
-        cmd = 'cd ' + source_path + ' && ' + \
-              'cp -rp ' + files_to_copy + tmp_path + ' && ' + \
-              'cd ' + tmp_base_path + ' && ' + \
-              'mv ' + run_id + ' ' + hiseq_log_prefix + run_id + ' && ' + \
-              'tar cjf ' + reports_data_path + '/' + hiseq_log_archive_file + ' ' + hiseq_log_prefix + run_id + \
-              ' && ' + 'rm -rf ' + tmp_path
+        cmd = 'cd ' + quote(source_path) + ' && ' + \
+              'cp -rp ' + files_to_copy + ' ' + quote(tmp_path) + ' && ' + \
+              'cd ' + quote(tmp_base_path) + ' && ' + \
+              'mv ' + quote(run_id) + ' ' + quote(hiseq_log_prefix + run_id) + ' && ' + \
+              'tar cjf ' + quote(reports_data_path + '/' + hiseq_log_archive_file) + ' ' + quote(hiseq_log_prefix + run_id) + ' && ' +\
+              'rm -rf ' + quote(tmp_path)
         # + ' && rm -rf ' + hiseq_log_prefix + run_id
 
         common.log("INFO", "exec: " + cmd, conf)
@@ -267,7 +285,7 @@ def create_run_summary_reports(run_id, conf):
 
     # Save html reports
     if os.path.exists(tmp_path):
-        cmd = 'rm -rf ' + tmp_path
+        cmd = 'rm -rf ' + quote(tmp_path)
 
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
@@ -283,17 +301,17 @@ def create_run_summary_reports(run_id, conf):
     else:
         files = ['./Config', './Recipe', './RTALogs', './RTAConfiguration.xml', './RunCompletionStatus.xml']
 
-    files_to_copy = common.list_existing_files(source_path, files)
-    if files_to_copy is None:
+    files_to_copy = list_existing_files(source_path, files)
+    if len(files_to_copy) == 0:
         common.log("WARNING", "Archive " + report_archive_file + " not created: none file exists " + str(
             files) + ' in ' + source_path, conf)
     else:
-        cmd = 'cd ' + source_path + ' && ' + \
-              'cp -rp ' + files_to_copy + tmp_path + ' && ' + \
-              'cd ' + tmp_base_path + ' && ' + \
-              'mv ' + run_id + ' ' + report_prefix + run_id + ' && ' + \
-              'tar cjf ' + reports_data_path + '/' + report_archive_file + ' ' + report_prefix + run_id + ' && ' + \
-              'mv ' + report_prefix + run_id + ' ' + reports_data_path
+        cmd = 'cd ' + quote(source_path) + ' && ' + \
+              'cp -rp ' + files_to_copy + ' ' + quote(tmp_path) + ' && ' + \
+              'cd ' + quote(tmp_base_path) + ' && ' + \
+              'mv ' + quote(run_id) + ' ' + quote(report_prefix + run_id) + ' && ' + \
+              'tar cjf ' + quote(reports_data_path + '/' + report_archive_file) + ' ' + quote(report_prefix + run_id) + ' && ' + \
+              'mv ' + quote(report_prefix + run_id) + ' ' + quote(reports_data_path)
 
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:

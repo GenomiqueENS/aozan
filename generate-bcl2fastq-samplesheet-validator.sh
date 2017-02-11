@@ -67,53 +67,52 @@ done
 cat > $PROJECT_NAME/war/$HELP_TEXT_PATH << EOF
 Help page for validator sample-sheet for bcl2fastq-2.x tool (Illumina: http://support.illumina.com/downloads/bcl2fastq-conversion-software-v217.html):
 
-The Bcl2fastq version 2.0 sample sheet validator helps users to check their run design. This tool uses only html and javascript. No data is sent to our servers when you use this tool.
-This tool generates a sample sheet only in csv format with a very strict syntax.
+The bcl2fastq 2.x sample sheet validator helps users to check their run design. This tool uses only HTML and Javascript. No data are sent to our servers when you use this tool.
+This tool generates a sample sheet only in CSV format with a very strict syntax.
 It ensures you that the demultiplexing will not fail because the sample sheet is not correct.
 
-You can use the validator in association with Aozan, a tool that automatically handles data transfer, demultiplexing conversion and quality control once a HiSeq run is over (developed by Genomic Paris Centre and available at http://tools.genomique.biologie.ens.fr/aozan/).
+You can use the validator in association with Aozan, a tool that automatically handles data transfer, demultiplexing conversion and quality control once an Illumina sequencer run is over (developed by the genomics facility of the Institut de biologie de l'École normale supérieure and available at http://outils.genomique.biologie.ens.fr/aozan/).
 
 The validator is very simple to use:
-1/ copy the sample sheet from your spreadsheet or csv/tsv format in the first tab with the column headers;
-2/ optional: indicate the flow cell id or the run id the text box;
-3/ launch check & convert to csv (the csv output appears in the second tab).
+1/ copy the sample sheet from your spreadsheet or CSV/TSV format in the first tab of the left panel with the column headers;
+2/ click on the "Check bcl2fastq samplesheet" to check and convert to CSV (the CSV output appears in the second tab).
 
 The verification step opens an alert window in two cases :
 - error message : the conversion is stopped, the sample sheet format is invalid;
-- warning message : the conversion is finalized and it alerts on any potential input error.
+- warning message : the conversion has been performed and some warnings exits about your sample sheet.
 
 The sample sheet input format is strict. Some fields can't be null or empty.
-- a line containing only '[Data]' must be included juste before defining the header.
-- Some column must have specific headers :
-        - Sample_ID: name used in the fastq file (THIS COLUMN IS MENDATORY);
+- a line containing only '[Data]' must be included in the header your sample sheet.
+- Some column must have specific values:
+        - Sample_ID: name used in the FASTQ file (THIS COLUMN IS MANDATORY);
         - Lane: lane number between 1 and 8;
-        - Sample_Name: descriptive name used in the fastq file;
-        - Sample_Ref: reference name. You can use aliases like index, you can put a key-value list (ex mm10=Mus musculus), available in the 'References Aliases' tab, the program checks if each value exists in the list; if not, it generates a warning message;
-        - index: sequence of index or an alias, in case multi-indexes like TCGAAG-TCGGCA or E1-E2. You can put a key-value list (ex B1=CGATGT), available in the 'Indexes Aliases' tab, the program replaces the aliases by the real value in csv output;
-        - index2: sequence of index or an alias, like the index field (Optional);
+        - Sample_Name: descriptive name used in the FASTQ file;
+        - Sample_Ref: reference name. You can use aliases defined in the "Reference aliases" tab. You can put a key-value list  (e.g. mm10=Mus musculus) in this tab to define the allowed aliases. If the value does not exists in the list, a warning message will be thrown;
+        - index: sequence of the first index or an alias. You can use aliases defined in the "Index aliases" tab. You must put a key-value list (e.g. B1=CGATGT) in this tab to define the allowed aliases.
+        - index2: sequence of the second index or an alias, like the index field (Optional);
         - Description (Optional);
-        - Sample_Project;
+        - Sample_Project: sample project;
 
 Possible reasons for error/warning messages :
-- missing [Data] line before header.
+- missing [Data] line in the header;
 - column headers missing in the line next to [Data] line;
-- invalid mendatory header name;
-- null or empty mendatory field;
-- lane number not in range [1,8];
+- invalid mandatory header name;
+- missing or empty mandatory field;
+- lane number not in expected range [1,8];
 - same sample_ID defined with different indexes;
 - same sample_ID defined in several projects;
 - same sample_ID defined in several lanes;
-- misspelled fields : Sample_ID, Sample_Ref, Sample_Name or Sample_Project should be written only with letters, digits, '-' or '_';
+- misspelled fields : Sample_ID, Sample_Ref, Sample_Name or Sample_Project values should be written only with letters, digits, '-' or '_';
 - misspelled index : the index sequence should be written only with the letters A, T, C and G;
-- same sample_ID defined in several lanes, but index is not the same;
+- same sample_ID defined in several lanes, but not using the same index.
 
 Using the aliases tab (optional) :
-There are two tabs that allow you to copy a key-value list used to check the sample-sheet for the following fields : index and Sample_Ref.
-For the index, you can use the aliases to replace them by the real value in the csv output.
+There are two tabs that allow you to copy a key-value list used to check the sample-sheet for the following fields : index, index2 and Sample_Ref.
+For the index, you can use the aliases to replace them by the real value in the CSV output.
 For the Sample_Ref, you can use the aliases to check that one reference is always written the same way. It is not required by bcl2fastq 2.x. If a Sample_Ref is not found in the list, the program prints a warning message, sometimes with a proposition to fix it.
 
 
-NB : the code of this tool is available on GitHub at:
+NB: the code of this tool is available on GitHub at:
 https://github.com/GenomicParisCentre/aozan/blob/master/generate-bcl2fastq-samplesheet-validator.sh
 
 EOF
@@ -580,8 +579,8 @@ public class $PROJECT_NAME implements EntryPoint {
     // Set the layouts
     final TabLayoutPanel tp = new TabLayoutPanel(1.5, Unit.EM);
     tp.add(new ScrollPanel(inputTextarea), "[Input Samplesheet]");
-    tp.add(new ScrollPanel(indexesTextarea), "[Indexes Aliases]");
-    tp.add(new ScrollPanel(genomesTextarea), "[References Aliases]");
+    tp.add(new ScrollPanel(indexesTextarea), "[Index Aliases]");
+    tp.add(new ScrollPanel(genomesTextarea), "[Reference Aliases]");
 
 
     final TabLayoutPanel tpo = new TabLayoutPanel(1.5, Unit.EM);

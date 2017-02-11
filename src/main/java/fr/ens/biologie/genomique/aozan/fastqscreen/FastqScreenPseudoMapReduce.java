@@ -184,10 +184,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
             // Paired end mode
             final MapperProcess process = mapper.mapPE(fastqRead1, fastqRead2);
 
-            // final InputStream outputSAM =
-            // mapper.mapPE(fastqRead1, fastqRead2).getStout();
-            // parser.parseLines(outputSAM);
-
+            // Parse SAM output
             parser.parseLines(process.getStout());
 
             // Wait the end of the process and do cleanup
@@ -203,10 +200,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
             // Single read mapping
             final MapperProcess process = mapper.mapSE(fastqRead1);
 
-            // final InputStream outputSAM =
-            // mapper.mapSE(fastqRead1).getStout();
-            // parser.parseLines(outputSAM);
-
+            // Parse SAM output
             parser.parseLines(process.getStout());
 
             // Wait the end of the process and do cleanup

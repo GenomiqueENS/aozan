@@ -26,8 +26,11 @@
 This script checks all informations about a run.
 '''
 
-import os, os.path, time
-import stat, detection_end_run
+import os
+import os.path
+import time
+import stat
+
 import common
 
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
@@ -35,8 +38,6 @@ from fr.ens.biologie.genomique.aozan.Settings import HISEQ_CRITICAL_MIN_SPACE_KE
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.illumina import RunInfo
 
-# from pickle import FALSE
-# from macpath import pathsep
 
 def load_deny_run_ids(conf):
     """Load the list of the run ids to not process.

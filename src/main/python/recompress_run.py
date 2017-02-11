@@ -30,8 +30,10 @@ import glob
 import os
 import time
 from subprocess import call, CalledProcessError
+from pipes import quote
 
 import common
+
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import FASTQ_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import RECOMPRESS_COMPRESSION_KEY
@@ -142,14 +144,15 @@ def recompress_fastq_process(input_file, output_file, input_decompression_comman
 
             # Rename and set previous time stamp and rights to output_file then remove md5sum files
             os.rename(temp_file, output_file)
-            if call(["bash", "-c", "touch -r \'" + input_file + "\' \'" + output_file + "\'"]) != 0:
+
+            if call(["bash", "-c", "touch -r " + quote(input_file) + " " + quote(output_file) ]) != 0:
                 error_message = "Error while trying to edit metadata using touch command."
                 long_error_message = "Error while trying to edit metadata using touch command. Input file is " + str(
                     input_file) + " and output file is " + str(
                     output_file) + ""
                 return False, error_message, long_error_message
 
-            if call(["bash", "-c", "chmod --reference \'" + input_file + "\' \'" + output_file + "\'"]) != 0:
+            if call(["bash", "-c", "chmod --reference " + quote(input_file) + " " + quote(output_file)]) != 0:
                 error_message = "Error while trying to edit rights using chmod command."
                 long_error_message = "Error while trying to edit right using touch command. Input file is " + str(
                     input_file) + " and output file is " + str(
@@ -215,10 +218,10 @@ def convert_fastq_file(input_file, output_file, input_decompression_command, out
         # Command a decompresses input file create md5sum for this file then compresses it
         # Whereas Command b decompresses output file just to check md5sum
         # noinspection PyPep8
-        command_a = input_decompression_command + " '" + input_file + "' |tee >(md5sum > '" + input_md5sum + "') | " \
-                        + output_compression_command + " " + compression_level_argument + " > '" + output_file + "'"
+        command_a = input_decompression_command + " " + quote(input_file) + " | tee >( md5sum > " + quote(input_md5sum) + " ) | " \
+                        + output_compression_command + " " + compression_level_argument + " > " + quote(output_file)
 
-        command_b = output_decompression_command + " '" + output_file + "' | md5sum > '" + output_md5sum + "'"
+        command_b = output_decompression_command + " " + quote(output_file) + " | md5sum > " + quote(output_md5sum)
 
         # Actual commands execution
         try:

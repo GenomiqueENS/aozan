@@ -28,7 +28,6 @@ import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtBehavior;
 import javassist.CtClass;
-import javassist.CtConstructor;
 import javassist.NotFoundException;
 
 /**
@@ -78,38 +77,6 @@ public class RuntimePatchFastQC {
         // Load the class by the ClassLoader
         cc.toClass();
 
-      }
-    } catch (final NotFoundException e) {
-      // Nothing to do
-
-    }
-  }
-
-  /**
-   * Remove code from Report.HTMLReportArchive in constructor. Can also redefine
-   * code in a heritage class HTMLReportArchiveAozan which had access the files
-   * included in fastqc jar.
-   * @throws CannotCompileException thrown when bytecode transformation has
-   *           failed.
-   */
-  public static void modifyConstructorHtmlReportArchive()
-      throws CannotCompileException {
-    try {
-      // Get the class to modify
-      final CtClass cc = ClassPool.getDefault()
-          .get("uk.ac.babraham.FastQC.Report.HTMLReportArchive");
-
-      // Check class not frozen
-      if (cc != null && !cc.isFrozen()) {
-
-        // Retrieve the constructor
-        final CtConstructor[] constructors = cc.getConstructors();
-
-        // Modify constructor, it does nothing
-        constructors[0].setBody(null);
-
-        // Load the class by the ClassLoader
-        cc.toClass();
       }
     } catch (final NotFoundException e) {
       // Nothing to do
@@ -177,9 +144,6 @@ public class RuntimePatchFastQC {
       rewriteContaminantFinderMethod(useBlast);
 
       changeSuperClassOverrepresentedModule(useBlast);
-
-      // Not necessary with FastQC v0.11.2
-      // modifyConstructorHtmlReportArchive();
 
     } catch (final CannotCompileException e) {
       throw new AozanException(e);

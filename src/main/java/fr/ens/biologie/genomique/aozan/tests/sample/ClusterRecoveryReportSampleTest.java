@@ -60,12 +60,12 @@ public class ClusterRecoveryReportSampleTest extends AbstractSampleTest {
         return new TestResult("NA");
       }
 
-      final String url = String.format(
-          "Undetermined_indices/lane%s_Undetermined_L%03d_R1_001-potentialindices.html",
-          lane, lane);
+      final String filename =
+          data.get("undeterminedindices.lane" + lane + ".report.file.name");
+
+      final String url = "Undetermined_indices/" + filename;
 
       return new TestResult(-1, url, "url");
-
     }
 
     // Case standard sample
@@ -78,10 +78,8 @@ public class ClusterRecoveryReportSampleTest extends AbstractSampleTest {
 
     // Get HTML report URL
     final String projectName = data.getProjectSample(sampleId);
-    final String demuxName = data.getSampleDemuxName(sampleId);
-
     final String filename =
-        String.format("%s_lane%s-potentialindices.html", demuxName, lane);
+        data.get("undeterminedindices.sample" + sampleId + ".report.file.name");
 
     final String url = "Project_" + projectName + "/" + filename;
 

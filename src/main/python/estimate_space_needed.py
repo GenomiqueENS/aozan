@@ -26,9 +26,12 @@
 This script estimates if enough space is available for a run.
 '''
 
-import common, hiseq_run
-from java.io import File
 from xml.dom.minidom import parse
+
+import common
+import hiseq_run
+
+from java.io import File
 
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
 

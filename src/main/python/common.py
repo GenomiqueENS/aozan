@@ -26,23 +26,32 @@
 This script contains all common functions in all Aozan python scripts
 '''
 
-import hiseq_run, sync_run, demux_run
-import smtplib, os.path, time, sys, os, stat
+
+import smtplib
+import os.path
+import time
+import sys
+import os
+import stat
 import mimetypes
 from email.utils import formatdate
 from glob import glob
 from xml.etree.ElementTree import ElementTree
-
-from java.io import File
-from java.lang import Runtime
-from java.util import LinkedHashMap
-from java.util.logging import Level
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.audio import MIMEAudio
 from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
 from email import encoders
+from pipes import quote
+
+import hiseq_run
+import sync_run
+
+from java.io import File
+from java.lang import Runtime
+from java.util import LinkedHashMap
+from java.util.logging import Level
 
 from fr.ens.biologie.genomique.aozan import Common
 from fr.ens.biologie.genomique.aozan import Globals
@@ -58,6 +67,11 @@ from java.io import RandomAccessFile;
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_DEBUG_KEY
 from fr.ens.biologie.genomique.aozan.Settings import SEND_MAIL_KEY
 from fr.ens.biologie.genomique.aozan.Settings import SMTP_SERVER_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SMTP_PORT_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SMTP_USE_STARTTLS_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SMTP_USE_SSL_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SMTP_LOGIN_KEY
+from fr.ens.biologie.genomique.aozan.Settings import SMTP_PASSWORD_KEY
 from fr.ens.biologie.genomique.aozan.Settings import MAIL_ERROR_TO_KEY
 from fr.ens.biologie.genomique.aozan.Settings import MAIL_FOOTER_KEY
 from fr.ens.biologie.genomique.aozan.Settings import MAIL_FROM_KEY
@@ -81,7 +95,6 @@ from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQC_BLAST_ENABLE
 from fr.ens.biologie.genomique.aozan.Settings import QC_CONF_FASTQC_BLAST_DB_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import READ_ONLY_OUTPUT_FILES_KEY
-
 from fr.ens.biologie.genomique.aozan.util import StringUtils
 
 PRIORITY_FILE = 'runs.priority'
@@ -158,7 +171,7 @@ def du(path):
     if not os.path.exists(path):
         return 0L
 
-    cmd = 'du -b --max-depth=0 ' + path
+    cmd = 'du -b --max-depth=0 ' + quote(path)
     child_stdin, child_stdout = os.popen2(cmd)
     lines = child_stdout.readlines()
     child_stdin.close()
@@ -322,25 +335,6 @@ def is_conf_value_defined(settings_key, expected_value, conf):
     return value == expected_value
 
 
-def list_existing_files(path, files_array):
-    """Return string with existing files from array
-
-    Arguments:
-        path: path to directory
-        files_array: all files to check
-    """
-
-    s = ''
-    for filename in files_array:
-        if os.path.exists(path + '/' + filename):
-            s = filename + ' ' + s
-
-    if s == '':
-        return None
-
-    return s + ' '
-
-
 def get_input_run_data_path(run_id, conf):
     """Return the path to input run data according to hiseq and synchronization step parameters
 
@@ -387,7 +381,6 @@ def send_msg(subject, message, is_error, conf):
     """
 
     send_mail = is_conf_value_equals_true(SEND_MAIL_KEY, conf)
-    smtp_server = conf[SMTP_SERVER_KEY]
 
     # Specific receiver for error message
     if is_error:
@@ -422,7 +415,7 @@ def send_msg(subject, message, is_error, conf):
     composed = msg.as_string()
 
     if send_mail:
-        server = smtplib.SMTP(smtp_server)
+        server = _connect_smtp_server(conf)
         dests = []
         dests.extend(mail_to)
         if mail_cc is not None:
@@ -441,7 +434,6 @@ def send_msg_with_attachment(subject, message, attachment_file, is_error, conf):
     """Send a message to the user about the data extraction."""
 
     send_mail = is_conf_value_equals_true(SEND_MAIL_KEY, conf)
-    smtp_server = conf[SMTP_SERVER_KEY]
     mail_from = conf[MAIL_FROM_KEY]
     mail_cc = None
     mail_bcc = None
@@ -508,7 +500,7 @@ def send_msg_with_attachment(subject, message, attachment_file, is_error, conf):
     composed = msg.as_string()
 
     if send_mail:
-        server = smtplib.SMTP(smtp_server)
+        server = _connect_smtp_server(conf)
         dests = []
         dests.extend(mail_to)
         if mail_cc is not None:
@@ -521,6 +513,42 @@ def send_msg_with_attachment(subject, message, attachment_file, is_error, conf):
         print '-------------'
         print composed
         print '-------------'
+
+
+def _connect_smtp_server(conf):
+    """Configure the connection to the SMTP server.
+
+    Arguments:
+        conf: configuration object
+    """
+
+    smtp_server = conf[SMTP_SERVER_KEY]
+
+    # Define default port
+    if is_conf_value_equals_true(SMTP_USE_SSL_KEY, conf):
+        smtp_port = 465
+    else:
+        smtp_port = 25
+
+    # Change the port if required
+    if is_conf_key_exists(SMTP_PORT_KEY, conf):
+        smtp_port = int(conf[SMTP_PORT_KEY])
+
+    # Connect to the server using SSL or not
+    if is_conf_value_equals_true(SMTP_USE_SSL_KEY, conf):
+        server = smtplib.SMTP_SSL(smtp_server, smtp_port)
+    else:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+
+    # Enable StartTLS
+    if is_conf_value_equals_true(SMTP_USE_STARTTLS_KEY, conf):
+        server.starttls()
+
+    # Use a login and a password if required
+    if is_conf_key_exists(SMTP_LOGIN_KEY, conf) and is_conf_key_exists(SMTP_PASSWORD_KEY, conf):
+        server.login(conf[SMTP_LOGIN_KEY], conf[SMTP_PASSWORD_KEY])
+
+    return server
 
 
 def create_msg(mail_from, mail_to, mail_cc, mail_bcc, subject, message, conf):
@@ -714,30 +742,27 @@ def add_run_id(run_id, file_path, conf):
         conf)
 
     f = File(file_path);
-    try:
-        # Open file
-        raf = RandomAccessFile(f, 'rws')
 
-        # Creating lock
-        channel = raf.getChannel()
-        lock = channel.lock()
+    # Open file
+    raf = RandomAccessFile(f, 'rws')
 
-        # Set position at the end of the file
-        raf.seek(f.length())
+    # Creating lock
+    channel = raf.getChannel()
+    lock = channel.lock()
 
-        # Add the run_id at the end of the file
-        raf.writeBytes(run_id.strip() + '\n')
+    # Set position at the end of the file
+    raf.seek(f.length())
 
-        # Release locks
-        if lock:
-            lock.release()
+    # Add the run_id at the end of the file
+    raf.writeBytes(run_id.strip() + '\n')
 
-        # Close file
-        channel.close()
-        raf.close()
+    # Release locks
+    if lock:
+        lock.release()
 
-    except:
-        raise Exception("Can't write " + run_id + " to " + file_path)
+    # Close file
+    channel.close()
+    raf.close()
 
 
 def get_report_run_data_path(run_id, conf):
@@ -943,7 +968,7 @@ def check_configuration(conf, configuration_file_path):
         if _check_conf_key(conf, msg, HISEQ_DATA_PATH_KEY):
             # Check if hiseq_data_path exists
             for hiseq_output_path in hiseq_run.get_hiseq_data_paths(conf):
-                if not os.path.exists(hiseq_output_path):
+                if not os.path.isdir(hiseq_output_path):
                     msg += '\n\t* Sequencer output directory does not exist: ' + hiseq_output_path
 
     # For step SYNC

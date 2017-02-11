@@ -28,9 +28,11 @@ This script synchronize a run.
 
 import os
 import time
+from pipes import quote
 
 import common
 import hiseq_run
+
 from fr.ens.biologie.genomique.aozan.Settings import AOZAN_VAR_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import BCL_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import HISEQ_DATA_PATH_KEY
@@ -41,6 +43,7 @@ from fr.ens.biologie.genomique.aozan.Settings import SYNC_EXCLUDE_CIF_KEY
 from fr.ens.biologie.genomique.aozan.Settings import SYNC_SPACE_FACTOR_KEY
 from fr.ens.biologie.genomique.aozan.Settings import SYNC_STEP_KEY
 from fr.ens.biologie.genomique.aozan.Settings import TMP_PATH_KEY
+
 
 def load_denied_run_ids(conf):
     """Load the list of the denied run ids.
@@ -208,19 +211,19 @@ def partial_sync(run_id, last_sync, conf):
     else:
         # Exclude files that will be rewritten severals times during the run
         exclude_files.extend(['*.bin', '*.txt', '*.xml'])
-        cmd = 'cd ' + input_path + ' && find . -type f -mmin +' + conf[SYNC_CONTINUOUS_SYNC_MIN_AGE_FILES_KEY]
+        cmd = 'cd ' + quote(input_path) + ' && find . -type f -mmin +' + conf[SYNC_CONTINUOUS_SYNC_MIN_AGE_FILES_KEY]
         for exclude_file in exclude_files:
             cmd += " -not -name '" + exclude_file + "' "
-        cmd += ' > ' + rsync_manifest_path
+        cmd += ' > ' + quote(rsync_manifest_path)
         common.log("INFO", "exec: " + cmd, conf)
         if os.system(cmd) != 0:
             error("Error while executing rsync for run " + run_id, 'Error while executing find.\nCommand line:\n' + cmd,
                   conf)
             return False
-        rsync_params = '--files-from=' + rsync_manifest_path
+        rsync_params = '--files-from=' + quote(rsync_manifest_path)
 
     # Copy data from hiseq path to bcl path
-    cmd = 'rsync  -a --no-owner --no-group ' + rsync_params + ' ' + input_path + '/ ' + output_path
+    cmd = 'rsync  -a --no-owner --no-group ' + rsync_params + ' ' + quote(input_path + '/') + ' ' + quote(output_path)
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
         error("Error while executing rsync for run " + run_id, 'Error while executing rsync.\nCommand line:\n' + cmd,
@@ -247,6 +250,12 @@ def sync(run_id, conf):
     bcl_data_path = conf[BCL_DATA_PATH_KEY]
     reports_data_base_path = conf[REPORTS_DATA_PATH_KEY]
     output_path = bcl_data_path + '/' + run_id
+
+    # check if rsync exists in PATH
+    if not common.exists_in_path("rsync"):
+        error("Can't find all needed commands in PATH env var",
+              "Can't find all needed commands in PATH env var. Unable to find: rsync command.", conf)
+        return False
 
     # Check if reports_data_path exists
     if not os.path.exists(reports_data_base_path):

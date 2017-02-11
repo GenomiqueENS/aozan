@@ -96,8 +96,11 @@ fi
 
 echo -e "Aozan demo installer\n"
 
+# Ask for Aozan installation directory
+read -e -r -p "Aozan installation directory: " -i "$AOZAN_DIR" AOZAN_DIR
+
 # Ask for Email configuration
-read -r -p "Enable email? [y/N] " response
+read -e -r -p "Enable email? [y/N] " response
 case $response in
     [yY][eE][sS]|[yY])
         EMAIL_ENABLED=1
@@ -109,13 +112,13 @@ esac
 
 if [ $EMAIL_ENABLED -eq 1 ]; then
 
-    read -r -p "SMTP server: " SMTP_SERVER_NAME
-    read -r -p "User email: " USER_EMAIL
+    read -e -r -p "SMTP server: " SMTP_SERVER_NAME
+    read -e -r -p "User email: " USER_EMAIL
 fi
 
 # Ask to enable Blast
 if [ $BLAST_INSTALLED -eq 1 ]; then
-    read -r -p "Enable Blast for overrepresenting sequences in FastQC? [y/N] " response
+    read -e -r -p "Enable Blast for overrepresenting sequences in FastQC? [y/N] " response
     case $response in
         [yY][eE][sS]|[yY])
             BLAST_ENABLED=1
@@ -129,7 +132,7 @@ else
 fi
 
 # Ask to enable FastQ Screen
-read -r -p "Enable FastQ Screen?  [y/N] " response
+read -e -r -p "Enable FastQ Screen?  [y/N] " response
 case $response in
     [yY][eE][sS]|[yY])
         FASTQ_SCREEN_ENABLED=1
@@ -145,6 +148,7 @@ esac
 #
 
 echo -e "\nSystem configuration:"
+echo -e "  - Aozan directory\t\t:" $AOZAN_DIR
 echo -e "  - Docker installed\t\t:" $(yes_or_no $DOCKER_INSTALLED)
 echo -e "  - Bcl2fastq2 installed\t:" $(yes_or_no $BCL2FASTQ2_INSTALLED)
 if [ $BCL2FASTQ2_INSTALLED -eq 1 ]; then
@@ -179,7 +183,7 @@ fi
 
 # Ask to validate connfiguration
 echo
-read -r -p "Is configuration correct? [y/N] " response
+read -e -r -p "Is configuration correct? [y/N] " response
 case $response in
     [yY][eE][sS]|[yY])
         ;;
@@ -224,7 +228,7 @@ mkdir "$AOZAN_DIR"/runs
 
 echo "* Download example configuration file"
 cd "$AOZAN_DIR"/conf
-wget -q "$AOZAN_WEBITE/aozan-example.conf"
+wget -q "$AOZAN_WEBITE/data/aozan-example.conf"
 mv aozan-example.conf aozan.conf
 cd "$AOZAN_DIR"
 
@@ -337,7 +341,7 @@ fi
 
 # Ask to validate connfiguration
 echo
-read -r -p "Download and install Aozan and all its dependencies and data example? [Y/n] " response
+read -e -r -p "Download and install Aozan and all its dependencies and data example? [Y/n] " response
 case $response in
     [nN][oO]|[nN])
         echo >&2 "Abort."; exit 1;

@@ -89,7 +89,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
             + this.pfClusterCountParsed;
 
     LOGGER.fine("Temporary Partial fastq created in "
-        + duration + " for " + getFastqSample().getKeyFastqSample() + txt
+        + duration + " for " + getFastqSample().getFilenamePrefix() + txt
         + ")");
 
   }
@@ -98,8 +98,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
    * Create a temporary partial file from a array of fastq files.
    * @throws AozanException if an error occurs while creating file
    */
-  @Override
-  protected void processResults() throws AozanException {
+  private void processResults() throws AozanException {
 
     if (!getFastqSample().getSubsetFastqFile().exists()) {
 
@@ -199,7 +198,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
               LOGGER.warning(
                   "Exception occuring during the closing of FastqReader. Step collector "
                       + SubsetFastqCollector.COLLECTOR_NAME + " for the sample "
-                      + getFastqSample().getKeyFastqSample());
+                      + getFastqSample().getFilenamePrefix());
             }
           }
         }
@@ -213,7 +212,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
       LOGGER.warning("Exception occuring during creating tmp file : "
           + this.tmpFastqFile.getAbsolutePath() + ". Step collector "
           + SubsetFastqCollector.COLLECTOR_NAME + " for the sample "
-          + getFastqSample().getKeyFastqSample());
+          + getFastqSample().getFilenamePrefix());
 
     } finally {
       if (fwTmpFastq != null) {
@@ -293,7 +292,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
               LOGGER.warning(
                   "Exception occurred during the closing of FastqReader. Step collector "
                       + SubsetFastqCollector.COLLECTOR_NAME + " for the sample "
-                      + getFastqSample().getKeyFastqSample());
+                      + getFastqSample().getFilenamePrefix());
             }
           }
         }
@@ -303,7 +302,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
       LOGGER.warning("Exception occurred during creating tmp file : "
           + this.tmpFastqFile.getAbsolutePath() + ". Step collector "
           + SubsetFastqCollector.COLLECTOR_NAME + " for the sample "
-          + getFastqSample().getKeyFastqSample());
+          + getFastqSample().getFilenamePrefix());
 
     } finally {
       try {
@@ -345,11 +344,6 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
     } catch (final IOException io) {
       throw new AozanException(io);
     }
-  }
-
-  @Override
-  protected void createReportFile() throws AozanException, IOException {
-    // No report
   }
 
   //

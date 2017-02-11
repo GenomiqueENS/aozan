@@ -50,76 +50,76 @@
           <tr><td>qc.test.global.non.indexed.base.count.enable</td><td>boolean</td><td>False</td><td>Enable global non indexed global base count test</td></tr>
 
           <tr><td>qc.test.global.raw.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable global raw cluster count test</td></tr>
-          <tr><td>qc.test.global.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global raw cluster count</td></tr>
+          <tr><td>qc.test.global.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.mean.raw.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable global mean raw cluster count test</td></tr>
-          <tr><td>qc.test.global.mean.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global mean raw cluster count</td></tr>
+          <tr><td>qc.test.global.mean.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.median.raw.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable global median raw cluster count test</td></tr>
-          <tr><td>qc.test.global.median.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global median raw cluster</td></tr>
+          <tr><td>qc.test.global.median.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.raw.cluster.sd.enable</td><td>boolean</td><td>False</td><td>Enable global raw cluster standard deviation test</td></tr>
-          <tr><td>qc.test.global.raw.cluster.sd.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global raw cluster standard deviation</td></tr>
+          <tr><td>qc.test.global.raw.cluster.sd.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.pf.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable global passing filter cluster count test</td></tr>
-          <tr><td>qc.test.global.pf.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global passing filter cluster count</td></tr>
+          <tr><td>qc.test.global.pf.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.mean.pf.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable global mean passing filter cluster count test</td></tr>
-          <tr><td>qc.test.global.mean.pf.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global mean passing filter cluster count</td></tr>
+          <tr><td>qc.test.global.mean.pf.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.median.pf.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable global median passing filter cluster count test</td></tr>
-          <tr><td>qc.test.global.median.pf.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global median passing filter cluster count</td></tr>
+          <tr><td>qc.test.global.median.pf.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.pf.cluster.sd.enable</td><td>boolean</td><td>False</td><td>Enable global passing filter cluster standard deviation test</td></tr>
-          <tr><td>qc.test.global.pf.cluster.sd.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global passing filter cluster standard deviation</td></tr>
+          <tr><td>qc.test.global.pf.cluster.sd.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.pf.cluster.percent.enable</td><td>boolean</td><td>False</td><td>Enable global passing filter percent test</td></tr>
-          <tr><td>qc.test.global.pf.cluster.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values of global passing filter cluster percent</td></tr>
+          <tr><td>qc.test.global.pf.cluster.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.phix.align.percent.enable</td><td>boolean</td><td>False</td><td>Enable global PhiX align percent test</td></tr>
-          <tr><td>qc.test.global.phix.align.percent.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global PhiX align percent</td></tr>
+          <tr><td>qc.test.global.phix.align.percent.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.phix.raw.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable global PhiX raw cluster count test</td></tr>
-          <tr><td>qc.test.global.phix.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global PhiX raw cluster count</td></tr>
+          <tr><td>qc.test.global.phix.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.mean.phix.raw.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable global mean PhiX raw cluster count test</td></tr>
-          <tr><td>qc.test.global.mean.phix.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global mean PhiX raw cluster count</td></tr>
+          <tr><td>qc.test.global.mean.phix.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.median.phix.raw.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable global median PhiX raw cluster count test</td></tr>
-          <tr><td>qc.test.global.median.phix.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global median PhiX raw cluster count</td></tr>
+          <tr><td>qc.test.global.median.phix.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.phix.raw.cluster.sd.enable</td><td>boolean</td><td>False</td><td>Enable global PhiX raw cluster standard deviation test</td></tr>
-          <tr><td>qc.test.global.phix.raw.cluster.sd.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global PhiX raw cluster standard deviation</td></tr>
+          <tr><td>qc.test.global.phix.raw.cluster.sd.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.undetermined.cluster.percent.enable</td><td>boolean</td><td>False</td><td>Enable global undetermined cluster percent test</td></tr>
-          <tr><td>qc.test.global.undetermined.cluster.percent.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global undetermined cluster percent</td></tr>
+          <tr><td>qc.test.global.undetermined.cluster.percent.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.cycle.count.enable</td><td>boolean</td><td>False</td><td>Enable global cycle count test</td></tr>
-          <tr><td>qc.test.global.cycle.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global cycle count</td></tr>
+          <tr><td>qc.test.global.cycle.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.lane.count.enable</td><td>boolean</td><td>False</td><td>Enable global lane count test</td></tr>
-          <tr><td>qc.test.global.lane.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global lane count</td></tr>
+          <tr><td>qc.test.global.lane.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.project.count.enable</td><td>boolean</td><td>False</td><td>Enable global project count test</td></tr>
-          <tr><td>qc.test.global.project.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global project count</td></tr>
+          <tr><td>qc.test.global.project.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.sample.count.enable</td><td>boolean</td><td>False</td><td>Enable global sample count test</td></tr>
-          <tr><td>qc.test.global.sample.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global sample count</td></tr>
+          <tr><td>qc.test.global.sample.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.sample.count.enable</td><td>boolean</td><td>False</td><td>Enable global sample count test</td></tr>
-          <tr><td>qc.test.global.sample.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global sample count</td></tr>
+          <tr><td>qc.test.global.sample.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.sample.count.enable</td><td>boolean</td><td>False</td><td>Enable global sample count test</td></tr>
-          <tr><td>qc.test.global.sample.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values of global sample count</td></tr>
+          <tr><td>qc.test.global.sample.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.error.rate.enable</td><td>boolean</td><td>False</td><td>Enable global error rate test</td></tr>
-          <tr><td>qc.test.global.error.rate.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values of global error rate</td></tr>
+          <tr><td>qc.test.global.error.rate.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.cluster.density.enable</td><td>boolean</td><td>False</td><td>Enable global cluster density test</td></tr>
-          <tr><td>qc.test.global.cluster.density.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values of global cluster density</td></tr>
+          <tr><td>qc.test.global.cluster.density.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.q30.percent.enable</td><td>boolean</td><td>False</td><td>Enable global Q30 percent test</td></tr>
-          <tr><td>qc.test.global.q30.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values of global Q30 percent</td></tr>
+          <tr><td>qc.test.global.q30.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
        </table>
 

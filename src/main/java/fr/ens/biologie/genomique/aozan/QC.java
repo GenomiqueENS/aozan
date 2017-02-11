@@ -60,6 +60,7 @@ import fr.ens.biologie.genomique.aozan.tests.project.ProjectTest;
 import fr.ens.biologie.genomique.aozan.tests.sample.SampleTest;
 import fr.ens.biologie.genomique.eoulsan.EoulsanRuntime;
 import fr.ens.biologie.genomique.eoulsan.data.protocols.DataProtocolService;
+import uk.ac.babraham.FastQC.FastQCConfig;
 
 /**
  * This class is the main QC class.
@@ -300,7 +301,7 @@ public class QC {
    */
   public void writeReport(final QCReport report,
       final String stylesheetFilename, final String outputFilename)
-          throws AozanException {
+      throws AozanException {
 
     if (outputFilename == null) {
       throw new AozanException("The filename for the qc report is null");
@@ -638,7 +639,6 @@ public class QC {
 
     // Define parameters of FastQC
     System.setProperty("java.awt.headless", "true");
-    System.setProperty("fastqc.unzip", "true");
 
     // Set the number of threads of FastQC at one
     System.setProperty("fastqc.threads", "1");
@@ -678,9 +678,23 @@ public class QC {
     addSystemProperty(settings, Settings.QC_CONF_FASTQC_NANO_KEY,
         "fastqc.nano");
 
+    // Unzip FastQC report
+    System.setProperty("fastqc.unzip", "false");
+    addSystemProperty(settings, Settings.QC_CONF_FASTQC_UNZIP_REPORT_FILE_KEY,
+        "fastqc.unzip");
+
     // Patch FastQC classes
     RuntimePatchFastQC.runPatchFastQC(Boolean
         .valueOf(settings.get(Settings.QC_CONF_FASTQC_BLAST_ENABLE_KEY)));
+
+    // Initialize FastQCConfig
+    FastQCConfig.getInstance();
+
+    // Fix FastQCConfig
+    if (FastQCConfig.getInstance().do_unzip == null) {
+      FastQCConfig.getInstance().do_unzip = Boolean.FALSE;
+    }
+
   }
 
   /**
@@ -698,11 +712,11 @@ public class QC {
     final fr.ens.biologie.genomique.eoulsan.Settings eoulsanSettings =
         EoulsanRuntime.getSettings();
 
-    final String genomeDescStoragePath = settings
-        .get(Settings.QC_CONF_FASTQSCREEN_GENOMES_DESC_PATH_KEY);
+    final String genomeDescStoragePath =
+        settings.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_DESC_PATH_KEY);
 
-    final String genomeMapperIndexStoragePath = settings
-        .get(Settings.QC_CONF_FASTQSCREEN_MAPPERS_INDEXES_PATH_KEY);
+    final String genomeMapperIndexStoragePath =
+        settings.get(Settings.QC_CONF_FASTQSCREEN_MAPPERS_INDEXES_PATH_KEY);
 
     final String genomeStoragePath =
         settings.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_PATH_KEY);
@@ -743,8 +757,8 @@ public class QC {
         "fr.ens.biologie.genomique.eoulsan.data.protocols.S3NDataProtocol"));
 
     // Initialize GenomeDescriptionCreator
-    GenomeDescriptionCreator.initialize(settings
-        .get(Settings.QC_CONF_FASTQSCREEN_GENOMES_DESC_PATH_KEY));
+    GenomeDescriptionCreator.initialize(
+        settings.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_DESC_PATH_KEY));
   }
 
   /**
@@ -876,7 +890,7 @@ public class QC {
    */
   public QC(final Settings settings, final String bclDir, final String fastqDir,
       final String qcDir, final String tmpDirname, final String runId)
-          throws AozanException {
+      throws AozanException {
 
     this(settings, bclDir, fastqDir, qcDir,
         tmpDirname == null ? null : new File(tmpDirname), runId);
@@ -894,7 +908,7 @@ public class QC {
    */
   public QC(final Settings settings, final String bclDir, final String fastqDir,
       final String qcDir, final File tmpDir, final String runId)
-          throws AozanException {
+      throws AozanException {
 
     this.settings = settings;
     this.bclDir = checkDir(bclDir);

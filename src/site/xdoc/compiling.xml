@@ -34,27 +34,30 @@
 
     <section name="How to compile Aozan">
 
-    <p>To build Aozan, you need a <a href="http://java.sun.com/j2se/">Java 2 Standard Edition SDK</a> greater or equal to 7 and <a href="http://maven.apache.org">Maven</a> 3.2.x.</p>
+      <p>To build Aozan, you need a <a href="http://java.sun.com/j2se/">Java 2 Standard Edition SDK</a> greater or equal to 7 and <a href="http://maven.apache.org">Maven</a> 3.2.x.</p>
 
-    <p>The following command lines will work whatever your operating system is and whatever the "<code>$</code>" character representing the command line prompt is.</p>
-          <p>To compile Aozan, the default memory amount allocated by Maven is not enough. Your have to set the environment variable <b>MAVEN_OPTS</b> to do allow a greater memory allocation. To change this variable using bash, use the built-in command <b>export</b>.Something like 512MiB or 1GiB is a good amount of memory of Maven:</p>
-          <source>$ export MAVEN_OPTS=-Xmx1024m</source>
-          <p><b>Update:</b> The default memory amount allocated by the last version of Maven seems to be enough to build Aozan.</p>
-          <p>Aozan needs <a href="http://jython.org/">Jython</a> to compile. You have to install it. Aozan was developed using Jython 2.5.x but later version of Jython may also works.</p>
+      <p>The following command lines will work whatever your operating system is and whatever the "<code>$</code>" character representing the command line prompt is.</p>
+      <p>To compile Aozan, the default memory amount allocated by Maven is not enough.
+      Your have to set the environment variable <b>MAVEN_OPTS</b> to do allow a greater memory allocation.
+      To change this variable using bash, use the built-in command <b>export</b>.
+      Something like 512MiB or 1GiB is a good amount of memory of Maven:</p>
 
-    <p>First set your current directory to the base directory of <b>Aozan</b>.</p>
+      <source>$ export MAVEN_OPTS=-Xmx1024m</source>
+      <p><b>Update:</b> The default memory amount allocated by the last version of Maven seems to be enough to build Aozan.</p>
 
-    <p>To build both source and binary distribution, type:</p>
-    <source>$ mvn install</source>
+      <p>First set your current directory to the base directory of <b>Aozan</b>.</p>
 
-    <p>To generate documentation, type:</p>
-    <source>$ mvn site</source>
+      <p>To build both source and binary distribution, type:</p>
+      <source>$ mvn install</source>
 
-    <p>To generate both distributions and documentation, type:</p>
-    <source>$ mvn site install</source>
+      <p>To generate documentation, type:</p>
+      <source>$ mvn site</source>
 
-    <p>To clean the build directories, type:</p>
-    <source>$ mvn clean</source>
+      <p>To generate both distributions and documentation, type:</p>
+      <source>$ mvn site install</source>
+
+      <p>To clean the build directories, type:</p>
+      <source>$ mvn clean</source>
 
     </section>
 

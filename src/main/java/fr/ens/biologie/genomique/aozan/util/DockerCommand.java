@@ -89,16 +89,25 @@ public class DockerCommand {
   private Throwable exception = null;
   private final DockerClient dockerClient;
 
-  public void run() {
-    // Create connection
+  /**
+   * Launch Docker container.
+   * @throws AozanException if an error occurs while running the container.
+   */
+  public void run() throws AozanException {
+
+    final String image = buildImageName();
+    LOGGER.warning("Pull docker image: " + image);
 
     try {
-
-      final String image = buildImageName();
-      LOGGER.warning("Pull docker image: " + image);
-
       // Pull image
       dockerClient.pull(image);
+    } catch (DockerException | InterruptedException e) {
+
+      // Do not thrown an exception as the network can be down
+      LOGGER.severe("Unable to pull docker image: " + e.getMessage());
+    }
+
+    try {
 
       // Create container
       final HostConfig hostConfig =
@@ -146,8 +155,8 @@ public class DockerCommand {
       LOGGER.info("Docker container successufully removed: " + id);
 
     } catch (DockerException | InterruptedException e) {
-
-      e.printStackTrace();
+      LOGGER.severe("Error while running Docker container: " + e.getMessage());
+      throw new AozanException(e);
     }
   }
 

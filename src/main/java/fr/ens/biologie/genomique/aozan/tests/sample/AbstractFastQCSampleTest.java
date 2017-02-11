@@ -43,18 +43,15 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
       final int readSample, final int sampleId) {
 
     final boolean undetermined = data.isUndeterminedSample(sampleId);
-    final int lane = data.getSampleLane(sampleId);
+    final String filename = data.get("fastqc.sample" + sampleId + ".read" + read + ".report.file.name");
 
     // Check indetermined indexed sample
     if (undetermined) {
 
       final String projectName = "Undetermined_indices";
 
-      final String dirname = String.format(
-          "lane%s_Undetermined_L%03d_R%d_001-fastqc", lane, lane, readSample);
-
       final String url = projectName
-          + "/" + dirname + "/fastqc_report.html#M" + getHTMLAnchorIndex();
+          + "/" + filename + ".html#M" + getHTMLAnchorIndex();
 
       // Set score test at -1
       return new TestResult(-1, url, "url");
@@ -74,14 +71,9 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
     final int score = errorRaise ? 0 : (warningRaise ? 4 : 9);
 
     final String projectName = data.getProjectSample(sampleId);
-    final String index = data.getIndexSample(sampleId);
-    final String sampleName = data.getSampleDemuxName(sampleId);
-
-    final String dirname = String.format("%s_%s_L%03d_R%d_001-fastqc",
-        sampleName, "".equals(index) ? "NoIndex" : index, lane, readSample);
 
     final String url = "Project_"
-        + projectName + "/" + dirname + "/fastqc_report.html#M"
+        + projectName + "/" + filename + ".html#M"
         + getHTMLAnchorIndex();
 
     return new TestResult(score, url, "url");

@@ -91,6 +91,8 @@ public class UndeterminedIndexesProcessThread
 
   private static final Joiner JOINER = Joiner.on(", ");
 
+  private static final String REPORT_FILENAME_SUFFIX = "-potentialindices";
+
   private final RunData data;
   private final int lane;
   private final int read;
@@ -490,7 +492,7 @@ public class UndeterminedIndexesProcessThread
   @Override
   protected void logThreadStart() {
     LOGGER.fine(COLLECTOR_NAME.toUpperCase()
-        + ": start for " + getFastqSample().getKeyFastqSample());
+        + ": start for " + getFastqSample().getFilenamePrefix());
   }
 
   @Override
@@ -503,7 +505,7 @@ public class UndeterminedIndexesProcessThread
   protected void logThreadEnd(final String duration) {
 
     LOGGER.fine(COLLECTOR_NAME.toUpperCase()
-        + ": end for " + getFastqSample().getKeyFastqSample() + " in "
+        + ": end for " + getFastqSample().getFilenamePrefix() + " in "
         + duration);
   }
 
@@ -607,7 +609,10 @@ public class UndeterminedIndexesProcessThread
     }
   }
 
-  @Override
+  /**
+   * Process results after the end of the thread.
+   * @throws AozanException if an error occurs while generate report
+   */
   protected void processResults() throws AozanException {
 
     int recoverableRawClusterCount = 0;
@@ -661,9 +666,16 @@ public class UndeterminedIndexesProcessThread
         RUN_DATA_PREFIX + ".lane" + this.lane + ".recoverable.pf.cluster.count",
         recoverablePFClusterCount);
 
-    // Create report
+    // Create reports
     try {
-      createReportFile();
+      // Create the report for the lane
+      createReportForLane();
+
+      // Create the report for each samples
+      for (final int sampleId : this.data.getSamplesInLane(this.lane)) {
+        createReportForSample(sampleId);
+      }
+
     } catch (final IOException e) {
       throw new AozanException(e);
     }
@@ -699,18 +711,6 @@ public class UndeterminedIndexesProcessThread
         recoverableClusterCount);
 
     return recoverableClusterCount;
-  }
-
-  @Override
-  protected void createReportFile() throws AozanException, IOException {
-
-    // Create the report for the lane
-    createReportForLane();
-
-    // Create the report for each samples
-    for (final int sampleId : this.data.getSamplesInLane(this.lane)) {
-      createReportForSample(sampleId);
-    }
   }
 
   /**
@@ -765,8 +765,8 @@ public class UndeterminedIndexesProcessThread
     // Sort list
     Collections.sort(entries);
 
-    writeCSV(entries, totalEntry);
-    writeHTML(entries, totalEntry, !oneMismatcheDemuxPossible);
+    writeLaneCSVResults(entries, totalEntry);
+    writeLaneHTMLResults(entries, totalEntry, !oneMismatcheDemuxPossible);
   }
 
   /**
@@ -794,7 +794,7 @@ public class UndeterminedIndexesProcessThread
   private File createLaneResultFile(final String extension) throws IOException {
 
     final File reportFile = new File(this.reportDir,
-        getFastqSample().getPrefixReport() + "-potentialindices" + extension);
+        getFastqSample().getFilenamePrefix() + REPORT_FILENAME_SUFFIX + extension);
 
     // Create parent directory if necessary
     final File parentDir = reportFile.getParentFile();
@@ -811,7 +811,7 @@ public class UndeterminedIndexesProcessThread
    * @param totalEntry total entries summary
    * @throws IOException if an error occurs while writing the file
    */
-  private void writeCSV(final List<LaneResultEntry> entries,
+  private void writeLaneCSVResults(final List<LaneResultEntry> entries,
       final LaneResultEntry totalEntry) throws IOException {
 
     final BufferedWriter br =
@@ -840,12 +840,18 @@ public class UndeterminedIndexesProcessThread
    * @throws IOException if an error occurs while writing the file
    * @throws AozanException if an error occurs while building xml file
    */
-  private void writeHTML(final List<LaneResultEntry> entries,
+  private void writeLaneHTMLResults(final List<LaneResultEntry> entries,
       final LaneResultEntry totalEntry,
       final boolean demultiplexingWithConflict)
       throws IOException, AozanException {
 
     final File reportHtml = createLaneResultFile(".html");
+
+    // Save the filename of the report in RunData
+    getResults().put(
+        RUN_DATA_PREFIX
+            + ".lane" + this.lane + ".report.file.name",
+            reportHtml.getName());
 
     toXML(-1, null, entries, totalEntry, reportHtml, false,
         demultiplexingWithConflict);
@@ -910,8 +916,17 @@ public class UndeterminedIndexesProcessThread
     // Sort lists
     Collections.sort(entries);
 
-    writeCSV(sampleId, demuxEntry, entries, totalEntry);
-    writeHTML(sampleId, demuxEntry, entries, totalEntry);
+    // Define the output files
+    final File csvFile = createSampleResultFile(sampleId, ".csv");
+    final File htmlFile = createSampleResultFile(sampleId, ".html");
+
+    // Save the filename of the report in RunData
+    getResults().put(
+        RUN_DATA_PREFIX + ".sample" + sampleId + ".report.file.name",
+        htmlFile.getName());
+
+    writeCSVSampleResult(sampleId, demuxEntry, entries, totalEntry, csvFile);
+    writeSampleHTMLResult(sampleId, demuxEntry, entries, totalEntry, htmlFile);
   }
 
   /**
@@ -928,7 +943,7 @@ public class UndeterminedIndexesProcessThread
         new File(this.reportDir.getParentFile().getAbsolutePath()
             + "/Project_" + this.data.getProjectSample(sampleId) + "/"
             + this.data.getSampleDemuxName(sampleId) + "_lane" + this.lane
-            + "-potentialindices" + extension);
+            + REPORT_FILENAME_SUFFIX + extension);
 
     // Create parent directory if necessary
     final File parentDir = reportFile.getParentFile();
@@ -945,14 +960,15 @@ public class UndeterminedIndexesProcessThread
    * @param demuxEntry original demux result
    * @param entries entries to write
    * @param totalEntry total entries summary
+   * @param outputFile output file
    * @throws IOException if an error occurs while writing the file
    */
-  private void writeCSV(final int sampleId, final SampleResultEntry demuxEntry,
-      final List<SampleResultEntry> entries, final SampleResultEntry totalEntry)
-      throws IOException {
+  private void writeCSVSampleResult(final int sampleId, final SampleResultEntry demuxEntry,
+      final List<SampleResultEntry> entries, final SampleResultEntry totalEntry,
+      final File outputFile) throws IOException {
 
     final BufferedWriter br = Files.newWriter(
-        createSampleResultFile(sampleId, ".csv"), StandardCharsets.UTF_8);
+        outputFile, StandardCharsets.UTF_8);
 
     // Header
     br.write(ResultEntry.headerCSV());
@@ -977,17 +993,16 @@ public class UndeterminedIndexesProcessThread
    * @param demuxEntry original demux result
    * @param entries entries to write
    * @param totalEntry total entries summary
+   * @param outputFile output file
    * @throws IOException if an error occurs while writing the file
    * @throws AozanException if on useful file is not define or if an error
    *           occurs during transforming document.
    */
-  private void writeHTML(final int sampleId, final SampleResultEntry demuxEntry,
-      final List<SampleResultEntry> entries, final SampleResultEntry totalEntry)
-      throws IOException, AozanException {
+  private void writeSampleHTMLResult(final int sampleId, final SampleResultEntry demuxEntry,
+      final List<SampleResultEntry> entries, final SampleResultEntry totalEntry,
+      final File outputFile) throws IOException, AozanException {
 
-    final File reportHtml = createSampleResultFile(sampleId, ".html");
-
-    toXML(sampleId, demuxEntry, entries, totalEntry, reportHtml, true, false);
+    toXML(sampleId, demuxEntry, entries, totalEntry, outputFile, true, false);
   }
 
   /**
