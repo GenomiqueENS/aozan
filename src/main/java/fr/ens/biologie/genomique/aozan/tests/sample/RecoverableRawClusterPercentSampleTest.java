@@ -55,7 +55,7 @@ public class RecoverableRawClusterPercentSampleTest extends AbstractSampleTest {
   }
 
   @Override
-  public TestResult test(final RunData data, final int re2ad,
+  public TestResult test(final RunData data, final int read,
       final int readSample, final int sampleId) {
 
     final boolean undetermined = data.isUndeterminedSample(sampleId);
@@ -72,20 +72,15 @@ public class RecoverableRawClusterPercentSampleTest extends AbstractSampleTest {
       // Undetermined case
       recoveryCountKey =
           "undeterminedindices.lane" + lane + ".recoverable.raw.cluster.count";
-
-      sampleCountKey = "demux.lane"
-          + lane + ".sample.lane" + lane + ".read" + readSample
-          + ".raw.cluster.count";
-
     } else {
 
       // Case sample
       recoveryCountKey = "undeterminedindices.sample"
           + sampleId + ".recoverable.raw.cluster.count";
-
-      sampleCountKey = "demux.sample"
-          + sampleId + ".read" + readSample + ".raw.cluster.count";
     }
+
+    sampleCountKey =
+        "demux.sample" + sampleId + ".read" + readSample + ".raw.cluster.count";
 
     try {
       final long recoveryCount;

@@ -58,18 +58,18 @@ public class RecoverablePFClusterPercentSampleTest extends AbstractSampleTest {
   public TestResult test(final RunData data, final int read,
       final int readSample, final int sampleId) {
 
+    final boolean undetermined = data.isUndeterminedSample(sampleId);
+    final int lane = data.getSampleLane(sampleId);
+
     String recoveryCountKey;
     String sampleCountKey;
-
-    final int lane = data.getSampleLane(sampleId);
-    final boolean undetermined = data.isUndeterminedSample(sampleId);
 
     if (!data.isLaneIndexed(lane)) {
       return new TestResult("NA");
     }
 
-    if (data.isUndeterminedSample(sampleId)) {
-      // Case undetermined
+    if (undetermined) {
+      // Undetermined case
       recoveryCountKey =
           "undeterminedindices.lane" + lane + ".recoverable.pf.cluster.count";
     } else {
