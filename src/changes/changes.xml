@@ -862,15 +862,21 @@
 			</action>
 		</release>
 
-		<release version="2.0-rc21" description="Aozan 2.0-rc21 release"  date="TBD">
+		<release version="2.0" description="Aozan 2.0 release"  date="2017-02-14">
 			<action dev="jourdren" type="fix">
                                  Spaces, simple and double quotes can now be used in paths to the Aozan input and output files.
+			</action>
+                        <action dev="jourdren" type="fix">
+                                 Fix NullPointerException when process undetermined samples in RecoverableRawClusterPercentSampleTest.
 			</action>
 			<action dev="jourdren" type="update">
                                  StartTTLS, SSL, and login/password can now be used to configure the connection to the SMTP server to send emails.
 			</action>
 			<action dev="jourdren" type="update">
                                  The FastQC and Fastq Screen reports have now the same prefix as the FASTQ files.
+			</action>
+			<action dev="jourdren" type="add">
+                                 Add two new configuration property to unzip and/or remove FastQC Zip report file.
 			</action>
 			<action dev="jourdren" type="update">
                                  Aozan now use Eoulsan 2.0-beta4 as dependency.
