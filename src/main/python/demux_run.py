@@ -849,13 +849,13 @@ def demux(run_id, conf):
     cmd = 'cp ' + quote(conf[TMP_PATH_KEY]) + '/bcl2fastq_output_' + run_id + '.* ' + quote(fastq_output_dir)
     common.log("INFO", "exec: " + cmd, conf)
     if os.system(cmd) != 0:
-        error("Error while copying bcl2fastq log to the output FASTQ directory" + run_id_msg,
+        error("Error while copying bcl2fastq log to the output FASTQ directory for run " +  run_id + ' on ' + common.get_instrument_name(run_id, conf),
               'Error while copying bcl2fastq log to the output FASTQ directory.\nCommand line:\n' + cmd, conf)
         return False
 
     # The output directory must be read only
     if not common.chmod_files_in_dir(fastq_output_dir, ".fastq", conf):
-        error("Error while setting the output FASTQ directory to read only" + run_id_msg,
+        error("Error while setting the output FASTQ directory to read only for run " +  run_id + ' on ' + common.get_instrument_name(run_id, conf),
               'Error while setting the output FASTQ directory to read only.\nCommand line:\n' + cmd, conf)
         return False
 
