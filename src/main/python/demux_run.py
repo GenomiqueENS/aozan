@@ -411,9 +411,34 @@ def get_cpu_count(conf):
 
     return cpu_count
 
+def get_bcl2fastq_version(bcl2fastq_executable_path):
+    """ Get the version of bcl2fastq by launching bcl2fastq --version.
+
+    Arguments:
+        bcl2fastq_executable_path bcl2fastq executable path
+
+    Return:
+        The version of bcl2fastq or None if an error occurs
+    """
+
+    p = subprocess.Popen([bcl2fastq_executable_path, '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = p.communicate()
+    exit_code = p.returncode
+
+    # Check if the exit code is OK
+    if p.returncode != 0:
+        return None
+
+    # Parse the output of bcl2fastq
+    for line in err.split('\n'):
+        if line.startswith('bcl2fastq'):
+            return line[len('bcl2fastq v'):]
+
+    return None
+
 
 def create_bcl2fastq_command_line(run_id, command_path, input_run_data_path, fastq_output_dir, samplesheet_csv_path,
-                                  tmp_path, nb_mismatch, conf):
+                                  tmp_path, nb_mismatch, bcl2fastq_version, conf):
     nb_threads = str(get_cpu_count(conf))
 
     if command_path is None:
@@ -421,13 +446,18 @@ def create_bcl2fastq_command_line(run_id, command_path, input_run_data_path, fas
     else:
         final_command_path = command_path
 
+    # Get bc2fastq2 minor version
+    bcl2fastq_minor_version = int(bcl2fastq_version.split('.')[1])
+
     #  List arg
     args = []
     args.append(final_command_path)
     args.extend(['--loading-threads', nb_threads])
-    args.extend(['--demultiplexing-threads', nb_threads])
     args.extend(['--processing-threads', nb_threads])
     args.extend(['--writing-threads', nb_threads])
+
+    if bcl2fastq_minor_version < 19:
+        args.extend(['--demultiplexing-threads', nb_threads])
 
     args.extend(['--sample-sheet', samplesheet_csv_path])
     args.extend(['--barcode-mismatches', nb_mismatch])
@@ -494,8 +524,15 @@ def demux_run_standalone(run_id, input_run_data_path, fastq_output_dir, samplesh
               ", invalid bcl2fastq path: " + bcl2fastq_executable_path, conf)
         return False
 
+    # Get bcl2fastq version
+    bcl2fastq_version = get_bcl2fastq_version(bcl2fastq_executable_path)
+    if bcl2fastq_version is None:
+        error("Error while getting the bcl2fastq version", "Error while getting the bcl2fastq version" + run_id_msg +
+              ", bcl2fastq path: " + bcl2fastq_executable_path, conf)
+        return False
+
     cmd = create_bcl2fastq_command_line(run_id, bcl2fastq_executable_path, input_run_data_path, fastq_output_dir,
-                                        samplesheet_csv_path, tmp, nb_mismatch, conf)
+                                        samplesheet_csv_path, tmp, nb_mismatch, bcl2fastq_version, conf)
 
     common.log('INFO', 'Demultiplexing in standalone mode using the following command line: ' + str(cmd), conf)
 
@@ -548,13 +585,16 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
     bcl2fastq_log_file = tmp + "/bcl2fastq_output_" + run_id + ".err"
     samplesheet_csv_docker = tmp_docker + '/' + os.path.basename(samplesheet_csv_path)
 
+    # Get bcl2fastq version to use
+    bcl2fastq_version = common.BCL2FASTQ2_VERSION
+
     cmd = create_bcl2fastq_command_line(run_id, None, input_run_data_path_in_docker, fastq_data_path_in_docker,
-                                        samplesheet_csv_docker, tmp_docker, nb_mismatch, conf)
+                                        samplesheet_csv_docker, tmp_docker, nb_mismatch, bcl2fastq_version, conf)
 
     try:
         # Set working in docker on parent demultiplexing run directory.
         # Demultiplexing run directory will create by bcl2fastq
-        docker = DockerCommand(conf[Settings.DOCKER_URI_KEY], ['/bin/bash', '-c', cmd], 'bcl2fastq2', common.BCL2FASTQ2_VERSION)
+        docker = DockerCommand(conf[Settings.DOCKER_URI_KEY], ['/bin/bash', '-c', cmd], 'bcl2fastq2', bcl2fastq_version)
 
         common.log("CONFIG", "Demultiplexing using docker image from " + docker.getImageDockerName() +
                    " with command line " + cmd, conf)
