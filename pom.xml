@@ -661,6 +661,7 @@
             <configuration>
               <includeArtifactIds>jython-standalone,eoulsan,poi,guava,fastqc,jbzip2,commons-compress,htsjdk,commons-math3,commons-cli,javassist,aws-java-sdk,docker-client,httpclient,httpcore,commons-logging,slf4j-api</includeArtifactIds>
               <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
+              <excludeTransitive>true</excludeTransitive>
             </configuration>
           </execution>
         </executions>
