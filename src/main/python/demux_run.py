@@ -32,6 +32,7 @@ import sys
 import time
 import glob
 import re
+import subprocess
 from xml.etree.ElementTree import ElementTree
 from pipes import quote
 
