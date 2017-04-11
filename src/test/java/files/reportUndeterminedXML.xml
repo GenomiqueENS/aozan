@@ -3,7 +3,7 @@
 <Step>Recovery cluster from undetermined fastq file</Step>
 <GeneratorName>Aozan</GeneratorName>
 <GeneratorVersion>UNKNOWN_VERSION</GeneratorVersion>
-<GeneratorWebsite>http://transcriptome.ens.fr/aozan</GeneratorWebsite>
+<GeneratorWebsite>http://outils.genomique.biologie.ens.fr/aozan</GeneratorWebsite>
 <GeneratorRevision>UNKNOWN_COMMIT</GeneratorRevision>
 <RunId>140818_SNL110_0129_Ah9bvmadxx</RunId>
 <RunDate>Mon 18 Aug 2014</RunDate>

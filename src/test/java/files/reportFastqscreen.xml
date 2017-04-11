@@ -3,7 +3,7 @@
 <AozanStep>Detection contamination</AozanStep>
 <GeneratorName>Aozan</GeneratorName>
 <GeneratorVersion>UNKNOWN_VERSION</GeneratorVersion>
-<GeneratorWebsite>http://transcriptome.ens.fr/aozan</GeneratorWebsite>
+<GeneratorWebsite>http://outils.genomique.biologie.ens.fr/aozan</GeneratorWebsite>
 <GeneratorRevision>UNKNOWN_COMMIT</GeneratorRevision>
 <RunId>run_id</RunId>
 <RunDate>130722</RunDate>
