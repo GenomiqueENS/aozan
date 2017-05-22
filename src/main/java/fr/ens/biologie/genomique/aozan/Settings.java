@@ -103,6 +103,8 @@ public final class Settings {
   /** Set available use container docker. */
   public static final String BCL2FASTQ_USE_DOCKER_KEY = "bcl2fastq.use.docker";
 
+  /** Archive samplesheets key. */
+  public static final String DEMUX_ARCHIVE_SAMPLESHEETS_KEY = "demux.archive.samplesheets";
   /** Demultiplex space factor. */
   public static final String DEMUX_SPACE_FACTOR_KEY = "demux.space.factor";
   /** Demultiplex step. */

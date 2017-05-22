@@ -1483,6 +1483,7 @@ def set_default_conf(conf):
     conf[Settings.BCL2FASTQ_ADAPTER_FASTA_FILE_PATH_KEY] = ''
     conf[Settings.BCL2FASTQ_WITH_FAILED_READS_KEY] = 'True'
     conf[Settings.BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY] = ''
+    conf[Settings.DEMUX_ARCHIVE_SAMPLESHEETS_KEY] = 'True'
 
     # New options since Aozan version 2.0 and managment of NextSeq
     conf[Settings.BCL2FASTQ_USE_DOCKER_KEY] = 'false'

@@ -921,7 +921,8 @@ def demux(run_id, conf):
         return False
 
     # Archive samplesheet
-    if not archive_samplesheet(run_id, original_samplesheet_path, bcl2fastq_samplesheet_path, conf):
+    if common.is_conf_value_equals_true(Settings.DEMUX_ARCHIVE_SAMPLESHEETS_KEY, conf) \
+       and not archive_samplesheet(run_id, original_samplesheet_path, bcl2fastq_samplesheet_path, conf):
         return False
 
     # Remove temporary samplesheet files
