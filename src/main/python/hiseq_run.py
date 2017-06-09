@@ -145,10 +145,15 @@ def check_run_id(run_id, conf):
 
     # Test the flow cell id
 
-    if not flow_cell_id.isalnum() or len(flow_cell_id) != 10:
-        return False
+    if len(flow_cell_id) == 10 and flow_cell_id.isalnum():
+        return True
 
-    return True
+    if len(flow_cell_id) == 15:
+        flow_cell_fields = flow_cell_id.split('-')
+        if len(flow_cell_fields) == 2 and flow_cell_fields[0] == '000000000':
+            return True
+
+    return False
 
 
 def get_working_run_ids(conf):
