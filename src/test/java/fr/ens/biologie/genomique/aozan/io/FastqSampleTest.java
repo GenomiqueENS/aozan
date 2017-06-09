@@ -221,6 +221,21 @@ public class FastqSampleTest {
           "/Project_C2015/sample9_S9_L004_R1_001.fastq.gz",
           "/Project_C2015/sample9_S9_L004_R2_001.fastq.gz"};
 
+  private static final String[] PROJECT5_FILENAMES =
+      new String[] {
+          "/Project_A2015/2015_267/sample267_S1_L002_R1_001.fastq.gz",
+          "/Project_A2015/2015_267/sample267_S1_L002_R2_001.fastq.gz",
+          "/Project_A2015/2015_268/sample268_S2_L002_R1_001.fastq.gz",
+          "/Project_A2015/2015_268/sample268_S2_L002_R2_001.fastq.gz",
+          "/Project_A2015/2015_269/sample269_S3_L002_R1_001.fastq.gz",
+          "/Project_A2015/2015_269/sample269_S3_L002_R2_001.fastq.gz",
+          "/Project_B2015/2015_167/sample167_S4_L001_R1_001.fastq.gz",
+          "/Project_B2015/2015_167/sample167_S4_L001_R2_001.fastq.gz",
+          "/Project_B2015/2015_168/sample168_S5_L001_R1_001.fastq.gz",
+          "/Project_B2015/2015_168/sample168_S5_L001_R2_001.fastq.gz",
+          "/Project_B2015/2015_169/sample169_S6_L001_R1_001.fastq.gz",
+          "/Project_B2015/2015_169/sample169_S6_L001_R2_001.fastq.gz"};
+
   @Test
   public void testGetSampleId() throws IOException {
 
@@ -238,6 +253,7 @@ public class FastqSampleTest {
     testSampleSheet("design_version_bcl2fastq2_samplename.csv",
         SAMPLENAMES_FILENAMES, 2);
     testSampleSheet("samplesheet_big.csv", PROJECT4_FILENAMES, 2);
+    testSampleSheet("design_lane_order.csv", PROJECT5_FILENAMES, 2);
 
   }
 

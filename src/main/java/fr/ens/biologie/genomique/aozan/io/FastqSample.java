@@ -28,13 +28,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +48,6 @@ import fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput;
 import fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput.Bcl2FastqVersion;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 import fr.ens.biologie.genomique.eoulsan.io.CompressionType;
 
 /**
@@ -546,15 +543,20 @@ public class FastqSample {
     }
 
     int i = 0;
+    List<Integer> lanesSorted = new ArrayList<Integer>();
     Multimap<Integer, String> sampleEntries = ArrayListMultimap.create();
 
     for (Sample sample : samplesheet) {
-      // If sample id is not defined, use sample name
-      sampleEntries.put(sample.getLane(), sample.getDemultiplexingName());
-    }
 
-    List<Integer> lanesSorted = new ArrayList<Integer>(sampleEntries.keySet());
-    Collections.sort(lanesSorted);
+      int lane = sample.getLane();
+      // If sample id is not defined, use sample name
+      sampleEntries.put(lane, sample.getDemultiplexingName());
+
+      // Save the order of the lane in the samplesheet
+      if (!lanesSorted.contains(lane)) {
+        lanesSorted.add(lane);
+      }
+    }
 
     final Set<String> samplesFound = new HashSet<>();
 
