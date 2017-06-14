@@ -36,7 +36,9 @@ import com.google.common.base.Joiner;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
+import fr.ens.biologie.genomique.aozan.collectors.FastqScreenCollector;
 import fr.ens.biologie.genomique.aozan.collectors.StatisticsCollector;
+import fr.ens.biologie.genomique.aozan.collectors.UndeterminedIndexesCollector;
 import fr.ens.biologie.genomique.aozan.util.StatisticsUtils;
 
 /**
@@ -154,14 +156,14 @@ public class EntityStat {
   private void addConditionalRundata(final RunData data, final String prefix) {
 
     // Check collector is selected
-    if (this.statisticsCollector.isUndeterminedIndexesCollectorSelected()) {
+    if (data.isCollectorEnabled(UndeterminedIndexesCollector.COLLECTOR_NAME)) {
       // Compile data on recoverable cluster
       data.put(prefix + ".raw.cluster.recovery.sum", rawClusterRecoverySum);
       data.put(prefix + ".pf.cluster.recovery.sum", pfClusterRecoverySum);
     }
 
     // Check collector is selected
-    if (this.statisticsCollector.isFastqScreenCollectorSelected()) {
+    if (this.data.isCollectorEnabled(FastqScreenCollector.COLLECTOR_NAME)) {
       // Compile data on detection contamination
       data.put(prefix + ".samples.exceeded.contamination.threshold.count",
           getSamplesWithContaminationCount());
@@ -217,7 +219,7 @@ public class EntityStat {
     final int lane = this.data.getSampleLane(sampleId);
 
     // Check collector is selected
-    if (this.statisticsCollector.isUndeterminedIndexesCollectorSelected()
+    if (this.data.isCollectorEnabled(UndeterminedIndexesCollector.COLLECTOR_NAME)
         && this.data.isUndeterminedInLane(lane)) {
 
       // Check if lane is indexed
@@ -241,7 +243,7 @@ public class EntityStat {
     }
 
     // Check collector is selected
-    if (this.statisticsCollector.isFastqScreenCollectorSelected()) {
+    if (this.data.isCollectorEnabled(FastqScreenCollector.COLLECTOR_NAME)) {
 
       this.mappedContaminationPercentSamples.add(
           this.data.getPercentMappedReadOnContaminationSample(sampleId, READ));

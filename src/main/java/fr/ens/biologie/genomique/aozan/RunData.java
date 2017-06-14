@@ -138,6 +138,34 @@ public class RunData {
   }
 
   //
+  // Collector getters
+  //
+
+  /**
+   * Get the list of collector names.
+   * @return a list with the names of the collectors
+   */
+  public List<String> getCollectorNames() {
+
+    if (!contains(QC.QC_COLLECTOR_NAMES)) {
+      return Collections.emptyList();
+    }
+
+    return Splitter.on(',').trimResults().omitEmptyStrings()
+        .splitToList(get(QC.QC_COLLECTOR_NAMES));
+  }
+
+  /**
+   * Test if a collector is enabled.
+   * @param collectorName name of the collector to test
+   * @return true if the collector is enabled
+   */
+  public boolean isCollectorEnabled(final String collectorName) {
+
+    return getCollectorNames().contains(collectorName);
+  }
+
+  //
   // Sample getters
   //
 

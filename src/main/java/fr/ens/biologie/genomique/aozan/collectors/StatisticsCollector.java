@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
@@ -60,9 +59,6 @@ public abstract class StatisticsCollector implements Collector {
 
   /** Contamination threshold. */
   private double contaminationThreshold;
-
-  private boolean undeterminedIndexesCollectorSelected = false;
-  private boolean fastqScreenCollectorSelected = false;
 
   private Map<String, List<File>> fastqScreenReportFiles = new HashMap<>();
 
@@ -100,16 +96,6 @@ public abstract class StatisticsCollector implements Collector {
     this.contaminationThreshold = conf.getDouble(
         Settings.QC_CONF_FASTQSCREEN_PERCENT_PROJECT_CONTAMINATION_THRESHOLD_KEY,
         DEFAULT_CONTAMINATION_PERCENT_THRESHOLD);
-
-    // Check optional collector selected
-    final List<String> collectorNames = Splitter.on(',').trimResults()
-        .omitEmptyStrings().splitToList(conf.get(QC.QC_COLLECTOR_NAMES));
-
-    this.undeterminedIndexesCollectorSelected =
-        collectorNames.contains(UndeterminedIndexesCollector.COLLECTOR_NAME);
-
-    this.fastqScreenCollectorSelected =
-        collectorNames.contains(FastqScreenCollector.COLLECTOR_NAME);
   }
 
   @Override
@@ -148,7 +134,7 @@ public abstract class StatisticsCollector implements Collector {
       throws AozanException, IOException {
 
     // Check FastqScreen collected
-    if (!isFastqScreenCollectorSelected()) {
+    if (!data.isCollectorEnabled(FastqScreenCollector.COLLECTOR_NAME)) {
       // No selected, no data to create project report
       return;
     }
@@ -235,22 +221,6 @@ public abstract class StatisticsCollector implements Collector {
   //
   // Getters
   //
-
-  /**
-   * Checks if is undetermined indexes collector selected.
-   * @return true, if is undetermined indexes collector selected
-   */
-  public boolean isUndeterminedIndexesCollectorSelected() {
-    return this.undeterminedIndexesCollectorSelected;
-  }
-
-  /**
-   * Checks if is fastqscreen collector selected.
-   * @return true, if is fastqscreen collector selected
-   */
-  public boolean isFastqScreenCollectorSelected() {
-    return this.fastqScreenCollectorSelected;
-  }
 
   /**
    * Gets the report directory.
