@@ -43,6 +43,7 @@ import com.google.common.collect.Multimap;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
+import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeAliases;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
@@ -71,11 +72,12 @@ public class SamplesheetCollector implements Collector {
     private final String index1;
     private final String index2;
     private final String ref;
+    private final String normalizedRef;
 
     @Override
     public int hashCode() {
       return Objects.hash(this.project, this.name, this.index1, this.index2,
-          this.ref);
+          this.ref, this.normalizedRef);
     }
 
     @Override
@@ -89,7 +91,8 @@ public class SamplesheetCollector implements Collector {
 
       return this.project.equals(that.project)
           && this.name.equals(that.name) && this.index1.equals(that.index1)
-          && this.index2.equals(that.index2) && this.ref.equals(that.ref);
+          && this.index2.equals(that.index2) && this.ref.equals(that.ref)
+          && this.normalizedRef.equals(that.normalizedRef);
     }
 
     //
@@ -103,15 +106,18 @@ public class SamplesheetCollector implements Collector {
      * @param index1 first index
      * @param index2 second index
      * @param ref the genome reference
+     * @param normalizedRef the genome reference
      */
     public PooledSample(final String project, final String name,
-        final String index1, final String index2, final String ref) {
+        final String index1, final String index2, final String ref,
+        final String normalizedRef) {
 
       this.project = project;
       this.name = name;
       this.index1 = index1;
       this.index2 = index2;
       this.ref = ref;
+      this.normalizedRef = normalizedRef;
     }
   }
 
@@ -133,6 +139,9 @@ public class SamplesheetCollector implements Collector {
     if (conf == null) {
       return;
     }
+
+    // Initialize Genome aliases
+    //GenomeAliases.initialize(settings);
 
     this.samplesheetFile = qc.getSampleSheetFile();
   }
@@ -179,13 +188,15 @@ public class SamplesheetCollector implements Collector {
         final String index1 = Strings.nullToEmpty(s.getIndex1());
         final String index2 = Strings.nullToEmpty(s.getIndex2());
         final String ref = Strings.nullToEmpty(s.getSampleRef());
+        final String normalizedRef = GenomeAliases.getInstance().get(ref);
 
         data.put(prefix + ".id", id);
         data.put(prefix + ".name", name);
         data.put(prefix + ".demux.name", demuxName);
         data.put(prefix + ".lane", lane);
         data.put(prefix + ".undetermined", false);
-        data.put(prefix + ".ref", s.getSampleRef());
+        data.put(prefix + ".ref", ref);
+        data.put(prefix + ".normalized.ref", normalizedRef);
         data.put(prefix + ".indexed", s.isIndexed());
         data.put(prefix + ".index", index1);
         data.put(prefix + ".description", s.getDescription());
@@ -201,8 +212,8 @@ public class SamplesheetCollector implements Collector {
         }
 
         projectSamples.put(project, sampleNumber);
-        pooledSamples.put(
-            new PooledSample(project, demuxName, index1, index2, ref),
+        pooledSamples.put(new PooledSample(project, demuxName, index1, index2,
+            ref, normalizedRef),
             sampleNumber);
         samplesInLane.put(lane, sampleNumber);
 
@@ -255,6 +266,7 @@ public class SamplesheetCollector implements Collector {
           data.put(prefix + ".lane", lane);
           data.put(prefix + ".undetermined", true);
           data.put(prefix + ".ref", "");
+          data.put(prefix + ".normalized.ref", "");
           data.put(prefix + ".indexed", false);
           data.put(prefix + ".index", "");
           data.put(prefix + ".description", "");
@@ -334,6 +346,7 @@ public class SamplesheetCollector implements Collector {
       data.put(prefix + ".project.name", ps.project);
       data.put(prefix + ".project", data.getProjectId(ps.project));
       data.put(prefix + ".ref", ps.ref);
+      data.put(prefix + ".normalized.ref", ps.normalizedRef);
       data.put(prefix + ".samples", Joiner.on(",").join(e.getValue()));
     }
 
@@ -348,6 +361,7 @@ public class SamplesheetCollector implements Collector {
       data.put(prefix + ".index", "");
       data.put(prefix + ".project.name", "");
       data.put(prefix + ".ref", "");
+      data.put(prefix + ".normalized.ref", "");
       data.put(prefix + ".samples", Joiner.on(",").join(undeterminedSamples));
     }
 

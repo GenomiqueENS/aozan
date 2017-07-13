@@ -373,6 +373,16 @@ public class RunData {
   }
 
   /**
+   * Gets the normalized sample genome.
+   * @param sampleId the sample id
+   * @return the normalized sample genome
+   */
+  public String getNormalizedSampleGenome(final int sampleId) {
+    return get(
+        SAMPLESHEET_DATA_PREFIX + ".sample" + sampleId + ".normalized.ref");
+  }
+
+  /**
    * Get the index of a sample.
    * @param sampleId the sample id
    * @return the index of the sample

@@ -97,7 +97,7 @@ public class FastQScreenMappedPercentSampleTest
       final int read, final int readSample, final int sampleId) {
 
     // Set genome sample
-    final String genomeSample = data.getSampleGenome(sampleId);
+    final String genomeSample = data.getNormalizedSampleGenome(sampleId);
 
     // Set reference genome corresponding of genome sample if it exists
     String genomeSampleReference = null;

@@ -30,12 +30,10 @@ import java.util.List;
 import java.util.Set;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.fastqscreen.FastqScreen;
-import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeAliases;
 import fr.ens.biologie.genomique.aozan.io.FastqSample;
 
 /**
@@ -172,27 +170,8 @@ public class FastqScreenCollector extends AbstractFastqCollector {
     final boolean isPairedMode = isRunPE && !this.ignorePairedMode;
 
     // Retrieve genome sample from run data
-    final String sampleRef = data.getSampleGenome(fastqSample.getSampleId());
-
-    final String sampleGenomeName;
-    if (sampleRef != null) {
-
-      // Get corresponding valid genome name for mapping
-      sampleGenomeName = GenomeAliases.getInstance().get(sampleRef);
-
-      Common.getLogger()
-          .info("FASTQSCREEN: Genome ref of sample \""
-              + fastqSample.getSampleName() + "\" is \"" + sampleRef
-              + "\". search related name in genome available on mapping "
-              + (sampleGenomeName == null ? "NoFOUND" : sampleGenomeName));
-
-      // Genome can be use for mapping
-      if (sampleGenomeName != null) {
-        genomes.add(sampleGenomeName);
-      }
-    } else {
-      sampleGenomeName = null;
-    }
+    final String sampleGenomeName =
+        data.getNormalizedSampleGenome(fastqSample.getSampleId());
 
     // In mode paired FastqScreen should be launched with R1 and R2
     // together.
