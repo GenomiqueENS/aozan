@@ -123,7 +123,7 @@ QC_DENY_FILE = 'qc.deny'
 QC_DONE_FILE = 'qc.done'
 QC_LASTERR_FILE = 'qc.lasterr'
 
-BCL2FASTQ2_VERSION = "2.19.0.316"
+BCL2FASTQ2_VERSION = "2.20.0.422"
 MAX_DELAY_TO_SEND_TERMINATED_RUN_EMAIL = 12 * 3600
 
 def exists_in_path(program):
