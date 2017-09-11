@@ -502,7 +502,7 @@ public class SampleSheetUtils {
 
       if (sample.isIndex2Field()) {
 
-        String index2 = sample.getIndex1();
+        String index2 = sample.getIndex2();
 
         if (index2 == null) {
           throw new NullPointerException(
