@@ -89,10 +89,12 @@ public class SamplesheetCollector implements Collector {
 
       final PooledSample that = (PooledSample) obj;
 
-      return this.project.equals(that.project)
-          && this.name.equals(that.name) && this.index1.equals(that.index1)
-          && this.index2.equals(that.index2) && this.ref.equals(that.ref)
-          && this.normalizedRef.equals(that.normalizedRef);
+      return Objects.equals(this.project, that.project)
+          && Objects.equals(this.name, that.name)
+          && Objects.equals(this.index1, that.index1)
+          && Objects.equals(this.index2, that.index2)
+          && Objects.equals(this.ref, that.ref)
+          && Objects.equals(this.normalizedRef, that.normalizedRef);
     }
 
     //
