@@ -44,6 +44,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.io.Files;
 
+import fr.ens.biologie.genomique.aozan.collectors.AozanCollector;
 import fr.ens.biologie.genomique.aozan.collectors.ReadCollector;
 
 /**
@@ -151,8 +152,8 @@ public class RunData {
       return Collections.emptyList();
     }
 
-    return Splitter.on(',').trimResults().omitEmptyStrings()
-        .splitToList(get(QC.QC_COLLECTOR_NAMES));
+    return Splitter.on(',').trimResults().omitEmptyStrings().splitToList(
+        get(AozanCollector.PREFIX + ".conf." + QC.QC_COLLECTOR_NAMES));
   }
 
   /**
