@@ -98,6 +98,10 @@ public class SampleSheetCheck {
       if (sample.isIndex2Field()) {
         checkIndex(sample.getIndex2());
       }
+      if (!sample.isIndex1Field() && sample.isIndex2Field()) {
+        warnings.add("Found a column in the samplesheet for index 2 "
+            + "but not for index 1");
+      }
 
       // Check sample Index
       checkSampleIndex(sample.getSampleId(), sample.getIndex1(),
