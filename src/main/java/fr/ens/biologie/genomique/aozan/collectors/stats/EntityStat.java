@@ -104,71 +104,56 @@ public class EntityStat {
 
   /**
    * Creates the run data project.
-   * @return the run data.
    * @throws AozanException if run data object has already be create.
    */
-  public RunData createRunDataProject(final String prefix)
-      throws AozanException {
+  public void addRunDataProjectEntries(final String prefix) throws AozanException {
 
-    if (compiledData) {
+    if (this.compiledData) {
       throw new AozanException("Run data always updated for project "
           + this.data.getProjectName(this.projectId) + ".");
     }
 
-    final RunData data = new RunData();
+    this.data.put(prefix + ".lanes", Joiner.on(",").join(this.lanes));
 
-    StatisticsUtils stats = null;
-
-    data.put(prefix + ".lanes", Joiner.on(",").join(this.lanes));
-
-    data.put(prefix + ".genomes.ref",
+    this.data.put(prefix + ".genomes.ref",
         (this.genomes.isEmpty() ? "NA" : Joiner.on(",").join(getGenomes())));
 
-    data.put(prefix + ".samples.count", samples.size());
-    data.put(prefix + ".isindexed", isIndexed);
+    this.data.put(prefix + ".samples.count", samples.size());
+    this.data.put(prefix + ".isindexed", isIndexed);
 
     // Compile data on raw cluster
-    stats = new StatisticsUtils(this.rawClusterSamples);
+    StatisticsUtils rawStats = new StatisticsUtils(this.rawClusterSamples);
 
-    data.put(prefix + ".raw.cluster.sum", stats.getSumToInteger());
-    data.put(prefix + ".raw.cluster.min", stats.getMin().intValue());
-    data.put(prefix + ".raw.cluster.max", stats.getMax().intValue());
+    this.data.put(prefix + ".raw.cluster.sum", rawStats.getSumToInteger());
+    this.data.put(prefix + ".raw.cluster.min", rawStats.getMin().intValue());
+    this.data.put(prefix + ".raw.cluster.max", rawStats.getMax().intValue());
 
     // Compile data on raw cluster
-    stats = new StatisticsUtils(this.pfClusterSamples);
+    StatisticsUtils pfStats = new StatisticsUtils(this.pfClusterSamples);
 
-    data.put(prefix + ".pf.cluster.sum", stats.getSumToInteger());
-    data.put(prefix + ".pf.cluster.min", stats.getMin().intValue());
-    data.put(prefix + ".pf.cluster.max", stats.getMax().intValue());
+    this.data.put(prefix + ".pf.cluster.sum", pfStats.getSumToInteger());
+    this.data.put(prefix + ".pf.cluster.min", pfStats.getMin().intValue());
+    this.data.put(prefix + ".pf.cluster.max", pfStats.getMax().intValue());
 
-    addConditionalRundata(data, prefix);
-
-    compiledData = true;
-
-    return data;
-  }
-
-  /**
-   * Adds the conditional rundata.
-   * @param data the data
-   * @param prefix the prefix
-   */
-  private void addConditionalRundata(final RunData data, final String prefix) {
-
-    // Check collector is selected
-    if (this.data.isCollectorEnabled(UndeterminedIndexesCollector.COLLECTOR_NAME)) {
+    // Check collector is enabled
+    if (this.data
+        .isCollectorEnabled(UndeterminedIndexesCollector.COLLECTOR_NAME)) {
       // Compile data on recoverable cluster
-      data.put(prefix + ".raw.cluster.recovery.sum", rawClusterRecoverySum);
-      data.put(prefix + ".pf.cluster.recovery.sum", pfClusterRecoverySum);
+      this.data.put(prefix + ".raw.cluster.recovery.sum",
+          rawClusterRecoverySum);
+      this.data.put(prefix + ".pf.cluster.recovery.sum", pfClusterRecoverySum);
     }
 
-    // Check collector is selected
+    // Check collector is enabled
     if (this.data.isCollectorEnabled(FastqScreenCollector.COLLECTOR_NAME)) {
       // Compile data on detection contamination
-      data.put(prefix + ".samples.exceeded.contamination.threshold.count",
+      this.data.put(prefix + ".samples.exceeded.contamination.threshold.count",
           getSamplesWithContaminationCount());
     }
+
+    this.compiledData = true;
   }
+
 
   /**
    * Adds the sample.

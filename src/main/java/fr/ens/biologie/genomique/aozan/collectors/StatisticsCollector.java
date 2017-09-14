@@ -111,8 +111,7 @@ public abstract class StatisticsCollector implements Collector {
 
     // Collect projects statistics in rundata
     for (Map.Entry<Integer, EntityStat> e : stats.entrySet()) {
-      data.put(
-          e.getValue().createRunDataProject(getCollectorPrefix() + e.getKey()));
+      e.getValue().addRunDataProjectEntries(getCollectorPrefix() + e.getKey());
     }
 
     try {
