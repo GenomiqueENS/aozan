@@ -148,12 +148,14 @@ public class RunData {
    */
   public List<String> getCollectorNames() {
 
-    if (!contains(QC.QC_COLLECTOR_NAMES)) {
+    final String key = AozanCollector.PREFIX + ".conf." + QC.QC_COLLECTOR_NAMES;
+
+    if (!contains(key)) {
       return Collections.emptyList();
     }
 
-    return Splitter.on(',').trimResults().omitEmptyStrings().splitToList(
-        get(AozanCollector.PREFIX + ".conf." + QC.QC_COLLECTOR_NAMES));
+    return Splitter.on(',').trimResults().omitEmptyStrings()
+        .splitToList(get(key));
   }
 
   /**
