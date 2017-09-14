@@ -156,7 +156,7 @@ public class EntityStat {
   private void addConditionalRundata(final RunData data, final String prefix) {
 
     // Check collector is selected
-    if (data.isCollectorEnabled(UndeterminedIndexesCollector.COLLECTOR_NAME)) {
+    if (this.data.isCollectorEnabled(UndeterminedIndexesCollector.COLLECTOR_NAME)) {
       // Compile data on recoverable cluster
       data.put(prefix + ".raw.cluster.recovery.sum", rawClusterRecoverySum);
       data.put(prefix + ".pf.cluster.recovery.sum", pfClusterRecoverySum);
