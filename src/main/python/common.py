@@ -363,7 +363,7 @@ def get_input_run_data_path(run_id, conf):
         path = hiseq_run.find_hiseq_run_path(run_id, conf)
 
     if path is None or path is False or not os.path.exists(path):
-        error("Sequencer data directory does not exist.", "Sequencer data data directory does not exist.",
+        error("Sequencer data directory does not exist.", "Sequencer data directory does not exist.",
               get_last_error_file(conf), conf)
         return None
 
