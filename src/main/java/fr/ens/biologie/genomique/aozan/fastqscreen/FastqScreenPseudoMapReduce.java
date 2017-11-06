@@ -45,12 +45,15 @@ import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.eoulsan.bio.BadBioEntryException;
+import fr.ens.biologie.genomique.eoulsan.bio.FastqFormat;
 import fr.ens.biologie.genomique.eoulsan.bio.GenomeDescription;
-import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.Bowtie2ReadsMapper;
-import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.BowtieReadsMapper;
+import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.Bowtie2MapperProvider;
+import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.BowtieMapperProvider;
+import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.FileMapping;
+import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.Mapper;
+import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.MapperIndex;
+import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.MapperInstance;
 import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.MapperProcess;
-import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.SequenceReadsMapper;
-import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.SequenceReadsMapperService;
 import fr.ens.biologie.genomique.eoulsan.data.DataFile;
 import fr.ens.biologie.genomique.eoulsan.modules.generators.GenomeMapperIndexer;
 import fr.ens.biologie.genomique.eoulsan.util.LocalReporter;
@@ -75,17 +78,14 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   private static final String COUNTER_GROUP = "reads_mapping";
   private final Reporter reporter;
 
-  private int mapperThreads = Runtime.getRuntime().availableProcessors();
-  // private final SequenceReadsMapper mapper;
   private GenomeDescription desc = null;
   private final FastqScreenResult fastqScreenResult;
   private final File tmpDir;
 
-  private String newArgumentsMapper;
   private final Pattern pattern = Pattern.compile("\t");
 
-  private int readsprocessed = 0;
-  private int readsmapped = 0;
+  private int readsProcessed = 0;
+  private int readsMapped = 0;
   private final boolean pairedMode;
   private String genomeReference;
 
@@ -129,15 +129,20 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       checkNotNull(fastqRead2, "fastqRead2 argument cannot be null");
     }
 
-    if (threadNumber > 0) {
-      this.mapperThreads = threadNumber;
-    }
+    // Define the number of thread to use
+    final int mapperThreads = threadNumber > 0
+        ? threadNumber : Runtime.getRuntime().availableProcessors();
 
     if (firstDoMapRunning) {
       // Update logger at the first execution
       LOGGER.info("FASTQSCREEN: map "
           + fastqRead1.getName() + " on genomes "
           + Joiner.on(",").join(genomes));
+
+      LOGGER.info("FASTQSCREEN: init "
+          + this.mapperName + " mapper, arguments: \"" + this.mapperArguments
+          + "\", mode: " + (pairedMode ? "paired" : "single") + ", threads: "
+          + mapperThreads);
     }
 
     for (final String genome : genomes) {
@@ -148,21 +153,31 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
           + fastqRead1.getName() + "(" + fastqRead1
           + (this.pairedMode ? ", " + fastqRead2 : "") + ")" + " on " + genome);
 
-      // Create instance of Mapper
-      final SequenceReadsMapper mapper =
-          createInstanceMapper(this.mapperName, this.mapperArguments);
+      // Get the mapper object
+      final Mapper mapper = Mapper.newMapper(this.mapperName);
+
+      // Set mapper temporary directory
+      mapper.setTempDirectory(this.tmpDir);
 
       try {
+
+        // Create the mapper instance
+        final MapperInstance mapperInstance =
+            mapper.newMapperInstance("", "", true, null);
+
         final DataFile genomeFile = new DataFile("genome://" + genome);
 
         // get index Genome reference exists
-        final File archiveIndexFile = createIndex(mapper, genomeFile);
+        final File archiveIndexFile = createIndex(mapperInstance, genomeFile);
 
         if (archiveIndexFile == null) {
           LOGGER.warning(
               "FASTQSCREEN: archive index file not found for " + genome);
           continue;
         }
+
+        final File indexDir = new File(
+            StringUtils.filenameWithoutExtension(archiveIndexFile.getPath()));
 
         final FastqScreenSAMParser parser = new FastqScreenSAMParser(
             this.getMapOutputTempFile(), genome, this.pairedMode, this.desc);
@@ -174,48 +189,35 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
           parser.closeMapOutputFile();
         } else {
 
-          final File indexDir = new File(
-              StringUtils.filenameWithoutExtension(archiveIndexFile.getPath()));
+          // Create the MapperIndex object
+          final MapperIndex mapperIndex =
+              mapperInstance.newMapperIndex(archiveIndexFile, indexDir);
 
-          mapper.init(archiveIndexFile, indexDir, this.reporter, COUNTER_GROUP);
+          // Create the mapping object
+          FileMapping mapping = mapperIndex.newFileMapping(
+              FastqFormat.FASTQ_SANGER, this.mapperArguments, mapperThreads,
+              false, this.reporter, COUNTER_GROUP);
 
-          if (this.pairedMode) {
+          // Create the MapperProcess
+          final MapperProcess process = this.pairedMode
+              ? mapping.mapPE(fastqRead1, fastqRead2)
+              : mapping.mapSE(fastqRead1);
 
-            // Paired end mode
-            final MapperProcess process = mapper.mapPE(fastqRead1, fastqRead2);
+          // Parse SAM output
+          parser.parseLines(process.getStout());
 
-            // Parse SAM output
-            parser.parseLines(process.getStout());
+          // Wait the end of the process and do cleanup
+          process.waitFor();
 
-            // Wait the end of the process and do cleanup
-            process.waitFor();
-
-          } else {
-
-            if (this.desc == null) {
-              throw new AozanException(
-                  "Fastqscreen: genome description is null for bowtie");
-            }
-
-            // Single read mapping
-            final MapperProcess process = mapper.mapSE(fastqRead1);
-
-            // Parse SAM output
-            parser.parseLines(process.getStout());
-
-            // Wait the end of the process and do cleanup
-            process.waitFor();
-          }
+          // Throw an exception if an exception has occurred while mapping
+          mapping.throwMappingException();
         }
 
-        this.readsprocessed = parser.getReadsprocessed();
-
-        // Throw an exception if an exception has occurred while mapping
-        mapper.throwMappingException();
+        this.readsProcessed = parser.getReadsprocessed();
 
         LOGGER.fine("FASTQSCREEN: "
-            + mapper.getMapperName() + " mapping on genome " + genome
-            + " in mode " + (this.pairedMode ? "paired" : "single") + ", in "
+            + mapper.getName() + " mapping on genome " + genome + " in mode "
+            + (this.pairedMode ? "paired" : "single") + ", in "
             + toTimeHumanReadable(timer.elapsed(TimeUnit.MILLISECONDS)));
 
         timer.stop();
@@ -237,7 +239,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @throws AozanException if an error occurs during call
    *           FastqScreenGenomeMapper instance.
    */
-  private File createIndex(final SequenceReadsMapper bowtie,
+  private File createIndex(final MapperInstance bowtie,
       final DataFile genomeDataFile) throws IOException, AozanException {
 
     // Timer :
@@ -246,7 +248,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     final DataFile tempDir = new DataFile(this.tmpDir);
     final DataFile result = new DataFile(tempDir,
         "aozan-"
-            + bowtie.getMapperName().toLowerCase() + "-index-"
+            + bowtie.getName().toLowerCase() + "-index-"
             + genomeDataFile.getName() + ".zip");
 
     // Create genome description
@@ -269,7 +271,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     final Map<String, String> additionnalArgument = Collections.emptyMap();
 
     final GenomeMapperIndexer indexer =
-        new GenomeMapperIndexer(bowtie, "", additionnalArgument);
+        new GenomeMapperIndexer(bowtie, "", additionnalArgument, 1);
 
     indexer.createIndex(genomeDataFile, this.desc, result);
 
@@ -340,7 +342,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     boolean oneGenome = true;
     String currentGenome = null;
 
-    this.readsmapped++;
+    this.readsMapped++;
 
     // values format : a number 1 or 2 which represent the number of hits for
     // the read on one genome and after name of the genome
@@ -379,18 +381,18 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    */
   public FastqScreenResult getFastqScreenResult() throws AozanException {
 
-    if (this.readsmapped > this.readsprocessed) {
+    if (this.readsMapped > this.readsProcessed) {
       LOGGER.warning("FASTQSCREEN: mapped reads count ("
-          + this.readsmapped + ") must been inferior to processed reads count ("
-          + this.readsprocessed + ")");
+          + this.readsMapped + ") must been inferior to processed reads count ("
+          + this.readsProcessed + ")");
       return null;
     }
 
     LOGGER.fine("FASTQSCREEN: result of mappings : nb read mapped "
-        + this.readsmapped + " / nb read " + this.readsprocessed);
+        + this.readsMapped + " / nb read " + this.readsProcessed);
 
-    this.fastqScreenResult.countPercentValue(this.readsmapped,
-        this.readsprocessed);
+    this.fastqScreenResult.countPercentValue(this.readsMapped,
+        this.readsProcessed);
 
     return this.fastqScreenResult;
   }
@@ -402,95 +404,31 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    * @throws AozanException for mapper different bowtie or bowtie2, no
    *           parameters are define
    */
-  private String getMapperArguments() throws AozanException {
+  private static String getMapperArguments(final String mapperName,
+      final String mapperArguments, final boolean pairedMode)
+      throws AozanException {
 
-    if (this.newArgumentsMapper != null && this.newArgumentsMapper.isEmpty()) {
-
-      // Return parameters setting in configuration Aozan file
-      return this.newArgumentsMapper;
+    if (mapperArguments != null && !mapperArguments.isEmpty()) {
+      return mapperArguments;
     }
 
     // Use default argument mapper
     final String mapperNameLower =
-        this.mapperName.toLowerCase(Globals.DEFAULT_LOCALE);
+        mapperName.toLowerCase(Globals.DEFAULT_LOCALE);
 
-    if (mapperNameLower.equals(new BowtieReadsMapper().getMapperName()
-        .toLowerCase(Globals.DEFAULT_LOCALE))) {
-
-      // Parameter for Bowtie
+    if (BowtieMapperProvider.MAPPER_NAME.toLowerCase(Globals.DEFAULT_LOCALE).equals(mapperNameLower)) {
       return " -l 20 -k 2 --chunkmbs 512"
-          + (this.pairedMode ? " --maxins 1000" : "");
+          + (pairedMode ? " --maxins 1000" : "");
+    }
 
-    } else if (mapperNameLower.equals(new Bowtie2ReadsMapper().getMapperName()
-        .toLowerCase(Globals.DEFAULT_LOCALE))) {
-      // Parameter for Bowtie2
+    if (Bowtie2MapperProvider.MAPPER_NAME.toLowerCase(Globals.DEFAULT_LOCALE).equals(mapperNameLower)) {
       return " -k 2 --very-fast-local --no-discordant --no-mixed"
-          + (this.pairedMode ? " --maxins 1000" : "");
-
-    } else { // No parameter define for mapper
-      throw new AozanException(
-          "FastqScreen fail: no argument defined to the mapper "
-              + this.mapperName
-              + ". Only bowtie or bowtie2 are default parameters.");
+          + (pairedMode ? " --maxins 1000" : "");
     }
 
-  }
-
-  /**
-   * Instantiation the mapper used for fastqscreen, if it is not define the
-   * mapper per default is called.
-   * @param mapperName mapper name
-   * @return instance of mapper
-   * @throws AozanException occurs when the instantiation of mapper fails or if
-   *           the mapper name doesn't recognize
-   */
-  private SequenceReadsMapper createInstanceMapper(final String mapperName,
-      final String mapperArguments) throws AozanException {
-
-    // Retrieve instance of mapper or null
-    SequenceReadsMapper mapper;
-
-    // Use default mapper if mapper name or arguments is null
-    if (mapperName == null || mapperName.length() == 0) {
-
-      if (mapperArguments != null && !mapperArguments.isEmpty()) {
-        this.newArgumentsMapper = mapperArguments;
-      }
-
-      mapper = new BowtieReadsMapper();
-    } else {
-
-      // Retrieve instance of mapper or null
-      mapper = SequenceReadsMapperService.getInstance().newService(mapperName);
-
-      if (mapper == null) {
-        throw new AozanException("FASTQSCREEN: mapper name "
-            + mapperName + " from configuration Aozan doesn't recognized.");
-      }
-
-      this.newArgumentsMapper = mapperArguments;
-    }
-
-    // Set temporary directory
-    mapper.setTempDirectory(this.tmpDir);
-
-    // remove default argument
-    mapper.setMapperArguments("");
-
-    // define new argument
-    mapper.setMapperArguments(getMapperArguments());
-
-    mapper.setThreadsNumber(this.mapperThreads);
-
-    if (firstDoMapRunning) {
-      // Update logger at the first execution
-      LOGGER.info("FASTQSCREEN: init "
-          + mapper.getMapperName() + " mapper, arguments: \""
-          + getMapperArguments() + "\", mode: "
-          + (pairedMode ? "paired" : "single") + ", threads: "
-          + this.mapperThreads);
-    }
-    return mapper;
+    throw new AozanException(
+          "FastqScreen fail: no argument defined for the mapper "
+              + mapperName);
   }
 
   //
@@ -519,8 +457,16 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     this.pairedMode = pairedMode;
     this.tmpDir = tmpDir;
-    this.mapperName = mapperName;
-    this.mapperArguments = mapperArguments;
+
+    // Use default mapper if mapper name or arguments is null
+    if (mapperName == null || mapperName.isEmpty()) {
+      this.mapperName = new BowtieMapperProvider().getName();
+    } else {
+      this.mapperName = mapperName;
+    }
+
+    this.mapperArguments =
+        getMapperArguments(mapperName, mapperArguments, pairedMode);
 
     // Define temporary directory
     this.setMapReduceTemporaryDirectory(this.tmpDir);
