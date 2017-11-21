@@ -34,7 +34,6 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Sets;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Common;
@@ -78,21 +77,26 @@ public class FastqScreenGenomes {
    *           file
    */
   private Set<String> initSampleGenomes(
-      final Set<String> genomesReferencesSample, final File aliasGenomesFile)
-      throws AozanException {
+      final Set<String> genomesReferencesSample) throws AozanException {
 
     // Identify genomes can be use for mapping
     final Set<String> genomes = new HashSet<>();
+
+    // Add the contamination genomes to the genomes to use
+    genomes.addAll(this.contaminantGenomes);
 
     final GenomeAliases genomeAliases = GenomeAliases.getInstance();
 
     for (final String genomeName : genomesReferencesSample) {
 
+      final String newGenomeName = genomeAliases.contains(genomeName)
+          ? genomeAliases.get(genomeName) : genomeName;
+
       // Retrieve genome description if it exists
       GenomeDescription gdesc = null;
       try {
         gdesc = GenomeDescriptionCreator.getInstance()
-            .createGenomeDescription(new DataFile("genome://" + genomeName));
+            .createGenomeDescription(new DataFile("genome://" + newGenomeName));
       } catch (final Exception isIgnored) {
         // Do nothing
       }
@@ -100,7 +104,7 @@ public class FastqScreenGenomes {
       // Check if a genome is available for mapping
       if (gdesc != null) {
         // Genome description exist for the genome
-        genomes.add(genomeName);
+        genomes.add(newGenomeName);
 
         // Add the genome as Alias if not exists
         if (!genomeAliases.contains(genomeName)) {
@@ -121,12 +125,7 @@ public class FastqScreenGenomes {
     // Update new unknown genome aliases
     genomeAliases.saveUnknownAliases();
 
-    // Union genomes contaminants and genomes references
-    final Set<String> genomesToMap =
-        Sets.newLinkedHashSet(this.contaminantGenomes);
-    genomesToMap.addAll(genomes);
-
-    return Collections.unmodifiableSet(genomesToMap);
+    return Collections.unmodifiableSet(genomes);
   }
 
   /**
@@ -256,15 +255,12 @@ public class FastqScreenGenomes {
     checkNotNull(testConfiguration,
         "testConfiguration argument cannot be null");
 
-    final File aliasGenomesFile = new File(testConfiguration
-        .get(Settings.QC_CONF_FASTQSCREEN_GENOMES_ALIAS_PATH_KEY));
-    final File sampleshettFile =
+    final File samplesheetFile =
         new File(testConfiguration.get(QC.BCL2FASTQ_SAMPLESHEET_PATH));
     final String contaminantGenomeNames =
         testConfiguration.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
 
-    return new FastqScreenGenomes(aliasGenomesFile, sampleshettFile,
-        contaminantGenomeNames);
+    return new FastqScreenGenomes(samplesheetFile, contaminantGenomeNames);
   }
 
   //
@@ -273,17 +269,14 @@ public class FastqScreenGenomes {
 
   /**
    * Public constructor.
-   * @param aliasGenomesFile alias genomes file
    * @param samplesheetFile samplesheet file
    * @param contaminantGenomeNames a string with the list of the contaminant
    *          genomes
    * @throws AozanException if an error occurs while creating the object
    */
-  public FastqScreenGenomes(final File aliasGenomesFile,
-      final File samplesheetFile, final String contaminantGenomeNames)
-      throws AozanException {
+  public FastqScreenGenomes(final File samplesheetFile,
+      final String contaminantGenomeNames) throws AozanException {
 
-    checkNotNull(aliasGenomesFile, "aliasGenomesFile argument cannot be null");
     checkNotNull(samplesheetFile, "samplesheetFile argument cannot be null");
     checkNotNull(contaminantGenomeNames,
         "contaminantGenomeNames argument cannot be null");
@@ -292,8 +285,8 @@ public class FastqScreenGenomes {
     this.contaminantGenomes = initContaminantGenomes(contaminantGenomeNames);
 
     // Collect genomes useful to contaminant detection
-    this.sampleGenomes = initSampleGenomes(
-        createSampleRefsFromSamplesheetFile(samplesheetFile), aliasGenomesFile);
+    this.sampleGenomes =
+        initSampleGenomes(createSampleRefsFromSamplesheetFile(samplesheetFile));
   }
 
 }

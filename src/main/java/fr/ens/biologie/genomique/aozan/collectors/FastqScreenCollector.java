@@ -161,17 +161,37 @@ public class FastqScreenCollector extends AbstractFastqCollector {
       final RunData data, final FastqSample fastqSample, final File reportDir,
       final boolean isRunPE) throws AozanException {
 
-    final Set<String> contaminantGenomes =
-        this.fastqscreen.getFastqScreenGenomes().getContaminantGenomes();
-
-    final Set<String> genomes = new HashSet<>(contaminantGenomes);
-
     // Set mode for FastqScreen
     final boolean isPairedMode = isRunPE && !this.ignorePairedMode;
 
-    // Retrieve genome sample from run data
-    final String sampleGenomeName =
+    final Set<String> contaminantGenomes =
+        this.fastqscreen.getFastqScreenGenomes().getContaminantGenomes();
+
+    final Set<String> genomesToMap =
+        this.fastqscreen.getFastqScreenGenomes().getSampleGenomes();
+
+    final Set<String> genomes = new HashSet<>(contaminantGenomes);
+
+    final String sampleGenomeName;
+
+    // Retrieve normalized genome sample from run data
+    final String normalizedSampleName =
         data.getNormalizedSampleGenome(fastqSample.getSampleId());
+
+    // Retrieve non normalized genome sample from run data
+    final String unNormalizedSampleGenome =
+        data.getSampleGenome(fastqSample.getSampleId());
+
+    // Test if the sample genome must be mappped
+    if (genomesToMap.contains(unNormalizedSampleGenome)) {
+      genomes.add(unNormalizedSampleGenome);
+      sampleGenomeName = unNormalizedSampleGenome;
+    } else if (genomesToMap.contains(normalizedSampleName)) {
+      genomes.add(normalizedSampleName);
+      sampleGenomeName = normalizedSampleName;
+    } else {
+      sampleGenomeName = null;
+    }
 
     // In mode paired FastqScreen should be launched with R1 and R2
     // together.

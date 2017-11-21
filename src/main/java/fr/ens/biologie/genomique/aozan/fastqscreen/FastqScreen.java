@@ -57,15 +57,14 @@ public class FastqScreen {
 
   // Fields for delayed initialization of fastqScreenGenomes
   private FastqScreenGenomes fastqScreenGenomes;
-  private final File aliasGenomesFile;
   private final File samplesheetFile;
   private final String contaminantGenomeNames;
 
   public FastqScreenGenomes getFastqScreenGenomes() throws AozanException {
 
     if (this.fastqScreenGenomes == null) {
-      this.fastqScreenGenomes = new FastqScreenGenomes(this.aliasGenomesFile,
-          this.samplesheetFile, this.contaminantGenomeNames);
+      this.fastqScreenGenomes = new FastqScreenGenomes(this.samplesheetFile,
+          this.contaminantGenomeNames);
     }
 
     return this.fastqScreenGenomes;
@@ -181,8 +180,6 @@ public class FastqScreen {
     this.confThreads = conf.getInt(Settings.QC_CONF_THREADS_KEY, -1);
 
     // Fields required to initialize fastqScreenGenomes
-    this.aliasGenomesFile =
-        conf.getFile(Settings.QC_CONF_FASTQSCREEN_GENOMES_ALIAS_PATH_KEY);
     this.samplesheetFile = conf.getFile(QC.BCL2FASTQ_SAMPLESHEET_PATH);
     this.contaminantGenomeNames =
         conf.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);

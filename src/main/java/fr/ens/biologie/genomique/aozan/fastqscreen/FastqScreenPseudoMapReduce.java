@@ -182,7 +182,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
         final FastqScreenSAMParser parser = new FastqScreenSAMParser(
             this.getMapOutputTempFile(), genome, this.pairedMode, this.desc);
 
-        this.setGenomeReference(genome, sampleGenome);
+        this.genomeReference = genome;
+        this.fastqScreenResult.addGenome(genome, sampleGenome);
 
         // Do nothing if the file is empty
         if (fastqRead1.length() == 0) {
@@ -360,18 +361,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       this.fastqScreenResult.countHitPerGenome(currentGenome, oneHit,
           oneGenome);
     }
-  }
-
-  /**
-   * Define the genome reference for mapping.
-   * @param genome name of the new genome
-   * @param genomeSample genome reference corresponding to sample
-   */
-  public void setGenomeReference(final String genome,
-      final String genomeSample) {
-    this.genomeReference = genome;
-
-    this.fastqScreenResult.addGenome(genome, genomeSample);
   }
 
   /**
