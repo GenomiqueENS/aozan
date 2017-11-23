@@ -919,5 +919,11 @@
 			</action>
 		</release>
 
-	</body>
+		<release version="2.1.1" description="Aozan 2.1.1 release"  date="2017-11-23">
+			<action dev="jourdren" type="fix">
+                                 When a genome alias was used as reference genome for FastQScreen, the mapping of the reads was not performed.
+			</action>
+		</release>
+
+		</body>
 </document>
