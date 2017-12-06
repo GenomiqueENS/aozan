@@ -25,6 +25,8 @@ package fr.ens.biologie.genomique.aozan.collectors;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -198,9 +200,21 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
         new File(this.reportDir, filename.replaceAll("\\.html$", ".zip"));
     if (reportZip.exists()) {
 
-      if (!this.keepZipReportFile && !reportZip.delete()) {
-        LOGGER.warning(
-            "FASTQC: fail to delete report " + reportZip.getAbsolutePath());
+      if (!this.keepZipReportFile) {
+
+        if (!reportZip.delete()) {
+          LOGGER.warning(
+              "FASTQC: fail to delete report " + reportZip.getAbsolutePath());
+        }
+      } else {
+
+        // Create a symbolic link to the zip file for MultiQC
+        File multiQCLink = new File(reportZip.getParentFile(),
+            reportZip.getName().replace("-fastqc.zip", "_fastqc.zip"));
+
+        Files.createSymbolicLink(multiQCLink.toPath(),
+            Paths.get(reportZip.getName()));
+
       }
     }
   }
