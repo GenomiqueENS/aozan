@@ -186,7 +186,7 @@ public class SampleSheetReaderTest {
 
       Bcl2FastqOutput bclfile = new Bcl2FastqOutput(
           readSamplesheetCSV(new File(path, filename), nbLanes), new File("."),
-          Bcl2FastqVersion.BCL2FASTQ_2, false);
+          Bcl2FastqVersion.BCL2FASTQ_2, null, false);
       for (int lane = 1; lane <= nbLanes; lane++) {
         for (String sampleName : sampleNames.keySet()) {
           FastqSample fastqSample =

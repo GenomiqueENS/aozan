@@ -117,6 +117,9 @@ public class DemultiplexingCollector implements Collector {
 
     }
 
+    // Add Bcl2fastq version to result
+    data.put(PREFIX + ".bcl2fastq.version", manager.getFullVersion());
+
     // Init collector
     subCollector.configure(qc, this.conf);
 

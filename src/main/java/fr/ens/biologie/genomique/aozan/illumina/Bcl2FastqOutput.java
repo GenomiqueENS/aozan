@@ -29,6 +29,9 @@ public class Bcl2FastqOutput {
   /** The Bcl2fastq version. */
   private final Bcl2FastqVersion version;
 
+  /** The Bcl2fastq full version. */
+  private final String fullVersion;
+
   /** The fastq directory. */
   private final File fastqDirectory;
 
@@ -82,6 +85,15 @@ public class Bcl2FastqOutput {
   public Bcl2FastqVersion getVersion() {
 
     return this.version;
+  }
+
+  /**
+   * Get the full bcl2fastq version used to generate the FASTQ files.
+   * @return the full bcl2fastq version used to generate the FASTQ files
+   */
+  public String getFullVersion() {
+
+    return this.fullVersion;
   }
 
   /**
@@ -140,8 +152,8 @@ public class Bcl2FastqOutput {
     }
 
     // Find the bcl2fastq version in the log file
-    final Bcl2FastqVersion versionInLogFile =
-        extractBcl2FastqVersionFromLog(fastqDir);
+    final Bcl2FastqVersion versionInLogFile = Bcl2FastqVersion.parseVersion(
+        extractBcl2FastqVersionFromLog(fastqDir));
     if (versionInLogFile != null) {
       return versionInLogFile;
     }
@@ -164,7 +176,7 @@ public class Bcl2FastqOutput {
    * @return the bcl2fastq version or null if cannot be read in the log file
    * @throws IOException if more than one log file was found
    */
-  private static Bcl2FastqVersion extractBcl2FastqVersionFromLog(
+  private static String extractBcl2FastqVersionFromLog(
       final File fastqDir) throws IOException {
 
     // Find log file
@@ -176,8 +188,8 @@ public class Bcl2FastqOutput {
         final String filename = pathname.getName();
 
         return filename.startsWith("bcl2fastq_output_")
-            && (filename.endsWith(".out")
-                || filename.endsWith(".err") && pathname.length() > 0);
+            && (filename.endsWith(".out") || filename.endsWith(".err"))
+            && pathname.length() > 0;
 
       }
     });
@@ -185,7 +197,7 @@ public class Bcl2FastqOutput {
     // If no log found,
     if (logFiles == null || logFiles.length == 0) {
 
-      return Bcl2FastqVersion.BCL2FASTQ_1;
+      return null;
     }
 
     if (logFiles.length > 1) {
@@ -208,7 +220,7 @@ public class Bcl2FastqOutput {
           continue;
         }
 
-        return Bcl2FastqVersion.parseVersion(fields.get(1));
+        return fields.get(1);
       }
     }
 
@@ -297,7 +309,8 @@ public class Bcl2FastqOutput {
   public Bcl2FastqOutput(final SampleSheet samplesheet, final File fastqDir)
       throws IOException {
 
-    this(samplesheet, fastqDir, findBcl2FastqVersion(fastqDir), true);
+    this(samplesheet, fastqDir, findBcl2FastqVersion(fastqDir),
+        extractBcl2FastqVersionFromLog(fastqDir), true);
   }
 
   /**
@@ -309,7 +322,7 @@ public class Bcl2FastqOutput {
    * @throws IOException if an error occurs while reading bcl2fastq version
    */
   public Bcl2FastqOutput(final SampleSheet samplesheet, final File fastqDir,
-      Bcl2FastqVersion version, boolean checkFastqDirectory) throws IOException {
+      Bcl2FastqVersion version, String fullVersion, boolean checkFastqDirectory) throws IOException {
 
     if (samplesheet == null) {
       throw new NullPointerException("samplesheet argument cannot be null");
@@ -326,6 +339,7 @@ public class Bcl2FastqOutput {
     this.fastqDirectory = fastqDir;
     this.version = version;
     this.samplesheet = samplesheet;
+    this.fullVersion = fullVersion;
   }
 
 }

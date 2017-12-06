@@ -40,6 +40,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import com.google.common.base.Strings;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -119,6 +120,11 @@ public final class XMLUtilsWriter {
           data.getSequencerApplicationVersion());
       XMLUtils.addTagValue(doc, parent, "SequencerRTAVersion",
           data.getSequencerRTAVersion());
+
+      XMLUtils.addTagValue(doc, parent, "Bcl2FastqVersion",
+          Strings.nullToEmpty(data.getBcl2FastqVersion()).isEmpty()
+              ? "Unknown version" : data.getBcl2FastqVersion());
+
 
       XMLUtils.addTagValue(doc, parent, "ReportDate",
           dateFormatter.format(new Date()));

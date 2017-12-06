@@ -736,6 +736,14 @@ public class RunData {
   }
 
   /**
+   * Gets the bcl2fastq version.
+   * @return the bcl2fastq version
+   */
+  public String getBcl2FastqVersion() {
+    return get("demux.bcl2fastq.version");
+  }
+
+  /**
    * Get the cycles count in the read.
    * @param read the read number
    * @return cycles count in the read

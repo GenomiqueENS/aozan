@@ -269,7 +269,7 @@ public class FastqSampleTest {
 
     // Create Bcl2FastqOutput object
     Bcl2FastqOutput bcl2FastqOutput = new Bcl2FastqOutput(samplesheet,
-        new File(""), Bcl2FastqVersion.BCL2FASTQ_2, false);
+        new File(""), Bcl2FastqVersion.BCL2FASTQ_2, null, false);
 
     Set<String> expected = new HashSet<>();
     List<String> expectedList = Arrays.asList(expectedOutputFilenames);
