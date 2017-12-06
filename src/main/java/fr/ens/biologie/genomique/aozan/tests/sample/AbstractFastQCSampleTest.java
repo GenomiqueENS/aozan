@@ -43,7 +43,8 @@ public abstract class AbstractFastQCSampleTest extends AbstractSampleTest {
       final int readSample, final int sampleId) {
 
     final boolean undetermined = data.isUndeterminedSample(sampleId);
-    final String filename = data.get("fastqc.sample" + sampleId + ".read" + read + ".report.file.name");
+    final String filename = data.get("fastqc.sample"
+        + sampleId + ".read" + readSample + ".report.file.name");
 
     // Check indetermined indexed sample
     if (undetermined) {

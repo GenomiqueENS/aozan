@@ -47,7 +47,8 @@ public class FastQScreenReportSampleTest extends AbstractSampleTest {
   public TestResult test(final RunData data, final int read,
       final int readSample, final int sampleId) {
 
-    final String filename = data.get("fastqscreen.sample" + sampleId + ".read" + read + ".report.file.name");
+    final String filename = data.get("fastqscreen.sample"
+        + sampleId + ".read" + readSample + ".report.file.name");
 
     if (data.isUndeterminedSample(sampleId)) {
 

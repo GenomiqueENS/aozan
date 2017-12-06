@@ -52,7 +52,7 @@ public class PFPercentSampleTest extends AbstractSampleTest {
   }
 
   @Override
-  public TestResult test(final RunData data, final int re2ad,
+  public TestResult test(final RunData data, final int read,
       final int readSample, final int sampleId) {
 
     final boolean undetermined = data.isUndeterminedSample(sampleId);
