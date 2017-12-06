@@ -25,16 +25,16 @@ package fr.ens.biologie.genomique.aozan.collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
-
-import com.google.common.io.Files;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Common;
@@ -107,8 +107,14 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     final File csvFile = new File(this.reportDir, reportFilename + ".csv");
     final File htmlFile = new File(this.reportDir, reportFilename + ".html");
+    final File multiQCLink = new File(this.reportDir,
+        getFastqSample().getFilenamePrefix() + "_screen.txt");
 
+    // Create CVS report
     writeCSV(csvFile);
+
+    // Create symbolic link for MultiQC filename handling
+    Files.createSymbolicLink(multiQCLink.toPath(), Paths.get(csvFile.getName()));
 
     // Report with a link in qc html page
     writeHtml(htmlFile);
@@ -193,8 +199,8 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   private void writeCSV(final File file)
       throws AozanException, IOException {
 
-    final BufferedWriter br = Files.newWriter(file, StandardCharsets.UTF_8);
-    br.append(this.resultsFastqscreen.reportToCSV(getFastqSample(),
+    final Writer br = new FileWriter(file);
+    br.write(this.resultsFastqscreen.reportToCSV(getFastqSample(),
         this.sampleGenome));
 
     br.close();
