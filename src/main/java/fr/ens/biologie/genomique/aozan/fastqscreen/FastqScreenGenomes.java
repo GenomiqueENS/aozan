@@ -155,13 +155,17 @@ public class FastqScreenGenomes {
 
       // Retrieve all genome sample included in Bcl2fastq samplesheet file
       for (final Sample sample : samplesheet) {
-        String genomeSample =
-            sample.getSampleRef().replaceAll("\"", "").toLowerCase();
 
-        // Replace all symbols not letters or numbers by space
-        genomeSample = PATTERN.matcher(genomeSample).replaceAll(" ");
+        if (sample.isSampleRefField()) {
 
-        genomesFromSamplesheet.add(genomeSample.trim());
+          String genomeSample =
+              sample.getSampleRef().replaceAll("\"", "").toLowerCase();
+
+          // Replace all symbols not letters or numbers by space
+          genomeSample = PATTERN.matcher(genomeSample).replaceAll(" ");
+
+          genomesFromSamplesheet.add(genomeSample.trim());
+        }
       }
 
       // TODO
