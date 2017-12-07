@@ -400,6 +400,9 @@ public class QC {
    */
   private void init(final Settings settings) throws AozanException {
 
+    // Initialize Genome aliases
+    GenomeAliases.initialize(settings);
+
     final AozanTestRegistry registry = new AozanTestRegistry();
     List<AozanTest> tests;
 
@@ -705,9 +708,6 @@ public class QC {
    */
   private void initFastqScreenCollectorRequirements(final Settings settings)
       throws AozanException {
-
-    // Initialize Genome aliases
-    GenomeAliases.initialize(settings);
 
     final fr.ens.biologie.genomique.eoulsan.Settings eoulsanSettings =
         EoulsanRuntime.getSettings();
