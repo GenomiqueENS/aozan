@@ -396,6 +396,16 @@ public class RunData {
   }
 
   /**
+   * Get the index of a sample.
+   * @param sampleId the sample id
+   * @return the index of the sample
+   */
+  public String getSampleIndex2(final int sampleId) {
+
+    return get(SAMPLESHEET_DATA_PREFIX + ".sample" + sampleId + ".index2");
+  }
+
+  /**
    * Checks if is lane indexed.
    * @param lane the lane
    * @return true, if is lane indexed
@@ -659,6 +669,14 @@ public class RunData {
    */
   public int getReadCount() {
     return getInt("run.info.read.count");
+  }
+
+  /**
+   * Get the indexed read count in run.
+   * @return indexed read count.
+   */
+  public int getIndexedReadCount() {
+    return getInt("run.info.indexed.read.count");
   }
 
   /**

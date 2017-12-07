@@ -204,8 +204,11 @@ public class EntityStat {
     final int lane = this.data.getSampleLane(sampleId);
 
     // Check collector is selected
-    if (this.data.isCollectorEnabled(UndeterminedIndexesCollector.COLLECTOR_NAME)
-        && this.data.isUndeterminedInLane(lane)) {
+    // TODO Handle dual indexing
+    if (this.data
+        .isCollectorEnabled(UndeterminedIndexesCollector.COLLECTOR_NAME)
+        && this.data.isUndeterminedInLane(lane)
+        && this.data.getIndexedReadCount() == 1) {
 
       // Check if lane is indexed
       if (this.data.isLaneIndexed(lane)) {

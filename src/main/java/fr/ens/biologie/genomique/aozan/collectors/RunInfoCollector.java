@@ -165,6 +165,7 @@ public class RunInfoCollector implements Collector {
           readIndexedCount++;
         }
       }
+      data.put(PREFIX + ".indexed.read.count", readIndexedCount);
 
       final Set<Integer> lanesToAlign =
           Sets.newHashSet(runInfo.getAlignToPhix());
