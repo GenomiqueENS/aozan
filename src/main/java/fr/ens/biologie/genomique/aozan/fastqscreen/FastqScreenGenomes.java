@@ -28,6 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -80,7 +81,7 @@ public class FastqScreenGenomes {
       final Set<String> genomesReferencesSample) throws AozanException {
 
     // Identify genomes can be use for mapping
-    final Set<String> genomes = new HashSet<>();
+    final Set<String> genomes = new LinkedHashSet<>();
 
     // Add the contamination genomes to the genomes to use
     genomes.addAll(this.contaminantGenomes);
