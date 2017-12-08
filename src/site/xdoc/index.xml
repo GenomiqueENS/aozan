@@ -84,9 +84,24 @@
     </section>
 
 
+    <section name="What's new in Aozan 2.2?">
+
+      <subsection name="MultiQC support">
+        <p>Aozan can now generate a <a href="http://multiqc.info/">MultiQC</a> report for each run project.
+        To activate the MultiQC report creation, just enable the <tt>qc.test.project.multiqc.report.enable</tt> parameter in your configuration file.</p>
+
+        <div align="center">
+          <a href="http://multiqc.info/" target="_blank">
+            <img src="images/logo_multiqc.png" alt="MultiQC logo"/>
+          </a>
+        </div>
+      </subsection>
+
+    </section>
+
     <section name="What's new in Aozan 2.0?">
 
-      <subsection name="Bbcl2fastq 2.x support">
+      <subsection name="Bcl2fastq 2.x support">
         <p>Aozan can now handle bcl2fastq 2.x and its new samplesheet file format.
         Aozan do not support anymore bcl2fastq 1.x as bcl2fastq 2.x can handle all Illumina sequencer output since HiSeq 1000/2000.
         Aozan has been tested with bcl2fastq 2.16, 2.17 and 2.18.</p>
