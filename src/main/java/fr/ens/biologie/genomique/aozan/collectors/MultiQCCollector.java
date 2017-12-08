@@ -52,9 +52,7 @@ public class MultiQCCollector implements Collector {
 
   private static final String MULTIQC_EXECUTABLE = "multiqc";
   private static final String MULTIQC_EXECUTABLE_DOCKER = "multiqc";
-  private static final String MULTIQC_DOCKER_DEPOT = "ewels";
-  private static final String MULTIQC_DOCKER_IMAGE = "multiqc";
-  private static final String MULTIQC_VERSION_DOCKER = "v1.3";
+  private static final String MULTIQC_DOCKER_IMAGE = "ewels/multiqc:v1.3";
 
   private File fastqDir;
   private File qcDir;
@@ -200,9 +198,8 @@ public class MultiQCCollector implements Collector {
         createMultiQCOptions(inputDirectories, multiQCReportFile, projectName));
 
     DockerCommand dc = new DockerCommand(this.dockerConnectionString, cmd,
-        MULTIQC_DOCKER_IMAGE, MULTIQC_VERSION_DOCKER);
+        MULTIQC_DOCKER_IMAGE);
 
-    dc.setDepotDockerName(MULTIQC_DOCKER_DEPOT);
 
     // MultiQC input directories
     for (File d : inputDirectories) {

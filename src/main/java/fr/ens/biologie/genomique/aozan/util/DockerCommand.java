@@ -67,21 +67,18 @@ public class DockerCommand {
 
   private static final char SEPARATOR = File.separatorChar;
 
-  private static final String DEPOT_DEFAULT = "genomicpariscentre";
-
-  private static final String DEFAULT_VERSION = "latest";
   private static final String WORK_DIRECTORY_DOCKER_DEFAULT = "/root";
 
   private final File stdoutFile;
   private final File stderrFile;
 
-  private final String imageDockerVersion;
+  //private String depotPublicName;
+  //private final String imageDockerVersion;
   private final String imageName;
   private final List<String> commandLine;
   private final List<String> mountArgument = new ArrayList<>();
 
   private String permission;
-  private String depotPublicName;
   private String workDirectoryDocker;
   private Map<String, String> mountPoints = new HashMap<>();
 
@@ -95,12 +92,11 @@ public class DockerCommand {
    */
   public void run() throws AozanException {
 
-    final String image = buildImageName();
-    LOGGER.warning("Pull docker image: " + image);
+    LOGGER.warning("Pull docker image: " + this.imageName);
 
     try {
       // Pull image
-      dockerClient.pull(image);
+      dockerClient.pull(this.imageName);
     } catch (DockerException | InterruptedException e) {
 
       // Do not thrown an exception as the network can be down
@@ -120,14 +116,14 @@ public class DockerCommand {
 
       // // Create container
       LOGGER.warning("Docker create config "
-          + "\n\tdocker " + dockerClient + "\n\t imagename " + image
+          + "\n\tdocker " + dockerClient + "\n\t imagename " + this.imageName
           + "\n\t host Configure is  " + hostConfig + "\n\tcommend line "
           + Joiner.on(" ").join(cmd) + "\n\twork directory " + workDir
           + "\n\tpermission " + permission);
 
-      final ContainerConfig config =
-          ContainerConfig.builder().image(image).cmd(cmd).hostConfig(hostConfig)
-              .user(permission).workingDir(workDir).build();
+      final ContainerConfig config = ContainerConfig.builder()
+          .image(this.imageName).cmd(cmd).hostConfig(hostConfig)
+          .user(permission).workingDir(workDir).build();
 
       ContainerCreation creation;
       creation = dockerClient.createContainer(config);
@@ -219,31 +215,6 @@ public class DockerCommand {
     LOGGER.info("Docker for image "
         + imageName + " mount partition "
         + this.mountArgument.get(this.mountArgument.size() - 1));
-  }
-
-  //
-  // Private methods for launch Docker
-  //
-
-  /**
-   * Builds the image name in depot Docker.
-   * @return image name
-   */
-  private String buildImageName() {
-
-    checkArgument(!Strings.isNullOrEmpty(this.depotPublicName),
-        "depot public name for Docker");
-
-    checkArgument(!Strings.isNullOrEmpty(this.imageName), "image Docker");
-
-    final String name =
-        String.format("%s/%s", this.depotPublicName, this.imageName);
-
-    if (Strings.isNullOrEmpty(this.imageDockerVersion)) {
-      return name;
-    }
-
-    return String.format("%s:%s", name, this.imageDockerVersion);
   }
 
   //
@@ -404,14 +375,6 @@ public class DockerCommand {
   }
 
   /**
-   * Sets the depot docker name.
-   * @param depotName the new depot docker name
-   */
-  public void setDepotDockerName(final String depotName) {
-    this.depotPublicName = depotName;
-  }
-
-  /**
    * Sets the work directory docker.
    * @param workDirectoryDocker the new work directory docker
    */
@@ -436,8 +399,7 @@ public class DockerCommand {
    * @return the image docker name
    */
   public String getImageDockerName() {
-    return String.format("%s/%s:%s", this.depotPublicName, this.imageName,
-        this.imageDockerVersion);
+    return this.imageName;
   }
 
   /**
@@ -452,36 +414,27 @@ public class DockerCommand {
   // Constructor
   //
 
-  public DockerCommand(final String dockerConnectionString,
-      final List<String> commandLine, final String softwareName)
-      throws AozanException {
-    this(dockerConnectionString, commandLine, softwareName, DEFAULT_VERSION);
-  }
-
   /**
    * Public constructor to initialize parameters to a docker images.
    * @param dockerConnectionString Docker connection string
    * @param commandLine the command line
-   * @param softwareName the software name
+   * @param imageName the image name
    * @param softwareVersion the software version
    * @throws AozanException
    */
   public DockerCommand(final String dockerConnectionString,
-      final List<String> commandLine, final String softwareName,
-      final String softwareVersion) throws AozanException {
+      final List<String> commandLine, final String imageName)
+      throws AozanException {
 
     checkNotNull(commandLine, "commande line");
-    checkNotNull(softwareName, "software image Docker");
+    checkNotNull(imageName, "software image Docker");
 
     this.dockerClient =
         DockerConnection.getInstance(dockerConnectionString).getClient();
 
     this.commandLine = commandLine;
 
-    this.imageName = softwareName.trim();
-    this.imageDockerVersion = softwareVersion.trim();
-
-    this.depotPublicName = DEPOT_DEFAULT;
+    this.imageName = imageName.trim();
     this.permission = setDefaultPermission();
 
     this.stderrFile = new File("/tmp", "STDERR");

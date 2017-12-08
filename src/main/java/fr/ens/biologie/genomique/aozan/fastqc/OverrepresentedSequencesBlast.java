@@ -87,7 +87,7 @@ public class OverrepresentedSequencesBlast {
   private static final Object LOCK = new Object();
 
   private static final String BLAST_EXECUTABLE_DOCKER = "blastall";
-  private static final String BLAST_DOCKER_IMAGE = "blast2";
+  private static final String BLAST_DOCKER_IMAGE = "genomicpariscentre/blast2";
   private static final String BLAST_VERSION_DOCKER = "2.2.26";
 
   // Tag configuration general of blast
@@ -437,7 +437,7 @@ public class OverrepresentedSequencesBlast {
     final List<String> cmd = commandLine.getComandLine(inputFile, outputFile);
 
     DockerCommand du = new DockerCommand(dockerConnectionString, cmd,
-        BLAST_DOCKER_IMAGE, BLAST_VERSION_DOCKER);
+        BLAST_DOCKER_IMAGE + ':' + BLAST_VERSION_DOCKER);
     du.addMountDirectory(inputFile.getParentFile().getAbsolutePath());
     du.addMountDirectory(outputFile.getParentFile().getAbsolutePath());
     du.addMountDirectory(
