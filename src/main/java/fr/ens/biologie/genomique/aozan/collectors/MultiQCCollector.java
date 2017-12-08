@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.google.common.collect.Lists;
 
@@ -53,6 +54,8 @@ public class MultiQCCollector implements Collector {
   private static final String MULTIQC_EXECUTABLE = "multiqc";
   private static final String MULTIQC_EXECUTABLE_DOCKER = "multiqc";
   private static final String MULTIQC_DOCKER_IMAGE = "ewels/multiqc:v1.3";
+
+  private static final Logger LOGGER = Common.getLogger();
 
   private File fastqDir;
   private File qcDir;
@@ -84,6 +87,8 @@ public class MultiQCCollector implements Collector {
 
     // Test if Docker must be use to launch MultiQC
     this.useDocker = conf.getBoolean(Settings.QC_CONF_MULTIQC_USE_DOCKER_KEY);
+
+    LOGGER.info("MultiQC, use Docker: " + this.useDocker);
 
     if (this.useDocker) {
       this.dockerConnectionString = conf.get(Settings.DOCKER_URI_KEY);
@@ -124,10 +129,10 @@ public class MultiQCCollector implements Collector {
       try {
         // Launch MultiQC
         if (this.useDocker) {
-          createMultiQCReport(inputDirectories, multiQCReportFile, projectName);
-        } else {
           createMultiQCReportWithDocker(inputDirectories, multiQCReportFile,
               projectName);
+        } else {
+          createMultiQCReport(inputDirectories, multiQCReportFile, projectName);
         }
       } catch (IOException e) {
         throw new AozanException(e);
@@ -167,8 +172,7 @@ public class MultiQCCollector implements Collector {
     builder.directory(multiQCReportFile.getParentFile());
     builder.environment().put("TMPDIR", this.tmpDir.getAbsolutePath());
 
-    Common.getLogger()
-        .fine("MultiQC: MultiQC command line: " + builder.command());
+    LOGGER.fine("MultiQC: MultiQC command line: " + builder.command());
 
     // Execute command line
     try {
@@ -200,7 +204,6 @@ public class MultiQCCollector implements Collector {
     DockerCommand dc = new DockerCommand(this.dockerConnectionString, cmd,
         MULTIQC_DOCKER_IMAGE);
 
-
     // MultiQC input directories
     for (File d : inputDirectories) {
       dc.addMountDirectory(d.getAbsolutePath());
@@ -208,7 +211,7 @@ public class MultiQCCollector implements Collector {
 
     dc.addMountDirectory(multiQCReportFile.getParentFile().getAbsolutePath());
 
-    Common.getLogger().fine("FASTQC: Blast command line: " + cmd);
+    LOGGER.fine("FASTQC: Blast command line: " + cmd);
 
     // Launch Docker container
     dc.run();
