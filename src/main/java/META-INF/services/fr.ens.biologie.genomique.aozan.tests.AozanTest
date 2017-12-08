@@ -50,6 +50,7 @@ fr.ens.biologie.genomique.aozan.tests.project.MinRawClusterCountProjectTest
 fr.ens.biologie.genomique.aozan.tests.project.RawClusterCountProjectTest
 fr.ens.biologie.genomique.aozan.tests.project.SampleCountProjectTest
 fr.ens.biologie.genomique.aozan.tests.project.FastQScreenSampleOvercontaminationCountProjectTest
+fr.ens.biologie.genomique.aozan.tests.project.MultiQCReportProjectTest
 fr.ens.biologie.genomique.aozan.tests.sample.FastQCAdapterContentSampleTest
 fr.ens.biologie.genomique.aozan.tests.sample.FastQCBadTilesSampleTest
 fr.ens.biologie.genomique.aozan.tests.sample.FastQCBasicStatsSampleTest

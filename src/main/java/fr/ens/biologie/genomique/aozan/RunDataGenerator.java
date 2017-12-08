@@ -41,6 +41,7 @@ import com.google.common.base.Stopwatch;
 
 import fr.ens.biologie.genomique.aozan.collectors.Collector;
 import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
+import fr.ens.biologie.genomique.aozan.collectors.MultiQCCollector;
 import fr.ens.biologie.genomique.aozan.collectors.StatisticsCollector;
 
 /**
@@ -173,7 +174,8 @@ public class RunDataGenerator {
     for (final Collector collector : collectorsInitOrder) {
 
       // Collector selected
-      if (collector instanceof StatisticsCollector) {
+      if (collector instanceof StatisticsCollector
+          || collector instanceof MultiQCCollector) {
         statisticsCollector.add(collector);
       } else {
         collectorsNewOrder.add(collector);

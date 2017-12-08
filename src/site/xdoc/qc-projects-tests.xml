@@ -87,6 +87,8 @@
         <tr><td>qc.test.project.fastqscreen.sample.overcontamination.count.enable</td><td>integer interval</td><td>False</td><td>Integer for valid values</td></tr>
 
         <tr><td>qc.test.project.fastqscreen.report.enable</td><td>link</td><td>False</td><td>Enable link to detection contamination project report compilation samples data</td></tr>
+
+        <tr><td>qc.test.project.multiqc.report.enable</td><td>link</td><td>False</td><td>Enable link to MultiQC project report</td></tr>
       </table>
 
       <h4>Optional general configuration</h4>

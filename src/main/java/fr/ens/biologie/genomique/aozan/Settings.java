@@ -293,6 +293,10 @@ public final class Settings {
   public static final String QC_CONF_FASTQSCREEN_PERCENT_PROJECT_CONTAMINATION_THRESHOLD_KEY =
       "qc.conf.fastqscreen.project.contamination.percent.threshold";
 
+  /** Use Docker for MultiQC. */
+  public static final String QC_CONF_MULTIQC_USE_DOCKER_KEY =
+      "qc.conf.multiqc.use.docker";
+
   /** Collector read xml collector used. */
   public static final String QC_CONF_READ_XML_COLLECTOR_USED_KEY =
       "qc.conf.read.xml.collector.used";
