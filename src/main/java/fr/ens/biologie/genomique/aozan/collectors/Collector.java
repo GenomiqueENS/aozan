@@ -67,4 +67,11 @@ public interface Collector {
    */
   void clear();
 
+  /**
+   * Test if the class is a summary collector. A summary collector must be
+   * executed after all the other collectors.
+   * @return
+   */
+  boolean isSummaryCollector();
+
 }

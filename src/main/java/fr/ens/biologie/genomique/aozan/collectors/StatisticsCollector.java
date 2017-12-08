@@ -237,4 +237,9 @@ public abstract class StatisticsCollector implements Collector {
     return contaminationThreshold;
   }
 
+  @Override
+  public boolean isSummaryCollector() {
+    return true;
+  }
+
 }

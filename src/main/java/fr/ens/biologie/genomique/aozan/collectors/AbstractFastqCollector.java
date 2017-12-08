@@ -631,4 +631,9 @@ public abstract class AbstractFastqCollector implements Collector {
     return Collections.unmodifiableList(Arrays.asList(dataFiles));
   }
 
+  @Override
+  public boolean isSummaryCollector() {
+    return false;
+  }
+
 }

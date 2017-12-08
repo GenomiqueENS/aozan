@@ -401,4 +401,9 @@ public class SamplesheetCollector implements Collector {
   public void clear() {
   }
 
+  @Override
+  public boolean isSummaryCollector() {
+    return false;
+  }
+
 }

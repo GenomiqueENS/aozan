@@ -106,7 +106,11 @@ public class AozanCollector implements Collector {
 
   @Override
   public void clear() {
+  }
 
+  @Override
+  public boolean isSummaryCollector() {
+    return false;
   }
 
 }

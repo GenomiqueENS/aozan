@@ -151,4 +151,9 @@ abstract class AbstractMetricsCollector implements Collector {
 
     return readsData.getReadData(read);
   }
+
+  @Override
+  public boolean isSummaryCollector() {
+    return false;
+  }
 }

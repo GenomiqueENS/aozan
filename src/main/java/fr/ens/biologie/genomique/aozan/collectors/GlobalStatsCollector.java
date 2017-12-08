@@ -162,4 +162,9 @@ public class GlobalStatsCollector implements Collector {
   public GlobalStatsCollector() {
   }
 
+  @Override
+  public boolean isSummaryCollector() {
+    return false;
+  }
+
 }

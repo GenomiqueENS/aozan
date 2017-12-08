@@ -112,4 +112,9 @@ public class ReadCollector implements Collector {
     }
   }
 
+  @Override
+  public boolean isSummaryCollector() {
+    return false;
+  }
+
 }

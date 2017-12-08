@@ -202,4 +202,10 @@ public class RunInfoCollector implements Collector {
   @Override
   public void clear() {
   }
+
+  @Override
+  public boolean isSummaryCollector() {
+    return false;
+  }
+
 }
