@@ -419,7 +419,6 @@ public class DockerCommand {
    * @param dockerConnectionString Docker connection string
    * @param commandLine the command line
    * @param imageName the image name
-   * @param softwareVersion the software version
    * @throws AozanException
    */
   public DockerCommand(final String dockerConnectionString,

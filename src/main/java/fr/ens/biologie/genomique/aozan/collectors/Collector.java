@@ -70,7 +70,7 @@ public interface Collector {
   /**
    * Test if the class is a summary collector. A summary collector must be
    * executed after all the other collectors.
-   * @return
+   * @return true if the collector is a summary collector
    */
   boolean isSummaryCollector();
 
