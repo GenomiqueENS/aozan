@@ -925,15 +925,15 @@
 			</action>
 		</release>
 
-		<release version="2.2" description="Aozan 2.2 release"  date="TBD">
+		<release version="2.2" description="Aozan 2.2 release"  date="2017-12-10">
 			<action dev="jourdren" type="fix">
                                  In paired-end mode, the links in the main report to FastQC reports were null.
 			</action>
 			<action dev="jourdren" type="fix">
-                                 Fix NullPointerException in Fastq Screen collector when no sample reference is defined in samplesheet.
+                                 Fix NullPointerException in Fastq Screen collector when no sample reference was defined in the samplesheet.
 			</action>
 			<action dev="jourdren" type="fix">
-                                 Fix error when accessing to the genome alias names and the Fastq Screen collector was not enabled.
+                                 Fix error when accessing to genome alias names and the Fastq Screen collector was not enabled.
 			</action>
 			<action dev="jourdren" type="fix">
                                  The gathering of cluster recovering counts in EntityStat is now not made if dual indexing is enabled because the recovery cluster collector does not work with dual indexing.
