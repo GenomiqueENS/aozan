@@ -120,10 +120,14 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
     writeHtml(htmlFile);
 
     // Save the filename of the report in RunData
-    this.data.put(
-        "fastqscreen"
-            + super.getFastqSample().getRundataPrefix() + ".report.file.name",
-        htmlFile.getName());
+    String key = "fastqscreen"
+        + getFastqSample().getRundataPrefix() + ".report.file.name";
+    this.data.put(key, htmlFile.getName());
+
+    // Save the filename of the report in RunData for read 2
+    if (this.isRunPE) {
+      this.data.put(key.replace(".read1.", ".read2."), htmlFile.getName());
+    }
 
     LOGGER.fine("FASTQSCREEN: save "
         + getFastqSample().getFilenamePrefix() + " report fastqscreen");
