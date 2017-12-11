@@ -36,7 +36,11 @@
 
     <section name="How to cite Aozan">
 
-      <p>Aozan is currently under submission process.</p>
+      <p><b>Aozan: an automated post-sequencing data-processing pipeline.</b></p>
+      <p>
+         <small>Sandrine Perrin, Cyril Firmo, Sophie Lemoine, Stéphane Le Crom and Laurent Jourdren.</small><br/>
+         <small><i>Bioinformatics (2017) <b>33</b> <b>(14)</b>: 2212-2213. doi: <a href="http://doi.org/10.1093/bioinformatics/btx154">10.1093/bioinformatics/btx154</a></i></small>
+      </p>
 
     </section>
   </body>
