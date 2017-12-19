@@ -171,7 +171,7 @@ public class GenomeAliases {
 
     checkNotNull(genomeName, "genomeName parameter cannot be null");
 
-    if (this.unknownAliases.contains(createKey(genomeName))) {
+    if (!this.unknownAliases.contains(genomeName)) {
       this.newUnknownAliases.add(genomeName);
     }
   }
@@ -247,6 +247,20 @@ public class GenomeAliases {
         .toLowerCase();
   }
 
+  /**
+   * Get the path of the alias file from the settings
+   * @param settings the settings
+   * @return the alias file
+   */
+  private static File getAliasFile(final Settings settings) {
+
+    final String genomeAliasesFilename =
+        settings.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_ALIAS_PATH_KEY);
+
+    return Strings.emptyToNull(genomeAliasesFilename) == null
+        ? null : new File(genomeAliasesFilename.trim());
+  }
+
   //
   // Constructor
   //
@@ -258,11 +272,17 @@ public class GenomeAliases {
    */
   private GenomeAliases(final Settings settings) throws AozanException {
 
-    final String genomeAliasesFilename = settings
-        .get(Settings.QC_CONF_FASTQSCREEN_GENOMES_ALIAS_PATH_KEY);
+    this(getAliasFile(settings));
+  }
 
-    this.genomeAliasesFile = Strings.emptyToNull(genomeAliasesFilename) == null
-        ? null : new File(genomeAliasesFilename.trim());
+  /**
+   * Private constructor of GenomeAliases.
+   * @param File alias file
+   * @throws AozanException if the initialization of instance fail.
+   */
+  private GenomeAliases(final File aliasFile) throws AozanException {
+
+    this.genomeAliasesFile = aliasFile;
 
     loadGenomeAliasFile(this.genomeAliasesFile);
 
