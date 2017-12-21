@@ -946,7 +946,7 @@
 			</action>
 		</release>
 
-		<release version="2.2.1" description="Aozan 2.2.1 release"  date="TBD">
+		<release version="2.2.1" description="Aozan 2.2.1 release"  date="2017-12-21">
 			<action dev="jourdren" type="fix">
                                  The entry for FastQ Screen report path for read 2 in paired-end mode was not exists.
 			</action>
