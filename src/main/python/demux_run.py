@@ -356,7 +356,7 @@ def check_samplesheet(samplesheet, run_id, flow_cell_id, conf):
     return True, samplesheet_warnings
 
 
-def get_bcl2fastq_mismatches(samplesheet, default_value, run_id):
+def get_bcl2fastq_mismatches(samplesheet, default_value, run_id, conf):
     list = samplesheet.getMetadata('Settings', 'MismatchCount')
 
     if list is None or len(list) == 0:
@@ -853,7 +853,7 @@ def demux(run_id, conf):
         return False
 
     # Get the number of mismatches
-    nb_mismatch = get_bcl2fastq_mismatches(samplesheet, conf[BCL2FASTQ_MISMATCHES_KEY], run_id)
+    nb_mismatch = get_bcl2fastq_mismatches(samplesheet, conf[BCL2FASTQ_MISMATCHES_KEY], run_id, conf)
     if nb_mismatch == False:
         return False
 
