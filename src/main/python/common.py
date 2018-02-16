@@ -802,7 +802,9 @@ def get_run_parameters_path(run_id, conf):
         if os.path.basename(run_parameter_path).lower() == "runparameters.xml":
             return run_parameter_path
 
-    raise Exception('Unable to find the run parameters for run ' + run_id)
+    raise Exception('Unable to find the run parameters file ' + \
+                    '(RunParameters.xml) for run ' + run_id + \
+                    ' in ' + run_dir_path)
 
 
 def create_html_index_file(conf, run_id, sections):
