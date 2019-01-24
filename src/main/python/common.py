@@ -647,7 +647,7 @@ def error(short_message, message, last_error_file_path, conf):
         send_msg(short_message, message, True, conf)
 
     f = open(last_error_file_path, 'w')
-    f.write(new_error)
+    f.write(new_error.encode('utf8'))
     f.close()
 
 
