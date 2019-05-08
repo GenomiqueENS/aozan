@@ -25,17 +25,13 @@ package fr.ens.biologie.genomique.aozan.fastqc;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.biologie.genomique.aozan.util.StringUtils.stackTraceToString;
-import static fr.ens.biologie.genomique.aozan.util.XMLUtilsParser.extractFirstValueToInt;
-import static fr.ens.biologie.genomique.aozan.util.XMLUtilsParser.extractFirstValueToString;
 import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.checkExistingFile;
 import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.createTempFile;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,13 +43,13 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import com.google.common.base.Joiner;
 
@@ -65,7 +61,6 @@ import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
 import fr.ens.biologie.genomique.aozan.util.DockerCommand;
-import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
 
 /**
  * This class launches blastn on one sequence query and parses xml result file
@@ -91,9 +86,16 @@ public class OverrepresentedSequencesBlast {
   private static final String BLAST_VERSION_DOCKER = "2.2.26";
 
   // Tag configuration general of blast
+  private static final String ITERATION_TAG = "Iteration";
   private static final String HIT_TAG = "Hit";
   private static final String QUERY_LENGTH_TAG = "Iteration_query-len";
   private static final String QUERY_DEF_TAG = "Iteration_query-def";
+
+  private static final String HIT_NUM_TAG = "Hit_num";
+  private static final String HIT_DEF_TAG = "Hit_def";
+  private static final String HSP_EVALUE_TAG = "Hsp_evalue";
+  private static final String HSP_IDENTITY_TAG = "Hsp_identity";
+  private static final String HSP_ALIGN_LEN_TAG = "Hsp_align-len";
 
   private static volatile OverrepresentedSequencesBlast singleton;
 
@@ -105,11 +107,180 @@ public class OverrepresentedSequencesBlast {
   private boolean configured;
   private File tmpDir;
 
-  private boolean firstCall = true;
-
   private CommandLine blastCommonCommandLine;
   private Set<String> submittedSequences = new HashSet<>();
   private String dockerConnectionString;
+
+  /**
+   * This class with parse Blast XML output using SAX API.
+   */
+  private static class IterationHandler extends DefaultHandler {
+
+    private final Map<String, String> sequences;
+    private final Map<String, BlastResultHit> result = new HashMap<>();
+
+    private String currentElement;
+
+    private Integer queryLength;
+    private String seqId;
+
+    private Integer hitNum;
+    private String hitResult;
+    private String hspEValue;
+    private Integer hspIdentity;
+    private Integer hspAlignLen;
+    private int hitCount;
+    private int iterationCount;
+
+    @Override
+    public void startElement(final String uri, final String localName,
+        final String qName, final Attributes attributes) throws SAXException {
+
+      switch (qName) {
+
+      case QUERY_LENGTH_TAG:
+      case QUERY_DEF_TAG:
+      case HIT_NUM_TAG:
+      case HIT_DEF_TAG:
+      case HSP_EVALUE_TAG:
+      case HSP_IDENTITY_TAG:
+      case HSP_ALIGN_LEN_TAG:
+        this.currentElement = qName;
+        break;
+
+      case ITERATION_TAG:
+        this.iterationCount++;
+        this.currentElement = null;
+        break;
+
+      case HIT_TAG:
+        this.hitCount++;
+        this.currentElement = null;
+        break;
+
+      default:
+        this.currentElement = null;
+        break;
+      }
+    }
+
+    @Override
+    public void endElement(final String uri, final String localName,
+        final String qName) throws SAXException {
+
+      if (ITERATION_TAG.equals(qName)) {
+
+        if (this.hitCount > 0) {
+
+          BlastResultHit blastResultHit =
+              new BlastResultHit(this.hitNum, this.hitResult, this.hspEValue,
+                  this.hspIdentity, this.hspAlignLen, this.hitCount,
+                  this.queryLength, this.seqId, BLAST_RESULT_HTML_TYPE);
+
+          this.result.put(seqId, blastResultHit);
+        } else {
+          this.result.put(seqId, null);
+        }
+
+        this.seqId = null;
+        this.queryLength = null;
+
+        this.hitNum = null;
+        this.hitResult = null;
+        this.hspAlignLen = null;
+        this.hspIdentity = null;
+        this.hspEValue = null;
+        this.hitCount = 0;
+      }
+    }
+
+    @Override
+    public void characters(final char[] ch, final int start, final int length)
+        throws SAXException {
+
+      if (this.currentElement == null) {
+        return;
+      }
+
+      switch (currentElement) {
+
+      case QUERY_LENGTH_TAG:
+        this.queryLength = Integer.decode(new String(ch, start, length));
+        break;
+
+      case QUERY_DEF_TAG:
+        this.seqId = new String(ch, start, length);
+        break;
+
+      case HIT_DEF_TAG:
+        if (hitCount == 1) {
+          this.hitResult = new String(ch, start, length);
+        }
+        break;
+
+      case HIT_NUM_TAG:
+        if (hitCount == 1) {
+          this.hitNum = Integer.decode(new String(ch, start, length));
+        }
+        break;
+
+      case HSP_EVALUE_TAG:
+        if (hitCount == 1) {
+          this.hspEValue = new String(ch, start, length);
+        }
+        break;
+
+      case HSP_IDENTITY_TAG:
+        if (hitCount == 1) {
+          this.hspIdentity = Integer.decode(new String(ch, start, length));
+        }
+        break;
+
+      case HSP_ALIGN_LEN_TAG:
+        if (hitCount == 1) {
+          this.hspAlignLen = Integer.decode(new String(ch, start, length));
+        }
+        break;
+
+      default:
+        break;
+      }
+
+    }
+
+    @Override
+    public void endDocument() throws SAXException {
+
+      // Empty responses
+      if (this.iterationCount == 0) {
+        for (String seqId : this.sequences.keySet()) {
+          this.result.put(seqId, null);
+        }
+      }
+    }
+
+    /**
+     * Get the result of the parsing.
+     * @return a map with the results of the parsing
+     */
+    public Map<String, BlastResultHit> getResult() {
+      return this.result;
+    }
+
+    //
+    // Constructor
+    //
+
+    /**
+     * Constructor.
+     * @param sequences submitted sequences
+     */
+    IterationHandler(final Map<String, String> sequences) {
+
+      this.sequences = sequences;
+    }
+
+  }
 
   //
   // Configuration
@@ -129,8 +300,8 @@ public class OverrepresentedSequencesBlast {
       return;
     }
 
-    boolean stepEnabled = conf
-        .getBoolean(Settings.QC_CONF_FASTQC_BLAST_ENABLE_KEY);
+    boolean stepEnabled =
+        conf.getBoolean(Settings.QC_CONF_FASTQC_BLAST_ENABLE_KEY);
 
     if (!stepEnabled) {
       this.configured = true;
@@ -466,112 +637,21 @@ public class OverrepresentedSequencesBlast {
   private void parseDocument(final File resultXML,
       final Map<String, String> sequences) throws AozanException {
 
-    InputStream is = null;
     try {
       checkExistingFile(resultXML, "FastQC: Blast xml query result");
 
-      // Create the input stream
-      is = new FileInputStream(resultXML);
+      SAXParserFactory factory = SAXParserFactory.newInstance();
+      SAXParser saxParser = factory.newSAXParser();
+      IterationHandler iterationHandler = new IterationHandler(sequences);
+      saxParser.parse(resultXML, iterationHandler);
 
-      // Read the XML file
-      final DocumentBuilder dBuilder =
-          DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      final Document doc = dBuilder.parse(is);
-      doc.getDocumentElement().normalize();
-
-      // Parse general information on blastn
-      parseHeaderDocument(doc);
-
-      is.close();
       // Search the best hit
-      this.sequencesAlreadyAnalysis.putAll(parseHit(doc, sequences));
+      this.sequencesAlreadyAnalysis.putAll(iterationHandler.getResult());
 
     } catch (final IOException | SAXException
         | ParserConfigurationException e) {
       throw new AozanException(e);
-    } finally {
-      try {
-        is.close();
-      } catch (final IOException e) {
-      }
     }
-  }
-
-  /**
-   * Retrieve general informations of blastn, call once.
-   * @param doc root of xml file result for blastn
-   */
-  private void parseHeaderDocument(final Document doc) {
-
-    if (this.firstCall) {
-
-      final String parameters = "Parameters_expect="
-          + extractFirstValueToString(doc, "Parameters_expect")
-          + ", Parameters_sc-match="
-          + extractFirstValueToString(doc, "Parameters_sc-match")
-          + ", Parameters_sc-mismatch="
-          + extractFirstValueToString(doc, "Parameters_sc-mismatch")
-          + ", Parameters_gap-open="
-          + extractFirstValueToString(doc, "Parameters_gap-open")
-          + ", Parameters_gap-extend="
-          + extractFirstValueToString(doc, "Parameters_gap-extend")
-          + ", Parameters_filter="
-          + extractFirstValueToString(doc, "Parameters_filter");
-
-      LOGGER.info("FastQC-step blast parameters : " + parameters);
-
-      this.firstCall = false;
-    }
-  }
-
-  /**
-   * Search hit in XML result file.
-   * @param doc root of the XML file
-   * @param sequence query blastn
-   * @return best hit contained in XML file or null
-   */
-  private static Map<String, BlastResultHit> parseHit(final Document doc,
-      final Map<String, String> sequences) {
-
-    final Map<String, BlastResultHit> result = new HashMap<>();
-
-    final List<Element> responses =
-        XMLUtils.getElementsByTagName(doc, "Iteration");
-
-    if (responses == null) {
-
-      // Empty responses
-      for (String seqId : sequences.keySet()) {
-        result.put(seqId, null);
-      }
-    } else {
-
-      // Entries in responses
-      for (Element elemIteration : responses) {
-
-        final Integer queryLength =
-            extractFirstValueToInt(elemIteration, QUERY_LENGTH_TAG);
-
-        final String seqId =
-            extractFirstValueToString(elemIteration, QUERY_DEF_TAG);
-        final String sequence = sequences.get(seqId);
-
-        final List<Element> hits =
-            XMLUtils.getElementsByTagName(elemIteration, HIT_TAG);
-
-        // No hit found
-        if (hits.isEmpty()) {
-          result.put(sequence, null);
-        } else {
-
-          // Parse the first hit to build result
-          result.put(sequence, new BlastResultHit(hits.get(0), hits.size(),
-              queryLength, sequence, BLAST_RESULT_HTML_TYPE));
-        }
-      }
-    }
-
-    return result;
   }
 
   //

@@ -23,11 +23,6 @@
 
 package fr.ens.biologie.genomique.aozan.fastqc;
 
-import static fr.ens.biologie.genomique.aozan.util.XMLUtilsParser.extractFirstValueToInt;
-import static fr.ens.biologie.genomique.aozan.util.XMLUtilsParser.extractFirstValueToString;
-
-import org.w3c.dom.Element;
-
 import uk.ac.babraham.FastQC.Sequence.Contaminant.Contaminant;
 import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
 
@@ -46,12 +41,6 @@ class BlastResultHit {
   private static final int MIN_IDENTITY_EXPECTED = 100;
   private static final int MAX_QUERYCOVERT_EXPECTED = 0;
 
-  // print version blast BlastOutput_version
-  private static final String HIT_DEF_TAG = "Hit_def";
-  private static final String HSP_EVALUE_TAG = "Hsp_evalue";
-  private static final String HSP_IDENTITY_TAG = "Hsp_identity";
-  private static final String HSP_ALIGN_LEN_TAG = "Hsp_align-len";
-
   private final boolean htmlTypeOutput;
   private final String sequence;
   private int queryLength;
@@ -65,25 +54,28 @@ class BlastResultHit {
 
   /**
    * Generate hit data.
-   * @param firstHit first hit retrieved by blast
+   * @param hitNum hit number
+   * @param result result string
+   * @param hspEValue HSP e-value
+   * @param hspIdentity HSP identity
+   * @param hspAlignLen HSP alignment length
    * @param countHits number hits retrieved by blast
    * @param queryLength number base in sequence query
    */
-  private void addHitData(final Element firstHit, final int countHits,
-      final int queryLength) {
+  private void addHitData(final int hitNum, final String result,
+      final String hspEValue, final int hspIdentity, final int hspAlignLen,
+      final int countHits, final int queryLength) {
 
     // No hit found for this sequence
-    if (extractFirstValueToInt(firstHit, "Hit_num") == 0) {
+    if (hitNum == 0) {
       return;
     }
 
     this.queryLength = queryLength;
     this.countHits = countHits;
 
-    this.result = extractFirstValueToString(firstHit, HIT_DEF_TAG);
-    this.hspEValue = extractFirstValueToString(firstHit, HSP_EVALUE_TAG);
-    final int hspIdentity = extractFirstValueToInt(firstHit, HSP_IDENTITY_TAG);
-    final int hspAlignLen = extractFirstValueToInt(firstHit, HSP_ALIGN_LEN_TAG);
+    this.result = result;
+    this.hspEValue = hspEValue;
     final int countGap = queryLength - hspAlignLen;
 
     this.prcIdentity = (int) ((double) hspIdentity / this.queryLength * 100);
@@ -188,20 +180,26 @@ class BlastResultHit {
   /**
    * Public constructor. Object contains all information for one blast response
    * to a query.
-   * @param hit first hit retrieved by blast
+   * @param hitNum hit number
+   * @param result result string
+   * @param hspEValue HSP e-value
+   * @param hspIdentity HSP identity
+   * @param hspAlignLen HSP alignment length
    * @param countHits number hits retrieved by blast
    * @param queryLength number base in sequence query
    * @param sequence query blast
    * @param htmlTypeOutput true if output in html type, otherwise in text type
    */
-  public BlastResultHit(final Element hit, final int countHits,
-      final int queryLength, final String sequence,
+  public BlastResultHit(final int hitNum, final String result,
+      final String hspEValue, final int hspIdentity, final int hspAlignLen,
+      final int countHits, final int queryLength, final String sequence,
       final boolean htmlTypeOutput) {
 
     this.sequence = sequence;
     this.htmlTypeOutput = htmlTypeOutput;
 
-    addHitData(hit, countHits, queryLength);
+    addHitData(hitNum, result, hspEValue, hspIdentity, hspAlignLen, countHits,
+        queryLength);
   }
 
 }
