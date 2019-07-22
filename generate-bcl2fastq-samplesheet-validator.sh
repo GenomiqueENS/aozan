@@ -743,7 +743,13 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
     <!-- be added before this line.                -->
     <!--                                           -->
     <script language="javascript">
-      document.domain = "idunn.ens.fr";
+      document.domain = "outils.genomique.biologie.ens.fr";
+
+      var loc = window.location.href+'';
+      if (loc.indexOf('http://')==0){
+          window.location.href = loc.replace('http://','https://');
+      }
+
     </script>
     <script type="text/javascript" language="javascript" src="samplesheetvalidator/samplesheetvalidator.nocache.js"></script>
   </head>
@@ -768,8 +774,8 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
 
 
     <div class="header">
-      <a href="https://www.genomique.biologie.ens.fr" ><img src="http://tools.genomique.biologie.ens.fr/aozan/images/logo_genomicpariscentre-90pxh.png" alt="logo genomic paris centre" align="left"/></a>
-      <a href="http://www.tools.genomique.biologie.ens.fr/aozan/" ><img src="http://tools.genomique.biologie.ens.fr/aozan/images/aozan_qc_logo.png" alt="logo aozan" align="right" height="70px" style="padding-top:10px;"/></a>
+      <a href="https://www.genomique.biologie.ens.fr" ><img src="https://outils.genomique.biologie.ens.fr/aozan/images/logo_genomicpariscentre-90pxh.png" alt="logo genomic paris centre" align="left"/></a>
+      <a href="http://outils.genomique.biologie.ens.fr/aozan/" ><img src="http://outils.genomique.biologie.ens.fr/aozan/images/aozan_qc_logo.png" alt="logo aozan" align="right" height="70px" style="padding-top:10px;"/></a>
       <h1 align="center">Bcl2fastq 2 samplesheet validator</h1>
     </div>
     <div>
