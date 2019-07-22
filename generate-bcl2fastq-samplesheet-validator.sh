@@ -743,7 +743,8 @@ cat > $PROJECT_NAME/war/$PROJECT_NAME.html.tmp << EOF
     <!-- be added before this line.                -->
     <!--                                           -->
     <script language="javascript">
-      document.domain = "outils.genomique.biologie.ens.fr";
+      /*document.domain = "outils.genomique.biologie.ens.fr";*/
+      document.domain = "idunn.ens.fr";
 
       var loc = window.location.href+'';
       if (loc.indexOf('http://')==0){
