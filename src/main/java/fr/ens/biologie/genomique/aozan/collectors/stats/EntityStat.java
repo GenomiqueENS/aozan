@@ -116,7 +116,7 @@ public class EntityStat {
     this.data.put(prefix + ".lanes", Joiner.on(",").join(this.lanes));
 
     this.data.put(prefix + ".genomes.ref",
-        (this.genomes.isEmpty() ? "NA" : Joiner.on(",").join(getGenomes())));
+        (this.genomes.isEmpty() ? "NA" : String.join(",", getGenomes())));
 
     this.data.put(prefix + ".samples.count", samples.size());
     this.data.put(prefix + ".isindexed", isIndexed);
