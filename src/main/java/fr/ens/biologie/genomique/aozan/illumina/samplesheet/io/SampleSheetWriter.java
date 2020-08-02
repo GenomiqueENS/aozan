@@ -32,7 +32,7 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
  * @since 1.1
  * @author Laurent Jourdren
  */
-public interface SampleSheetWriter {
+public interface SampleSheetWriter extends AutoCloseable {
 
   /**
    * Write a samplesheet.

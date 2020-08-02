@@ -362,6 +362,11 @@ public class SampleSheetUtils {
 
         return parser.getSampleSheet();
       }
+
+      @Override
+      public void close() throws IOException {
+      }
+
     }.read();
   }
 
@@ -399,6 +404,11 @@ public class SampleSheetUtils {
 
         return parser.getSampleSheet();
       }
+
+      @Override
+      public void close() throws IOException {
+      }
+
     }.read();
   }
 

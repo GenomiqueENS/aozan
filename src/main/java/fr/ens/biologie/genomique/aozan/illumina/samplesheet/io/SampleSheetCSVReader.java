@@ -32,6 +32,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
@@ -41,7 +43,7 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
  * @since 2.0
  * @author Laurent Jourdren
  */
-public class SampleSheetCSVReader implements SampleSheetReader {
+public class SampleSheetCSVReader implements SampleSheetReader, AutoCloseable {
 
   /* Default Charset. */
   private static final Charset CHARSET = StandardCharsets.UTF_8;
@@ -94,7 +96,7 @@ public class SampleSheetCSVReader implements SampleSheetReader {
       }
     }
 
-    this.reader.close();
+    close();
 
     return parser.getSampleSheet();
   }
@@ -115,6 +117,12 @@ public class SampleSheetCSVReader implements SampleSheetReader {
   public int getVersion() {
 
     return this.version;
+  }
+
+  @Override
+  public void close() throws IOException {
+
+    this.reader.close();
   }
 
   //
@@ -151,6 +159,16 @@ public class SampleSheetCSVReader implements SampleSheetReader {
     }
 
     this.reader = new BufferedReader(new FileReader(file));
+  }
+
+  /**
+   * Public constructor
+   * @param path File to use
+   * @throws IOException if the file does not exists
+   */
+  public SampleSheetCSVReader(final Path path) throws IOException {
+
+    this.reader = Files.newBufferedReader(path);
   }
 
   /**

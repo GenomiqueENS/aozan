@@ -28,6 +28,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -49,7 +51,7 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
  * @since 0.1
  * @author Laurent Jourdren
  */
-public class SampleSheetXLSReader implements SampleSheetReader {
+public class SampleSheetXLSReader implements SampleSheetReader, AutoCloseable {
 
   private final InputStream is;
   private int version = -1;
@@ -115,9 +117,14 @@ public class SampleSheetXLSReader implements SampleSheetReader {
     }
 
     wb.close();
-    this.is.close();
+    close();
 
     return parser.getSampleSheet();
+  }
+
+  @Override
+  public void close() throws IOException {
+    this.is.close();
   }
 
   /**
@@ -209,6 +216,24 @@ public class SampleSheetXLSReader implements SampleSheetReader {
     }
 
     this.is = new FileInputStream(file);
+  }
+
+  /**
+   * Public constructor.
+   * @param path File to use
+   * @throws IOException if an error occurs while openning the file
+   */
+  public SampleSheetXLSReader(final Path file) throws IOException {
+
+    if (file == null) {
+      throw new NullPointerException("File is null");
+    }
+
+    if (!Files.isRegularFile(file)) {
+      throw new FileNotFoundException("File not found: " + file);
+    }
+
+    this.is = Files.newInputStream(file);
   }
 
   /**

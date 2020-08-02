@@ -39,7 +39,7 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
  * @since 2.0
  * @author Laurent Jourdren
  */
-public class SampleSheetCSVWriter implements SampleSheetWriter {
+public class SampleSheetCSVWriter implements SampleSheetWriter, AutoCloseable {
 
   private final Writer writer;
   private int version = 2;
@@ -66,8 +66,6 @@ public class SampleSheetCSVWriter implements SampleSheetWriter {
     }
 
     this.writer.write(text);
-
-    this.writer.close();
   }
 
   /**
@@ -86,6 +84,11 @@ public class SampleSheetCSVWriter implements SampleSheetWriter {
   public int getVersion() {
 
     return this.version;
+  }
+
+  @Override
+  public void close() throws IOException {
+    this.writer.close();
   }
 
   //
@@ -132,5 +135,7 @@ public class SampleSheetCSVWriter implements SampleSheetWriter {
 
     this.writer = new FileWriter(outputFilename);
   }
+
+
 
 }

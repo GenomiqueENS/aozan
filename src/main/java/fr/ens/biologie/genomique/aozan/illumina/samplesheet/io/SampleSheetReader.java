@@ -32,7 +32,7 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
  * @since 1.1
  * @author Laurent Jourdren
  */
-public interface SampleSheetReader {
+public interface SampleSheetReader extends AutoCloseable {
 
   /**
    * Read a samplesheet.
@@ -40,4 +40,7 @@ public interface SampleSheetReader {
    * @throws IOException if an error occurs while reading the samplesheet
    */
   SampleSheet read() throws IOException;
+
+  @Override
+  void close() throws IOException;
 }
