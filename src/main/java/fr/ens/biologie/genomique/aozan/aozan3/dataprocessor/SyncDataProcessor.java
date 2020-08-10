@@ -14,7 +14,6 @@ import fr.ens.biologie.genomique.aozan.aozan3.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataLocation;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
-import fr.ens.biologie.genomique.aozan.aozan3.DummyAzoanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.EmailMessage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
@@ -27,16 +26,51 @@ import fr.ens.biologie.genomique.aozan.aozan3.RunId;
  */
 public abstract class SyncDataProcessor implements DataProcessor {
 
-  private final DataStorage outputStorage;
-  private final String dataDescription;
-  private final boolean partialSync;
-  private final AozanLogger logger;
+  private DataStorage outputStorage;
+  private String dataDescription;
+  private boolean partialSync;
+  private AozanLogger logger;
+  private boolean initialized;
+
+  @Override
+  public void init(final Configuration conf, final AozanLogger logger)
+      throws Aozan3Exception {
+
+    requireNonNull(conf);
+
+    // Set logger
+    if (logger != null) {
+      this.logger = logger;
+    }
+
+    final DataStorage outputStorage =
+        DataStorage.deSerializeFromJson(conf.get("output.storage"));
+
+    // Check if directory is writable
+    if (!outputStorage.isWritable()) {
+      throw new Aozan3Exception(
+          "The output synchronization directory is not writable: "
+              + outputStorage);
+    }
+
+    this.outputStorage = outputStorage;
+    this.partialSync = conf.getBoolean("partial.sync", false);
+    this.dataDescription = conf.get("data.description", "no description");
+
+    this.initialized = true;
+  }
 
   @Override
   public ProcessResult process(final RunData inputRunData,
       RunConfiguration runConf) throws Aozan3Exception {
 
     requireNonNull(inputRunData);
+
+    // Check if object has been initialized
+    if (!this.initialized) {
+      throw new IllegalStateException();
+    }
+
     RunId runId = inputRunData.getRunId();
 
     try {
@@ -140,32 +174,5 @@ public abstract class SyncDataProcessor implements DataProcessor {
 
   protected abstract void partialSync(Path inputPath, Path outputPath)
       throws IOException;
-
-  //
-  // Constructor
-  //
-
-  public SyncDataProcessor(final Configuration conf, final AozanLogger logger)
-      throws IOException {
-
-    requireNonNull(conf);
-
-    // Set logger
-    this.logger = logger == null ? new DummyAzoanLogger() : logger;
-
-    final DataStorage outputStorage =
-        DataStorage.deSerializeFromJson(conf.get("output.storage"));
-
-    // Check if directory is writable
-    if (!outputStorage.isWritable()) {
-      throw new IOException(
-          "The output synchronization directory is not writable: "
-              + outputStorage);
-    }
-
-    this.outputStorage = outputStorage;
-    this.partialSync = conf.getBoolean("partial.sync", false);
-    this.dataDescription = conf.get("data.description", "no description");
-  }
 
 }

@@ -48,15 +48,50 @@ public class IlluminaDemuxDataProcessor implements DataProcessor {
 
   private static final int DEFAULT_MISMATCHES = 0;
 
-  private final AozanLogger logger;
+  private AozanLogger logger = new DummyAzoanLogger();
 
-  private final DataStorage outputStorage;
-  private final String dataDescription;
+  private DataStorage outputStorage;
+  private String dataDescription;
   private final RunConfiguration conf = new RunConfiguration();
+  private boolean initialized;
 
   @Override
   public String getName() {
     return PROCESSOR_NAME;
+  }
+
+  @Override
+  public void init(final Configuration conf, final AozanLogger logger)
+      throws Aozan3Exception {
+
+    requireNonNull(conf);
+
+    // Set logger
+    if (logger != null) {
+      this.logger = logger;
+    }
+
+    final DataStorage outputStorage =
+        DataStorage.deSerializeFromJson(conf.get("output.storage"));
+
+    // Check if directory is writable
+    if (!outputStorage.isWritable()) {
+      throw new Aozan3Exception(
+          "The output synchronization directory is not writable: "
+              + outputStorage);
+    }
+
+    this.outputStorage = outputStorage;
+    this.dataDescription = conf.get("data.description", "no description");
+
+    // Default configuration
+    this.conf.set(conf);
+    this.conf.setIfNotExists("bcl2fastq.use.docker", USE_DOCKER);
+    this.conf.setIfNotExists("bcl2fastq.docker.image", DEFAULT_DOCKER_IMAGE);
+    this.conf.setIfNotExists("bcl2fastq.path", "/usr/local/bin/bcl2fastq");
+    this.conf.setIfNotExists("tmp.dir", System.getProperty("java.io.tmpdir"));
+
+    this.initialized = true;
   }
 
   @Override
@@ -65,6 +100,11 @@ public class IlluminaDemuxDataProcessor implements DataProcessor {
 
     requireNonNull(inputRunData);
     requireNonNull(runConf);
+
+    // Check if object has been initialized
+    if (!this.initialized) {
+      throw new IllegalStateException();
+    }
 
     RunId runId = inputRunData.getRunId();
 
@@ -156,11 +196,14 @@ public class IlluminaDemuxDataProcessor implements DataProcessor {
           sizeToHumanReadable(outputFreeSize));
 
       // Create success message
-      EmailMessage email = new EmailMessage("Ending demultiplexing for run "
-          + runId.getId() + " on " + inputRunData.getSource(), emailContent);
+      EmailMessage email = new EmailMessage(
+          "Ending demultiplexing for run "
+              + runId.getId() + " on " + inputRunData.getSource(),
+          emailContent);
 
       return new SimpleProcessResult(
-          inputRunData.newLocation(outputLocation).newType(Type.PROCESSED), email);
+          inputRunData.newLocation(outputLocation).newType(Type.PROCESSED),
+          email);
 
     } catch (IOException e) {
       throw new Aozan3Exception(runId, e);
@@ -394,39 +437,6 @@ public class IlluminaDemuxDataProcessor implements DataProcessor {
       throw new IOException(e);
     }
     return outputFile.toPath();
-  }
-
-  //
-  // Constructor
-  //
-
-  public IlluminaDemuxDataProcessor(final Configuration conf,
-      final AozanLogger logger) throws IOException {
-
-    requireNonNull(conf);
-
-    // Set logger
-    this.logger = logger == null ? new DummyAzoanLogger() : logger;
-
-    final DataStorage outputStorage =
-        DataStorage.deSerializeFromJson(conf.get("output.storage"));
-
-    // Check if directory is writable
-    if (!outputStorage.isWritable()) {
-      throw new IOException(
-          "The output synchronization directory is not writable: "
-              + outputStorage);
-    }
-
-    this.outputStorage = outputStorage;
-    this.dataDescription = conf.get("data.description", "no description");
-
-    // Default configuration
-    this.conf.set(conf);
-    this.conf.setIfNotExists("bcl2fastq.use.docker", USE_DOCKER);
-    this.conf.setIfNotExists("bcl2fastq.docker.image", DEFAULT_DOCKER_IMAGE);
-    this.conf.setIfNotExists("bcl2fastq.path", "/usr/local/bin/bcl2fastq");
-    this.conf.setIfNotExists("tmp.dir", System.getProperty("java.io.tmpdir"));
   }
 
 }

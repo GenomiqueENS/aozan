@@ -5,8 +5,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 
-import fr.ens.biologie.genomique.aozan.aozan3.AozanLogger;
-import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.util.RSync;
 
 /**
@@ -35,16 +33,6 @@ public class IlluminaSyncDataProcessor extends SyncDataProcessor {
     RSync rsync =
         new RSync(inputPath, outputPath, 0, Arrays.asList("*.bin", "*.txt"));
     rsync.sync();
-  }
-
-  //
-  // Constructor
-  //
-
-  public IlluminaSyncDataProcessor(final Configuration conf,
-      final AozanLogger logger) throws IOException {
-
-    super(conf, logger);
   }
 
 }
