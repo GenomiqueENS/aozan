@@ -1,7 +1,5 @@
 package fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider;
 
-import java.io.IOException;
-
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
@@ -12,6 +10,12 @@ import fr.ens.biologie.genomique.aozan.aozan3.RunData;
  * @since 3.0
  */
 public interface RunConfigurationProvider {
+
+  /**
+   * Get the name of the run configuration provider.
+   * @return the name of the run configuration provider
+   */
+  public String getName();
 
   /**
    * Get the run configuration for a run data

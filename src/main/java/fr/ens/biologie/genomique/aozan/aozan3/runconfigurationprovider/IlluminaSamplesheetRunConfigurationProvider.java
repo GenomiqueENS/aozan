@@ -47,6 +47,8 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetXLSXRe
 public class IlluminaSamplesheetRunConfigurationProvider
     implements RunConfigurationProvider {
 
+  public static final String PROVIDER_NAME = "illumina_samplesheet";
+
   private static final String DEFAULT_SAMPLESHEET_PREFIX = "design";
   private static final String DEFAULT_SAMPLESHEET_FORMAT = "xls";
 
@@ -116,6 +118,11 @@ public class IlluminaSamplesheetRunConfigurationProvider
 
   private final SamplesheetFormat sampleSheetFormat;
   private final String samplesheetCreationCommand;
+
+  @Override
+  public String getName() {
+    return PROVIDER_NAME;
+  }
 
   @Override
   public RunConfiguration getRunConfiguration(final RunData runData)
