@@ -148,6 +148,7 @@ public class IlluminaSamplesheetRunConfigurationProvider
       loadIndexSequences(conf.getPath("index.sequences"));
     }
 
+    this.initialized = true;
   }
 
   @Override
