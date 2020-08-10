@@ -1,6 +1,8 @@
 package fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
+import fr.ens.biologie.genomique.aozan.aozan3.AozanLogger;
+import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 
@@ -16,6 +18,15 @@ public interface RunConfigurationProvider {
    * @return the name of the run configuration provider
    */
   public String getName();
+
+  /**
+   * Initialize the run configurator provider.
+   * @param conf the configuration of the run configurator provider
+   * @param logger the logger to use
+   * @throws Aozan3Exception if an error occurs while initialize the provider
+   */
+  public void init(Configuration conf, AozanLogger logger)
+      throws Aozan3Exception;
 
   /**
    * Get the run configuration for a run data

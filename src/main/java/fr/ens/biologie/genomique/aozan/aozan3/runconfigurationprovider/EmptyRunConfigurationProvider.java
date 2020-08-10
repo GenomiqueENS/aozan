@@ -1,5 +1,8 @@
 package fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider;
 
+import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
+import fr.ens.biologie.genomique.aozan.aozan3.AozanLogger;
+import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 
@@ -15,6 +18,11 @@ public class EmptyRunConfigurationProvider implements RunConfigurationProvider {
   @Override
   public String getName() {
     return PROVIDER_NAME;
+  }
+
+  @Override
+  public void init(Configuration conf, AozanLogger logger)
+      throws Aozan3Exception {
   }
 
   @Override

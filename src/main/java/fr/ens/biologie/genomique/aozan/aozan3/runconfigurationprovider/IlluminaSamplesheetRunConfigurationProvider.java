@@ -24,7 +24,6 @@ import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
-import fr.ens.biologie.genomique.aozan.aozan3.DummyAzoanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.IlluminaRunIdWrapper;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
@@ -110,14 +109,15 @@ public class IlluminaSamplesheetRunConfigurationProvider
 
   };
 
-  private final AozanLogger logger;
+  private AozanLogger logger;
 
-  private final Path samplesheetsPath;
-  private final String samplesheetPrefix;
+  private Path samplesheetsPath;
+  private String samplesheetPrefix;
   private final Map<String, String> indexSequences = new HashMap<>();
 
-  private final SamplesheetFormat sampleSheetFormat;
-  private final String samplesheetCreationCommand;
+  private SamplesheetFormat sampleSheetFormat;
+  private String samplesheetCreationCommand;
+  private boolean initialized;
 
   @Override
   public String getName() {
@@ -125,8 +125,41 @@ public class IlluminaSamplesheetRunConfigurationProvider
   }
 
   @Override
+  public void init(Configuration conf, AozanLogger logger)
+      throws Aozan3Exception {
+
+    requireNonNull(conf);
+
+    // Set logger
+    if (logger != null) {
+      this.logger = logger;
+    }
+
+    this.samplesheetsPath = conf.getPath("samplesheet.path");
+    this.sampleSheetFormat = SamplesheetFormat
+        .parse(conf.get("samplesheet.format", DEFAULT_SAMPLESHEET_FORMAT));
+    this.samplesheetPrefix =
+        conf.get("samplesheet.prefix.filename", DEFAULT_SAMPLESHEET_PREFIX);
+    this.samplesheetCreationCommand =
+        conf.get("samplesheet.generator.command", "");
+
+    // Load index sequences
+    if (conf.containsKey("index.sequences")) {
+      loadIndexSequences(conf.getPath("index.sequences"));
+    }
+
+  }
+
+  @Override
   public RunConfiguration getRunConfiguration(final RunData runData)
       throws Aozan3Exception {
+
+    requireNonNull(runData);
+
+    // Check if object has been initialized
+    if (!this.initialized) {
+      throw new IllegalStateException();
+    }
 
     RunConfiguration result = new RunConfiguration();
     RunId runId = runData.getRunId();
@@ -293,23 +326,29 @@ public class IlluminaSamplesheetRunConfigurationProvider
 
   /**
    * Load the map of the index sequences.
-   * @throws IOException if an error occurs while reading the file
+   * @throws Aozan3Exception if an error occurs while reading the file
    */
-  private void loadIndexSequences(Path indexSequenceFile) throws IOException {
+  private void loadIndexSequences(Path indexSequenceFile)
+      throws Aozan3Exception {
 
-    if (!Files.isRegularFile(indexSequenceFile)) {
-      throw new IOException(
-          "Cannot read index sequence file: " + indexSequenceFile);
-    }
+    try {
 
-    Splitter splitter = Splitter.on('=').trimResults();
-    for (String line : Files.readAllLines(indexSequenceFile)) {
-
-      List<String> fields = splitter.splitToList(line);
-      if (fields.size() == 2) {
-        this.indexSequences.put(fields.get(0), fields.get(1));
+      if (!Files.isRegularFile(indexSequenceFile)) {
+        throw new IOException(
+            "Cannot read index sequence file: " + indexSequenceFile);
       }
 
+      Splitter splitter = Splitter.on('=').trimResults();
+      for (String line : Files.readAllLines(indexSequenceFile)) {
+
+        List<String> fields = splitter.splitToList(line);
+        if (fields.size() == 2) {
+          this.indexSequences.put(fields.get(0), fields.get(1));
+        }
+
+      }
+    } catch (IOException e) {
+      throw new Aozan3Exception(e);
     }
 
   }
@@ -343,38 +382,6 @@ public class IlluminaSamplesheetRunConfigurationProvider
     } catch (AozanException e) {
       throw new Aozan3Exception(e);
     }
-  }
-
-  //
-  // Constructor
-  //
-
-  /**
-   * Constructor.
-   * @param conf configuration of the provider
-   * @param logger the logger to use
-   * @throws IOException if an error occurs while creating the object
-   */
-  public IlluminaSamplesheetRunConfigurationProvider(final Configuration conf,
-      final AozanLogger logger) throws IOException {
-
-    Objects.requireNonNull(conf);
-
-    this.logger = logger == null ? new DummyAzoanLogger() : logger;
-
-    this.samplesheetsPath = conf.getPath("samplesheet.path");
-    this.sampleSheetFormat = SamplesheetFormat
-        .parse(conf.get("samplesheet.format", DEFAULT_SAMPLESHEET_FORMAT));
-    this.samplesheetPrefix =
-        conf.get("samplesheet.prefix.filename", DEFAULT_SAMPLESHEET_PREFIX);
-    this.samplesheetCreationCommand =
-        conf.get("samplesheet.generator.command", "");
-
-    // Load index sequences
-    if (conf.containsKey("index.sequences")) {
-      loadIndexSequences(conf.getPath("index.sequences"));
-    }
-
   }
 
 }
