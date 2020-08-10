@@ -14,7 +14,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.util.RSync;
  * @author Laurent Jourdren
  * @since 3.0
  */
-public class IlluminaSyncDataProvider extends SyncDataProcessor {
+public class IlluminaSyncDataProcessor extends SyncDataProcessor {
 
   public static final String PROCESSOR_NAME = "illumina_sync";
 
@@ -41,7 +41,7 @@ public class IlluminaSyncDataProvider extends SyncDataProcessor {
   // Constructor
   //
 
-  public IlluminaSyncDataProvider(final Configuration conf,
+  public IlluminaSyncDataProcessor(final Configuration conf,
       final AozanLogger logger) throws IOException {
 
     super(conf, logger);
