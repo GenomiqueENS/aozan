@@ -16,6 +16,13 @@ import fr.ens.biologie.genomique.aozan.aozan3.util.RSync;
  */
 public class IlluminaSyncDataProvider extends SyncDataProcessor {
 
+  public static final String PROCESSOR_NAME = "illumina_sync";
+
+  @Override
+  public String getName() {
+    return PROCESSOR_NAME;
+  }
+
   protected void sync(Path inputPath, Path outputPath) throws IOException {
 
     RSync rsync =

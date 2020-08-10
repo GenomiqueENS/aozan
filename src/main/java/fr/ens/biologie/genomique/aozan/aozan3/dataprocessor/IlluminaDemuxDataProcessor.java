@@ -39,6 +39,8 @@ import fr.ens.biologie.genomique.eoulsan.util.process.SystemSimpleProcess;
  */
 public class IlluminaDemuxDataProcessor implements DataProcessor {
 
+  public static final String PROCESSOR_NAME = "illumina_demux";
+
   private static final boolean USE_DOCKER = true;
   private static final String DEFAULT_BCL2FASTQ_VERSION = "2.18.0.12";
   private static final String DEFAULT_DOCKER_IMAGE =
@@ -51,6 +53,11 @@ public class IlluminaDemuxDataProcessor implements DataProcessor {
   private final DataStorage outputStorage;
   private final String dataDescription;
   private final RunConfiguration conf = new RunConfiguration();
+
+  @Override
+  public String getName() {
+    return PROCESSOR_NAME;
+  }
 
   @Override
   public ProcessResult process(final RunData inputRunData,

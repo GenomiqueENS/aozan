@@ -31,6 +31,12 @@ public interface DataProcessor {
   }
 
   /**
+   * Get the name of the processor.
+   * @return the name of the processor
+   */
+  public String getName();
+
+  /**
    * Process data.
    * @param inputRunData input run data
    * @param conf run configuration
