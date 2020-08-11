@@ -95,7 +95,7 @@ public class EmailMessage {
     Objects.requireNonNull(subject);
     Objects.requireNonNull(content);
 
-    this.noMessage = true;
+    this.noMessage = false;
     this.id = id;
     this.subject = subject;
     this.content = content;
