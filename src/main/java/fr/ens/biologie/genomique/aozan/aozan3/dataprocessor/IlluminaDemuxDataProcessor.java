@@ -66,6 +66,11 @@ public class IlluminaDemuxDataProcessor implements DataProcessor {
 
     requireNonNull(conf);
 
+    // Check if object has not been already initialized
+    if (this.initialized) {
+      throw new IllegalStateException();
+    }
+
     // Set logger
     if (logger != null) {
       this.logger = logger;
