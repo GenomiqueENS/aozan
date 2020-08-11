@@ -184,19 +184,18 @@ public class IlluminaDemuxDataProcessor implements DataProcessor {
 
       // Report URL in email message
       String reportLocationMessage = runConf.containsKey("reports.url")
-          ? String.format(
-              "\n\nRun reports can be found at following location:\n  %s",
-              runConf.get("reports.url") + '/' + runId.getId())
+          ? "\n\nRun reports can be found at following location:\n  "
+              + runConf.get("reports.url") + '/' + runId.getId()
           : "";
 
       String emailContent = String.format("Ending demultiplexing with %d"
           + " mismatch(es) for run %s.\n"
-          + "Job finished at %s \" without error in %s.\n"
+          + "Job finished at %s without error in %s.\n"
           + "FASTQ files for this run can be found in the following directory: %s\n%s"
-          + "\n\nFor this task %.2f GB has been used and %.2f GB still free.",
+          + "\nFor this task %s has been used and %s GB still free.",
           runConf.getInt("bcl2fastq.allowed.mismatches", DEFAULT_MISMATCHES),
           runId.getId(), new Date(endTime).toString(),
-          toTimeHumanReadable(endTime - startTime), outputLocation,
+          toTimeHumanReadable(endTime - startTime), outputLocation.getPath(),
           reportLocationMessage, sizeToHumanReadable(outputSize),
           sizeToHumanReadable(outputFreeSize));
 
