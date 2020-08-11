@@ -59,6 +59,11 @@ public class SequencerSource {
     return this.description;
   }
 
+  @Override
+  public String toString() {
+    return this.id;
+  }
+
   //
   // Static constructor
   //
