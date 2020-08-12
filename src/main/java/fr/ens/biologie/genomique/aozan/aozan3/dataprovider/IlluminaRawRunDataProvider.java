@@ -1,15 +1,14 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprovider;
 
-import static fr.ens.biologie.genomique.aozan.aozan3.SequencerSource.unknownSequencerSource;
-
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
+import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
+import fr.ens.biologie.genomique.aozan.aozan3.AozanLogger;
+import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.IlluminaUtils;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
@@ -24,8 +23,11 @@ import fr.ens.biologie.genomique.aozan.aozan3.util.Utils;
  */
 public class IlluminaRawRunDataProvider implements RunDataProvider {
 
-  private final DataStorage storage;
-  private final SequencerSource name;
+  public static final String PROVIDER_NAME = "illumina_bcl";
+
+  private DataStorage storage;
+  private SequencerSource name;
+  private boolean initialized;
 
   private static final class RunDirectoryFileFilter implements FileFilter {
 
@@ -67,7 +69,29 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
   }
 
   @Override
+  public String getName() {
+    return PROVIDER_NAME;
+  }
+
+  @Override
+  public void init(DataStorage storage, Configuration conf, AozanLogger logger)
+      throws Aozan3Exception {
+
+    // Check if step has not been already initialized
+    if (this.initialized) {
+      throw new IllegalStateException();
+    }
+
+    this.name = storage.getSequencerSource();
+    this.storage = storage;
+
+    this.initialized = true;
+  }
+
+  @Override
   public DataStorage getDataStorage() {
+
+    checkInitialization();
 
     return this.storage;
   }
@@ -75,11 +99,15 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
   @Override
   public boolean canProvideRunData() {
 
+    checkInitialization();
+
     return true;
   }
 
   @Override
   public List<RunData> listInProgressRunData() {
+
+    checkInitialization();
 
     return listRuns(false);
   }
@@ -87,7 +115,23 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
   @Override
   public List<RunData> listCompletedRunData() {
 
+    checkInitialization();
+
     return listRuns(true);
+  }
+
+  //
+  // Other methods
+  //
+
+  /**
+   * Check if step has been initialized.
+   */
+  private void checkInitialization() {
+
+    if (!this.initialized) {
+      throw new IllegalStateException();
+    }
   }
 
   private List<RunData> listRuns(boolean completedRuns) {
@@ -108,23 +152,4 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
     return Collections.unmodifiableList(result);
   }
 
-  //
-  // Constructor
-  //
-
-  /**
-   * Public constructor.
-   * @param source sequencer source
-   * @param storage storage used by the provider
-   * @throws IOException if an error occurs while creating the object
-   */
-  public IlluminaRawRunDataProvider(final SequencerSource source,
-      final DataStorage storage) throws IOException {
-
-    Objects.requireNonNull(source);
-    Objects.requireNonNull(storage);
-
-    this.name = source != null ? source : unknownSequencerSource();
-    this.storage = storage;
-  }
 }
