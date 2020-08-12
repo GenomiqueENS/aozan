@@ -17,7 +17,7 @@ public interface DataProcessor {
   /**
    * This interface define a process result
    */
-  public interface ProcessResult {
+  interface ProcessResult {
 
     /**
      * Get the output data.
@@ -36,7 +36,7 @@ public interface DataProcessor {
    * Get the name of the processor.
    * @return the name of the processor
    */
-  public String getName();
+  String getName();
 
   /**
    * Initialize the processor.
@@ -44,8 +44,7 @@ public interface DataProcessor {
    * @param logger the logger to use
    * @throws Aozan3Exception if an error occurs while initialize the processor
    */
-  public void init(Configuration conf, AozanLogger logger)
-      throws Aozan3Exception;
+  void init(Configuration conf, AozanLogger logger) throws Aozan3Exception;
 
   /**
    * Test if the processor accept a type of RunData.
