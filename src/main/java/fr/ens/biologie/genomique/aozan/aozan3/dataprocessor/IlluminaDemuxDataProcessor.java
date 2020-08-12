@@ -61,6 +61,12 @@ public class IlluminaDemuxDataProcessor implements DataProcessor {
   }
 
   @Override
+  public boolean accept(Type type, boolean partialData) {
+
+    return type == RunData.Type.RAW && !partialData;
+  }
+
+  @Override
   public void init(final Configuration conf, final AozanLogger logger)
       throws Aozan3Exception {
 

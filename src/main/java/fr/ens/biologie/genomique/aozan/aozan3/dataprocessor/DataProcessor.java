@@ -48,6 +48,14 @@ public interface DataProcessor {
       throws Aozan3Exception;
 
   /**
+   * Test if the processor accept a type of RunData.
+   * @param type type of run data
+   * @param partialData partial run data
+   * @return true if the process accept this type of run data
+   */
+  boolean accept(RunData.Type type, boolean partialData);
+
+  /**
    * Process data.
    * @param inputRunData input run data
    * @param conf run configuration

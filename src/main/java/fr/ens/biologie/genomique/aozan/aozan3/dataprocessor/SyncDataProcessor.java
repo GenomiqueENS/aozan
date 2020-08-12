@@ -18,6 +18,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.EmailMessage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
+import fr.ens.biologie.genomique.aozan.aozan3.RunData.Type;
 
 /**
  * This class define an Illumina synchronization data processor.
@@ -31,6 +32,12 @@ public abstract class SyncDataProcessor implements DataProcessor {
   private boolean partialSync;
   private AozanLogger logger;
   private boolean initialized;
+
+  @Override
+  public boolean accept(Type type, boolean partialData) {
+
+    return type == RunData.Type.RAW;
+  }
 
   @Override
   public void init(final Configuration conf, final AozanLogger logger)
