@@ -1,0 +1,3 @@
+fr.ens.biologie.genomique.aozan.aozan3.dataprovider.EmptyRunDataProvider
+fr.ens.biologie.genomique.aozan.aozan3.dataprovider.IlluminaRawRunDataProvider
+fr.ens.biologie.genomique.aozan.aozan3.dataprovider.IlluminaProcessedRunDataProvider
