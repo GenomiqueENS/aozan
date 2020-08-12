@@ -20,6 +20,7 @@ public class DataStorage {
 
   private final String machine;
   private final Path path;
+  private final SequencerSource source;
   private final long minimalSpace = 0;
   private final boolean writable = true;
 
@@ -43,6 +44,11 @@ public class DataStorage {
   public Path getPath() {
 
     return this.path;
+  }
+
+  public SequencerSource getSequencerSource() {
+
+    return this.source;
   }
 
   /**
@@ -197,6 +203,7 @@ public class DataStorage {
   private DataStorage() {
     this.machine = null;
     this.path = null;
+    this.source = null;
   }
 
   /**
@@ -206,7 +213,19 @@ public class DataStorage {
    */
   public DataStorage(final String machine, final String path) {
 
-    this(machine, Paths.get(path));
+    this(machine, path, null);
+  }
+
+  /**
+   * Constructor.
+   * @param machine machine of the data storage
+   * @param path path of the data storage
+   * @param source sequencer source
+   */
+  public DataStorage(final String machine, final String path,
+      final SequencerSource source) {
+
+    this(machine, Paths.get(path), source);
   }
 
   /**
@@ -216,8 +235,22 @@ public class DataStorage {
    */
   public DataStorage(final String machine, final Path path) {
 
+    this(machine, path, null);
+  }
+
+  /**
+   * Constructor.
+   * @param machine machine of the data storage
+   * @param path path of the data storage
+   * @param source sequencer source
+   */
+  public DataStorage(final String machine, final Path path,
+      final SequencerSource source) {
+
     this.machine = machine;
     this.path = path;
+    this.source =
+        source != null ? source : SequencerSource.unknownSequencerSource();
 
     // TODO Check if path exists
     // TODO Check if directory and readable
