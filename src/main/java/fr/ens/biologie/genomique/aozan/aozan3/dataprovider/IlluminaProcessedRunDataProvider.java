@@ -3,11 +3,11 @@ package fr.ens.biologie.genomique.aozan.aozan3.dataprovider;
 import java.util.List;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
-import fr.ens.biologie.genomique.aozan.aozan3.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.SequencerSource;
+import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 
 /**
  * This class define a processed data provider for Illumina runs.

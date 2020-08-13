@@ -1,8 +1,11 @@
-package fr.ens.biologie.genomique.aozan.aozan3;
+package fr.ens.biologie.genomique.aozan.aozan3.log;
 
 import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
+
+import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
+import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 
 /**
  * This class implements an Aozan Logger based on a log file

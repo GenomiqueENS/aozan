@@ -1,10 +1,14 @@
-package fr.ens.biologie.genomique.aozan.aozan3;
+package fr.ens.biologie.genomique.aozan.aozan3.log;
 
 import static java.util.Objects.requireNonNull;
 
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
+import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
+import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 
 /**
  * This class define an abstract logger for the AozanLogger implementations

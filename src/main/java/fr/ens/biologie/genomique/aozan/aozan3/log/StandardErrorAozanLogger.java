@@ -1,8 +1,11 @@
-package fr.ens.biologie.genomique.aozan.aozan3;
+package fr.ens.biologie.genomique.aozan.aozan3.log;
 
 import java.util.logging.Handler;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
+
+import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
+import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 
 /**
  * This class define implements a logger on the standard error.

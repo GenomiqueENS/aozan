@@ -1,4 +1,6 @@
-package fr.ens.biologie.genomique.aozan.aozan3;
+package fr.ens.biologie.genomique.aozan.aozan3.log;
+
+import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 
 /**
  * This class implements a dummy AozanLogger

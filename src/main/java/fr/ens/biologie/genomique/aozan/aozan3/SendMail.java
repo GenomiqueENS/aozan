@@ -15,6 +15,9 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
+import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
+
 /**
  * This class is used to send emails
  * @author Laurent Jourdren
