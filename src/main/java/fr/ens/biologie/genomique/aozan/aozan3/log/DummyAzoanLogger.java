@@ -1,5 +1,6 @@
 package fr.ens.biologie.genomique.aozan.aozan3.log;
 
+import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 
 /**
@@ -47,6 +48,26 @@ public class DummyAzoanLogger implements AozanLogger {
 
   @Override
   public void error(RunId runId, Throwable exception) {
+  }
+
+  @Override
+  public void debug(RunData runData, String message) {
+  }
+
+  @Override
+  public void info(RunData runData, String message) {
+  }
+
+  @Override
+  public void warn(RunData runData, String message) {
+  }
+
+  @Override
+  public void error(RunData runData, String message) {
+  }
+
+  @Override
+  public void error(RunData runData, Throwable exception) {
   }
 
 }

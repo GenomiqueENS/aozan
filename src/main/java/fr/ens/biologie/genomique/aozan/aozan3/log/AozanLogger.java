@@ -1,5 +1,6 @@
 package fr.ens.biologie.genomique.aozan.aozan3.log;
 
+import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 
 /**
@@ -73,4 +74,40 @@ public interface AozanLogger {
    * @param exception exception to log
    */
   void error(RunId runId, Throwable exception);
+
+  /**
+   * Log a debug message.
+   * @param RunData run data
+   * @param message message to log
+   */
+  void debug(RunData runData, String message);
+
+  /**
+   * Log an info message.
+   * @param RunData run data
+   * @param message message to log
+   */
+  void info(RunData runData, String message);
+
+  /**
+   * Log a warning message.
+   * @param RunData run data
+   * @param message message to log
+   */
+  void warn(RunData runData, String message);
+
+  /**
+   * Log an error message.
+   * @param RunData run data
+   * @param message message to log
+   */
+  void error(RunData runData, String message);
+
+  /**
+   * Log an error message.
+   * @param RunData run data
+   * @param exception exception to log
+   */
+  void error(RunData runData, Throwable exception);
+
 }

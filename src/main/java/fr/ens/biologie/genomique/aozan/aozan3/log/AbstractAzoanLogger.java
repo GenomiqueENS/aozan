@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
+import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 
 /**
@@ -77,7 +78,39 @@ public abstract class AbstractAzoanLogger implements AozanLogger {
 
   @Override
   public void error(RunId runId, Throwable exception) {
-    getLogger().severe((formatMessage(runId, exception.getMessage())));
+    getLogger().severe((formatMessage(runId,
+        exception != null ? exception.getMessage() : "UNKNOWN EXCEPTION")));
+  }
+
+  @Override
+  public void debug(RunData runData, String message) {
+    getLogger().fine(
+        formatMessage(runData != null ? runData.getRunId() : null, message));
+  }
+
+  @Override
+  public void info(RunData runData, String message) {
+    getLogger().info(
+        formatMessage(runData != null ? runData.getRunId() : null, message));
+  }
+
+  @Override
+  public void warn(RunData runData, String message) {
+    getLogger().warning(
+        formatMessage(runData != null ? runData.getRunId() : null, message));
+  }
+
+  @Override
+  public void error(RunData runData, String message) {
+    getLogger().severe(
+        formatMessage(runData != null ? runData.getRunId() : null, message));
+  }
+
+  @Override
+  public void error(RunData runData, Throwable exception) {
+    getLogger()
+        .severe(formatMessage(runData != null ? runData.getRunId() : null,
+            exception != null ? exception.getMessage() : "UNKNOWN EXCEPTION"));
   }
 
   //
