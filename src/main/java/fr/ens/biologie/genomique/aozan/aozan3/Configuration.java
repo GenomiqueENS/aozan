@@ -18,7 +18,7 @@ public class Configuration {
   private final Map<String, String> conf = new HashMap<>();
 
   //
-  // Getter
+  // Getters
   //
 
   /**
@@ -155,7 +155,7 @@ public class Configuration {
   }
 
   //
-  // Setter
+  // Setters
   //
 
   /**
@@ -249,6 +249,15 @@ public class Configuration {
   //
   // Other
   //
+
+  /**
+   * Convert the configuration as a Map.
+   * @return a copy of the configuration object in a map
+   */
+  public Map<String, String> toMap() {
+
+    return new HashMap<String, String>(this.conf);
+  }
 
   @Override
   public String toString() {
