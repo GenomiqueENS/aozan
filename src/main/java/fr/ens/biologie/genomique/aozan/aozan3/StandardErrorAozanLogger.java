@@ -1,69 +1,33 @@
 package fr.ens.biologie.genomique.aozan.aozan3;
 
-import java.util.Date;
+import java.util.logging.Handler;
+import java.util.logging.SimpleFormatter;
+import java.util.logging.StreamHandler;
 
 /**
  * This class define implements a logger on the standard error.
  * @author Laurent Jourdren
  * @since 3.0
  */
-public class StandardErrorAozanLogger implements AozanLogger {
+public class StandardErrorAozanLogger extends AbstractAzoanLogger {
 
   @Override
-  public void debug(String message) {
-    System.err.println(new Date() + ", DEBUG: " + message);
+  protected Handler createHandler(Configuration conf) throws Aozan3Exception {
+
+    return new StreamHandler(System.err, new SimpleFormatter());
   }
 
-  @Override
-  public void info(String message) {
-    System.err.println(new Date() + ", INFO: " + message);
-  }
+  //
+  // Constructor
+  //
 
-  @Override
-  public void warn(String message) {
-    System.err.println(new Date() + ", WARN: " + message);
-  }
-
-  @Override
-  public void error(String message) {
-    System.err.println(new Date() + ", ERROR: " + message);
-  }
-
-  @Override
-  public void error(Throwable exception) {
-    System.err.println(new Date() + ", ERROR: " + exception.getMessage());
-  }
-
-  @Override
-  public void debug(RunId runId, String message) {
-    System.err
-        .println(new Date() + ", [Run " + runId + "] , DEBUG: " + message);
-  }
-
-  @Override
-  public void info(RunId runId, String message) {
-    System.err.println(new Date() + ", [Run " + runId + "] , INFO: " + message);
-
-  }
-
-  @Override
-  public void warn(RunId runId, String message) {
-    System.err.println(new Date() + ", [Run " + runId + "] , WARN: " + message);
-
-  }
-
-  @Override
-  public void error(RunId runId, String message) {
-    System.err
-        .println(new Date() + ", [Run " + runId + "] , ERROR: " + message);
-
-  }
-
-  @Override
-  public void error(RunId runId, Throwable exception) {
-    System.err.println(new Date()
-        + ", [Run " + runId + "] , ERROR: " + exception.getMessage());
-
+  /**
+   * Constructor.
+   * @param conf configuration
+   * @throws Aozan3Exception if an error occurs while creating the logger
+   */
+  public StandardErrorAozanLogger(Configuration conf) throws Aozan3Exception {
+    super(conf);
   }
 
 }
