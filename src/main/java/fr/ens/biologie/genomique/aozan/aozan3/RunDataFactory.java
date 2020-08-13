@@ -1,7 +1,5 @@
 package fr.ens.biologie.genomique.aozan.aozan3;
 
-import static fr.ens.biologie.genomique.aozan.aozan3.SequencingTechnology.ILLUMINA;
-
 import java.nio.file.Path;
 
 import fr.ens.biologie.genomique.aozan.aozan3.util.Utils;
@@ -23,9 +21,9 @@ public class RunDataFactory {
   public static RunData newRawIlluminaRunData(final DataStorage storage,
       final Path path, final SequencerSource source) {
 
-    RunId runId = new RunId(path.getFileName().toString(), ILLUMINA);
+    RunId runId = new RunId(path.getFileName().toString());
 
-    return new RunData(runId, source, RunData.Type.RAW, false,
+    return new RunData(runId, source, DataType.BCL,
         new DataLocation(storage, path));
   }
 
@@ -39,10 +37,10 @@ public class RunDataFactory {
   public static RunData newPartialRawIlluminaRunData(final DataStorage storage,
       final Path path, final SequencerSource source) {
 
-    RunId runId = new RunId(
-        Utils.removeTmpExtension(path.getFileName().toString()), ILLUMINA);
+    RunId runId =
+        new RunId(Utils.removeTmpExtension(path.getFileName().toString()));
 
-    return new RunData(runId, source, RunData.Type.RAW, true,
+    return new RunData(runId, source, DataType.PARTIAL_BCL,
         new DataLocation(storage, path));
   }
 

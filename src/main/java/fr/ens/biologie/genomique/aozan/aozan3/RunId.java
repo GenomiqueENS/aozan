@@ -10,15 +10,15 @@ import static java.util.Objects.requireNonNull;
 public class RunId {
 
   private final String id;
-  private final SequencingTechnology sequencingTechnology;
+  private final String originalId;
 
   //
   // Getter
   //
 
   /**
-   * Get the id of the sequencer
-   * @return
+   * Get the id of the run.
+   * @return the id of the run
    */
   public String getId() {
 
@@ -26,12 +26,12 @@ public class RunId {
   }
 
   /**
-   * Get the sequencing technology
-   * @return the sequencing technology
+   * Get the id of the run.
+   * @return the id of the run
    */
-  public SequencingTechnology getSequencingTechnology() {
+  public String getOriginalRunId() {
 
-    return this.sequencingTechnology;
+    return this.originalId;
   }
 
   //
@@ -40,8 +40,7 @@ public class RunId {
 
   @Override
   public String toString() {
-    return "RunId [id="
-        + id + ", sequencingTechnology=" + sequencingTechnology + "]";
+    return "RunId [id=" + this.id + ", originalId=" + this.originalId + "]";
   }
 
   //
@@ -53,25 +52,38 @@ public class RunId {
    */
   protected RunId() {
     this.id = null;
-    this.sequencingTechnology = null;
+    this.originalId = null;
   }
 
   /**
    * Public constructor.
    * @param id the identifier of the run
-   * @param sequencingTechnology the sequencing technology
    */
-  public RunId(String id, SequencingTechnology sequencingTechnology) {
+  public RunId(String id) {
+
+    this(id, id);
+  }
+
+  /**
+   * Public constructor.
+   * @param id the identifier of the run
+   * @param originalId original run identifier
+   */
+  public RunId(String id, String originalId) {
 
     requireNonNull(id);
-    requireNonNull(sequencingTechnology);
+    requireNonNull(originalId);
 
     if (id.trim().isEmpty()) {
       throw new IllegalArgumentException("Run id cannot be empty");
     }
 
+    if (originalId.trim().isEmpty()) {
+      throw new IllegalArgumentException("Original run id cannot be empty");
+    }
+
     this.id = id;
-    this.sequencingTechnology = sequencingTechnology;
+    this.originalId = originalId;
   }
 
 }

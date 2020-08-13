@@ -13,11 +13,12 @@ import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataLocation;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
+import fr.ens.biologie.genomique.aozan.aozan3.DataType;
+import fr.ens.biologie.genomique.aozan.aozan3.DataType.Category;
 import fr.ens.biologie.genomique.aozan.aozan3.EmailMessage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
-import fr.ens.biologie.genomique.aozan.aozan3.RunData.Type;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 
 /**
@@ -34,9 +35,13 @@ public abstract class SyncDataProcessor implements DataProcessor {
   private boolean initialized;
 
   @Override
-  public boolean accept(Type type, boolean partialData) {
+  public boolean accept(DataType type) {
 
-    return type == RunData.Type.RAW;
+    if (type == null) {
+      return false;
+    }
+
+    return type.getCategory() == Category.RAW;
   }
 
   @Override
@@ -172,7 +177,7 @@ public abstract class SyncDataProcessor implements DataProcessor {
           emailContent);
 
       return new SimpleProcessResult(
-          inputRunData.newLocation(outputLocation).newPartialData(false),
+          inputRunData.newLocation(outputLocation).setPartialData(false),
           email);
 
     } catch (IOException e) {

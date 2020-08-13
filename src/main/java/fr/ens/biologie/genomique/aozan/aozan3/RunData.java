@@ -3,6 +3,9 @@ package fr.ens.biologie.genomique.aozan.aozan3;
 import static fr.ens.biologie.genomique.aozan.aozan3.SequencerSource.unknownSequencerSource;
 import static java.util.Objects.requireNonNull;
 
+import fr.ens.biologie.genomique.aozan.aozan3.DataType.Category;
+import fr.ens.biologie.genomique.aozan.aozan3.DataType.SequencingTechnology;
+
 /**
  * This class define a run data.
  * @author Laurent Jourdren
@@ -10,17 +13,9 @@ import static java.util.Objects.requireNonNull;
  */
 public class RunData {
 
-  /**
-   * Run data type.
-   */
-  public enum Type {
-    RAW, LOG, PROCESSED, PROCESSED_LOG, QC
-  }
-
   private final RunId runId;
   private final SequencerSource source;
-  private final Type type;
-  private final boolean partialData;
+  private final DataType type;
 
   private final DataLocation location;
 
@@ -47,19 +42,10 @@ public class RunData {
   }
 
   /**
-   * Get the sequencing technology used for the data.
-   * @return the sequencing technology
-   */
-  public SequencingTechnology getSequencingTechnology() {
-
-    return this.runId.getSequencingTechnology();
-  }
-
-  /**
    * Get the type of the data.
    * @return the type of the data
    */
-  public Type getType() {
+  public DataType getType() {
 
     return this.type;
   }
@@ -73,15 +59,6 @@ public class RunData {
     return this.location;
   }
 
-  /**
-   * Test if the run data is partial.
-   * @return true if the run is partial
-   */
-  public boolean isPartialData() {
-
-    return this.partialData;
-  }
-
   //
   // Object methods
   //
@@ -89,8 +66,7 @@ public class RunData {
   @Override
   public String toString() {
     return "RunData [runId="
-        + runId + ", type=" + type + ", partialData=" + partialData
-        + ", location=" + location + "]";
+        + runId + ", type=" + type + ", location=" + location + "]";
   }
 
   //
@@ -105,8 +81,7 @@ public class RunData {
   public RunData newLocation(final DataLocation location) {
 
     requireNonNull(location);
-    return new RunData(this.runId, this.source, this.type, this.partialData,
-        location);
+    return new RunData(this.runId, this.source, this.type, location);
   }
 
   /**
@@ -114,31 +89,67 @@ public class RunData {
    * @param type the new type
    * @return a new RunData object
    */
-  public RunData newType(final Type type) {
+  public RunData newType(final DataType type) {
 
     requireNonNull(type);
-    return new RunData(this.runId, this.source, type, this.partialData,
-        this.location);
+    return new RunData(this.runId, this.source, type, this.location);
+  }
+
+  //
+  // Convinient methods for updating DataType
+  //
+
+  /**
+   * Create a new RunType object from the current object with a new type.
+   * @param type the new type
+   * @return a new RunType object
+   */
+  public RunData newCategory(final Category category) {
+
+    return newType(this.type.newCategory(category));
   }
 
   /**
-   * Create a new RunData object from the current object with a new partial data
-   * setting.
-   * @param location the new location
-   * @return a new RunData object
+   * Create a new RunType object from the current object with a new type.
+   * @param type the new type
+   * @return a new RunType object
    */
-  public RunData newPartialData(final boolean partialData) {
+  public RunData newTechnology(final SequencingTechnology technology) {
 
-    return new RunData(this.runId, this.source, type, partialData,
-        this.location);
+    return newType(this.type.newTechnology(technology));
   }
 
-  //
-  // New methods
-  // TODO Create a dedicated factory for this methods
-  //
+  /**
+   * Create a new RunType object from the current object with a new type.
+   * @param type the new type
+   * @return a new RunType object
+   */
+  public RunData newType(final String type) {
 
-  
+    return newType(this.type.newType(type));
+  }
+
+  /**
+   * Create a new RunType object from the current object with a new partial data
+   * setting.
+   * @param partialData the new partial data value
+   * @return a new RunType object
+   */
+  public RunData setPartialData(final boolean partialData) {
+
+    return newType(this.type.setPartialData(partialData));
+  }
+
+  /**
+   * Create a new RunType object from the current object with a new log only
+   * setting.
+   * @param logOnly the new log only value
+   * @return a new RunType object
+   */
+  public RunData setLogOnly(final boolean logOnly) {
+
+    return newType(this.type.setLogOnly(logOnly));
+  }
 
   //
   // Constructor
@@ -151,7 +162,6 @@ public class RunData {
     this.runId = null;
     this.source = null;
     this.type = null;
-    this.partialData = false;
     this.location = null;
   }
 
@@ -163,8 +173,8 @@ public class RunData {
    * @param partialData partial data
    * @param location location of the data
    */
-  RunData(final RunId runId, final SequencerSource source, final Type type,
-      final boolean partialData, final DataLocation location) {
+  RunData(final RunId runId, final SequencerSource source, final DataType type,
+      final DataLocation location) {
 
     requireNonNull(runId);
     requireNonNull(type);
@@ -173,7 +183,6 @@ public class RunData {
     this.runId = runId;
     this.source = source != null ? source : unknownSequencerSource();
     this.type = type;
-    this.partialData = partialData;
     this.location = location;
   }
 

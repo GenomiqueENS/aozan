@@ -23,11 +23,11 @@ import com.google.common.base.Splitter;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
+import fr.ens.biologie.genomique.aozan.aozan3.DataType.SequencingTechnology;
 import fr.ens.biologie.genomique.aozan.aozan3.IlluminaRunIdWrapper;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
-import fr.ens.biologie.genomique.aozan.aozan3.SequencingTechnology;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.illumina.RunInfo;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
@@ -171,9 +171,9 @@ public class IlluminaSamplesheetRunConfigurationProvider
     RunId runId = runData.getRunId();
 
     if (!SequencingTechnology.ILLUMINA
-        .equals(runId.getSequencingTechnology())) {
+        .equals(runData.getType().getSequencingTechnology())) {
       throw new IllegalArgumentException(
-          "Excepting an Illumina run id: " + runId);
+          "Excepting an Illumina run data: " + runId);
     }
 
     // Get run information

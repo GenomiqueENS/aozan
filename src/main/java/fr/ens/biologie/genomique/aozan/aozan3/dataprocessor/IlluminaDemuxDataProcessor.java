@@ -17,10 +17,11 @@ import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataLocation;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
+import fr.ens.biologie.genomique.aozan.aozan3.DataType;
+import fr.ens.biologie.genomique.aozan.aozan3.DataType.Category;
 import fr.ens.biologie.genomique.aozan.aozan3.EmailMessage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
-import fr.ens.biologie.genomique.aozan.aozan3.RunData.Type;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
@@ -61,9 +62,13 @@ public class IlluminaDemuxDataProcessor implements DataProcessor {
   }
 
   @Override
-  public boolean accept(Type type, boolean partialData) {
+  public boolean accept(DataType type) {
 
-    return type == RunData.Type.RAW && !partialData;
+    if (type == null) {
+      return false;
+    }
+
+    return type.getCategory() == Category.RAW && !type.isPartialData();
   }
 
   @Override
@@ -211,9 +216,8 @@ public class IlluminaDemuxDataProcessor implements DataProcessor {
               + runId.getId() + " on " + inputRunData.getSource(),
           emailContent);
 
-      return new SimpleProcessResult(
-          inputRunData.newLocation(outputLocation).newType(Type.PROCESSED),
-          email);
+      return new SimpleProcessResult(inputRunData.newLocation(outputLocation)
+          .newCategory(Category.PROCESSED), email);
 
     } catch (IOException e) {
       throw new Aozan3Exception(runId, e);

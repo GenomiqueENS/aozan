@@ -2,6 +2,7 @@ package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
+import fr.ens.biologie.genomique.aozan.aozan3.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.EmailMessage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
@@ -12,7 +13,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
  * @author Laurent Jourdren
  * @since 3.0
  */
-public interface DataProcessor {
+public interface DataProcessor extends DataTypeFilter {
 
   /**
    * This interface define a process result
@@ -45,14 +46,6 @@ public interface DataProcessor {
    * @throws Aozan3Exception if an error occurs while initialize the processor
    */
   void init(Configuration conf, AozanLogger logger) throws Aozan3Exception;
-
-  /**
-   * Test if the processor accept a type of RunData.
-   * @param type type of run data
-   * @param partialData partial run data
-   * @return true if the process accept this type of run data
-   */
-  boolean accept(RunData.Type type, boolean partialData);
 
   /**
    * Process data.

@@ -1,6 +1,5 @@
 package fr.ens.biologie.genomique.aozan.aozan3;
 
-import static fr.ens.biologie.genomique.aozan.aozan3.SequencingTechnology.ILLUMINA;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -57,11 +56,6 @@ public class IlluminaRunIdWrapper {
   public IlluminaRunIdWrapper(RunId runId) {
 
     requireNonNull(runId);
-
-    if (!ILLUMINA.equals(runId.getSequencingTechnology())) {
-      throw new IllegalArgumentException(
-          "Invalid sequencing technology: " + runId.getSequencingTechnology());
-    }
 
     if (!IlluminaUtils.checkRunId(runId.getId())) {
       throw new IllegalArgumentException("Invalid Illumina run id: " + runId);
