@@ -1,4 +1,6 @@
-package fr.ens.biologie.genomique.aozan.aozan3;
+package fr.ens.biologie.genomique.aozan.aozan3.datatypefilter;
+
+import fr.ens.biologie.genomique.aozan.aozan3.DataType;
 
 /**
  * This interface define a filter for DataType.

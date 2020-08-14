@@ -14,9 +14,9 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import fr.ens.biologie.genomique.aozan.aozan3.DataType;
-import fr.ens.biologie.genomique.aozan.aozan3.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.DataType.Category;
+import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
 
 /**
  * This class define InputData for processors.

@@ -1,5 +1,6 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
+import static fr.ens.biologie.genomique.aozan.aozan3.DataType.BCL;
 import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.sizeToHumanReadable;
 import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
 import static java.util.Arrays.asList;
@@ -21,11 +22,12 @@ import fr.ens.biologie.genomique.aozan.aozan3.DataLocation;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.DataType;
 import fr.ens.biologie.genomique.aozan.aozan3.DataType.Category;
-import fr.ens.biologie.genomique.aozan.aozan3.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.EmailMessage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
+import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
+import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.SimpleDataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
@@ -67,20 +69,8 @@ public class IlluminaDemuxDataProcessor implements DataProcessor {
   @Override
   public Set<DataTypeFilter> getInputRequirements() {
 
-    DataTypeFilter filter = new DataTypeFilter() {
-
-      @Override
-      public boolean accept(DataType type) {
-
-        if (type == null) {
-          return false;
-        }
-
-        return DataType.BCL == type;
-      }
-    };
-
-    return Collections.singleton(filter);
+    return Collections
+        .singleton((DataTypeFilter) new SimpleDataTypeFilter(BCL));
   }
 
   @Override

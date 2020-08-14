@@ -1,15 +1,18 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
+import static fr.ens.biologie.genomique.aozan.aozan3.DataType.Category.RAW;
+import static fr.ens.biologie.genomique.aozan.aozan3.DataType.SequencingTechnology.ILLUMINA;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
-import fr.ens.biologie.genomique.aozan.aozan3.DataType;
-import fr.ens.biologie.genomique.aozan.aozan3.DataType.Category;
-import fr.ens.biologie.genomique.aozan.aozan3.DataType.SequencingTechnology;
-import fr.ens.biologie.genomique.aozan.aozan3.DataTypeFilter;
+import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.CategoryDataTypeFilter;
+import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
+import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.MultiDataTypeFilter;
+import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.TechnologyDataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.util.RSync;
 
 /**
@@ -29,19 +32,9 @@ public class IlluminaSyncDataProcessor extends SyncDataProcessor {
   @Override
   public Set<DataTypeFilter> getInputRequirements() {
 
-    DataTypeFilter filter = new DataTypeFilter() {
-
-      @Override
-      public boolean accept(DataType type) {
-
-        if (type == null) {
-          return false;
-        }
-
-        return Category.RAW == type.getCategory()
-            && SequencingTechnology.ILLUMINA == type.getSequencingTechnology();
-      }
-    };
+    DataTypeFilter filter =
+        new MultiDataTypeFilter(new CategoryDataTypeFilter(RAW),
+            new TechnologyDataTypeFilter(ILLUMINA));
 
     return Collections.singleton(filter);
   }
