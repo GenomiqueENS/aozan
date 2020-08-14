@@ -13,8 +13,6 @@ import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataLocation;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
-import fr.ens.biologie.genomique.aozan.aozan3.DataType;
-import fr.ens.biologie.genomique.aozan.aozan3.DataType.Category;
 import fr.ens.biologie.genomique.aozan.aozan3.EmailMessage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
@@ -33,16 +31,6 @@ public abstract class SyncDataProcessor implements DataProcessor {
   private boolean partialSync;
   private AozanLogger logger;
   private boolean initialized;
-
-  @Override
-  public boolean accept(DataType type) {
-
-    if (type == null) {
-      return false;
-    }
-
-    return type.getCategory() == Category.RAW;
-  }
 
   @Override
   public void init(final Configuration conf, final AozanLogger logger)
@@ -78,10 +66,12 @@ public abstract class SyncDataProcessor implements DataProcessor {
   }
 
   @Override
-  public ProcessResult process(final RunData inputRunData,
+  public ProcessResult process(final InputData input,
       RunConfiguration runConf) throws Aozan3Exception {
 
-    requireNonNull(inputRunData);
+    requireNonNull(input);
+
+    RunData inputRunData = input.getTheOnlyElement();
 
     // Check if object has been initialized
     if (!this.initialized) {

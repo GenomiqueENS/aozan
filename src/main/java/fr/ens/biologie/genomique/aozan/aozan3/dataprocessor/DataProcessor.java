@@ -1,5 +1,7 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
+import java.util.Set;
+
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataTypeFilter;
@@ -13,7 +15,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
  * @author Laurent Jourdren
  * @since 3.0
  */
-public interface DataProcessor extends DataTypeFilter {
+public interface DataProcessor {
 
   /**
    * This interface define a process result
@@ -48,13 +50,19 @@ public interface DataProcessor extends DataTypeFilter {
   void init(Configuration conf, AozanLogger logger) throws Aozan3Exception;
 
   /**
+   * Get the input requirements of the processor.
+   * @return a set with input requirements
+   */
+  Set<DataTypeFilter> getInputRequirements();
+
+  /**
    * Process data.
-   * @param inputRunData input run data
+   * @param inputData input run data
    * @param conf run configuration
    * @return a ProcessResult object
    * @throws Aozan3Exception if an error occurs while processing the data
    */
-  ProcessResult process(RunData inputRunData, RunConfiguration conf)
+  ProcessResult process(InputData inputData, RunConfiguration conf)
       throws Aozan3Exception;
 
 }

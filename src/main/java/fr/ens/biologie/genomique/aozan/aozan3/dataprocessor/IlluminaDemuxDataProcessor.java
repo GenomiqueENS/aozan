@@ -10,8 +10,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
@@ -19,12 +21,13 @@ import fr.ens.biologie.genomique.aozan.aozan3.DataLocation;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.DataType;
 import fr.ens.biologie.genomique.aozan.aozan3.DataType.Category;
+import fr.ens.biologie.genomique.aozan.aozan3.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.EmailMessage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
+import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
-import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVWriter;
@@ -62,13 +65,22 @@ public class IlluminaDemuxDataProcessor implements DataProcessor {
   }
 
   @Override
-  public boolean accept(DataType type) {
+  public Set<DataTypeFilter> getInputRequirements() {
 
-    if (type == null) {
-      return false;
-    }
+    DataTypeFilter filter = new DataTypeFilter() {
 
-    return type.getCategory() == Category.RAW && !type.isPartialData();
+      @Override
+      public boolean accept(DataType type) {
+
+        if (type == null) {
+          return false;
+        }
+
+        return DataType.BCL == type;
+      }
+    };
+
+    return Collections.singleton(filter);
   }
 
   @Override
@@ -111,11 +123,13 @@ public class IlluminaDemuxDataProcessor implements DataProcessor {
   }
 
   @Override
-  public ProcessResult process(final RunData inputRunData,
+  public ProcessResult process(final InputData inputData,
       final RunConfiguration runConf) throws Aozan3Exception {
 
-    requireNonNull(inputRunData);
+    requireNonNull(inputData);
     requireNonNull(runConf);
+
+    RunData inputRunData = inputData.get(DataType.BCL);
 
     // Check if object has been initialized
     if (!this.initialized) {
