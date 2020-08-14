@@ -1,6 +1,9 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
-import java.util.Objects;
+import static java.util.Collections.singleton;
+import static java.util.Objects.requireNonNull;
+
+import java.util.Set;
 
 import fr.ens.biologie.genomique.aozan.aozan3.EmailMessage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
@@ -12,11 +15,11 @@ import fr.ens.biologie.genomique.aozan.aozan3.RunData;
  */
 public class SimpleProcessResult implements DataProcessor.ProcessResult {
 
-  private final RunData rundata;
+  private final Set<RunData> rundata;
   private final EmailMessage email;
 
   @Override
-  public RunData getRunData() {
+  public Set<RunData> getRunData() {
 
     return this.rundata;
   }
@@ -38,8 +41,26 @@ public class SimpleProcessResult implements DataProcessor.ProcessResult {
    */
   public SimpleProcessResult(RunData outputRunData, EmailMessage email) {
 
-    Objects.requireNonNull(outputRunData);
-    Objects.requireNonNull(email);
+    this(singleton(outputRunData), email);
+  }
+
+  /**
+   * Constructor.
+   * @param outputRunData output runData
+   * @param email output email
+   */
+  public SimpleProcessResult(Set<RunData> outputRunData, EmailMessage email) {
+
+    requireNonNull(outputRunData);
+    requireNonNull(email);
+
+    // Check if one or more element of the set is null
+    for (RunData r : outputRunData) {
+      if (r == null) {
+        throw new IllegalArgumentException(
+            "one or more output run data is null");
+      }
+    }
 
     this.rundata = outputRunData;
     this.email = email;

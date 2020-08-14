@@ -26,7 +26,7 @@ public interface DataProcessor {
      * Get the output data.
      * @return a RunData
      */
-    RunData getRunData();
+    Set<RunData> getRunData();
 
     /**
      * Get the output email
