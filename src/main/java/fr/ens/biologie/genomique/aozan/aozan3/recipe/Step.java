@@ -3,17 +3,23 @@ package fr.ens.biologie.genomique.aozan.aozan3.recipe;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
+import fr.ens.biologie.genomique.aozan.aozan3.DefaultRunIdGenerator;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
+import fr.ens.biologie.genomique.aozan.aozan3.RunIdGenerator;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.DataProcessor;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.DataProcessor.ProcessResult;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.DataProcessorService;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.InputData;
+import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.SimpleProcessResult;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.EmptyRunConfigurationProvider;
@@ -32,6 +38,7 @@ public class Step {
   private final String sinkName;
   private final Configuration conf;
   private final RunConfigurationProvider runConfProvider;
+  private final RunIdGenerator runIdGenerator;
   // private String outputNameConf;
 
   private transient DataProcessor processor;
@@ -128,7 +135,28 @@ public class Step {
     this.logger.info(inputRunData,
         "End of processor " + this.processorName + " for the run");
 
-    return result;
+    // Return result with updated run ids
+    return updateRunIds(result, runConf);
+  }
+
+  //
+  // Other methods
+  //
+
+  private ProcessResult updateRunIds(ProcessResult result,
+      RunConfiguration runConf) throws Aozan3Exception {
+
+    Map<String, String> constants = new HashMap<>();
+    constants.putAll(this.conf.toMap());
+    constants.putAll(runConf.toMap());
+
+    Set<RunData> runDataSet = new HashSet<>();
+    for (RunData r : result.getRunData()) {
+      runDataSet.add(
+          r.newRunId(this.runIdGenerator.newRunId(r.getRunId(), constants)));
+    }
+
+    return new SimpleProcessResult(runDataSet, result.getEmail());
   }
 
   //
@@ -147,7 +175,7 @@ public class Step {
    */
   public Step(Recipe recipe, String stepName, String processorName,
       String sourceName, String sinkName, Configuration conf,
-      RunConfigurationProvider runConfProvider) {
+      RunConfigurationProvider runConfProvider, RunIdGenerator runIdGenerator) {
 
     requireNonNull(recipe);
     requireNonNull(stepName);
@@ -155,6 +183,7 @@ public class Step {
     requireNonNull(sourceName);
     requireNonNull(sinkName);
     requireNonNull(stepName);
+    requireNonNull(runIdGenerator);
 
     this.name = stepName;
     this.processorName = processorName;
@@ -162,6 +191,8 @@ public class Step {
     this.sinkName = sinkName;
     this.runConfProvider = runConfProvider != null
         ? runConfProvider : new EmptyRunConfigurationProvider();
+    this.runIdGenerator =
+        runIdGenerator != null ? runIdGenerator : new DefaultRunIdGenerator();
 
     this.logger = recipe.getLogger();
     this.storages = recipe.getStorages();

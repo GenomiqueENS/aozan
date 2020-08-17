@@ -74,6 +74,18 @@ public class RunData {
   //
 
   /**
+   * Create a new RunData object from the current object with a new run Id.
+   * @param runId the new run id
+   * @return a new RunData object
+   */
+
+  public RunData newRunId(final RunId runId) {
+
+    requireNonNull(runId);
+    return new RunData(runId, this.source, this.type, this.location);
+  }
+
+  /**
    * Create a new RunData object from the current object with a new location.
    * @param location the new location
    * @return a new RunData object
