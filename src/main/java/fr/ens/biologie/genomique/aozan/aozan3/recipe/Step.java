@@ -34,7 +34,6 @@ public class Step {
 
   private final String name;
   private final String processorName;
-  private final String sourceName;
   private final String sinkName;
   private final Configuration conf;
   private final RunConfigurationProvider runConfProvider;
@@ -168,26 +167,23 @@ public class Step {
    * @param recipe recipe of the step
    * @param stepName step name
    * @param processorName name of the processor
-   * @param sourceName source name
    * @param sinkName sink name
    * @param conf step configuration
    * @param runConfProvider run configuration to use
    */
   public Step(Recipe recipe, String stepName, String processorName,
-      String sourceName, String sinkName, Configuration conf,
+      String sinkName, Configuration conf,
       RunConfigurationProvider runConfProvider, RunIdGenerator runIdGenerator) {
 
     requireNonNull(recipe);
     requireNonNull(stepName);
     requireNonNull(processorName);
-    requireNonNull(sourceName);
     requireNonNull(sinkName);
     requireNonNull(stepName);
     requireNonNull(runIdGenerator);
 
     this.name = stepName;
     this.processorName = processorName;
-    this.sourceName = sourceName;
     this.sinkName = sinkName;
     this.runConfProvider = runConfProvider != null
         ? runConfProvider : new EmptyRunConfigurationProvider();
@@ -204,8 +200,5 @@ public class Step {
     if (conf != null) {
       this.conf.set(conf);
     }
-
-    // Add the step to the recipe
-    recipe.addStep(this);
   }
 }
