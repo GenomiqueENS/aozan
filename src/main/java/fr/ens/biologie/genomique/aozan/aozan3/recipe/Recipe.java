@@ -149,6 +149,19 @@ public class Recipe {
   }
 
   /**
+   * Add steps.
+   * @param steps a collection of step to add
+   */
+  public void addSteps(Collection<Step> steps) {
+
+    requireNonNull(steps);
+
+    for (Step step : steps) {
+      addStep(step);
+    }
+  }
+
+  /**
    * Add a step.
    * @param step the step to add
    */
