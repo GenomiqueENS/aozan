@@ -259,6 +259,22 @@ public class Configuration {
     return new HashMap<String, String>(this.conf);
   }
 
+  /**
+   * Return the size of the configuration.
+   * @return the number of elements in the configuration
+   */
+  public int size() {
+    return this.conf.size();
+  }
+
+  /**
+   * Test if the configuration is empty.
+   * @return true if the configuration is empty
+   */
+  public boolean isEmpty() {
+    return this.conf.isEmpty();
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName() + " [conf=" + conf + "]";
