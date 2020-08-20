@@ -30,6 +30,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.DefaultRunIdGenerator;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
+import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.EmptyRunConfigurationProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.RunConfigurationProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.RunConfigurationProviderService;
 
@@ -369,14 +370,14 @@ public class RecipeParser {
     requireNonNull(recipe);
     requireNonNull(rootElement);
 
-    RunConfigurationProvider result = null;
+    RunConfigurationProvider result = new EmptyRunConfigurationProvider();
 
     final NodeList nList =
         rootElement.getElementsByTagName(RECIPE_RUN_CONFIGURATION_TAG_NAME);
 
     for (int i = 0; i < nList.getLength(); i++) {
 
-      if (result != null) {
+      if (i > 1) {
         throw new Aozan3Exception("Found more than one \""
             + RECIPE_RUN_CONFIGURATION_TAG_NAME + "\" tag");
       }
