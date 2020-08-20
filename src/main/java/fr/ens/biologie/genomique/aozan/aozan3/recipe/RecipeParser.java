@@ -1,15 +1,19 @@
 package fr.ens.biologie.genomique.aozan.aozan3.recipe;
 
+import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.checkAllowedAttributes;
+import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.checkAllowedChildTags;
+import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.evaluateExpressions;
+import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.getAttribute;
+import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.getTagValue;
+import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.nullToEmpty;
+import static java.lang.Boolean.parseBoolean;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -19,15 +23,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
-import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
-import fr.ens.biologie.genomique.aozan.aozan3.DefaultRunIdGenerator;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.EmptyRunConfigurationProvider;
@@ -51,21 +52,15 @@ public class RecipeParser {
   private static final String RECIPE_FORMAT_VERSION_TAG_NAME = "formatversion";
   private static final String RECIPE_NAME_TAG_NAME = "name";
   private static final String RECIPE_CONF_TAG_NAME = "configuration";
-  private static final String RECIPE_STORAGES_TAG_NAME = "storages";
+  static final String RECIPE_STORAGES_TAG_NAME = "storages";
   private static final String RECIPE_RUN_CONFIGURATION_TAG_NAME =
       "runconfiguration";
   private static final String RECIPE_DATASOURCE_TAG_NAME = "datasource";
-  private static final String RECIPE_STEPS_TAG_NAME = "steps";
+  static final String RECIPE_STEPS_TAG_NAME = "steps";
 
   private static final String PARAMETER_TAG_NAME = "parameter";
   private static final String PARAMETERNAME_TAG_NAME = "name";
   private static final String PARAMETERVALUE_TAG_NAME = "value";
-
-  private static final String STORAGE_TAG_NAME = "storage";
-  private static final String STORAGE_INPROGRESS_ATTR_NAME = "inprogress";
-  private static final String STORAGE_NAME_TAG_NAME = "name";
-  private static final String STORAGE_PATH_TAG_NAME = "path";
-  private static final String STORAGE_SOURCE_TAG_NAME = "source";
 
   private static final String RUNCONF_PROVIDER_TAG_NAME = "provider";
   private static final String RUNCONF_CONF_TAG_NAME = "configuration";
@@ -73,13 +68,7 @@ public class RecipeParser {
   private static final String DATASOURCE_PROVIDER_TAG_NAME = "provider";
   private static final String DATASOURCE_STORAGE_TAG_NAME = "storage";
   private static final String DATASOURCE_CONF_TAG_NAME = "configuration";
-
-  private static final String STEP_TAG_NAME = "step";
-  private static final String STEP_NAME_TAG_NAME = "name";
-  private static final String STEP_PROVIDER_TAG_NAME = "provider";
-  private static final String STEP_SINKSTORAGE_TAG_NAME = "sinkstorage";
-  private static final String STEP_CONF_TAG_NAME = "configuration";
-  private static final String STEP_OUTPUTIDSCHEME_TAG_NAME = "outputidscheme";
+  private static final String DATASOURCE_INPROGRESS_ATTR_NAME = "inprogress";
 
   /**
    * Parse XML as an input stream.
@@ -187,7 +176,7 @@ public class RecipeParser {
     Recipe recipe = new Recipe(recipeName, recipeConf);
 
     // Parse storages
-    parseStoragesTag(recipe, element);
+    new StoragesParser(recipe).parseStoragesTag(element);
 
     // Parse run configuration provider
     RunConfigurationProvider runConfProvider =
@@ -197,7 +186,8 @@ public class RecipeParser {
     parseDataSourceTag(recipe, element);
 
     // Parse steps
-    recipe.addSteps(parseStepsTag(recipe, runConfProvider, element));
+    recipe.addSteps(
+        new StepsParser(recipe, runConfProvider).parseStepsTag(element));
 
     return recipe;
   }
@@ -212,7 +202,7 @@ public class RecipeParser {
    *         configuration and the parameters defined inside the XML tag
    * @throws Aozan3Exception if an error occurs while parsing the tag
    */
-  Configuration parseConfigurationTag(final String tagName,
+  static Configuration parseConfigurationTag(final String tagName,
       final Element rootElement, String sectionName, Configuration parentConf)
       throws Aozan3Exception {
 
@@ -283,78 +273,6 @@ public class RecipeParser {
     }
 
     return result;
-  }
-
-  /**
-   * Parse a storage tag.
-   * @param recipe the recipe
-   * @param rootElement element to parse
-   * @throws Aozan3Exception if an error occurs while parsing the XML
-   */
-  private void parseStoragesTag(final Recipe recipe, final Element rootElement)
-      throws Aozan3Exception {
-
-    requireNonNull(recipe);
-    requireNonNull(rootElement);
-
-    final NodeList nList =
-        rootElement.getElementsByTagName(RECIPE_STORAGES_TAG_NAME);
-
-    for (int i = 0; i < nList.getLength(); i++) {
-
-      final Node node = nList.item(i);
-      if (node.getNodeType() == Node.ELEMENT_NODE) {
-
-        Element element = (Element) node;
-
-        // TODO storages can be define in another XML file
-
-        // Check allowed tags for the "storages" tag
-        checkAllowedChildTags(element, STORAGE_TAG_NAME);
-
-        parseStorageTag(recipe, element);
-      }
-    }
-  }
-
-  /**
-   * Parse a storage tag.
-   * @param recipe the recipe
-   * @param rootElement element to parse
-   * @throws Aozan3Exception if an error occurs while parsing the XML
-   */
-  private void parseStorageTag(final Recipe recipe, final Element rootElement)
-      throws Aozan3Exception {
-
-    final NodeList nStorageList =
-        rootElement.getElementsByTagName(STORAGE_TAG_NAME);
-
-    for (int j = 0; j < nStorageList.getLength(); j++) {
-
-      final Node nStorageNode = nStorageList.item(j);
-
-      if (nStorageNode.getNodeType() == Node.ELEMENT_NODE) {
-
-        Element eStorageElement = (Element) nStorageNode;
-
-        // Check allowed tags for the "storages" tag
-        checkAllowedChildTags(eStorageElement, STORAGE_NAME_TAG_NAME,
-            STORAGE_PATH_TAG_NAME, STORAGE_SOURCE_TAG_NAME);
-
-        String storageName =
-            nullToEmpty(getTagValue(STORAGE_NAME_TAG_NAME, eStorageElement));
-        String storagePath =
-            nullToEmpty(getTagValue(STORAGE_PATH_TAG_NAME, eStorageElement));
-        String storageSource =
-            nullToEmpty(getTagValue(STORAGE_SOURCE_TAG_NAME, eStorageElement));
-
-        // Add the storage to the recipe
-        // TODO Handle sequencer sources
-        DataStorage storage = new DataStorage("local", storagePath, null);
-        recipe.addStorage(storageName, storage);
-      }
-
-    }
   }
 
   /**
@@ -434,14 +352,14 @@ public class RecipeParser {
         Element element = (Element) node;
 
         // Check allowed attributes for the "storages" tag
-        checkAllowedAttributes(element, STORAGE_INPROGRESS_ATTR_NAME);
+        checkAllowedAttributes(element, DATASOURCE_INPROGRESS_ATTR_NAME);
 
         // Check allowed tags for the "storages" tag
         checkAllowedChildTags(element, DATASOURCE_PROVIDER_TAG_NAME,
             DATASOURCE_STORAGE_TAG_NAME, DATASOURCE_CONF_TAG_NAME);
 
-        final boolean inProgress = Boolean.parseBoolean(
-            nullToEmpty(getAttribute(element, STORAGE_INPROGRESS_ATTR_NAME)
+        final boolean inProgress = parseBoolean(
+            nullToEmpty(getAttribute(element, DATASOURCE_INPROGRESS_ATTR_NAME)
                 .trim().toLowerCase()));
 
         String providerName =
@@ -457,258 +375,9 @@ public class RecipeParser {
     }
   }
 
-  /**
-   * Parse a run step XML tag.
-   * @param recipe the recipe
-   * @param runConfProvider run configuration provider
-   * @param rootElement element to parse
-   * @return a list with step objects
-   * @throws Aozan3Exception if an error occurs while parsing the XML
-   */
-  private List<Step> parseStepsTag(final Recipe recipe,
-      RunConfigurationProvider runConfProvider, final Element rootElement)
-      throws Aozan3Exception {
-
-    requireNonNull(recipe);
-    requireNonNull(rootElement);
-
-    List<Step> result = new ArrayList<>();
-
-    final NodeList nList =
-        rootElement.getElementsByTagName(RECIPE_STEPS_TAG_NAME);
-
-    for (int i = 0; i < nList.getLength(); i++) {
-
-      final Node node = nList.item(i);
-      if (node.getNodeType() == Node.ELEMENT_NODE) {
-
-        Element element = (Element) node;
-
-        // TODO steps can be define in another XML files
-
-        // Check allowed tags for the "storages" tag
-        checkAllowedChildTags(element, STEP_TAG_NAME);
-
-        result.addAll(parseStepTag(recipe, runConfProvider, element));
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * Parse a run step XML tag.
-   * @param recipe the recipe
-   * @param runConfProvider run configuration provider
-   * @param rootElement element to parse
-   * @return a list with step objects
-   * @throws Aozan3Exception if an error occurs while parsing the XML
-   */
-  private List<Step> parseStepTag(final Recipe recipe,
-      RunConfigurationProvider runConfProvider, final Element rootElement)
-      throws Aozan3Exception {
-
-    List<Step> result = new ArrayList<>();
-
-    final NodeList nStorageList =
-        rootElement.getElementsByTagName(STEP_TAG_NAME);
-
-    for (int j = 0; j < nStorageList.getLength(); j++) {
-
-      final Node nStepNode = nStorageList.item(j);
-
-      if (nStepNode.getNodeType() == Node.ELEMENT_NODE) {
-
-        Element element = (Element) nStepNode;
-
-        // Check allowed tags for the "storages" tag
-        checkAllowedChildTags(element, STEP_NAME_TAG_NAME,
-            STEP_PROVIDER_TAG_NAME, STEP_SINKSTORAGE_TAG_NAME,
-            STEP_CONF_TAG_NAME, STEP_OUTPUTIDSCHEME_TAG_NAME);
-
-        String stepName = nullToEmpty(getTagValue(STEP_NAME_TAG_NAME, element));
-        String providerName =
-            nullToEmpty(getTagValue(STEP_PROVIDER_TAG_NAME, element));
-        String outputStorage =
-            nullToEmpty(getTagValue(STEP_SINKSTORAGE_TAG_NAME, element));
-        Configuration conf = parseConfigurationTag(STEP_CONF_TAG_NAME, element,
-            RECIPE_DATASOURCE_TAG_NAME, recipe.getConfiguration());
-        String runIdScheme =
-            nullToEmpty(getTagValue(STEP_OUTPUTIDSCHEME_TAG_NAME, element));
-
-        // Create new step
-        Step step = new Step(recipe, stepName, providerName, outputStorage,
-            conf, runConfProvider, runIdScheme.isEmpty()
-                ? null : new DefaultRunIdGenerator(runIdScheme));
-
-        result.add(step);
-      }
-    }
-
-    return result;
-  }
-
   //
   // Utility parsing methods
   //
-
-  /**
-   * Check if the child tags of a tag is in a list of allowed tag names.
-   * @param element the tag element
-   * @param tagNames the allowed tag names
-   * @throws Aozan3Exception if a child tag of the tag in not in the allowed tag
-   *           list
-   */
-  private static void checkAllowedChildTags(final Element element,
-      String... tagNames) throws Aozan3Exception {
-
-    final List<String> tagList = Arrays.asList(tagNames);
-
-    final NodeList nl = element.getChildNodes();
-
-    for (int i = 0; i < nl.getLength(); i++) {
-
-      final Node n = nl.item(i);
-
-      if (n.getNodeType() == Node.ELEMENT_NODE) {
-
-        final String childTagName = n.getNodeName();
-
-        if (!tagList.contains(childTagName)) {
-          throw new Aozan3Exception("the \""
-              + element.getNodeName() + "\" tag contains an unknown tag: "
-              + childTagName + ".");
-        }
-      }
-    }
-  }
-
-  /**
-   * Check if the attribute of a tag is in a list of allowed attribute names.
-   * @param element the tag element
-   * @param attributeNames the allowed attribute names
-   * @throws Aozan3Exception if an attribute of the tag in not in the allowed
-   *           attribute list
-   */
-  private static void checkAllowedAttributes(final Element element,
-      String... attributeNames) throws Aozan3Exception {
-
-    final List<String> attributeList = Arrays.asList(attributeNames);
-
-    final NamedNodeMap nnm = element.getAttributes();
-
-    for (int i = 0; i < nnm.getLength(); i++) {
-
-      final Node n = nnm.item(i);
-
-      if (n.getNodeType() == Node.ATTRIBUTE_NODE) {
-
-        final String attributeName = n.getNodeName();
-
-        if (!attributeList.contains(attributeName)) {
-          throw new Aozan3Exception("the \""
-              + element.getNodeName() + "\" tag contains an unknown attribute: "
-              + attributeName + ".");
-        }
-      }
-    }
-  }
-
-  /**
-   * Get the value of a tag
-   * @param tag name of the tag
-   * @param element root element
-   * @return the value of the tag
-   */
-  private static String getTagValue(final String tag, final Element element) {
-
-    final NodeList nl = element.getChildNodes();
-    for (int i = 0; i < nl.getLength(); i++) {
-
-      final Node n = nl.item(i);
-      if (n.getNodeType() == Node.ELEMENT_NODE && tag.equals(n.getNodeName())) {
-        return n.getTextContent();
-      }
-    }
-
-    return null;
-  }
-
-  /**
-   * Get the value of an XML tag attribute and evaluate it if necessary.
-   * @param element the XML tag element
-   * @param name the name of the attribute
-   * @return the value of the attribute
-   */
-  private String getAttribute(Element element, final String name) {
-
-    return element.getAttribute(name);
-  }
-
-  private static String nullToEmpty(String s) {
-
-    return Objects.toString(s, "");
-  }
-
-  /**
-   * Evaluate expression in a string.
-   * @param s string in witch expression must be replaced
-   * @param allowExec allow execution of code
-   * @return a string with expression evaluated
-   * @throws Aozan3Exception if an error occurs while parsing the string or
-   *           executing an expression
-   */
-  private String evaluateExpressions(final String s, Configuration conf)
-      throws Aozan3Exception {
-
-    if (s == null) {
-      return null;
-    }
-
-    final StringBuilder result = new StringBuilder();
-
-    final int len = s.length();
-
-    for (int i = 0; i < len; i++) {
-
-      final int c0 = s.codePointAt(i);
-
-      // Variable substitution
-      if (c0 == '$' && i + 1 < len) {
-
-        final int c1 = s.codePointAt(i + 1);
-        if (c1 == '{') {
-
-          final String expr = subStr(s, i + 2, '}');
-
-          final String trimmedExpr = expr.trim();
-          if (this.conf.containsKey(trimmedExpr)) {
-            result.append(this.conf.get(trimmedExpr));
-          }
-
-          i += expr.length() + 2;
-          continue;
-        }
-      }
-
-      result.appendCodePoint(c0);
-    }
-
-    return result.toString();
-  }
-
-  private String subStr(final String s, final int beginIndex,
-      final int charPoint) throws Aozan3Exception {
-
-    final int endIndex = s.indexOf(charPoint, beginIndex);
-
-    if (endIndex == -1) {
-      throw new Aozan3Exception(
-          "Unexpected end of expression in \"" + s + "\"");
-    }
-
-    return s.substring(beginIndex, endIndex);
-  }
 
   //
   // Constructors
