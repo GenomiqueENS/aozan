@@ -232,9 +232,11 @@ public class StepsParser {
             nullToEmpty(getTagValue(STEP_PROVIDER_TAG_NAME, element));
         String outputStorage =
             nullToEmpty(getTagValue(STEP_SINKSTORAGE_TAG_NAME, element));
-        Configuration conf =
-            ConfigurationParser.parseConfigurationTag(STEP_CONF_TAG_NAME,
-                element, STEP_TAG_NAME, recipe.getConfiguration());
+
+        Configuration conf = new ConfigurationParser(STEP_CONF_TAG_NAME,
+            STEP_TAG_NAME, recipe.getConfiguration(), recipe.getLogger())
+                .parseConfigurationTag(element);
+
         String runIdScheme =
             nullToEmpty(getTagValue(STEP_OUTPUTIDSCHEME_TAG_NAME, element));
 

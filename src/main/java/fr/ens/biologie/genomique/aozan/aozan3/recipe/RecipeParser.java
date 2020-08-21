@@ -2,10 +2,10 @@ package fr.ens.biologie.genomique.aozan.aozan3.recipe;
 
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.checkAllowedAttributes;
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.checkAllowedChildTags;
-import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.evaluateExpressions;
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.getAttribute;
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.getTagValue;
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.nullToEmpty;
+import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.nullToUnknownSource;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Objects.requireNonNull;
 
@@ -13,9 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -58,10 +56,6 @@ public class RecipeParser {
   private static final String RECIPE_DATASOURCE_TAG_NAME = "datasource";
   static final String RECIPE_STEPS_TAG_NAME = "steps";
 
-  private static final String PARAMETER_TAG_NAME = "parameter";
-  private static final String PARAMETERNAME_TAG_NAME = "name";
-  private static final String PARAMETERVALUE_TAG_NAME = "value";
-
   private static final String RUNCONF_PROVIDER_TAG_NAME = "provider";
   private static final String RUNCONF_CONF_TAG_NAME = "configuration";
 
@@ -96,7 +90,7 @@ public class RecipeParser {
 
     Objects.requireNonNull(is);
 
-    this.logger.info("Start parsing the workflow workflow file");
+    this.logger.info("Start parsing the recipe file");
 
     // Parse file into a Document object
     try {
@@ -162,15 +156,16 @@ public class RecipeParser {
         nullToEmpty(getTagValue(RECIPE_FORMAT_VERSION_TAG_NAME, element));
     if (!FORMAT_VERSION.equals(formatVersion)) {
       throw new Aozan3Exception(
-          "Invalid version of the format of the workflow file.");
+          "Invalid version of the format of the recipe file.");
     }
 
     // Get the recipe name
     String recipeName = nullToEmpty(getTagValue(RECIPE_NAME_TAG_NAME, element));
 
     // Get the recipe configuration
-    Configuration recipeConf = parseConfigurationTag(RECIPE_CONF_TAG_NAME,
-        element, "recipe configuration", this.conf);
+    Configuration recipeConf =
+        new ConfigurationParser(RECIPE_CONF_TAG_NAME, "recipe configuration",
+            this.conf, this.logger).parseConfigurationTag(element);
 
     // Create a new recipe
     Recipe recipe = new Recipe(recipeName, recipeConf);
@@ -193,97 +188,14 @@ public class RecipeParser {
   }
 
   /**
-   * Parse a configuration tag.
-   * @param tagName name of the tag to parse
-   * @param rootElement root element of the tag
-   * @param sectionName name of the section in the recipe file
-   * @param parentConf parent configuration
-   * @return a new Configuration object with the content of the parent
-   *         configuration and the parameters defined inside the XML tag
-   * @throws Aozan3Exception if an error occurs while parsing the tag
-   */
-  static Configuration parseConfigurationTag(final String tagName,
-      final Element rootElement, String sectionName, Configuration parentConf)
-      throws Aozan3Exception {
-
-    requireNonNull(tagName);
-    requireNonNull(rootElement);
-    requireNonNull(sectionName);
-
-    Configuration result = new Configuration(parentConf);
-
-    final Set<String> parameterNames = new HashSet<>();
-
-    final NodeList nList = rootElement.getElementsByTagName(tagName);
-
-    // TODO configuration can be define in a another key/value or XML file
-
-    for (int i = 0; i < nList.getLength(); i++) {
-
-      final Node node = nList.item(i);
-      if (node.getNodeType() == Node.ELEMENT_NODE) {
-
-        Element element = (Element) node;
-
-        // Check allowed tags for the "parameter" tag
-        checkAllowedChildTags(element, PARAMETER_TAG_NAME);
-
-        final NodeList nParameterList =
-            element.getElementsByTagName(PARAMETER_TAG_NAME);
-
-        for (int j = 0; j < nParameterList.getLength(); j++) {
-
-          final Node nParameterNode = nParameterList.item(j);
-
-          if (nParameterNode.getNodeType() == Node.ELEMENT_NODE) {
-
-            Element eParameterElement = (Element) nParameterNode;
-
-            checkAllowedChildTags(eParameterElement, PARAMETERNAME_TAG_NAME,
-                PARAMETERVALUE_TAG_NAME);
-
-            final String paramName =
-                getTagValue(PARAMETERNAME_TAG_NAME, eParameterElement);
-            final String paramValue =
-                getTagValue(PARAMETERVALUE_TAG_NAME, eParameterElement);
-
-            if (paramName == null) {
-              throw new Aozan3Exception(
-                  "<name> Tag not found in parameter section of "
-                      + sectionName + " in recipe file.");
-            }
-            if (paramValue == null) {
-              throw new Aozan3Exception(
-                  "<value> Tag not found in parameter section of "
-                      + sectionName + " in recipe file.");
-            }
-
-            if (parameterNames.contains(paramName)) {
-              throw new Aozan3Exception("The parameter \""
-                  + paramName + "\" has been already defined for " + sectionName
-                  + " in workflow file.");
-            }
-            parameterNames.add(paramName);
-
-            result.set(paramName, evaluateExpressions(paramValue, result));
-          }
-        }
-
-      }
-    }
-
-    return result;
-  }
-
-  /**
    * Parse a run configuration XML tag.
    * @param recipe the recipe
    * @param rootElement element to parse
    * @return a new RunConfigurationProvider object
    * @throws Aozan3Exception if an error occurs while parsing the XML
    */
-  private RunConfigurationProvider parseRunConfigurationTag(final Recipe recipe,
-      final Element rootElement) throws Aozan3Exception {
+  private static RunConfigurationProvider parseRunConfigurationTag(
+      final Recipe recipe, final Element rootElement) throws Aozan3Exception {
 
     requireNonNull(recipe);
     requireNonNull(rootElement);
@@ -311,9 +223,10 @@ public class RecipeParser {
 
         String providerName =
             nullToEmpty(getTagValue(RUNCONF_PROVIDER_TAG_NAME, element));
-        Configuration conf =
-            parseConfigurationTag(RUNCONF_CONF_TAG_NAME, element,
-                RECIPE_RUN_CONFIGURATION_TAG_NAME, recipe.getConfiguration());
+
+        Configuration conf = new ConfigurationParser(RUNCONF_CONF_TAG_NAME,
+            "run configuration", recipe.getConfiguration(), recipe.getLogger())
+                .parseConfigurationTag(element);
 
         result = RunConfigurationProviderService.getInstance()
             .newService(providerName);
@@ -366,8 +279,10 @@ public class RecipeParser {
             nullToEmpty(getTagValue(DATASOURCE_PROVIDER_TAG_NAME, element));
         String storageName =
             nullToEmpty(getTagValue(DATASOURCE_STORAGE_TAG_NAME, element));
-        Configuration conf = parseConfigurationTag(DATASOURCE_CONF_TAG_NAME,
-            element, RECIPE_DATASOURCE_TAG_NAME, recipe.getConfiguration());
+
+        Configuration conf = new ConfigurationParser(DATASOURCE_CONF_TAG_NAME,
+            RECIPE_DATASOURCE_TAG_NAME, recipe.getConfiguration(),
+            recipe.getLogger()).parseConfigurationTag(element);
 
         recipe.setDataProvider(providerName, storageName, conf);
         recipe.setUseInProgressData(inProgress);
