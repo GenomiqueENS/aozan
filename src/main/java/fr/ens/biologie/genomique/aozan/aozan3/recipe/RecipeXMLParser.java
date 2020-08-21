@@ -5,7 +5,6 @@ import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.checkAll
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.getAttribute;
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.getTagValue;
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.nullToEmpty;
-import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.nullToUnknownSource;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Objects.requireNonNull;
 
@@ -38,7 +37,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.RunConfig
  * @author Laurent Jourdren
  * @since 3.0
  */
-public class RecipeParser {
+public class RecipeXMLParser {
 
   private final Configuration conf;
   private AozanLogger logger = new DummyAzoanLogger();
@@ -163,15 +162,14 @@ public class RecipeParser {
     String recipeName = nullToEmpty(getTagValue(RECIPE_NAME_TAG_NAME, element));
 
     // Get the recipe configuration
-    Configuration recipeConf =
-        new ConfigurationParser(RECIPE_CONF_TAG_NAME, "recipe configuration",
-            this.conf, this.logger).parseConfigurationTag(element);
+    Configuration recipeConf = new ConfigurationXMLParser(RECIPE_CONF_TAG_NAME,
+        "recipe configuration", this.conf, this.logger).parse(element);
 
     // Create a new recipe
     Recipe recipe = new Recipe(recipeName, recipeConf);
 
     // Parse storages
-    new StoragesParser(recipe).parseStoragesTag(element);
+    new StoragesXMLParser(recipe).parse(element);
 
     // Parse run configuration provider
     RunConfigurationProvider runConfProvider =
@@ -181,8 +179,7 @@ public class RecipeParser {
     parseDataSourceTag(recipe, element);
 
     // Parse steps
-    recipe.addSteps(
-        new StepsParser(recipe, runConfProvider).parseStepsTag(element));
+    recipe.addSteps(new StepsXMLParser(recipe, runConfProvider).parse(element));
 
     return recipe;
   }
@@ -224,9 +221,9 @@ public class RecipeParser {
         String providerName =
             nullToEmpty(getTagValue(RUNCONF_PROVIDER_TAG_NAME, element));
 
-        Configuration conf = new ConfigurationParser(RUNCONF_CONF_TAG_NAME,
+        Configuration conf = new ConfigurationXMLParser(RUNCONF_CONF_TAG_NAME,
             "run configuration", recipe.getConfiguration(), recipe.getLogger())
-                .parseConfigurationTag(element);
+                .parse(element);
 
         result = RunConfigurationProviderService.getInstance()
             .newService(providerName);
@@ -280,9 +277,10 @@ public class RecipeParser {
         String storageName =
             nullToEmpty(getTagValue(DATASOURCE_STORAGE_TAG_NAME, element));
 
-        Configuration conf = new ConfigurationParser(DATASOURCE_CONF_TAG_NAME,
-            RECIPE_DATASOURCE_TAG_NAME, recipe.getConfiguration(),
-            recipe.getLogger()).parseConfigurationTag(element);
+        Configuration conf =
+            new ConfigurationXMLParser(DATASOURCE_CONF_TAG_NAME,
+                RECIPE_DATASOURCE_TAG_NAME, recipe.getConfiguration(),
+                recipe.getLogger()).parse(element);
 
         recipe.setDataProvider(providerName, storageName, conf);
         recipe.setUseInProgressData(inProgress);
@@ -303,7 +301,7 @@ public class RecipeParser {
    * @param conf initial configuration
    * @param logger default logger
    */
-  public RecipeParser(Configuration conf, AozanLogger logger) {
+  public RecipeXMLParser(Configuration conf, AozanLogger logger) {
 
     requireNonNull(conf);
     this.conf = conf;
