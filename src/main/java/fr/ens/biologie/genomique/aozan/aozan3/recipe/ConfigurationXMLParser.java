@@ -49,14 +49,26 @@ public class ConfigurationXMLParser extends AbstractXMLParser<Configuration> {
         // Check allowed tags for the "parameter" tag
         checkAllowedChildTags(element, PARAMETER_TAG_NAME);
 
-        // TODO configuration can be defined in a another key/value file
         // Load steps in the include file
         Path includePath = getIncludePath(element, source);
         if (includePath != null) {
-          ConfigurationXMLParser parser = new ConfigurationXMLParser(
-              getRootTagName(), this.sectionName, this.parentConf, getLogger());
 
-          result.set(parser.parse(includePath));
+          String filename = includePath.getFileName().toString();
+          if (filename.endsWith(".conf")) {
+
+            // Load key/value file
+            Configuration conf = new Configuration();
+            conf.load(includePath);
+
+          } else {
+
+            // Parse XML file
+            ConfigurationXMLParser parser =
+                new ConfigurationXMLParser(getRootTagName(), this.sectionName,
+                    this.parentConf, getLogger());
+
+            result.set(parser.parse(includePath));
+          }
         }
 
         final NodeList nParameterList =

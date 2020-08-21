@@ -2,6 +2,8 @@ package fr.ens.biologie.genomique.aozan.aozan3;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -278,6 +280,40 @@ public class Configuration {
   @Override
   public String toString() {
     return this.getClass().getSimpleName() + " [conf=" + conf + "]";
+  }
+
+  //
+  // Configuration loading
+  //
+
+  /**
+   * Load configuration.
+   * @param file file to save
+   * @throws Aozan3Exception if an error occurs while reading the file
+   */
+  public void load(final Path file) throws Aozan3Exception {
+
+    try {
+      for (String line : Files.readAllLines(file)) {
+
+        String trimmedLine = line.trim();
+
+        if (trimmedLine.isEmpty() || trimmedLine.startsWith("#")) {
+          continue;
+        }
+
+        int index = line.indexOf('=');
+        if (index >= 0) {
+
+          String key = line.substring(0, index);
+          String value = line.substring(index + 1);
+
+          set(key.trim(), value.trim());
+        }
+      }
+    } catch (IOException e) {
+      throw new Aozan3Exception(e);
+    }
   }
 
   //
