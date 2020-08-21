@@ -31,14 +31,7 @@ public class ConfigurationXMLParser extends AbstractXMLParser<Configuration> {
   static final String PARAMETERNAME_TAG_NAME = "name";
   static final String PARAMETERVALUE_TAG_NAME = "value";
 
-  /**
-   * Parse a configuration tag.
-   * @param tagName name of the tag to parse
-   * @param rootElement root element of the tag
-   * @return a new Configuration object with the content of the parent
-   *         configuration and the parameters defined inside the XML tag
-   * @throws Aozan3Exception if an error occurs while parsing the tag
-   */
+  @Override
   protected Configuration parse(NodeList nList, String source)
       throws Aozan3Exception {
 
@@ -58,10 +51,10 @@ public class ConfigurationXMLParser extends AbstractXMLParser<Configuration> {
 
         // TODO configuration can be defined in a another key/value file
         // Load steps in the include file
-        Path includePath = getIncludePath(element);
+        Path includePath = getIncludePath(element, source);
         if (includePath != null) {
-          ConfigurationXMLParser parser = new ConfigurationXMLParser(getRootTagName(),
-              this.sectionName, this.parentConf, getLogger());
+          ConfigurationXMLParser parser = new ConfigurationXMLParser(
+              getRootTagName(), this.sectionName, this.parentConf, getLogger());
 
           result.set(parser.parse(includePath));
         }
@@ -126,7 +119,7 @@ public class ConfigurationXMLParser extends AbstractXMLParser<Configuration> {
   public ConfigurationXMLParser(String rootTagName, String sectionName,
       Configuration parentConfiguration, AozanLogger logger) {
 
-    super(rootTagName, logger);
+    super(rootTagName, "configuration", logger);
 
     requireNonNull(sectionName);
     requireNonNull(parentConfiguration);

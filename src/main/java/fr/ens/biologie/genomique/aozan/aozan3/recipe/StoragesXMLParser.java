@@ -30,12 +30,7 @@ public class StoragesXMLParser extends AbstractXMLParser<Void> {
 
   private final Recipe recipe;
 
-  /**
-   * Parse a storage tag.
-   * @param recipe the recipe
-   * @param rootElement element to parse
-   * @throws Aozan3Exception if an error occurs while parsing the XML
-   */
+  @Override
   protected Void parse(NodeList nList, String source) throws Aozan3Exception {
 
     requireNonNull(nList);
@@ -57,7 +52,7 @@ public class StoragesXMLParser extends AbstractXMLParser<Void> {
         checkAllowedChildTags(element, STORAGE_TAG_NAME);
 
         // Get the include path
-        Path includePath = getIncludePath(element);
+        Path includePath = getIncludePath(element, source);
 
         // Load storages in the include file
         if (includePath != null) {
@@ -122,7 +117,7 @@ public class StoragesXMLParser extends AbstractXMLParser<Void> {
    */
   StoragesXMLParser(Recipe recipe) {
 
-    super(RECIPE_STORAGES_TAG_NAME, recipe.getLogger());
+    super(RECIPE_STORAGES_TAG_NAME, "storage", recipe.getLogger());
 
     requireNonNull(recipe);
 

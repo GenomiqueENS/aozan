@@ -38,13 +38,7 @@ public class StepsXMLParser extends AbstractXMLParser<List<Step>> {
   private final Recipe recipe;
   private final RunConfigurationProvider runConfProvider;
 
-  /**
-   * Parse a run step XML tag.
-   * @param nList node list
-   * @param source XML source description
-   * @return a list with step objects
-   * @throws Aozan3Exception if an error occurs while parsing the XML
-   */
+  @Override
   protected List<Step> parse(NodeList nList, String source)
       throws Aozan3Exception {
 
@@ -67,7 +61,7 @@ public class StepsXMLParser extends AbstractXMLParser<List<Step>> {
         checkAllowedChildTags(element, STEP_TAG_NAME);
 
         // Get the include path
-        Path includePath = getIncludePath(element);
+        Path includePath = getIncludePath(element, source);
 
         // Load steps in the include file
         if (includePath != null) {
@@ -76,7 +70,7 @@ public class StepsXMLParser extends AbstractXMLParser<List<Step>> {
           result.addAll(parser.parse(includePath));
         }
 
-        result.addAll(parseStepTag(element));
+        result.addAll(parseStepTag(element, source));
       }
     }
 
@@ -88,10 +82,12 @@ public class StepsXMLParser extends AbstractXMLParser<List<Step>> {
    * @param recipe the recipe
    * @param runConfProvider run configuration provider
    * @param rootElement element to parse
+   * @param source file source
    * @return a list with step objects
    * @throws Aozan3Exception if an error occurs while parsing the XML
    */
-  List<Step> parseStepTag(final Element rootElement) throws Aozan3Exception {
+  List<Step> parseStepTag(final Element rootElement, final String source)
+      throws Aozan3Exception {
 
     List<Step> result = new ArrayList<>();
 
@@ -117,9 +113,9 @@ public class StepsXMLParser extends AbstractXMLParser<List<Step>> {
         String outputStorage =
             nullToEmpty(getTagValue(STEP_SINKSTORAGE_TAG_NAME, element));
 
-        Configuration conf =
-            new ConfigurationXMLParser(STEP_CONF_TAG_NAME, STEP_TAG_NAME,
-                recipe.getConfiguration(), recipe.getLogger()).parse(element);
+        Configuration conf = new ConfigurationXMLParser(STEP_CONF_TAG_NAME,
+            STEP_TAG_NAME, recipe.getConfiguration(), recipe.getLogger())
+                .parse(element, source);
 
         String runIdScheme =
             nullToEmpty(getTagValue(STEP_OUTPUTIDSCHEME_TAG_NAME, element));
@@ -146,7 +142,7 @@ public class StepsXMLParser extends AbstractXMLParser<List<Step>> {
    */
   StepsXMLParser(Recipe recipe, RunConfigurationProvider runConfProvider) {
 
-    super(RECIPE_STEPS_TAG_NAME, recipe.getLogger());
+    super(RECIPE_STEPS_TAG_NAME, "step", recipe.getLogger());
 
     requireNonNull(recipe);
     requireNonNull(runConfProvider);

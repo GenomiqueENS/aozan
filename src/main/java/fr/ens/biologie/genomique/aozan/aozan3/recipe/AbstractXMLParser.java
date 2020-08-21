@@ -38,6 +38,7 @@ abstract class AbstractXMLParser<E> {
 
   private final AozanLogger logger;
   private final String rootTagName;
+  private final String fileType;
 
   //
   // Getters
@@ -75,7 +76,8 @@ abstract class AbstractXMLParser<E> {
       return parse(Files.newInputStream(path), path.toString());
     } catch (IOException e) {
       throw new Aozan3Exception(
-          "Error while reading recipe file: " + e.getMessage(), e);
+          "Error while reading " + this.fileType + " file: " + e.getMessage(),
+          e);
     }
   }
 
@@ -101,8 +103,8 @@ abstract class AbstractXMLParser<E> {
 
     Objects.requireNonNull(is);
 
-    this.logger
-        .info("Start parsing the steps file: " + nullToUnknownSource(source));
+    this.logger.info("Start parsing the "
+        + this.fileType + " file: " + nullToUnknownSource(source));
 
     // Parse file into a Document object
     try {
@@ -117,7 +119,8 @@ abstract class AbstractXMLParser<E> {
 
     } catch (ParserConfigurationException | SAXException | IOException e) {
       throw new Aozan3Exception(
-          "Error while parsing recipe file: " + e.getMessage(), e);
+          "Error while parsing " + this.fileType + " file: " + e.getMessage(),
+          e);
     }
   }
 
@@ -177,7 +180,8 @@ abstract class AbstractXMLParser<E> {
    * @return a Path object if the element to include exists or null
    * @throws Aozan3Exception if other attribute than include exists for the tag
    */
-  protected Path getIncludePath(Element element) throws Aozan3Exception {
+  protected Path getIncludePath(Element element, String source)
+      throws Aozan3Exception {
 
     // Check allowed attributes for the "storages" tag
     checkAllowedAttributes(element, INCLUDE_ATTR_NAME);
@@ -186,8 +190,20 @@ abstract class AbstractXMLParser<E> {
     String includePath =
         nullToEmpty(getAttribute(element, INCLUDE_ATTR_NAME)).trim();
 
-    if (!includePath.isEmpty()) {
+    if (includePath.isEmpty()) {
       return null;
+    }
+
+    // If the file is absolute return the Path
+    Path result = Paths.get(includePath);
+    if (result.isAbsolute() || source == null) {
+      return result;
+    }
+
+    // If relative try to use the source to get the Path
+    Path sourcePath = Paths.get(source);
+    if (Files.isRegularFile(sourcePath)) {
+      return Paths.get(sourcePath.getParent().toString(), includePath);
     }
 
     return Paths.get(includePath);
@@ -197,12 +213,14 @@ abstract class AbstractXMLParser<E> {
   // Constructor
   //
 
-  protected AbstractXMLParser(String rootTagName, AozanLogger logger) {
+  protected AbstractXMLParser(String rootTagName, String fileType,
+      AozanLogger logger) {
 
     requireNonNull(rootTagName);
-    requireNonNull(logger);
+    requireNonNull(fileType);
 
     this.rootTagName = rootTagName;
+    this.fileType = fileType;
     this.logger = logger != null ? logger : new DummyAzoanLogger();
   }
 

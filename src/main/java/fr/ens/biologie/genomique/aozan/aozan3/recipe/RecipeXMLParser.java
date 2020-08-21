@@ -8,21 +8,9 @@ import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.nullToEm
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Objects.requireNonNull;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Objects;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
@@ -37,7 +25,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.RunConfig
  * @author Laurent Jourdren
  * @since 3.0
  */
-public class RecipeXMLParser {
+public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
 
   private final Configuration conf;
   private AozanLogger logger = new DummyAzoanLogger();
@@ -63,72 +51,20 @@ public class RecipeXMLParser {
   private static final String DATASOURCE_CONF_TAG_NAME = "configuration";
   private static final String DATASOURCE_INPROGRESS_ATTR_NAME = "inprogress";
 
-  /**
-   * Parse XML as an input stream.
-   * @param is input stream
-   * @return a Recipe object
-   * @throws Aozan3Exception if an error occurs while parsing the file
-   */
-  public Recipe parse(Path path) throws Aozan3Exception {
-
-    try {
-      return parse(Files.newInputStream(path));
-    } catch (IOException e) {
-      throw new Aozan3Exception(
-          "Error while reading recipe file: " + e.getMessage(), e);
-    }
-  }
-
-  /**
-   * Parse XML as an input stream.
-   * @param is input stream
-   * @return a Recipe object
-   * @throws Aozan3Exception if an error occurs while parsing the file
-   */
-  public Recipe parse(InputStream is) throws Aozan3Exception {
-
-    Objects.requireNonNull(is);
-
-    this.logger.info("Start parsing the recipe file");
-
-    // Parse file into a Document object
-    try {
-      final DocumentBuilderFactory dbFactory =
-          DocumentBuilderFactory.newInstance();
-      final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-      final Document doc = dBuilder.parse(is);
-      doc.getDocumentElement().normalize();
-
-      // Create Recipe object
-      return parse(doc);
-
-    } catch (ParserConfigurationException | SAXException | IOException e) {
-      throw new Aozan3Exception(
-          "Error while parsing recipe file: " + e.getMessage(), e);
-    }
-  }
-
-  /**
-   * Parse XML document.
-   * @param doc XML document
-   * @return a new Recipe Object
-   * @throws Aozan3Exception if an error occurs while parsing the XML document
-   */
-  public Recipe parse(Document doc) throws Aozan3Exception {
-
-    final NodeList nAnalysisList = doc.getElementsByTagName(ROOT_TAG_NAME);
+  @Override
+  protected Recipe parse(NodeList nList, String source) throws Aozan3Exception {
 
     Recipe result = null;
 
-    for (int i = 0; i < nAnalysisList.getLength(); i++) {
+    for (int i = 0; i < nList.getLength(); i++) {
 
       if (result != null) {
         throw new Aozan3Exception("Found several recipe in the recipe file");
       }
 
-      Node nNode = nAnalysisList.item(i);
+      Node nNode = nList.item(i);
       if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-        result = parseRecipeTag((Element) nNode);
+        result = parseRecipeTag((Element) nNode, source);
       }
 
     }
@@ -139,10 +75,12 @@ public class RecipeXMLParser {
   /**
    * Parse a recipe tag.
    * @param element element to parse
+   * @param source file source
    * @return a new recipe object
    * @throws Aozan3Exception if an error occurs while parsing the XML
    */
-  private Recipe parseRecipeTag(Element element) throws Aozan3Exception {
+  private Recipe parseRecipeTag(Element element, String source)
+      throws Aozan3Exception {
 
     // Check allowed child tags of the root tag
     checkAllowedChildTags(element, RECIPE_FORMAT_VERSION_TAG_NAME,
@@ -163,23 +101,24 @@ public class RecipeXMLParser {
 
     // Get the recipe configuration
     Configuration recipeConf = new ConfigurationXMLParser(RECIPE_CONF_TAG_NAME,
-        "recipe configuration", this.conf, this.logger).parse(element);
+        "recipe configuration", this.conf, this.logger).parse(element, source);
 
     // Create a new recipe
     Recipe recipe = new Recipe(recipeName, recipeConf);
 
     // Parse storages
-    new StoragesXMLParser(recipe).parse(element);
+    new StoragesXMLParser(recipe).parse(element, source);
 
     // Parse run configuration provider
     RunConfigurationProvider runConfProvider =
-        parseRunConfigurationTag(recipe, element);
+        parseRunConfigurationTag(recipe, element, source);
 
     // Parse the datasource tag
-    parseDataSourceTag(recipe, element);
+    parseDataSourceTag(recipe, element, source);
 
     // Parse steps
-    recipe.addSteps(new StepsXMLParser(recipe, runConfProvider).parse(element));
+    recipe.addSteps(
+        new StepsXMLParser(recipe, runConfProvider).parse(element, source));
 
     return recipe;
   }
@@ -188,11 +127,13 @@ public class RecipeXMLParser {
    * Parse a run configuration XML tag.
    * @param recipe the recipe
    * @param rootElement element to parse
+   * @param source file source
    * @return a new RunConfigurationProvider object
    * @throws Aozan3Exception if an error occurs while parsing the XML
    */
   private static RunConfigurationProvider parseRunConfigurationTag(
-      final Recipe recipe, final Element rootElement) throws Aozan3Exception {
+      final Recipe recipe, final Element rootElement, final String source)
+      throws Aozan3Exception {
 
     requireNonNull(recipe);
     requireNonNull(rootElement);
@@ -223,7 +164,7 @@ public class RecipeXMLParser {
 
         Configuration conf = new ConfigurationXMLParser(RUNCONF_CONF_TAG_NAME,
             "run configuration", recipe.getConfiguration(), recipe.getLogger())
-                .parse(element);
+                .parse(element, source);
 
         result = RunConfigurationProviderService.getInstance()
             .newService(providerName);
@@ -238,10 +179,11 @@ public class RecipeXMLParser {
    * Parse a run data source XML tag.
    * @param recipe the recipe
    * @param rootElement element to parse
+   * @param source file source
    * @throws Aozan3Exception if an error occurs while parsing the XML
    */
   private void parseDataSourceTag(final Recipe recipe,
-      final Element rootElement) throws Aozan3Exception {
+      final Element rootElement, final String source) throws Aozan3Exception {
 
     requireNonNull(recipe);
     requireNonNull(rootElement);
@@ -280,7 +222,7 @@ public class RecipeXMLParser {
         Configuration conf =
             new ConfigurationXMLParser(DATASOURCE_CONF_TAG_NAME,
                 RECIPE_DATASOURCE_TAG_NAME, recipe.getConfiguration(),
-                recipe.getLogger()).parse(element);
+                recipe.getLogger()).parse(element, source);
 
         recipe.setDataProvider(providerName, storageName, conf);
         recipe.setUseInProgressData(inProgress);
@@ -302,6 +244,8 @@ public class RecipeXMLParser {
    * @param logger default logger
    */
   public RecipeXMLParser(Configuration conf, AozanLogger logger) {
+
+    super(ROOT_TAG_NAME, "recipe", logger);
 
     requireNonNull(conf);
     this.conf = conf;
