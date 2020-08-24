@@ -1,4 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+#
+# This script set the right classpath and start the application
+#
+# Author : Laurent Jourdren
+#
 
 # Function to create lib paths
 make_paths() {
@@ -15,48 +21,93 @@ make_paths() {
 }
 
 # Read link to get aozan.sh path
-REAL_PATH=`readlink -f $0`
+REAL_PATH=$(readlink -f $0)
 
 # Get the path to this script
-BASEDIR=`dirname $REAL_PATH`
+BASEDIR=$(dirname $REAL_SCRIPT_PATH)
 
-# Set the Eoulsan libraries path
+# Set the libraries path
 LIBDIR=$BASEDIR/lib
 
-# Set the memory in MiB needed by Aozan (only Java part, not external tools)
+# Set the memory in MiB needed by the application (only Java part, not external tools)
 # By Default 4096
-MEMORY=4096
+if [ -n "$AOZAN_MEMORY" ]; then
+	MEMORY=$AOZAN_MEMORY
+else
+	MEMORY=4096
+fi
 
 # Additional JVM options
-JVM_OPTS="-server"
+if [ -n "$AOZAN_JVM_OPTS" ]; then
+	JVM_OPTS=$AOZAN_JVM_OPTS
+else
+	JVM_OPTS="-server"
+fi
 
 # Add here your plugins and dependencies
-PLUGINS=
+if [ -n "$AOZAN_PLUGINS" ]; then
+	PLUGINS=$AOZAN_PLUGINS
+else
+	PLUGINS=
+fi
+
+# Parse options
+OPTERR=0
+while getopts "j:m:J:p:" OPTION
+do
+	case $OPTION in
+		j)
+			JAVA_HOME=$OPTARG
+		;;
+		m)
+			MEMORY=$OPTARG
+		;;
+		J)
+			JVM_OPTS=$OPTARG
+		;;
+		p)
+			PLUGINS=$OPTARG
+		;;
+		w)
+			cd $OPTARG
+		;;
+	esac
+done
 
 # Set the path to java
-if [ -z "$JAVA_HOME" ] ; then
-    JAVA_CMD="java"
+if [ -n "$AOZAN_JAVA_HOME" ] ; then
+	JAVA_CMD="$AOZAN_JAVA_HOME/bin/java"
+elif [ -n "$JAVA_HOME" ] ; then
+	JAVA_CMD="$JAVA_HOME/bin/java"
 else
-    JAVA_CMD="$JAVA_HOME/bin/java"
+	JAVA_CMD="java"
+fi
+
+# Set the temporary directory
+TMPDIR_JVM_OPT=""
+if [ -n "$TMPDIR" ]; then
+	TMPDIR_JVM_OPT="-Djava.io.tmpdir=$TMPDIR"
 fi
 
 COMMON_LIBS=$(make_paths $LIBDIR)
+LOCAL_LIBS=$(make_paths $LIBDIR/local)
 PLUGINS_LIBS=$(make_paths $AOZAN_PLUGINS)
-
-# Check if only jython jar exists
-if [ `ls $LIBDIR/jython-standalone-*.jar | wc -l` -ne 1 ]; then
-	echo Error: found more than one jython-standalone jar >&2
-	exit 1
-fi
+APP_CLASSPATH=$COMMON_LIBS:$LOCAL_LIBS:$PLUGINS:$PLUGINS_LIBS
 
 # Force language
-export LANG=C
+#export LANG=C
 
 # Launch Aozan
 $JAVA_CMD \
-        $JVM_OPTS \
-        -Xmx${MEMORY}m \
-        -cp $COMMON_LIBS:$PLUGINS:$PLUGINS_LIBS \
-        org.python.util.jython \
-        -jar $LIBDIR/jython-standalone-*.jar "$@"
+		$TMPDIR_JVM_OPT \
+		$JVM_OPTS \
+		-Xmx${MEMORY}m \
+		-cp $APP_CLASSPATH \
+		-Dapplication.script.path="$0" \
+		-Dapplication.classpath=$APP_CLASSPATH \
+		-Dapplication.memory=$MEMORY \
+		-Dapplication.launch.mode=local \
+		-Dapplication.launch.script.path="$0" \
+		-Dapplication.path="$BASEDIR" \
+		fr.ens.biologie.genomique.aozan.aozan3.Main "$@"
 
