@@ -29,6 +29,8 @@ public class Globals {
   /** Minimal java version required by Aozan. */
   public static final int MINIMAL_JAVA_VERSION_REQUIRED = 8;
 
+  public static final String CONF_FILE_EXTENSION = ".conf";
+
   //
   // Description constants
   //

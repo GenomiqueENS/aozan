@@ -1,5 +1,6 @@
 package fr.ens.biologie.genomique.aozan.aozan3.recipe;
 
+import static fr.ens.biologie.genomique.aozan.aozan3.Globals.CONF_FILE_EXTENSION;
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.checkAllowedChildTags;
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.evaluateExpressions;
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.getTagValue;
@@ -54,7 +55,7 @@ public class ConfigurationXMLParser extends AbstractXMLParser<Configuration> {
         if (includePath != null) {
 
           String filename = includePath.getFileName().toString();
-          if (filename.endsWith(".conf")) {
+          if (filename.endsWith(CONF_FILE_EXTENSION)) {
 
             // Load key/value file
             Configuration conf = new Configuration();
