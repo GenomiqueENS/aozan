@@ -24,6 +24,7 @@ import com.google.common.base.Strings;
 import fr.ens.biologie.genomique.aozan.aozan3.action.Action;
 import fr.ens.biologie.genomique.aozan.aozan3.action.ActionService;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
+import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLoggerFactory;
 import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
 
 /**
@@ -415,7 +416,8 @@ public class Main {
       // Load configuration file (if needed)
       loadConfigurationFile();
 
-      // TODO initialize log
+      // Initialize log
+      this.logger = AozanLoggerFactory.newLogger(this.conf, this.logger);
 
     } catch (Aozan3Exception e) {
       Common.errorExit(e, e.getMessage());

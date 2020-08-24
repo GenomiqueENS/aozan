@@ -21,7 +21,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.dataprovider.RunDataProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprovider.RunDataProviderService;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
-import fr.ens.biologie.genomique.aozan.aozan3.log.StandardErrorAozanLogger;
+import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLoggerFactory;
 
 /**
  * This class define a recipe.
@@ -303,23 +303,6 @@ public class Recipe {
   }
 
   //
-  // Configuration methods
-  //
-
-  /**
-   * Configure logger.
-   * @param conf the recipe configuration
-   * @return a new AozanLogger object
-   * @throws Aozan3Exception if an error occurs while creating the logger
-   */
-  private static AozanLogger newLogger(final Configuration conf)
-      throws Aozan3Exception {
-
-    // TODO configure logger from recipe configuration
-    return new StandardErrorAozanLogger(conf);
-  }
-
-  //
   // Other methods
   //
 
@@ -437,10 +420,12 @@ public class Recipe {
    * Public constructor.
    * @param recipeName recipe name
    * @param conf configuration
+   * @param logger logger
    * @throws Aozan3Exception if an error occurs while initializing the email
    *           sending
    */
-  public Recipe(String recipeName, Configuration conf) throws Aozan3Exception {
+  public Recipe(String recipeName, Configuration conf, AozanLogger logger)
+      throws Aozan3Exception {
 
     requireNonNull(recipeName);
 
@@ -452,7 +437,7 @@ public class Recipe {
     }
 
     // Configure the logger
-    this.logger = newLogger(this.conf);
+    this.logger = AozanLoggerFactory.newLogger(this.conf, logger);
 
     // Configure emails
     this.sendMail = new SendMail(conf, this.logger);

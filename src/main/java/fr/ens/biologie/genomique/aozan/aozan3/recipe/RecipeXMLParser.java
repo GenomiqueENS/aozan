@@ -104,7 +104,7 @@ public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
         "recipe configuration", this.conf, this.logger).parse(element, source);
 
     // Create a new recipe
-    Recipe recipe = new Recipe(recipeName, recipeConf);
+    Recipe recipe = new Recipe(recipeName, recipeConf, getLogger());
 
     // Parse storages
     new StoragesXMLParser(recipe).parse(element, source);
