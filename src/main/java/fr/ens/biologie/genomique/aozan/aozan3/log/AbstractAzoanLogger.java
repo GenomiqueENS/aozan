@@ -113,6 +113,16 @@ public abstract class AbstractAzoanLogger implements AozanLogger {
             exception != null ? exception.getMessage() : "UNKNOWN EXCEPTION"));
   }
 
+  @Override
+  public void flush() {
+    getLogger().getHandlers()[0].flush();
+  }
+
+  @Override
+  public void close() {
+    getLogger().getHandlers()[0].close();
+  }
+
   //
   // Other methods
   //

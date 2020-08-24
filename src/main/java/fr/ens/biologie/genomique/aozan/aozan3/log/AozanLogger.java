@@ -110,4 +110,14 @@ public interface AozanLogger {
    */
   void error(RunData runData, Throwable exception);
 
+  /**
+   * Flush log entries.
+   */
+  void flush();
+
+  /**
+   * Close the logger
+   */
+  void close();
+
 }

@@ -70,4 +70,12 @@ public class DummyAzoanLogger implements AozanLogger {
   public void error(RunData runData, Throwable exception) {
   }
 
+  @Override
+  public void flush() {
+  }
+
+  @Override
+  public void close() {
+  }
+
 }
