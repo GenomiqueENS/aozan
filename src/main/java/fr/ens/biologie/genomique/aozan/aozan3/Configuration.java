@@ -248,6 +248,25 @@ public class Configuration {
     this.conf.putAll(conf.conf);
   }
 
+  /**
+   * Parse a string (e.g. key=value) and set the key and value in the
+   * configuration.
+   * @param s String to parse
+   */
+  public void parseAndSet(String s) {
+
+    requireNonNull(s);
+
+    int index = s.indexOf('=');
+    if (index >= 0) {
+
+      String key = s.substring(0, index);
+      String value = s.substring(index + 1);
+
+      set(key.trim(), value.trim());
+    }
+  }
+
   //
   // Other
   //
@@ -302,14 +321,8 @@ public class Configuration {
           continue;
         }
 
-        int index = line.indexOf('=');
-        if (index >= 0) {
-
-          String key = line.substring(0, index);
-          String value = line.substring(index + 1);
-
-          set(key.trim(), value.trim());
-        }
+        // Parse and set the line
+        parseAndSet(line);
       }
     } catch (IOException e) {
       throw new Aozan3Exception(e);
