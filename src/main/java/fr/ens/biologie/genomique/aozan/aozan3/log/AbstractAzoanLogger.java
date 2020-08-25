@@ -120,7 +120,7 @@ public abstract class AbstractAzoanLogger implements AozanLogger {
 
   @Override
   public void close() {
-    getLogger().getHandlers()[0].close();
+    getLogger().removeHandler(getLogger().getHandlers()[0]);
   }
 
   //
