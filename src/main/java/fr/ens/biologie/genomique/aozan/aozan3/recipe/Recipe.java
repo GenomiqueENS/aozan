@@ -412,6 +412,22 @@ public class Recipe {
     return result;
   }
 
+  /**
+   * Get the list of available runs.
+   * @return a list with available runs
+   * @throws Aozan3Exception if an error occurs while getting the available runs
+   */
+  public List<String> getAvalaibleRuns() throws Aozan3Exception {
+
+    List<String> result = new ArrayList<>();
+
+    for (RunData runData : runDataToProcess()) {
+      result.add(runData.getRunId().getId());
+    }
+
+    return result;
+  }
+
   //
   // Constructor
   //
