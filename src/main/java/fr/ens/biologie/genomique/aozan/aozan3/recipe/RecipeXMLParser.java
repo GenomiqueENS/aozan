@@ -34,9 +34,9 @@ public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
   /** Version of the format of the workflow file. */
   private static final String FORMAT_VERSION = "0.1";
 
-  private static final String ROOT_TAG_NAME = "recipe";
+  static final String ROOT_TAG_NAME = "recipe";
   private static final String RECIPE_FORMAT_VERSION_TAG_NAME = "formatversion";
-  private static final String RECIPE_NAME_TAG_NAME = "name";
+  static final String RECIPE_NAME_TAG_NAME = "name";
   private static final String RECIPE_CONF_TAG_NAME = "configuration";
   static final String RECIPE_STORAGES_TAG_NAME = "storages";
   private static final String RECIPE_RUN_CONFIGURATION_TAG_NAME =
