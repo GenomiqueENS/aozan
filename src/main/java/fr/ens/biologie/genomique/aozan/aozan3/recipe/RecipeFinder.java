@@ -3,6 +3,7 @@ package fr.ens.biologie.genomique.aozan.aozan3.recipe;
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.getTagValue;
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.nullToEmpty;
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.RecipeXMLParser.RECIPE_NAME_TAG_NAME;
+import static fr.ens.biologie.genomique.aozan.aozan3.recipe.RecipeXMLParser.RECIPE_DESCRIPTION_TAG_NAME;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
@@ -12,7 +13,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -41,18 +41,21 @@ public class RecipeFinder {
   public static class RecipePath implements Comparable<RecipePath> {
 
     public final String recipeName;
+    public final String description;
     public final Path recipePath;
 
-    private RecipePath(String recipeName, Path recipePath) {
+    private RecipePath(String recipeName, String description, Path recipePath) {
 
       this.recipeName = recipeName;
+      this.description = description;
       this.recipePath = recipePath;
     }
 
     @Override
     public String toString() {
       return "RecipePath [recipeName="
-          + recipeName + ", recipePath=" + recipePath + "]";
+          + recipeName + ", description=" + description + ", recipePath="
+          + recipePath + "]";
     }
 
     @Override
@@ -65,8 +68,13 @@ public class RecipeFinder {
       int c = this.recipeName.compareTo(o.recipeName);
 
       if (c == 0) {
-        return this.recipePath.compareTo(o.recipePath);
+        c = this.description.compareTo(o.description);
       }
+
+      if (c == 0) {
+        c = this.recipePath.compareTo(o.recipePath);
+      }
+
       return c;
 
     }
@@ -89,9 +97,9 @@ public class RecipeFinder {
         if (Files.isRegularFile(path)
             && path.getFileName().toString().endsWith(RECIPE_FILE_EXTENSION)) {
 
-          String recipeName = getRecipeName(path);
-          if (recipeName != null) {
-            result.add(new RecipePath(recipeName, path));
+          String[] array = getRecipeNameAndDescription(path);
+          if (array != null) {
+            result.add(new RecipePath(array[0], array[1], path));
           }
 
         }
@@ -106,12 +114,26 @@ public class RecipeFinder {
   }
 
   /**
-   * Load a file and try to get the recipe name inside if it is a recipe file
+   * Load a file and try to get the recipe name inside if it is a recipe file.
    * @param file the file to load
    * @return the name of the recipe in a String or null if the file is not a
    *         recipe file
    */
   public static String getRecipeName(Path file) {
+
+    String[] result = getRecipeNameAndDescription(file);
+
+    return result == null ? null : result[0];
+  }
+
+  /**
+   * Load a file and try to get the recipe name and description inside if it is
+   * a recipe file.
+   * @param file the file to load
+   * @return the name and the description of the recipe in a String array or
+   *         null if the file is not a recipe file
+   */
+  private static String[] getRecipeNameAndDescription(Path file) {
 
     requireNonNull(file);
 
@@ -140,8 +162,12 @@ public class RecipeFinder {
           String recipeName =
               nullToEmpty(getTagValue(RECIPE_NAME_TAG_NAME, element));
 
+          // Get the recipe description
+          String description =
+              nullToEmpty(getTagValue(RECIPE_DESCRIPTION_TAG_NAME, element));
+
           if (!recipeName.isEmpty()) {
-            return recipeName;
+            return new String[] {recipeName, description};
           }
 
         }

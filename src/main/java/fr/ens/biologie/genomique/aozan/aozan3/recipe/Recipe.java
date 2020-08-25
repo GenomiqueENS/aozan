@@ -13,7 +13,6 @@ import java.util.Set;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
-import fr.ens.biologie.genomique.aozan.aozan3.ConfigurationDefaults;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.SendMail;
@@ -34,6 +33,7 @@ import fr.ens.biologie.genomique.eoulsan.EoulsanRuntime;
 public class Recipe {
 
   private String name;
+  private String description;
   private final Configuration conf = new Configuration();
 
   private final DataStorageRegistry storages = new DataStorageRegistry();
@@ -56,6 +56,14 @@ public class Recipe {
    */
   public String getName() {
     return this.name;
+  }
+
+  /**
+   * Get the recipe name
+   * @return the name of the recipe
+   */
+  public String getDescription() {
+    return this.description;
   }
 
   /**
@@ -438,17 +446,20 @@ public class Recipe {
   /**
    * Public constructor.
    * @param recipeName recipe name
+   * @param description description of the recipe
    * @param conf configuration
    * @param logger logger
    * @throws Aozan3Exception if an error occurs while initializing the email
    *           sending
    */
-  public Recipe(String recipeName, Configuration conf, AozanLogger logger)
-      throws Aozan3Exception {
+  public Recipe(String recipeName, String description, Configuration conf,
+      AozanLogger logger) throws Aozan3Exception {
 
     requireNonNull(recipeName);
+    requireNonNull(description);
 
     this.name = recipeName;
+    this.description = description;
 
     // Set the configuration
     if (conf != null) {

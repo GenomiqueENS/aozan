@@ -13,6 +13,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import com.google.common.base.Strings;
+
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Common;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
@@ -30,6 +32,8 @@ public class ListAction implements Action {
 
   /** Name of this action. */
   public static final String ACTION_NAME = "list";
+
+  private static final int TEXT_PADDING = 30;
 
   @Override
   public String getName() {
@@ -93,8 +97,13 @@ public class ListAction implements Action {
 
       if (!recipes.isEmpty()) {
 
+        System.out.println(
+            Strings.padEnd("Recipe name", TEXT_PADDING, ' ') + "Description");
+
         for (RecipePath rp : recipes) {
-          System.out.println(rp.recipeName);
+          System.out.println(Strings.padEnd(rp.recipeName, TEXT_PADDING, ' ')
+              + (rp.description.isEmpty()
+                  ? "(no description)" : rp.description));
         }
 
       } else {

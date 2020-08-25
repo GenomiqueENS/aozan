@@ -37,6 +37,7 @@ public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
   static final String ROOT_TAG_NAME = "recipe";
   private static final String RECIPE_FORMAT_VERSION_TAG_NAME = "formatversion";
   static final String RECIPE_NAME_TAG_NAME = "name";
+  static final String RECIPE_DESCRIPTION_TAG_NAME = "description";
   private static final String RECIPE_CONF_TAG_NAME = "configuration";
   static final String RECIPE_STORAGES_TAG_NAME = "storages";
   private static final String RECIPE_RUN_CONFIGURATION_TAG_NAME =
@@ -100,6 +101,10 @@ public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
     // Get the recipe name
     String recipeName = nullToEmpty(getTagValue(RECIPE_NAME_TAG_NAME, element));
 
+    // Get the recipe description
+    String description =
+        nullToEmpty(getTagValue(RECIPE_DESCRIPTION_TAG_NAME, element));
+
     // Get the recipe configuration
     Configuration recipeConf = new ConfigurationXMLParser(RECIPE_CONF_TAG_NAME,
         "recipe configuration", this.conf, this.logger).parse(element, source);
@@ -108,7 +113,8 @@ public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
     recipeConf.set(this.cliConf);
 
     // Create a new recipe
-    Recipe recipe = new Recipe(recipeName, recipeConf, getLogger());
+    Recipe recipe =
+        new Recipe(recipeName, description, recipeConf, getLogger());
 
     // Parse storages
     new StoragesXMLParser(recipe).parse(element, source);
