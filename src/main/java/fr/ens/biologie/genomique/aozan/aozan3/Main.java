@@ -4,6 +4,7 @@ import static fr.ens.biologie.genomique.aozan.aozan3.Globals.MINIMAL_JAVA_VERSIO
 import static fr.ens.biologie.genomique.eoulsan.util.SystemUtils.getJavaVersion;
 import static java.util.Collections.unmodifiableList;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,6 +27,9 @@ import fr.ens.biologie.genomique.aozan.aozan3.action.ActionService;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLoggerFactory;
 import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
+import fr.ens.biologie.genomique.eoulsan.EoulsanException;
+import fr.ens.biologie.genomique.eoulsan.EoulsanRuntime;
+import fr.ens.biologie.genomique.eoulsan.LocalEoulsanRuntime;
 
 /**
  * This class define the main class.
@@ -413,13 +417,16 @@ public class Main {
 
     try {
 
+      // Initialize Eoulsan runtime
+      LocalEoulsanRuntime.initEoulsanRuntimeForExternalApp();
+
       // Load configuration file (if needed)
       loadConfigurationFile();
 
       // Initialize log
       this.logger = AozanLoggerFactory.newLogger(this.conf, this.logger);
 
-    } catch (Aozan3Exception e) {
+    } catch (Aozan3Exception | IOException | EoulsanException e) {
       Common.errorExit(e, e.getMessage());
     }
 
