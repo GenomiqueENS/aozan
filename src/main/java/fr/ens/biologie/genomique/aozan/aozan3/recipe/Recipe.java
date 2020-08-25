@@ -1,5 +1,6 @@
 package fr.ens.biologie.genomique.aozan.aozan3.recipe;
 
+import static fr.ens.biologie.genomique.aozan.aozan3.ConfigurationDefaults.DOCKER_URI_KEY;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.Set;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
+import fr.ens.biologie.genomique.aozan.aozan3.ConfigurationDefaults;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.SendMail;
@@ -22,6 +24,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.dataprovider.RunDataProviderServic
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLoggerFactory;
+import fr.ens.biologie.genomique.eoulsan.EoulsanRuntime;
 
 /**
  * This class define a recipe.
@@ -457,6 +460,12 @@ public class Recipe {
 
     // Configure emails
     this.sendMail = new SendMail(conf, this.logger);
+
+    // Set Docker URI
+    if (conf.containsKey(DOCKER_URI_KEY)) {
+      EoulsanRuntime.getSettings()
+          .setDockerConnectionURI(conf.get(DOCKER_URI_KEY));
+    }
   }
 
 }
