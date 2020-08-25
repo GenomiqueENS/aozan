@@ -28,6 +28,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.RunConfig
 public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
 
   private final Configuration conf;
+  private final Configuration cliConf;
   private AozanLogger logger = new DummyAzoanLogger();
 
   /** Version of the format of the workflow file. */
@@ -102,6 +103,9 @@ public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
     // Get the recipe configuration
     Configuration recipeConf = new ConfigurationXMLParser(RECIPE_CONF_TAG_NAME,
         "recipe configuration", this.conf, this.logger).parse(element, source);
+
+    // Overwrite recipe conf with command line configuration
+    recipeConf.set(this.cliConf);
 
     // Create a new recipe
     Recipe recipe = new Recipe(recipeName, recipeConf, getLogger());
@@ -245,10 +249,25 @@ public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
    */
   public RecipeXMLParser(Configuration conf, AozanLogger logger) {
 
+    this(conf, new Configuration(), logger);
+  }
+
+  /**
+   * Public constructor.
+   * @param conf initial configuration
+   * @param cliConf configuration that will overwrite global configuration of
+   *          the recipe
+   * @param logger default logger
+   */
+  public RecipeXMLParser(Configuration conf, Configuration cliConf,
+      AozanLogger logger) {
+
     super(ROOT_TAG_NAME, "recipe", logger);
 
     requireNonNull(conf);
+    requireNonNull(cliConf);
     this.conf = conf;
+    this.cliConf = cliConf;
 
     // Set logger
     if (logger != null) {
