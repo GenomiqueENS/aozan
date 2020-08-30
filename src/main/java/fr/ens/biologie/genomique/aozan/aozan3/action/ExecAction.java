@@ -73,6 +73,7 @@ public class ExecAction implements Action {
       // All option
       if (line.hasOption("all")) {
         allRuns = true;
+        argsOptions++;
       }
 
       if (line.hasOption("d")) {
@@ -111,7 +112,7 @@ public class ExecAction implements Action {
       recipe.init();
 
       // Print available runs if there is no run argument
-      if (runIds.isEmpty()) {
+      if (runIds.isEmpty() && !allRuns) {
         printAvailableRuns(recipe);
         Common.exit(0);
       }
