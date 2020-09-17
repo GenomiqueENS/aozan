@@ -4,7 +4,7 @@
 
   <groupId>fr.ens.biologie.genomique</groupId>
   <artifactId>aozan</artifactId>
-  <version>2.3-SNAPSHOT</version>
+  <version>3.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Aozan</name>
@@ -17,7 +17,6 @@
     <didyouknow>Did you know that aozan is the breton word for prepare?</didyouknow>
 
     <java.version>1.8</java.version>
-    <jython.version>2.7.0</jython.version>
     <htsjdk.version>1.118</htsjdk.version>
   </properties>
   
@@ -158,13 +157,6 @@
 
 
   <dependencies>
-    <!-- Warning: Jython version must be set in the properties -->
-    <dependency>
-      <groupId>org.python</groupId>
-      <artifactId>jython-standalone</artifactId>
-      <version>${jython.version}</version>
-      <scope>runtime</scope>
-    </dependency>
     <dependency>
       <groupId>fr.ens.biologie.genomique</groupId>
       <artifactId>eoulsan</artifactId>
@@ -332,24 +324,6 @@
     </pluginManagement>
     <plugins>
       <plugin>
-      	 <groupId>org.apache.maven.plugins</groupId> 
-         <artifactId>maven-site-plugin</artifactId>
-         <version>3.4</version>
-         <configuration>
-			<templateFile>${basedir}/src/site/site.vm</templateFile>
-			<outputEncoding>utf-8</outputEncoding>
-		 </configuration>
-		 <executions>
-			<execution>
-				<id>attach-descriptor</id>
-				<goals>
-					<goal>attach-descriptor</goal>
-				</goals>
-			 </execution>
-		  </executions>
-      </plugin>
-    	
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
@@ -389,7 +363,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
-        <version>1.15</version>
+        <version>1.16</version>
         <executions>
           <execution>
             <id>signature-check</id>
@@ -402,7 +376,7 @@
         <configuration>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>
-            <artifactId>java17</artifactId>
+            <artifactId>java18</artifactId>
             <version>1.0</version>
           </signature>
         </configuration>
@@ -458,6 +432,7 @@
                 <manifest file="${basedir}/target/generated-resources/MANIFEST.MF">
                   <attribute name="Built-By" value="${user.name}"/>
                   <attribute name="Built-Date" value="${TODAY}"/>  
+                  <attribute name="Built-YEAR" value="${YEAR}"/>
                   <attribute name="Built-Commit" value="${build.commit}" />
                   <attribute name="Built-Host" value="${build.host}" /> 
 
@@ -467,9 +442,24 @@
 
                   <attribute name="Implementation-Title" value="${project.name}"/>   
                   <attribute name="Implementation-Version" value="build${build.number}"/>   
-                  <attribute name="Implementation-Vendor" value="${project.organization.name}"/>
+		  <attribute name="Implementation-Vendor" value="${project.organization.name}"/>
+                  <attribute name="Main-Class" value="fr.ens.biologie.genomique.aozan.aozan3.Main" />
 
                 </manifest>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>pre-integration-test</id>
+            <phase>pre-integration-test</phase>
+            <configuration>
+              <tasks>
+                <mkdir dir="${basedir}/target/classes/META-INF" />
+                <copy file="${basedir}/target/generated-resources/MANIFEST.MF"
+                  tofile="${basedir}/target/classes/META-INF/MANIFEST.MF" />
               </tasks>
             </configuration>
             <goals>
@@ -480,9 +470,9 @@
             <id>create-dist</id>
             <phase>package</phase>
             <configuration>
-              <tasks>
+              <tasks unless="distrib.package.skip">
 
-                <!-- Package binary distribution -->
+		      <!-- Package binary distribution -->
 
                 <mkdir dir="${basedir}/target/dist/lib"/>
 
@@ -495,10 +485,6 @@
 
                 <copy file="${basedir}/target/${project.artifactId}-${project.version}.jar" todir="${basedir}/target/dist/lib" />
                 <move file="${basedir}/target/dist/" tofile="${basedir}/target/dist/${project.artifactId}-${project.version}"/>
-
-                <jar jarfile="${basedir}/target/dist/${project.artifactId}-${project.version}/lib/jython-standalone-${jython.version}.jar" update="true">
-                  <fileset dir="${basedir}/src/main/python" includes="*" />
-                </jar>
 
                 <!-- Package source distribution -->
 
@@ -536,11 +522,11 @@
                   <tarfileset dir="${basedir}/target/dist"  mode="644" dirmode="755" username="nobody" group="nobody">
                     <include name="*/**"/>
                     <exclude name="${project.artifactId}-${project.version}/${project.artifactId}.sh" />
-                    <exclude name="${project.artifactId}-${project.version}/jython.sh" />
+		    <exclude name="${project.artifactId}-${project.version}/bin/*" />
                   </tarfileset>
                   <tarfileset dir="${basedir}/target/dist"  mode="755" dirmode="755" username="nobody" group="nobody">
                     <include name="${project.artifactId}-${project.version}/${project.artifactId}.sh" />
-                    <include name="${project.artifactId}-${project.version}/jython.sh" />
+                    <include name="${project.artifactId}-${project.version}/bin.*" />
                   </tarfileset>
                 </tar>
                 <gzip zipfile="${basedir}/target/${project.artifactId}-${project.version}.tar.gz"
@@ -583,25 +569,28 @@
                   <include name="**/*.jnlp"/>
                   <include name="**/*.html"/>
                   <include name="**/*.rss"/>
+                  <include name="**/*.sh"/>
                   <replacetoken>@@@WEBSITE@@@</replacetoken>
                 </replace>
                 <replace encoding="UTF-8" dir="${basedir}/target/site" value="${project.version}">
                   <include name="**/*.jnlp"/>
                   <include name="**/*.html"/>
                   <include name="**/*.rss"/>
-                  <include name="**/configure-aozan-demo.sh"/>
+                  <include name="**/*.sh"/>
                   <replacetoken>@@@VERSION@@@</replacetoken>
                 </replace>
                 <replace encoding="UTF-8" dir="${basedir}/target/site" value="${project.name}">
                   <include name="**/*.jnlp"/>
                   <include name="**/*.html"/>
                   <include name="**/*.rss"/>
+                  <include name="**/*.sh"/>
                   <replacetoken>@@@APPNAME@@@</replacetoken>
                 </replace>
                 <replace encoding="UTF-8" dir="${basedir}/target/site" value="${project.artifactId}">
                   <include name="**/*.jnlp"/>
                   <include name="**/*.html"/>
                   <include name="**/*.rss"/>
+                  <include name="**/*.sh"/>
                   <replacetoken>@@@APPNAMEMIN@@@</replacetoken>
                 </replace>
 
@@ -612,6 +601,7 @@
                   <include name="**/*.jnlp"/>
                   <include name="**/*.html"/>
                   <include name="**/*.rss"/>
+                  <include name="**/*.sh"/>
                   <replacetoken>@@@DATE@@@</replacetoken>
                 </replace>
               </tasks>
@@ -653,10 +643,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.5</version>
+        <version>3.1.0</version>
         <configuration>
           <archive>
-            <manifestEntries/>
+		<manifestEntries>
+			<mode>development</mode>
+			<url>${project.url}</url>
+		</manifestEntries>
             <manifestFile>${basedir}/target/generated-resources/MANIFEST.MF</manifestFile>
           </archive>
         </configuration>
@@ -664,6 +657,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
+	<version>3.1.1</version>
         <executions>
           <execution>
             <id>copy</id>
@@ -672,20 +666,36 @@
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>jython-standalone,eoulsan,poi,guava,fastqc,jbzip2,commons-compress,htsjdk,commons-math3,commons-cli,javassist,aws-java-sdk,docker-client,httpclient,httpcore,commons-logging,slf4j-api</includeArtifactIds>
-              <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
+              <!--includeArtifactIds>jython-standalone,eoulsan,poi,guava,fastqc,jbzip2,commons-compress,htsjdk,commons-math3,commons-cli,javassist,aws-java-sdk,docker-client,httpclient,httpcore,commons-logging,slf4j-api</includeArtifactIds-->
               <excludeTransitive>true</excludeTransitive>
+              <outputDirectory>${basedir}/target/dist/lib</outputDirectory>
             </configuration>
           </execution>
         </executions>
       </plugin>
-      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.4</version>
+        <configuration>
+          <templateFile>${basedir}/src/site/site.vm</templateFile>
+          <outputEncoding>UTF-8</outputEncoding>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-descriptor</id>
+            <goals>
+              <goal>attach-descriptor</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
        <!-- add plugin for test with Jenkins : static analysis code -->
         <!-- PLUG-IN Checkstyle -->
         <plugin>
            <groupId>org.apache.maven.plugins</groupId>
            <artifactId>maven-checkstyle-plugin</artifactId>
-           <version>2.12</version>
+           <version>3.0.0</version>
            <configuration>
               <configLocation>./checkstyle.xml</configLocation>
            </configuration>
@@ -706,7 +716,7 @@
         <plugin>
            <groupId>org.apache.maven.plugins</groupId>
            <artifactId>maven-pmd-plugin</artifactId>
-           <version>3.0.1</version>
+           <version>3.10.0</version>
            <configuration>
               <!-- PMD options -->
               <targetJdk>${java.version}</targetJdk>
@@ -728,9 +738,7 @@
 		<plugin>
 		  <groupId>org.gaul</groupId>
 		  <artifactId>modernizer-maven-plugin</artifactId>
-		  <version>1.1.0</version>
-                  <!-- Use 1.4.0 with Java 8 -->
-		  <!--version>1.4.0</version-->
+		  <version>1.6.0</version>
                   <executions>
                     <execution>
                      <id>modernizer</id>
@@ -755,7 +763,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-		<version>2.7</version>
+		<version>2.9</version>
 		<configuration>
 			<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
 		</configuration>
@@ -763,12 +771,12 @@
       <plugin>
 		<groupId>org.apache.maven.plugins</groupId>
 		<artifactId>maven-changes-plugin</artifactId>
-		<version>2.11</version>
+		<version>2.12.1</version>
 	  </plugin>
 	  
 	  <plugin>
 		<artifactId>maven-javadoc-plugin</artifactId>
-		<version>2.10.1</version>
+		<version>3.0.1</version>
 		<configuration>
 			<encoding>utf-8</encoding>
 			<doctitle>${project.name} ${project.version} API</doctitle>
