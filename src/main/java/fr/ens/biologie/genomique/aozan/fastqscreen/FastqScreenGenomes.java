@@ -23,7 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.fastqscreen;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.util.Collections;
@@ -257,7 +258,7 @@ public class FastqScreenGenomes {
   public static FastqScreenGenomes newInstance(
       final TestConfiguration testConfiguration) throws AozanException {
 
-    checkNotNull(testConfiguration,
+    requireNonNull(testConfiguration,
         "testConfiguration argument cannot be null");
 
     final File samplesheetFile =
@@ -282,8 +283,8 @@ public class FastqScreenGenomes {
   public FastqScreenGenomes(final File samplesheetFile,
       final String contaminantGenomeNames) throws AozanException {
 
-    checkNotNull(samplesheetFile, "samplesheetFile argument cannot be null");
-    checkNotNull(contaminantGenomeNames,
+    requireNonNull(samplesheetFile, "samplesheetFile argument cannot be null");
+    requireNonNull(contaminantGenomeNames,
         "contaminantGenomeNames argument cannot be null");
 
     // Collect genomes contaminant list

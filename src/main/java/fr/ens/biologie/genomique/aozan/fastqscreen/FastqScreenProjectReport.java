@@ -22,7 +22,8 @@
  */
 package fr.ens.biologie.genomique.aozan.fastqscreen;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -71,7 +72,7 @@ public class FastqScreenProjectReport {
   public void createReport(final File reportHtml)
       throws AozanException, IOException {
 
-    checkNotNull(reportHtml, "fastqscreen report filename");
+    requireNonNull(reportHtml, "fastqscreen report filename");
 
     if (fastqScreenFiles.isEmpty()) {
       return;
@@ -327,8 +328,8 @@ public class FastqScreenProjectReport {
   public FastqScreenProjectReport(final List<File> fastqScreenFiles,
       final String description, final File xslFile) {
 
-    checkNotNull(fastqScreenFiles, "fastqScreenFiles argument cannot be null");
-    checkNotNull(description, "description argument cannot be null");
+    requireNonNull(fastqScreenFiles, "fastqScreenFiles argument cannot be null");
+    requireNonNull(description, "description argument cannot be null");
 
     // this.entityStat = entites;
     this.fastqScreenFiles = fastqScreenFiles;

@@ -23,10 +23,10 @@
 
 package fr.ens.biologie.genomique.aozan;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.biologie.genomique.aozan.collectors.ReadCollector.READ_DATA_PREFIX;
 import static fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector.SAMPLESHEET_DATA_PREFIX;
 import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.checkExistingFile;
+import static java.util.Objects.requireNonNull;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -88,7 +88,7 @@ public class RunData {
      */
     public ProjectComparator(final RunData data) {
 
-      checkNotNull(data, "data object cannot be null");
+      requireNonNull(data, "data object cannot be null");
       this.data = data;
     }
   }
@@ -133,7 +133,7 @@ public class RunData {
      */
     public PooledSampleComparator(final RunData data) {
 
-      checkNotNull(data, "data object cannot be null");
+      requireNonNull(data, "data object cannot be null");
       this.data = data;
     }
   }

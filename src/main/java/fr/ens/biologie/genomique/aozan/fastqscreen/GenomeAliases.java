@@ -23,7 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.fastqscreen;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+
+import static java.util.Objects.requireNonNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -72,7 +73,7 @@ public class GenomeAliases {
    */
   public String get(final String genomeName) {
 
-    checkNotNull(genomeName, "genome argument cannot be null");
+    requireNonNull(genomeName, "genome argument cannot be null");
 
     final String key = createKey(genomeName);
 
@@ -85,7 +86,7 @@ public class GenomeAliases {
 
   public boolean contains(final String genomeName) {
 
-    checkNotNull(genomeName, "genome argument cannot be null");
+    requireNonNull(genomeName, "genome argument cannot be null");
 
     final String key = createKey(genomeName);
 
@@ -157,8 +158,8 @@ public class GenomeAliases {
    */
   public void addAlias(final String genomeName, final String alias) {
 
-    checkNotNull(genomeName, "genomeName parameter cannot be null");
-    checkNotNull(alias, "alias parameter cannot be null");
+    requireNonNull(genomeName, "genomeName parameter cannot be null");
+    requireNonNull(alias, "alias parameter cannot be null");
 
     this.genomeAliases.put(genomeName, alias);
   }
@@ -169,7 +170,7 @@ public class GenomeAliases {
    */
   public void addUnknownAlias(final String genomeName) {
 
-    checkNotNull(genomeName, "genomeName parameter cannot be null");
+    requireNonNull(genomeName, "genomeName parameter cannot be null");
 
     if (!this.unknownAliases.contains(genomeName)) {
       this.newUnknownAliases.add(genomeName);
@@ -220,7 +221,7 @@ public class GenomeAliases {
    */
   public static void initialize(final Settings settings) throws AozanException {
 
-    checkNotNull(settings, "conf argument cannot be null");
+    requireNonNull(settings, "conf argument cannot be null");
 
     if (singleton == null) {
       singleton = new GenomeAliases(settings);

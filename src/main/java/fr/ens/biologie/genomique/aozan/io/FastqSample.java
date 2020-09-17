@@ -24,7 +24,7 @@
 package fr.ens.biologie.genomique.aozan.io;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -331,7 +331,7 @@ public class FastqSample {
    * @return sampleSheetFile
    */
   private static File getSampleSheetFileFromQC(QC qc) {
-    checkNotNull(qc, "qc argument cannot be null");
+    requireNonNull(qc, "qc argument cannot be null");
     return qc.getSampleSheetFile();
   }
 
@@ -437,7 +437,7 @@ public class FastqSample {
             getConstantFastqSuffix(getLane(), read));
       }
 
-      checkNotNull(sampleSheet,
+      requireNonNull(sampleSheet,
           "sample sheet on version 2 instance not initialize.");
 
       // Build sample name on fastq file according to version used

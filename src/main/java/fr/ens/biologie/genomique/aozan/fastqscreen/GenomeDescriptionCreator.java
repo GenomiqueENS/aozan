@@ -23,7 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.fastqscreen;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+
+import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 
@@ -56,7 +57,7 @@ public class GenomeDescriptionCreator {
   public GenomeDescription createGenomeDescription(final DataFile genomeFile)
       throws BadBioEntryException, IOException {
 
-    checkNotNull(genomeFile, "genomeFile argument cannot be null");
+    requireNonNull(genomeFile, "genomeFile argument cannot be null");
 
     GenomeDescription desc = null;
 

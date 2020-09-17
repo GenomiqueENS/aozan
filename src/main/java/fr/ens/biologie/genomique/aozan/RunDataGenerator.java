@@ -23,8 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -222,8 +222,8 @@ public class RunDataGenerator {
   public RunDataGenerator(final List<Collector> collectors, final String runId,
       final Map<String, String> generatorsConf) {
 
-    checkNotNull(collectors, "The list of collectors is null");
-    checkNotNull(generatorsConf, "the generatorsConf argument cannot be null");
+    requireNonNull(collectors, "The list of collectors is null");
+    requireNonNull(generatorsConf, "the generatorsConf argument cannot be null");
 
     this.collectors = reorderCollector(collectors);
     this.runId = runId;

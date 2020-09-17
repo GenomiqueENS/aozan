@@ -24,7 +24,7 @@
 package fr.ens.biologie.genomique.aozan.util;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -425,8 +425,8 @@ public class DockerCommand {
       final List<String> commandLine, final String imageName)
       throws AozanException {
 
-    checkNotNull(commandLine, "commande line");
-    checkNotNull(imageName, "software image Docker");
+    requireNonNull(commandLine, "commande line");
+    requireNonNull(imageName, "software image Docker");
 
     this.dockerClient =
         DockerConnection.getInstance(dockerConnectionString).getClient();

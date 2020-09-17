@@ -1,8 +1,8 @@
 package fr.ens.biologie.genomique.aozan.illumina;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.biologie.genomique.eoulsan.util.XMLUtils.getTagValue;
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -106,7 +106,7 @@ public class RunParameters {
   public static RunParameters parse(final String filepath)
       throws ParserConfigurationException, SAXException, IOException {
 
-    checkNotNull(filepath, "RunInfo.xml path cannot be null");
+    requireNonNull(filepath, "RunInfo.xml path cannot be null");
 
     return parse(new File(filepath));
   }
@@ -122,7 +122,7 @@ public class RunParameters {
   public static RunParameters parse(final File file)
       throws ParserConfigurationException, SAXException, IOException {
 
-    checkNotNull(file, "file cannot be null");
+    requireNonNull(file, "file cannot be null");
 
     checkArgument(file.isFile(),
         "RunParameters.xml does not exists or is not a file");
@@ -141,7 +141,7 @@ public class RunParameters {
   public static RunParameters parse(final InputStream is)
       throws ParserConfigurationException, SAXException, IOException {
 
-    checkNotNull(is, "RunParameters.xml input stream cannot be null");
+    requireNonNull(is, "RunParameters.xml input stream cannot be null");
 
     try (InputStream in = is) {
 

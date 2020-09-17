@@ -23,7 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.collectors;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -285,7 +286,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
         reportDir, isPairedEndMode, isRunPE, fastqscreenXSLFile);
 
     if (isPairedEndMode) {
-      checkNotNull(fastqSampleR2, "fastqSampleR2 argument cannot be null");
+      requireNonNull(fastqSampleR2, "fastqSampleR2 argument cannot be null");
     }
 
     this.fastqSampleR2 = fastqSampleR2;
@@ -316,10 +317,10 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
     super(fastqSample);
 
-    checkNotNull(fastqscreen, "fastqscreen argument cannot be null");
-    checkNotNull(data, "data argument cannot be null");
-    checkNotNull(genomes, "genomes argument cannot be null");
-    checkNotNull(reportDir, "reportDir argument cannot be null");
+    requireNonNull(fastqscreen, "fastqscreen argument cannot be null");
+    requireNonNull(data, "data argument cannot be null");
+    requireNonNull(genomes, "genomes argument cannot be null");
+    requireNonNull(reportDir, "reportDir argument cannot be null");
 
     this.fastqSampleR2 = null;
     this.fastqscreen = fastqscreen;

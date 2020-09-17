@@ -23,9 +23,9 @@
 
 package fr.ens.biologie.genomique.aozan.collectors;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.biologie.genomique.aozan.collectors.UndeterminedIndexesCollector.COLLECTOR_NAME;
 import static fr.ens.biologie.genomique.aozan.collectors.UndeterminedIndexesCollector.RUN_DATA_PREFIX;
+import static java.util.Objects.requireNonNull;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -1119,8 +1119,8 @@ public class UndeterminedIndexesProcessThread
    */
   public static final int mismatches(final String a, final String b) {
 
-    Preconditions.checkNotNull(a, "a cannot be null");
-    Preconditions.checkNotNull(b, "b cannot be null");
+    requireNonNull(a, "a cannot be null");
+    requireNonNull(b, "b cannot be null");
     Preconditions.checkArgument(a.length() == b.length(),
         "The length of the 2 String must be equals (a=" + a + ", b=" + b + ")");
 
@@ -1193,8 +1193,8 @@ public class UndeterminedIndexesProcessThread
 
     super(fastqSample);
 
-    checkNotNull(data, "data argument cannot be null");
-    checkNotNull(reportDir, "reportDir argument cannot be null");
+    requireNonNull(data, "data argument cannot be null");
+    requireNonNull(reportDir, "reportDir argument cannot be null");
 
     this.data = data;
     this.lane = fastqSample.getLane();

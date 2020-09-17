@@ -24,7 +24,8 @@
 
 package fr.ens.biologie.genomique.aozan.collectors;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.util.Collections;
@@ -152,9 +153,9 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
       final FastqSample fastqSample, final File reportDir, final boolean runPE)
       throws AozanException {
 
-    checkNotNull(data, "data argument cannot be null");
-    checkNotNull(fastqSample, "fastqSample argument cannot be null");
-    checkNotNull(reportDir, "reportDir argument cannot be null");
+    requireNonNull(data, "data argument cannot be null");
+    requireNonNull(fastqSample, "fastqSample argument cannot be null");
+    requireNonNull(reportDir, "reportDir argument cannot be null");
 
     if (fastqSample.getFastqFiles() == null
         || fastqSample.getFastqFiles().isEmpty()) {

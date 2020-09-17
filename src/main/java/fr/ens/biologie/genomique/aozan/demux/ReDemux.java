@@ -24,7 +24,7 @@
 package fr.ens.biologie.genomique.aozan.demux;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -90,7 +90,7 @@ public class ReDemux {
      */
     public void addIndex(final String index) throws AozanException {
 
-      checkNotNull(index, "index cannot be null");
+      requireNonNull(index, "index cannot be null");
 
       final String upperIndex = index.trim().toUpperCase();
 
@@ -134,7 +134,7 @@ public class ReDemux {
      */
     private void addIndexRegex(final String index) throws AozanException {
 
-      Preconditions.checkNotNull(index, "Index argument cannot be null");
+      requireNonNull(index, "Index argument cannot be null");
 
       final Pattern pattern = Pattern.compile(index);
       Sample sample = null;
@@ -167,7 +167,7 @@ public class ReDemux {
      */
     private void addIndexSequence(final String index) throws AozanException {
 
-      Preconditions.checkNotNull(index, "Index argument cannot be null");
+      requireNonNull(index, "Index argument cannot be null");
 
       Sample sample = null;
       int bestScore = Integer.MAX_VALUE;
@@ -588,8 +588,8 @@ public class ReDemux {
    */
   private static int mismatches(final String a, final String b) {
 
-    Preconditions.checkNotNull(a, "a cannot be null");
-    Preconditions.checkNotNull(b, "b cannot be null");
+    requireNonNull(a, "a cannot be null");
+    requireNonNull(b, "b cannot be null");
     Preconditions.checkArgument(a.length() == b.length(),
         "The length of the 2 String must be equals");
 
@@ -618,9 +618,9 @@ public class ReDemux {
   public ReDemux(final File baseDir, final SampleSheet samplesheet,
       final File outputDir) {
 
-    Preconditions.checkNotNull(samplesheet,
+    requireNonNull(samplesheet,
         "samplesheet argument cannot be null");
-    Preconditions.checkNotNull(baseDir, "baseDir argument cannot be null");
+    requireNonNull(baseDir, "baseDir argument cannot be null");
     this.sampleSheet = samplesheet;
     this.inputDir = baseDir;
     this.outputDir = outputDir;
@@ -635,10 +635,10 @@ public class ReDemux {
       final File outputDir) throws FileNotFoundException, IOException,
       AozanException, BadBioEntryException {
 
-    Preconditions.checkNotNull(samplesheetFile,
+    requireNonNull(samplesheetFile,
         "samplesheetFile cannot be null");
-    Preconditions.checkNotNull(lanesAndIndex, "laneAndIndex cannot be null");
-    Preconditions.checkNotNull(outputDir, "output directory cannot be null");
+    requireNonNull(lanesAndIndex, "laneAndIndex cannot be null");
+    requireNonNull(outputDir, "output directory cannot be null");
 
     // Load samplesheet
     final SampleSheet samplesheet =

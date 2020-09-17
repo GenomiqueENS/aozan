@@ -25,8 +25,8 @@
 package fr.ens.biologie.genomique.aozan.fastqscreen;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -122,11 +122,11 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       final List<String> genomes, final String sampleGenome,
       final int threadNumber) throws AozanException {
 
-    checkNotNull(fastqRead1, "fastqRead1 argument cannot be null");
-    checkNotNull(genomes, "genomesForMapping argument cannot be null");
+    requireNonNull(fastqRead1, "fastqRead1 argument cannot be null");
+    requireNonNull(genomes, "genomesForMapping argument cannot be null");
 
     if (this.pairedMode) {
-      checkNotNull(fastqRead2, "fastqRead2 argument cannot be null");
+      requireNonNull(fastqRead2, "fastqRead2 argument cannot be null");
     }
 
     // Define the number of thread to use
@@ -297,7 +297,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   public void map(final String value, final List<String> output,
       final Reporter reporter) throws IOException {
 
-    checkNotNull(output, "output argument cannot be null");
+    requireNonNull(output, "output argument cannot be null");
 
     if (value == null || value.length() == 0 || value.charAt(0) == '@') {
       return;
@@ -332,7 +332,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   public void reduce(final String key, final Iterator<String> values,
       final List<String> output, final Reporter reporter) throws IOException {
 
-    checkNotNull(values, "values argument cannot be null");
+    requireNonNull(values, "values argument cannot be null");
 
     // Do not process null keys
     if (key == null) {
@@ -438,8 +438,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       final String mapperName, final String mapperArguments)
       throws AozanException {
 
-    checkNotNull(tmpDir, "tmpDir argument cannot be null");
-    checkNotNull(mapperName, "mapperName argument cannot be null");
+    requireNonNull(tmpDir, "tmpDir argument cannot be null");
+    requireNonNull(mapperName, "mapperName argument cannot be null");
 
     checkArgument(tmpDir.isDirectory(),
         "temporary directory does not exists or is not a directory: " + tmpDir);

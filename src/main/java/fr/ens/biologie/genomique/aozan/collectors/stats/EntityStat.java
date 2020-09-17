@@ -23,7 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.collectors.stats;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+
+import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -350,8 +351,8 @@ public class EntityStat {
       final int sampleId, final StatisticsCollector statCollector)
       throws AozanException {
 
-    checkNotNull(runData, "runData argument cannot be null");
-    checkNotNull(statCollector, "statCollector argument cannot be null");
+    requireNonNull(runData, "runData argument cannot be null");
+    requireNonNull(statCollector, "statCollector argument cannot be null");
 
     this.data = runData;
     this.projectId = projectId;

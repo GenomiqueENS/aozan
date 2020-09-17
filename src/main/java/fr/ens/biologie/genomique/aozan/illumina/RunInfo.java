@@ -24,10 +24,10 @@
 package fr.ens.biologie.genomique.aozan.illumina;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.biologie.genomique.eoulsan.util.XMLUtils.getAttributeNames;
 import static fr.ens.biologie.genomique.eoulsan.util.XMLUtils.getElementsByTagName;
 import static fr.ens.biologie.genomique.eoulsan.util.XMLUtils.getTagValue;
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -204,7 +204,7 @@ public class RunInfo {
   public static RunInfo parse(final String filepath)
       throws ParserConfigurationException, SAXException, IOException {
 
-    checkNotNull(filepath, "RunInfo.xml path cannot be null");
+    requireNonNull(filepath, "RunInfo.xml path cannot be null");
 
     return parse(new File(filepath));
   }
@@ -220,7 +220,7 @@ public class RunInfo {
   public static RunInfo parse(final File file)
       throws ParserConfigurationException, SAXException, IOException {
 
-    checkNotNull(file, "RunInfo.xml file cannot be null");
+    requireNonNull(file, "RunInfo.xml file cannot be null");
 
     checkArgument(file.isFile(),
         "RunInfo.xml does not exists or is not a file");
@@ -239,7 +239,7 @@ public class RunInfo {
   public static RunInfo parse(final InputStream is)
       throws ParserConfigurationException, SAXException, IOException {
 
-    checkNotNull(is, "RunInfo.xml input stream cannot be null");
+    requireNonNull(is, "RunInfo.xml input stream cannot be null");
 
     try (InputStream in = is) {
 
@@ -664,15 +664,15 @@ public class RunInfo {
       final FlowCellLayout layout, final List<Integer> alignToPhiX,
       final List<String> imageChannels) {
 
-    checkNotNull(id, "Run id argument cannot be null");
+    requireNonNull(id, "Run id argument cannot be null");
     checkArgument(number > 0, "Run number must be greater than 0: " + number);
-    checkNotNull(flowCell, "Flowcell id argument cannot be null");
-    checkNotNull(instrument, "Instrument id argument cannot be null");
-    checkNotNull(date, "date argument cannot be null");
-    checkNotNull(readList, "readList argument cannot be null");
-    checkNotNull(layout, "layout argument cannot be null");
-    checkNotNull(alignToPhiX, "alignToPhiX argument cannot be null");
-    checkNotNull(imageChannels, "imageChannels argument cannot be null");
+    requireNonNull(flowCell, "Flowcell id argument cannot be null");
+    requireNonNull(instrument, "Instrument id argument cannot be null");
+    requireNonNull(date, "date argument cannot be null");
+    requireNonNull(readList, "readList argument cannot be null");
+    requireNonNull(layout, "layout argument cannot be null");
+    requireNonNull(alignToPhiX, "alignToPhiX argument cannot be null");
+    requireNonNull(imageChannels, "imageChannels argument cannot be null");
 
     this.id = id;
     this.number = number;

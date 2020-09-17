@@ -24,7 +24,7 @@
 package fr.ens.biologie.genomique.aozan.collectors.interop;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -163,7 +163,7 @@ final class ReadsData {
    */
   ReadsData(final RunData runData) {
 
-    checkNotNull(runData, "For extract reads data, runData is null");
+    requireNonNull(runData, "For extract reads data, runData is null");
 
     this.runData = runData;
     this.readsCount = runData.getReadCount();

@@ -23,8 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.fastqscreen;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -104,13 +104,13 @@ public class FastqScreen {
       final String sampleGenome, final boolean isPairedMode)
       throws AozanException {
 
-    checkNotNull(fastqRead1, "fastqRead1 argument cannot be null");
-    checkNotNull(genomes, "genomes argument cannot be null");
-    checkNotNull(sampleDescription,
+    requireNonNull(fastqRead1, "fastqRead1 argument cannot be null");
+    requireNonNull(genomes, "genomes argument cannot be null");
+    requireNonNull(sampleDescription,
         "sampleDescription argument cannot be null");
 
     if (isPairedMode) {
-      checkNotNull(fastqRead2, "fastqRead2 argument cannot be null");
+      requireNonNull(fastqRead2, "fastqRead2 argument cannot be null");
     }
 
     // Timer
@@ -173,7 +173,7 @@ public class FastqScreen {
    */
   public FastqScreen(final CollectorConfiguration conf) {
 
-    checkNotNull(conf, "properties argument cannot be null");
+    requireNonNull(conf, "properties argument cannot be null");
 
     this.tmpDir = conf.getFile(QC.TMP_DIR);
 

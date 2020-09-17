@@ -23,8 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.collectors;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.biologie.genomique.aozan.util.StringUtils.stackTraceToString;
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -176,8 +176,8 @@ public abstract class AbstractFastqCollector implements Collector {
   @Override
   public void configure(final QC qc, final CollectorConfiguration conf) {
 
-    checkNotNull(qc, "qc argument cannot be null");
-    checkNotNull(conf, "conf argument cannot be null");
+    requireNonNull(qc, "qc argument cannot be null");
+    requireNonNull(conf, "conf argument cannot be null");
 
     this.qcReportOutputPath = qc.getQcDir();
     this.tmpDir = qc.getTmpDir();
@@ -202,7 +202,7 @@ public abstract class AbstractFastqCollector implements Collector {
   @Override
   public void collect(final RunData data) throws AozanException {
 
-    checkNotNull(data, "data argument cannot be null");
+    requireNonNull(data, "data argument cannot be null");
 
     try {
 

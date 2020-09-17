@@ -23,10 +23,10 @@
 
 package fr.ens.biologie.genomique.aozan.fastqc;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static fr.ens.biologie.genomique.aozan.util.StringUtils.stackTraceToString;
 import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.checkExistingFile;
 import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.createTempFile;
+import static java.util.Objects.requireNonNull;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -294,7 +294,7 @@ public class OverrepresentedSequencesBlast {
   public void configure(final CollectorConfiguration conf,
       final String dockerConnectionString) {
 
-    checkNotNull(conf, "conf argument cannot be null");
+    requireNonNull(conf, "conf argument cannot be null");
 
     if (this.configured) {
       return;
@@ -425,7 +425,7 @@ public class OverrepresentedSequencesBlast {
    */
   public void submitSequence(final String sequence) {
 
-    checkNotNull(sequence, "sequence argument cannot be null");
+    requireNonNull(sequence, "sequence argument cannot be null");
 
     if (!this.sequencesAlreadyAnalysis.containsKey(sequence)
         && !this.submittedSequences.contains(sequence)) {
@@ -445,7 +445,7 @@ public class OverrepresentedSequencesBlast {
   public BlastResultHit getResult(final String sequence)
       throws IOException, AozanException {
 
-    checkNotNull(sequence, "sequence argument cannot be null");
+    requireNonNull(sequence, "sequence argument cannot be null");
 
     // Test if the instance has been configured
     if (!this.configured) {
