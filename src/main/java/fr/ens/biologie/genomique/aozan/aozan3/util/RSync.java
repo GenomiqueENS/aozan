@@ -176,7 +176,7 @@ public class RSync {
   public RSync(final Path inputPath, final Path outputPath,
       Collection<String> excludePatterns) {
 
-    this(inputPath, outputPath, 0, Collections.<String> emptySet());
+    this(inputPath, outputPath, 0, excludePatterns);
   }
 
   /**
