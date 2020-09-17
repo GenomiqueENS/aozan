@@ -24,7 +24,10 @@ package fr.ens.biologie.genomique.aozan.illumina.io;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,9 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.base.Joiner;
@@ -148,11 +149,6 @@ public class SampleSheetReaderTest {
   private static final String SAMPLESHEET_CSV_BCL2FASTQ_V2_FILENAME_SHUFFLED_SAMPLE =
       "design_version_bcl2fastq2_shuffled_sample.csv";
 
-  private static final String SAMPLESHEET_CSV = "samplesheet.csv";
-
-  private String path;
-  private File outputFile;
-
   @Test
   public void testReadsXLSWithHeaderVersion2() {
 
@@ -184,15 +180,14 @@ public class SampleSheetReaderTest {
     sampleNames.put("2015_069", 3);
     for (String filename : files) {
 
-      Bcl2FastqOutput bclfile = new Bcl2FastqOutput(
-          readSamplesheetCSV(new File(path, filename), nbLanes), new File("."),
-          Bcl2FastqVersion.BCL2FASTQ_2, null, false);
+      Bcl2FastqOutput bclfile =
+          new Bcl2FastqOutput(readSamplesheetCSV(filename, nbLanes),
+              new File("."), Bcl2FastqVersion.BCL2FASTQ_2, null, false);
       for (int lane = 1; lane <= nbLanes; lane++) {
         for (String sampleName : sampleNames.keySet()) {
           FastqSample fastqSample =
-              new FastqSample(bclfile, new File("."), "", 1, 1,
-                  lane, null, sampleName, "Project_A2015", "desc", "Bindex",
-                  false, false);
+              new FastqSample(bclfile, new File("."), "", 1, 1, lane, null,
+                  sampleName, "Project_A2015", "desc", "Bindex", false, false);
 
           Assert.assertEquals(sampleName
               + "_S" + sampleNames.get(sampleName) + "_L00" + lane + "_R1_001",
@@ -206,13 +201,13 @@ public class SampleSheetReaderTest {
       final String samplesheetType, final int version,
       final String expectedDataName, final boolean withLane) {
 
-    final File samplesheet = new File(path, samplesheetFileToTest);
-
     int laneNumber = (withLane ? 2 : -1);
 
+    File outputFile = temporaryFile();
+
     // Create CSV file
-    convertSamplesheetToCSV(samplesheet, samplesheetType, outputFile, 0,
-        version);
+    convertSamplesheetToCSV(samplesheetFileToTest, samplesheetType, outputFile,
+        0, version);
 
     // Load sample sheet CSV
     final SampleSheet samplesheetTested =
@@ -223,6 +218,9 @@ public class SampleSheetReaderTest {
         buildSamplesheetExpected(expectedDataName, version);
 
     compareSamplesheetV2(samplesheetExpected, samplesheetTested, withLane);
+
+    // Delete temporary file
+    outputFile.delete();
   }
 
   /**
@@ -231,9 +229,10 @@ public class SampleSheetReaderTest {
   @Test
   public void testReadsShortCSVVersion() {
 
-    try {
-      new SampleSheetCSVReader(
-          new ByteArrayInputStream(EXPECTED_SMALLER_CSV.getBytes())).read();
+    try (SampleSheetCSVReader reader = new SampleSheetCSVReader(
+        new ByteArrayInputStream(EXPECTED_SMALLER_CSV.getBytes()))) {
+
+      reader.read();
 
     } catch (IOException e) {
       // TODO Auto-generated catch block
@@ -299,7 +298,9 @@ public class SampleSheetReaderTest {
 
     final int laneCount = 2;
 
-    final File csvFile = writeCSVFromTabulatedString(EXPECTED_CSV);
+    File csvFile =  temporaryFile();
+
+    writeCSVFromTabulatedString(csvFile, EXPECTED_CSV);
 
     // Load samplesheet csv
     final SampleSheet samplesheetTested =
@@ -313,12 +314,17 @@ public class SampleSheetReaderTest {
         samplesheetExpected.size() > 0);
 
     compareSamplesheetV2(samplesheetExpected, samplesheetTested, true);
+
+    // Delete temporary file
+    csvFile.delete();
   }
 
   @Test
   public void testReadsCSVVersion2WithoutLaneColumnToCreate() {
 
-    final File csvFile = writeCSVFromTabulatedString(EXPECTED_CSV);
+    File csvFile =  temporaryFile();
+
+    writeCSVFromTabulatedString(csvFile, EXPECTED_CSV);
 
     // Load samplesheet csv
     final SampleSheet samplesheetTested = readSamplesheetCSV(csvFile, 0);
@@ -331,6 +337,9 @@ public class SampleSheetReaderTest {
         samplesheetExpected.size() > 0);
 
     compareSamplesheetV2(samplesheetExpected, samplesheetTested, false);
+
+    // Delete temporary file
+    csvFile.delete();
   }
 
   /**
@@ -340,12 +349,13 @@ public class SampleSheetReaderTest {
   @Test
   public void testReadsXLSVersion1() {
 
-    final File samplesheet =
-        new File(path, SAMPLESHEET_XLS_BCL2FASTQ_V1_FILENAME);
     final int laneCount = 2;
 
+    File outputFile =  temporaryFile();
+
     // Create CSV file
-    convertSamplesheetToCSV(samplesheet, "xls", outputFile, laneCount, 1);
+    convertSamplesheetToCSV(SAMPLESHEET_XLS_BCL2FASTQ_V1_FILENAME, "xls",
+        outputFile, laneCount, 1);
 
     // Load samplesheet csv
     final SampleSheet samplesheetTested =
@@ -356,6 +366,9 @@ public class SampleSheetReaderTest {
 
     // Compare with expected content
     compareSamplesheetV1(samplesheetExpected, samplesheetTested);
+
+    // Delete temporary file
+    outputFile.delete();
   }
 
   /**
@@ -365,12 +378,13 @@ public class SampleSheetReaderTest {
   @Test
   public void testReadsXLSXVersion1() {
 
-    final File samplesheet =
-        new File(path, SAMPLESHEET_XLSX_BCL2FASTQ_V1_FILENAME);
     final int laneCount = 2;
 
+    File outputFile =  temporaryFile();
+
     // Create CSV file
-    convertSamplesheetToCSV(samplesheet, "xlsx", outputFile, laneCount, 1);
+    convertSamplesheetToCSV(SAMPLESHEET_XLSX_BCL2FASTQ_V1_FILENAME, "xlsx",
+        outputFile, laneCount, 1);
 
     // Load samplesheet csv
     final SampleSheet samplesheetTested =
@@ -381,6 +395,9 @@ public class SampleSheetReaderTest {
 
     // Compare with expected content
     compareSamplesheetV1(samplesheetExpected, samplesheetTested);
+
+    // Delete temporary file
+    outputFile.delete();
   }
   //
   // Private methods
@@ -484,7 +501,7 @@ public class SampleSheetReaderTest {
         samplesheetExpected.size(), 0);
   }
 
-  private File writeCSVFromTabulatedString(String stringCSV) {
+  private void writeCSVFromTabulatedString(File outputFile, String stringCSV) {
 
     try (Writer writer = FileUtils.createFastBufferedWriter(outputFile)) {
       writer.write("[Data]\n");
@@ -495,15 +512,28 @@ public class SampleSheetReaderTest {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
+  }
 
-    return outputFile;
+  private SampleSheet readSamplesheetCSV(final String filename,
+      final int laneCount) throws FileNotFoundException {
+
+    return readSamplesheetCSV(loadRessource(filename), laneCount);
   }
 
   private SampleSheet readSamplesheetCSV(final File file, final int laneCount) {
-
     try {
+      return readSamplesheetCSV(new FileInputStream(file), laneCount);
+    } catch (FileNotFoundException e) {
+      return null;
+    }
+  }
 
-      final SampleSheet result = new SampleSheetCSVReader(file).read();
+  private SampleSheet readSamplesheetCSV(final InputStream in,
+      final int laneCount) {
+
+    try (SampleSheetCSVReader reader = new SampleSheetCSVReader(in) ) {
+
+      final SampleSheet result = reader.read();
 
       if (!result.isLaneSampleField() && laneCount > 1) {
         SampleSheetUtils.duplicateSamplesIfLaneFieldNotSet(result, laneCount);
@@ -520,29 +550,30 @@ public class SampleSheetReaderTest {
 
   }
 
-  private void convertSamplesheetToCSV(final File samplesheet,
+  private void convertSamplesheetToCSV(final String samplesheetName,
       final String samplesheetType, final File outputFile, final int laneCount,
       final int version) {
 
-    try {
+    try (InputStream in = loadRessource(samplesheetName)) {
 
       SampleSheet result = null;
 
       if (samplesheetType.equals("xls")) {
-        SampleSheetXLSReader reader = new SampleSheetXLSReader(samplesheet);
-        reader.setVersion(version);
-        result = reader.read();
+        try (SampleSheetXLSReader reader = new SampleSheetXLSReader(in)) {
+          reader.setVersion(version);
+          result = reader.read();
+        }
 
       } else if (samplesheetType.equals("xlsx")) {
-        SampleSheetXLSXReader reader = new SampleSheetXLSXReader(samplesheet);
-        reader.setVersion(version);
-        result = reader.read();
+        try (SampleSheetXLSXReader reader = new SampleSheetXLSXReader(in)) {
+          reader.setVersion(version);
+          result = reader.read();
+        }
 
       } else {
         throw new IOException(
-            samplesheet.getName() + " is not a " + samplesheetType + " file.");
+            samplesheetName + " is not a " + samplesheetType + " file.");
       }
-
       if (!result.isLaneSampleField() && laneCount > 0) {
         SampleSheetUtils.duplicateSamplesIfLaneFieldNotSet(result, laneCount);
       }
@@ -552,9 +583,10 @@ public class SampleSheetReaderTest {
           loadIndexSequences());
 
       // Write CSV samplesheet file
-      SampleSheetCSVWriter writer = new SampleSheetCSVWriter(outputFile);
-      writer.setVersion(version);
-      writer.writer(result);
+      try (SampleSheetCSVWriter writer = new SampleSheetCSVWriter(outputFile)) {
+        writer.setVersion(version);
+        writer.writer(result);
+      }
 
     } catch (IOException | AozanException e) {
       // TODO Auto-generated catch block
@@ -604,23 +636,21 @@ public class SampleSheetReaderTest {
   // Common methods
   //
 
-  @Before
-  public void init() {
+  private InputStream loadRessource(String filename) {
 
-    // Path to samplesheet directory
-    path = new File(
-        new File(".").getAbsolutePath() + "/src/test/java/files/samplesheets")
-            .getAbsolutePath();
-    outputFile = new File(path, SAMPLESHEET_CSV);
-
+    return this.getClass().getResourceAsStream("/samplesheets/" + filename);
   }
 
-  @After
-  public void destroy() {
+  private File temporaryFile() {
 
-    if (outputFile.exists()) {
-      outputFile.delete();
+    File result = null;
+    try {
+      result = File.createTempFile("samplesheet-", ".csv");
+      result.delete();
+    } catch (IOException e) {
     }
+
+    return result;
   }
 
   //
