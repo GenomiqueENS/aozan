@@ -21,10 +21,10 @@ make_paths() {
 }
 
 # Read link to get aozan.sh path
-REAL_PATH=$(readlink -f $0)
+REAL_SCRIPT_PATH=$(readlink -f "$0")
 
 # Get the path to this script
-BASEDIR=$(dirname $REAL_SCRIPT_PATH)
+BASEDIR=$(dirname "$REAL_SCRIPT_PATH")
 
 # Set the libraries path
 LIBDIR=$BASEDIR/lib
@@ -90,9 +90,8 @@ if [ -n "$TMPDIR" ]; then
 fi
 
 COMMON_LIBS=$(make_paths $LIBDIR)
-LOCAL_LIBS=$(make_paths $LIBDIR/local)
 PLUGINS_LIBS=$(make_paths $AOZAN_PLUGINS)
-APP_CLASSPATH=$COMMON_LIBS:$LOCAL_LIBS:$PLUGINS:$PLUGINS_LIBS
+APP_CLASSPATH=$COMMON_LIBS:$PLUGINS:$PLUGINS_LIBS
 
 # Force language
 #export LANG=C
