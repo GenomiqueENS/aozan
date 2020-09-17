@@ -70,6 +70,16 @@ public class Configuration {
   }
 
   /**
+   * Get a long configuration key.
+   * @param key the key The key must exists
+   * @return a long value
+   */
+  public long getLong(String key) {
+
+    return Long.parseLong(get(key));
+  }
+
+  /**
    * Get a double configuration key.
    * @param key the key The key must exists
    * @return a double value
@@ -126,6 +136,17 @@ public class Configuration {
   public int getInt(String key, int defaultValue) {
 
     return Integer.parseInt(get(key, Integer.toString(defaultValue)));
+  }
+
+  /**
+   * Get a long value for a configuration key.
+   * @param key the key
+   * @param defaultValue value if the key does not exists
+   * @return a long
+   */
+  public long getLong(String key, long defaultValue) {
+
+    return Long.parseLong(get(key, Long.toString(defaultValue)));
   }
 
   /**
