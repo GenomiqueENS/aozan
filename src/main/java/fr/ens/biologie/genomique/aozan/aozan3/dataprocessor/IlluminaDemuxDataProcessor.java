@@ -95,7 +95,7 @@ public class IlluminaDemuxDataProcessor implements DataProcessor {
     // Check if directory is writable
     if (!outputStorage.isWritable()) {
       throw new Aozan3Exception(
-          "The output synchronization directory is not writable: "
+          "The output demultiplexing directory is not writable: "
               + outputStorage);
     }
 
@@ -119,13 +119,12 @@ public class IlluminaDemuxDataProcessor implements DataProcessor {
     requireNonNull(inputData);
     requireNonNull(runConf);
 
-    RunData inputRunData = inputData.get(DataType.BCL);
-
     // Check if object has been initialized
     if (!this.initialized) {
       throw new IllegalStateException();
     }
 
+    RunData inputRunData = inputData.get(DataType.BCL);
     RunId runId = inputRunData.getRunId();
 
     RunConfiguration conf = new RunConfiguration(this.conf);
@@ -137,7 +136,7 @@ public class IlluminaDemuxDataProcessor implements DataProcessor {
 
     try {
 
-      // Check if the input and ouput storage are equals
+      // Check if the input and output storage are equals
       if (this.outputStorage.getPath()
           .equals(inputRunData.getLocation().getStorage().getPath())) {
         throw new IOException(
