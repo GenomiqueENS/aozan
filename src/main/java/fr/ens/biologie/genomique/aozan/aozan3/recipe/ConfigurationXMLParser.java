@@ -60,6 +60,7 @@ public class ConfigurationXMLParser extends AbstractXMLParser<Configuration> {
             // Load key/value file
             Configuration conf = new Configuration();
             conf.load(includePath);
+            result.set(conf);
 
           } else {
 
