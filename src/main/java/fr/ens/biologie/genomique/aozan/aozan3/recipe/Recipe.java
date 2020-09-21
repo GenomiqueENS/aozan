@@ -228,7 +228,15 @@ public class Recipe {
   public void execute() {
 
     try {
-      process(runDataToProcess());
+      List<RunData> runs = runDataToProcess();
+
+      if (runs.isEmpty()) {
+        this.logger.info("No run to process found");
+      } else {
+        this.logger.info("Found " + runs.size() + " runs to process");
+      }
+
+      process(runs);
     } catch (Aozan3Exception e) {
       exitAozan(e);
     }
@@ -345,6 +353,9 @@ public class Recipe {
    */
   private List<RunData> runDataToProcess(Collection<String> runIds)
       throws Aozan3Exception {
+
+    this.logger
+        .info("Looks for run in: " + this.provider.getDataStorage().getPath());
 
     List<RunData> runs = this.useInProgressData
         ? this.provider.listInProgressRunData()
