@@ -1,6 +1,7 @@
 package fr.ens.biologie.genomique.aozan.aozan3.recipe;
 
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.checkAllowedChildTags;
+import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.evaluateExpressions;
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.getTagValue;
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.nullToEmpty;
 import static fr.ens.biologie.genomique.aozan.aozan3.recipe.ParserUtils.nullToUnknownSource;
@@ -100,7 +101,9 @@ public class StoragesXMLParser extends AbstractXMLParser<Void> {
 
         // Add the storage to the recipe
         // TODO Handle sequencer sources
-        DataStorage storage = new DataStorage("local", storagePath, null);
+        DataStorage storage = new DataStorage("local",
+            evaluateExpressions(storagePath, this.recipe.getConfiguration()),
+            null);
         recipe.addStorage(storageName, storage);
       }
 
