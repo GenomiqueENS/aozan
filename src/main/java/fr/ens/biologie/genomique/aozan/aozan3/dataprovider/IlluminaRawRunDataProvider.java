@@ -3,6 +3,7 @@ package fr.ens.biologie.genomique.aozan.aozan3.dataprovider;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -141,12 +142,14 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
     File[] runDirectories = this.storage.getPath().toFile()
         .listFiles(new RunDirectoryFileFilter(completedRuns));
 
-    for (File f : runDirectories) {
-      result.add(completedRuns
-          ? RunDataFactory.newRawIlluminaRunData(this.storage, f.toPath(),
-              this.name)
-          : RunDataFactory.newPartialRawIlluminaRunData(this.storage,
-              f.toPath(), this.name));
+    if (runDirectories != null) {
+      for (File f : runDirectories) {
+        result.add(completedRuns
+            ? RunDataFactory.newRawIlluminaRunData(this.storage, f.toPath(),
+                this.name)
+            : RunDataFactory.newPartialRawIlluminaRunData(this.storage,
+                f.toPath(), this.name));
+      }
     }
 
     return Collections.unmodifiableList(result);
