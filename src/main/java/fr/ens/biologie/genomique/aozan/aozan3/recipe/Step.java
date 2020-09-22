@@ -76,6 +76,7 @@ public class Step {
     DataStorage sink = this.storages.get(sinkName);
 
     Configuration processorConf = new Configuration(this.conf);
+    processorConf.set("step.name", getName());
     processorConf.set("output.storage", sink.toJson());
 
     this.logger.info("Looking for processor: " + this.processorName);

@@ -321,6 +321,10 @@ public class Recipe {
 
       if (!stepInputData.isEmpty()) {
 
+        this.logger
+            .info("Start step \""
+                + step.getName() + "\" for run " + run.getRunId() + ".");
+
         ProcessResult result = step.process(stepInputData);
 
         // Update data
@@ -328,6 +332,10 @@ public class Recipe {
 
         // Send email
         this.sendMail.sendMail(result.getEmail());
+
+        this.logger
+            .info("End of step \""
+                + step.getName() + "\" for run " + run.getRunId() + ".");
       }
     }
 
