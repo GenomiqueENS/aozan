@@ -44,6 +44,39 @@ public class RunDataFactory {
         new DataLocation(storage, path));
   }
 
+  /**
+   * Create a new Illumina processed run data.
+   * @param storage the storage used for the data
+   * @param path path of the data
+   * @param source source of the data
+   * @return a new RunData object
+   */
+  public static RunData newProcessedIlluminaRunData(final DataStorage storage,
+      final Path path, final SequencerSource source) {
+
+    RunId runId = new RunId(path.getFileName().toString());
+
+    return new RunData(runId, source, DataType.ILLUMINA_FASTQ,
+        new DataLocation(storage, path));
+  }
+
+  /**
+   * Create a new Illumina partial processed run data.
+   * @param storage the storage used for the data
+   * @param path path of the data
+   * @param source source of the data
+   * @return a new RunData object
+   */
+  public static RunData newPartialProcessedIlluminaRunData(
+      final DataStorage storage, final Path path,
+      final SequencerSource source) {
+
+    RunId runId = new RunId(path.getFileName().toString());
+
+    return new RunData(runId, source, DataType.PARTIAL_ILLUMINA_FASTQ,
+        new DataLocation(storage, path));
+  }
+
   //
   // Constructor
   //

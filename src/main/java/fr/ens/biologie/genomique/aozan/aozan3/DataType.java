@@ -51,6 +51,10 @@ public class DataType {
   public static final DataType ILLUMINA_FASTQ = new DataType(Category.PROCESSED,
       SequencingTechnology.ILLUMINA, "illumina_fastq");
 
+  public static final DataType PARTIAL_ILLUMINA_FASTQ =
+      new DataType(Category.PROCESSED, SequencingTechnology.ILLUMINA,
+          "illumina_fastq", false, true);
+
   //
   // Getters
   //
