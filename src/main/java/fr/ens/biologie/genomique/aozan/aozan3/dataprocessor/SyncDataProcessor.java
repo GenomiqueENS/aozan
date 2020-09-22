@@ -95,10 +95,10 @@ public abstract class SyncDataProcessor implements DataProcessor {
       }
 
       // Check if input directory exists
-      inputLocation.checkReadableDirectory(this.dataDescription + " input");
+      inputLocation.checkReadableDirectory("input synchronization");
 
       // Check if final output directory already exists
-      finalLocation.checkIfNotExists(this.dataDescription + " output");
+      finalLocation.checkIfNotExists("Output synchronization directory already exists");
 
       // Define output directory
       if (this.partialSync) {
