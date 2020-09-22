@@ -55,6 +55,14 @@ public class Step {
   }
 
   /**
+   * Get the name of the processor of the step.
+   * @return the name of the processor of thestep
+   */
+  public String getProcessorName() {
+    return this.processorName;
+  }
+
+  /**
    * Initialize the step.
    * @throws Aozan3Exception if an error occurs while initializing the step
    */

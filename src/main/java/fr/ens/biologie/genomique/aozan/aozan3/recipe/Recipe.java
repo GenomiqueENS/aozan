@@ -214,9 +214,21 @@ public class Recipe {
       throw new Aozan3Exception("Run Data provider has not been defined.");
     }
 
+    // Log steps of the recipe
+    List<String> stepNames = new ArrayList<>();
+    for (Step step : this.steps) {
+      stepNames.add(step.getName() + " [" + step.getProcessorName() + "]");
+    }
+    this.logger.info("Recipe \""
+        + getName() + "\" step(s): " + String.join(", ", stepNames));
+
+    this.logger.info("Initiliaze step(s)");
+
     for (Step step : this.steps) {
       step.init();
     }
+
+    this.logger.info("Successful initiliazation of step(s)");
 
     this.initialized = true;
   }
