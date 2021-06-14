@@ -24,6 +24,11 @@ public class CategoryDataTypeFilter implements DataTypeFilter {
     return this.category == type.getCategory();
   }
 
+  @Override
+  public String toString() {
+    return "CategoryDataTypeFilter [category=" + category + "]";
+  }
+
   //
   // Constructors
   //

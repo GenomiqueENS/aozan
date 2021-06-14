@@ -33,6 +33,11 @@ public class MultiDataTypeFilter implements DataTypeFilter {
     return true;
   }
 
+  @Override
+  public String toString() {
+    return "MultiDataTypeFilter [filters=" + filters + "]";
+  }
+
   //
   // Constructor
   //

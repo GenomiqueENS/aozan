@@ -22,6 +22,11 @@ public class TechnologyDataTypeFilter implements DataTypeFilter {
     return this.technology == type.getSequencingTechnology();
   }
 
+  @Override
+  public String toString() {
+    return "TechnologyDataTypeFilter [technology=" + technology + "]";
+  }
+
   //
   // Constructors
   //

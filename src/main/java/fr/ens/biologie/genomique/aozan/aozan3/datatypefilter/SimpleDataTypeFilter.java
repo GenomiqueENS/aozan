@@ -19,6 +19,11 @@ public class SimpleDataTypeFilter implements DataTypeFilter {
     return this.dataType.equals(type);
   }
 
+  @Override
+  public String toString() {
+    return "SimpleDataTypeFilter [dataType=" + this.dataType + "]";
+  }
+
   //
   // Constructors
   //

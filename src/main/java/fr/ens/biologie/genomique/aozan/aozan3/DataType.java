@@ -173,6 +173,13 @@ public class DataType {
   //
 
   @Override
+  public String toString() {
+    return "DataType [category="
+        + category + ", technology=" + technology + ", type=" + type
+        + ", logOnly=" + logOnly + ", partialData=" + partialData + "]";
+  }
+
+  @Override
   public int hashCode() {
 
     return Objects.hash(this.category, this.technology, this.type, this.logOnly,
