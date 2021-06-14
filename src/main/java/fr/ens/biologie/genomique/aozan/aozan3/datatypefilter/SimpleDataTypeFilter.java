@@ -16,7 +16,7 @@ public class SimpleDataTypeFilter implements DataTypeFilter {
   @Override
   public boolean accept(DataType type) {
 
-    return dataType == type;
+    return this.dataType.equals(type);
   }
 
   //
