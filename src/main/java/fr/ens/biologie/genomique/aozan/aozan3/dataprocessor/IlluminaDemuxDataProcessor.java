@@ -34,7 +34,9 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVWriter;
 import fr.ens.biologie.genomique.eoulsan.util.StringUtils;
+import fr.ens.biologie.genomique.eoulsan.util.process.DockerImageInstance;
 import fr.ens.biologie.genomique.eoulsan.util.process.DockerManager;
+import fr.ens.biologie.genomique.eoulsan.util.process.FallBackDockerClient;
 import fr.ens.biologie.genomique.eoulsan.util.process.SimpleProcess;
 import fr.ens.biologie.genomique.eoulsan.util.process.SystemSimpleProcess;
 
@@ -309,7 +311,15 @@ public class IlluminaDemuxDataProcessor implements DataProcessor {
           "Docker image to use for bcl2fastq: " + dockerImage);
     }
 
-    return DockerManager.getInstance().createImageInstance(dockerImage);
+    // TODO The Spotify Docker client in Eoulsan does not seems to work anymore
+    // Use fallback Docker client
+    DockerImageInstance result =
+        new FallBackDockerClient().createConnection(dockerImage);
+
+    // Pull Docker image if not exists
+    result.pullImageIfNotExists();
+
+    return result;
   }
 
   /**
