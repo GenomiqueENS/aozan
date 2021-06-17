@@ -34,6 +34,15 @@ public class RunId {
     return this.originalId;
   }
 
+  /**
+   * Test if the run Id is the original run Id.
+   * @return true if the run Id is the original run Id
+   */
+  public boolean isOriginalId() {
+
+    return this.id.equals(this.originalId);
+  }
+
   //
   // Object methods
   //
