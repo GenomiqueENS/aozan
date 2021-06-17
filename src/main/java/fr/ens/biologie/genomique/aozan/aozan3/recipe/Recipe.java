@@ -6,10 +6,12 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
@@ -38,9 +40,9 @@ public class Recipe {
 
   private final DataStorageRegistry storages = new DataStorageRegistry();
   private final SendMail sendMail;
-  private RunDataProvider provider;
+  private final Set<RunDataProvider> providers = new HashSet<>();
+  private final Set<RunDataProvider> inProgressProviders = new HashSet<>();
   private final List<Step> steps = new ArrayList<>();
-  private boolean useInProgressData;
 
   private final AozanLogger logger;
 
@@ -106,15 +108,16 @@ public class Recipe {
   }
 
   /**
-   * Set the data provider.
+   * Add a data provider.
    * @param providerName provider name
    * @param storageName storage used by the provider
+   * @param inProgress true if in progress data must be used
    * @param conf provider configuration
    * @throws Aozan3Exception if an error occurs while setting the provider
    */
-  public void setDataProvider(final String providerName,
-      final String storageName, final Configuration conf)
-      throws Aozan3Exception {
+  public void addDataProvider(final String providerName,
+      final String storageName, final boolean inProgress,
+      final Configuration conf) throws Aozan3Exception {
 
     checkNotInitialized();
     requireNonNull(providerName);
@@ -139,24 +142,25 @@ public class Recipe {
     // Initialize the provider
     provider.init(storage, providerConf, this.logger);
 
-    setDataProvider(provider);
+    addDataProvider(provider);
+
+    if (inProgress) {
+      this.inProgressProviders.add(provider);
+    }
   }
 
   /**
    * Set an existing data provider
    * @param dataProvider provider to set
    */
-  public void setDataProvider(final RunDataProvider dataProvider) {
+  public void addDataProvider(final RunDataProvider dataProvider) {
 
     checkNotInitialized();
     requireNonNull(dataProvider);
 
-    // Check if a data provider has been already set
-    if (this.provider != null) {
-      throw new IllegalStateException();
-    }
+    // TODO Check if the same provider has been already set
 
-    this.provider = dataProvider;
+    this.providers.add(dataProvider);
   }
 
   /**
@@ -186,17 +190,6 @@ public class Recipe {
     this.steps.add(step);
   }
 
-  /**
-   * Set if in progress run data must be used for the recipe.
-   * @param inProgress true if in progress data must be used
-   */
-  public void setUseInProgressData(boolean inProgress) {
-
-    checkNotInitialized();
-
-    this.useInProgressData = inProgress;
-  }
-
   //
   // Recipe execution
   //
@@ -210,8 +203,8 @@ public class Recipe {
     checkNotInitialized();
 
     // Check if a provide has been set
-    if (this.provider == null) {
-      throw new Aozan3Exception("Run Data provider has not been defined.");
+    if (this.providers.isEmpty()) {
+      throw new Aozan3Exception("No run data provider has not been defined.");
     }
 
     // Log steps of the recipe
@@ -240,7 +233,7 @@ public class Recipe {
   public void execute() {
 
     try {
-      List<RunData> runs = runDataToProcess();
+      List<InputData> runs = runDataToProcess();
 
       if (runs.isEmpty()) {
         this.logger.info("No run to process found");
@@ -286,11 +279,11 @@ public class Recipe {
    * @param runs input runs
    * @throws Aozan3Exception if an error occurs while executing the recipe
    */
-  private void process(List<RunData> runs) throws Aozan3Exception {
+  private void process(List<InputData> runs) throws Aozan3Exception {
 
     requireNonNull(runs);
 
-    for (RunData run : runs) {
+    for (InputData run : runs) {
       process(run);
     }
   }
@@ -300,14 +293,11 @@ public class Recipe {
    * @param runs input runs
    * @throws Aozan3Exception if an error occurs while executing the recipe
    */
-  private void process(RunData run) throws Aozan3Exception {
+  private void process(InputData data) throws Aozan3Exception {
 
-    requireNonNull(run);
+    requireNonNull(data);
 
-    // Map<DataType, RunData> data = new HashMap<>();
-    // data.put(run.getType(), run);
-
-    InputData data = new InputData(run);
+    String runId = data.getLastRunData().getRunId().getId();
 
     // Check if the recipe has been initialized
     if (!this.initialized) {
@@ -321,9 +311,8 @@ public class Recipe {
 
       if (!stepInputData.isEmpty()) {
 
-        this.logger
-            .info("Start step \""
-                + step.getName() + "\" for run " + run.getRunId() + ".");
+        this.logger.info(
+            "Start step \"" + step.getName() + "\" for run " + runId + ".");
 
         ProcessResult result = step.process(stepInputData);
 
@@ -333,9 +322,8 @@ public class Recipe {
         // Send email
         this.sendMail.sendMail(result.getEmail());
 
-        this.logger
-            .info("End of step \""
-                + step.getName() + "\" for run " + run.getRunId() + ".");
+        this.logger.info(
+            "End of step \"" + step.getName() + "\" for run " + runId + ".");
       }
     }
 
@@ -360,7 +348,7 @@ public class Recipe {
    * @return a list of RunData object
    * @throws Aozan3Exception if a run identifier does not exists
    */
-  private List<RunData> runDataToProcess() throws Aozan3Exception {
+  private List<InputData> runDataToProcess() throws Aozan3Exception {
 
     return runDataToProcess(null);
   }
@@ -371,40 +359,48 @@ public class Recipe {
    * @return a list of RunData object
    * @throws Aozan3Exception if a run identifier does not exists
    */
-  private List<RunData> runDataToProcess(Collection<String> runIds)
+  private List<InputData> runDataToProcess(Collection<String> runIds)
       throws Aozan3Exception {
 
-    this.logger
-        .info("Looks for run in: " + this.provider.getDataStorage().getPath());
+    // Create a map with runIds
+    Multimap<String, RunData> map = ArrayListMultimap.create();
+    List<InputData> result = new ArrayList<>();
 
-    List<RunData> runs = this.useInProgressData
-        ? this.provider.listInProgressRunData()
-        : this.provider.listCompletedRunData();
+    for (RunDataProvider provider : this.providers) {
+
+      this.logger
+          .info("Looks for run in: " + provider.getDataStorage().getPath());
+
+      List<RunData> runs = this.inProgressProviders.contains(provider)
+          ? provider.listInProgressRunData() : provider.listCompletedRunData();
+
+      for (RunData r : runs) {
+
+        String runId = r.getRunId().getId();
+        map.put(runId, r);
+      }
+    }
 
     if (runIds == null) {
-      return runs;
-    }
 
-    // Create a map with runIds
-    Map<String, RunData> map = new HashMap<>();
-    for (RunData r : runs) {
-      map.put(r.getRunId().getId(), r);
-    }
-
-    List<RunData> result = new ArrayList<>();
-
-    // Filter the runs to process
-    for (String runId : runIds) {
-
-      if (runId == null) {
-        continue;
+      // Handle all available runs
+      for (String runId : map.keySet()) {
+        result.add(new InputData(map.get(runId)));
       }
+    } else {
 
-      if (!map.containsKey(runId)) {
-        throw new Aozan3Exception("Unknown run: " + runId);
+      // Filter the runs to process
+      for (String runId : runIds) {
+
+        if (runId == null) {
+          continue;
+        }
+
+        if (!map.containsKey(runId)) {
+          throw new Aozan3Exception("Unknown run: " + runId);
+        }
+        result.add(new InputData(map.get(runId)));
       }
-
-      result.add(map.get(runId));
     }
 
     return result;
@@ -463,8 +459,8 @@ public class Recipe {
 
     List<String> result = new ArrayList<>();
 
-    for (RunData runData : runDataToProcess()) {
-      result.add(runData.getRunId().getId());
+    for (InputData runData : runDataToProcess()) {
+      result.add(runData.getLastRunData().getRunId().getId());
     }
 
     return result;

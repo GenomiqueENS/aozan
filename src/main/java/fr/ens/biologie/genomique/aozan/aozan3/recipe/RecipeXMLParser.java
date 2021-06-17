@@ -43,6 +43,7 @@ public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
   private static final String RECIPE_RUN_CONFIGURATION_TAG_NAME =
       "runconfiguration";
   private static final String RECIPE_DATASOURCE_TAG_NAME = "datasource";
+  private static final String RECIPE_DATASOURCES_TAG_NAME = "datasources";
   static final String RECIPE_STEPS_TAG_NAME = "steps";
 
   private static final String RUNCONF_PROVIDER_TAG_NAME = "provider";
@@ -87,7 +88,7 @@ public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
     // Check allowed child tags of the root tag
     checkAllowedChildTags(element, RECIPE_FORMAT_VERSION_TAG_NAME,
         RECIPE_NAME_TAG_NAME, RECIPE_CONF_TAG_NAME, RECIPE_STORAGES_TAG_NAME,
-        RECIPE_RUN_CONFIGURATION_TAG_NAME, RECIPE_DATASOURCE_TAG_NAME,
+        RECIPE_RUN_CONFIGURATION_TAG_NAME, RECIPE_DATASOURCES_TAG_NAME,
         RECIPE_STEPS_TAG_NAME);
 
     // Check version of the XML file
@@ -123,8 +124,8 @@ public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
     RunConfigurationProvider runConfProvider =
         parseRunConfigurationTag(recipe, element, source);
 
-    // Parse the datasource tag
-    parseDataSourceTag(recipe, element, source);
+    // Parse the datasources tag
+    parseDataSourcesTag(recipe, element, source);
 
     // Parse steps
     recipe.addSteps(
@@ -186,6 +187,43 @@ public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
   }
 
   /**
+   * Parse a run datasources XML tag.
+   * @param recipe the recipe
+   * @param rootElement element to parse
+   * @param source file source
+   * @throws Aozan3Exception if an error occurs while parsing the XML
+   */
+  private void parseDataSourcesTag(final Recipe recipe,
+      final Element rootElement, final String source) throws Aozan3Exception {
+
+    requireNonNull(recipe);
+    requireNonNull(rootElement);
+
+    final NodeList nList =
+        rootElement.getElementsByTagName(RECIPE_DATASOURCES_TAG_NAME);
+
+    for (int i = 0; i < nList.getLength(); i++) {
+
+      if (i > 0) {
+        throw new Aozan3Exception(
+            "Found more than one \"" + RECIPE_DATASOURCES_TAG_NAME + "\" tag");
+      }
+
+      final Node node = nList.item(i);
+      if (node.getNodeType() == Node.ELEMENT_NODE) {
+
+        Element element = (Element) node;
+
+        // Check allowed tags for the "datasources" tag
+        checkAllowedChildTags(element, RECIPE_DATASOURCE_TAG_NAME);
+
+        // Parse each datasource element
+        parseDataSourceTag(recipe, element, source);
+      }
+    }
+  }
+
+  /**
    * Parse a run data source XML tag.
    * @param recipe the recipe
    * @param rootElement element to parse
@@ -202,11 +240,6 @@ public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
         rootElement.getElementsByTagName(RECIPE_DATASOURCE_TAG_NAME);
 
     for (int i = 0; i < nList.getLength(); i++) {
-
-      if (i > 0) {
-        throw new Aozan3Exception(
-            "Found more than one \"" + RECIPE_DATASOURCE_TAG_NAME + "\" tag");
-      }
 
       final Node node = nList.item(i);
       if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -234,8 +267,7 @@ public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
                 RECIPE_DATASOURCE_TAG_NAME, recipe.getConfiguration(),
                 recipe.getLogger()).parse(element, source);
 
-        recipe.setDataProvider(providerName, storageName, conf);
-        recipe.setUseInProgressData(inProgress);
+        recipe.addDataProvider(providerName, storageName, inProgress, conf);
       }
     }
   }
