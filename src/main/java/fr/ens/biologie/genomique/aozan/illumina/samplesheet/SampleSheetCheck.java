@@ -259,7 +259,7 @@ public class SampleSheetCheck {
     // Check for forbidden characters
     if (hasForbiddenCharacter(sampleId)) {
       throw new AozanException(
-          "Invalid sample id, only letters, digits, '-' or '_' characters are allowed : "
+          "Invalid sample id, only letters, digits or '-' characters are allowed : "
               + sampleId + ".");
     }
 
@@ -276,7 +276,7 @@ public class SampleSheetCheck {
 
       final char c = s.charAt(i);
 
-      if (!(Character.isLetterOrDigit(c) || c == '_' || c == '-')) {
+      if (!(Character.isLetterOrDigit(c) || c == '-')) {
 
         return true;
 
@@ -313,7 +313,7 @@ public class SampleSheetCheck {
     // Check for forbidden characters
     if (hasForbiddenCharacter(sampleName)) {
       throw new AozanException(
-          "Invalid sample id, only letters, digits, '-' or '_' characters are allowed : "
+          "Invalid sample id, only letters, digits or '-' characters are allowed : "
               + sampleName + ".");
     }
 
