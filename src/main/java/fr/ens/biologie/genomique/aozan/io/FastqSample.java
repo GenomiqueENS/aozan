@@ -184,6 +184,20 @@ public class FastqSample {
   }
 
   /**
+   * Get list of fastq file names for this sample.
+   * @return a String with the filename of the sample
+   */
+  public String getFastqFilenames() {
+
+    List<String> result = new ArrayList<>();
+    for (File f : this.fastqFiles) {
+      result.add(f.getName());
+    }
+
+    return String.join(",", result);
+  }
+
+  /**
    * Get the name for temporary fastq files uncompressed.
    * @return temporary fastq file name
    */

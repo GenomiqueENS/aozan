@@ -105,6 +105,7 @@ public class OverrepresentedSequencesBlast {
 
   private boolean useDocker;
   private boolean configured;
+  private boolean enabled;
   private File tmpDir;
 
   private CommandLine blastCommonCommandLine;
@@ -325,7 +326,7 @@ public class OverrepresentedSequencesBlast {
 
     final String blastPath;
 
-    if (useDocker) {
+    if (this.useDocker) {
       blastPath = BLAST_EXECUTABLE_DOCKER;
       this.dockerConnectionString = conf.get(Settings.DOCKER_URI_KEY);
     } else {
@@ -365,11 +366,10 @@ public class OverrepresentedSequencesBlast {
 
         LOGGER.info("FASTQC: blast is enabled, command line = "
             + this.blastCommonCommandLine);
+        this.enabled = true;
 
       } catch (final IOException | AozanException e) {
         LOGGER.warning(e.getMessage() + '\n' + stackTraceToString(e));
-        stepEnabled = false;
-
       }
     }
 
@@ -451,6 +451,11 @@ public class OverrepresentedSequencesBlast {
     if (!this.configured) {
       throw new AozanRuntimeException(
           "OverrepresentedSequencesBlast is not configured");
+    }
+
+    // Return nothing if blast if disabled
+    if (!this.enabled) {
+      return null;
     }
 
     // Return the result if it already been computed

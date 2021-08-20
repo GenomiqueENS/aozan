@@ -48,7 +48,7 @@ public class BlastContaminantHit extends ContaminantHit {
           + e.getMessage() + "\n" + stackTraceToString(e));
     }
 
-    // If an error occurs
+    // If an error occurs or if blast is disabled
     return "No Hit";
   }
 
