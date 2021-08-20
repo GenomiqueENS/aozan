@@ -251,7 +251,7 @@ public class ExecAction implements Action {
 
     // No recipe found
     if (recipePath == null) {
-      throw new Aozan3Exception("Unknow recipe: " + recipeName);
+      throw new Aozan3Exception("Unknown recipe: " + recipeName);
     }
 
     return loadRecipe(conf, cliConf, recipePath, logger);
