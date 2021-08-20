@@ -33,6 +33,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,7 +62,10 @@ import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
-import fr.ens.biologie.genomique.aozan.util.DockerCommand;
+import fr.ens.biologie.genomique.aozan.util.DockerManager;
+import fr.ens.biologie.genomique.eoulsan.util.process.DockerImageInstance;
+import fr.ens.biologie.genomique.eoulsan.util.process.SimpleProcess;
+import fr.ens.biologie.genomique.eoulsan.util.process.SystemSimpleProcess;
 
 /**
  * This class launches blastn on one sequence query and parses xml result file
@@ -533,17 +538,13 @@ public class OverrepresentedSequencesBlast {
       writer.flush();
     }
 
-    // Launch blast
     LOGGER
         .info("FASTQC: Launch " + this.submittedSequences.size() + " blast(s)");
 
-    if (this.useDocker) {
-      launchDockerBlast(this.dockerConnectionString,
-          this.blastCommonCommandLine, inputFastaFile, resultXMLFile);
-    } else {
-      launchStandaloneBlast(this.blastCommonCommandLine, inputFastaFile,
-          resultXMLFile);
-    }
+    // Launch blast
+    launchBlast(useDocker, this.dockerConnectionString,
+        this.blastCommonCommandLine, inputFastaFile, resultXMLFile);
+
     // Wait writing xml file
     try {
       Thread.sleep(100);
@@ -573,59 +574,58 @@ public class OverrepresentedSequencesBlast {
 
   /**
    * Launch blast.
+   * @param dockerMode launch Blast in Docker mode if true
    * @param commandLine the command line
    * @param inputFile input FASTA file
    * @param outputFile output XML file
    * @throws AozanException occurs if the process fails
    */
-  private static void launchStandaloneBlast(final CommandLine commandLine,
+  private static void launchBlast(final boolean dockerMode,
+      final String dockerConnectionString, final CommandLine commandLine,
       final File inputFile, final File outputFile) throws AozanException {
 
     final List<String> cmd = commandLine.getComandLine(inputFile, outputFile);
-    final ProcessBuilder builder = new ProcessBuilder(cmd);
 
-    LOGGER.fine("FASTQC: Blast command line: " + cmd);
+    SimpleProcess process;
 
     try {
 
-      final int exitValue = builder.start().waitFor();
+      if (dockerMode) {
+
+        DockerImageInstance instance =
+            DockerManager.getInstance(DockerManager.ClientType.FALLBACK,
+                new URI(dockerConnectionString)).createImageInstance(
+                    BLAST_DOCKER_IMAGE + ':' + BLAST_VERSION_DOCKER);
+
+        instance.pullImageIfNotExists();
+        process = instance;
+
+      } else {
+        process = new SystemSimpleProcess();
+      }
+
+      File workingDir = outputFile.getParentFile();
+      File tmpDir = outputFile.getParentFile();
+      File stderrFile = new File(tmpDir, "STDERR");
+      File stdoutFile = new File(tmpDir, "STDOUT");
+
+      LOGGER.fine("FASTQC: Blast command line: " + cmd);
+
+      int exitValue = process.execute(cmd, workingDir,
+          outputFile.getParentFile(), stdoutFile, stderrFile,
+          inputFile.getParentFile(), outputFile.getParentFile(),
+          commandLine.blastDBPath.getParentFile());
+
       if (exitValue > 0) {
         LOGGER.warning(
             "FastQC: fail of blastn process, exit value is : " + exitValue);
       }
 
-    } catch (final IOException | InterruptedException e) {
+    } catch (IOException e) {
       throw new AozanException(e);
-    }
-  }
-
-  /**
-   * Launch blast.
-   * @param commandLine the command line
-   * @param inputFile input FASTA file
-   * @param outputFile output XML file
-   * @throws AozanException occurs if the process fails
-   */
-  private static void launchDockerBlast(final String dockerConnectionString,
-      final CommandLine commandLine, final File inputFile,
-      final File outputFile) throws AozanException {
-
-    final List<String> cmd = commandLine.getComandLine(inputFile, outputFile);
-
-    DockerCommand du = new DockerCommand(dockerConnectionString, cmd,
-        BLAST_DOCKER_IMAGE + ':' + BLAST_VERSION_DOCKER);
-    du.addMountDirectory(inputFile.getParentFile().getAbsolutePath());
-    du.addMountDirectory(outputFile.getParentFile().getAbsolutePath());
-    du.addMountDirectory(
-        commandLine.blastDBPath.getParentFile().getAbsolutePath());
-
-    LOGGER.fine("FASTQC: Blast command line: " + cmd);
-
-    du.run();
-    final int exitValue = du.getExitValue();
-    if (exitValue > 0) {
-      LOGGER.warning(
-          "FastQC: fail of blastn process, exit value is : " + exitValue);
+    } catch (URISyntaxException e) {
+      throw new AozanException(
+          "Invalid Docker connection URI: " + dockerConnectionString, e);
     }
   }
 
