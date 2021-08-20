@@ -25,6 +25,8 @@ package fr.ens.biologie.genomique.aozan.collectors;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -36,8 +38,13 @@ import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
-import fr.ens.biologie.genomique.aozan.util.DockerCommand;
+import fr.ens.biologie.genomique.aozan.util.DockerManager;
 import fr.ens.biologie.genomique.eoulsan.util.SystemUtils;
+import fr.ens.biologie.genomique.eoulsan.util.process.DockerClient;
+import fr.ens.biologie.genomique.eoulsan.util.process.DockerImageInstance;
+import fr.ens.biologie.genomique.eoulsan.util.process.FallBackDockerClient;
+import fr.ens.biologie.genomique.eoulsan.util.process.SimpleProcess;
+import fr.ens.biologie.genomique.eoulsan.util.process.SystemSimpleProcess;
 
 /**
  * This class define a MultiQC collector.
@@ -127,13 +134,11 @@ public class MultiQCCollector implements Collector {
       inputDirectories.add(projectReportDir);
 
       try {
+
         // Launch MultiQC
-        if (this.useDocker) {
-          createMultiQCReportWithDocker(inputDirectories, multiQCReportFile,
-              projectName);
-        } else {
-          createMultiQCReport(inputDirectories, multiQCReportFile, projectName);
-        }
+        runMultiQC(this.useDocker, inputDirectories, multiQCReportFile,
+            projectName);
+
       } catch (IOException e) {
         throw new AozanException(e);
       }
@@ -141,86 +146,7 @@ public class MultiQCCollector implements Collector {
       // Add result entry
       data.put(MULTIQC_DATA_PREFIX + ".project" + projectId + ".report",
           multiQCReportFile.getAbsolutePath());
-
     }
-  }
-
-  /**
-   * Create the MultiQC report.
-   * @param inputDirectories input directories
-   * @param multiQCReportFile output report
-   * @param projectName project name
-   * @throws IOException if an error occurs while creating the report
-   */
-  private void createMultiQCReport(final List<File> inputDirectories,
-      final File multiQCReportFile, final String projectName)
-      throws IOException {
-
-    File multiQCExecutable =
-        SystemUtils.searchExecutableInPATH(MULTIQC_EXECUTABLE);
-
-    if (multiQCExecutable == null) {
-      throw new IOException(
-          "Unable to find \"" + MULTIQC_EXECUTABLE + "\" executable");
-    }
-
-    // Create command line
-    final ProcessBuilder builder = new ProcessBuilder();
-    builder.command().add(multiQCExecutable.getAbsolutePath());
-    builder.command().addAll(
-        createMultiQCOptions(inputDirectories, multiQCReportFile, projectName));
-    builder.directory(multiQCReportFile.getParentFile());
-    builder.environment().put("TMPDIR", this.tmpDir.getAbsolutePath());
-
-    LOGGER.fine("MultiQC: MultiQC command line: " + builder.command());
-
-    // Execute command line
-    try {
-      final int exitValue = builder.start().waitFor();
-      if (exitValue > 0) {
-        throw new IOException("MultiQC: bad exit value: " + exitValue);
-      }
-    } catch (InterruptedException e) {
-      throw new IOException(e);
-    }
-  }
-
-  /**
-   * Create the MultiQC report using docker.
-   * @param inputDirectories input directories
-   * @param multiQCReportFile output report
-   * @param projectName project name
-   * @throws IOException if an error occurs while creating the report
-   */
-  private void createMultiQCReportWithDocker(final List<File> inputDirectories,
-      final File multiQCReportFile, final String projectName)
-      throws IOException, AozanException {
-
-    final List<String> cmd = new ArrayList<String>();
-    cmd.add(MULTIQC_EXECUTABLE_DOCKER);
-    cmd.addAll(
-        createMultiQCOptions(inputDirectories, multiQCReportFile, projectName));
-
-    DockerCommand dc = new DockerCommand(this.dockerConnectionString, cmd,
-        MULTIQC_DOCKER_IMAGE);
-
-    // MultiQC input directories
-    for (File d : inputDirectories) {
-      dc.addMountDirectory(d.getAbsolutePath());
-    }
-
-    dc.addMountDirectory(multiQCReportFile.getParentFile().getAbsolutePath());
-
-    LOGGER.fine("FASTQC: Blast command line: " + cmd);
-
-    // Launch Docker container
-    dc.run();
-    final int exitValue = dc.getExitValue();
-    if (exitValue > 0) {
-      Common.getLogger().warning(
-          "FastQC: fail of blastn process, exit value is : " + exitValue);
-    }
-
   }
 
   /**
@@ -247,6 +173,72 @@ public class MultiQCCollector implements Collector {
     }
 
     return result;
+  }
+
+  private void runMultiQC(boolean docker, final List<File> inputDirectories,
+      final File multiQCReportFile, final String projectName)
+      throws IOException {
+
+    SimpleProcess process;
+    String executablePath;
+
+    if (docker) {
+
+      DockerImageInstance instance;
+      try {
+        instance = DockerManager
+            .getInstance(DockerManager.ClientType.FALLBACK,
+                new URI(dockerConnectionString))
+            .createImageInstance(MULTIQC_DOCKER_IMAGE);
+      } catch (URISyntaxException e) {
+        throw new IOException("Invalid Docker connection URI", e);
+      }
+
+      instance.pullImageIfNotExists();
+
+      executablePath = MULTIQC_EXECUTABLE_DOCKER;
+      process = instance;
+
+    } else {
+
+      File multiQCExecutable =
+          SystemUtils.searchExecutableInPATH(MULTIQC_EXECUTABLE);
+
+      if (multiQCExecutable == null) {
+        throw new IOException(
+            "Unable to find \"" + MULTIQC_EXECUTABLE + "\" executable");
+      }
+
+      executablePath = multiQCExecutable.getAbsolutePath();
+      process = new SystemSimpleProcess();
+    }
+
+    final List<String> commandLine = new ArrayList<String>();
+    commandLine.add(executablePath);
+    commandLine.addAll(
+        createMultiQCOptions(inputDirectories, multiQCReportFile, projectName));
+
+    List<File> filesUsed = new ArrayList<>(inputDirectories);
+    filesUsed.add(multiQCReportFile.getParentFile());
+    filesUsed.add(this.tmpDir);
+
+    LOGGER.fine("FASTQC: MultiQC command line: " + commandLine);
+
+    File stdout = new File(multiQCReportFile.getParentFile(),
+        multiQCReportFile.getName() + ".out");
+    File stderr = new File(multiQCReportFile.getParentFile(),
+        multiQCReportFile.getName() + ".err");
+
+    // Launch Docker container
+    int exitValue =
+        process.execute(commandLine, multiQCReportFile.getParentFile(),
+            this.tmpDir, stdout, stderr, filesUsed.toArray(new File[0]));
+
+    if (exitValue > 0) {
+      Common.getLogger().warning(
+          "FastQC: fail of blastn process, exit value is : " + exitValue);
+    }
+
   }
 
   @Override
