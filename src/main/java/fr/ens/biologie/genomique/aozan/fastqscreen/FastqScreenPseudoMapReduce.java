@@ -56,6 +56,7 @@ import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.MapperInstance;
 import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.MapperProcess;
 import fr.ens.biologie.genomique.eoulsan.data.DataFile;
 import fr.ens.biologie.genomique.eoulsan.modules.generators.GenomeMapperIndexer;
+import fr.ens.biologie.genomique.eoulsan.modules.mapping.MappingCounters;
 import fr.ens.biologie.genomique.eoulsan.util.LocalReporter;
 import fr.ens.biologie.genomique.eoulsan.util.PseudoMapReduce;
 import fr.ens.biologie.genomique.eoulsan.util.Reporter;
@@ -201,8 +202,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
           // Create the MapperProcess
           final MapperProcess process = this.pairedMode
-              ? mapping.mapPE(fastqRead1, fastqRead2)
-              : mapping.mapSE(fastqRead1);
+              ? mapping.mapPE(fastqRead1, fastqRead2, null, null)
+              : mapping.mapSE(fastqRead1, null, null);
 
           // Parse SAM output
           parser.parseLines(process.getStout());
