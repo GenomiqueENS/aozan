@@ -2,7 +2,6 @@ package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
 import static fr.ens.biologie.genomique.aozan.Settings.QC_CONF_THREADS_KEY;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -242,7 +241,8 @@ public class Aozan2Compatibility {
     Map<String, String> result = new LinkedHashMap<>();
 
     for (Map.Entry<String, String> e : m.entrySet()) {
-      result.put(TEST_PREFIX + e.getKey() + '.', TEST_PREFIX + e.getValue() + '.');
+      result.put(TEST_PREFIX + e.getKey() + '.',
+          TEST_PREFIX + e.getValue() + '.');
     }
 
     return result;
