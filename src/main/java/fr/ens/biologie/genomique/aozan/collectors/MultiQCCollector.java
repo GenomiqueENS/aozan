@@ -40,9 +40,7 @@ import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.util.DockerManager;
 import fr.ens.biologie.genomique.eoulsan.util.SystemUtils;
-import fr.ens.biologie.genomique.eoulsan.util.process.DockerClient;
 import fr.ens.biologie.genomique.eoulsan.util.process.DockerImageInstance;
-import fr.ens.biologie.genomique.eoulsan.util.process.FallBackDockerClient;
 import fr.ens.biologie.genomique.eoulsan.util.process.SimpleProcess;
 import fr.ens.biologie.genomique.eoulsan.util.process.SystemSimpleProcess;
 
@@ -93,7 +91,8 @@ public class MultiQCCollector implements Collector {
     this.tmpDir = qc.getTmpDir();
 
     // Test if Docker must be use to launch MultiQC
-    this.useDocker = conf.getBoolean(Settings.QC_CONF_MULTIQC_USE_DOCKER_KEY);
+    this.useDocker =
+        conf.getBoolean(Settings.QC_CONF_MULTIQC_USE_DOCKER_KEY, false);
 
     LOGGER.info("MultiQC, use Docker: " + this.useDocker);
 
@@ -133,12 +132,10 @@ public class MultiQCCollector implements Collector {
 
       inputDirectories.add(projectReportDir);
 
+      // Launch MultiQC
       try {
-
-        // Launch MultiQC
         runMultiQC(this.useDocker, inputDirectories, multiQCReportFile,
             projectName);
-
       } catch (IOException e) {
         throw new AozanException(e);
       }
@@ -146,6 +143,7 @@ public class MultiQCCollector implements Collector {
       // Add result entry
       data.put(MULTIQC_DATA_PREFIX + ".project" + projectId + ".report",
           multiQCReportFile.getAbsolutePath());
+
     }
   }
 
@@ -188,7 +186,7 @@ public class MultiQCCollector implements Collector {
       try {
         instance = DockerManager
             .getInstance(DockerManager.ClientType.FALLBACK,
-                new URI(dockerConnectionString))
+                new URI(this.dockerConnectionString))
             .createImageInstance(MULTIQC_DOCKER_IMAGE);
       } catch (URISyntaxException e) {
         throw new IOException("Invalid Docker connection URI", e);
