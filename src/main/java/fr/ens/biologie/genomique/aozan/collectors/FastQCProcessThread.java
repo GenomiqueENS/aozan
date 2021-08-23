@@ -36,7 +36,6 @@ import com.google.common.collect.Lists;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Common;
-import fr.ens.biologie.genomique.aozan.fastqc.BadTiles;
 import fr.ens.biologie.genomique.aozan.io.FastqSample;
 import uk.ac.babraham.FastQC.Modules.ModuleFactory;
 import uk.ac.babraham.FastQC.Modules.QCModule;
@@ -248,7 +247,6 @@ class FastQCProcessThread extends AbstractFastqProcessThread {
 
     // Define modules list
     this.moduleList = Lists.newArrayList(ModuleFactory.getStandardModuleList());
-    this.moduleList.add(new BadTiles());
   }
 
 }
