@@ -630,6 +630,12 @@ public class QC {
     this.globalConf.put(BCL2FASTQ_OUTPUT_DIR, this.fastqDir.getPath());
     this.globalConf.put(QC_OUTPUT_DIR, this.qcDir.getPath());
     this.globalConf.put(TMP_DIR, this.tmpDir.getAbsolutePath());
+
+    // Add Docker URI key
+    if (settings.containsKey(Settings.DOCKER_URI_KEY)) {
+      this.globalConf.put(Settings.DOCKER_URI_KEY,
+          settings.get(Settings.DOCKER_URI_KEY));
+    }
   }
 
   /**
