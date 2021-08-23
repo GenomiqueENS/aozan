@@ -48,7 +48,6 @@
           <ul>
             <li><a href="#fcconfiguration">General configuration</a></li>
             <li><a href="#fctests">Configuration tests</a></li>
-            <li><a href="#badtiles">New module for Bad tiles</a></li>
             <li><a href="#overrepresented">Enhancement of module Overrepresented sequences</a></li>
           </ul>
         </li>
@@ -132,19 +131,6 @@
         <div align="center">
           <img src="images/qc_sample_test_800px.png" alt="example on report with demultiplexing and fastqc data" />
         </div>
-
-        <a name="badtiles"/>
-        <h5>New module for &#145;Bad tiles&#146;</h5>
-        <p>It contains an additional FastQC step named "<b>Bad tiles</b>" that search tiles with BMS (Bottom Middle Swath) issues with Illumina flowcell v3.
-        During the Quality Control development phase of the project with the new V3 chemistry, we set up a new FastQC module in order to detect bad tiles caused by the BMS problem.</p>
-
-        <table>
-          <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
-          <tr><td>qc.test.sample.fastqc.bad.tiles.enable</td><td>boolean</td><td>False</td><td>Enable FastQC badtiles test</td></tr>
-        </table>
-
-        <p>Example of module &#145;Bad tiles&#146;:</p>
-        <div align="center"><img src="images/qc_fastqc_bad_tiles_300px.png" alt="module bad tiles"/></div>
 
         <a name="overrepresented"/>
         <h5>Enhancement to module &#145;Overrepresented sequences&#146;</h5>
