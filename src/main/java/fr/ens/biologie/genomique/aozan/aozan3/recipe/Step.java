@@ -143,6 +143,11 @@ public class Step {
     this.logger.info(inputRunData,
         "End of processor " + this.processorName + " for the run");
 
+    if (result == null) {
+      throw new Aozan3Exception(
+          "Result of processor " + this.processorName + " is null");
+    }
+
     // Return result with updated run ids
     return updateRunIds(result, runConf);
   }
