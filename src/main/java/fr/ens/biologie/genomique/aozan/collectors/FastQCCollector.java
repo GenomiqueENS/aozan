@@ -93,9 +93,6 @@ public class FastQCCollector extends AbstractFastqCollector {
       final FastqSample fastqSample, final File reportDir, final boolean runPE)
       throws AozanException {
 
-    Common.getLogger()
-        .info("Process sample for FastQC: " + fastqSample.getFastqFilenames());
-
     if (fastqSample.getFastqFiles() == null
         || fastqSample.getFastqFiles().isEmpty()) {
 
