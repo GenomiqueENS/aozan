@@ -56,7 +56,6 @@ import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.MapperInstance;
 import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.MapperProcess;
 import fr.ens.biologie.genomique.eoulsan.data.DataFile;
 import fr.ens.biologie.genomique.eoulsan.modules.generators.GenomeMapperIndexer;
-import fr.ens.biologie.genomique.eoulsan.modules.mapping.MappingCounters;
 import fr.ens.biologie.genomique.eoulsan.util.LocalReporter;
 import fr.ens.biologie.genomique.eoulsan.util.PseudoMapReduce;
 import fr.ens.biologie.genomique.eoulsan.util.Reporter;
@@ -74,7 +73,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
   // Boolean use to update logger with parameter mapper only at the first
   // execution
-  private static boolean firstDoMapRunning = true;
+  private static boolean firstDoMapRun = true;
 
   private static final String COUNTER_GROUP = "reads_mapping";
   private final Reporter reporter;
@@ -134,7 +133,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     final int mapperThreads = threadNumber > 0
         ? threadNumber : Runtime.getRuntime().availableProcessors();
 
-    if (firstDoMapRunning) {
+    if (firstDoMapRun) {
       // Update logger at the first execution
       LOGGER.info("FASTQSCREEN: map "
           + fastqRead1.getName() + " on genomes "
@@ -151,8 +150,9 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
       final Stopwatch timer = Stopwatch.createStarted();
 
       LOGGER.info("FASTQSCREEN: map "
-          + fastqRead1.getName() + "(" + fastqRead1
-          + (this.pairedMode ? ", " + fastqRead2 : "") + ")" + " on " + genome);
+          + fastqRead1.getName()
+          + (this.pairedMode ? ", " + fastqRead2.getName() : "") + " on "
+          + genome);
 
       // Get the mapper object
       final Mapper mapper = Mapper.newMapper(this.mapperName);
@@ -224,7 +224,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
         timer.stop();
 
-        firstDoMapRunning = false;
+        firstDoMapRun = false;
 
       } catch (final IOException e) {
         throw new AozanException(e);
