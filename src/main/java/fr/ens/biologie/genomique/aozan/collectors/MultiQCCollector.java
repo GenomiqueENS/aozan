@@ -57,14 +57,16 @@ public class MultiQCCollector implements Collector {
   public static final String MULTIQC_DATA_PREFIX = "multiqc";
 
   private static final String MULTIQC_EXECUTABLE = "multiqc";
-  private static final String MULTIQC_EXECUTABLE_DOCKER = "multiqc";
-  private static final String MULTIQC_DOCKER_IMAGE = "ewels/multiqc:v1.3";
+  private static final String MULTIQC_EXECUTABLE_DOCKER = "";
+  private static final String MULTIQC_DOCKER_IMAGE = "ewels/multiqc:v1.11";
 
   private static final Logger LOGGER = Common.getLogger();
 
   private File fastqDir;
   private File qcDir;
   private File tmpDir;
+  private String dockerImage;
+  private String dockerExecutable = MULTIQC_EXECUTABLE_DOCKER;
 
   private boolean useDocker;
   private String dockerConnectionString;
@@ -89,6 +91,10 @@ public class MultiQCCollector implements Collector {
     this.fastqDir = qc.getFastqDir();
     this.qcDir = qc.getQcDir();
     this.tmpDir = qc.getTmpDir();
+    this.dockerImage =
+        conf.get("qc.conf.multiqc.docker.image", MULTIQC_DOCKER_IMAGE);
+    this.dockerExecutable = conf.get("qc.conf.multiqc.docker.executable",
+        MULTIQC_EXECUTABLE_DOCKER);
 
     // Test if Docker must be use to launch MultiQC
     this.useDocker =
@@ -187,14 +193,14 @@ public class MultiQCCollector implements Collector {
         instance = DockerManager
             .getInstance(DockerManager.ClientType.FALLBACK,
                 new URI(this.dockerConnectionString))
-            .createImageInstance(MULTIQC_DOCKER_IMAGE);
+            .createImageInstance(this.dockerImage);
       } catch (URISyntaxException e) {
         throw new IOException("Invalid Docker connection URI", e);
       }
 
       instance.pullImageIfNotExists();
 
-      executablePath = MULTIQC_EXECUTABLE_DOCKER;
+      executablePath = this.dockerExecutable;
       process = instance;
 
     } else {
@@ -212,7 +218,9 @@ public class MultiQCCollector implements Collector {
     }
 
     final List<String> commandLine = new ArrayList<String>();
-    commandLine.add(executablePath);
+    if (!executablePath.isEmpty()) {
+      commandLine.add(executablePath);
+    }
     commandLine.addAll(
         createMultiQCOptions(inputDirectories, multiQCReportFile, projectName));
 

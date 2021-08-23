@@ -25,6 +25,23 @@ public class CollectorConfiguration {
   }
 
   /**
+   * Get a setting value.
+   * @param key the setting key
+   * @param defaultValue default value
+   * @return the value of the setting or null if the setting does not exists
+   */
+  public String get(final String key, final String defaultValue) {
+
+    String value = this.map.get(key);
+
+    if (value == null) {
+      return defaultValue;
+    }
+
+    return value;
+  }
+
+  /**
    * Get a setting value as an integer value.
    * @param key the setting key
    * @return the integer value of the setting
