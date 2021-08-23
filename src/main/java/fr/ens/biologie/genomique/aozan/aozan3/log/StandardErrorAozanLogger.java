@@ -1,6 +1,7 @@
 package fr.ens.biologie.genomique.aozan.aozan3.log;
 
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
@@ -18,7 +19,7 @@ public class StandardErrorAozanLogger extends AbstractAzoanLogger {
   @Override
   protected Handler createHandler(Configuration conf) throws Aozan3Exception {
 
-    return new StreamHandler(System.err, new SimpleFormatter()) {
+    Handler result = new StreamHandler(System.err, new SimpleFormatter()) {
 
       // Force flush after each log
       @Override
@@ -28,6 +29,14 @@ public class StandardErrorAozanLogger extends AbstractAzoanLogger {
       }
 
     };
+
+    if (conf.containsKey("aozan.log.level")) {
+      String logLevelName = conf.get("aozan.log.level");
+      Level logLevel = Level.parse(logLevelName.toUpperCase());
+      result.setLevel(logLevel);
+    }
+
+    return result;
   }
 
   //
