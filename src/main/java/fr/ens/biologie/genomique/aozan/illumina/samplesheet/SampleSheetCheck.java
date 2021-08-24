@@ -21,18 +21,36 @@ public class SampleSheetCheck {
   public static List<String> checkSampleSheet(final SampleSheet samplesheet)
       throws AozanException {
 
-    return checkSampleSheet(samplesheet, null);
+    return checkSampleSheet(samplesheet, null, false);
   }
 
   /**
    * Check a samplesheet.
    * @param samplesheet the samplesheet
    * @param flowCellId the flow cell id
+   * @param allowUnderscoreInSampleID allow underscore characters in Sample_ID
+   *          fields
    * @return the list
    * @throws AozanException the aozan exception
    */
   public static List<String> checkSampleSheet(final SampleSheet samplesheet,
       final String flowCellId) throws AozanException {
+
+    return checkSampleSheet(samplesheet, flowCellId, false);
+  }
+
+  /**
+   * Check a samplesheet.
+   * @param samplesheet the samplesheet
+   * @param flowCellId the flow cell id
+   * @param allowUnderscoreInSampleID allow underscore characters in Sample_ID
+   *          fields
+   * @return the list
+   * @throws AozanException the aozan exception
+   */
+  public static List<String> checkSampleSheet(final SampleSheet samplesheet,
+      final String flowCellId, final boolean allowUnderscoreInSampleID)
+      throws AozanException {
 
     if (samplesheet == null) {
       throw new NullPointerException("The samplesheet object is null");
@@ -79,11 +97,12 @@ public class SampleSheetCheck {
       }
 
       // Check if the sample is null or empty
-      checkSampleId(sample.getSampleId(), sampleIds);
+      checkSampleId(sample.getSampleId(), allowUnderscoreInSampleID, sampleIds);
 
       // Check if the sample is null or empty
       if (sample.isSampleNameField()) {
-        checkSampleName(sample.getSampleName(), sampleNames, true, warnings);
+        checkSampleName(sample.getSampleName(), allowUnderscoreInSampleID,
+            sampleNames, true, warnings);
       }
 
       // Check sample reference
@@ -242,11 +261,14 @@ public class SampleSheetCheck {
   /**
    * Check sample id.
    * @param sampleId the sample id
+   * @param allowUnderscoreInSampleID allow underscore characters in Sample_ID
+   *          fields
    * @param sampleIds the sample ids
    * @throws AozanException the aozan exception
    */
   private static void checkSampleId(final String sampleId,
-      final Set<String> sampleIds) throws AozanException {
+      boolean allowUnderscoreInSampleID, final Set<String> sampleIds)
+      throws AozanException {
 
     // Check if null of empty
     if (isNullOrEmpty(sampleId)) {
@@ -257,7 +279,7 @@ public class SampleSheetCheck {
     checkCharset(sampleId);
 
     // Check for forbidden characters
-    if (hasForbiddenCharacter(sampleId)) {
+    if (hasForbiddenCharacter(sampleId, allowUnderscoreInSampleID)) {
       throw new AozanException(
           "Invalid sample id, only letters, digits, '-' or '_' characters are allowed: "
               + sampleId + ".");
@@ -276,14 +298,17 @@ public class SampleSheetCheck {
   /**
    * Check if a string has a forbidden character in samplesheet
    * @param s the string to test
+   * @param allowUnderscoreInSampleID allow underscore characters
    */
-  public static Boolean hasForbiddenCharacter(String s) {
+  public static boolean hasForbiddenCharacter(String s,
+      boolean allowUnderscoreInSampleID) {
 
     for (int i = 0; i < s.length(); i++) {
 
       final char c = s.charAt(i);
 
-      if (!(Character.isLetterOrDigit(c) || c == '-')) {
+      if (!(Character.isLetterOrDigit(c)
+          || (c == '_' && !allowUnderscoreInSampleID) || c == '-')) {
 
         return true;
 
@@ -291,18 +316,18 @@ public class SampleSheetCheck {
     }
 
     return false;
-
   }
 
   /**
    * Check sample name.
    * @param sampleName the sample name
+   * @param allowUnderscoreInSampleID allow underscore characters
    * @param sampleNames the sample names
    * @throws AozanException the aozan exception
    */
   private static void checkSampleName(final String sampleName,
-      final Set<String> sampleNames, Boolean isBcl2Fastq2,
-      final List<String> warnings) throws AozanException {
+      boolean allowUnderscoreInSampleID, final Set<String> sampleNames,
+      Boolean isBcl2Fastq2, final List<String> warnings) throws AozanException {
 
     if (isNullOrEmpty(sampleName)) {
 
@@ -318,7 +343,7 @@ public class SampleSheetCheck {
     checkCharset(sampleName);
 
     // Check for forbidden characters
-    if (hasForbiddenCharacter(sampleName)) {
+    if (hasForbiddenCharacter(sampleName, allowUnderscoreInSampleID)) {
       throw new AozanException(
           "Invalid sample id, only letters, digits or '-' characters are allowed : "
               + sampleName + ".");
