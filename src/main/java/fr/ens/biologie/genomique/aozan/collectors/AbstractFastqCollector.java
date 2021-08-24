@@ -491,6 +491,7 @@ public abstract class AbstractFastqCollector implements Collector {
 
     final boolean interruptThreadIfRunning = true;
 
+    final Set<AbstractFastqProcessThread> threadDataSaved = new HashSet<>();
     int samplesNotProcessed;
 
     // Wait until all samples are processed
@@ -502,7 +503,6 @@ public abstract class AbstractFastqCollector implements Collector {
         // LOGGER.warning("InterruptedException: " + e.getMessage());
       }
 
-      final Set<AbstractFastqProcessThread> threadDataSaved = new HashSet<>();
       samplesNotProcessed = 0;
 
       for (final Future<? extends AbstractFastqProcessThread> fst : threads) {
