@@ -263,6 +263,13 @@ public class SampleSheetCheck {
               + sampleId + ".");
     }
 
+    // Check the length of the Id
+    if (sampleId.length() > 20) {
+      throw new AozanException(
+          "Invalid sample id, a valid id cannot be longuer than 20 characters: "
+              + sampleId + ".");
+    }
+
     sampleIds.add(sampleId);
   }
 
@@ -455,7 +462,7 @@ public class SampleSheetCheck {
       final String projectName, final int lane,
       final Map<String, Set<Integer>> sampleInLanes,
       final Map<String, String> samplesProjects, final List<String> warnings)
-          throws AozanException {
+      throws AozanException {
 
     // Check if two or more project use the same sample
     if (samplesProjects.containsKey(sampleId)
