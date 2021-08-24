@@ -53,6 +53,9 @@ public class Aozan2Compatibility {
       result.put(key, e.getValue());
     }
 
+    // Avoid errors with removed tests
+    result.put("qc.test.sample.fastqc.bad.tiles.enable", "False");
+
     return new Settings(result);
   }
 
