@@ -232,7 +232,7 @@ public class SampleSheetCheck {
       final char c = fcid.charAt(i);
       if (!(Character.isLetterOrDigit(c))) {
         throw new AozanException(
-            "Invalid flow cell id, only letters or digits are allowed : "
+            "Invalid flow cell id, only letters or digits are allowed: "
                 + fcid + ".");
       }
     }
@@ -259,7 +259,7 @@ public class SampleSheetCheck {
     // Check for forbidden characters
     if (hasForbiddenCharacter(sampleId)) {
       throw new AozanException(
-          "Invalid sample id, only letters, digits, '-' or '_' characters are allowed : "
+          "Invalid sample id, only letters, digits, '-' or '_' characters are allowed: "
               + sampleId + ".");
     }
 
