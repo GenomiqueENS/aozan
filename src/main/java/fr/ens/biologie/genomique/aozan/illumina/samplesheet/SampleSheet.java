@@ -1,19 +1,32 @@
 package fr.ens.biologie.genomique.aozan.illumina.samplesheet;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
 
+/**
+ * This class define an Illumina samplesheet.
+ * @author Laurent Jourdren
+ * @since 2.0
+ */
 public class SampleSheet implements Iterable<Sample> {
 
-  private Map<String, List<String>> metadata =
-      new LinkedHashMap<String, List<String>>();
-  private List<Sample> samples = new ArrayList<Sample>();
+  public static final String DEFAULT_TABLE_NAME = "Data";
+
+  private List<String> sectionOrder = new ArrayList<>();
+  private Map<String, PropertySection> propertySections = new HashMap<>();
+  private Map<String, TableSection> tableSections = new HashMap<>();
+  private TableSection defaultTable = null;
 
   private int version = 2;
   private String flowCellId;
@@ -22,15 +35,93 @@ public class SampleSheet implements Iterable<Sample> {
   // Getters
   //
 
+  private TableSection getDefaultTableSection() {
+
+    if (this.defaultTable == null) {
+      return addTableSection(DEFAULT_TABLE_NAME);
+    }
+
+    return this.defaultTable;
+  }
+
+  /**
+   * Get a property section.
+   * @param sectionName section name
+   * @return a PropertySection object
+   */
+  public PropertySection getPropertySection(String sectionName) {
+
+    if (sectionName == null) {
+      throw new NullPointerException("The section name cannot be null");
+    }
+
+    PropertySection result = this.propertySections.get(sectionName.trim());
+
+    if (result == null) {
+      throw new NoSuchElementException();
+    }
+
+    return result;
+  }
+
+  /**
+   * Get a table section.
+   * @param sectionName section name
+   * @return a PropertySection object
+   */
+  public TableSection getTableSection(String sectionName) {
+
+    if (sectionName == null) {
+      throw new NullPointerException("The section name cannot be null");
+    }
+
+    TableSection result = this.tableSections.get(sectionName.trim());
+
+    if (result == null) {
+      throw new NoSuchElementException();
+    }
+
+    return result;
+  }
+
+  /**
+   * Test if a section is a property section.
+   * @param sectionName section name
+   * @return true if the section is a property section
+   */
+  public boolean isPropertySection(String sectionName) {
+
+    if (sectionName == null) {
+      throw new NullPointerException("The section name cannot be null");
+    }
+
+    return this.propertySections.containsKey(sectionName.trim());
+  }
+
+  /**
+   * Test if a table is a property section.
+   * @param sectionName section name
+   * @return true if the section is a property section
+   */
+  public boolean isTableSection(String sectionName) {
+
+    if (sectionName == null) {
+      throw new NullPointerException("The section name cannot be null");
+    }
+
+    return this.tableSections.containsKey(sectionName.trim());
+  }
+
   /**
    * Get a medadata value.
-   * @param section the section name
+   * @param sectionName the section name
    * @param key the key name
    * @return the value of the metadata
    */
-  public List<String> getMetadata(final String section, final String key) {
+  @Deprecated
+  public List<String> getMetadata(final String sectionName, final String key) {
 
-    if (section == null) {
+    if (sectionName == null) {
       throw new NullPointerException("The section name cannot be null");
     }
 
@@ -38,7 +129,13 @@ public class SampleSheet implements Iterable<Sample> {
       throw new NullPointerException("The key name cannot be null");
     }
 
-    return this.metadata.get(section.trim() + '.' + key.trim());
+    String result = getPropertySection(sectionName).get(key);
+
+    if (result == null) {
+      return Collections.emptyList();
+    }
+
+    return Arrays.asList(key, result);
   }
 
   /**
@@ -65,18 +162,7 @@ public class SampleSheet implements Iterable<Sample> {
    */
   public List<String> getSections() {
 
-    final List<String> result = new ArrayList<String>();
-
-    for (String key : this.metadata.keySet()) {
-
-      final int pos = key.indexOf('.');
-
-      if (pos == -1) {
-        result.add(key);
-      }
-    }
-
-    return result;
+    return Collections.unmodifiableList(this.sectionOrder);
   }
 
   /**
@@ -84,6 +170,7 @@ public class SampleSheet implements Iterable<Sample> {
    * @param sectionName the name of the section name
    * @return the metadata of a section in a Map object
    */
+  @Deprecated
   public Map<String, List<String>> getSectionMetadata(
       final String sectionName) {
 
@@ -94,18 +181,14 @@ public class SampleSheet implements Iterable<Sample> {
     final Map<String, List<String>> result =
         new LinkedHashMap<String, List<String>>();
 
-    for (Map.Entry<String, List<String>> e : this.metadata.entrySet()) {
+    PropertySection section = this.getPropertySection(sectionName);
 
-      final int pos = e.getKey().indexOf('.');
+    if (section == null) {
+      return result;
+    }
 
-      if (pos == -1) {
-        continue;
-      }
-
-      if (sectionName.equals(e.getKey().substring(0, pos))) {
-
-        result.put(e.getKey().substring(pos + 1), e.getValue());
-      }
+    for (String key : section.keySet()) {
+      result.put(key, getMetadata(sectionName, key));
     }
 
     return result;
@@ -116,11 +199,96 @@ public class SampleSheet implements Iterable<Sample> {
   //
 
   /**
+   * Add a property section.
+   * @param sectionName name of the section to add
+   * @return a PropertySection object
+   */
+  public PropertySection addPropertySection(String sectionName) {
+
+    requireNonNull(sectionName);
+
+    String trimmedSectionName = sectionName.trim();
+
+    if (trimmedSectionName.isEmpty()) {
+      throw new IllegalArgumentException("sectionName cannot be empty");
+    }
+
+    if (this.sectionOrder.contains(trimmedSectionName)) {
+      throw new IllegalArgumentException(
+          "section already exists: " + sectionName);
+    }
+
+    PropertySection result = new PropertySection();
+    this.propertySections.put(trimmedSectionName, result);
+    this.sectionOrder.add(trimmedSectionName);
+
+    return result;
+  }
+
+  /**
+   * Add a table section.
+   * @param sectionName name of the section to add
+   * @return a TableSection object
+   */
+  public TableSection addTableSection(String sectionName) {
+
+    requireNonNull(sectionName);
+
+    String trimmedSectionName = sectionName.trim();
+
+    if (trimmedSectionName.isEmpty()) {
+      throw new IllegalArgumentException("sectionName cannot be empty");
+    }
+
+    if (this.sectionOrder.contains(trimmedSectionName)) {
+      throw new IllegalArgumentException(
+          "section already exists: " + sectionName);
+    }
+
+    TableSection result = new TableSection(this);
+    this.tableSections.put(trimmedSectionName, result);
+    this.sectionOrder.add(trimmedSectionName);
+
+    if (this.defaultTable == null) {
+      this.defaultTable = result;
+    }
+
+    return result;
+  }
+
+  /**
+   * Remove a section
+   * @param sectionName name of the section to remove
+   */
+  public void removeSection(String sectionName) {
+
+    requireNonNull(sectionName);
+
+    String trimmedSectionName = sectionName.trim();
+
+    if (trimmedSectionName.isEmpty()) {
+      throw new IllegalArgumentException("sectionName cannot be empty");
+    }
+
+    if (!this.sectionOrder.contains(trimmedSectionName)) {
+      throw new IllegalArgumentException(
+          "section does not exists: " + sectionName);
+    }
+
+    if (this.propertySections.remove(trimmedSectionName) != null) {
+      this.tableSections.remove(trimmedSectionName);
+    }
+
+    this.sectionOrder.remove(trimmedSectionName);
+  }
+
+  /**
    * Add a metadata of the samplesheet.
    * @param section the section of the metadata
    * @param key the key of the metadata
    * @param value the value of the metadata
    */
+  @Deprecated
   public void addMetadata(final String section, final String key,
       final String value) {
 
@@ -136,43 +304,29 @@ public class SampleSheet implements Iterable<Sample> {
       throw new NullPointerException("The value cannot be null");
     }
 
-    if (section.contains(".")) {
-      throw new NullPointerException(
-          "The section name cannot contains a '.' character");
-    }
+    String trimmedSection = section.trim();
 
-    if (!metadata.containsKey(section)) {
-      this.metadata.put(section, null);
-    }
+    final PropertySection propertySection;
 
-    final String mapKey = section.trim() + '.' + key.trim();
+    if (!this.propertySections.containsKey(trimmedSection)) {
 
-    final List<String> values;
-    if (this.metadata.containsKey(mapKey)) {
-      values = this.metadata.get(mapKey);
+      if (this.sectionOrder.contains(trimmedSection)) {
+        throw new IllegalArgumentException(
+            "Section argument is a table section: " + section);
+      }
+
+      propertySection = addPropertySection(trimmedSection);
     } else {
-      values = new ArrayList<String>();
-      this.metadata.put(mapKey, values);
+      propertySection = getPropertySection(trimmedSection);
     }
 
-    values.add(value.trim());
+    propertySection.set(key, value);
   }
 
+  @Deprecated
   public void addMetadataSection(final String section) {
 
-    if (section == null) {
-      throw new NullPointerException("The section name cannot be null");
-    }
-
-    if (section.contains(".")) {
-      throw new NullPointerException(
-          "The section name cannot contains a '.' character");
-    }
-
-    if (!metadata.containsKey(section)) {
-      this.metadata.put(section, null);
-    }
-
+    addPropertySection(section);
   }
 
   /**
@@ -214,22 +368,17 @@ public class SampleSheet implements Iterable<Sample> {
   // Sample Handling
   //
 
-  /**
-   * Add a sample.
-   * @return the new sample
-   */
+  @Deprecated
   public Sample addSample() {
 
-    final Sample sample = new Sample(this);
-    this.samples.add(sample);
-
-    return sample;
+    return getDefaultTableSection().addSample();
   }
 
   @Override
+  @Deprecated
   public Iterator<Sample> iterator() {
 
-    return samples.iterator();
+    return getDefaultTableSection().iterator();
   }
 
   /**
@@ -238,108 +387,73 @@ public class SampleSheet implements Iterable<Sample> {
    */
   public List<String> getSamplesFieldNames() {
 
-    final List<String> result = new ArrayList<String>();
-
-    for (Sample s : this) {
-
-      for (String fieldName : s.getFieldNames()) {
-
-        if (!result.contains(fieldName)) {
-          result.add(fieldName);
-        }
-      }
-    }
-
-    return result;
+    return getDefaultTableSection().getSamplesFieldNames();
   }
 
-  /**
-   * Test if the sample field exists.
-   * @param fieldName the name of the field name to test
-   * @return true if the sample field exists
-   */
+  @Deprecated
   public boolean isSampleFieldName(final String fieldName) {
 
-    if (fieldName == null) {
-      throw new NullPointerException("fieldName argument cannot be null");
-    }
-
-    return getSamplesFieldNames().contains(fieldName);
+    return getDefaultTableSection().isSampleFieldName(fieldName);
   }
 
+  @Deprecated
   public boolean isLaneSampleField() {
 
-    return isSampleFieldName(Sample.LANE_FIELD_NAME);
+    return getDefaultTableSection().isLaneSampleField();
   }
 
+  @Deprecated
   public boolean isSampleIdSampleField() {
 
-    return isSampleFieldName(Sample.SAMPLE_ID_FIELD_NAME);
+    return getDefaultTableSection().isSampleIdSampleField();
   }
 
+  @Deprecated
   public boolean isSampleNameSampleField() {
 
-    return isSampleFieldName(Sample.SAMPLE_NAME_FIELD_NAME);
+    return getDefaultTableSection().isSampleNameSampleField();
   }
 
+  @Deprecated
   public boolean isDescriptionSampleField() {
 
-    return isSampleFieldName(Sample.DESCRIPTION_FIELD_NAME);
+    return getDefaultTableSection().isDescriptionSampleField();
   }
 
+  @Deprecated
   public boolean isProjectSampleField() {
 
-    return isSampleFieldName(Sample.PROJECT_FIELD_NAME);
+    return getDefaultTableSection().isProjectSampleField();
   }
 
+  @Deprecated
   public boolean isIndex1SampleField() {
 
-    return isSampleFieldName(Sample.INDEX1_FIELD_NAME);
+    return getDefaultTableSection().isIndex1SampleField();
   }
 
+  @Deprecated
   public boolean isIndex2SampleField() {
 
-    return isSampleFieldName(Sample.INDEX2_FIELD_NAME);
+    return getDefaultTableSection().isIndex2SampleField();
   }
 
-  /**
-   * Get all the samples of a lane.
-   * @param lane the lane of the samples
-   * @return a list of the samples in the lane in the same order as the
-   *         samplesheet
-   */
+  @Deprecated
   public List<Sample> getSampleInLane(final int lane) {
 
-    if (lane < 1 || !isLaneSampleField()) {
-      return Collections.emptyList();
-    }
-
-    final List<Sample> result = new ArrayList<Sample>();
-
-    for (Sample s : this) {
-      if (s.getLane() == lane) {
-        result.add(s);
-      }
-    }
-
-    return result;
+    return getDefaultTableSection().getSampleInLane(lane);
   }
 
-  /**
-   * Get the samples of the samplesheet.
-   * @return a list of samples
-   */
+  @Deprecated
   public List<Sample> getSamples() {
 
-    return Collections.unmodifiableList(this.samples);
+    return getDefaultTableSection().getSamples();
   }
 
-  /**
-   * Get the number of samples.
-   * @return the number of samples
-   */
+  @Deprecated
   public int size() {
-    return this.samples.size();
+
+    return getDefaultTableSection().size();
   }
 
 }

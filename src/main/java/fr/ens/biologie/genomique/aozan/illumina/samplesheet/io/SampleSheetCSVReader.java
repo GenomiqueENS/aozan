@@ -76,9 +76,9 @@ public class SampleSheetCSVReader implements SampleSheetReader, AutoCloseable {
     }
 
     String line = null;
-
+    int count = 0;
     while ((line = this.reader.readLine()) != null) {
-
+      count++;
       line = line.trim();
       if ("".equals(line)) {
         continue;
@@ -92,7 +92,8 @@ public class SampleSheetCSVReader implements SampleSheetReader, AutoCloseable {
 
         // If an error occurs while parsing add the line to the exception
         // message
-        throw new IOException(e.getMessage() + " in line: " + line);
+        throw new IOException(
+            e.getMessage() + " in line #" + count + ": " + line, e);
       }
     }
 

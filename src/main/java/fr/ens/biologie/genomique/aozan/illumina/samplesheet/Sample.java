@@ -5,6 +5,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class define a sample of a samplesheet.
+ * @author Laurent Jourdren
+ * @since 2.0
+ */
 public class Sample {
 
   public static final String LANE_FIELD_NAME = "_lane";
@@ -16,7 +21,7 @@ public class Sample {
   public static final String INDEX2_FIELD_NAME = "_index2";
   public static final String SAMPLE_REF_FIELD_NAME = "_sampleref";
 
-  private final SampleSheet samplesheet;
+  private final TableSection tableSection;
 
   private final Map<String, String> map = new LinkedHashMap<String, String>();
 
@@ -170,12 +175,21 @@ public class Sample {
   }
 
   /**
+   * Get the table section of the sample.
+   * @return a TableSection object
+   */
+  public TableSection getTableSection() {
+
+    return this.tableSection;
+  }
+
+  /**
    * Get the samplesheet of the sample.
    * @return a SampleSheet object
    */
   public SampleSheet getSampleSheet() {
 
-    return this.samplesheet;
+    return this.tableSection.getSampleSheet();
   }
 
   /**
@@ -364,13 +378,13 @@ public class Sample {
   // Constructor
   //
 
-  public Sample(final SampleSheet samplesheet) {
+  public Sample(final TableSection tableSection) {
 
-    if (samplesheet == null) {
-      throw new NullPointerException("The samplesheet cannot be null");
+    if (tableSection == null) {
+      throw new NullPointerException("The tableSection cannot be null");
     }
 
-    this.samplesheet = samplesheet;
+    this.tableSection = tableSection;
   }
 
 }

@@ -141,37 +141,59 @@ public class SampleSheetUtils {
 
     final StringBuilder sb = new StringBuilder();
 
+    boolean first = true;
+
     // Write sections
     for (String section : samplesheet.getSections()) {
 
-      sb.append('[');
-      sb.append(quoteStringWithComma(section));
-      sb.append("]\n");
+      if (first) {
+        first = false;
+      } else {
+        sb.append('\n');
+      }
 
-      for (Map.Entry<String, List<String>> e : samplesheet
-          .getSectionMetadata(section).entrySet()) {
+      sb.append(sectionHeader(section));
 
-        final String key = e.getKey();
-        for (String value : e.getValue()) {
+      if (samplesheet.isPropertySection(section)) {
+        sb.append(
+            propertySectionToCSV(samplesheet.getPropertySection(section)));
+      } else {
+        sb.append(tableSectionToCSV(samplesheet.getTableSection(section)));
+      }
+    }
 
-          sb.append(key);
+    return sb.toString();
+  }
 
-          if (!value.isEmpty()) {
-            sb.append(SEPARATOR);
-            sb.append(quoteStringWithComma(value));
-          }
+  private static String sectionHeader(String sectionName) {
 
-          sb.append('\n');
-        }
+    return '[' + quoteStringWithComma(sectionName) + "]\n";
+  }
+
+  private static String propertySectionToCSV(PropertySection propertySection) {
+
+    StringBuilder sb = new StringBuilder();
+
+    for (Map.Entry<String, String> e : propertySection.entrySet()) {
+
+      sb.append(e.getKey());
+
+      if (!e.getValue().isEmpty()) {
+        sb.append(SEPARATOR);
+        sb.append(quoteStringWithComma(e.getValue()));
       }
 
       sb.append('\n');
     }
 
-    // Write data
-    sb.append("[Data]\n");
+    return sb.toString();
+  }
 
-    final List<String> fieldNames = samplesheet.getSamplesFieldNames();
+  private static String tableSectionToCSV(TableSection tableSection) {
+
+    StringBuilder sb = new StringBuilder();
+
+    final List<String> fieldNames = tableSection.getSamplesFieldNames();
 
     // Write header
     boolean firstHeader = true;
@@ -190,7 +212,7 @@ public class SampleSheetUtils {
     }
     sb.append('\n');
 
-    for (Sample s : samplesheet) {
+    for (Sample s : tableSection) {
 
       boolean first = true;
 
@@ -451,7 +473,6 @@ public class SampleSheetUtils {
     return result;
   }
 
-
   /**
    * Custom splitter for Bcl2fastq tabulated file.
    * @param line line to parse
@@ -479,7 +500,7 @@ public class SampleSheetUtils {
    */
   public static void replaceIndexShortcutsBySequences(
       final SampleSheet samplesheet, final Map<String, String> sequences)
-          throws AozanException {
+      throws AozanException {
 
     if (samplesheet == null || sequences == null) {
       return;

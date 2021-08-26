@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.illumina.samplesheet.io;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -30,6 +32,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.Objects;
 
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
@@ -42,6 +45,7 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
 public class SampleSheetCSVWriter implements SampleSheetWriter, AutoCloseable {
 
   private final Writer writer;
+  private boolean addCommas;
   private int version = 2;
 
   @Override
@@ -65,7 +69,7 @@ public class SampleSheetCSVWriter implements SampleSheetWriter, AutoCloseable {
           "Unknown bcl2fastq samplesheet format version: " + this.version);
     }
 
-    this.writer.write(text);
+    this.writer.write(this.addCommas ? addMissingComas(text) : text);
   }
 
   /**
@@ -86,9 +90,62 @@ public class SampleSheetCSVWriter implements SampleSheetWriter, AutoCloseable {
     return this.version;
   }
 
+  /**
+   * Add missing commas, to get a similar output as a spreadsheet CSV export.
+   * @param addCommas if true additional commas will be added to end of lines
+   */
+  public void addMissingCommas(boolean addCommas) {
+
+    this.addCommas = addCommas;
+  }
+
   @Override
   public void close() throws IOException {
     this.writer.close();
+  }
+
+  //
+  // Utility methods
+  //
+
+  private static int maxCharacterInLines(String text) {
+
+    requireNonNull(text);
+
+    int max = 0;
+
+    for (String s : text.split("\\n")) {
+      max = Math.max(max, commasInLine(s));
+    }
+
+    return max;
+  }
+
+  private static int commasInLine(String line) {
+
+    requireNonNull(line);
+
+    return line.length() - line.replace(",", "").length();
+  }
+
+  private static String addMissingComas(String text) {
+
+    requireNonNull(text);
+
+    int max = maxCharacterInLines(text);
+    StringBuilder sb = new StringBuilder();
+
+    for (String s : text.split("\\n")) {
+
+      sb.append(s);
+
+      for (int i = commasInLine(s); i < max; i++) {
+        sb.append(',');
+      }
+      sb.append('\n');
+    }
+
+    return sb.toString();
   }
 
   //
@@ -135,7 +192,5 @@ public class SampleSheetCSVWriter implements SampleSheetWriter, AutoCloseable {
 
     this.writer = new FileWriter(outputFilename);
   }
-
-
 
 }

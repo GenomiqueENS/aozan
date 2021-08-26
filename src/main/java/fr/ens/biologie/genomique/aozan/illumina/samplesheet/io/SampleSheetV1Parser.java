@@ -32,6 +32,7 @@ import java.util.List;
 
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.aozan.illumina.samplesheet.TableSection;
 
 /**
  * This class allow to easily write reader for SampleSheet objects in text
@@ -46,6 +47,7 @@ public class SampleSheetV1Parser implements SampleSheetParser {
           "Description", "Control", "Recipe", "Operator", "SampleProject"};
 
   private final SampleSheet samplesheet;
+  private final TableSection tableSection;
   private boolean firstLine = true;
 
   /**
@@ -100,7 +102,7 @@ public class SampleSheetV1Parser implements SampleSheetParser {
       return;
     }
 
-    final Sample sample = this.samplesheet.addSample();
+    final Sample sample = this.tableSection.addSample();
 
     // FCID
     this.samplesheet.setFlowCellId(fields.get(0));
@@ -183,6 +185,8 @@ public class SampleSheetV1Parser implements SampleSheetParser {
 
     this.samplesheet = new SampleSheet();
     this.samplesheet.setVersion(1);
+    this.tableSection =
+        this.samplesheet.addTableSection(SampleSheet.DEFAULT_TABLE_NAME);
   }
 
 }

@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.ens.biologie.genomique.aozan.illumina.samplesheet.PropertySection;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.aozan.illumina.samplesheet.TableSection;
 
 public class SampleSheetV2Parser implements SampleSheetParser {
 
@@ -16,8 +18,9 @@ public class SampleSheetV2Parser implements SampleSheetParser {
 
   private final SampleSheet samplesheet;
 
-  private String currentSection;
-  private boolean dataSection;
+  private PropertySection propertySection;
+  private TableSection tableSection;
+
   private List<String> header = new ArrayList<String>();
 
   /**
@@ -77,6 +80,10 @@ public class SampleSheetV2Parser implements SampleSheetParser {
 
     String firstField = fields.get(0);
 
+    if (firstField.isEmpty()) {
+      return;
+    }
+
     if (firstField.startsWith("[")) {
 
       if (!firstField.endsWith("]")) {
@@ -88,47 +95,53 @@ public class SampleSheetV2Parser implements SampleSheetParser {
       final String sectionName =
           firstField.substring(1, firstField.length() - 1).trim();
 
-      if (DATA_SECTION_NAME.equals(sectionName.toLowerCase())) {
-        dataSection = true;
+      if (sectionName.toLowerCase().endsWith("data")) {
+
+        this.tableSection = this.samplesheet.addTableSection(sectionName);
+        this.header.clear();
+        this.propertySection = null;
       } else {
-        samplesheet.addMetadataSection(sectionName);
+
+        this.tableSection = null;
+        this.propertySection = this.samplesheet.addPropertySection(sectionName);
       }
 
-      this.currentSection = sectionName;
       return;
     }
 
-    if (!dataSection) {
+    if (this.propertySection != null) {
 
       final String value = fields.size() > 1 ? fields.get(1).trim() : "";
 
-      this.samplesheet.addMetadata(this.currentSection, fields.get(0), value);
+      this.propertySection.set(fields.get(0), value);
       return;
     }
 
-    // Set the header
-    if (this.header.isEmpty()) {
-      this.header.addAll(fields);
-      return;
-    }
+    if (this.tableSection != null) {
 
-    final Sample sample = this.samplesheet.addSample();
-
-    final int headerLength = this.header.size();
-
-    for (int i = 0; i < headerLength; i++) {
-
-      final String key = convertFieldName(this.header.get(i));
-      String value = i < fields.size() ? fields.get(i) : "";
-
-      if (Sample.LANE_FIELD_NAME.equals(key)) {
-
-        value = "" + parseLane(value);
+      // Set the header
+      if (this.header.isEmpty()) {
+        this.header.addAll(fields);
+        return;
       }
 
-      sample.set(key, value);
-    }
+      final Sample sample = this.tableSection.addSample();
 
+      final int headerLength = this.header.size();
+
+      for (int i = 0; i < headerLength; i++) {
+
+        final String key = convertFieldName(this.header.get(i));
+        String value = i < fields.size() ? fields.get(i) : "";
+
+        if (Sample.LANE_FIELD_NAME.equals(key)) {
+
+          value = "" + parseLane(value);
+        }
+
+        sample.set(key, value);
+      }
+    }
   }
 
   @Override
