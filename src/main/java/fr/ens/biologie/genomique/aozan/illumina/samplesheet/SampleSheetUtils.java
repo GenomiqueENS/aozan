@@ -7,6 +7,7 @@ import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample.LANE_F
 import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample.PROJECT_FIELD_NAME;
 import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample.SAMPLE_ID_FIELD_NAME;
 import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample.SAMPLE_NAME_FIELD_NAME;
+import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
@@ -46,7 +48,15 @@ public class SampleSheetUtils {
       return sb.toString();
     }
 
-    for (Sample s : samplesheet) {
+    TableSection table;
+
+    try {
+      table = samplesheet.getDemuxSection();
+    } catch (NoSuchElementException e) {
+      return sb.toString();
+    }
+
+    for (Sample s : table) {
 
       sb.append(samplesheet.getFlowCellId().toUpperCase());
       sb.append(SEPARATOR);
@@ -283,14 +293,22 @@ public class SampleSheetUtils {
           "The lane count cannot be lower than 1: " + laneCount);
     }
 
-    if (samplesheet.isLaneSampleField()) {
+    TableSection table;
+
+    try {
+      table = samplesheet.getDemuxSection();
+    } catch (NoSuchElementException e) {
+      return;
+    }
+
+    if (table.isLaneSampleField()) {
       return;
     }
 
     List<Sample> samples = new ArrayList<Sample>();
 
     // Copy to avoid iterator modification
-    for (Sample s : samplesheet) {
+    for (Sample s : table) {
       samples.add(s);
     }
 
@@ -312,7 +330,7 @@ public class SampleSheetUtils {
     // Duplicate the sample for all the other lanes
     for (int i = 2; i <= laneCount; i++) {
       for (Map<String, String> s2Entries : samplesToDuplicate) {
-        final Sample s2 = samplesheet.addSample();
+        final Sample s2 = table.addSample();
         for (Map.Entry<String, String> e : s2Entries.entrySet()) {
           s2.set(e.getKey(), e.getValue());
         }
@@ -335,10 +353,18 @@ public class SampleSheetUtils {
       throw new NullPointerException("The samplesheet argument cannot be null");
     }
 
+    TableSection table;
+
+    try {
+      table = samplesheet.getDemuxSection();
+    } catch (NoSuchElementException e) {
+      return;
+    }
+
     for (String fieldName : Arrays.asList("sampleref", INDEX1_FIELD_NAME,
         DESCRIPTION_FIELD_NAME, PROJECT_FIELD_NAME)) {
 
-      if (samplesheet.isSampleFieldName(fieldName)) {
+      if (table.isSampleFieldName(fieldName)) {
         throw new AozanRuntimeException(
             "A required field is Missing in the samplesheet to create thr quality control report: "
                 + convertFieldNameV2(fieldName));
@@ -506,7 +532,15 @@ public class SampleSheetUtils {
       return;
     }
 
-    for (final Sample sample : samplesheet) {
+    TableSection table;
+
+    try {
+      table = samplesheet.getDemuxSection();
+    } catch (NoSuchElementException e) {
+      return;
+    }
+
+    for (final Sample sample : table) {
 
       if (sample.isIndex1Field()) {
 
@@ -554,6 +588,27 @@ public class SampleSheetUtils {
         }
       }
     }
+  }
+
+  /**
+   * Get and check if demultiplexing section exists in a samplesheet.
+   * @param samplesheet the samplesheet
+   * @return a TableSection object
+   * @throws AozanException if the demultiplexing sample table does not exist in
+   *           the samplesheet
+   */
+  public static TableSection getCheckedDemuxTableSection(
+      SampleSheet samplesheet) throws AozanException {
+
+    requireNonNull(samplesheet);
+
+    try {
+      return samplesheet.getDemuxSection();
+    } catch (NoSuchElementException e) {
+      throw new AozanException(
+          "No sample table for demultiplexing found in samplesheet");
+    }
+
   }
 
   //

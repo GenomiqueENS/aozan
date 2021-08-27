@@ -46,6 +46,7 @@ import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeAliases;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 
 /**
@@ -175,7 +176,8 @@ public class SamplesheetCollector implements Collector {
       // TODO handle empty samplesheet where a sample is create by lane
       // TODO save pooled samples
 
-      for (final Sample s : samplesheet) {
+      for (final Sample s : SampleSheetUtils
+          .getCheckedDemuxTableSection(samplesheet)) {
 
         sampleNumber++;
 

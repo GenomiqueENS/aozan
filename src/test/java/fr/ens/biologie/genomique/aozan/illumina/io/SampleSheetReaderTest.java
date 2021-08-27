@@ -535,7 +535,7 @@ public class SampleSheetReaderTest {
 
       final SampleSheet result = reader.read();
 
-      if (!result.isLaneSampleField() && laneCount > 1) {
+      if (!result.getDemuxSection().isLaneSampleField() && laneCount > 1) {
         SampleSheetUtils.duplicateSamplesIfLaneFieldNotSet(result, laneCount);
       }
 
@@ -574,7 +574,7 @@ public class SampleSheetReaderTest {
         throw new IOException(
             samplesheetName + " is not a " + samplesheetType + " file.");
       }
-      if (!result.isLaneSampleField() && laneCount > 0) {
+      if (!result.getDemuxSection().isLaneSampleField() && laneCount > 0) {
         SampleSheetUtils.duplicateSamplesIfLaneFieldNotSet(result, laneCount);
       }
 

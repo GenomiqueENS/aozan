@@ -47,6 +47,7 @@ import com.google.common.base.Preconditions;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 import fr.ens.biologie.genomique.eoulsan.EoulsanRuntimeException;
 import fr.ens.biologie.genomique.eoulsan.bio.BadBioEntryException;
@@ -139,7 +140,8 @@ public class ReDemux {
       final Pattern pattern = Pattern.compile(index);
       Sample sample = null;
 
-      for (Sample s : samplesheet.getSampleInLane(this.lane)) {
+      for (Sample s : SampleSheetUtils.getCheckedDemuxTableSection(samplesheet)
+          .getSampleInLane(this.lane)) {
 
         if (pattern.matcher(s.getIndex1()).matches()) {
 
@@ -173,7 +175,8 @@ public class ReDemux {
       int bestScore = Integer.MAX_VALUE;
       int bestCoreCount = 0;
 
-      for (Sample s : samplesheet.getSampleInLane(this.lane)) {
+      for (Sample s : SampleSheetUtils.getCheckedDemuxTableSection(samplesheet)
+          .getSampleInLane(this.lane)) {
 
         final String sampleIndex = s.getIndex1();
 

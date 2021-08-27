@@ -56,8 +56,10 @@ public class SampleSheetCheck {
       throw new NullPointerException("The samplesheet object is null");
     }
 
-    if (samplesheet.size() == 0) {
+    TableSection table =
+        SampleSheetUtils.getCheckedDemuxTableSection(samplesheet);
 
+    if (table.size() == 0) {
       throw new AozanException("No samples found in the samplesheet.");
     }
 
@@ -76,7 +78,7 @@ public class SampleSheetCheck {
     final Map<String, String> samplesProjects = new HashMap<String, String>();
     final Map<String, String> samplesIndex = new HashMap<String, String>();
 
-    for (Sample sample : samplesheet) {
+    for (Sample sample : table) {
 
       // Check Flow cell id
       if (sample.isField("FCID")) {

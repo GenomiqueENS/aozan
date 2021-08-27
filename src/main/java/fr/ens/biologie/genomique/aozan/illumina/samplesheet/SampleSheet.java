@@ -21,7 +21,9 @@ import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
  */
 public class SampleSheet implements Iterable<Sample> {
 
-  public static final String DEFAULT_TABLE_NAME = "Data";
+  public static final String BCL2FASTQ_DEMUX_TABLE_NAME = "Data";
+  public static final String BCLCONVERT_DEMUX_TABLE_NAME = "BCLConvert_Data";
+  private static final String DEFAULT_TABLE_NAME = BCL2FASTQ_DEMUX_TABLE_NAME;
 
   private List<String> sectionOrder = new ArrayList<>();
   private Map<String, PropertySection> propertySections = new HashMap<>();
@@ -82,6 +84,19 @@ public class SampleSheet implements Iterable<Sample> {
     }
 
     return result;
+  }
+
+  /**
+   * Get the demultiplexing table section.
+   * @return the demultiplexing table section
+   */
+  public TableSection getDemuxSection() {
+
+    if (isTableSection(BCL2FASTQ_DEMUX_TABLE_NAME)) {
+      return getTableSection(BCL2FASTQ_DEMUX_TABLE_NAME);
+    }
+
+    return getTableSection(BCLCONVERT_DEMUX_TABLE_NAME);
   }
 
   /**

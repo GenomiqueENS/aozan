@@ -23,6 +23,7 @@
 
 package fr.ens.biologie.genomique.aozan.illumina.samplesheet.io;
 
+import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet.BCL2FASTQ_DEMUX_TABLE_NAME;
 import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetReaderUtils.checkFields;
 import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetReaderUtils.parseLane;
 import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetReaderUtils.trimFields;
@@ -186,7 +187,7 @@ public class SampleSheetV1Parser implements SampleSheetParser {
     this.samplesheet = new SampleSheet();
     this.samplesheet.setVersion(1);
     this.tableSection =
-        this.samplesheet.addTableSection(SampleSheet.DEFAULT_TABLE_NAME);
+        this.samplesheet.addTableSection(BCL2FASTQ_DEMUX_TABLE_NAME);
   }
 
 }
