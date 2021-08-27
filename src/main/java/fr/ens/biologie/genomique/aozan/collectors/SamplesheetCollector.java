@@ -166,8 +166,11 @@ public class SamplesheetCollector implements Collector {
           ArrayListMultimap.create();
 
       // Read Bcl2fastq samplesheet
-      final SampleSheet samplesheet =
-          new SampleSheetCSVReader(this.samplesheetFile).read();
+      final SampleSheet samplesheet;
+      try (SampleSheetCSVReader reader =
+          new SampleSheetCSVReader(this.samplesheetFile)) {
+        samplesheet = reader.read();
+      }
 
       int sampleNumber = 0;
       final Set<Integer> lanes = new HashSet<>();

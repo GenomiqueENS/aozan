@@ -298,7 +298,7 @@ public class SampleSheetReaderTest {
 
     final int laneCount = 2;
 
-    File csvFile =  temporaryFile();
+    File csvFile = temporaryFile();
 
     writeCSVFromTabulatedString(csvFile, EXPECTED_CSV);
 
@@ -322,7 +322,7 @@ public class SampleSheetReaderTest {
   @Test
   public void testReadsCSVVersion2WithoutLaneColumnToCreate() {
 
-    File csvFile =  temporaryFile();
+    File csvFile = temporaryFile();
 
     writeCSVFromTabulatedString(csvFile, EXPECTED_CSV);
 
@@ -351,7 +351,7 @@ public class SampleSheetReaderTest {
 
     final int laneCount = 2;
 
-    File outputFile =  temporaryFile();
+    File outputFile = temporaryFile();
 
     // Create CSV file
     convertSamplesheetToCSV(SAMPLESHEET_XLS_BCL2FASTQ_V1_FILENAME, "xls",
@@ -380,7 +380,7 @@ public class SampleSheetReaderTest {
 
     final int laneCount = 2;
 
-    File outputFile =  temporaryFile();
+    File outputFile = temporaryFile();
 
     // Create CSV file
     convertSamplesheetToCSV(SAMPLESHEET_XLSX_BCL2FASTQ_V1_FILENAME, "xlsx",
@@ -531,7 +531,7 @@ public class SampleSheetReaderTest {
   private SampleSheet readSamplesheetCSV(final InputStream in,
       final int laneCount) {
 
-    try (SampleSheetCSVReader reader = new SampleSheetCSVReader(in) ) {
+    try (SampleSheetCSVReader reader = new SampleSheetCSVReader(in)) {
 
       final SampleSheet result = reader.read();
 

@@ -49,6 +49,7 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
+import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetReader;
 import fr.ens.biologie.genomique.eoulsan.EoulsanRuntimeException;
 import fr.ens.biologie.genomique.eoulsan.bio.BadBioEntryException;
 import fr.ens.biologie.genomique.eoulsan.bio.ReadSequence;
@@ -644,8 +645,11 @@ public class ReDemux {
     requireNonNull(outputDir, "output directory cannot be null");
 
     // Load samplesheet
-    final SampleSheet samplesheet =
-        new SampleSheetCSVReader(samplesheetFile).read();
+    final SampleSheet samplesheet;
+
+    try (SampleSheetReader reader = new SampleSheetCSVReader(samplesheetFile)) {
+      samplesheet = reader.read();
+    }
 
     // Create ReDemux object
     ReDemux rd =

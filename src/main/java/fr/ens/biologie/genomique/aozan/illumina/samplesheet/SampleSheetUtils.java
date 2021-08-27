@@ -389,7 +389,7 @@ public class SampleSheetUtils {
       return null;
     }
 
-    return new SampleSheetReader() {
+    try (SampleSheetReader reader = new SampleSheetReader() {
 
       @Override
       public SampleSheet read() throws IOException {
@@ -415,7 +415,10 @@ public class SampleSheetUtils {
       public void close() throws IOException {
       }
 
-    }.read();
+    }) {
+      return reader.read();
+    }
+
   }
 
   /**
@@ -431,7 +434,7 @@ public class SampleSheetUtils {
       return null;
     }
 
-    return new SampleSheetReader() {
+    try (SampleSheetReader reader = new SampleSheetReader() {
 
       @Override
       public SampleSheet read() throws IOException {
@@ -457,7 +460,9 @@ public class SampleSheetUtils {
       public void close() throws IOException {
       }
 
-    }.read();
+    }) {
+      return reader.read();
+    }
   }
 
   /**
