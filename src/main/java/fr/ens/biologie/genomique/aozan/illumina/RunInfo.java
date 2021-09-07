@@ -373,6 +373,8 @@ public class RunInfo {
           case "IsIndexedRead":
             readIndexedRead = "Y".equals(value.toUpperCase().trim());
             break;
+          case "IsReverseComplement":
+            break;
           default:
             throw new AozanRuntimeException(
                 "in RunInfo unvalid value for name attribute on read tag.");
