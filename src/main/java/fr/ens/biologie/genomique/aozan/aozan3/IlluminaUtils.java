@@ -39,12 +39,17 @@ public class IlluminaUtils {
     }
 
     // Test the run count
-    if (!count.matches("^[0-9]*$") || count.length() != 4) {
+    if (!count.matches("^[0-9]*$")) {
       return false;
     }
 
     // Test the flow cell id
     if (flowCellId.length() == 10 && flowCellId.matches("^[0-9a-zA-Z]*$")) {
+      return true;
+    }
+
+    // Test the flow cell id
+    if (flowCellId.length() == 9 && flowCellId.matches("^[0-9a-zA-Z]*$")) {
       return true;
     }
 
