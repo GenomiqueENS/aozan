@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import com.google.common.collect.LinkedListMultimap;
@@ -20,17 +21,69 @@ public class PropertySection {
       LinkedListMultimap.create();
 
   /**
+   * Test if the property section contains a key.
+   * @param key the key for the metadata
+   * @return true if the key exists
+   */
+  public boolean containsKey(String key) {
+
+    return this.containsKey(key);
+  }
+
+  /**
    * Get property value.
    * @param key the key for the metadata
    * @return the value of the metadata
    */
   public String get(String key) {
 
+    return get(key, null);
+  }
+
+  /**
+   * Get property value.
+   * @param key the key for the metadata
+   * @param defaultValue default value
+   * @return the value of the metadata
+   */
+  public String get(String key, String defaultValue) {
+
     requireNonNull(key);
 
     Collection<String> result = this.properties.get(key.trim());
 
-    return result == null || result.isEmpty() ? null : result.iterator().next();
+    if (result == null || result.isEmpty()) {
+      return defaultValue;
+    }
+
+    return result.iterator().next();
+  }
+
+  /**
+   * Get an integer property value.
+   * @param key the key for the metadata
+   * @param defaultValue default value
+   * @return the value of the metadata
+   */
+  public int getInt(String key, int defaultValue) {
+
+    String value = get(key);
+
+    return value == null ? defaultValue : Integer.parseInt(value);
+  }
+
+  /**
+   * Get an integer property value.
+   * @param key the key for the metadata
+   * @return the value of the metadata
+   */
+  public int getInt(String key) {
+
+    String value = get(key);
+
+    Objects.requireNonNull(value);
+
+    return Integer.parseInt(value);
   }
 
   /**
@@ -105,6 +158,12 @@ public class PropertySection {
   public boolean isEmpty() {
 
     return this.properties.isEmpty();
+  }
+
+  @Override
+  public String toString() {
+
+    return this.properties.toString();
   }
 
 }

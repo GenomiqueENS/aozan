@@ -92,7 +92,7 @@ public class SampleSheet implements Iterable<Sample> {
    */
   public TableSection getDemuxSection() {
 
-    if (isTableSection(BCL2FASTQ_DEMUX_TABLE_NAME)) {
+    if (containsTableSection(BCL2FASTQ_DEMUX_TABLE_NAME)) {
       return getTableSection(BCL2FASTQ_DEMUX_TABLE_NAME);
     }
 
@@ -104,7 +104,7 @@ public class SampleSheet implements Iterable<Sample> {
    * @param sectionName section name
    * @return true if the section is a property section
    */
-  public boolean isPropertySection(String sectionName) {
+  public boolean containsPropertySection(String sectionName) {
 
     if (sectionName == null) {
       throw new NullPointerException("The section name cannot be null");
@@ -118,13 +118,28 @@ public class SampleSheet implements Iterable<Sample> {
    * @param sectionName section name
    * @return true if the section is a property section
    */
-  public boolean isTableSection(String sectionName) {
+  public boolean containsTableSection(String sectionName) {
 
     if (sectionName == null) {
       throw new NullPointerException("The section name cannot be null");
     }
 
     return this.tableSections.containsKey(sectionName.trim());
+  }
+
+  /**
+   * Test if a section exists.
+   * @param sectionName section name
+   * @return true if the section exists
+   */
+  public boolean containsSection(String sectionName) {
+
+    if (sectionName == null) {
+      throw new NullPointerException("The section name cannot be null");
+    }
+
+    return containsPropertySection(sectionName)
+        || containsTableSection(sectionName);
   }
 
   /**

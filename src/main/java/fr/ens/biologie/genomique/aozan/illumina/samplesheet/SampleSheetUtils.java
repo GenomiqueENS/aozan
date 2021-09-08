@@ -164,7 +164,7 @@ public class SampleSheetUtils {
 
       sb.append(sectionHeader(section));
 
-      if (samplesheet.isPropertySection(section)) {
+      if (samplesheet.containsPropertySection(section)) {
         sb.append(
             propertySectionToCSV(samplesheet.getPropertySection(section)));
       } else {
