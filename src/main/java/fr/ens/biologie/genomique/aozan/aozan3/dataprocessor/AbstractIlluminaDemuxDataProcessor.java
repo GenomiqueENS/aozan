@@ -298,13 +298,15 @@ public abstract class AbstractIlluminaDemuxDataProcessor
     List<String> commandLine = createDemuxCommandLine(inputPath, outputPath,
         samplesheetPath, toolVersion, conf);
 
-    File executionOutputPath = isOutputMustExists()
+    // If output directory must not exists before demux, the working directory
+    // will be the parent directory of the output directory
+    File workingDirectory = isOutputMustExists()
         ? outputPath.toFile() : outputPath.toFile().getParentFile();
 
     // define stdout and stderr files
-    File stdoutFile = new File(executionOutputPath,
+    File stdoutFile = new File(workingDirectory,
         getConfPrefix() + "_output_" + runId.getId() + ".out");
-    File stderrFile = new File(executionOutputPath,
+    File stderrFile = new File(workingDirectory,
         getConfPrefix() + "_output_" + runId.getId() + ".err");
 
     // Get temporary directory
@@ -316,12 +318,19 @@ public abstract class AbstractIlluminaDemuxDataProcessor
 
     long startTime = System.currentTimeMillis();
 
-    final int exitValue =
-        newSimpleProcess(runId, conf, true).execute(commandLine,
-            executionOutputPath, temporaryDirectory, stdoutFile, stderrFile,
-            inputPath.toFile(), executionOutputPath, temporaryDirectory);
+    final int exitValue = newSimpleProcess(runId, conf, true).execute(
+        commandLine, workingDirectory, temporaryDirectory, stdoutFile,
+        stderrFile, inputPath.toFile(), workingDirectory, temporaryDirectory);
 
     long endTime = System.currentTimeMillis();
+
+    // If output directory must not exists before demux, move in output
+    // directory after demux stdout
+    // and stderr files
+    if (!isOutputMustExists()) {
+      stdoutFile.renameTo(new File(outputPath.toFile(), stdoutFile.getName()));
+      stderrFile.renameTo(new File(outputPath.toFile(), stderrFile.getName()));
+    }
 
     if (exitValue != 0) {
       throw new IOException("Error while running "
