@@ -306,25 +306,23 @@ public class IlluminaSamplesheetRunConfigurationProvider
   private int getBcl2fastqMismatches(SampleSheet samplesheet, RunId runId)
       throws Aozan3Exception {
 
-    List<String> list = samplesheet.getMetadata("Settings", "MismatchCount");
-
-    if (list == null || list.size() == 0) {
-      return -1;
-    }
-
     int result = -1;
 
-    for (String value : list) {
+    if (!samplesheet.containsPropertySection("Settings")) {
+      return result;
+    }
 
-      try {
-        result = Integer.parseInt(value.trim().replace(" ", ""));
+    String value =
+        samplesheet.getPropertySection("Settings").get("MismatchCount", "-1");
 
-      } catch (NumberFormatException e) {
-        String errorMessage = "Error while reading Bcl2fastq samplesheet. "
-            + "No number of allowed mismatches found in samplesheet: " + value;
-        this.logger.error(runId, errorMessage);
-        throw new Aozan3Exception(errorMessage);
-      }
+    try {
+      result = Integer.parseInt(value.trim().replace(" ", ""));
+
+    } catch (NumberFormatException e) {
+      String errorMessage = "Error while reading Bcl2fastq samplesheet. "
+          + "No number of allowed mismatches found in samplesheet: " + value;
+      this.logger.error(runId, errorMessage);
+      throw new Aozan3Exception(errorMessage);
     }
 
     return result;
