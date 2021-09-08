@@ -4,11 +4,13 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -241,16 +243,21 @@ public class IlluminaSamplesheetRunConfigurationProvider
 
     RunId runId = runData.getRunId();
 
-    // Path of the samplesheet if in run directory
-    Path samplesheetFileInRunDirectory = Paths
-        .get(runData.getLocation().getPath().toString(), "SampleSheet.csv");
+    Path samplesheetFileInRunDirectory =
+        searchSamplesheetInRunDir(runData.getLocation().getPath());
 
     // Test if a samplesheet file exists in run directory
-    if (Files.exists(samplesheetFileInRunDirectory)) {
+    if (samplesheetFileInRunDirectory != null
+        && Files.exists(samplesheetFileInRunDirectory)) {
+
+      String filename = samplesheetFileInRunDirectory.getFileName().toString();
+      String filenameWithoutExtension =
+          filename.substring(0, filename.length() - 4);
+
       this.logger.info(runId,
-          "Use existing SampleSheet.csv file in run directory");
+          "Use existing " + filename + " file in run directory");
       return loadSamplesheet(runId, samplesheetFileInRunDirectory.getParent(),
-          "SampleSheet", SamplesheetFormat.CSV, this.logger);
+          filenameWithoutExtension, SamplesheetFormat.CSV, this.logger);
     }
 
     if (this.samplesheetCreationCommand != null
@@ -386,6 +393,31 @@ public class IlluminaSamplesheetRunConfigurationProvider
     } catch (AozanException e) {
       throw new Aozan3Exception(e);
     }
+  }
+
+  private static Path searchSamplesheetInRunDir(Path runPath) {
+
+    File[] files = runPath.toFile().listFiles(new FilenameFilter() {
+
+      @Override
+      public boolean accept(File dir, String name) {
+        return name.startsWith("SampleSheet") && name.endsWith(".csv");
+      }
+    });
+
+    if (files == null || files.length == 0) {
+      return null;
+    }
+
+    Arrays.sort(files, new Comparator<File>() {
+
+      @Override
+      public int compare(File o1, File o2) {
+        return o1.getName().compareTo(o2.getName());
+      }
+    });
+
+    return files[0].toPath();
   }
 
 }
