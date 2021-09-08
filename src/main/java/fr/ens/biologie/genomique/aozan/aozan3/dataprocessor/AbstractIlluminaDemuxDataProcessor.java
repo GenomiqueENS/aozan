@@ -451,4 +451,17 @@ public abstract class AbstractIlluminaDemuxDataProcessor
     }
   }
 
+  protected void addCommandLineArgument(List<String> args,
+      RunConfiguration conf, String longArgName) {
+
+    String confKey =
+        getConfPrefix() + '.' + longArgName.replace("--", "").replace('-', '.');
+
+    if (conf.containsKey(confKey)) {
+      args.add(longArgName);
+      args.add(conf.get(confKey));
+    }
+
+  }
+
 }

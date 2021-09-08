@@ -63,25 +63,10 @@ public class BclConvertIlluminaDemuxDataProcessor
     args.add("--output-directory");
     args.add(outputPath.toAbsolutePath().toString());
 
-    if (runConf.containsKey("bclconvert.bcl.num.parallel.tiles")) {
-      args.add("--bcl-num-parallel-tiles");
-      args.add(runConf.get("bclconvert.bcl.num.parallel.tiles"));
-    }
-
-    if (runConf.containsKey("bclconvert.bcl.num.conversion.threads")) {
-      args.add("--bcl-num-conversion-threads");
-      args.add(runConf.get("bclconvert.bcl.num.conversion.threads"));
-    }
-
-    if (runConf.containsKey("bclconvert.bcl.num.compression.threads")) {
-      args.add("--bcl-num-compression-threads");
-      args.add(runConf.get("bclconvert.bcl.num.parallel.tiles"));
-    }
-
-    if (runConf.containsKey("bclconvert.bcl.num.decompression.threads")) {
-      args.add("--bcl-num-decompression-threads");
-      args.add(runConf.get("bclconvert.bcl.num.decompression.threads"));
-    }
+    addCommandLineArgument(args, runConf, "--bcl-num-parallel-tiles");
+    addCommandLineArgument(args, runConf, "--bcl-num-conversion-threads");
+    addCommandLineArgument(args, runConf, "--bcl-num-compression-threads");
+    addCommandLineArgument(args, runConf, "--bcl-num-decompression-threads");
 
     args.addAll(asList("--sample-sheet", samplesheetPath.toString()));
 

@@ -59,8 +59,14 @@ public class Bcl2FastqIlluminaDemuxDataProcessor
 
     // Get parameter values
     String finalCommandPath = runConf.get("bcl2fastq.path", "bcl2fastq");
+
     int threadCount = runConf.getInt("bcl2fastq.threads",
         Runtime.getRuntime().availableProcessors());
+
+    if (!runConf.containsKey("bcl2fastq.processing.threads")) {
+      runConf.set("bcl2fastq.processing.threads", threadCount);
+    }
+
     int mismatchCount =
         runConf.getInt("illumina.demux.allowed.mismatches", DEFAULT_MISMATCHES);
     int bcl2fastqMinorVersion =
@@ -70,9 +76,9 @@ public class Bcl2FastqIlluminaDemuxDataProcessor
     List<String> args = new ArrayList<>();
 
     args.add(finalCommandPath);
-    args.addAll(asList("--loading-threads", "" + threadCount));
-    args.addAll(asList("--processing-threads", "" + threadCount));
-    args.addAll(asList("--writing-threads", "" + threadCount));
+    addCommandLineArgument(args, runConf, "--loading-threads");
+    addCommandLineArgument(args, runConf, "--processing-threads");
+    addCommandLineArgument(args, runConf, "--writing-threads");
 
     if (bcl2fastqMinorVersion < 19) {
       args.addAll(asList("--demultiplexing-threads", "" + threadCount));
