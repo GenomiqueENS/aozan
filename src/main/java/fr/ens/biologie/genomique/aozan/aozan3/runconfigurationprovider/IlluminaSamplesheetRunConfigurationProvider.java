@@ -198,7 +198,7 @@ public class IlluminaSamplesheetRunConfigurationProvider
       this.logger.info(runData.getRunId(),
           "Custom number of allowed mismatches in demultiplexing: "
               + mismatches);
-      result.set("bcl2fastq.allowed.mismatches", mismatches);
+      result.set("illumina.demux.allowed.mismatches", mismatches);
     }
 
     // Update samplesheet
@@ -209,7 +209,7 @@ public class IlluminaSamplesheetRunConfigurationProvider
     checkSamplesheet(samplesheet, runId, runInfo.getFlowCell());
 
     // Save samplesheet in Run configuration
-    result.set("bcl2fastq.samplesheet",
+    result.set("illumina.samplesheet",
         SampleSheetUtils.toSampleSheetV2CSV(samplesheet));
 
     return result;

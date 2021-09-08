@@ -1,3 +1,4 @@
-fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.IlluminaDemuxDataProcessor
+fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.Bcl2FastqIlluminaDemuxDataProcessor
+fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.BclConvertIlluminaDemuxDataProcessor
 fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.IlluminaSyncDataProcessor
 fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.Aozan2QCDataProcessor
