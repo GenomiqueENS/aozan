@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -37,6 +38,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
+import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
@@ -50,6 +52,8 @@ import fr.ens.biologie.genomique.aozan.illumina.RunParameters;
  * @author Laurent Jourdren
  */
 public class RunInfoCollector implements Collector {
+
+  private static final Logger LOGGER = Common.getLogger();
 
   /** The collector name. */
   public static final String COLLECTOR_NAME = "runinfo";
@@ -79,23 +83,13 @@ public class RunInfoCollector implements Collector {
     if (conf == null)
       return;
 
-    final File parentFile;
-
-    if (qc == null) {
-      // Unit Test
-      parentFile = conf.getFile(QC.RTA_OUTPUT_DIR);
-    } else {
-      parentFile = qc.getBclDir();
+    // Fix for unit Test
+    if (qc != null) {
       this.settings = qc.getSettings();
     }
 
-    this.runInfoFile = new File(parentFile, "RunInfo.xml");
-    this.runParametersFile = new File(parentFile, "runParameters.xml");
-
-    if (!this.runParametersFile.exists()) {
-      this.runParametersFile = new File(parentFile, "RunParameters.xml");
-    }
-
+    this.runInfoFile = runInfoFilePath(qc, conf);
+    this.runParametersFile = runParametersFile(qc, conf);
   }
 
   @Override
@@ -103,6 +97,9 @@ public class RunInfoCollector implements Collector {
 
     if (data == null)
       return;
+
+    LOGGER.fine("RunInfo file: " + this.runInfoFile);
+    LOGGER.fine("RunParameters file: " + this.runParametersFile);
 
     try {
       // Parse run info file
@@ -206,6 +203,39 @@ public class RunInfoCollector implements Collector {
   @Override
   public boolean isSummaryCollector() {
     return false;
+  }
+
+  private File runInfoFilePath(final QC qc, final CollectorConfiguration conf) {
+
+    final File parentFile;
+
+    if (qc == null) {
+      // Unit Test
+      parentFile = conf.getFile(QC.RTA_OUTPUT_DIR);
+    } else {
+      parentFile = qc.getBclDir();
+      this.settings = qc.getSettings();
+    }
+
+    return new File(parentFile, "RunInfo.xml");
+  }
+
+  private File runParametersFile(final QC qc,
+      final CollectorConfiguration conf) {
+
+    final File parentFile;
+
+    if (qc == null) {
+      // Unit Test
+      parentFile = conf.getFile(QC.RTA_OUTPUT_DIR);
+    } else {
+      parentFile = qc.getBclDir();
+      this.settings = qc.getSettings();
+    }
+
+    File result = new File(parentFile, "runParameters.xml");
+
+    return result.exists() ? result : new File(parentFile, "RunParameters.xml");
   }
 
 }

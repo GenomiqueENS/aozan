@@ -165,27 +165,46 @@ public class RunParameters {
 
     for (Element e : XMLUtils.getElementsByTagName(document, "RunParameters")) {
 
-      String rtaVersion = getTagValue(e, "RTAVersion");
-
-      final List<Element> elements = XMLUtils.getElementsByTagName(e, "Setup");
-      if (!elements.isEmpty()) {
-
-        final Element setupElement = elements.get(0);
-
-        final String applicationName =
-            getTagValue(setupElement, "ApplicationName");
-        final String applicationVersion =
-            getTagValue(setupElement, "ApplicationVersion");
-
-        if (rtaVersion == null) {
-          rtaVersion = getTagValue(setupElement, "RTAVersion");
-        }
-        return new RunParameters(applicationName, applicationVersion,
-            rtaVersion);
-      }
+      return getTagValue(e, "RtaVersion") == null
+          ? parseRTA12(e) : parseRTA3(e);
     }
 
-    throw new AozanRuntimeException("No \"Run\" tag found in RunInfo.xml");
+    throw new AozanRuntimeException(
+        "Invalid format of the RunParameters.xml file");
+  }
+
+  private static RunParameters parseRTA12(Element e) {
+
+    String rtaVersion = getTagValue(e, "RTAVersion");
+
+    final List<Element> elements = XMLUtils.getElementsByTagName(e, "Setup");
+    if (!elements.isEmpty()) {
+
+      final Element setupElement = elements.get(0);
+
+      final String applicationName =
+          getTagValue(setupElement, "ApplicationName");
+      final String applicationVersion =
+          getTagValue(setupElement, "ApplicationVersion");
+
+      if (rtaVersion == null) {
+        rtaVersion = getTagValue(setupElement, "RTAVersion");
+      }
+      return new RunParameters(applicationName, applicationVersion, rtaVersion);
+    }
+
+    throw new AozanRuntimeException(
+        "Invalid format of the RunParameters.xml file");
+
+  }
+
+  private static RunParameters parseRTA3(Element e) {
+
+    String rtaVersion = getTagValue(e, "RtaVersion");
+    String applicationName = getTagValue(e, "ApplicationName");
+    String applicationVersion = getTagValue(e, "ApplicationVersion");
+
+    return new RunParameters(applicationName, applicationVersion, rtaVersion);
   }
 
   //
