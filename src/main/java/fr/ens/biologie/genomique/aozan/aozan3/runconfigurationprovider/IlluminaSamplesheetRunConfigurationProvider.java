@@ -401,7 +401,8 @@ public class IlluminaSamplesheetRunConfigurationProvider
 
       @Override
       public boolean accept(File dir, String name) {
-        return name.startsWith("SampleSheet") && name.endsWith(".csv");
+        return name.toLowerCase().startsWith("samplesheet")
+            && name.endsWith(".csv");
       }
     });
 
