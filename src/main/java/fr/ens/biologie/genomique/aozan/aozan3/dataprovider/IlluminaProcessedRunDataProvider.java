@@ -51,8 +51,11 @@ public class IlluminaProcessedRunDataProvider implements RunDataProvider {
       boolean interOpExists =
           new File(file, "InterOp/IndexMetricsOut.bin").isFile();
 
+      boolean fastqCompleteExists =
+          new File(file, "Logs/FastqComplete.txt").isFile();
+
       if (this.completedDemux) {
-        return interOpExists;
+        return interOpExists || fastqCompleteExists;
       }
 
       return true;
