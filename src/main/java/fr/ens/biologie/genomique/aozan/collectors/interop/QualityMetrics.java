@@ -75,7 +75,7 @@ import java.util.Arrays;
 public class QualityMetrics {
 
   private final int laneNumber; // uint16
-  private final int tileNumber; // uint16
+  private final long tileNumber; // uint16 or uint32
 
   private final int cycleNumber; // uint16
 
@@ -87,7 +87,7 @@ public class QualityMetrics {
   }
 
   /** Get the tile number. */
-  public int getTileNumber() {
+  public long getTileNumber() {
     return this.tileNumber;
   }
 
@@ -114,27 +114,28 @@ public class QualityMetrics {
    * Constructor. One record countReads on the ByteBuffer.
    * @param bb ByteBuffer who read one record
    */
-  QualityMetrics(final ByteBuffer bb, final int binCount, final int [] remappedScoreQuality) {
+  QualityMetrics(final int version, final ByteBuffer bb, final int binCount,
+      final int[] remappedScoreQuality) {
 
-    this.laneNumber = uShortToInt(bb.getShort());
-    this.tileNumber = uShortToInt(bb.getShort());
-    this.cycleNumber = uShortToInt(bb.getShort());
+    this.laneNumber = uShortToInt(bb);
+    this.tileNumber = version == 7 ? uIntToLong(bb) : uShortToInt(bb);
+    this.cycleNumber = uShortToInt(bb);
 
     if (binCount > 0) {
 
       // Read cluster count in each bin if version 6 but do nothing with this
       // information
       for (int i = 0; i < binCount; i++) {
-        this.clustersScore[remappedScoreQuality[i] - 1] =
-            uIntToLong(bb.getInt());
+        this.clustersScore[remappedScoreQuality[i] - 1] = uIntToLong(bb);
       }
     } else {
 
       // Read cluster count for each Phred score
       for (int i = 0; i < 50; i++) {
-        this.clustersScore[i] = uIntToLong(bb.getInt());
+        this.clustersScore[i] = uIntToLong(bb);
       }
     }
+
   }
 
 }

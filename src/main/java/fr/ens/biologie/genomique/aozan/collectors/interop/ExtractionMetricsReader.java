@@ -25,12 +25,15 @@ package fr.ens.biologie.genomique.aozan.collectors.interop;
 
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 
 /**
- * This class define a specified iterator for reading the binary file :
+ * This class define a specified iterator for reading the binary file version 2:
  * ExtractionMetricsOut.bin.
  * @author Sandrine Perrin
  * @since 1.1
@@ -43,8 +46,7 @@ public class ExtractionMetricsReader
   public static final String EXTRACTION_METRICS_FILE =
       "ExtractionMetricsOut.bin";
 
-  private static final int EXPECTED_RECORD_SIZE = 38;
-  private static final int EXPECTED_VERSION = 2;
+  private int channelCount = 4;
 
   @Override
   public String getName() {
@@ -57,20 +59,46 @@ public class ExtractionMetricsReader
   }
 
   @Override
-  protected int getExpectedRecordSize() {
-    return EXPECTED_RECORD_SIZE;
+  protected int getExpectedRecordSize(int version) {
+
+    switch (version) {
+    case 2:
+      return 38;
+
+    case 3:
+      return 8 + 6 * this.channelCount;
+
+    default:
+      throw new IllegalArgumentException();
+    }
   }
 
   @Override
-  protected int getExpectedVersion() {
-    return EXPECTED_VERSION;
+  protected Set<Integer> getExpectedVersions() {
+    return new HashSet<Integer>(Arrays.asList(2, 3));
   }
 
   @Override
-  protected void addIlluminaMetricsInCollection(
-      final List<ExtractionMetrics> collection, final ByteBuffer bb) {
+  protected void readOptionalFlag(ByteBuffer bb, int version) {
 
-    collection.add(new ExtractionMetrics(bb));
+    switch (version) {
+    case 2:
+      return;
+
+    case 3:
+      this.channelCount = uByteToInt(bb);
+      return;
+
+    default:
+      throw new IllegalArgumentException();
+    }
+  }
+
+  @Override
+  protected void readMetricRecord(final List<ExtractionMetrics> collection,
+      final ByteBuffer bb, final int version) {
+
+    collection.add(new ExtractionMetrics(version, this.channelCount, bb));
   }
 
   //

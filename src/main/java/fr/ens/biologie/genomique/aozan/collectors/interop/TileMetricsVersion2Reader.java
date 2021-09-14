@@ -25,7 +25,9 @@ package fr.ens.biologie.genomique.aozan.collectors.interop;
 
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 
@@ -35,7 +37,8 @@ import fr.ens.biologie.genomique.aozan.AozanException;
  * @author Sandrine Perrin
  * @since 1.1
  */
-public class TileMetricsReader extends AbstractBinaryFileReader<TileMetrics> {
+public class TileMetricsVersion2Reader
+    extends AbstractBinaryFileReader<TileMetricsVersion2> {
 
   public static final String NAME = "TileMetricsOut";
 
@@ -50,14 +53,13 @@ public class TileMetricsReader extends AbstractBinaryFileReader<TileMetrics> {
   }
 
   @Override
-  protected int getExpectedRecordSize() {
+  protected int getExpectedRecordSize(int version) {
     return EXPECTED_RECORD_SIZE;
   }
 
   @Override
-  protected int getExpectedVersion() {
-    return EXPECTED_VERSION;
-
+  protected Set<Integer> getExpectedVersions() {
+    return Collections.singleton(EXPECTED_VERSION);
   }
 
   @Override
@@ -66,17 +68,17 @@ public class TileMetricsReader extends AbstractBinaryFileReader<TileMetrics> {
   }
 
   @Override
-  protected void addIlluminaMetricsInCollection(
-      final List<TileMetrics> collection, final ByteBuffer bb) {
+  protected void readMetricRecord(final List<TileMetricsVersion2> collection,
+      final ByteBuffer bb, final int version) {
 
-    collection.add(new TileMetrics(bb));
+    collection.add(new TileMetricsVersion2(bb));
   }
 
   //
   // Constructor
   //
 
-  TileMetricsReader(final File dirPath) throws AozanException {
+  TileMetricsVersion2Reader(final File dirPath) throws AozanException {
     super(dirPath);
   }
 

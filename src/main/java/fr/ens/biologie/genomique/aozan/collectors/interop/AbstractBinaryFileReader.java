@@ -31,6 +31,7 @@ import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
@@ -62,15 +63,16 @@ abstract class AbstractBinaryFileReader<M> {
 
   /**
    * Gets the expected record size.
+   * @param version version of the format
    * @return expected record size
    */
-  protected abstract int getExpectedRecordSize();
+  protected abstract int getExpectedRecordSize(int version);
 
   /**
-   * Gets the expected version.
-   * @return expected version of binary file
+   * Gets the expected versions for the file.
+   * @return a set with the expected versions of binary file
    */
-  protected abstract int getExpectedVersion();
+  protected abstract Set<Integer> getExpectedVersions();
 
   /**
    * Gets the dir path inter op.
@@ -85,7 +87,7 @@ abstract class AbstractBinaryFileReader<M> {
    * @return set Illumina metrics corresponding to one binary InterOp file
    * @throws AozanException the aozan exception
    */
-  public List<M> getSetIlluminaMetrics() throws AozanException {
+  public List<M> readMetrics() throws AozanException {
 
     final List<M> collection = new ArrayList<>();
 
@@ -110,6 +112,8 @@ abstract class AbstractBinaryFileReader<M> {
       throw new AozanException(e);
     }
 
+    int version = -1;
+
     // check version file
     if (HEADER_SIZE > 0) {
       ByteBuffer b = ByteBuffer.allocate(HEADER_SIZE);
@@ -117,30 +121,56 @@ abstract class AbstractBinaryFileReader<M> {
       b = buf.get(header);
       b.position(0);
 
-      final int recordSize = checkVersionFile(b);
-      readOptionalFlag(b);
-      checkRecordSize(recordSize);
+      // Read byte 0: file version number
+      version = uByteToInt(b.get());
+
+      // Check version
+      if (!getExpectedVersions().contains(version)) {
+        throw new AozanException(getName()
+            + " expects the version number to be " + getExpectedVersions()
+            + ".  Actual Version in Header(" + version + ")");
+      }
+
+      // Read byte 1: length of each record
+      final int recordSize = uByteToInt(b.get());
+
+      readOptionalFlag(b, version);
+
+      // Check the size record needed
+      final int expectedRecordSize = getExpectedRecordSize(version);
+      if (expectedRecordSize != recordSize) {
+        throw new AozanException(getName()
+            + " expects the record size to be " + expectedRecordSize
+            + ". Actual Record Size in Header(" + recordSize + ")");
+      }
+
+      // checkRecordSize(recordSize);
     }
 
-    final byte[] element = new byte[getExpectedRecordSize()];
+    final int recordSize = getExpectedRecordSize(version);
+    final byte[] element = new byte[recordSize];
     final ByteBuffer recordBuf = ByteBuffer.wrap(element);
     recordBuf.order(ByteOrder.LITTLE_ENDIAN);
 
     // Build collection of illumina metrics
-    while (buf.limit() - buf.position() >= getExpectedRecordSize()) {
+    while (buf.limit() - buf.position() >= recordSize) {
       recordBuf.position(0);
       buf.get(element);
       recordBuf.position(0);
 
       // collection.add(new IlluminaMetrics(recordBuf));
-      addIlluminaMetricsInCollection(collection, recordBuf);
+      readMetricRecord(collection, recordBuf, version);
     }
 
     return collection;
   }
 
-  protected void readOptionalFlag(ByteBuffer bb) {
-
+  /**
+   * Read optional flags.
+   * @param bb byte buffer
+   * @param version version of the format of the file
+   */
+  protected void readOptionalFlag(ByteBuffer bb, int version) {
   }
 
   /**
@@ -148,47 +178,10 @@ abstract class AbstractBinaryFileReader<M> {
    * reading.
    * @param collection list of illumina metrics
    * @param bb ByteBuffer contains the value corresponding to one record
+   * @param version version of the format
    */
-  protected abstract void addIlluminaMetricsInCollection(
-      final List<M> collection, final ByteBuffer bb);
-
-  /**
-   * Check version file corresponding to the implemented code
-   * @param header header file.
-   * @return record size in bytes
-   * @throws AozanException occurs if the checking fails
-   */
-  private int checkVersionFile(final ByteBuffer header) throws AozanException {
-
-    // Read byte 0: file version number
-    final int actualVersion = uByteToInt(header.get());
-
-    // Check if is the expected version
-    if (actualVersion != getExpectedVersion()) {
-      throw new AozanException(getName()
-          + " expects the version number to be " + getExpectedVersion()
-          + ".  Actual Version in Header(" + actualVersion + ")");
-    }
-
-    // Read byte 1: length of each record
-    return uByteToInt(header.get());
-  }
-
-  /**
-   * Check version file corresponding to the implemented code
-   * @param header header file.
-   * @return record size in bytes
-   * @throws AozanException occurs if the checking fails
-   */
-  private void checkRecordSize(final int recordSize) throws AozanException {
-
-    // Check the size record needed
-    if (getExpectedRecordSize() != recordSize) {
-      throw new AozanException(getName()
-          + " expects the record size to be " + getExpectedRecordSize()
-          + ". Actual Record Size in Header(" + recordSize + ")");
-    }
-  }
+  protected abstract void readMetricRecord(final List<M> collection,
+      final ByteBuffer bb, int version);
 
   //
   // Constructor
@@ -215,22 +208,42 @@ abstract class AbstractBinaryFileReader<M> {
   }
 
   /** Convert an unsigned byte to a signed int. */
-  public static final int uByteToInt(final byte unsignedByte) {
+  public static final int uByteToInt(final ByteBuffer bb) {
+    return uByteToInt(bb.get());
+  }
+
+  /** Convert an unsigned byte to a signed short. */
+  public static final int uByteToShort(final ByteBuffer bb) {
+    return uByteToShort(bb.get());
+  }
+
+  /** Convert an unsigned short to an int. */
+  public static final int uShortToInt(final ByteBuffer bb) {
+    return uShortToInt(bb.getShort());
+  }
+
+  /** Convert an unsigned int to a long. */
+  public static final long uIntToLong(final ByteBuffer bb) {
+    return uIntToLong(bb.getInt());
+  }
+
+  /** Convert an unsigned byte to a signed int. */
+  private static final int uByteToInt(final byte unsignedByte) {
     return unsignedByte & 0xFF;
   }
 
   /** Convert an unsigned byte to a signed short. */
-  public static final int uByteToShort(final byte unsignedByte) {
+  private static final int uByteToShort(final byte unsignedByte) {
     return unsignedByte & 0xFF;
   }
 
   /** Convert an unsigned short to an int. */
-  public static final int uShortToInt(final short unsignedShort) {
+  private static final int uShortToInt(final short unsignedShort) {
     return unsignedShort & 0xFFFF;
   }
 
   /** Convert an unsigned int to a long. */
-  public static final long uIntToLong(final int unsignedInt) {
+  private static final long uIntToLong(final int unsignedInt) {
     return unsignedInt & 0xFFFFFFFFL;
   }
 

@@ -28,7 +28,6 @@ import java.util.List;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
-import fr.ens.biologie.genomique.eoulsan.core.Version;
 
 /**
  * This class collects run data by reading the QualityMetricsOut.bin in InterOp
@@ -43,6 +42,7 @@ public class QualityMetricsCollector extends AbstractMetricsCollector {
   public static final String DATA_PREFIX = "qualitymetrics";
   public static final String FORK_VERSION_5 = "1.18.64";
   public static final String FORK_VERSION_6 = "2.7.1";
+  public static final String FORK_VERSION_7 = "3.0.0";
 
   @Override
   public String getName() {
@@ -57,18 +57,7 @@ public class QualityMetricsCollector extends AbstractMetricsCollector {
   public void collect(final RunData data) throws AozanException {
 
     super.collect(data);
-    final QMetricsVersion4Reader reader;
-    final Version rtaVersion = new Version(data.get("run.info.rta.version"));
-
-    if (rtaVersion.greaterThanOrEqualTo(new Version(FORK_VERSION_5))) {
-      if (rtaVersion.greaterThanOrEqualTo(new Version(FORK_VERSION_6))) {
-        reader = new QMetricsVersion6Reader(getInterOpDir());
-      } else {
-        reader = new QMetricsVersion5Reader(getInterOpDir());
-      }
-    } else {
-      reader = new QMetricsVersion4Reader(getInterOpDir());
-    }
+    final QMetricsReader reader = new QMetricsReader(getInterOpDir());
 
     final long[][][] lanes = new long[data.getLaneCount()][][];
     final long[] global = new long[50];
@@ -93,7 +82,7 @@ public class QualityMetricsCollector extends AbstractMetricsCollector {
 
     }
 
-    for (final QualityMetrics qual : reader.getSetIlluminaMetrics()) {
+    for (final QualityMetrics qual : reader.readMetrics()) {
 
       int readSource = readNumberFromCycle.get(qual.getCycleNumber() - 1) - 1;
       int lane = qual.getLaneNumber() - 1;

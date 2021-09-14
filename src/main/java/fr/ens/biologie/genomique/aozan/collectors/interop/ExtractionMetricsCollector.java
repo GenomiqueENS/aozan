@@ -68,12 +68,11 @@ public class ExtractionMetricsCollector extends AbstractMetricsCollector {
 
     int keyMap;
 
-    final ExtractionMetricsReader reader =
-        new ExtractionMetricsReader(getInterOpDir());
     initMetricsMap();
 
     // Distribution of metrics between lane and code
-    for (final ExtractionMetrics iim : reader.getSetIlluminaMetrics()) {
+    for (final ExtractionMetrics iim : new ExtractionMetricsReader(
+        getInterOpDir()).readMetrics()) {
 
       // key : number read, value(pair:first number cycle, last number cycle)
       keyMap = getKeyMap(iim.getLaneNumber(),
@@ -144,8 +143,8 @@ public class ExtractionMetricsCollector extends AbstractMetricsCollector {
     private double ratioIntensityCycle20 = 0.0;
     private double ratioIntensityCycle20SD = 0.0;
 
-    private final Map<Integer, Number> intensityCycle1ValuesPerTile;
-    private final Map<Integer, Number> intensityCycle20ValuesPerTile;
+    private final Map<Long, Number> intensityCycle1ValuesPerTile;
+    private final Map<Long, Number> intensityCycle20ValuesPerTile;
 
     private boolean dataToCompute = true;
 

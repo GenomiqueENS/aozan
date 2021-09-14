@@ -23,6 +23,7 @@
 
 package fr.ens.biologie.genomique.aozan.collectors.interop;
 
+import static fr.ens.biologie.genomique.aozan.collectors.interop.AbstractBinaryFileReader.uIntToLong;
 import static fr.ens.biologie.genomique.aozan.collectors.interop.AbstractBinaryFileReader.uShortToInt;
 
 import java.nio.ByteBuffer;
@@ -54,7 +55,7 @@ public class ErrorMetrics {
   private final int laneNumber; // uint16
 
   /** The tile number. */
-  private final int tileNumber; // uint16
+  private final long tileNumber; // uint16
 
   /** The cycle number. */
   private final int cycleNumber; // uint16
@@ -89,7 +90,7 @@ public class ErrorMetrics {
    * Get the number tile.
    * @return the tile number
    */
-  public int getTileNumber() {
+  public long getTileNumber() {
     return this.tileNumber;
   }
 
@@ -166,19 +167,34 @@ public class ErrorMetrics {
    * Constructor. One record countReads on the ByteBuffer.
    * @param bb ByteBuffer who read one record
    */
-  ErrorMetrics(final ByteBuffer bb) {
+  ErrorMetrics(final int version, final ByteBuffer bb) {
 
-    this.laneNumber = uShortToInt(bb.getShort());
-    this.tileNumber = uShortToInt(bb.getShort());
-    this.cycleNumber = uShortToInt(bb.getShort());
+    this.laneNumber = uShortToInt(bb);
+    this.tileNumber = version > 3 ? uIntToLong(bb) : uShortToInt(bb);
+    this.cycleNumber = uShortToInt(bb);
 
     this.errorRate = bb.getFloat();
-    this.numberPerfectReads = bb.getInt();
 
-    this.numberReadsOneError = bb.getInt();
-    this.numberReadsTwoErrors = bb.getInt();
-    this.numberReadsThreeErrors = bb.getInt();
-    this.numberReadsFourErrors = bb.getInt();
+    if (version == 3) {
+      this.numberPerfectReads = bb.getInt();
+
+      this.numberReadsOneError = bb.getInt();
+      this.numberReadsTwoErrors = bb.getInt();
+      this.numberReadsThreeErrors = bb.getInt();
+      this.numberReadsFourErrors = bb.getInt();
+    } else {
+
+      if (version == 5) {
+        @SuppressWarnings("unused")
+        float fractionOfReadAdapterTrimmed = bb.getFloat();
+      }
+
+      this.numberPerfectReads = -1;
+      this.numberReadsOneError = -1;
+      this.numberReadsTwoErrors = -1;
+      this.numberReadsThreeErrors = -1;
+      this.numberReadsFourErrors = -1;
+    }
 
   }
 }

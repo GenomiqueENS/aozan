@@ -71,13 +71,14 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
     super.collect(data);
 
     try {
-      final ErrorMetricsReader reader = new ErrorMetricsReader(getInterOpDir());
+
       initMetricsMap(data);
 
       int keyMap;
 
       // Distribution of metrics between lane and code
-      for (final ErrorMetrics iem : reader.getSetIlluminaMetrics()) {
+      for (final ErrorMetrics iem : new ErrorMetricsReader(getInterOpDir())
+          .readMetrics()) {
         keyMap = getKeyMap(iem.getLaneNumber(),
             getReadFromCycleNumber(iem.getCycleNumber()));
 
@@ -195,19 +196,19 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
     private boolean dataToCompute = true;
 
     // Save pair tile-rate error for all cycles for a lane
-    private final ListMultimap<Integer, Number> allErrorRates =
+    private final ListMultimap<Long, Number> allErrorRates =
         ArrayListMultimap.create();
 
     // Save pair tile-rate error for cycles (1 to 35) for all tiles
-    private final ListMultimap<Integer, Number> error35 =
+    private final ListMultimap<Long, Number> error35 =
         ArrayListMultimap.create();
 
     // Save pair tile-rate error for cycles (1 to 75) for all tiles, for run PE
-    private final ListMultimap<Integer, Number> error75 =
+    private final ListMultimap<Long, Number> error75 =
         ArrayListMultimap.create();
 
     // Save pair tile-rate error for cycles (1 to 100) for all tiles, for run PE
-    private final ListMultimap<Integer, Number> error100 =
+    private final ListMultimap<Long, Number> error100 =
         ArrayListMultimap.create();
 
     /**
@@ -290,15 +291,15 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
      * @return list of rate error for each number tile
      */
     public List<Number> computeErrorRatePerTile(
-        final ListMultimap<Integer, Number> values) {
+        final ListMultimap<Long, Number> values) {
 
       // Define map : tile and list of rate error, one per cycle to use
-      final Map<Integer, Collection<Number>> errorValuePerTile = values.asMap();
+      final Map<Long, Collection<Number>> errorValuePerTile = values.asMap();
 
       // Save rate error per tile
       final List<Number> errorRatePerTile = new ArrayList<>();
 
-      for (final Map.Entry<Integer, Collection<Number>> entry : errorValuePerTile
+      for (final Map.Entry<Long, Collection<Number>> entry : errorValuePerTile
           .entrySet()) {
 
         final Collection<Number> value = entry.getValue();

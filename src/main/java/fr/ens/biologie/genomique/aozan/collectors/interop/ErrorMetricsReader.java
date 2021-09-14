@@ -26,7 +26,10 @@ package fr.ens.biologie.genomique.aozan.collectors.interop;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 
@@ -41,8 +44,6 @@ public class ErrorMetricsReader extends AbstractBinaryFileReader<ErrorMetrics> {
   public static final String NAME = "ErrorMetricsOut";
 
   public static final String ERROR_METRICS_FILE = "ErrorMetricsOut.bin";
-  private static final int EXPECTED_RECORD_SIZE = 30;
-  private static final int EXPECTED_VERSION = 3;
 
   /**
    * Get the file name treated.
@@ -59,20 +60,34 @@ public class ErrorMetricsReader extends AbstractBinaryFileReader<ErrorMetrics> {
   }
 
   @Override
-  protected int getExpectedRecordSize() {
-    return EXPECTED_RECORD_SIZE;
+  protected int getExpectedRecordSize(int version) {
+
+    switch (version) {
+    case 3:
+      return 30;
+
+    case 4:
+      return 12;
+
+    case 5:
+      return 16;
+
+    default:
+      throw new IllegalArgumentException();
+    }
+
   }
 
   @Override
-  protected int getExpectedVersion() {
-    return EXPECTED_VERSION;
+  protected Set<Integer> getExpectedVersions() {
+    return new HashSet<Integer>(Arrays.asList(3, 4, 5));
   }
 
   @Override
-  protected void addIlluminaMetricsInCollection(
-      final List<ErrorMetrics> collection, final ByteBuffer bb) {
+  protected void readMetricRecord(final List<ErrorMetrics> collection,
+      final ByteBuffer bb, final int version) {
 
-    collection.add(new ErrorMetrics(bb));
+    collection.add(new ErrorMetrics(version, bb));
   }
 
   //

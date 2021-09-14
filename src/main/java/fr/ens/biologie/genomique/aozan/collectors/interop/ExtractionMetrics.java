@@ -24,6 +24,7 @@
 package fr.ens.biologie.genomique.aozan.collectors.interop;
 
 import static fr.ens.biologie.genomique.aozan.collectors.interop.AbstractBinaryFileReader.uShortToInt;
+import static fr.ens.biologie.genomique.aozan.collectors.interop.AbstractBinaryFileReader.uIntToLong;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -58,7 +59,7 @@ public class ExtractionMetrics {
   private final int[] intensities = new int[4]; // A C G T - uint16
 
   private final int laneNumber; // uint16
-  private final int tileNumber; // uint16
+  private final long tileNumber; // uint16 or uint32
 
   private final int cycleNumber; // uint16
 
@@ -68,7 +69,7 @@ public class ExtractionMetrics {
   }
 
   /** Get the number tile. */
-  public int getTileNumber() {
+  public long getTileNumber() {
     return this.tileNumber;
   }
 
@@ -117,24 +118,38 @@ public class ExtractionMetrics {
    * Constructor. One record countReads on the ByteBuffer.
    * @param bb ByteBuffer who read one record
    */
-  ExtractionMetrics(final ByteBuffer bb) {
+  ExtractionMetrics(final int version, final int channelCount,
+      final ByteBuffer bb) {
 
-    this.laneNumber = uShortToInt(bb.getShort());
-    this.tileNumber = uShortToInt(bb.getShort());
-    this.cycleNumber = uShortToInt(bb.getShort());
+    this.laneNumber = uShortToInt(bb);
+    this.tileNumber = version == 3 ? uIntToLong(bb) : uShortToInt(bb);
+    this.cycleNumber = uShortToInt(bb);
 
-    for (int i = 0; i < 4; i++) {
-      this.fwhm[i] = bb.getFloat();
+    if (version == 2) {
+
+      for (int i = 0; i < 4; i++) {
+        this.fwhm[i] = bb.getFloat();
+      }
+
+      for (int i = 0; i < 4; i++) {
+        this.intensities[i] = uShortToInt(bb);
+      }
+
+      // Read date/time for CIF creation, not used
+      // TODO get date create cif file to finalize
+      @SuppressWarnings("unused")
+      final ByteBuffer buf = bb.get(new byte[8]);
+
+    } else if (version == 3) {
+
+      for (int i = 0; i < channelCount; i++) {
+        this.fwhm[i] = bb.getFloat();
+      }
+
+      for (int i = 0; i < channelCount; i++) {
+        this.intensities[i] = uShortToInt(bb);
+      }
+
     }
-
-    for (int i = 0; i < 4; i++) {
-      this.intensities[i] = uShortToInt(bb.getShort());
-    }
-
-    // Read date/time for CIF creation, not used
-    // TODO get date create cif file to finalize
-    @SuppressWarnings("unused")
-    final ByteBuffer buf = bb.get(new byte[8]);
-
   }
 }

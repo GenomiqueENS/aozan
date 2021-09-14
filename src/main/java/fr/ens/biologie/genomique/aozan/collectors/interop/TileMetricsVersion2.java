@@ -51,7 +51,7 @@ import java.nio.ByteBuffer;
  * @author Sandrine Perrin
  * @since 1.1
  */
-public class TileMetrics {
+public class TileMetricsVersion2 {
 
   private final int metricCode;
   private final float metricValue;
@@ -100,10 +100,10 @@ public class TileMetrics {
    * Constructor. One record countReads on the ByteBuffer.
    * @param bb ByteBuffer who read one record
    */
-  TileMetrics(final ByteBuffer bb) {
-    this.laneNumber = uShortToInt(bb.getShort());
-    this.tileNumber = uShortToInt(bb.getShort());
-    this.metricCode = uShortToInt(bb.getShort());
+  TileMetricsVersion2(final ByteBuffer bb) {
+    this.laneNumber = uShortToInt(bb);
+    this.tileNumber = uShortToInt(bb);
+    this.metricCode = uShortToInt(bb);
     this.metricValue = bb.getFloat();
 
   }

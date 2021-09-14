@@ -61,7 +61,7 @@ final class ReadsData {
   public int getReadFromCycleNumber(final int cycleNumber)
       throws AozanException {
 
-    if (cycleNumber < 1 && cycleNumber > getCyclesCount()) {
+    if (cycleNumber < 1 || cycleNumber > getCyclesCount()) {
       throw new AozanException("Cycle number invalid "
           + cycleNumber + ", must be < " + getCyclesCount()
           + ". Can not extract read number.");
