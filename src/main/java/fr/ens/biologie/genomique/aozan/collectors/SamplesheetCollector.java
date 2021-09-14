@@ -256,7 +256,7 @@ public class SamplesheetCollector implements Collector {
         }
 
         // List projects in run
-        projectNames.add(s.getSampleProject());
+        projectNames.add(project);
       }
 
       // Add undetermined samples
