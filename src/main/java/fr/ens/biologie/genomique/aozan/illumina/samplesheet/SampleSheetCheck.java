@@ -461,7 +461,7 @@ public class SampleSheetCheck {
 
     // Check if null of empty
     if (isNullOrEmpty(sampleProject)) {
-      throw new AozanException("Found a null or sample project.");
+      throw new AozanException("Found a null or empty sample project name.");
     }
 
     // Check for forbidden characters
