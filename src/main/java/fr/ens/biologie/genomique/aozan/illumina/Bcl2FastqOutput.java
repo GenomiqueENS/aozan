@@ -47,7 +47,7 @@ public class Bcl2FastqOutput {
    * @author Laurent Jourdren
    */
   public enum Bcl2FastqVersion {
-    BCL2FASTQ_1, BCL2FASTQ_2, BCL2FASTQ_2_15;
+    BCL2FASTQ_1, BCL2FASTQ_2, BCL2FASTQ_2_15, BCL_CONVERT;
 
     public static Bcl2FastqVersion parseVersion(final String version) {
 
@@ -65,6 +65,9 @@ public class Bcl2FastqOutput {
       case 2:
         return v.getMinor() == 15 || v.getMinor() == 16
             ? BCL2FASTQ_2_15 : BCL2FASTQ_2;
+
+      case 3:
+        return BCL_CONVERT;
 
       default:
         throw new AozanRuntimeException(
@@ -146,14 +149,23 @@ public class Bcl2FastqOutput {
       }
     }
 
+    // Check if bcl-convert 2 files exists
+    for (String filename : Arrays.asList("Demultiplex_Stats.csv",
+        "IndexMetricsOut.bin")) {
+
+      if (new File(new File(fastqDir, "Reports"), filename).exists()) {
+        return Bcl2FastqVersion.BCL_CONVERT;
+      }
+    }
+
     // Check if the output directory is a bcl2fastq output
     if (!new File(fastqDir, "InterOp").isDirectory()) {
       throw new IOException("Unknown Bcl2fastq output directory tree");
     }
 
     // Find the bcl2fastq version in the log file
-    final Bcl2FastqVersion versionInLogFile = Bcl2FastqVersion.parseVersion(
-        extractBcl2FastqVersionFromLog(fastqDir));
+    final Bcl2FastqVersion versionInLogFile =
+        Bcl2FastqVersion.parseVersion(extractBcl2FastqVersionFromLog(fastqDir));
     if (versionInLogFile != null) {
       return versionInLogFile;
     }
@@ -176,8 +188,8 @@ public class Bcl2FastqOutput {
    * @return the bcl2fastq version or null if cannot be read in the log file
    * @throws IOException if more than one log file was found
    */
-  private static String extractBcl2FastqVersionFromLog(
-      final File fastqDir) throws IOException {
+  private static String extractBcl2FastqVersionFromLog(final File fastqDir)
+      throws IOException {
 
     // Find log file
     final File[] logFiles = fastqDir.listFiles(new FileFilter() {
@@ -187,7 +199,8 @@ public class Bcl2FastqOutput {
 
         final String filename = pathname.getName();
 
-        return filename.startsWith("bcl2fastq_output_")
+        return (filename.startsWith("bcl2fastq_output_")
+            || filename.startsWith("bclconvert_output_"))
             && (filename.endsWith(".out") || filename.endsWith(".err"))
             && pathname.length() > 0;
 
@@ -196,13 +209,12 @@ public class Bcl2FastqOutput {
 
     // If no log found,
     if (logFiles == null || logFiles.length == 0) {
-
       return null;
     }
 
     if (logFiles.length > 1) {
       throw new IOException(
-          "Found more than one bcl1fastq2 log file in " + fastqDir);
+          "Found more than one demultiplexing log file in " + fastqDir);
     }
 
     // Parse log file
@@ -221,6 +233,17 @@ public class Bcl2FastqOutput {
         }
 
         return fields.get(1);
+      }
+
+      if (line.toLowerCase().startsWith("bcl-convert version ")) {
+
+        String result = line.substring("bcl-convert Version ".length());
+        int index = result.replace("00.000.000.", "").indexOf('-');
+        if (index != -1) {
+
+          return result.substring(0, index);
+        }
+
       }
     }
 
@@ -281,7 +304,10 @@ public class Bcl2FastqOutput {
   private static SampleSheet readSampleSheet(final File samplesheetFile)
       throws IOException {
 
-    return new SampleSheetCSVReader(samplesheetFile).read();
+    try (SampleSheetCSVReader reader =
+        new SampleSheetCSVReader(samplesheetFile)) {
+      return reader.read();
+    }
   }
 
   //
@@ -322,7 +348,8 @@ public class Bcl2FastqOutput {
    * @throws IOException if an error occurs while reading bcl2fastq version
    */
   public Bcl2FastqOutput(final SampleSheet samplesheet, final File fastqDir,
-      Bcl2FastqVersion version, String fullVersion, boolean checkFastqDirectory) throws IOException {
+      Bcl2FastqVersion version, String fullVersion, boolean checkFastqDirectory)
+      throws IOException {
 
     if (samplesheet == null) {
       throw new NullPointerException("samplesheet argument cannot be null");

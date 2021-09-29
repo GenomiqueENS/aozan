@@ -100,7 +100,7 @@ class ConversionStatsCollector extends DemultiplexingCollector {
     collect(data, new File(demuxSummaryPath));
   }
 
-  void collect(final RunData data, final File demuxSummaryFile)
+  private static void collect(final RunData data, final File demuxSummaryFile)
       throws AozanException {
 
     // Create the input stream
@@ -128,7 +128,7 @@ class ConversionStatsCollector extends DemultiplexingCollector {
    * @throws AozanException, it throws if an error occurs when extract data from
    *           document.
    */
-  private void parse(final Document document, final RunData data)
+  private static void parse(final Document document, final RunData data)
       throws AozanException {
 
     final int readIndexedCount = countReadIndexed(data);
@@ -166,7 +166,7 @@ class ConversionStatsCollector extends DemultiplexingCollector {
     }
   }
 
-  private int countReadIndexed(RunData data) {
+  private static int countReadIndexed(RunData data) {
 
     int count = 0;
     for (int read = 1; read <= data.getReadCount(); read++) {

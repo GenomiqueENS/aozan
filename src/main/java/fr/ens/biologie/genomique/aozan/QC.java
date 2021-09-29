@@ -873,6 +873,14 @@ public class QC {
     });
 
     if (samplesheetFiles == null || samplesheetFiles.length == 0) {
+
+      File sampleSheetInReportDir =
+          new File(fastqDir, "/Reports/SampleSheet.csv");
+
+      if (sampleSheetInReportDir.exists()) {
+        return sampleSheetInReportDir;
+      }
+
       throw new AozanException(
           "No Bcl2fastq samplesheet file found in " + fastqDir);
     }

@@ -84,6 +84,7 @@ public class DemultiplexingCollector implements Collector {
   @Override
   public void collect(final RunData data) throws AozanException {
 
+
     final Collector subCollector;
 
     final Bcl2FastqOutput manager;
@@ -110,6 +111,11 @@ public class DemultiplexingCollector implements Collector {
       subCollector = new ConversionStatsCollector();
       break;
 
+    case BCL_CONVERT:
+      // Demultiplex Stats collector
+      subCollector = new DemultiplexStatsCollector();
+      break;
+
     default:
 
       throw new AozanRuntimeException(
@@ -130,6 +136,7 @@ public class DemultiplexingCollector implements Collector {
     tmp.put("run.info.read.count", data.getReadCount());
     for (int read = 1; read <= data.getReadCount(); read++) {
       tmp.put("run.info.read" + read + ".indexed", data.isReadIndexed(read));
+      tmp.put("run.info.read" + read + ".cycles", data.getReadCyclesCount(read));
     }
 
     // Collect data

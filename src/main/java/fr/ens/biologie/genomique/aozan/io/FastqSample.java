@@ -404,6 +404,20 @@ public class FastqSample {
         return new File(projectV2Dir, getSampleDirectoryName());
       }
 
+    case BCL_CONVERT:
+
+      if (isUndeterminedIndex()) {
+        return fastqDirectory;
+      }
+
+      final File projectV3Dir = new File(fastqDirectory, getProjectName());
+
+      if (projectV3Dir.exists()) {
+        return projectV3Dir;
+      } else {
+        return fastqDirectory;
+      }
+
     default:
       throw new IllegalStateException(
           "Unhandled Bcl2FastqVersion enum value: " + version);
@@ -444,6 +458,7 @@ public class FastqSample {
 
     case BCL2FASTQ_2:
     case BCL2FASTQ_2_15:
+    case BCL_CONVERT:
 
       if (isUndeterminedIndex()) {
 
@@ -506,6 +521,7 @@ public class FastqSample {
       return getSampleName();
 
     case BCL2FASTQ_2_15:
+    case BCL_CONVERT:
       return getSampleName().replace("_", "-");
 
     default:
