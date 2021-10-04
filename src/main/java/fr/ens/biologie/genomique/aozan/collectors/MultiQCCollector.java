@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -69,6 +70,7 @@ public class MultiQCCollector implements Collector {
   private String dockerExecutable = MULTIQC_EXECUTABLE_DOCKER;
 
   private boolean useDocker;
+  private String multiQCPath;
   private String dockerConnectionString;
 
   @Override
@@ -95,6 +97,7 @@ public class MultiQCCollector implements Collector {
         conf.get("qc.conf.multiqc.docker.image", MULTIQC_DOCKER_IMAGE);
     this.dockerExecutable = conf.get("qc.conf.multiqc.docker.executable",
         MULTIQC_EXECUTABLE_DOCKER);
+    this.multiQCPath = conf.get("qc.conf.multiqc.path", null);
 
     // Test if Docker must be use to launch MultiQC
     this.useDocker =
@@ -205,10 +208,12 @@ public class MultiQCCollector implements Collector {
 
     } else {
 
-      File multiQCExecutable =
-          SystemUtils.searchExecutableInPATH(MULTIQC_EXECUTABLE);
+      File multiQCExecutable = this.multiQCPath != null
+          ? new File(this.multiQCPath)
+          : SystemUtils.searchExecutableInPATH(MULTIQC_EXECUTABLE);
 
-      if (multiQCExecutable == null) {
+      if (multiQCExecutable == null
+          || Files.isExecutable(multiQCExecutable.toPath())) {
         throw new IOException(
             "Unable to find \"" + MULTIQC_EXECUTABLE + "\" executable");
       }
