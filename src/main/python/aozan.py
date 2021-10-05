@@ -63,7 +63,7 @@ from fr.ens.biologie.genomique.aozan.Settings import BCL_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import FASTQ_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import REPORTS_DATA_PATH_KEY
 from fr.ens.biologie.genomique.aozan.Settings import DOCKER_URI_KEY
-from fr.ens.biologie.genomique.aozan.util import DockerConnection
+from fr.ens.biologie.genomique.aozan.util import DockerManager
 
 
 def run_id_sorted_by_priority(run_ids, priority_ids):
@@ -521,7 +521,7 @@ def launch_steps(conf):
                 common.log('INFO', 'Partial synchronizing ' + run_id + ' is locked.', conf)
 
     # Close Docker connections
-    DockerConnection.getInstance(conf[DOCKER_URI_KEY]).closeConnections()
+    DockerManager.getInstance(DockerManager.ClientType.FALLBACK, conf[DOCKER_URI_KEY]).closeConnections()
 
     # Everything is OK
     return True
