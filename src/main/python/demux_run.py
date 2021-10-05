@@ -572,24 +572,17 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
     """
 
     # In docker mount with input_run_data_path
-    input_docker = '/data/input'
-    input_run_data_path_in_docker = input_docker
     run_id_msg = " for run " + run_id + ' on ' + common.get_instrument_name(run_id, conf)
 
-    # In docker mount with fastq_output_dir
-    output_docker = '/data/output'
-    fastq_data_path_in_docker = output_docker + '/' + os.path.basename(fastq_output_dir)
-
     tmp = conf[TMP_PATH_KEY]
-    tmp_docker = '/tmp'
 
     bcl2fastq_log_file = tmp + "/bcl2fastq_output_" + run_id + ".err"
-    samplesheet_csv_docker = tmp_docker + '/' + os.path.basename(samplesheet_csv_path)
+    samplesheet_csv_docker = tmp + '/' + os.path.basename(samplesheet_csv_path)
 
     # Get bcl2fastq version to use
     bcl2fastq_version = common.BCL2FASTQ2_VERSION
 
-    cmd = create_bcl2fastq_command_line(run_id, None, input_run_data_path_in_docker, fastq_data_path_in_docker,
+    cmd = create_bcl2fastq_command_line(run_id, None, input_run_data_path, fastq_output_dir,
                                         samplesheet_csv_docker, tmp_docker, nb_mismatch, bcl2fastq_version, conf)
 
     try:
@@ -600,14 +593,10 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
         common.log("CONFIG", "Demultiplexing using docker image from " + docker.getImageDockerName() +
                    " with command line " + cmd, conf)
 
-        common.log("CONFIG", "Bcl2fastq docker mount: " +
-                   str(os.path.dirname(fastq_output_dir)) + ":" + str(output_docker) + "; " +
-                   input_run_data_path + ":" + input_docker + "; " + tmp + ":" + tmp_docker, conf)
-
         # Mount input directory
-        docker.addMountDirectory(input_run_data_path, input_docker)
-        docker.addMountDirectory(os.path.dirname(fastq_output_dir), output_docker)
-        docker.addMountDirectory(tmp, tmp_docker)
+        docker.addMountDirectory(input_run_data_path)
+        docker.addMountDirectory(os.path.dirname(fastq_output_dir))
+        docker.addMountDirectory(tmp)
 
         docker.run()
         exit_code = docker.getExitValue()
