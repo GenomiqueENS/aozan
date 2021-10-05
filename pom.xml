@@ -16,7 +16,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <didyouknow>Did you know that aozan is the breton word for prepare?</didyouknow>
 
-    <java.version>1.7</java.version>
+    <java.version>1.8</java.version>
     <jython.version>2.7.0</jython.version>
     <htsjdk.version>1.118</htsjdk.version>
   </properties>
@@ -389,7 +389,7 @@
         <configuration>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>
-            <artifactId>java17</artifactId>
+            <artifactId>java18</artifactId>
             <version>1.0</version>
           </signature>
         </configuration>
@@ -693,7 +693,7 @@
         <plugin>
            <groupId>org.apache.maven.plugins</groupId>
            <artifactId>maven-pmd-plugin</artifactId>
-           <version>3.0.1</version>
+           <version>3.10.0</version>
            <configuration>
               <!-- PMD options -->
               <targetJdk>${java.version}</targetJdk>
