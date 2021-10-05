@@ -198,7 +198,7 @@
     <dependency>
       <groupId>uk.ac.babraham</groupId>
       <artifactId>fastqc</artifactId>
-      <version>0.11.5-aozan</version>
+      <version>0.11.9-aozan</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
