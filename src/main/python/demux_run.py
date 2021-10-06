@@ -583,7 +583,7 @@ def demux_run_with_docker(run_id, input_run_data_path, fastq_output_dir, samples
     bcl2fastq_version = common.BCL2FASTQ2_VERSION
 
     cmd = create_bcl2fastq_command_line(run_id, None, input_run_data_path, fastq_output_dir,
-                                        samplesheet_csv_docker, tmp_docker, nb_mismatch, bcl2fastq_version, conf)
+                                        samplesheet_csv_docker, tmp, nb_mismatch, bcl2fastq_version, conf)
 
     try:
         # Set working in docker on parent demultiplexing run directory.
