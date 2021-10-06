@@ -1443,6 +1443,7 @@ def load_conf(conf, conf_file_path):
 
     # Bad tiles FastQC module no longer exists
     conf['qc.test.badtiles.enable'] = 'False'
+    conf['qc.test.sample.fastqc.bad.tiles.enable'] = 'False'
 
     # Save configuration file path
     conf[Settings.AOZAN_CONF_FILE_PATH] = conf_file_path
