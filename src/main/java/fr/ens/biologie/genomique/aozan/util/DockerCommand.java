@@ -26,6 +26,7 @@ public class DockerCommand {
   private final String imageName;
   private final List<String> commandLine;
   private final List<File> filesUsed = new ArrayList<>();
+  private File workDirectoryDocker;
   private int exitValue;
 
   /**
@@ -42,6 +43,18 @@ public class DockerCommand {
    */
   public int getExitValue() {
     return this.exitValue;
+  }
+
+  /**
+   * Sets the work directory docker.
+   * @param workDirectoryDocker the new work directory docker
+   */
+  public void setWorkDirectoryDocker(final String workDirectoryDocker) {
+
+    checkArgument(!Strings.isNullOrEmpty(workDirectoryDocker),
+        "work directory setting for Docker");
+
+    this.workDirectoryDocker = new File(workDirectoryDocker);
   }
 
   /**
@@ -69,9 +82,10 @@ public class DockerCommand {
       this.instance.pullImageIfNotExists();
 
       this.exitValue =
-          this.instance.execute(this.commandLine, new File("/root"),
-              new File("java.io.tmpdir"), new File("/tmp", "STDOUT"),
-              new File("/tmp", "STDERR"), this.filesUsed.toArray(new File[0]));
+          this.instance.execute(this.commandLine, this.workDirectoryDocker,
+              new File(System.getProperty("java.io.tmpdir")),
+              new File("/tmp", "STDOUT"), new File("/tmp", "STDERR"),
+              this.filesUsed.toArray(new File[0]));
 
     } catch (IOException e) {
       throw new AozanException(e);
