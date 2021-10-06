@@ -87,6 +87,20 @@ public class DockerManager {
    *           instance
    */
   public static synchronized DockerManager getInstance(ClientType clientType,
+      String dockerConnection) throws IOException {
+
+    return getInstance(clientType, URI.create(dockerConnection));
+  }
+
+  /**
+   * Get the instance of the DockerManager.
+   * @param clientType Docker client type
+   * @param dockerConnection URI of the docker connection
+   * @return the instance of the DockerManager
+   * @throws IOException if an error occurs while creating the DockerManager
+   *           instance
+   */
+  public static synchronized DockerManager getInstance(ClientType clientType,
       URI dockerConnection) throws IOException {
 
     if (singleton == null) {
