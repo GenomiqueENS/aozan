@@ -23,9 +23,18 @@ import fr.ens.biologie.genomique.eoulsan.util.process.DockerImageInstance;
 public class DockerCommand {
 
   private final DockerImageInstance instance;
-  private final List<File> filesUsed = new ArrayList<>();
+  private final String imageName;
   private final List<String> commandLine;
+  private final List<File> filesUsed = new ArrayList<>();
   private int exitValue;
+
+  /**
+   * Gets the image docker name.
+   * @return the image docker name
+   */
+  public String getImageDockerName() {
+    return this.imageName;
+  }
 
   /**
    * Gets the exit value.
@@ -88,6 +97,7 @@ public class DockerCommand {
     Objects.requireNonNull(commandLine);
     Objects.requireNonNull(imageName);
 
+    this.imageName = imageName;
     this.commandLine = commandLine;
 
     try {
