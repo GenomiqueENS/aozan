@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -24,11 +25,11 @@ import com.google.common.base.Strings;
 
 import fr.ens.biologie.genomique.aozan.aozan3.action.Action;
 import fr.ens.biologie.genomique.aozan.aozan3.action.ActionService;
+import fr.ens.biologie.genomique.aozan.aozan3.action.LegacyAction;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLoggerFactory;
 import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
 import fr.ens.biologie.genomique.eoulsan.EoulsanException;
-import fr.ens.biologie.genomique.eoulsan.EoulsanRuntime;
 import fr.ens.biologie.genomique.eoulsan.LocalEoulsanRuntime;
 
 /**
@@ -356,9 +357,19 @@ public class Main {
 
     // Action not found ?
     if (this.action == null) {
-      Common.showErrorMessageAndExit("Unknown action: "
-          + actionName + ".\n" + "type: " + Globals.APP_NAME_LOWER_CASE
-          + " -help for more help.\n");
+
+      // Legacy mode ?
+      Path path = Paths.get(this.args.get(optionsCount));
+      if (Files.isRegularFile(path)) {
+        this.action =
+            ActionService.getInstance().newService(LegacyAction.ACTION_NAME);
+        this.actionArgs = Collections.singletonList(path.toString());
+      } else {
+
+        Common.showErrorMessageAndExit("Unknown action: "
+            + actionName + ".\n" + "type: " + Globals.APP_NAME_LOWER_CASE
+            + " -help for more help.\n");
+      }
     }
   }
 

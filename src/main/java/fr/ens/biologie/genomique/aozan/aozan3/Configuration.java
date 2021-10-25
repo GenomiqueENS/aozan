@@ -2,6 +2,7 @@ package fr.ens.biologie.genomique.aozan.aozan3;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -332,6 +333,16 @@ public class Configuration {
    * @throws Aozan3Exception if an error occurs while reading the file
    */
   public void load(final Path file) throws Aozan3Exception {
+    load(file, false);
+  }
+
+  /**
+   * Load configuration.
+   * @param file file to save
+   * @throws Aozan3Exception if an error occurs while reading the file
+   */
+  public void load(final Path file, boolean aozan2Compatibility)
+      throws Aozan3Exception {
 
     try {
       for (String line : Files.readAllLines(file)) {
@@ -340,6 +351,23 @@ public class Configuration {
 
         if (trimmedLine.isEmpty() || trimmedLine.startsWith("#")) {
           continue;
+        }
+
+        // Handle "include" directive for Aozan 2 compatibility
+        if (trimmedLine.startsWith("include") && aozan2Compatibility) {
+
+          int index = trimmedLine.indexOf('=');
+          if (index >= 0) {
+
+            String key = trimmedLine.substring(0, index);
+            String value = trimmedLine.substring(index + 1);
+
+            if ("include".equals(key)) {
+              load(new File(value).toPath(), true);
+              System.out.println("Load include: " + value);
+              continue;
+            }
+          }
         }
 
         // Parse and set the line
