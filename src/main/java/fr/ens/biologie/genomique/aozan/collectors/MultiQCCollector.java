@@ -213,7 +213,7 @@ public class MultiQCCollector implements Collector {
           : SystemUtils.searchExecutableInPATH(MULTIQC_EXECUTABLE);
 
       if (multiQCExecutable == null
-          || Files.isExecutable(multiQCExecutable.toPath())) {
+          || !Files.isExecutable(multiQCExecutable.toPath())) {
         throw new IOException(
             "Unable to find \"" + MULTIQC_EXECUTABLE + "\" executable");
       }
