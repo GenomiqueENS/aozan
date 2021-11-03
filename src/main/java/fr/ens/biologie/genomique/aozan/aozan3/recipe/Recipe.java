@@ -17,6 +17,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
+import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 import fr.ens.biologie.genomique.aozan.aozan3.SendMail;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.DataProcessor.ProcessResult;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.InputData;
@@ -259,6 +260,10 @@ public class Recipe {
     execute(Collections.singletonList(runId));
   }
 
+  /**
+   * Execute a list of run Ids.
+   * @param runIds a list of run ids
+   */
   public void execute(List<String> runIds) {
 
     requireNonNull(runIds);
@@ -268,6 +273,25 @@ public class Recipe {
     } catch (Aozan3Exception e) {
       exitAozan(e);
     }
+  }
+
+  /**
+   * Get available runs.
+   * @return a set with available runs.
+   * @throws Aozan3Exception if an error occurs while getting the available runs
+   */
+  public Set<RunId> availableRuns() throws Aozan3Exception {
+
+    Set<RunId> result = new HashSet<>();
+
+    for (InputData inputData : runDataToProcess()) {
+
+      for (RunData runData : inputData.entries()) {
+        result.add(runData.getRunId());
+      }
+    }
+
+    return result;
   }
 
   //

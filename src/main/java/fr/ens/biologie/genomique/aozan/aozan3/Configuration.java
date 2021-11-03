@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -18,7 +18,7 @@ import java.util.NoSuchElementException;
  */
 public class Configuration {
 
-  private final Map<String, String> conf = new HashMap<>();
+  private final Map<String, String> conf = new LinkedHashMap<>();
 
   //
   // Getters
@@ -299,7 +299,7 @@ public class Configuration {
    */
   public Map<String, String> toMap() {
 
-    return new HashMap<String, String>(this.conf);
+    return new LinkedHashMap<String, String>(this.conf);
   }
 
   /**
