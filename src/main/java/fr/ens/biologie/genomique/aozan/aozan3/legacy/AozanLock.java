@@ -27,7 +27,8 @@ public class AozanLock {
   public void createLock() throws Aozan3Exception {
 
     try {
-      Files.write(this.lockFile, ("" + Common.getCurrentPid()).getBytes());
+      Files.write(this.lockFile,
+          ("" + Common.getCurrentPid() + '\n').getBytes());
     } catch (IOException e) {
       throw new Aozan3Exception("Unable to create the Aozan main lock", e);
     }

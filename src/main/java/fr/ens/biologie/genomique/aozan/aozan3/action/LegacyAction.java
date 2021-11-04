@@ -65,6 +65,9 @@ public class LegacyAction implements Action {
         return;
       }
 
+      // Create Aozan lock
+      mainLock.createLock();
+
       // Perform synchronization
       execute(recipes, recipes.getSyncStepRecipe(), recipes.getVarPath());
 
