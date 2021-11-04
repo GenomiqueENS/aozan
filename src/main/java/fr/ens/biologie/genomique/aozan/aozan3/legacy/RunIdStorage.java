@@ -70,7 +70,7 @@ public class RunIdStorage {
       raf.seek(f.length());
 
       // Add the run_id at the end of the file
-      raf.writeBytes(runId.toString().trim() + '\n');
+      raf.writeBytes(runId.getId().trim() + '\n');
 
       // Release locks
       if (lock != null) {
