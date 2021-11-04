@@ -2,6 +2,8 @@ package fr.ens.biologie.genomique.aozan.aozan3;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Objects;
+
 /**
  * This class define a run run identifier.
  * @author Laurent Jourdren
@@ -49,12 +51,35 @@ public class RunId {
 
   @Override
   public String toString() {
+
     return "RunId [id=" + this.id + ", originalId=" + this.originalId + "]";
   }
 
   //
   // Constructor
   //
+
+  @Override
+  public int hashCode() {
+
+    return Objects.hash(this.id, this.originalId);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+
+    if (this == obj) {
+      return true;
+    }
+
+    if (!(obj instanceof RunId)) {
+      return false;
+    }
+
+    RunId that = (RunId) obj;
+    return Objects.equals(this.id, that.id)
+        && Objects.equals(this.originalId, that.originalId);
+  }
 
   /**
    * Constructor for Gson
