@@ -253,26 +253,29 @@ public class Recipe {
    * @param runId the run identifier
    * @throws Aozan3Exception if an error occurs while executing the recipe
    */
-  public void execute(String runId) {
+  public boolean execute(String runId) {
 
     requireNonNull(runId);
 
-    execute(Collections.singletonList(runId));
+    return execute(Collections.singletonList(runId)).isEmpty() ? false : true;
   }
 
   /**
    * Execute a list of run Ids.
    * @param runIds a list of run ids
    */
-  public void execute(List<String> runIds) {
+  public Set<RunId> execute(List<String> runIds) {
 
     requireNonNull(runIds);
 
     try {
-      process(runDataToProcess(runIds));
+      return process(runDataToProcess(runIds));
     } catch (Aozan3Exception e) {
       exitAozan(e);
     }
+
+    // Non reachable code
+    return null;
   }
 
   /**
@@ -301,27 +304,35 @@ public class Recipe {
   /**
    * Execute the recipe on a list of run data
    * @param runs input runs
+   * @return a set with the processed runs
    * @throws Aozan3Exception if an error occurs while executing the recipe
    */
-  private void process(List<InputData> runs) throws Aozan3Exception {
+  private Set<RunId> process(List<InputData> runs) throws Aozan3Exception {
 
     requireNonNull(runs);
+    Set<RunId> result = new HashSet<>();
 
     for (InputData run : runs) {
-      process(run);
+      if (process(run)) {
+        result.add(run.getLastRunData().getRunId());
+      }
     }
+
+    return result;
   }
 
   /**
    * Execute the recipe on a run data.
    * @param runs input runs
+   * @return true if a run has been processed
    * @throws Aozan3Exception if an error occurs while executing the recipe
    */
-  private void process(InputData data) throws Aozan3Exception {
+  private boolean process(InputData data) throws Aozan3Exception {
 
     requireNonNull(data);
 
     String runId = data.getLastRunData().getRunId().getId();
+    boolean runProcessed = false;
 
     // Check if the recipe has been initialized
     if (!this.initialized) {
@@ -348,9 +359,11 @@ public class Recipe {
 
         this.logger.info(
             "End of step \"" + step.getName() + "\" for run " + runId + ".");
+        runProcessed = true;
       }
     }
 
+    return runProcessed;
   }
 
   //

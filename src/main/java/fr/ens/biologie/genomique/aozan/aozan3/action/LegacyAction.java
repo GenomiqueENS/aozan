@@ -92,6 +92,11 @@ public class LegacyAction implements Action {
 
   private static void execute(LegacyRecipes recipes, Recipe recipe,
       Path varPath) throws Aozan3Exception {
+    execute(recipes, recipe, varPath, null);
+  }
+
+  private static void execute(LegacyRecipes recipes, Recipe recipe,
+      Path varPath, Set<RunId> forbiddenRuns) throws Aozan3Exception {
 
     if (recipe == null) {
       return;
@@ -100,40 +105,65 @@ public class LegacyAction implements Action {
     // Get output path of the recipe
     Path outputPath = recipes.getOutputPath(recipe);
 
-    RunIdStorage runIdStorage = new RunIdStorage(
+    RunIdStorage processedRunIdStorage = new RunIdStorage(
         Paths.get(varPath.toString(), recipe.getName() + ".done"));
 
-    Set<RunId> availableRunIds = recipe.availableRuns();
-    Set<RunId> processedRunIds = runIdStorage.load();
+    // Run to process
+    Set<RunId> todoRunIds = new HashSet<>(recipe.availableRuns());
 
-    Set<RunId> todo = new HashSet<>(availableRunIds);
-    todo.removeAll(processedRunIds);
+    // Remove forbidden runs
+    if (forbiddenRuns != null) {
+      todoRunIds.removeAll(forbiddenRuns);
+    }
+
+    // Remove processed runs
+    Set<RunId> processed = processedRunIdStorage.load();
+    todoRunIds.removeAll(processed);
+
+    // Remove locked runs
+    Set<RunId> lockedRunIds = new HashSet<>();
+    for (RunId runId : todoRunIds) {
+      Path lockPath = Paths.get(outputPath.toString(), runId.getId() + ".lock");
+      if (Files.isRegularFile(lockPath)) {
+        lockedRunIds.add(runId);
+      }
+    }
+    todoRunIds.removeAll(lockedRunIds);
 
     // Nothing to do
-    if (todo.isEmpty()) {
+    if (todoRunIds.isEmpty()) {
       return;
     }
 
     // Initialize recipe
-    recipe.init();
-
-    // Execute the recipe for all available runs
-    for (RunId runId : todo) {
-
-      Path lockPath = Paths.get(outputPath.toString(), runId.getId() + ".lock");
-
-      // Lock the step, if a lock already exists, there is nothing to do
-      if (!lockStep(lockPath, recipe.getName())) {
-        continue;
-      }
-
-      recipe.execute(runId.getId());
-      runIdStorage.add(runId);
-
-      // Unlock the step
-      unlockStep(lockPath);
+    if (forbiddenRuns == null) {
+      recipe.init();
+      forbiddenRuns = new HashSet<>();
     }
 
+    // Get the first run
+    RunId runId = todoRunIds.iterator().next();
+
+    // Define lock path
+    Path lockPath = Paths.get(outputPath.toString(), runId.getId() + ".lock");
+
+    // Lock the step, if a lock already exists, there is nothing to do
+    if (!lockStep(lockPath, recipe.getName())) {
+      return;
+    }
+
+    // If run has been processed, add it to the list of processed runs
+    if (recipe.execute(runId.getId())) {
+      processedRunIdStorage.add(runId);
+    } else {
+      forbiddenRuns.add(runId);
+    }
+
+    // Unlock the step
+    unlockStep(lockPath);
+
+    // Search for new runs to process
+    execute(recipes, recipe, varPath, forbiddenRuns);
   }
 
   /**
