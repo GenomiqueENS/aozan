@@ -34,10 +34,6 @@ import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVWriter;
 import fr.ens.biologie.genomique.eoulsan.util.StringUtils;
-import fr.ens.biologie.genomique.eoulsan.util.process.DockerImageInstance;
-import fr.ens.biologie.genomique.eoulsan.util.process.FallBackDockerClient;
-import fr.ens.biologie.genomique.eoulsan.util.process.SimpleProcess;
-import fr.ens.biologie.genomique.eoulsan.util.process.SystemSimpleProcess;
 
 /**
  * This class define an abstract Illumina demultiplexing data processor.
@@ -256,7 +252,7 @@ public abstract class AbstractIlluminaDemuxDataProcessor
    * @param line line with the version of tool
    * @return the parsed version
    */
-  protected abstract String parseDemuxToolVersion(String line);
+  protected abstract String parseDemuxToolVersion(List<String> line);
 
   /**
    * Test if output directory must exists before launching demultiplexing.
@@ -291,8 +287,15 @@ public abstract class AbstractIlluminaDemuxDataProcessor
     requireNonNull(samplesheetPath);
     requireNonNull(conf);
 
+    // Define external tool
+    ExternalTool tool = new ExternalTool(getDemuxToolName(),
+        conf.getBoolean(getConfPrefix() + ".use.docker", false),
+        conf.get(getConfPrefix() + ".docker.image", ""), this.logger);
+
     // Get demultiplexing tool version
-    String toolVersion = getDemuxToolVersion(runId, conf);
+    String toolVersion = tool.getToolVersion(runId, conf.get("tmp.dir"),
+        asList(conf.get(getConfPrefix() + ".path", getDemuxToolName()),
+            "--version"), true, this::parseDemuxToolVersion);
 
     // Create command line
     List<String> commandLine = createDemuxCommandLine(inputPath, outputPath,
@@ -318,7 +321,7 @@ public abstract class AbstractIlluminaDemuxDataProcessor
 
     long startTime = System.currentTimeMillis();
 
-    final int exitValue = newSimpleProcess(runId, conf, true).execute(
+    final int exitValue = tool.newSimpleProcess(runId, true).execute(
         commandLine, workingDirectory, temporaryDirectory, stdoutFile,
         stderrFile, inputPath.toFile(), workingDirectory, temporaryDirectory);
 
@@ -339,110 +342,6 @@ public abstract class AbstractIlluminaDemuxDataProcessor
 
     this.logger.info(runId, "Successful demultiplexing in "
         + StringUtils.toTimeHumanReadable(endTime - startTime));
-  }
-
-  /**
-   * Create a new process.
-   * @param runId run id for logging
-   * @param runConf run configuration
-   * @param enableLogging enable logging
-   * @return a new SimpleProcess
-   * @throws IOException if an error occurs while creating the process
-   */
-  private SimpleProcess newSimpleProcess(final RunId runId,
-      final RunConfiguration runConf, boolean enableLogging)
-      throws IOException {
-
-    boolean dockerMode =
-        runConf.getBoolean(getConfPrefix() + ".use.docker", false);
-
-    if (enableLogging) {
-      this.logger.info(runId,
-          dockerMode
-              ? "Use Docker for executing " + getDemuxToolName()
-              : "Use installed version of " + getDemuxToolName());
-    }
-
-    if (!dockerMode) {
-      return new SystemSimpleProcess();
-    }
-
-    String dockerImage =
-        runConf.get(getConfPrefix() + ".docker.image", "").trim();
-
-    if (dockerImage.isEmpty()) {
-      throw new IOException(
-          "No docker image defined for " + getDemuxToolName());
-    }
-
-    if (enableLogging) {
-      this.logger.info(runId,
-          "Docker image to use for " + getDemuxToolName() + ": " + dockerImage);
-    }
-
-    // TODO The Spotify Docker client in Eoulsan does not seems to work anymore
-    // Use fallback Docker client
-    DockerImageInstance result =
-        new FallBackDockerClient().createConnection(dockerImage);
-
-    // Pull Docker image if not exists
-    result.pullImageIfNotExists();
-
-    return result;
-  }
-
-  /**
-   * Get demultiplexing executable version.
-   * @param runId the run Id
-   * @param runConf run configuration
-   * @return a string with the demultiplexing tool version
-   * @throws IOException if an error occurs while getting tool version
-   */
-  private String getDemuxToolVersion(final RunId runId,
-      final RunConfiguration runConf) throws IOException {
-
-    File tmpDir = new File(runConf.get("tmp.dir"));
-    List<String> commandLine =
-        asList(runConf.get(getConfPrefix() + ".path", getDemuxToolName()),
-            "--version");
-
-    File stdoutFile = Files
-        .createTempFile(tmpDir.toPath(), getConfPrefix() + "-version", ".out")
-        .toFile();
-    File stderrFile = Files
-        .createTempFile(tmpDir.toPath(), getConfPrefix() + "-version", ".err")
-        .toFile();
-
-    final int exitValue = newSimpleProcess(runId, runConf, false)
-        .execute(commandLine, tmpDir, tmpDir, stdoutFile, stderrFile, tmpDir);
-
-    // Launch demultiplexing tool
-    if (exitValue != 0) {
-      Files.delete(stdoutFile.toPath());
-      Files.delete(stderrFile.toPath());
-      throw new IOException("Unable to launch "
-          + getDemuxToolName() + " to get software version");
-    }
-
-    // Parse stderr file
-    String result = null;
-    for (String line : Files.readAllLines(stderrFile.toPath())) {
-
-      if (line.startsWith(getDemuxToolName())) {
-        result = parseDemuxToolVersion(line);
-        break;
-      }
-    }
-
-    // Delete output files
-    Files.delete(stdoutFile.toPath());
-    Files.delete(stderrFile.toPath());
-
-    if (result == null) {
-      throw new IOException("Unable to get " + getDemuxToolName() + " version");
-    }
-
-    return result;
   }
 
   private void saveSampleSheet(final RunId runId, final SampleSheet samplesheet,

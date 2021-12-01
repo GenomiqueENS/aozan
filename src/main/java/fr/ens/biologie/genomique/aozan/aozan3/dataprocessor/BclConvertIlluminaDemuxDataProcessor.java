@@ -82,13 +82,20 @@ public class BclConvertIlluminaDemuxDataProcessor
   }
 
   @Override
-  protected String parseDemuxToolVersion(String line) {
+  protected String parseDemuxToolVersion(List<String> lines) {
 
-    String result = line.substring("bcl-convert Version ".length());
-    int index = result.replace("00.000.000.", "").indexOf('-');
-    if (index != -1) {
+    for (String line : lines) {
 
-      return result.substring(0, index);
+      if (line.startsWith(getDemuxToolName())) {
+        String result = line.substring("bcl-convert Version ".length());
+        int index = result.replace("00.000.000.", "").indexOf('-');
+        if (index != -1) {
+
+          return result.substring(0, index);
+        }
+
+        return null;
+      }
     }
 
     return null;

@@ -126,9 +126,16 @@ public class Bcl2FastqIlluminaDemuxDataProcessor
   }
 
   @Override
-  protected String parseDemuxToolVersion(String line) {
+  protected String parseDemuxToolVersion(List<String> lines) {
 
-    return line.substring("bcl2fastq v".length());
+    for (String line : lines) {
+
+      if (line.startsWith(getDemuxToolName())) {
+        return line.substring("bcl2fastq v".length());
+      }
+    }
+
+    return null;
   }
 
   @Override
