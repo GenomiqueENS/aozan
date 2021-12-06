@@ -7,7 +7,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.ens.biologie.genomique.aozan.AozanException;
+import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
+import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.biologie.genomique.eoulsan.util.StringUtils;
 
 /**
@@ -105,6 +109,17 @@ public class BclConvertIlluminaDemuxDataProcessor
   protected boolean isOutputMustExists() {
 
     return false;
+  }
+
+  @Override
+  protected void processSampleSheet(SampleSheet samplesheet)
+      throws Aozan3Exception {
+
+    try {
+      SampleSheetUtils.removeBclConvertDataForbiddenFields(samplesheet);
+    } catch (AozanException e) {
+      throw new Aozan3Exception(e);
+    }
   }
 
 }

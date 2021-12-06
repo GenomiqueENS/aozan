@@ -616,6 +616,45 @@ public class SampleSheetUtils {
 
   }
 
+  /**
+   * Remove forbidden field in BCLConvert_Data section.
+   * @param samplesheet samplesheet to process
+   * @throws AozanException if the section does not exists
+   */
+  public static void removeBclConvertDataForbiddenFields(
+      SampleSheet samplesheet) throws AozanException {
+
+    requireNonNull(samplesheet);
+
+    if (!samplesheet.containsSection(SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME)) {
+      throw new AozanException("No section "
+          + SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME + " found in samplesheet");
+    }
+
+    TableSection demuxTable =
+        samplesheet.getTableSection(SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME);
+
+    for (String fieldName : demuxTable.getSamplesFieldNames()) {
+
+      switch (fieldName.toLowerCase().trim()) {
+
+      case "lane":
+      case "sample_id":
+      case "index":
+      case "index2":
+      case "sample_project":
+        break;
+
+      default:
+
+        for (Sample s : demuxTable.getSamples()) {
+          s.remove(fieldName);
+        }
+        break;
+      }
+    }
+  }
+
   //
   // Constructor
   //

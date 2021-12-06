@@ -153,6 +153,8 @@ public abstract class AbstractIlluminaDemuxDataProcessor
       SampleSheet samplesheet = SampleSheetUtils
           .parseCSVSamplesheet(conf.get("illumina.samplesheet"));
 
+      processSampleSheet(samplesheet);
+
       final Path samplesheetPath;
 
       // Create output directory before demux if required
@@ -295,7 +297,8 @@ public abstract class AbstractIlluminaDemuxDataProcessor
     // Get demultiplexing tool version
     String toolVersion = tool.getToolVersion(runId, conf.get("tmp.dir"),
         asList(conf.get(getConfPrefix() + ".path", getDemuxToolName()),
-            "--version"), true, this::parseDemuxToolVersion);
+            "--version"),
+        true, this::parseDemuxToolVersion);
 
     // Create command line
     List<String> commandLine = createDemuxCommandLine(inputPath, outputPath,
@@ -370,6 +373,14 @@ public abstract class AbstractIlluminaDemuxDataProcessor
       args.add(conf.get(confKey));
     }
 
+  }
+
+  /**
+   * Process sample sheet.
+   * @param samplesheet sample sheet to process
+   */
+  protected void processSampleSheet(SampleSheet samplesheet)
+      throws Aozan3Exception {
   }
 
 }

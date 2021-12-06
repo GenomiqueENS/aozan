@@ -342,6 +342,15 @@ public class Sample {
     return isField(SAMPLE_REF_FIELD_NAME);
   }
 
+  /**
+   * Remove value.
+   * @param fieldName field to remove
+   */
+  public void remove(final String fieldName) {
+
+    this.map.remove(fieldName);
+  }
+
   //
   // Other methods
   //
