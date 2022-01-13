@@ -1,12 +1,17 @@
 package fr.ens.biologie.genomique.aozan.aozan3.util;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -63,6 +68,112 @@ public class DiskUtils {
     }
 
     return Long.parseLong(sb.toString().split("\t")[0]);
+  }
+
+  /**
+   * Recursively change the owner of a directory.
+   * @param directory the directory
+   * @param owner the new owner of the directory
+   * @throws IOException if an error occurs while changing the owner of the
+   *           directory
+   */
+  public static void changeDirectoryOwner(Path directory, String owner)
+      throws IOException {
+
+    changeDirectoryOwner(directory, owner, null);
+  }
+
+  /**
+   * Recursively change the owner of a directory.
+   * @param directory the directory
+   * @param owner the new owner of the directory
+   * @param group the new group of the directory
+   * @throws IOException if an error occurs while changing the owner of the
+   *           directory
+   */
+  public static void changeDirectoryOwner(Path directory, String user,
+      String group) throws IOException {
+
+    requireNonNull(directory);
+    requireNonNull(user);
+
+    if (!Files.isDirectory(directory)) {
+      throw new IOException("Directory does not exists: " + directory);
+    }
+
+    if (user.trim().isEmpty()) {
+      throw new IllegalArgumentException("user argument cannot be empty");
+    }
+
+    if (group != null && group.trim().isEmpty()) {
+      throw new IllegalArgumentException("group argument cannot be empty");
+    }
+
+    List<String> commandLine = new ArrayList<>();
+    commandLine.add("chown");
+    commandLine.add("-R");
+    commandLine.add(user.trim() + (group != null ? ':' + group.trim() : ""));
+    commandLine.add(directory.toAbsolutePath().toString());
+
+    ProcessBuilder pb = new ProcessBuilder(commandLine);
+    pb.redirectOutput(new File("/home/jourdren/tmp/chown.out"));
+    pb.redirectError(new File("/home/jourdren/tmp/chown.err"));
+
+    try {
+      int exitValue = pb.start().waitFor();
+
+      if (exitValue != 0) {
+        throw new IOException(
+            "Error while performing chown, exit code: " + exitValue);
+      }
+
+    } catch (InterruptedException | IOException e) {
+      throw new IOException("Error while performing chown", e);
+    }
+  }
+
+  /**
+   * Recursively change the mode of a directory.
+   * @param directory the directory
+   * @param mode the new mode of the directory and its files and subdirectories
+   * @throws IOException if an error occurs while changing the owner of the
+   *           directory
+   */
+  public static void changeDirectoryMode(Path directory, String mode)
+      throws IOException {
+
+    requireNonNull(directory);
+    requireNonNull(mode);
+
+    if (!Files.isDirectory(directory)) {
+      throw new IOException("Directory does not exists: " + directory);
+    }
+
+    if (mode.trim().isEmpty()) {
+      throw new IllegalArgumentException("mode argument cannot be empty");
+    }
+
+    List<String> commandLine = new ArrayList<>();
+    commandLine.add("chmod");
+    commandLine.add("-R");
+    commandLine.add(mode.trim());
+    commandLine.add(directory.toAbsolutePath().toString());
+
+    ProcessBuilder pb = new ProcessBuilder(commandLine);
+    pb.redirectOutput(new File("/home/jourdren/tmp/chmod.out"));
+    pb.redirectError(new File("/home/jourdren/tmp/chmod.err"));
+
+    try {
+      int exitValue = pb.start().waitFor();
+
+      if (exitValue != 0) {
+        throw new IOException(
+            "Error while performing chmod, exit code: " + exitValue);
+      }
+
+    } catch (InterruptedException | IOException e) {
+      throw new IOException("Error while performing chmod", e);
+    }
   }
 
   //
