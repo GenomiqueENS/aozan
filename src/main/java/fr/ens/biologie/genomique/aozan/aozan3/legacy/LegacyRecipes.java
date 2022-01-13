@@ -176,6 +176,16 @@ public class LegacyRecipes {
     // Mode debug
     // aozan.debug=False
 
+    // Sequencer names
+    for (Map.Entry<String, String> e : aozan2Conf.toMap().entrySet()) {
+
+      String key = e.getKey();
+
+      if (key != null && key.startsWith("sequencer.name.")) {
+        conf.set(e.getKey(), e.getValue());
+      }
+    }
+
     // Enable email sending
     setSetting(conf, aozan2Conf, "send.mail", "send.mail", "False");
 
