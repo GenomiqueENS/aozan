@@ -55,6 +55,9 @@ public class DataType {
       new DataType(Category.PROCESSED, SequencingTechnology.ILLUMINA,
           "illumina_fastq", false, true);
 
+  public static final DataType FAST5_TAR =
+      new DataType(Category.RAW, SequencingTechnology.NANOPORE, "fast5_tar");
+
   //
   // Getters
   //
