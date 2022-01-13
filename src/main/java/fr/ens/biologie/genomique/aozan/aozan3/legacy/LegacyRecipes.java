@@ -190,7 +190,7 @@ public class LegacyRecipes {
     setSetting(conf, aozan2Conf, "send.mail", "send.mail", "False");
 
     // SMTP server name
-    setSetting(conf, aozan2Conf, "smtp.host", "mail.smtp.host");
+    setSetting(conf, aozan2Conf, "smtp.server", "mail.smtp.host");
 
     // SMTP server port
     setSetting(conf, aozan2Conf, "smtp.port", "mail.smtp.port", "25");
