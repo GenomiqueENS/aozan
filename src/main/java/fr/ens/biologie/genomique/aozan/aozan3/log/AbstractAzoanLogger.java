@@ -115,12 +115,22 @@ public abstract class AbstractAzoanLogger implements AozanLogger {
 
   @Override
   public void flush() {
-    getLogger().getHandlers()[0].flush();
+
+    Handler[] handlers = getLogger().getHandlers();
+
+    if (handlers != null && handlers.length > 0) {
+      getLogger().getHandlers()[0].flush();
+    }
   }
 
   @Override
   public void close() {
-    getLogger().removeHandler(getLogger().getHandlers()[0]);
+
+    Handler[] handlers = getLogger().getHandlers();
+
+    if (handlers != null && handlers.length > 0) {
+      getLogger().removeHandler(getLogger().getHandlers()[0]);
+    }
   }
 
   //
