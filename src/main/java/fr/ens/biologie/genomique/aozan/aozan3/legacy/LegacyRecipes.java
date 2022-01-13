@@ -21,6 +21,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.IlluminaSyncDataProc
 import fr.ens.biologie.genomique.aozan.aozan3.dataprovider.IlluminaProcessedRunDataProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprovider.IlluminaRawRunDataProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
+import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLoggerFactory;
 import fr.ens.biologie.genomique.aozan.aozan3.recipe.Recipe;
 import fr.ens.biologie.genomique.aozan.aozan3.recipe.Step;
 import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.EmptyRunConfigurationProvider;
@@ -419,6 +420,23 @@ public class LegacyRecipes {
         "The \"" + key + "\" setting has not been defined");
   }
 
+  private static AozanLogger createLogger(Configuration aozan2Conf,
+      AozanLogger currentLogger) throws Aozan3Exception {
+
+    if (aozan2Conf.containsKey("aozan.log.path")) {
+
+      Configuration logConf = new Configuration();
+      logConf.set("aozan.logger", "file");
+      logConf.set("aozan.log", aozan2Conf.get("aozan.log.path"));
+
+      // TODO Handle log level in aozan.log.level setting
+
+      return AozanLoggerFactory.newLogger(logConf, currentLogger);
+    }
+
+    return currentLogger;
+  }
+
   //
   // Constructor
   //
@@ -437,6 +455,9 @@ public class LegacyRecipes {
       // Aozan is not enabled, nothing to do
       return;
     }
+
+    // Change logger if required in Aozan 2 conf
+    logger = createLogger(aozan2Conf, logger);
 
     // Get the var path
     this.varPath = Paths.get(checkAndGetSetting(aozan2Conf, "aozan.var.path"));
