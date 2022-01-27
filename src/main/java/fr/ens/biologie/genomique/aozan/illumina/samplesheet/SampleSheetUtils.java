@@ -638,11 +638,11 @@ public class SampleSheetUtils {
 
       switch (fieldName.toLowerCase().trim()) {
 
-      case "lane":
-      case "sample_id":
-      case "index":
-      case "index2":
-      case "sample_project":
+      case Sample.LANE_FIELD_NAME:
+      case Sample.SAMPLE_ID_FIELD_NAME:
+      case Sample.INDEX1_FIELD_NAME:
+      case Sample.INDEX2_FIELD_NAME:
+      case Sample.PROJECT_FIELD_NAME:
         break;
 
       default:
