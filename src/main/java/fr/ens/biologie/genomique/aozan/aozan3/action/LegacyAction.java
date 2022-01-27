@@ -116,6 +116,11 @@ public class LegacyAction implements Action {
       todoRunIds.removeAll(forbiddenRuns);
     }
 
+    // Remove runs in .deny file
+    RunIdStorage denyRunIdStorage = new RunIdStorage(
+        Paths.get(varPath.toString(), recipe.getName() + ".deny"));
+    todoRunIds.removeAll(denyRunIdStorage.load());
+
     // Remove processed runs
     Set<RunId> processed = processedRunIdStorage.load();
     todoRunIds.removeAll(processed);
