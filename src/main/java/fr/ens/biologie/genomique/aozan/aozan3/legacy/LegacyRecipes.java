@@ -24,7 +24,6 @@ import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLoggerFactory;
 import fr.ens.biologie.genomique.aozan.aozan3.recipe.Recipe;
 import fr.ens.biologie.genomique.aozan.aozan3.recipe.Step;
-import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.EmptyRunConfigurationProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.IlluminaSamplesheetRunConfigurationProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.RunConfigurationProvider;
 
@@ -326,12 +325,16 @@ public class LegacyRecipes {
     recipe.addStorage(outputStorageName, new DataStorage("local", qcPath));
     this.outputPaths.put(recipe, qcPath);
 
+    // Run configuration provider
+    RunConfigurationProvider runConfProvider =
+        createRunConfProvider(recipe, aozan2Conf);
+
     // Define step configuration
     Configuration stepConf = new Configuration(aozan2Conf);
 
     Step qcStep = new Step(recipe, "qcstep",
         Aozan2QCDataProcessor.PROCESSOR_NAME, outputStorageName, stepConf,
-        new EmptyRunConfigurationProvider(), new DefaultRunIdGenerator());
+        runConfProvider, new DefaultRunIdGenerator());
 
     recipe.addStep(qcStep);
 

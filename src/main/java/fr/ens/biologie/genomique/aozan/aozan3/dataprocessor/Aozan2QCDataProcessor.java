@@ -33,6 +33,8 @@ import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.SimpleDataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
+import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
 
 /**
  * This class define an Aozan 2 QC data processor.
@@ -128,6 +130,14 @@ public class Aozan2QCDataProcessor implements DataProcessor {
 
     try {
 
+      // Check if a samplesheet exists
+      if (!conf.containsKey("illumina.samplesheet")) {
+        throw new IOException("No samplesheet found");
+      }
+
+      SampleSheet samplesheet =
+          SampleSheetUtils.deSerialize(conf.get("illumina.samplesheet"));
+
       // Check if the input and output storage are equals
       if (this.outputStorage.getPath()
           .equals(fastqRunData.getLocation().getStorage().getPath())) {
@@ -158,8 +168,8 @@ public class Aozan2QCDataProcessor implements DataProcessor {
       long startTime = System.currentTimeMillis();
 
       // Perform QC
-      qc(conf, bclLocation, fastqLocation, outputLocation, runId, writeDataFile,
-          writeXMLFile, writeHTMLFile);
+      qc(conf, bclLocation, fastqLocation, outputLocation, runId, samplesheet,
+          writeDataFile, writeXMLFile, writeHTMLFile);
 
       long endTime = System.currentTimeMillis();
 
@@ -208,8 +218,8 @@ public class Aozan2QCDataProcessor implements DataProcessor {
 
   private static void qc(RunConfiguration conf, DataLocation bclLocation,
       DataLocation fastqLocation, DataLocation outputLocation, RunId runId,
-      boolean writeDataFile, boolean writeXMLFile, boolean writeHTMLFile)
-      throws AozanException {
+      SampleSheet sampleSheet, boolean writeDataFile, boolean writeXMLFile,
+      boolean writeHTMLFile) throws AozanException {
 
     requireNonNull(conf);
     requireNonNull(bclLocation);
@@ -230,7 +240,7 @@ public class Aozan2QCDataProcessor implements DataProcessor {
     // TODO Create a constructor with File or Path Object types instead of
     // String for path
     QC qc = new QC(settings, bclDir, fastqDir, qcDir, temporaryDirectory,
-        illuminaRunId);
+        illuminaRunId, sampleSheet);
 
     // Compute report
     QCReport qcReport = qc.computeReport();
