@@ -655,6 +655,26 @@ public class SampleSheetUtils {
     }
   }
 
+  /**
+   * Serialize a sample sheet.
+   * @param sampleSheet the sample sheet to serialize
+   * @return a String with a serialized sample sheet.
+   */
+  public static String serialize(SampleSheet sampleSheet) {
+
+    return toSampleSheetV2CSV(sampleSheet);
+  }
+
+  /**
+   * Deserialize a sample sheet.
+   * @param s String to deserialize
+   * @return a SampleSheet object.
+   */
+  public static SampleSheet deSerialize(String s) throws IOException {
+
+    return parseCSVSamplesheet(s);
+  }
+
   //
   // Constructor
   //

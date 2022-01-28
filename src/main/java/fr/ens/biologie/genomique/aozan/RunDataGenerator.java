@@ -86,8 +86,8 @@ public class RunDataGenerator {
       throw new AozanException("RTA output directory is not set.");
     }
 
-    if (!this.generatorsProperties.containsKey(QC.BCL2FASTQ_SAMPLESHEET_PATH)) {
-      throw new AozanException("Bcl2fastq samplesheet file path is not set.");
+    if (!this.generatorsProperties.containsKey(QC.SAMPLESHEET)) {
+      throw new AozanException("Samplesheet is not set.");
     }
 
     if (!this.generatorsProperties.containsKey(QC.BCL2FASTQ_OUTPUT_DIR)) {

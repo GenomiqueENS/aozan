@@ -37,6 +37,7 @@ import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput;
+import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 
 public class DemultiplexingCollector implements Collector {
 
@@ -48,7 +49,7 @@ public class DemultiplexingCollector implements Collector {
 
   private QC qc;
   private File bcl2fastqOutputPath;
-  private File samplesheetFile;
+  private SampleSheet samplesheet;
   private CollectorConfiguration conf;
 
   //
@@ -77,7 +78,7 @@ public class DemultiplexingCollector implements Collector {
 
     this.qc = qc;
     this.bcl2fastqOutputPath = qc.getFastqDir();
-    this.samplesheetFile = qc.getSampleSheetFile();
+    this.samplesheet = qc.getSampleSheet();
     this.conf = new CollectorConfiguration(conf);
   }
 
@@ -91,7 +92,7 @@ public class DemultiplexingCollector implements Collector {
 
     try {
       manager =
-          new Bcl2FastqOutput(this.samplesheetFile, this.bcl2fastqOutputPath);
+          new Bcl2FastqOutput(this.samplesheet, this.bcl2fastqOutputPath);
     } catch (IOException e) {
       throw new AozanException(e);
     }

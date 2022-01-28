@@ -39,6 +39,7 @@ import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
+import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 
 /**
  * This class execute fastqscreen pair-end mode or single-end.
@@ -57,13 +58,13 @@ public class FastqScreen {
 
   // Fields for delayed initialization of fastqScreenGenomes
   private FastqScreenGenomes fastqScreenGenomes;
-  private final File samplesheetFile;
+  private final SampleSheet sampleSheet;
   private final String contaminantGenomeNames;
 
   public FastqScreenGenomes getFastqScreenGenomes() throws AozanException {
 
     if (this.fastqScreenGenomes == null) {
-      this.fastqScreenGenomes = new FastqScreenGenomes(this.samplesheetFile,
+      this.fastqScreenGenomes = new FastqScreenGenomes(this.sampleSheet,
           this.contaminantGenomeNames);
     }
 
@@ -180,7 +181,8 @@ public class FastqScreen {
     this.confThreads = conf.getInt(Settings.QC_CONF_THREADS_KEY, -1);
 
     // Fields required to initialize fastqScreenGenomes
-    this.samplesheetFile = conf.getFile(QC.BCL2FASTQ_SAMPLESHEET_PATH);
+    this.sampleSheet = conf.getSampleSheet(QC.SAMPLESHEET);
+
     this.contaminantGenomeNames =
         conf.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
 

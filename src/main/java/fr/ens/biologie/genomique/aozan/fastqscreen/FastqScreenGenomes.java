@@ -23,10 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.fastqscreen;
 
-
 import static java.util.Objects.requireNonNull;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -43,7 +41,6 @@ import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
 import fr.ens.biologie.genomique.eoulsan.bio.GenomeDescription;
 import fr.ens.biologie.genomique.eoulsan.data.DataFile;
@@ -136,54 +133,30 @@ public class FastqScreenGenomes {
    * @return collection on genomes reference names for the samples
    */
   private Set<String> createSampleRefsFromSamplesheetFile(
-      final File samplesheetFile) {
+      final SampleSheet samplesheet) {
 
     final Set<String> genomesFromSamplesheet = new HashSet<>();
 
-    if (samplesheetFile.exists() && samplesheetFile.isFile()) {
+    // Retrieve all genome sample included in Bcl2fastq samplesheet file
+    for (final Sample sample : samplesheet) {
 
-      final SampleSheetCSVReader samplesheetReader;
-      final SampleSheet samplesheet;
+      if (sample.isSampleRefField()) {
 
-      try {
-        // Reading Bcl2fastq samplesheet file in format csv
-        samplesheetReader = new SampleSheetCSVReader(samplesheetFile);
-        samplesheet = samplesheetReader.read();
+        String genomeSample =
+            sample.getSampleRef().replaceAll("\"", "").toLowerCase();
 
-      } catch (final Exception e) {
-        // Return empty list
-        return Collections.emptySet();
+        // Replace all symbols not letters or numbers by space
+        genomeSample = PATTERN.matcher(genomeSample).replaceAll(" ");
+
+        genomesFromSamplesheet.add(genomeSample.trim());
       }
-
-      // Retrieve all genome sample included in Bcl2fastq samplesheet file
-      for (final Sample sample : samplesheet) {
-
-        if (sample.isSampleRefField()) {
-
-          String genomeSample =
-              sample.getSampleRef().replaceAll("\"", "").toLowerCase();
-
-          // Replace all symbols not letters or numbers by space
-          genomeSample = PATTERN.matcher(genomeSample).replaceAll(" ");
-
-          genomesFromSamplesheet.add(genomeSample.trim());
-        }
-      }
-
-      // TODO
-      LOGGER
-          .warning("FQS-genomeMapper: list genome names found in samplesheet: "
-              + Joiner.on(", ").join(genomesFromSamplesheet));
-
-      return genomesFromSamplesheet;
-
     }
-    // TODO
-    LOGGER.warning("FQS-genomeMapper: no genome name found in samplesheet file "
-        + samplesheetFile.getAbsolutePath());
 
-    // Fail to read the samplesheet file
-    return Collections.emptySet();
+    // TODO
+    LOGGER.warning("FQS-genomeMapper: list genome names found in samplesheet: "
+        + Joiner.on(", ").join(genomesFromSamplesheet));
+
+    return genomesFromSamplesheet;
   }
 
   /**
@@ -261,12 +234,12 @@ public class FastqScreenGenomes {
     requireNonNull(testConfiguration,
         "testConfiguration argument cannot be null");
 
-    final File samplesheetFile =
-        new File(testConfiguration.get(QC.BCL2FASTQ_SAMPLESHEET_PATH));
+    final SampleSheet samplesheet =
+        testConfiguration.getSampleSheet(QC.SAMPLESHEET);
     final String contaminantGenomeNames =
         testConfiguration.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
 
-    return new FastqScreenGenomes(samplesheetFile, contaminantGenomeNames);
+    return new FastqScreenGenomes(samplesheet, contaminantGenomeNames);
   }
 
   //
@@ -275,15 +248,15 @@ public class FastqScreenGenomes {
 
   /**
    * Public constructor.
-   * @param samplesheetFile samplesheet file
+   * @param samplesheet sampleSheet file
    * @param contaminantGenomeNames a string with the list of the contaminant
    *          genomes
    * @throws AozanException if an error occurs while creating the object
    */
-  public FastqScreenGenomes(final File samplesheetFile,
+  public FastqScreenGenomes(final SampleSheet samplesheet,
       final String contaminantGenomeNames) throws AozanException {
 
-    requireNonNull(samplesheetFile, "samplesheetFile argument cannot be null");
+    requireNonNull(samplesheet, "sampleSheet argument cannot be null");
     requireNonNull(contaminantGenomeNames,
         "contaminantGenomeNames argument cannot be null");
 
@@ -292,7 +265,7 @@ public class FastqScreenGenomes {
 
     // Collect genomes useful to contaminant detection
     this.sampleGenomes =
-        initSampleGenomes(createSampleRefsFromSamplesheetFile(samplesheetFile));
+        initSampleGenomes(createSampleRefsFromSamplesheetFile(samplesheet));
   }
 
 }

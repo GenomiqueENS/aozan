@@ -23,8 +23,6 @@
 
 package fr.ens.biologie.genomique.aozan.collectors;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -47,7 +45,6 @@ import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeAliases;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 
 /**
  * This class define a Bcl2fastq samplesheet collector.
@@ -61,7 +58,7 @@ public class SamplesheetCollector implements Collector {
 
   public static final String SAMPLESHEET_DATA_PREFIX = "samplesheet";
 
-  private File samplesheetFile;
+  private SampleSheet samplesheet;
 
   /**
    * This private class define a pooled sample.
@@ -144,9 +141,9 @@ public class SamplesheetCollector implements Collector {
     }
 
     // Initialize Genome aliases
-    //GenomeAliases.initialize(settings);
+    // GenomeAliases.initialize(settings);
 
-    this.samplesheetFile = qc.getSampleSheetFile();
+    this.samplesheet = qc.getSampleSheet();
   }
 
   @Override
@@ -156,168 +153,152 @@ public class SamplesheetCollector implements Collector {
       return;
     }
 
-    try {
-      final Multimap<Integer, Integer> samplesInLane =
-          ArrayListMultimap.create();
-      final Set<String> projectNames = new LinkedHashSet<>();
-      final Multimap<String, Integer> projectSamples =
-          ArrayListMultimap.create();
-      final Multimap<PooledSample, Integer> pooledSamples =
-          ArrayListMultimap.create();
+    final Multimap<Integer, Integer> samplesInLane = ArrayListMultimap.create();
+    final Set<String> projectNames = new LinkedHashSet<>();
+    final Multimap<String, Integer> projectSamples = ArrayListMultimap.create();
+    final Multimap<PooledSample, Integer> pooledSamples =
+        ArrayListMultimap.create();
 
-      // Read Bcl2fastq samplesheet
-      final SampleSheet samplesheet;
-      try (SampleSheetCSVReader reader =
-          new SampleSheetCSVReader(this.samplesheetFile)) {
-        samplesheet = reader.read();
+    int sampleNumber = 0;
+    final Set<Integer> lanes = new HashSet<>();
+    final Set<Integer> indexedLanes = new HashSet<>();
+
+    // TODO handle empty samplesheet where a sample is create by lane
+    // TODO save pooled samples
+
+    for (final Sample s : SampleSheetUtils
+        .getCheckedDemuxTableSection(this.samplesheet)) {
+
+      sampleNumber++;
+
+      final String prefix = SAMPLESHEET_DATA_PREFIX + ".sample" + sampleNumber;
+
+      final String id = s.getSampleId();
+      final String name = s.getSampleName();
+      final String demuxName = s.getDemultiplexingName();
+      final int lane = s.getLane();
+      final String project = Strings.nullToEmpty(s.getSampleProject());
+      final String index1 = Strings.nullToEmpty(s.getIndex1());
+      final String index2 = Strings.nullToEmpty(s.getIndex2());
+      final String ref = Strings.nullToEmpty(s.getSampleRef());
+      final String normalizedRef = GenomeAliases.getInstance().get(ref);
+
+      data.put(prefix + ".id", id);
+      data.put(prefix + ".name", name);
+      data.put(prefix + ".demux.name", demuxName);
+      data.put(prefix + ".lane", lane);
+      data.put(prefix + ".undetermined", false);
+      data.put(prefix + ".ref", ref);
+      data.put(prefix + ".normalized.ref", normalizedRef);
+      data.put(prefix + ".indexed", s.isIndexed());
+      data.put(prefix + ".index", index1);
+      data.put(prefix + ".description", s.getDescription());
+      data.put(prefix + ".project", project);
+
+      lanes.add(s.getLane());
+      if (s.isIndexed()) {
+        indexedLanes.add(s.getLane());
       }
 
-      int sampleNumber = 0;
-      final Set<Integer> lanes = new HashSet<>();
-      final Set<Integer> indexedLanes = new HashSet<>();
+      if (s.isDualIndexed()) {
+        data.put(prefix + ".index2", index2);
+      }
 
-      // TODO handle empty samplesheet where a sample is create by lane
-      // TODO save pooled samples
+      projectSamples.put(project, sampleNumber);
+      pooledSamples.put(new PooledSample(project, demuxName, index1, index2,
+          ref, normalizedRef), sampleNumber);
+      samplesInLane.put(lane, sampleNumber);
 
-      for (final Sample s : SampleSheetUtils
-          .getCheckedDemuxTableSection(samplesheet)) {
+      // Extract data exist only with first version
+      switch (s.getSampleSheet().getVersion()) {
+
+      case 1:
+
+        data.put(prefix + ".flow.cell.id", s.get("FCID"));
+        data.put(prefix + ".control", s.get("Control"));
+        data.put(prefix + ".recipe", s.get("Recipe"));
+        data.put(prefix + ".operator", s.get("Operator"));
+        break;
+
+      case 2:
+
+        // Include additional columns
+        for (String fieldName : s.getFieldNames()) {
+
+          if (!Sample.isInternalField(fieldName)) {
+            data.put(
+                prefix + "." + fieldName.replaceAll(" _-", ".").toLowerCase(),
+                s.get(fieldName));
+          }
+        }
+        break;
+
+      default:
+
+        throw new AozanException(
+            "Samplesheet collector bcl2fastq version is invalid: "
+                + s.getSampleSheet().getVersion());
+      }
+
+      // List projects in run
+      projectNames.add(project);
+    }
+
+    // Add undetermined samples
+    final List<String> undeterminedSamples = new ArrayList<>();
+    for (int lane : lanes) {
+
+      if (indexedLanes.contains(lane)) {
 
         sampleNumber++;
 
         final String prefix =
             SAMPLESHEET_DATA_PREFIX + ".sample" + sampleNumber;
-
-        final String id = s.getSampleId();
-        final String name = s.getSampleName();
-        final String demuxName = s.getDemultiplexingName();
-        final int lane = s.getLane();
-        final String project = Strings.nullToEmpty(s.getSampleProject());
-        final String index1 = Strings.nullToEmpty(s.getIndex1());
-        final String index2 = Strings.nullToEmpty(s.getIndex2());
-        final String ref = Strings.nullToEmpty(s.getSampleRef());
-        final String normalizedRef = GenomeAliases.getInstance().get(ref);
-
-        data.put(prefix + ".id", id);
-        data.put(prefix + ".name", name);
-        data.put(prefix + ".demux.name", demuxName);
+        data.put(prefix + ".id", "undetermined");
         data.put(prefix + ".lane", lane);
-        data.put(prefix + ".undetermined", false);
-        data.put(prefix + ".ref", ref);
-        data.put(prefix + ".normalized.ref", normalizedRef);
-        data.put(prefix + ".indexed", s.isIndexed());
-        data.put(prefix + ".index", index1);
-        data.put(prefix + ".description", s.getDescription());
-        data.put(prefix + ".project", project);
+        data.put(prefix + ".undetermined", true);
+        data.put(prefix + ".ref", "");
+        data.put(prefix + ".normalized.ref", "");
+        data.put(prefix + ".indexed", false);
+        data.put(prefix + ".index", "");
+        data.put(prefix + ".description", "");
+        data.put(prefix + ".project", "");
 
-        lanes.add(s.getLane());
-        if (s.isIndexed()) {
-          indexedLanes.add(s.getLane());
-        }
-
-        if (s.isDualIndexed()) {
-          data.put(prefix + ".index2", index2);
-        }
-
-        projectSamples.put(project, sampleNumber);
-        pooledSamples.put(new PooledSample(project, demuxName, index1, index2,
-            ref, normalizedRef),
+        data.put(
+            SAMPLESHEET_DATA_PREFIX + ".lane" + lane + ".undetermined.sample",
             sampleNumber);
+        undeterminedSamples.add(Integer.toString(sampleNumber));
         samplesInLane.put(lane, sampleNumber);
-
-        // Extract data exist only with first version
-        switch (s.getSampleSheet().getVersion()) {
-
-        case 1:
-
-          data.put(prefix + ".flow.cell.id", s.get("FCID"));
-          data.put(prefix + ".control", s.get("Control"));
-          data.put(prefix + ".recipe", s.get("Recipe"));
-          data.put(prefix + ".operator", s.get("Operator"));
-          break;
-
-        case 2:
-
-          // Include additional columns
-          for (String fieldName : s.getFieldNames()) {
-
-            if (!Sample.isInternalField(fieldName)) {
-              data.put(
-                  prefix + "." + fieldName.replaceAll(" _-", ".").toLowerCase(),
-                  s.get(fieldName));
-            }
-          }
-          break;
-
-        default:
-
-          throw new AozanException(
-              "Samplesheet collector bcl2fastq version is invalid: "
-                  + s.getSampleSheet().getVersion());
-        }
-
-        // List projects in run
-        projectNames.add(project);
       }
-
-      // Add undetermined samples
-      final List<String> undeterminedSamples = new ArrayList<>();
-      for (int lane : lanes) {
-
-        if (indexedLanes.contains(lane)) {
-
-          sampleNumber++;
-
-          final String prefix =
-              SAMPLESHEET_DATA_PREFIX + ".sample" + sampleNumber;
-          data.put(prefix + ".id", "undetermined");
-          data.put(prefix + ".lane", lane);
-          data.put(prefix + ".undetermined", true);
-          data.put(prefix + ".ref", "");
-          data.put(prefix + ".normalized.ref", "");
-          data.put(prefix + ".indexed", false);
-          data.put(prefix + ".index", "");
-          data.put(prefix + ".description", "");
-          data.put(prefix + ".project", "");
-
-          data.put(
-              SAMPLESHEET_DATA_PREFIX + ".lane" + lane + ".undetermined.sample",
-              sampleNumber);
-          undeterminedSamples.add(Integer.toString(sampleNumber));
-          samplesInLane.put(lane, sampleNumber);
-        }
-      }
-
-      data.put(SAMPLESHEET_DATA_PREFIX + ".undetermined.samples",
-          Joiner.on(",").join(undeterminedSamples));
-
-      // List samples by lane
-      for (final Map.Entry<Integer, Collection<Integer>> e : samplesInLane
-          .asMap().entrySet()) {
-        data.put(SAMPLESHEET_DATA_PREFIX + ".lane" + e.getKey() + ".samples",
-            Joiner.on(",").join(e.getValue()));
-      }
-
-      // List indexed lanes
-      for (int lane : lanes) {
-        data.put(SAMPLESHEET_DATA_PREFIX + ".lane" + lane + ".indexed",
-            indexedLanes.contains(lane));
-      }
-
-      data.put(SAMPLESHEET_DATA_PREFIX + ".sample.count", sampleNumber);
-
-      // Add all projects name in data
-      data.put(SAMPLESHEET_DATA_PREFIX + ".projects.names",
-          Joiner.on(",").join(projectNames));
-
-      // Add the projects
-      addProjects(data, projectNames, projectSamples);
-
-      // Add pooled samples
-      addPooledSamplesInRunData(data, pooledSamples, undeterminedSamples);
-
-    } catch (final IOException e) {
-      throw new AozanException(e);
     }
+
+    data.put(SAMPLESHEET_DATA_PREFIX + ".undetermined.samples",
+        Joiner.on(",").join(undeterminedSamples));
+
+    // List samples by lane
+    for (final Map.Entry<Integer, Collection<Integer>> e : samplesInLane.asMap()
+        .entrySet()) {
+      data.put(SAMPLESHEET_DATA_PREFIX + ".lane" + e.getKey() + ".samples",
+          Joiner.on(",").join(e.getValue()));
+    }
+
+    // List indexed lanes
+    for (int lane : lanes) {
+      data.put(SAMPLESHEET_DATA_PREFIX + ".lane" + lane + ".indexed",
+          indexedLanes.contains(lane));
+    }
+
+    data.put(SAMPLESHEET_DATA_PREFIX + ".sample.count", sampleNumber);
+
+    // Add all projects name in data
+    data.put(SAMPLESHEET_DATA_PREFIX + ".projects.names",
+        Joiner.on(",").join(projectNames));
+
+    // Add the projects
+    addProjects(data, projectNames, projectSamples);
+
+    // Add pooled samples
+    addPooledSamplesInRunData(data, pooledSamples, undeterminedSamples);
   }
 
   /**

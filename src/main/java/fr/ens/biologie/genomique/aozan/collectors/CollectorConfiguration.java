@@ -1,9 +1,13 @@
 package fr.ens.biologie.genomique.aozan.collectors;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+
+import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
 
 /**
  * This class define the configuration of a collector.
@@ -140,6 +144,26 @@ public class CollectorConfiguration {
     }
 
     return Boolean.parseBoolean(value.trim());
+  }
+
+  /**
+   * Get a sample sheet.
+   * @param key the setting key
+   * @return the sample sheet in the configuration or an empty sample sheet
+   */
+  public SampleSheet getSampleSheet(final String key) {
+
+    String value = get(key);
+
+    if (value == null) {
+      return new SampleSheet();
+    }
+
+    try {
+      return SampleSheetUtils.deSerialize(value);
+    } catch (IOException e) {
+      return new SampleSheet();
+    }
   }
 
   /**
