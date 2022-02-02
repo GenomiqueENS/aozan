@@ -17,6 +17,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.DefaultRunIdGenerator;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.Aozan2QCDataProcessor;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.Bcl2FastqIlluminaDemuxDataProcessor;
+import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.BclConvertIlluminaDemuxDataProcessor;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.IlluminaSyncDataProcessor;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprovider.IlluminaProcessedRunDataProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprovider.IlluminaRawRunDataProvider;
@@ -289,9 +290,24 @@ public class LegacyRecipes {
     // Define step configuration
     Configuration stepConf = new Configuration();
 
-    Step demuxStep = new Step(recipe, "demuxstep",
-        Bcl2FastqIlluminaDemuxDataProcessor.PROCESSOR_NAME, outputStorageName,
-        stepConf, runConfProvider, new DefaultRunIdGenerator());
+    // Select the demux tool to use
+    String demuxProcessorName;
+    switch (conf.get("demux.tool.name", "bcl2fastq").trim().toLowerCase()) {
+
+    case "bclconvert":
+      demuxProcessorName = BclConvertIlluminaDemuxDataProcessor.PROCESSOR_NAME;
+      break;
+
+    default:
+    case "bcl2fastq":
+      demuxProcessorName = Bcl2FastqIlluminaDemuxDataProcessor.PROCESSOR_NAME;
+      break;
+
+    }
+
+    Step demuxStep =
+        new Step(recipe, "demuxstep", demuxProcessorName, outputStorageName,
+            stepConf, runConfProvider, new DefaultRunIdGenerator());
 
     recipe.addStep(demuxStep);
 
