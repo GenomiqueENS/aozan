@@ -1,5 +1,6 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
+import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME;
 import static java.util.Arrays.asList;
 
 import java.io.IOException;
@@ -28,6 +29,9 @@ public class BclConvertIlluminaDemuxDataProcessor
   private static final String DEFAULT_CONVERT_VERSION = "3.8.4";
   private static final String DEFAULT_DOCKER_IMAGE =
       "bclconvert:" + DEFAULT_CONVERT_VERSION;
+
+  public static final String BCL_CONVERT_FORBIDDEN_DATA_SECTION =
+      "BCLConvertForbidden_Data";
 
   @Override
   protected String getDemuxToolName() {
@@ -118,6 +122,13 @@ public class BclConvertIlluminaDemuxDataProcessor
       throws Aozan3Exception {
 
     try {
+
+      if (samplesheet.containsSection(BCLCONVERT_DEMUX_TABLE_NAME)) {
+
+        SampleSheetUtils.moveBclConvertDataForbiddenFieldsInNewSection(
+            samplesheet, BCL_CONVERT_FORBIDDEN_DATA_SECTION);
+      }
+
       SampleSheetUtils.removeBclConvertDataForbiddenFields(samplesheet);
     } catch (AozanException e) {
       throw new Aozan3Exception(e);

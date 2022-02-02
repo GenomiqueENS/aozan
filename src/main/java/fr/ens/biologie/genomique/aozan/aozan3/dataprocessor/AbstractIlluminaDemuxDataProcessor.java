@@ -150,8 +150,8 @@ public abstract class AbstractIlluminaDemuxDataProcessor
         throw new IOException("No samplesheet found");
       }
 
-      SampleSheet samplesheet = SampleSheetUtils
-          .parseCSVSamplesheet(conf.get("illumina.samplesheet"));
+      SampleSheet samplesheet =
+          SampleSheetUtils.deSerialize(conf.get("illumina.samplesheet"));
 
       processSampleSheet(samplesheet);
 

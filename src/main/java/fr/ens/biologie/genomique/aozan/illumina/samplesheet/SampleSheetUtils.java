@@ -7,15 +7,19 @@ import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample.LANE_F
 import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample.PROJECT_FIELD_NAME;
 import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample.SAMPLE_ID_FIELD_NAME;
 import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample.SAMPLE_NAME_FIELD_NAME;
+import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
@@ -617,8 +621,8 @@ public class SampleSheetUtils {
   }
 
   /**
-   * Remove forbidden field in BCLConvert_Data section.
-   * @param samplesheet samplesheet to process
+   * Remove forbidden fields in BCLConvert_Data section.
+   * @param samplesheet sample sheet to process
    * @throws AozanException if the section does not exists
    */
   public static void removeBclConvertDataForbiddenFields(
@@ -626,13 +630,13 @@ public class SampleSheetUtils {
 
     requireNonNull(samplesheet);
 
-    if (!samplesheet.containsSection(SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME)) {
+    if (!samplesheet.containsSection(BCLCONVERT_DEMUX_TABLE_NAME)) {
       throw new AozanException("No section "
-          + SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME + " found in samplesheet");
+          + BCLCONVERT_DEMUX_TABLE_NAME + " found in samplesheet");
     }
 
     TableSection demuxTable =
-        samplesheet.getTableSection(SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME);
+        samplesheet.getTableSection(BCLCONVERT_DEMUX_TABLE_NAME);
 
     for (String fieldName : demuxTable.getSamplesFieldNames()) {
 
@@ -653,6 +657,158 @@ public class SampleSheetUtils {
         break;
       }
     }
+  }
+
+  /**
+   * Move the forbidden fields in BCLConvert_Data section.
+   * @param samplesheet sample sheet to process
+   * @throws AozanException if the section does not exists
+   */
+  public static void moveBclConvertDataForbiddenFieldsInNewSection(
+      SampleSheet samplesheet, String otherSectionName) throws AozanException {
+
+    requireNonNull(samplesheet);
+    requireNonNull(otherSectionName);
+
+    if (!samplesheet.containsSection(BCLCONVERT_DEMUX_TABLE_NAME)) {
+      throw new AozanException("No section "
+          + BCLCONVERT_DEMUX_TABLE_NAME + " found in samplesheet");
+    }
+
+    if (samplesheet.containsSection(otherSectionName)) {
+      throw new AozanException(
+          "No section " + otherSectionName + " already found in samplesheet");
+    }
+
+    TableSection demuxTable =
+        samplesheet.getTableSection(BCLCONVERT_DEMUX_TABLE_NAME);
+    TableSection otherTable = samplesheet.addTableSection(otherSectionName);
+
+    for (Sample s : demuxTable.getSamples()) {
+
+      Sample newSample = otherTable.addSample();
+
+      for (String fieldName : s.getFieldNames()) {
+
+        switch (fieldName.toLowerCase().trim()) {
+
+        case Sample.LANE_FIELD_NAME:
+        case Sample.SAMPLE_ID_FIELD_NAME:
+        case Sample.PROJECT_FIELD_NAME:
+
+          newSample.set(fieldName, s.get(fieldName));
+          break;
+
+        case Sample.INDEX1_FIELD_NAME:
+        case Sample.INDEX2_FIELD_NAME:
+          break;
+
+        default:
+          newSample.set(fieldName, s.get(fieldName));
+          s.remove(fieldName);
+          break;
+
+        }
+      }
+    }
+  }
+
+  /**
+   * Merge a section with forbidden fields for BCL Convert in the
+   * BCLConvert_Data section of the sample sheet.
+   * @param samplesheet the sample sheet
+   * @param otherSectionName name of the section to merge
+   * @throws AozanException if an error occurs while merging sections
+   */
+  public static void mergeBclConvertDataAndForbiddenData(
+      SampleSheet samplesheet, String otherSectionName) throws AozanException {
+
+    requireNonNull(samplesheet);
+    requireNonNull(otherSectionName);
+
+    if (!samplesheet.containsTableSection(otherSectionName)
+        || !samplesheet.containsTableSection(BCLCONVERT_DEMUX_TABLE_NAME)) {
+      return;
+    }
+
+    TableSection demuxTable =
+        samplesheet.getTableSection(BCLCONVERT_DEMUX_TABLE_NAME);
+    TableSection otherTable = samplesheet.addTableSection(otherSectionName);
+
+    Map<String, String> values = new HashMap<>();
+    Set<String> fieldsToAdd = new HashSet<>();
+
+    // Fill value map
+    for (Sample s : otherTable.getSamples()) {
+
+      StringBuilder sb = new StringBuilder();
+
+      if (s.isSampleIdField()) {
+        sb.append(s.getSampleId());
+      }
+      sb.append('\t');
+
+      if (s.isLaneField()) {
+        sb.append(s.getLane());
+      }
+      sb.append('\t');
+
+      if (s.isSampleProjectField()) {
+        sb.append(s.getSampleName());
+      }
+      sb.append('\t');
+
+      String key = sb.toString();
+
+      for (String fieldName : s.getFieldNames()) {
+
+        switch (fieldName.toLowerCase().trim()) {
+
+        case Sample.LANE_FIELD_NAME:
+        case Sample.SAMPLE_ID_FIELD_NAME:
+        case Sample.PROJECT_FIELD_NAME:
+          break;
+
+        default:
+          fieldsToAdd.add(fieldName);
+          values.put(key + '\t' + fieldName, s.get(fieldName));
+          break;
+        }
+      }
+    }
+
+    // Add values in BCLConvert Data
+    for (Sample s : demuxTable.getSamples()) {
+
+      StringBuilder sb = new StringBuilder();
+
+      if (s.isSampleIdField()) {
+        sb.append(s.getSampleId());
+      }
+      sb.append('\t');
+
+      if (s.isLaneField()) {
+        sb.append(s.getLane());
+      }
+      sb.append('\t');
+
+      if (s.isSampleProjectField()) {
+        sb.append(s.getSampleName());
+      }
+      sb.append('\t');
+
+      String prefix = sb.toString();
+
+      for (String fieldName : fieldsToAdd) {
+        String key = prefix + '\t' + fieldName;
+        if (values.containsKey(key)) {
+          s.set(fieldName, values.get(key));
+        }
+      }
+    }
+
+    // Remove merged section
+    samplesheet.removeSection(otherSectionName);
   }
 
   /**
