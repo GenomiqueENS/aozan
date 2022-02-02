@@ -66,6 +66,8 @@ public class BclConvertIlluminaDemuxDataProcessor
     args.add(inputPath.toAbsolutePath().toString());
     args.add("--output-directory");
     args.add(outputPath.toAbsolutePath().toString());
+    addCommandLineArgument(args, runConf, "--bcl-sampleproject-subdirectories",
+        "true");
 
     addCommandLineArgument(args, runConf, "--bcl-num-parallel-tiles");
     addCommandLineArgument(args, runConf, "--bcl-num-conversion-threads");

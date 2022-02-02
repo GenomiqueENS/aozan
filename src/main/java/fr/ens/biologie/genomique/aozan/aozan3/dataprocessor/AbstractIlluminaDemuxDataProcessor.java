@@ -365,12 +365,21 @@ public abstract class AbstractIlluminaDemuxDataProcessor
   protected void addCommandLineArgument(List<String> args,
       RunConfiguration conf, String longArgName) {
 
+    addCommandLineArgument(args, conf, longArgName, null);
+  }
+
+  protected void addCommandLineArgument(List<String> args,
+      RunConfiguration conf, String longArgName, String defaultValue) {
+
     String confKey =
         getConfPrefix() + '.' + longArgName.replace("--", "").replace('-', '.');
 
     if (conf.containsKey(confKey)) {
       args.add(longArgName);
       args.add(conf.get(confKey));
+    } else if (defaultValue != null) {
+      args.add(longArgName);
+      args.add(defaultValue);
     }
 
   }
