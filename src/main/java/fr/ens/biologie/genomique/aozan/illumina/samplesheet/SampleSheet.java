@@ -313,6 +313,57 @@ public class SampleSheet implements Iterable<Sample> {
   }
 
   /**
+   * Rename a section.
+   * @param oldName name of the section to rename
+   * @param newName new name of the section
+   */
+  public void renameSection(String oldName, String newName) {
+
+    requireNonNull(oldName);
+    requireNonNull(newName);
+
+    // Nothing to do
+    if (oldName.equals(newName)) {
+      return;
+    }
+
+    String trimmedOldSectionName = oldName.trim();
+    String trimmedNewSectionName = newName.trim();
+
+    if (trimmedOldSectionName.isEmpty()) {
+      throw new IllegalArgumentException("old section name cannot be empty");
+    }
+
+    if (trimmedNewSectionName.isEmpty()) {
+      throw new IllegalArgumentException("new section name cannot be empty");
+    }
+
+    if (!this.sectionOrder.contains(trimmedOldSectionName)) {
+      throw new IllegalArgumentException("section does not exists: " + oldName);
+    }
+
+    if (this.sectionOrder.contains(trimmedNewSectionName)) {
+      throw new IllegalArgumentException(
+          "new section already exists: " + oldName);
+    }
+
+    if (this.propertySections.containsKey(trimmedOldSectionName)) {
+
+      PropertySection s = this.propertySections.remove(trimmedOldSectionName);
+      this.propertySections.put(trimmedNewSectionName, s);
+
+    } else {
+
+      TableSection s = this.tableSections.remove(trimmedOldSectionName);
+      this.tableSections.put(trimmedNewSectionName, s);
+    }
+
+    int index = this.sectionOrder.indexOf(trimmedOldSectionName);
+    this.sectionOrder.remove(index);
+    this.sectionOrder.add(index, trimmedNewSectionName);
+  }
+
+  /**
    * Add a metadata of the samplesheet.
    * @param section the section of the metadata
    * @param key the key of the metadata

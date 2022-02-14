@@ -1,3 +1,4 @@
 fr.ens.biologie.genomique.aozan.aozan3.action.ExecAction
 fr.ens.biologie.genomique.aozan.aozan3.action.ListAction
 fr.ens.biologie.genomique.aozan.aozan3.action.LegacyAction
+fr.ens.biologie.genomique.aozan.aozan3.action.SampleSheetConvertAction
