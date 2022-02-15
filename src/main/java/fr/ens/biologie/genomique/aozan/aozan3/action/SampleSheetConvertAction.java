@@ -54,7 +54,7 @@ public class SampleSheetConvertAction implements Action {
             + ".csv");
 
     // Check if the input file name ends with ".xls"
-    if (inputFile.getName().toLowerCase().endsWith(".xls")) {
+    if (!inputFile.getName().toLowerCase().endsWith(".xls")) {
       Common.showErrorMessageAndExit(
           "Invalid input file, only XLS file are allowed: " + inputFile);
     }
