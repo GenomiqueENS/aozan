@@ -7,6 +7,7 @@ import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample.LANE_F
 import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample.PROJECT_FIELD_NAME;
 import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample.SAMPLE_ID_FIELD_NAME;
 import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample.SAMPLE_NAME_FIELD_NAME;
+import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet.BCL2FASTQ_DEMUX_TABLE_NAME;
 import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME;
 import static java.util.Objects.requireNonNull;
 
@@ -809,6 +810,32 @@ public class SampleSheetUtils {
 
     // Remove merged section
     samplesheet.removeSection(otherSectionName);
+  }
+
+  /**
+   * Replace underscores by dashes in sample ids.
+   * @param samplesheet the samplesheet to modify
+   */
+  public static void replaceUnderscoresByDashesInSampleIds(
+      SampleSheet samplesheet) throws AozanException {
+
+    requireNonNull(samplesheet);
+
+    if (!(samplesheet.containsSection(BCL2FASTQ_DEMUX_TABLE_NAME)
+        || samplesheet.containsSection(BCLCONVERT_DEMUX_TABLE_NAME))) {
+      throw new AozanException(
+          "No section demultiplexing found in samplesheet");
+    }
+
+    TableSection demuxTable = samplesheet.getDemuxSection();
+
+    for (Sample s : demuxTable.getSamples()) {
+
+      if (s.isSampleIdField()) {
+        s.setSampleId(s.getSampleId().replace('_', '-'));
+      }
+    }
+
   }
 
   /**

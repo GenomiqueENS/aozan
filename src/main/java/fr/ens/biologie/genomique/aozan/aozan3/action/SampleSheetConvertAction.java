@@ -1,10 +1,14 @@
 package fr.ens.biologie.genomique.aozan.aozan3.action;
 
+import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils.removeBclConvertDataForbiddenFields;
+import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils.replaceUnderscoresByDashesInSampleIds;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
+import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.aozan3.Common;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
@@ -86,10 +90,14 @@ public class SampleSheetConvertAction implements Action {
           "Error while reading sample sheet: " + inputFile);
     }
 
-    // Rename BCLConvert sections
-    sampleSheet.renameSection("BCLConvert_Settings",
-        "DisabledBCLConvert_Settings");
-    sampleSheet.renameSection("BCLConvert_Data", "DisabledBCLConvert_Data");
+    // Fix sample sheet
+    try {
+      replaceUnderscoresByDashesInSampleIds(sampleSheet);
+      removeBclConvertDataForbiddenFields(sampleSheet);
+    } catch (AozanException e1) {
+      Common.showErrorMessageAndExit(
+          "Error while converting sample sheet: " + inputFile);
+    }
 
     // Write the output sample sheet in CSV format
     try (SampleSheetCSVWriter writer = new SampleSheetCSVWriter(outputFile)) {
