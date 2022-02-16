@@ -110,11 +110,13 @@ public class PropertySection {
    * @param key name of the property
    * @return the value of the removed property
    */
-  public String remove(String key) {
+  public void remove(String key) {
 
     requireNonNull(key);
 
-    return this.remove(key.trim());
+    if (this.properties.containsKey(key)) {
+      this.properties.remove(key, get(key.trim()));
+    }
   }
 
   /**
