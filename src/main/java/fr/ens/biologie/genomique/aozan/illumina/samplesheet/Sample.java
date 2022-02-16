@@ -231,6 +231,65 @@ public class Sample {
   }
 
   /**
+   * Set the sample id.
+   * @param sampleId the sample id
+   */
+  public void setSampleId(final String sampleId) {
+
+    set(SAMPLE_ID_FIELD_NAME, sampleId);
+  }
+
+  /**
+   * Set the sample name.
+   * @param sampleName the sample id
+   */
+  public void setSampleName(final String sampleName) {
+
+    set(SAMPLE_NAME_FIELD_NAME, sampleName);
+  }
+
+  /**
+   * Set the lane of the sample.
+   * @param lane the lane
+   */
+  public void setLane(final int lane) {
+
+    if (lane < 1) {
+      throw new IllegalArgumentException(
+          "Lane argument cannot be lower than 1");
+    }
+
+    set(LANE_FIELD_NAME, "" + lane);
+  }
+
+  /**
+   * Set the description of the sample.
+   * @param description the sample id
+   */
+  public void setDescription(final String description) {
+
+    set(DESCRIPTION_FIELD_NAME, description);
+  }
+
+  /**
+   * Set the description of the sample.
+   * @param projectName the sample id
+   */
+  public void setSampleProject(final String projectName) {
+
+    set(PROJECT_FIELD_NAME, projectName);
+  }
+
+  /**
+   * Set the sample reference.
+   * @param sampleRef the sample reference
+   */
+  public void setSampleRef(final String sampleRef) {
+
+    set(SAMPLE_REF_FIELD_NAME, sampleRef);
+  }
+
+  /**
    * Set the first index.
    * @param index the first index
    */
