@@ -221,8 +221,13 @@ public class IlluminaSamplesheetRunConfigurationProvider
 
   private RunInfo loadRunInfo(final RunData runData) throws Aozan3Exception {
 
-    File runInfoFile =
-        new File(runData.getLocation().getPath().toFile(), "RunInfo.xml");
+    File dataDir = runData.getLocation().getPath().toFile();
+    File runInfoFile = new File(dataDir, "RunInfo.xml");
+
+    // For BclConvert output
+    if (!runInfoFile.exists()) {
+      runInfoFile = new File(new File(dataDir, "Reports"), "RunInfo.xml");
+    }
 
     try {
       return RunInfo.parse(runInfoFile);
