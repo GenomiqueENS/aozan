@@ -278,15 +278,10 @@ public class LegacyRecipes {
 
     Recipe recipe = new Recipe("demux", "Demux step", conf, logger);
 
-    boolean inProgress = false;
-    final String inputStorageName = "bclStorage";
     final String outputStorageName = "fastqStorage";
 
-    // Set input storages
-    recipe.addStorage(inputStorageName,
-        new DataStorage("local", aozan2Conf.get("bcl.data.path").trim(), null));
-    recipe.addDataProvider(IlluminaRawRunDataProvider.PROVIDER_NAME,
-        inputStorageName, inProgress, conf);
+    // Create input BCL storages
+    createInputBclStorages(conf, recipe, aozan2Conf);
 
     // Set output storage
     Path fastqPath = Paths.get(aozan2Conf.get("fastq.data.path").trim());
@@ -335,21 +330,17 @@ public class LegacyRecipes {
     Recipe recipe = new Recipe("qc", "QC step", conf, logger);
 
     boolean inProgress = false;
-    final String inputStorageName1 = "bclStorage";
-    final String inputStorageName2 = "fastqStorage";
+    final String inputFastqStorageName = "fastqStorage";
     final String outputStorageName = "qcStorage";
 
-    // Set bcl input storage
-    recipe.addStorage(inputStorageName1,
-        new DataStorage("local", aozan2Conf.get("bcl.data.path").trim(), null));
-    recipe.addDataProvider(IlluminaRawRunDataProvider.PROVIDER_NAME,
-        inputStorageName1, inProgress, conf);
+    // Create input BCL storages
+    createInputBclStorages(conf, recipe, aozan2Conf);
 
     // Set fastq input storage
-    recipe.addStorage(inputStorageName2, new DataStorage("local",
+    recipe.addStorage(inputFastqStorageName, new DataStorage("local",
         aozan2Conf.get("fastq.data.path").trim(), null));
     recipe.addDataProvider(IlluminaProcessedRunDataProvider.PROVIDER_NAME,
-        inputStorageName2, inProgress, conf);
+        inputFastqStorageName, inProgress, conf);
 
     // Set output storage
     Path qcPath = Paths.get(aozan2Conf.get("reports.data.path").trim());
@@ -398,6 +389,43 @@ public class LegacyRecipes {
     result.init(stepConf, recipe.getLogger());
 
     return result;
+  }
+
+  /**
+   * Create input BCL storages.
+   * @param conf configuration
+   * @param recipe the recipe
+   * @param aozan2Conf Aozan2 configuration
+   * @throws Aozan3Exception if an error occurs while creating the storages
+   */
+  private static void createInputBclStorages(Configuration conf, Recipe recipe,
+      Configuration aozan2Conf) throws Aozan3Exception {
+
+    boolean inProgress = false;
+    final String inputStorageName = "bclStorage";
+
+    // Set input storages
+    if (aozan2Conf.getBoolean("demux.use.hiseq.output", false)) {
+
+      // Without sync step
+
+      createStorages(recipe, "nasStorage", aozan2Conf.get("hiseq.data.path"));
+
+      // Set input storages as run providers
+      for (String storageName : recipe.getStorages().names()) {
+        recipe.addDataProvider(IlluminaRawRunDataProvider.PROVIDER_NAME,
+            storageName, inProgress, conf);
+      }
+    } else {
+
+      // With sync step
+
+      recipe.addStorage(inputStorageName, new DataStorage("local",
+          aozan2Conf.get("bcl.data.path").trim(), null));
+      recipe.addDataProvider(IlluminaRawRunDataProvider.PROVIDER_NAME,
+          inputStorageName, inProgress, conf);
+    }
+
   }
 
   private static void setSetting(Configuration conf, Configuration aozan2Conf,
