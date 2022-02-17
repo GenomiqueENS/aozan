@@ -129,7 +129,6 @@ public class BclConvertIlluminaDemuxDataProcessor
             samplesheet, BCL_CONVERT_FORBIDDEN_DATA_SECTION);
       }
 
-      SampleSheetUtils.removeBclConvertDataForbiddenFields(samplesheet);
     } catch (AozanException e) {
       throw new Aozan3Exception(e);
     }
