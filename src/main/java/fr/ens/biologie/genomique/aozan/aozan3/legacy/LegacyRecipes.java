@@ -226,6 +226,11 @@ public class LegacyRecipes {
   private Recipe createSyncStepRecipe(Configuration conf, AozanLogger logger,
       Configuration aozan2Conf) throws Aozan3Exception {
 
+    // Check if the sync step is enabled
+    if (!aozan2Conf.getBoolean("sync.step", true)) {
+      return null;
+    }
+
     Recipe recipe = new Recipe("sync", "Sync step", conf, logger);
 
     boolean inProgress = aozan2Conf.getBoolean("sync.continuous.sync", false);
@@ -265,6 +270,11 @@ public class LegacyRecipes {
 
   private Recipe createDemuxStep(Configuration conf, AozanLogger logger,
       Configuration aozan2Conf) throws Aozan3Exception {
+
+    // Check if the demux step is enabled
+    if (!aozan2Conf.getBoolean("demux.step", true)) {
+      return null;
+    }
 
     Recipe recipe = new Recipe("demux", "Demux step", conf, logger);
 
@@ -316,6 +326,11 @@ public class LegacyRecipes {
 
   private Recipe createQCStep(Configuration conf, AozanLogger logger,
       Configuration aozan2Conf) throws Aozan3Exception {
+
+    // Check if the qc step is enabled
+    if (!aozan2Conf.getBoolean("qc.step", true)) {
+      return null;
+    }
 
     Recipe recipe = new Recipe("qc", "QC step", conf, logger);
 
