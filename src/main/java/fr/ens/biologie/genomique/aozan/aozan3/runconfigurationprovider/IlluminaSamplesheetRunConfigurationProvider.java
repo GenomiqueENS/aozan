@@ -242,6 +242,26 @@ public class IlluminaSamplesheetRunConfigurationProvider
     requireNonNull(samplesheetFilename);
 
     RunId runId = runData.getRunId();
+    Path samplesheetFile = Paths.get(samplesheetsPath.toString(),
+        samplesheetFilename + this.sampleSheetFormat.getExtension());
+
+    // If a sample sheet exists a dedicated directory
+    if (Files.isRegularFile(samplesheetFile)) {
+
+      this.logger.info(runId,
+          "Load a samplesheet in directory: " + this.samplesheetsPath);
+
+      return loadSamplesheet(runId, samplesheetFile, this.sampleSheetFormat,
+          this.logger);
+    }
+
+    // Use an external command if defined
+    if (this.samplesheetCreationCommand != null
+        && !this.samplesheetCreationCommand.isEmpty()) {
+      this.logger.info(runId,
+          "Use an external command to retrieve samplehseet");
+      return loadSampleSheetFromCommand(runId, this.samplesheetCreationCommand);
+    }
 
     Path samplesheetFileInRunDirectory =
         searchSamplesheetInRunDir(runData.getLocation().getPath());
@@ -250,35 +270,19 @@ public class IlluminaSamplesheetRunConfigurationProvider
     if (samplesheetFileInRunDirectory != null
         && Files.exists(samplesheetFileInRunDirectory)) {
 
-      String filename = samplesheetFileInRunDirectory.getFileName().toString();
-      String filenameWithoutExtension =
-          filename.substring(0, filename.length() - 4);
-
-      this.logger.info(runId,
-          "Use existing " + filename + " file in run directory");
-      return loadSamplesheet(runId, samplesheetFileInRunDirectory.getParent(),
-          filenameWithoutExtension, SamplesheetFormat.CSV, this.logger);
+      this.logger.info(runId, "Use existing "
+          + samplesheetFileInRunDirectory + " file in run directory");
+      return loadSamplesheet(runId, samplesheetFileInRunDirectory,
+          SamplesheetFormat.CSV, this.logger);
     }
 
-    if (this.samplesheetCreationCommand != null
-        && !this.samplesheetCreationCommand.isEmpty()) {
-      this.logger.info(runId,
-          "Use an external command to retrieve samplehseet");
-      return loadSampleSheetFromCommand(runId, this.samplesheetCreationCommand);
-    }
-
-    this.logger.info(runId,
-        "Load a samplesheet in directory: " + this.samplesheetsPath);
-    return loadSamplesheet(runId, this.samplesheetsPath, samplesheetFilename,
-        this.sampleSheetFormat, this.logger);
+    throw new Aozan3Exception(runId, "No sample sheet found");
   }
 
   private static SampleSheet loadSamplesheet(final RunId runId,
-      final Path samplesheetsPath, String samplesheetFilename,
-      SamplesheetFormat format, AozanLogger logger) throws Aozan3Exception {
+      Path samplesheetFile, SamplesheetFormat format, AozanLogger logger)
+      throws Aozan3Exception {
 
-    Path samplesheetFile = Paths.get(samplesheetsPath.toString(),
-        samplesheetFilename + format.getExtension());
     logger.info(runId, "Load samplesheet file: " + samplesheetFile);
 
     try (SampleSheetReader reader = format.getReader(samplesheetFile)) {
