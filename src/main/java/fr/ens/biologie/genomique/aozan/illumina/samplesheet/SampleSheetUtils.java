@@ -734,7 +734,7 @@ public class SampleSheetUtils {
 
     TableSection demuxTable =
         samplesheet.getTableSection(BCLCONVERT_DEMUX_TABLE_NAME);
-    TableSection otherTable = samplesheet.addTableSection(otherSectionName);
+    TableSection otherTable = samplesheet.getTableSection(otherSectionName);
 
     Map<String, String> values = new HashMap<>();
     Set<String> fieldsToAdd = new HashSet<>();
