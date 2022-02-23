@@ -22,7 +22,6 @@ import org.xml.sax.SAXException;
 
 import com.google.common.base.Splitter;
 
-import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataType.SequencingTechnology;
@@ -32,13 +31,15 @@ import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.illumina.RunInfo;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetCheck;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetReader;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetXLSReader;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetXLSXReader;
+import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetCheck;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVReader;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetReader;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetXLSReader;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetXLSXReader;
+
 
 /**
  * Get the run configuration from an Illumina samplesheet.
@@ -380,7 +381,7 @@ public class IlluminaSamplesheetRunConfigurationProvider
     try {
       SampleSheetUtils.replaceIndexShortcutsBySequences(samplesheet,
           this.indexSequences);
-    } catch (AozanException e) {
+    } catch (KenetreException e) {
       this.logger.error("Error while updating samplesheet for run " + runId);
       throw new Aozan3Exception(e);
     }
@@ -399,7 +400,7 @@ public class IlluminaSamplesheetRunConfigurationProvider
 
       this.logger.warn(runId, "Bcl2fastq samplesheet warnings: "
           + String.join(" ", samplesheetWarnings));
-    } catch (AozanException e) {
+    } catch (KenetreException e) {
       throw new Aozan3Exception(e);
     }
   }

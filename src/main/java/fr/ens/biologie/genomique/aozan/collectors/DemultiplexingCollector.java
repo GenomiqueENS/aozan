@@ -37,7 +37,7 @@ import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
 
 public class DemultiplexingCollector implements Collector {
 

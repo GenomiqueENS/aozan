@@ -42,9 +42,10 @@ import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeAliases;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
+import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.Sample;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
 
 /**
  * This class define a Bcl2fastq samplesheet collector.
@@ -166,82 +167,87 @@ public class SamplesheetCollector implements Collector {
     // TODO handle empty samplesheet where a sample is create by lane
     // TODO save pooled samples
 
-    for (final Sample s : SampleSheetUtils
-        .getCheckedDemuxTableSection(this.samplesheet)) {
+    try {
+      for (final Sample s : SampleSheetUtils
+          .getCheckedDemuxTableSection(this.samplesheet)) {
 
-      sampleNumber++;
+        sampleNumber++;
 
-      final String prefix = SAMPLESHEET_DATA_PREFIX + ".sample" + sampleNumber;
+        final String prefix =
+            SAMPLESHEET_DATA_PREFIX + ".sample" + sampleNumber;
 
-      final String id = s.getSampleId();
-      final String name = s.getSampleName();
-      final String demuxName = s.getDemultiplexingName();
-      final int lane = s.getLane();
-      final String project = Strings.nullToEmpty(s.getSampleProject());
-      final String index1 = Strings.nullToEmpty(s.getIndex1());
-      final String index2 = Strings.nullToEmpty(s.getIndex2());
-      final String ref = Strings.nullToEmpty(s.getSampleRef());
-      final String normalizedRef = GenomeAliases.getInstance().get(ref);
+        final String id = s.getSampleId();
+        final String name = s.getSampleName();
+        final String demuxName = s.getDemultiplexingName();
+        final int lane = s.getLane();
+        final String project = Strings.nullToEmpty(s.getSampleProject());
+        final String index1 = Strings.nullToEmpty(s.getIndex1());
+        final String index2 = Strings.nullToEmpty(s.getIndex2());
+        final String ref = Strings.nullToEmpty(s.getSampleRef());
+        final String normalizedRef = GenomeAliases.getInstance().get(ref);
 
-      data.put(prefix + ".id", id);
-      data.put(prefix + ".name", name);
-      data.put(prefix + ".demux.name", demuxName);
-      data.put(prefix + ".lane", lane);
-      data.put(prefix + ".undetermined", false);
-      data.put(prefix + ".ref", ref);
-      data.put(prefix + ".normalized.ref", normalizedRef);
-      data.put(prefix + ".indexed", s.isIndexed());
-      data.put(prefix + ".index", index1);
-      data.put(prefix + ".description", s.getDescription());
-      data.put(prefix + ".project", project);
+        data.put(prefix + ".id", id);
+        data.put(prefix + ".name", name);
+        data.put(prefix + ".demux.name", demuxName);
+        data.put(prefix + ".lane", lane);
+        data.put(prefix + ".undetermined", false);
+        data.put(prefix + ".ref", ref);
+        data.put(prefix + ".normalized.ref", normalizedRef);
+        data.put(prefix + ".indexed", s.isIndexed());
+        data.put(prefix + ".index", index1);
+        data.put(prefix + ".description", s.getDescription());
+        data.put(prefix + ".project", project);
 
-      lanes.add(s.getLane());
-      if (s.isIndexed()) {
-        indexedLanes.add(s.getLane());
-      }
-
-      if (s.isDualIndexed()) {
-        data.put(prefix + ".index2", index2);
-      }
-
-      projectSamples.put(project, sampleNumber);
-      pooledSamples.put(new PooledSample(project, demuxName, index1, index2,
-          ref, normalizedRef), sampleNumber);
-      samplesInLane.put(lane, sampleNumber);
-
-      // Extract data exist only with first version
-      switch (s.getSampleSheet().getVersion()) {
-
-      case 1:
-
-        data.put(prefix + ".flow.cell.id", s.get("FCID"));
-        data.put(prefix + ".control", s.get("Control"));
-        data.put(prefix + ".recipe", s.get("Recipe"));
-        data.put(prefix + ".operator", s.get("Operator"));
-        break;
-
-      case 2:
-
-        // Include additional columns
-        for (String fieldName : s.getFieldNames()) {
-
-          if (!Sample.isInternalField(fieldName)) {
-            data.put(
-                prefix + "." + fieldName.replaceAll(" _-", ".").toLowerCase(),
-                s.get(fieldName));
-          }
+        lanes.add(s.getLane());
+        if (s.isIndexed()) {
+          indexedLanes.add(s.getLane());
         }
-        break;
 
-      default:
+        if (s.isDualIndexed()) {
+          data.put(prefix + ".index2", index2);
+        }
 
-        throw new AozanException(
-            "Samplesheet collector bcl2fastq version is invalid: "
-                + s.getSampleSheet().getVersion());
+        projectSamples.put(project, sampleNumber);
+        pooledSamples.put(new PooledSample(project, demuxName, index1, index2,
+            ref, normalizedRef), sampleNumber);
+        samplesInLane.put(lane, sampleNumber);
+
+        // Extract data exist only with first version
+        switch (s.getSampleSheet().getVersion()) {
+
+        case 1:
+
+          data.put(prefix + ".flow.cell.id", s.get("FCID"));
+          data.put(prefix + ".control", s.get("Control"));
+          data.put(prefix + ".recipe", s.get("Recipe"));
+          data.put(prefix + ".operator", s.get("Operator"));
+          break;
+
+        case 2:
+
+          // Include additional columns
+          for (String fieldName : s.getFieldNames()) {
+
+            if (!Sample.isInternalField(fieldName)) {
+              data.put(
+                  prefix + "." + fieldName.replaceAll(" _-", ".").toLowerCase(),
+                  s.get(fieldName));
+            }
+          }
+          break;
+
+        default:
+
+          throw new AozanException(
+              "Samplesheet collector bcl2fastq version is invalid: "
+                  + s.getSampleSheet().getVersion());
+        }
+
+        // List projects in run
+        projectNames.add(project);
       }
-
-      // List projects in run
-      projectNames.add(project);
+    } catch (KenetreException e) {
+      throw new AozanException(e);
     }
 
     // Add undetermined samples

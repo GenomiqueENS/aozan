@@ -153,6 +153,14 @@
       <!--url>https://maven-repository.dev.java.net/nonav/repository</url-->
       <url>http://outils.genomique.biologie.ens.fr/maven2</url>
     </repository>
+    <repository>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>github</id>
+      <name>GitHub GenomiqueENS Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/GenomiqueENS/Kenetre</url>
+    </repository>
   </repositories>
 
 
@@ -290,6 +298,20 @@
          <groupId>com.sun.mail</groupId>
          <artifactId>javax.mail</artifactId>
          <version>1.6.2</version>
+         <scope>compile</scope>
+       </dependency>
+
+       <dependency>
+         <groupId>fr.ens.biologie.genomique</groupId>
+         <artifactId>kenetre-core</artifactId>
+         <version>0.1</version>
+         <scope>compile</scope>
+       </dependency>
+
+       <dependency>
+         <groupId>fr.ens.biologie.genomique</groupId>
+         <artifactId>kenetre-illumina</artifactId>
+         <version>0.1</version>
          <scope>compile</scope>
        </dependency>
 

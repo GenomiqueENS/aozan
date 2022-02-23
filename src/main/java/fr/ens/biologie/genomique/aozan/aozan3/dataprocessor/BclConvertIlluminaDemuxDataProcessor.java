@@ -1,6 +1,6 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
-import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME;
+import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME;
 import static java.util.Arrays.asList;
 
 import java.io.IOException;
@@ -8,12 +8,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.biologie.genomique.eoulsan.util.StringUtils;
+import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
 
 /**
  * This class define an Illumina demultiplexing data processor that use
@@ -129,7 +129,7 @@ public class BclConvertIlluminaDemuxDataProcessor
             samplesheet, BCL_CONVERT_FORBIDDEN_DATA_SECTION);
       }
 
-    } catch (AozanException e) {
+    } catch (KenetreException e) {
       throw new Aozan3Exception(e);
     }
   }

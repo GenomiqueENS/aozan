@@ -1,21 +1,21 @@
 package fr.ens.biologie.genomique.aozan.aozan3.action;
 
-import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils.removeBclConvertDataForbiddenFields;
-import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils.replaceUnderscoresByDashesInSampleIds;
+import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils.removeBclConvertDataForbiddenFields;
+import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils.replaceUnderscoresByDashesInSampleIds;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
-import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.aozan3.Common;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVWriter;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetReader;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetXLSReader;
+import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVWriter;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetReader;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetXLSReader;
 
 /**
  * This class define a sample sheet convert action.
@@ -94,7 +94,7 @@ public class SampleSheetConvertAction implements Action {
     try {
       replaceUnderscoresByDashesInSampleIds(sampleSheet);
       removeBclConvertDataForbiddenFields(sampleSheet);
-    } catch (AozanException e1) {
+    } catch (KenetreException e1) {
       Common.showErrorMessageAndExit(
           "Error while converting sample sheet: " + inputFile);
     }

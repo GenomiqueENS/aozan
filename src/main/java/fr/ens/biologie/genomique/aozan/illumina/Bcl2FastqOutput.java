@@ -14,9 +14,9 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
 import fr.ens.biologie.genomique.eoulsan.core.Version;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVReader;
 
 /**
  * This class define the output of bcl2fastq.

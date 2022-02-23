@@ -4,7 +4,7 @@ import static fr.ens.biologie.genomique.aozan.Globals.QC_DATA_EXTENSION;
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.BCL;
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.ILLUMINA_FASTQ;
 import static fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.BclConvertIlluminaDemuxDataProcessor.BCL_CONVERT_FORBIDDEN_DATA_SECTION;
-import static fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME;
+import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME;
 import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.sizeToHumanReadable;
 import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
 import static java.util.Objects.requireNonNull;
@@ -35,8 +35,9 @@ import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.SimpleDataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
+import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
 
 /**
  * This class define an Aozan 2 QC data processor.
@@ -220,7 +221,7 @@ public class Aozan2QCDataProcessor implements DataProcessor {
           fastqRunData.newLocation(outputLocation).newCategory(Category.QC),
           email);
 
-    } catch (IOException | AozanException e) {
+    } catch (IOException | AozanException | KenetreException e) {
       throw new Aozan3Exception(runId, e);
     }
   }

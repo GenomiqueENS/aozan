@@ -51,10 +51,6 @@ import fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector;
 import fr.ens.biologie.genomique.aozan.fastqc.RuntimePatchFastQC;
 import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeAliases;
 import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeDescriptionCreator;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetReader;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.AozanTestRegistry;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
@@ -65,6 +61,10 @@ import fr.ens.biologie.genomique.aozan.tests.project.ProjectTest;
 import fr.ens.biologie.genomique.aozan.tests.sample.SampleTest;
 import fr.ens.biologie.genomique.eoulsan.EoulsanRuntime;
 import fr.ens.biologie.genomique.eoulsan.data.protocols.DataProtocolService;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVReader;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetReader;
 import uk.ac.babraham.FastQC.FastQCConfig;
 
 /**
