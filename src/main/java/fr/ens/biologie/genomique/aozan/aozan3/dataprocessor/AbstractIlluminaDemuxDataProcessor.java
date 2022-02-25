@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -341,6 +342,14 @@ public abstract class AbstractIlluminaDemuxDataProcessor
     if (exitValue != 0) {
       throw new IOException("Error while running "
           + getDemuxToolName() + ", exit code is: " + exitValue);
+    }
+
+    // Create a copy of the sample at the root of the output directory
+    Path sampleSheetCopyFile =
+        Paths.get(outputPath.toString(), "SampleSheet.csv");
+    if (!Files.isRegularFile(sampleSheetCopyFile)) {
+      Files.copy(samplesheetPath, sampleSheetCopyFile,
+          StandardCopyOption.COPY_ATTRIBUTES);
     }
 
     this.logger.info(runId, "Successful demultiplexing in "
