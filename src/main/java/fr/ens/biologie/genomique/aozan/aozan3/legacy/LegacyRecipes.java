@@ -233,7 +233,9 @@ public class LegacyRecipes {
 
     Recipe recipe = new Recipe("sync", "Sync step", conf, logger);
 
-    boolean inProgress = aozan2Conf.getBoolean("sync.continuous.sync", false);
+    // boolean inProgress = aozan2Conf.getBoolean("sync.continuous.sync",
+    // false);
+    boolean inProgress = false;
     final String inputStoragePrefix = "nasStorage";
     final String outputStorage = "bclStorage";
 
@@ -490,8 +492,7 @@ public class LegacyRecipes {
       Configuration logConf = new Configuration();
       logConf.set("aozan.logger", "file");
       logConf.set("aozan.log", aozan2Conf.get("aozan.log.path"));
-
-      // TODO Handle log level in aozan.log.level setting
+      logConf.set("aozan.log.level", aozan2Conf.get("aozan.log.level"));
 
       return AozanLoggerFactory.newLogger(logConf, currentLogger);
     }
