@@ -162,8 +162,8 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
    * @throws Aozan3Exception if an error occurs while executing Guppy
    */
   private static void pipeline(RunId runId, Path inputTarPath, Path outputPath,
-      Path tmpPath, final RunConfiguration runConf, AozanLogger logger)
-      throws Aozan3Exception {
+      Path tmpPath, final RunConfiguration runConf, boolean keepTemporaryFiles,
+      AozanLogger logger) throws Aozan3Exception {
 
     requireNonNull(inputTarPath);
     requireNonNull(outputPath);
@@ -198,12 +198,16 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
       merger.execute();
 
       // Delete temporary untarred FAST5 tar
-      System.out.println("* Remove uncompressed FAST5 files");
-      deleteDirectory(inputDirPath);
+      if (!keepTemporaryFiles) {
+        System.out.println("* Remove uncompressed FAST5 files");
+        deleteDirectory(inputDirPath);
+      }
 
       // Delete unmerged Fastq directory
-      System.out.println("* Remove unmerged FASTQ directory");
-      deleteDirectory(outputDirPath);
+      if (!keepTemporaryFiles) {
+        System.out.println("* Remove unmerged FASTQ directory");
+        deleteDirectory(outputDirPath);
+      }
 
       System.out.println("### END ###");
 
@@ -321,6 +325,11 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
     // Compress Fastq
     result.add("--compress_fastq");
 
+    // Fast5 output
+    if (runConf.containsKey("guppy.fast5.output")) {
+      result.add("--fast5_out");
+    }
+
     // Config
     if (runConf.containsKey("guppy.config")) {
       result.add("--config");
@@ -415,7 +424,8 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
   public static void run(Path inputTar, Path outputPath, String runId,
       String guppyVersion, Path tmpPath, String flowcellType, String kit,
       String barcodeKits, boolean trimBarcodes, String minQscore, String config,
-      AozanLogger logger) throws Aozan3Exception {
+      boolean fast5Output, boolean keepTemporaryFiles, AozanLogger logger)
+      throws Aozan3Exception {
 
     requireNonNull(inputTar);
     requireNonNull(outputPath);
@@ -490,8 +500,12 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
       runConf.set("guppy.min.qscore", minQscore);
     }
 
+    if (fast5Output) {
+      runConf.set("guppy.fast5.output", "true");
+    }
+
     pipeline(new RunId(runId + "-guppy-" + guppyVersion), inputTar, outputPath,
-        tmpPath, runConf, logger);
+        tmpPath, runConf, keepTemporaryFiles, logger);
   }
 
 }

@@ -54,6 +54,8 @@ public class GuppyAction implements Action {
     String runId = "";
     String guppyVersion = "";
     boolean trimBarcode = false;
+    boolean fast5Output = false;
+    boolean keepTemporaryFiles = false;
     String minQscore = "";
     List<String> args = null;
 
@@ -101,6 +103,13 @@ public class GuppyAction implements Action {
         config = line.getOptionValue("m");
       }
 
+      if (line.hasOption("o")) {
+        fast5Output = true;
+      }
+
+      if (line.hasOption("k")) {
+        keepTemporaryFiles = true;
+      }
       args = Arrays.asList(line.getArgs());
 
       if (args.size() < 3) {
@@ -115,7 +124,7 @@ public class GuppyAction implements Action {
 
       GuppyONTBasecallingDataProcessor.run(inputTar, outputDir, runId,
           guppyVersion, tmpPath, flowcell, kit, barcodeKits, trimBarcode,
-          minQscore, config, logger);
+          minQscore, config, fast5Output, keepTemporaryFiles, logger);
 
     } catch (ParseException e) {
       Common.errorExit(e,
@@ -173,6 +182,12 @@ public class GuppyAction implements Action {
 
     // Trim barcode option
     options.addOption("t", "trim-barcodes", false, "trim barcodes");
+
+    // Fast5 output
+    options.addOption("o", "fast5-output", false, "Fast5 output");
+
+    // Fast5 output
+    options.addOption("e", "keep-temporary-files", false, "Fast5 output");
 
     // Barcode kits option
     options.addOption(
