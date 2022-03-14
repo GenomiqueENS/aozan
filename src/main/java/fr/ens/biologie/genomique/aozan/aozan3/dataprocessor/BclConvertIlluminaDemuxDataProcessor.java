@@ -26,7 +26,7 @@ public class BclConvertIlluminaDemuxDataProcessor
 
   public static final String PROCESSOR_NAME = "illumina_bclconvert";
 
-  private static final String DEFAULT_CONVERT_VERSION = "3.8.4";
+  private static final String DEFAULT_CONVERT_VERSION = "3.9.3";
   private static final String DEFAULT_DOCKER_IMAGE =
       "bclconvert:" + DEFAULT_CONVERT_VERSION;
 
@@ -97,14 +97,12 @@ public class BclConvertIlluminaDemuxDataProcessor
     for (String line : lines) {
 
       if (line.startsWith(getDemuxToolName())) {
+
         String result = line.substring("bcl-convert Version ".length());
-        int index = result.replace("00.000.000.", "").indexOf('-');
-        if (index != -1) {
+        result = result.replace("00.000.000.", "");
 
-          return result.substring(0, index);
-        }
-
-        return null;
+        int index = result.indexOf('-');
+        return index != -1 ? result.substring(0, index) : result;
       }
     }
 
