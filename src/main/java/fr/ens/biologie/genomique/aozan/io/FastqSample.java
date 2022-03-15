@@ -509,10 +509,10 @@ public class FastqSample {
     switch (version) {
 
     case BCL2FASTQ_2:
+    case BCL_CONVERT:
       return getSampleName();
 
     case BCL2FASTQ_2_15:
-    case BCL_CONVERT:
       return getSampleName().replace("_", "-");
 
     default:
