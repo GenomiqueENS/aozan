@@ -40,7 +40,6 @@ import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetRead
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetXLSReader;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetXLSXReader;
 
-
 /**
  * Get the run configuration from an Illumina samplesheet.
  * @author Laurent Jourdren
@@ -120,6 +119,7 @@ public class IlluminaSamplesheetRunConfigurationProvider
 
   private SamplesheetFormat sampleSheetFormat;
   private String samplesheetCreationCommand;
+  private boolean allowUnderscoresInSampleIds;
   private boolean initialized;
 
   @Override
@@ -150,6 +150,8 @@ public class IlluminaSamplesheetRunConfigurationProvider
         conf.get("samplesheet.prefix.filename", DEFAULT_SAMPLESHEET_PREFIX);
     this.samplesheetCreationCommand =
         conf.get("samplesheet.generator.command", "");
+    this.allowUnderscoresInSampleIds =
+        conf.getBoolean("samplesheet.allow.underscores.in.sample.ids", false);
 
     // Load index sequences
     if (conf.containsKey("index.sequences")) {
@@ -204,7 +206,8 @@ public class IlluminaSamplesheetRunConfigurationProvider
 
     // Update samplesheet
     this.logger.info(runData.getRunId(), "Update samplesheet");
-    updateSamplesheet(samplesheet, runId, runInfo.getFlowCellLaneCount());
+    updateSamplesheet(samplesheet, runId, runInfo.getFlowCellLaneCount(),
+        this.allowUnderscoresInSampleIds);
 
     // Check samplesheet
     checkSamplesheet(samplesheet, runId, runInfo.getFlowCell());
@@ -375,12 +378,20 @@ public class IlluminaSamplesheetRunConfigurationProvider
   }
 
   private void updateSamplesheet(SampleSheet samplesheet, RunId runId,
-      int laneCount) throws Aozan3Exception {
+      int laneCount, boolean allowUnderscoresInSampleIds)
+      throws Aozan3Exception {
 
-    // Replace index sequence shortcuts by sequences
     try {
+
+      // Replace underscores by dashes
+      if (!allowUnderscoresInSampleIds) {
+        SampleSheetUtils.replaceUnderscoresByDashesInSampleIds(samplesheet);
+      }
+
+      // Replace index sequence shortcuts by sequences
       SampleSheetUtils.replaceIndexShortcutsBySequences(samplesheet,
           this.indexSequences);
+
     } catch (KenetreException e) {
       this.logger.error("Error while updating samplesheet for run " + runId);
       throw new Aozan3Exception(e);
