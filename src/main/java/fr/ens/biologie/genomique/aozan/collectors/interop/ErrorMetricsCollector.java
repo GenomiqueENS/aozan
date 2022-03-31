@@ -40,6 +40,9 @@ import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.collectors.interop.ReadsData.ReadData;
 import fr.ens.biologie.genomique.aozan.util.StatisticsUtils;
+import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.illumina.interop.ErrorMetric;
+import fr.ens.biologie.genomique.kenetre.illumina.interop.ErrorMetricsReader;
 
 /**
  * This class collects run data by reading the ErrorMetricsOut.bin in InterOp
@@ -77,8 +80,8 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
       int keyMap;
 
       // Distribution of metrics between lane and code
-      for (final ErrorMetrics iem : new ErrorMetricsReader(getInterOpDir())
-          .readMetrics()) {
+      for (final ErrorMetric iem : new ErrorMetricsReader(
+          getInterOpDir()).readMetrics()) {
         keyMap = getKeyMap(iem.getLaneNumber(),
             getReadFromCycleNumber(iem.getCycleNumber()));
 
@@ -90,6 +93,8 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
       // Case : ErrorMetricsOut.bin doesn't exist, all values are 0.0
       collectionEmpty(1, getLanesCount());
 
+    } catch (final KenetreException e) {
+      throw new AozanException(e);
     }
 
     // Build runData
@@ -215,7 +220,7 @@ public class ErrorMetricsCollector extends AbstractMetricsCollector {
      * Save a record from TileMetricsOut.bin file.
      * @param iem Illumina tile metrics
      */
-    public void addMetric(final ErrorMetrics iem) {
+    public void addMetric(final ErrorMetric iem) {
 
       this.allErrorRates.put(iem.getTileNumber(), iem.getErrorRate());
       final int cycle = iem.getCycleNumber();

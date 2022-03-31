@@ -42,8 +42,8 @@ import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
-import fr.ens.biologie.genomique.aozan.illumina.RunInfo;
-import fr.ens.biologie.genomique.aozan.illumina.RunParameters;
+import fr.ens.biologie.genomique.kenetre.illumina.RunInfo;
+import fr.ens.biologie.genomique.kenetre.illumina.RunParameters;
 
 /**
  * This collector collect data from the RunInfo.xml file, working with all RTA

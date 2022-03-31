@@ -29,7 +29,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.PartialDataTypeFilt
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.TechnologyDataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
-import fr.ens.biologie.genomique.aozan.illumina.RunInfo;
+import fr.ens.biologie.genomique.kenetre.illumina.RunInfo;
 
 /**
  * This class define an Illumina end run data processor.

@@ -18,6 +18,7 @@
 
     <java.version>1.8</java.version>
     <htsjdk.version>1.118</htsjdk.version>
+    <kenetre.version>0.2</kenetre.version>
   </properties>
   
   <organization>
@@ -304,14 +305,14 @@
        <dependency>
          <groupId>fr.ens.biologie.genomique</groupId>
          <artifactId>kenetre-core</artifactId>
-         <version>0.1</version>
+	 <version>${kenetre.version}</version>
          <scope>compile</scope>
        </dependency>
 
        <dependency>
          <groupId>fr.ens.biologie.genomique</groupId>
          <artifactId>kenetre-illumina</artifactId>
-         <version>0.1</version>
+	 <version>${kenetre.version}</version>
          <scope>compile</scope>
        </dependency>
 

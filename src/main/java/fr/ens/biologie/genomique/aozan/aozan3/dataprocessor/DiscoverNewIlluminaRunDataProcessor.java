@@ -29,8 +29,8 @@ import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.PartialDataTypeFilt
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.TechnologyDataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
-import fr.ens.biologie.genomique.aozan.illumina.RunInfo;
-import fr.ens.biologie.genomique.aozan.illumina.RunInfo.Read;
+import fr.ens.biologie.genomique.kenetre.illumina.RunInfo;
+import fr.ens.biologie.genomique.kenetre.illumina.RunInfo.Read;
 
 /**
  * This class define an Illumina run discovering data processor.

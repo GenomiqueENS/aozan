@@ -28,6 +28,9 @@ import java.util.List;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
+import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.illumina.interop.QMetric;
+import fr.ens.biologie.genomique.kenetre.illumina.interop.QMetricsReader;
 
 /**
  * This class collects run data by reading the QualityMetricsOut.bin in InterOp
@@ -57,7 +60,6 @@ public class QualityMetricsCollector extends AbstractMetricsCollector {
   public void collect(final RunData data) throws AozanException {
 
     super.collect(data);
-    final QMetricsReader reader = new QMetricsReader(getInterOpDir());
 
     final long[][][] lanes = new long[data.getLaneCount()][][];
     final long[] global = new long[50];
@@ -82,16 +84,21 @@ public class QualityMetricsCollector extends AbstractMetricsCollector {
 
     }
 
-    for (final QualityMetrics qual : reader.readMetrics()) {
+    try {
+      for (final QMetric qual : new QMetricsReader(getInterOpDir())
+          .readMetrics()) {
 
-      int readSource = readNumberFromCycle.get(qual.getCycleNumber() - 1) - 1;
-      int lane = qual.getLaneNumber() - 1;
-      long[] scores = qual.getClustersScore();
-      for (int i = 0; i < scores.length; i++) {
-        lanes[lane][readSource][i] += scores[i];
-        global[i] += scores[i];
+        int readSource = readNumberFromCycle.get(qual.getCycleNumber() - 1) - 1;
+        int lane = qual.getLaneNumber() - 1;
+        long[] scores = qual.getClustersScore();
+        for (int i = 0; i < scores.length; i++) {
+          lanes[lane][readSource][i] += scores[i];
+          global[i] += scores[i];
+        }
+
       }
-
+    } catch (KenetreException e) {
+      throw new AozanException(e);
     }
 
     for (int i = 0; i < lanes.length; i++) {
