@@ -25,6 +25,7 @@ package fr.ens.biologie.genomique.aozan.collectors.interop;
 
 import static fr.ens.biologie.genomique.aozan.collectors.ReadCollector.READ_DATA_PREFIX;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,12 +33,11 @@ import java.util.List;
 import java.util.Map;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
-import fr.ens.biologie.genomique.aozan.Settings;
-import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
 import fr.ens.biologie.genomique.aozan.util.StatisticsUtils;
 import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.illumina.interop.ExtendedTileMetric;
+import fr.ens.biologie.genomique.kenetre.illumina.interop.ExtendedTileMetricsReader;
 import fr.ens.biologie.genomique.kenetre.illumina.interop.TileMetric;
 import fr.ens.biologie.genomique.kenetre.illumina.interop.TileMetricsReader;
 
@@ -60,7 +60,7 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
     private final int tileCount;
     private final int readCount;
 
-    private final List<Float> clusterCountList = new ArrayList<>();
+    private final Map<Long, Float> clusterCountMap = new HashMap<>();
     private final List<Float> clusterCountPFList = new ArrayList<>();
     private final List<Float> clusterCountPFRatioList = new ArrayList<>();
     private final List<Float> densityList = new ArrayList<>();
@@ -69,10 +69,11 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
     private final Map<Integer, List<Float>> alignedMap = new HashMap<>();
     private final Map<Integer, List<Float>> prephasingMap = new HashMap<>();
     private final Map<Integer, List<Float>> phasingMap = new HashMap<>();
+    private final List<Float> percentOccupiedList = new ArrayList<>();
 
     void addMetric(TileMetric tm) {
 
-      this.clusterCountList.add(tm.getClusterCount());
+      this.clusterCountMap.put(tm.getTileNumber(), tm.getClusterCount());
       this.clusterCountPFList.add(tm.getClusterCountPF());
       this.clusterCountPFRatioList
           .add(tm.getClusterCountPF() / tm.getClusterCount() * 100.0f);
@@ -95,6 +96,14 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
         this.prephasingMap.get(readNumber).add(tm.getPercentPrephasing(i));
         this.phasingMap.get(readNumber).add(tm.getPercentPhasing(i));
       }
+    }
+
+    void addMetric(ExtendedTileMetric etm) {
+
+      float clusterCount = this.clusterCountMap.get(etm.getTileNumber());
+      float clusterCountOccupied = etm.getClusterCountOccupied();
+
+      this.percentOccupiedList.add(clusterCountOccupied / clusterCount);
     }
 
     private void meanAndSD(String key, Collection<Float> c, RunData data) {
@@ -130,17 +139,13 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
 
       for (int readNumber = 1; readNumber <= this.readCount; readNumber++) {
 
-        // TODO fix this. value is defined by lane
-        data.put(READ_DATA_PREFIX + ".read" + readNumber + ".density.ratio",
-            new StatisticsUtils(this.densityPFRatioList).getMean());
-
         final String key =
             READ_DATA_PREFIX + ".read" + readNumber + ".lane" + this.laneNumber;
 
         // Same values for all read in a lane, values for one tile
-        meanAndSD(key + ".clusters.raw", this.clusterCountList, data, true);
+        meanAndSD(key + ".clusters.raw", this.clusterCountMap.values(), data,
+            true);
         meanAndSD(key + ".clusters.pf", this.clusterCountPFList, data, true);
-        meanAndSD(key + ".prc.pf.clusters", this.clusterCountPFList, data);
         meanAndSD(key + ".prc.pf.clusters", this.clusterCountPFRatioList, data);
 
         meanAndSD(key + ".density.raw", this.densityList, data);
@@ -159,6 +164,14 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
           data.put(key + ".prc.align.sd", 0);
           data.put(key + ".phasing", Float.NaN);
           data.put(key + ".prephasing", Float.NaN);
+        }
+
+        // Percent occupied
+        if (!this.percentOccupiedList.isEmpty()) {
+          meanAndSD(key + ".prc.occupied", this.percentOccupiedList, data);
+        } else {
+          data.put(key + ".prc.occupied", Float.NaN);
+          data.put(key + ".prc.occupied.sd", Float.NaN);
         }
 
         final String s = data.isReadIndexed(readNumber) ? "(Index)" : "";
@@ -184,15 +197,6 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
     return COLLECTOR_NAME;
   }
 
-  @Override
-  public void configure(final QC qc, final CollectorConfiguration conf) {
-
-    super.configure(qc, conf);
-
-    this.densityRatio =
-        conf.getDouble(Settings.QC_CONF_CLUSTER_DENSITY_RATIO_KEY, 0.3472222);
-  }
-
   /**
    * Collect data from TileMetric interOpFile.
    * @param data result data object
@@ -205,6 +209,7 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
     Map<Integer, TileMetricsPerLaneStatistics> tileMetrics = null;
     boolean first = true;
 
+    // Parse TileMetrics file
     try {
       for (TileMetric tm : new TileMetricsReader(getInterOpDir())
           .readMetrics()) {
@@ -219,6 +224,21 @@ public class TileMetricsCollector extends AbstractMetricsCollector {
       }
     } catch (KenetreException e) {
       throw new AozanException(e);
+    }
+
+    // Parse ExtendedTileMetrics
+    if (new File(getInterOpDir(), ExtendedTileMetricsReader.METRICS_FILE)
+        .exists()) {
+
+      try {
+        for (ExtendedTileMetric tm : new ExtendedTileMetricsReader(
+            getInterOpDir()).readMetrics()) {
+
+          tileMetrics.get(tm.getLaneNumber()).addMetric(tm);
+        }
+      } catch (KenetreException e) {
+        throw new AozanException(e);
+      }
     }
 
     // Build runData

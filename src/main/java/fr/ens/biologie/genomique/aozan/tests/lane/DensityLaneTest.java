@@ -33,11 +33,11 @@ import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.collectors.ReadCollector;
 
 /**
- * This class define a lane test on cluster density.
- * @since 0.8
+ * This class define a density lane test.
+ * @since 3.0
  * @author Laurent Jourdren
  */
-public class ClusterDensityLaneTest extends AbstractSimpleLaneTest {
+public class DensityLaneTest extends AbstractSimpleLaneTest {
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -71,9 +71,9 @@ public class ClusterDensityLaneTest extends AbstractSimpleLaneTest {
   /**
    * Public constructor.
    */
-  public ClusterDensityLaneTest() {
+  public DensityLaneTest() {
 
-    super("lane.cluster.density", "Cluster Density", "Cluster Density",
-        "k/mm²");
+    super("lane.density", "Density", "Density", "k/mm²");
   }
+
 }

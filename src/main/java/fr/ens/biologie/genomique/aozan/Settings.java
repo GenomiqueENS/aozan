@@ -246,10 +246,6 @@ public final class Settings {
   public static final String QC_CONF_FASTQC_BLAST_USE_DOCKER_KEY =
       "qc.conf.fastqc.blast.use.docker";
 
-  /** Collector cluster density ratio. */
-  public static final String QC_CONF_CLUSTER_DENSITY_RATIO_KEY =
-      "qc.conf.cluster.density.ratio";
-
   /** Collector fastqscreen fastq max reads parsed. */
   public static final String QC_CONF_FASTQSCREEN_FASTQ_MAX_READS_PARSED_KEY =
       "qc.conf.fastqscreen.fastq.max.reads.parsed";

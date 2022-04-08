@@ -18,7 +18,7 @@
 
     <java.version>1.8</java.version>
     <htsjdk.version>1.118</htsjdk.version>
-    <kenetre.version>0.2</kenetre.version>
+    <kenetre.version>0.3</kenetre.version>
   </properties>
   
   <organization>

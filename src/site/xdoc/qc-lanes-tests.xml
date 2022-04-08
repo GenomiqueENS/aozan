@@ -62,11 +62,20 @@
          <tr><td>qc.test.lane.pf.cluster.percent.enable</td><td>boolean</td><td>False</td><td>Enable lane passing filter cluster percent test</td></tr>
          <tr><td>qc.test.lane.pf.cluster.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
+         <tr><td>qc.test.lane.yield.enable</td><td>boolean</td><td>False</td><td>Enable lane yield test</td></tr>
+         <tr><td>qc.test.lane.yield.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
+
+         <tr><td>qc.test.lane.yield.pf.enable</td><td>boolean</td><td>False</td><td>Enable lane yield passing filter test</td></tr>
+         <tr><td>qc.test.lane.yield.pf.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
+
          <tr><td>qc.test.lane.phix.raw.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable lane PhiX raw cluster count test</td></tr>
          <tr><td>qc.test.lane.phix.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
          <tr><td>qc.test.lane.cluster.density.enable</td><td>boolean</td><td>False</td><td>Enable lane cluster density test</td></tr>
          <tr><td>qc.test.lane.cluster.density.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
+
+         <tr><td>qc.test.lane.cluster.density.pf.enable</td><td>boolean</td><td>False</td><td>Enable lane cluster passing filter density test</td></tr>
+         <tr><td>qc.test.lane.cluster.density.pf.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
          <tr><td>qc.test.lane.phix.align.percent.enable</td><td>boolean</td><td>False</td><td>Enable lane PhiX align percent test</td></tr>
          <tr><td>qc.test.lane.phix.align.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
@@ -95,6 +104,9 @@
 
          <tr><td>qc.test.lane.q30.percent.enable</td><td>boolean</td><td>False</td><td>Enable lane Q30 percent test</td></tr>
          <tr><td>qc.test.lane.q30.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
+
+	 <tr><td>qc.test.lane.occupancy.percent.enable</td><td>boolean</td><td>False</td><td>Enable lane occupancy percent test</td></tr>
+         <tr><td>qc.test.lane.occupancy.percent.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
        </table>
 
        <p>An example of table built with lanes quality tests.</p>
