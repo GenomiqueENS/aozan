@@ -124,6 +124,9 @@
           <tr><td>qc.test.global.q30.percent.enable</td><td>boolean</td><td>False</td><td>Enable global Q30 percent test</td></tr>
           <tr><td>qc.test.global.q30.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
+          <tr><td>qc.test.global.loading.concentration.percent.enable</td><td>boolean</td><td>False</td><td>Enable global loading concentration percent test</td></tr>
+          <tr><td>qc.test.global.loading.concentration.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
+
        </table>
 
        <p>An example of table built with lanes global tests.</p>

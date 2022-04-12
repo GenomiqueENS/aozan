@@ -23,6 +23,7 @@ fr.ens.biologie.genomique.aozan.tests.global.PhiXRawClusterSDGlobalTest
 fr.ens.biologie.genomique.aozan.tests.global.RawClusterSDGlobalTest
 fr.ens.biologie.genomique.aozan.tests.global.SampleCountGlobalTest
 fr.ens.biologie.genomique.aozan.tests.global.UndeterminedClusterPercentGlobalTest
+fr.ens.biologie.genomique.aozan.tests.global.LoadingConcentrationPercentGlobalTest
 fr.ens.biologie.genomique.aozan.tests.lane.ClusterDensityLaneTest
 fr.ens.biologie.genomique.aozan.tests.lane.ClusterDensityPFLaneTest
 fr.ens.biologie.genomique.aozan.tests.lane.Cycle100ErrorRateLaneTest
