@@ -406,19 +406,20 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     final String mapperNameLower =
         mapperName.toLowerCase(Globals.DEFAULT_LOCALE);
 
-    if (BowtieMapperProvider.MAPPER_NAME.toLowerCase(Globals.DEFAULT_LOCALE).equals(mapperNameLower)) {
+    if (BowtieMapperProvider.MAPPER_NAME.toLowerCase(Globals.DEFAULT_LOCALE)
+        .equals(mapperNameLower)) {
       return " -l 20 -k 2 --chunkmbs 512"
           + (pairedMode ? " --maxins 1000" : "");
     }
 
-    if (Bowtie2MapperProvider.MAPPER_NAME.toLowerCase(Globals.DEFAULT_LOCALE).equals(mapperNameLower)) {
+    if (Bowtie2MapperProvider.MAPPER_NAME.toLowerCase(Globals.DEFAULT_LOCALE)
+        .equals(mapperNameLower)) {
       return " -k 2 --very-fast-local --no-discordant --no-mixed"
           + (pairedMode ? " --maxins 1000" : "");
     }
 
     throw new AozanException(
-          "FastqScreen fail: no argument defined for the mapper "
-              + mapperName);
+        "FastqScreen fail: no argument defined for the mapper " + mapperName);
   }
 
   //
@@ -462,6 +463,6 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
     this.setMapReduceTemporaryDirectory(this.tmpDir);
 
     this.reporter = new LocalReporter();
-    this.fastqScreenResult = new FastqScreenResult();
+    this.fastqScreenResult = new FastqScreenResult(this.mapperName);
   }
 }

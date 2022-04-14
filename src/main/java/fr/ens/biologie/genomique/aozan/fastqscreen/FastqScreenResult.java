@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.fastqscreen;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -67,12 +69,12 @@ public class FastqScreenResult {
           + "%Multiple_hits_multiple_libraries";
 
   private static final String HEADER_COLUMNS_TEXT_V2 =
-      "Library\t#Reads_processed\t"
+      "Genome\t#Reads_processed\t"
           + "#Unmapped\t%Unmapped\t"
-          + "#One_hit_one_library\t%One_hit_one_library\t"
-          + "#Multiple_hits_one_library\t%Multiple_hits_one_library\t"
-          + "#One_hit_multiple_libraries\t%One_hit_multiple_libraries\t"
-          + "Multiple_hits_multiple_libraries";
+          + "#One_hit_one_genome\t%One_hit_one_genome\t"
+          + "#Multiple_hits_one_genome\t%Multiple_hits_one_genome\t"
+          + "#One_hit_multiple_genomes\t%One_hit_multiple_genomes\t"
+          + "#Multiple_hits_multiple_genomes\t%Multiple_hits_multiple_genomes";
 
   private final Map<String, DataPerGenome> resultsPerGenome = new HashMap<>();
   private double percentUnmappedNoneGenome = 0.0;
@@ -82,6 +84,7 @@ public class FastqScreenResult {
 
   private int readsMapped;
   private int readsprocessed;
+  private final String mapperName;
 
   /**
    * Print table percent in format use by fastqscreen program with rounding
@@ -98,7 +101,9 @@ public class FastqScreenResult {
 
     final StringBuilder s = new StringBuilder();
 
-    s.append("#Fastq_screen version: 0.5.0\t#Reads in subset: ");
+    s.append("#Fastq_screen version: 0.9.2\tAligner: ");
+    s.append(this.mapperName);
+    s.append("\t#Reads in subset: ");
     s.append(this.readsprocessed);
     s.append("\n#FastqScreen : for Projet ");
     s.append(fastqSample.getProjectName());
@@ -640,4 +645,17 @@ public class FastqScreenResult {
     }
   }
 
+  //
+  // Constructor
+  //
+
+  /**
+   * Constructor.
+   * @param mapperName name of the mapper
+   */
+  FastqScreenResult(String mapperName) {
+
+    requireNonNull(mapperName);
+    this.mapperName = mapperName;
+  }
 }
