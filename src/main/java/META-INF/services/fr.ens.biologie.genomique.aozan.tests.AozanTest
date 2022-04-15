@@ -24,6 +24,7 @@ fr.ens.biologie.genomique.aozan.tests.global.RawClusterSDGlobalTest
 fr.ens.biologie.genomique.aozan.tests.global.SampleCountGlobalTest
 fr.ens.biologie.genomique.aozan.tests.global.UndeterminedClusterPercentGlobalTest
 fr.ens.biologie.genomique.aozan.tests.global.LoadingConcentrationPercentGlobalTest
+fr.ens.biologie.genomique.aozan.tests.global.OccupancyPercentGlobalTest
 fr.ens.biologie.genomique.aozan.tests.lane.ClusterDensityLaneTest
 fr.ens.biologie.genomique.aozan.tests.lane.ClusterDensityPFLaneTest
 fr.ens.biologie.genomique.aozan.tests.lane.Cycle100ErrorRateLaneTest
@@ -83,6 +84,7 @@ fr.ens.biologie.genomique.aozan.tests.sample.RecoverablePFClusterCountSampleTest
 fr.ens.biologie.genomique.aozan.tests.sample.RecoverableRawClusterPercentSampleTest
 fr.ens.biologie.genomique.aozan.tests.sample.RecoverableRawClusterCountSampleTest
 fr.ens.biologie.genomique.aozan.tests.sample.FastQCSequenceLengthDistributionSampleTest
+fr.ens.biologie.genomique.aozan.tests.sample.GenomeNamesSampleTest
 fr.ens.biologie.genomique.aozan.tests.pooledsample.FastQScreenMappedPercentPooledSampleTest
 fr.ens.biologie.genomique.aozan.tests.pooledsample.GenomeNamesPooledSampleTest
 fr.ens.biologie.genomique.aozan.tests.pooledsample.FastQScreenMappedExceptRefPercentPooledSampleTest

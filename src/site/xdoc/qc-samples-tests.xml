@@ -65,6 +65,7 @@
 
         <table>
           <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+          <tr><td>qc.test.sample.genome.names.enable</td><td>boolean</td><td>False</td><td>Enable genome names test</td></tr>
           <tr><td>qc.test.sample.raw.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable raw clusters count test</td></tr>
           <tr><td>qc.test.sample.raw.cluster.count.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values</td></tr>
           <tr><td>qc.test.sample.pf.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable passing filter count test</td></tr>
