@@ -59,7 +59,7 @@ public class MultiQCCollector implements Collector {
 
   private static final String MULTIQC_EXECUTABLE = "multiqc";
   private static final String MULTIQC_EXECUTABLE_DOCKER = "";
-  private static final String MULTIQC_DOCKER_IMAGE = "ewels/multiqc:v1.11";
+  private static final String MULTIQC_DOCKER_IMAGE = "ewels/multiqc:v1.12";
 
   private static final Logger LOGGER = Common.getLogger();
 
