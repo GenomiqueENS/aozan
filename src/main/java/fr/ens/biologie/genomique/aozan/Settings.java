@@ -279,6 +279,9 @@ public final class Settings {
   /** Collector fastqscreen settings mappers indexes path. */
   public static final String QC_CONF_FASTQSCREEN_MAPPERS_INDEXES_PATH_KEY =
       "qc.conf.fastqscreen.mapper.indexes.path";
+  /** Collector fastqscreen settings max read length. */
+  public static final String QC_CONF_FASTQSCREEN_MAX_READ_LENGTH_KEY =
+      "qc.conf.fastqscreen.max.read.length";
   /** Collector fastqscreen xsl file. */
   public static final String QC_CONF_FASTQSCREEN_XSL_FILE_KEY =
       "qc.conf.fastqscreen.xsl.file";

@@ -24,7 +24,6 @@
 
 package fr.ens.biologie.genomique.aozan.collectors;
 
-
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
@@ -56,6 +55,7 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
   private boolean skipControlLane;
   private boolean ignorePairedMode;
   private boolean isProcessUndeterminedIndicesSamples = false;
+  private int maxReadLength = -1;
 
   // count reads pf necessary for create a temporary partial fastq
   private int countReadsPFtoCopy;
@@ -106,17 +106,31 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
       }
     }
 
+    // Set the maximum read length
+    if (conf.containsKey(Settings.QC_CONF_FASTQSCREEN_MAX_READ_LENGTH_KEY)) {
+
+      try {
+        final int maxReadLength =
+            conf.getInt(Settings.QC_CONF_FASTQSCREEN_MAX_READ_LENGTH_KEY, -1);
+        if (maxReadLength > 0) {
+          this.maxReadLength = maxReadLength;
+        }
+
+      } catch (final NumberFormatException ignored) {
+      }
+    }
+
     try {
-      this.skipControlLane =
-          conf.getBoolean(Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY);
+      this.skipControlLane = conf.getBoolean(
+          Settings.QC_CONF_FASTQSCREEN_MAPPING_SKIP_CONTROL_LANE_KEY);
     } catch (final Exception e) {
       // Default value
       this.skipControlLane = true;
     }
 
     try {
-      this.ignorePairedMode = conf
-          .getBoolean(Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_END_MODE_KEY);
+      this.ignorePairedMode = conf.getBoolean(
+          Settings.QC_CONF_FASTQSCREEN_MAPPING_IGNORE_PAIRED_END_MODE_KEY);
 
     } catch (final Exception e) {
       // Default value
@@ -229,7 +243,7 @@ public class SubsetFastqCollector extends AbstractFastqCollector {
 
     // Create the thread object
     return new SubsetFastqThread(fastqSample, rawClusterCount, pfClusterCount,
-        this.countReadsPFtoCopy, this.maxReadsPFtoParse);
+        this.countReadsPFtoCopy, this.maxReadsPFtoParse, this.maxReadLength);
   }
 
   /**

@@ -61,6 +61,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
 
   // count reads pf necessary for create a temporary partial fastq
   private final int countReadsPFtoCopy;
+  private final int maxReadLength;
 
   private final long rawClusterCount;
   private final long pfClusterCountParsed;
@@ -170,7 +171,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
             if (!ill.isFiltered()) {
               if (comptReadsPF % step == 0) {
                 // Write in tmp fastq file
-                fwTmpFastq.write(seq.toFastQ() + '\n');
+                fwTmpFastq.write(trimRead(seq).toFastQ() + '\n');
                 fwTmpFastq.flush();
 
                 if (--countReadsToCopyByFastq <= 0) {
@@ -267,7 +268,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
 
             if (comptReadsPF % step == 0) {
               // Write in tmp fastq file
-              fwTmpFastq.write(seq.toFastQ() + '\n');
+              fwTmpFastq.write(trimRead(seq).toFastQ() + '\n');
               fwTmpFastq.flush();
 
               if (--countReadsToCopyByFastq <= 0) {
@@ -346,6 +347,23 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
     }
   }
 
+  /**
+   * Trim reads to write if required in configuration file.
+   * @param read read to trim
+   * @return a trimmed read
+   */
+  private ReadSequence trimRead(ReadSequence read) {
+
+    if (this.maxReadLength < 1 || read.length() < this.maxReadLength) {
+      return read;
+    }
+
+    ReadSequence result = read.subSequence(0, this.maxReadLength);
+    result.setName(read.getName());
+
+    return result;
+  }
+
   //
   // Constructor
   //
@@ -363,8 +381,8 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
    */
   public SubsetFastqThread(final FastqSample fastqSample,
       final long rawClusterCount, final long pfClusterCount,
-      final int numberReadsToCopy, final int maxReadsToParse)
-      throws AozanException {
+      final int numberReadsToCopy, final int maxReadsToParse,
+      final int maxReadLength) throws AozanException {
 
     super(fastqSample);
 
@@ -376,5 +394,6 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
 
     this.tmpFastqFile =
         new File(fastqSample.getSubsetFastqFile().getPath() + ".tmp");
+    this.maxReadLength = maxReadLength;
   }
 }
