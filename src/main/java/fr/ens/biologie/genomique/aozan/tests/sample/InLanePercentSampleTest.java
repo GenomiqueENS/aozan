@@ -68,8 +68,12 @@ public class InLanePercentSampleTest extends AbstractSampleTest {
 
     try {
 
-      final long raw = data.getLong(rawSampleKey);
-      final long all = data.getLong(rawAll);
+      final long raw = data.getLong(rawSampleKey, 0);
+      final long all = data.getLong(rawAll, 0);
+
+      if (all == 0) {
+        return new TestResult("NA");
+      }
 
       final double percent = (double) raw / (double) all;
 

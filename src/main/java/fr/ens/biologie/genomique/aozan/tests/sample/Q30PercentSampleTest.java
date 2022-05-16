@@ -60,8 +60,12 @@ public class Q30PercentSampleTest extends AbstractSampleTest {
     final String prefix = "demux.sample" + sampleId + ".read" + readSample;
 
     try {
-      final long q30 = data.getLong(prefix + ".pf.yield.q30");
-      final long raw = data.getLong(prefix + ".pf.yield");
+      final long q30 = data.getLong(prefix + ".pf.yield.q30", 0);
+      final long raw = data.getLong(prefix + ".pf.yield", 0);
+
+      if (raw == 0) {
+        return new TestResult("NA");
+      }
 
       final double percent = (double) q30 / (double) raw;
 

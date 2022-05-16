@@ -60,8 +60,13 @@ public class PFPercentSampleTest extends AbstractSampleTest {
     final String prefix = "demux.sample" + sampleId + ".read" + readSample;
 
     try {
-      final long raw = data.getLong(prefix + ".raw.cluster.count");
-      final long pf = data.getLong(prefix + ".pf.cluster.count");
+      final long raw = data.getLong(prefix + ".raw.cluster.count", 0);
+      final long pf = data.getLong(prefix + ".pf.cluster.count", 0);
+
+      if (raw == 0) {
+        return new TestResult("NA");
+      }
+
       final double percent = (double) pf / (double) raw;
 
       if (interval == null || undetermined)
