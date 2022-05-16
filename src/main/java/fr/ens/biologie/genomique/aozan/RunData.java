@@ -937,6 +937,21 @@ public class RunData {
   }
 
   /**
+   * Get a key.
+   * @param key key name
+   * @param defaultValue value to use if the key does not exist
+   * @return the value of the data for the key
+   */
+  public String get(final String key, final String defaultValue) {
+
+    if (!contains(key)) {
+      return defaultValue;
+    }
+
+    return get(key);
+  }
+
+  /**
    * Get a boolean key.
    * @param key key name
    * @return the value of the data for the key
@@ -944,6 +959,21 @@ public class RunData {
   public boolean getBoolean(final String key) {
 
     return Boolean.parseBoolean(get(key));
+  }
+
+  /**
+   * Get a boolean key.
+   * @param key key name
+   * @param defaultValue value to use if the key does not exist
+   * @return the value of the data for the key
+   */
+  public boolean getBoolean(final String key, final boolean defaultValue) {
+
+    if (!contains(key)) {
+      return defaultValue;
+    }
+
+    return getBoolean(key);
   }
 
   /**
@@ -967,6 +997,21 @@ public class RunData {
           "DataRun getInt throw NumberFormatException on this key "
               + key + " (value is " + value + ")");
     }
+  }
+
+  /**
+   * Get an integer key.
+   * @param key key name
+   * @param defaultValue value to use if the key does not exist
+   * @return the value of the data for the key
+   */
+  public int getInt(final String key, final int defaultValue) {
+
+    if (!contains(key)) {
+      return defaultValue;
+    }
+
+    return getInt(key);
   }
 
   /**
@@ -998,6 +1043,21 @@ public class RunData {
   }
 
   /**
+   * Get a long array key.
+   * @param key key name
+   * @param defaultValue value to use if the key does not exist
+   * @return the value of the data for the key
+   */
+  public long[] getLongArray(final String key, final long[] defaultValue) {
+
+    if (!contains(key)) {
+      return defaultValue;
+    }
+
+    return getLongArray(key);
+  }
+
+  /**
    * Get a long key.
    * @param key key name
    * @return the value of the data for the key
@@ -1008,7 +1068,7 @@ public class RunData {
 
     if (value == null) {
       throw new AozanRuntimeException(
-          "DataRun getInt throw NullPointerException on this key " + key);
+          "DataRun getLong throw NullPointerException on this key " + key);
     }
 
     try {
@@ -1018,6 +1078,22 @@ public class RunData {
           "DataRun getLong throw NumberFormatException on this key "
               + key + " (value is " + value + ")");
     }
+  }
+
+  /**
+   * Get a long key.
+   * @param key key name
+   * @param defaultValue value to use if the key does not exist
+   * @return the value of the data for the key
+   */
+  public long getLong(final String key, final long defaultValue) {
+
+    if (!contains(key)) {
+
+      return defaultValue;
+    }
+
+    return getLong(key);
   }
 
   /**
@@ -1044,6 +1120,21 @@ public class RunData {
   }
 
   /**
+   * Get a float key.
+   * @param key key name
+   * @param defaultValue value to use if the key does not exist
+   * @return the value of the data for the key
+   */
+  public float getFloat(final String key, final float defaultValue) {
+
+    if (!contains(key)) {
+      return defaultValue;
+    }
+
+    return getFloat(key);
+  }
+
+  /**
    * Get a double key.
    * @param key key name
    * @return the value of the data for the key
@@ -1064,6 +1155,21 @@ public class RunData {
           "DataRun getDouble throw NumberFormatException on this key "
               + key + " (value is " + value + ")");
     }
+  }
+
+  /**
+   * Get a double key.
+   * @param key key name
+   * @param defaultValue value to use if the key does not exist
+   * @return the value of the data for the key
+   */
+  public double getDouble(final String key, final double defaultValue) {
+
+    if (!contains(key)) {
+      return defaultValue;
+    }
+
+    return getDouble(key);
   }
 
   //
