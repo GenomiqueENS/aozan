@@ -296,9 +296,11 @@ public class DemultiplexStatsCollector extends DemultiplexingCollector {
     int max = runData.getInt("run.info.read.count");
     List<Integer> result = new ArrayList<>(max);
 
+    int count = 0;
+
     for (int read = 1; read <= max; read++) {
       if (!runData.getBoolean("run.info.read" + read + ".indexed")) {
-        result.add(read);
+        result.add(++count);
       }
     }
 
