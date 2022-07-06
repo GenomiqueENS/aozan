@@ -17,7 +17,7 @@
     <didyouknow>Did you know that aozan is the breton word for prepare?</didyouknow>
 
     <java.version>1.8</java.version>
-    <jython.version>2.7.0</jython.version>
+    <jython.version>2.7.1</jython.version>
     <htsjdk.version>1.118</htsjdk.version>
   </properties>
   
