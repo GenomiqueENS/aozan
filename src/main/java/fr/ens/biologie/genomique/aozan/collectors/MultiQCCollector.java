@@ -25,8 +25,6 @@ package fr.ens.biologie.genomique.aozan.collectors;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,9 +37,9 @@ import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
-import fr.ens.biologie.genomique.aozan.util.DockerManager;
 import fr.ens.biologie.genomique.eoulsan.util.SystemUtils;
 import fr.ens.biologie.genomique.eoulsan.util.process.DockerImageInstance;
+import fr.ens.biologie.genomique.eoulsan.util.process.FallBackDockerClient;
 import fr.ens.biologie.genomique.eoulsan.util.process.SimpleProcess;
 import fr.ens.biologie.genomique.eoulsan.util.process.SystemSimpleProcess;
 
@@ -191,15 +189,11 @@ public class MultiQCCollector implements Collector {
 
     if (docker) {
 
-      DockerImageInstance instance;
-      try {
-        instance = DockerManager
-            .getInstance(DockerManager.ClientType.FALLBACK,
-                new URI(this.dockerConnectionString))
-            .createImageInstance(this.dockerImage);
-      } catch (URISyntaxException e) {
-        throw new IOException("Invalid Docker connection URI", e);
-      }
+      // TODO The Spotify Docker client in Eoulsan does not seems to work
+      // anymore
+      // Use fallback Docker client
+      DockerImageInstance instance =
+          new FallBackDockerClient().createConnection(this.dockerImage);
 
       instance.pullImageIfNotExists();
 
