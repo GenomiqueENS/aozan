@@ -4,18 +4,22 @@ import static fr.ens.biologie.genomique.aozan.Globals.QC_DATA_EXTENSION;
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.BCL;
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.ILLUMINA_FASTQ;
 import static fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.BclConvertIlluminaDemuxDataProcessor.BCL_CONVERT_FORBIDDEN_DATA_SECTION;
-import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME;
 import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.sizeToHumanReadable;
 import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME;
 import static java.util.Objects.requireNonNull;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
@@ -181,6 +185,11 @@ public class Aozan2QCDataProcessor implements DataProcessor {
       qc(conf, bclLocation, fastqLocation, outputLocation, runId, samplesheet,
           writeDataFile, writeXMLFile, writeHTMLFile);
 
+      // Legacy mode for output
+      if (conf.getBoolean("legacy.output")) {
+        legacyOutput(outputLocation.getPath().toFile(), runId.getId());
+      }
+
       long endTime = System.currentTimeMillis();
 
       // Log disk usage and disk free space
@@ -277,6 +286,46 @@ public class Aozan2QCDataProcessor implements DataProcessor {
       // TODO update argument type of the method
       qc.writeReport(qcReport, styleSheetPath.isEmpty() ? null : styleSheetPath,
           htmlFile.toString());
+    }
+  }
+
+  /**
+   * Create output in legacy mode.
+   * @param outputDir QC output directory
+   * @param runId runId
+   * @throws AozanException if an error occurs while creating HTML index file
+   */
+  private static void legacyOutput(File outputDir, String runId)
+      throws AozanException {
+
+    File parentDir = outputDir.getParentFile();
+    File tmpDir = new File(parentDir, outputDir.getName() + ".tmp");
+    File finalDir = new File(outputDir, "qc_" + outputDir.getName());
+    File indexFile = new File(outputDir, "index.html");
+
+    // Rename output directory to a temporary directory
+    outputDir.renameTo(tmpDir);
+
+    // Create a new output directory
+    outputDir.mkdir();
+
+    // Move original directory
+    tmpDir.renameTo(finalDir);
+
+    // Read template
+    String template = new BufferedReader(
+        new InputStreamReader(Aozan2QCDataProcessor.class.getResourceAsStream(
+            "/legacy_template_index_run.html"), StandardCharsets.UTF_8)).lines()
+                .collect(Collectors.joining("\n"));
+
+    // Update template
+    String text = template.replace("$RUN_ID", runId);
+
+    // Write final index file
+    try {
+      Files.write(indexFile.toPath(), text.getBytes(StandardCharsets.UTF_8));
+    } catch (IOException e) {
+      throw new AozanException("Unable to write HTML index file", e);
     }
   }
 

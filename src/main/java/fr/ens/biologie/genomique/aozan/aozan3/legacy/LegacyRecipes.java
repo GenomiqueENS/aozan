@@ -355,6 +355,7 @@ public class LegacyRecipes {
 
     // Define step configuration
     Configuration stepConf = new Configuration(aozan2Conf);
+    stepConf.set("legacy.output", true);
 
     Step qcStep = new Step(recipe, "qcstep",
         Aozan2QCDataProcessor.PROCESSOR_NAME, outputStorageName, stepConf,
