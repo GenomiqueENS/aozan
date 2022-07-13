@@ -525,6 +525,9 @@ public class LegacyRecipes {
     // Get the var path
     this.varPath = Paths.get(checkAndGetSetting(aozan2Conf, "aozan.var.path"));
 
+    // Set last error file
+    conf.set("mail.last.error.file", this.varPath + "/lasterror.msg");
+
     // Get the main lock path
     this.mainLockPath =
         Paths.get(checkAndGetSetting(aozan2Conf, "aozan.lock.file"));

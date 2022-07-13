@@ -2,8 +2,13 @@ package fr.ens.biologie.genomique.aozan.aozan3;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
@@ -41,6 +46,8 @@ public class SendMail {
   private final String header;
   private final String footer;
 
+  private final Path lastErrorFile;
+
   private AozanLogger logger;
 
   /**
@@ -71,22 +78,31 @@ public class SendMail {
     String subject =
         this.subjectPrefix + "Error: " + t.getMessage().replace('\n', ' ');
 
-    StringBuilder sb = new StringBuilder();
-    sb.append(this.header);
+    String errorMessage = errorMessage(t);
 
-    sb.append("An exception has occured while executing Aozan: ");
-    sb.append(t.getMessage());
-    sb.append("\nStacktrace:\n");
+    if (this.lastErrorFile != null) {
 
-    // StackTrace
-    StringWriter sw = new StringWriter();
-    PrintWriter pw = new PrintWriter(sw);
-    t.printStackTrace(pw);
-    sb.append(sw);
+      String text = subject + '\n' + errorMessage;
 
-    sb.append(this.footer);
+      if (Files.isRegularFile(this.lastErrorFile)) {
 
-    sendMail(subject, sb.toString(), true);
+        // Read last error message
+        String lastText = readLastErrorMessage(this.lastErrorFile, this.logger);
+
+        // Check if the error message has changed
+        if (!text.equals(lastText)) {
+          sendMail(subject, errorMessage, true);
+          writeLastErrorMessage(this.lastErrorFile, text, this.logger);
+        }
+
+      } else {
+        // Write new error message
+        writeLastErrorMessage(this.lastErrorFile, text, this.logger);
+      }
+
+    } else {
+      sendMail(subject, errorMessage, true);
+    }
   }
 
   /**
@@ -144,11 +160,83 @@ public class SendMail {
       this.logger.warn("Error while sending mail: " + mex.getMessage());
     }
 
+    if (!error && this.lastErrorFile != null) {
+
+      try {
+        Files.delete(this.lastErrorFile);
+      } catch (IOException e) {
+        this.logger.warn(
+            "Error while removing last error file: " + this.lastErrorFile);
+      }
+
+    }
+
   }
 
   //
   // Other methods
   //
+
+  /**
+   * Create error message content.
+   * @param t exception
+   * @return a String with the error message content
+   */
+  private String errorMessage(Throwable t) {
+
+    requireNonNull(t);
+
+    StringBuilder sb = new StringBuilder();
+    sb.append(this.header);
+
+    sb.append("An exception has occured while executing Aozan: ");
+    sb.append(t.getMessage());
+    sb.append("\nStacktrace:\n");
+
+    // StackTrace
+    StringWriter sw = new StringWriter();
+    PrintWriter pw = new PrintWriter(sw);
+    t.printStackTrace(pw);
+    sb.append(sw);
+
+    sb.append(this.footer);
+
+    return sb.toString();
+  }
+
+  /**
+   * Read last error message content.
+   * @param lastErrorFile last error message file
+   * @param logger logger
+   * @return a String with the error email content
+   */
+  private static String readLastErrorMessage(Path lastErrorFile,
+      AozanLogger logger) {
+
+    try {
+      return new String(Files.readAllBytes(lastErrorFile),
+          StandardCharsets.UTF_8);
+    } catch (IOException e) {
+      logger.warn("Error while reading last error file: " + lastErrorFile);
+      return null;
+    }
+  }
+
+  /**
+   * Write last error message content.
+   * @param lastErrorFile last error message file
+   * @param msg message to write
+   * @param logger logger
+   */
+  private static void writeLastErrorMessage(Path lastErrorFile, String msg,
+      AozanLogger logger) {
+
+    try {
+      Files.write(lastErrorFile, msg.getBytes(StandardCharsets.UTF_8));
+    } catch (IOException e) {
+      logger.warn("Error while writing last error file: " + lastErrorFile);
+    }
+  }
 
   /**
    * Create a property object for javamail smtp configuration from the settings.
@@ -257,6 +345,9 @@ public class SendMail {
     this.footer = conf.get("mail.footer", DEFAULT_MAIL_FOOTER);
 
     this.properties = createJavaMailSMTPProperties(conf);
+
+    this.lastErrorFile = conf.containsKey("mail.last.error.file")
+        ? new File(conf.get("mail.last.error.file")).toPath() : null;
 
     // Check Email configuration
     checkConfiguration();
