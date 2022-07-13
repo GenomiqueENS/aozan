@@ -492,7 +492,7 @@ public class LegacyRecipes {
       Configuration logConf = new Configuration();
       logConf.set("aozan.logger", "file");
       logConf.set("aozan.log", aozan2Conf.get("aozan.log.path"));
-      logConf.set("aozan.log.level", aozan2Conf.get("aozan.log.level"));
+      logConf.set("aozan.log.level", aozan2Conf.get("aozan.log.level", "info"));
 
       return AozanLoggerFactory.newLogger(logConf, currentLogger);
     }

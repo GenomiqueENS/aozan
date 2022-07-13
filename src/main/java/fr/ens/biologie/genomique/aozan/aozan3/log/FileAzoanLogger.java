@@ -3,6 +3,7 @@ package fr.ens.biologie.genomique.aozan.aozan3.log;
 import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
@@ -24,7 +25,16 @@ public class FileAzoanLogger extends AbstractAzoanLogger {
     }
 
     try {
-      return new FileHandler(logPath, true);
+
+      Handler result = new FileHandler(logPath, true);
+
+      if (conf.containsKey("aozan.log.level")) {
+        String logLevelName = conf.get("aozan.log.level");
+        Level logLevel = Level.parse(logLevelName.toUpperCase());
+        result.setLevel(logLevel);
+      }
+
+      return result;
     } catch (SecurityException | IOException e) {
       throw new Aozan3Exception(e);
     }

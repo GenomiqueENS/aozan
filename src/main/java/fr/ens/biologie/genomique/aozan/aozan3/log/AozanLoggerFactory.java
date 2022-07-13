@@ -25,10 +25,14 @@ public class AozanLoggerFactory {
     requireNonNull(conf);
     requireNonNull(oldLogger);
 
+    if (!(oldLogger instanceof DummyAzoanLogger)) {
+
+      return oldLogger;
+    }
+
     // Disable old logger
-    AozanLogger old = oldLogger != null ? oldLogger : new DummyAzoanLogger();
-    old.flush();
-    old.close();
+    oldLogger.flush();
+    oldLogger.close();
 
     String loggerName = conf.get("aozan.logger", "dummy").toLowerCase().trim();
 
