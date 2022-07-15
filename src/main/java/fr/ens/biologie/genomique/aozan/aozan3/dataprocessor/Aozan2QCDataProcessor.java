@@ -211,15 +211,15 @@ public class Aozan2QCDataProcessor implements DataProcessor {
       // TODO Use absolute path
 
       // Report URL in email message
-      String reportLocationMessage = runConf.containsKey("reports.url")
-          ? "\n\nRun reports can be found at following location:\n  "
-              + runConf.get("reports.url") + '/' + runId.getId()
+      String reportLocationMessage = conf.containsKey("reports.url")
+          ? "\nRun reports can be found at following location:\n  "
+              + conf.get("reports.url") + '/' + runId.getId() + "\n"
           : "";
 
       String emailContent = String.format("Ending quality control for run %s.\n"
           + "Job finished at %s without error in %s.\n"
           + "You will find attached to this message the quality control report.\n\n"
-          + "QC files for this run can be found in the following directory: %s\n%s"
+          + "QC files for this run can be found in the following directory:\n  %s\n%s"
           + "\nFor this task %s has been used and %s GB still free.",
           runId.getId(), new Date(endTime).toString(),
           toTimeHumanReadable(endTime - startTime), outputLocation.getPath(),

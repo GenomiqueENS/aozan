@@ -296,6 +296,9 @@ public class LegacyRecipes {
 
     // Define step configuration
     Configuration stepConf = new Configuration();
+    if (aozan2Conf.containsKey("reports.url")) {
+      stepConf.set("reports.url", aozan2Conf.get("reports.url"));
+    }
 
     // Select the demux tool to use
     String demuxProcessorName;
@@ -357,6 +360,9 @@ public class LegacyRecipes {
     // Define step configuration
     Configuration stepConf = new Configuration(aozan2Conf);
     stepConf.set("legacy.output", true);
+    if (aozan2Conf.containsKey("reports.url")) {
+      stepConf.set("reports.url", aozan2Conf.get("reports.url"));
+    }
 
     Step qcStep = new Step(recipe, "qcstep",
         Aozan2QCDataProcessor.PROCESSOR_NAME, outputStorageName, stepConf,

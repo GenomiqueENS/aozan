@@ -204,15 +204,17 @@ public abstract class AbstractIlluminaDemuxDataProcessor
           "space used by demux: " + sizeToHumanReadable(outputSize));
 
       // Report URL in email message
-      String reportLocationMessage = runConf.containsKey("reports.url")
-          ? "\n\nRun reports can be found at following location:\n  "
-              + runConf.get("reports.url") + '/' + runId.getId()
+      String reportLocationMessage = conf.containsKey("reports.url")
+          ? "\nRun reports can be found at following location:\n  "
+              + conf.get("reports.url") + '/' + runId.getId() + "\n"
           : "";
 
-      String emailContent = String.format("Ending demultiplexing "
-          + "for run %s.\n" + "Job finished at %s without error in %s.\n"
-          + "FASTQ files for this run can be found in the following directory: %s\n%s"
-          + "\nFor this task %s has been used and %s GB still free.",
+      String emailContent = String.format(
+          "Ending demultiplexing "
+              + "for run %s.\n" + "Job finished at %s without error in %s.\n\n"
+              + "FASTQ files for this run can be found in the following "
+              + "directory:\n  %s\n%s"
+              + "\nFor this task %s has been used and %s GB still free.",
           runId.getId(), new Date(endTime).toString(),
           toTimeHumanReadable(endTime - startTime), outputLocation.getPath(),
           reportLocationMessage, sizeToHumanReadable(outputSize),
