@@ -160,7 +160,9 @@ public class SendMail {
       this.logger.warn("Error while sending mail: " + mex.getMessage());
     }
 
-    if (!error && this.lastErrorFile != null) {
+    if (!error
+        && this.lastErrorFile != null
+        && Files.isRegularFile(this.lastErrorFile)) {
 
       try {
         Files.delete(this.lastErrorFile);
