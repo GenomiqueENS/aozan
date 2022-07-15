@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -30,6 +31,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLoggerFactory;
 import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
 import fr.ens.biologie.genomique.eoulsan.EoulsanException;
+import fr.ens.biologie.genomique.eoulsan.EoulsanLogger;
 import fr.ens.biologie.genomique.eoulsan.LocalEoulsanRuntime;
 
 /**
@@ -427,6 +429,9 @@ public class Main {
     final int optionsCount = parseCommandLine();
 
     try {
+
+      // Disable logging for Eoulsan runtime startup
+      EoulsanLogger.getLogger().setLevel(Level.OFF);
 
       // Initialize Eoulsan runtime
       LocalEoulsanRuntime.initEoulsanRuntimeForExternalApp();
