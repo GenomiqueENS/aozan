@@ -299,7 +299,8 @@ public class LegacyRecipes {
 
     // Select the demux tool to use
     String demuxProcessorName;
-    switch (conf.get("demux.tool.name", "bcl2fastq").trim().toLowerCase()) {
+    switch (aozan2Conf.get("demux.tool.name", "bcl2fastq").trim()
+        .toLowerCase()) {
 
     case "bclconvert":
       demuxProcessorName = BclConvertIlluminaDemuxDataProcessor.PROCESSOR_NAME;
