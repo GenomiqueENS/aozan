@@ -31,6 +31,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.SimpleDataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
+import fr.ens.biologie.genomique.aozan.aozan3.util.DiskUtils;
 import fr.ens.biologie.genomique.eoulsan.util.StringUtils;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
@@ -183,7 +184,10 @@ public abstract class AbstractIlluminaDemuxDataProcessor
         Files.delete(samplesheetPath);
       }
 
-      // TODO chmod on fastq
+      // Chmod on output directory
+      if (conf.getBoolean("read.only.output.files", false)) {
+        DiskUtils.changeDirectoryMode(outputLocation.getPath(), "u-w,g-w,o-w");
+      }
 
       // TODO archive stats and samplesheet (2 new data processors)
 
