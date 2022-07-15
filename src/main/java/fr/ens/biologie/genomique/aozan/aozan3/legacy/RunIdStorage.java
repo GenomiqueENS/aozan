@@ -40,7 +40,12 @@ public class RunIdStorage {
 
     try {
       for (String line : Files.readAllLines(this.filePath)) {
-        result.add(new RunId(line.trim()));
+
+        // Add only non-empty lines
+        line = line.trim();
+        if (!line.isEmpty()) {
+          result.add(new RunId(line.trim()));
+        }
       }
     } catch (IOException e) {
       throw new Aozan3Exception("Error while loading run id list", e);
