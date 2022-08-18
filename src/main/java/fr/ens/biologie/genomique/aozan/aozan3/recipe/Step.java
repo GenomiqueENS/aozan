@@ -79,19 +79,19 @@ public class Step {
     processorConf.set("step.name", getName());
     processorConf.set("output.storage", sink.toJson());
 
-    this.logger.info("Looking for processor: " + this.processorName);
+    this.logger.debug("Looking for processor: " + this.processorName);
 
     this.processor =
         DataProcessorService.getInstance().newService(this.processorName);
 
-    this.logger.info("Found "
-        + this.processor.getClass().getName() + "  for processor "
+    this.logger.debug("Found "
+        + this.processor.getClass().getName() + " for processor "
         + this.processorName);
 
-    this.logger.info("Initialize processor " + this.processorName);
+    this.logger.debug("Initialize processor " + this.processorName);
     this.processor.init(processorConf, this.logger);
     this.logger
-        .info("Initialization of processor " + this.processorName + " done");
+        .debug("Initialization of processor " + this.processorName + " done");
 
     this.initialized = true;
   }

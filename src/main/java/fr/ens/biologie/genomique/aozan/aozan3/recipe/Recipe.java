@@ -213,16 +213,16 @@ public class Recipe {
     for (Step step : this.steps) {
       stepNames.add(step.getName() + " [" + step.getProcessorName() + "]");
     }
-    this.logger.info("Recipe \""
+    this.logger.debug("Recipe \""
         + getName() + "\" step(s): " + String.join(", ", stepNames));
 
-    this.logger.info("Initiliaze step(s)");
+    this.logger.debug("Initiliaze step(s)");
 
     for (Step step : this.steps) {
       step.init();
     }
 
-    this.logger.info("Successful initiliazation of step(s)");
+    this.logger.debug("Successful initiliazation of step(s)");
 
     this.initialized = true;
   }
@@ -406,7 +406,7 @@ public class Recipe {
     for (RunDataProvider provider : this.providers) {
 
       this.logger
-          .info("Looks for run in: " + provider.getDataStorage().getPath());
+          .debug("Looks for run in: " + provider.getDataStorage().getPath());
 
       List<RunData> runs = this.inProgressProviders.contains(provider)
           ? provider.listInProgressRunData() : provider.listCompletedRunData();
