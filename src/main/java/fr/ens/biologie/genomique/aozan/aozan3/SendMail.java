@@ -97,6 +97,7 @@ public class SendMail {
 
       } else {
         // Write new error message
+        sendMail(subject, errorMessage, true);
         writeLastErrorMessage(this.lastErrorFile, text, this.logger);
       }
 
