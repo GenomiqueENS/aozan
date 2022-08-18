@@ -199,11 +199,19 @@ public class Bcl2FastqOutput {
 
         final String filename = pathname.getName();
 
-        return (filename.startsWith("bcl2fastq_output_")
-            || filename.startsWith("bclconvert_output_"))
-            && (filename.endsWith(".out") || filename.endsWith(".err"))
-            && pathname.length() > 0;
+        // File must not be empty
+        if (pathname.length() == 0) {
+          return false;
+        }
 
+        // bcl2fastq
+        if (filename.startsWith("bcl2fastq_output_")) {
+          return true;
+        }
+
+        // BCL Convert
+        return filename.startsWith("bclconvert_output_")
+            && filename.endsWith(".out");
       }
     });
 
