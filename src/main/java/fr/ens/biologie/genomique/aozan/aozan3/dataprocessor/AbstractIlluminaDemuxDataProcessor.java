@@ -185,6 +185,7 @@ public abstract class AbstractIlluminaDemuxDataProcessor
       }
 
       // Chmod on output directory
+      DiskUtils.changeDirectoryMode(outputLocation.getPath(), "u+r,g+r,o+r");
       if (conf.getBoolean("read.only.output.files", false)) {
         DiskUtils.changeDirectoryMode(outputLocation.getPath(), "u-w,g-w,o-w");
       }
