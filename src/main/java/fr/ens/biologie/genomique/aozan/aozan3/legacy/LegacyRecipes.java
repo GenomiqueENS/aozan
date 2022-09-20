@@ -296,9 +296,8 @@ public class LegacyRecipes {
 
     // Define step configuration
     Configuration stepConf = new Configuration();
-    if (aozan2Conf.containsKey("reports.url")) {
-      stepConf.set("reports.url", aozan2Conf.get("reports.url"));
-    }
+    stepConf.setFromOtherConfIfExists(aozan2Conf, "reports.url");
+    stepConf.setFromOtherConfIfExists(aozan2Conf, "read.only.output.files");
 
     // Select the demux tool to use
     String demuxProcessorName;
