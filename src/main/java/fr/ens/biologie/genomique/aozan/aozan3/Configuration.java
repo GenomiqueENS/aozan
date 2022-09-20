@@ -43,6 +43,8 @@ public class Configuration {
    */
   public String get(String key) {
 
+    requireNonNull(key);
+
     if (!containsKey(key)) {
       throw new NoSuchElementException(key);
     }
@@ -261,13 +263,50 @@ public class Configuration {
   }
 
   /**
-   * Add all the key and value of a Configuration object in this one.
+   * Add all the keys and value of a Configuration object in this one.
    * @param conf the configuration to add
    */
   public void set(Configuration conf) {
 
     requireNonNull(conf);
     this.conf.putAll(conf.conf);
+  }
+
+  /**
+   * Set a value from the value of another configuration.
+   * @param conf the configuration where retriving the value
+   * @param key the ley
+   */
+  public void setFromOtherConf(Configuration conf, String key) {
+
+    requireNonNull(conf);
+    set(key, conf.get(key));
+  }
+
+  /**
+   * Set a value from the value of another configuration.
+   * @param conf the configuration where retriving the value
+   * @param key the ley
+   */
+  public void setFromOtherConfIfExists(Configuration conf, String key) {
+
+    requireNonNull(conf);
+    if (conf.containsKey(key)) {
+      set(key, conf.get(key));
+    }
+  }
+
+  /**
+   * Set a value from the value of another configuration.
+   * @param conf the configuration where retrieving the value
+   * @param key the key
+   * @param defaultValue value if the key does not exists
+   */
+  public void setFromOtherConf(Configuration conf, String key,
+      String defaultValue) {
+
+    requireNonNull(conf);
+    set(key, conf.get(key, defaultValue));
   }
 
   /**
