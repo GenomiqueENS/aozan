@@ -192,7 +192,6 @@ public class Configuration {
   public void set(String key, String value) {
 
     requireNonNull(key);
-    requireNonNull(value);
 
     this.conf.put(key.trim(), value);
   }
@@ -219,7 +218,6 @@ public class Configuration {
   public void set(String key, boolean value) {
 
     requireNonNull(key);
-    requireNonNull(value);
 
     this.conf.put(key.trim(), Boolean.toString(value));
   }

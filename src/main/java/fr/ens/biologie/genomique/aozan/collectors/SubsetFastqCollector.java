@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.aozan.Common;
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
@@ -47,7 +47,7 @@ import fr.ens.biologie.genomique.aozan.io.FastqSample;
 public class SubsetFastqCollector extends AbstractFastqCollector {
 
   /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   public static final String COLLECTOR_NAME = "subsetfastq";
 

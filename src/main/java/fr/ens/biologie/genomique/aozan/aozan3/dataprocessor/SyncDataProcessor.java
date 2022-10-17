@@ -1,7 +1,7 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
-import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.sizeToHumanReadable;
-import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.sizeToHumanReadable;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.toTimeHumanReadable;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;

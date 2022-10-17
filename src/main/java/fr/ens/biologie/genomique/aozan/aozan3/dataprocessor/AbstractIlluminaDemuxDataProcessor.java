@@ -1,8 +1,8 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.BCL;
-import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.sizeToHumanReadable;
-import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.sizeToHumanReadable;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.toTimeHumanReadable;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 
@@ -32,7 +32,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.SimpleDataTypeFilte
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.util.DiskUtils;
-import fr.ens.biologie.genomique.eoulsan.util.StringUtils;
+import fr.ens.biologie.genomique.kenetre.util.StringUtils;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVWriter;

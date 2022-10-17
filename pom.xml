@@ -18,7 +18,7 @@
 
     <java.version>8</java.version>
     <htsjdk.version>1.118</htsjdk.version>
-    <kenetre.version>0.3</kenetre.version>
+    <kenetre.version>0.10</kenetre.version>
   </properties>
   
   <organization>
@@ -167,12 +167,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>fr.ens.biologie.genomique</groupId>
-      <artifactId>eoulsan</artifactId>
-      <version>2.5</version>
-      <scope>compile</scope>
-    </dependency> 
-    <dependency>
         <groupId>org.apache.poi</groupId>
         <artifactId>poi</artifactId>
         <version>3.12</version>
@@ -193,7 +187,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>15.0</version>
+      <version>30.1.1-jre</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -312,6 +306,41 @@
        <dependency>
          <groupId>fr.ens.biologie.genomique</groupId>
          <artifactId>kenetre-illumina</artifactId>
+	 <version>${kenetre.version}</version>
+         <scope>compile</scope>
+       </dependency>
+
+       <dependency>
+         <groupId>fr.ens.biologie.genomique</groupId>
+         <artifactId>kenetre-bio</artifactId>
+	 <version>${kenetre.version}</version>
+         <scope>compile</scope>
+       </dependency>
+
+       <dependency>
+         <groupId>fr.ens.biologie.genomique</groupId>
+         <artifactId>kenetre-mappers</artifactId>
+	 <version>${kenetre.version}</version>
+         <scope>compile</scope>
+       </dependency>
+
+       <dependency>
+         <groupId>fr.ens.biologie.genomique</groupId>
+         <artifactId>kenetre-docker</artifactId>
+	 <version>${kenetre.version}</version>
+         <scope>compile</scope>
+       </dependency>
+
+       <dependency>
+         <groupId>fr.ens.biologie.genomique</groupId>
+         <artifactId>kenetre-storages</artifactId>
+	 <version>${kenetre.version}</version>
+         <scope>compile</scope>
+       </dependency>
+
+       <dependency>
+         <groupId>fr.ens.biologie.genomique</groupId>
+         <artifactId>kenetre-it</artifactId>
 	 <version>${kenetre.version}</version>
          <scope>compile</scope>
        </dependency>

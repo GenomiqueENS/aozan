@@ -23,8 +23,6 @@
 
 package fr.ens.biologie.genomique.aozan;
 
-import static fr.ens.biologie.genomique.eoulsan.LocalEoulsanRuntime.initEoulsanRuntimeForExternalApp;
-
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.logging.FileHandler;
@@ -33,7 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import fr.ens.biologie.genomique.eoulsan.EoulsanException;
+import fr.ens.biologie.genomique.aozan.aozan3.log.AbstractAzoanLogger;
 
 /**
  * This class contains common methods like logger initialization.
@@ -41,10 +39,6 @@ import fr.ens.biologie.genomique.eoulsan.EoulsanException;
  * @author Laurent Jourdren
  */
 public class Common {
-
-  public static final Logger getLogger() {
-    return Logger.getLogger(fr.ens.biologie.genomique.eoulsan.Globals.APP_NAME);
-  }
 
   /**
    * Return the pid of the instance of jvm.
@@ -94,24 +88,18 @@ public class Common {
   public static void initLogger(final String logPath, final Level logLevel)
       throws SecurityException, IOException, AozanException {
 
-    final Logger eoulsanLogger = getLogger();
+    final Logger eoulsanLogger = Aozan2Logger.getLogger();
 
     eoulsanLogger.setLevel(Level.OFF);
 
     // Remove default Handler
     eoulsanLogger.removeHandler(eoulsanLogger.getParent().getHandlers()[0]);
 
-    try {
-      initEoulsanRuntimeForExternalApp();
-    } catch (final EoulsanException ee) {
-      throw new AozanException(ee);
-    }
-
     // Set default log level
     eoulsanLogger.setLevel(logLevel);
 
     final Handler fh = new FileHandler(logPath, true);
-    fh.setFormatter(fr.ens.biologie.genomique.eoulsan.Globals.LOG_FORMATTER);
+    fh.setFormatter(AbstractAzoanLogger.LOG_FORMATTER);
 
     eoulsanLogger.setUseParentHandlers(false);
 

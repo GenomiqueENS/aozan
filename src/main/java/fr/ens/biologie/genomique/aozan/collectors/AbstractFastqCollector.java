@@ -46,7 +46,7 @@ import java.util.logging.Logger;
 import com.google.common.collect.Lists;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.aozan.Common;
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
@@ -62,7 +62,7 @@ import fr.ens.biologie.genomique.aozan.io.FastqSampleUtils;
 public abstract class AbstractFastqCollector implements Collector {
 
   /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER =  Aozan2Logger.getLogger();
 
   private QC qc;
 

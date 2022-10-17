@@ -45,18 +45,17 @@ import java.util.regex.Pattern;
 import com.google.common.base.Preconditions;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.eoulsan.EoulsanRuntimeException;
-import fr.ens.biologie.genomique.eoulsan.bio.BadBioEntryException;
-import fr.ens.biologie.genomique.eoulsan.bio.ReadSequence;
-import fr.ens.biologie.genomique.eoulsan.bio.io.FastqReader;
-import fr.ens.biologie.genomique.eoulsan.bio.io.FastqWriter;
-import fr.ens.biologie.genomique.eoulsan.io.CompressionType;
 import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.bio.BadBioEntryException;
+import fr.ens.biologie.genomique.kenetre.bio.ReadSequence;
+import fr.ens.biologie.genomique.kenetre.bio.io.FastqReader;
+import fr.ens.biologie.genomique.kenetre.bio.io.FastqWriter;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVReader;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetReader;
+import fr.ens.biologie.genomique.kenetre.io.CompressionType;
 
 /**
  * This class allow to retrieve index from undetermined indices.
@@ -235,19 +234,19 @@ public class ReDemux {
     private void reDemux() throws IOException, BadBioEntryException {
 
       if (this.reads.isEmpty()) {
-        throw new EoulsanRuntimeException("No undetermined file found");
+        throw new IOException("No undetermined file found");
       }
 
       for (int i : this.reads) {
 
         if (i < 1) {
-          throw new EoulsanRuntimeException(
+          throw new IOException(
               "The read for the undetermined file cannot be lower than 1 in lane "
                   + this.lane + ": " + i);
         }
 
         if (i > 2) {
-          throw new EoulsanRuntimeException(
+          throw new IOException(
               "The read for the undetermined file cannot be greater than 2 in lane "
                   + this.lane + ": " + i);
         }

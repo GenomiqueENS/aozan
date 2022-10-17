@@ -25,6 +25,7 @@ package fr.ens.biologie.genomique.aozan.fastqscreen;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,14 +40,14 @@ import java.util.regex.Pattern;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.Settings;
+import fr.ens.biologie.genomique.aozan.Storages;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
-import fr.ens.biologie.genomique.eoulsan.bio.BadBioEntryException;
-import fr.ens.biologie.genomique.eoulsan.bio.GenomeDescription;
-import fr.ens.biologie.genomique.eoulsan.data.DataFile;
+import fr.ens.biologie.genomique.kenetre.bio.BadBioEntryException;
+import fr.ens.biologie.genomique.kenetre.bio.GenomeDescription;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
 
@@ -60,7 +61,7 @@ import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
 public class FastqScreenGenomes {
 
   /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   /** Pattern. */
   private static final Pattern PATTERN = Pattern.compile(".,;:/-_'");
@@ -128,9 +129,21 @@ public class FastqScreenGenomes {
    */
   private static boolean genomeExists(String genomeName) {
 
+    Storages storages = Storages.getInstance();
+
+    if (!storages.isGenomeStorage()) {
+      return false;
+    }
+
     try {
-      GenomeDescription gdesc = GenomeDescriptionCreator.getInstance()
-          .createGenomeDescription(new DataFile("genome://" + genomeName));
+
+      File genomeFile = storages.getGenomeStorage().getFile(genomeName);
+
+      if (genomeFile == null) {
+        return false;
+      }
+
+      GenomeDescription gdesc = storages.createGenomeDescription(genomeFile);
 
       return gdesc != null;
 

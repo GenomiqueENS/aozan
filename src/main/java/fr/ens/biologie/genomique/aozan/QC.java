@@ -50,7 +50,6 @@ import fr.ens.biologie.genomique.aozan.collectors.RunInfoCollector;
 import fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector;
 import fr.ens.biologie.genomique.aozan.fastqc.RuntimePatchFastQC;
 import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeAliases;
-import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeDescriptionCreator;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.AozanTestRegistry;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
@@ -59,8 +58,6 @@ import fr.ens.biologie.genomique.aozan.tests.lane.LaneTest;
 import fr.ens.biologie.genomique.aozan.tests.pooledsample.PooledSampleTest;
 import fr.ens.biologie.genomique.aozan.tests.project.ProjectTest;
 import fr.ens.biologie.genomique.aozan.tests.sample.SampleTest;
-import fr.ens.biologie.genomique.eoulsan.EoulsanRuntime;
-import fr.ens.biologie.genomique.eoulsan.data.protocols.DataProtocolService;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVReader;
@@ -75,7 +72,7 @@ import uk.ac.babraham.FastQC.FastQCConfig;
 public class QC {
 
   /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   /** RTA output directory property key. */
   public static final String RTA_OUTPUT_DIR = "rta.output.dir";
@@ -719,9 +716,6 @@ public class QC {
   private void initFastqScreenCollectorRequirements(final Settings settings)
       throws AozanException {
 
-    final fr.ens.biologie.genomique.eoulsan.Settings eoulsanSettings =
-        EoulsanRuntime.getSettings();
-
     final String genomeDescStoragePath =
         settings.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_DESC_PATH_KEY);
 
@@ -754,21 +748,9 @@ public class QC {
           + "the genomes files");
     }
 
-    // Set the values
-    eoulsanSettings.setGenomeDescStoragePath(genomeDescStoragePath);
-    eoulsanSettings
-        .setGenomeMapperIndexStoragePath(genomeMapperIndexStoragePath);
-    eoulsanSettings.setGenomeStoragePath(genomeStoragePath);
-
-    // Set data protocol from Eoulsan not load for Aozan because it needs to add
-    // dependencies
-    DataProtocolService.getInstance().addClassesToNotLoad(Lists.newArrayList(
-        "fr.ens.biologie.genomique.eoulsan.data.protocols.S3DataProtocol",
-        "fr.ens.biologie.genomique.eoulsan.data.protocols.S3NDataProtocol"));
-
-    // Initialize GenomeDescriptionCreator
-    GenomeDescriptionCreator.initialize(
-        settings.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_DESC_PATH_KEY));
+    // Configure storages
+    Storages.init(genomeStoragePath, genomeDescStoragePath,
+        genomeMapperIndexStoragePath, Aozan2Logger.getGenericLogger());
   }
 
   /**

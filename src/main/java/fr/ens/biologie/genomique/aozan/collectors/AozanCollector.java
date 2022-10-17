@@ -30,7 +30,7 @@ import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
-import fr.ens.biologie.genomique.eoulsan.util.SystemUtils;
+import fr.ens.biologie.genomique.kenetre.util.SystemUtils;
 
 public class AozanCollector implements Collector {
 

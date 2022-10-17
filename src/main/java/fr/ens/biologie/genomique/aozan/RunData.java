@@ -25,7 +25,7 @@ package fr.ens.biologie.genomique.aozan;
 
 import static fr.ens.biologie.genomique.aozan.collectors.ReadCollector.READ_DATA_PREFIX;
 import static fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector.SAMPLESHEET_DATA_PREFIX;
-import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.checkExistingFile;
+import static fr.ens.biologie.genomique.kenetre.io.FileUtils.checkExistingFile;
 import static java.util.Objects.requireNonNull;
 
 import java.io.BufferedReader;

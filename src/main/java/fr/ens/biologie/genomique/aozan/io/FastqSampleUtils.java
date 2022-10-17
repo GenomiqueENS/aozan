@@ -5,14 +5,14 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import fr.ens.biologie.genomique.aozan.Common;
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 
 public class FastqSampleUtils {
 
   /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   /**
    * Create a set of FastqSample to process.
@@ -79,7 +79,8 @@ public class FastqSampleUtils {
           final String descriptionSample = data.getSampleDescription(sampleId);
 
           result.add(new FastqSample(qc, sampleId, readIndexedCount, lane,
-              sampleSubDirName, demuxName, projectName, descriptionSample, index));
+              sampleSubDirName, demuxName, projectName, descriptionSample,
+              index));
         }
 
         if (undetermined && processUndeterminedSamples) {

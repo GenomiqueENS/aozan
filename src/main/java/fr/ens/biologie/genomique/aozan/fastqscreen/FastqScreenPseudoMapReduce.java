@@ -25,7 +25,7 @@
 package fr.ens.biologie.genomique.aozan.fastqscreen;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.toTimeHumanReadable;
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
@@ -41,25 +41,27 @@ import java.util.regex.Pattern;
 import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
 
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.Globals;
-import fr.ens.biologie.genomique.eoulsan.bio.BadBioEntryException;
-import fr.ens.biologie.genomique.eoulsan.bio.FastqFormat;
-import fr.ens.biologie.genomique.eoulsan.bio.GenomeDescription;
-import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.Bowtie2MapperProvider;
-import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.BowtieMapperProvider;
-import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.FileMapping;
-import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.Mapper;
-import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.MapperIndex;
-import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.MapperInstance;
-import fr.ens.biologie.genomique.eoulsan.bio.readsmappers.MapperProcess;
-import fr.ens.biologie.genomique.eoulsan.data.DataFile;
-import fr.ens.biologie.genomique.eoulsan.modules.generators.GenomeMapperIndexer;
-import fr.ens.biologie.genomique.eoulsan.util.LocalReporter;
-import fr.ens.biologie.genomique.eoulsan.util.PseudoMapReduce;
-import fr.ens.biologie.genomique.eoulsan.util.Reporter;
-import fr.ens.biologie.genomique.eoulsan.util.StringUtils;
+import fr.ens.biologie.genomique.aozan.Storages;
+import fr.ens.biologie.genomique.kenetre.bio.BadBioEntryException;
+import fr.ens.biologie.genomique.kenetre.bio.FastqFormat;
+import fr.ens.biologie.genomique.kenetre.bio.GenomeDescription;
+import fr.ens.biologie.genomique.kenetre.bio.readmapper.Bowtie2MapperProvider;
+import fr.ens.biologie.genomique.kenetre.bio.readmapper.BowtieMapperProvider;
+import fr.ens.biologie.genomique.kenetre.bio.readmapper.FileMapping;
+import fr.ens.biologie.genomique.kenetre.bio.readmapper.Mapper;
+import fr.ens.biologie.genomique.kenetre.bio.readmapper.MapperBuilder;
+import fr.ens.biologie.genomique.kenetre.bio.readmapper.MapperIndex;
+import fr.ens.biologie.genomique.kenetre.bio.readmapper.MapperInstance;
+import fr.ens.biologie.genomique.kenetre.bio.readmapper.MapperInstanceBuilder;
+import fr.ens.biologie.genomique.kenetre.bio.readmapper.MapperProcess;
+import fr.ens.biologie.genomique.kenetre.storage.FileGenomeMapperIndexer;
+import fr.ens.biologie.genomique.kenetre.util.LocalReporter;
+import fr.ens.biologie.genomique.kenetre.util.PseudoMapReduce;
+import fr.ens.biologie.genomique.kenetre.util.Reporter;
+import fr.ens.biologie.genomique.kenetre.util.StringUtils;
 
 /**
  * This class account reads that map to each of the reference genome.
@@ -69,7 +71,7 @@ import fr.ens.biologie.genomique.eoulsan.util.StringUtils;
 public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
   /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   // Boolean use to update logger with parameter mapper only at the first
   // execution
@@ -155,18 +157,22 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
           + genome);
 
       // Get the mapper object
-      final Mapper mapper = Mapper.newMapper(this.mapperName);
-
-      // Set mapper temporary directory
-      mapper.setTempDirectory(this.tmpDir);
+      final Mapper mapper = new MapperBuilder(this.mapperName)
+          .withTempDirectory(this.tmpDir).withLogger(getLogger()).build();
 
       try {
 
         // Create the mapper instance
-        final MapperInstance mapperInstance =
-            mapper.newMapperInstance("", "", true, null);
+        final MapperInstance mapperInstance = new MapperInstanceBuilder(mapper)
+            .withUseBundledBinaries(true).build();
 
-        final DataFile genomeFile = new DataFile("genome://" + genome);
+        final File genomeFile = !Storages.getInstance().isGenomeStorage()
+            ? null : Storages.getInstance().getGenomeStorage().getFile(genome);
+
+        if (genomeFile == null) {
+          LOGGER.warning("FASTQSCREEN: genome file not found for " + genome);
+          continue;
+        }
 
         // get index Genome reference exists
         final File archiveIndexFile = createIndex(mapperInstance, genomeFile);
@@ -242,21 +248,22 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
    *           FastqScreenGenomeMapper instance.
    */
   private File createIndex(final MapperInstance bowtie,
-      final DataFile genomeDataFile) throws IOException, AozanException {
+      final File genomeDataFile) throws IOException, AozanException {
 
-    // Timer :
+    // Timer
     final Stopwatch timer = Stopwatch.createStarted();
 
-    final DataFile tempDir = new DataFile(this.tmpDir);
-    final DataFile result = new DataFile(tempDir,
+    final Storages storages = Storages.getInstance();
+
+    // final DataFile tempDir = new DataFile(this.tmpDir);
+    final File result = new File(this.tmpDir,
         "aozan-"
             + bowtie.getName().toLowerCase() + "-index-"
             + genomeDataFile.getName() + ".zip");
 
     // Create genome description
     try {
-      this.desc = GenomeDescriptionCreator.getInstance()
-          .createGenomeDescription(genomeDataFile);
+      this.desc = storages.createGenomeDescription(genomeDataFile);
     } catch (final BadBioEntryException e) {
       throw new AozanException(e);
     }
@@ -267,13 +274,14 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     // Check if the index has already been created/retrieved
     if (result.exists()) {
-      return result.toFile();
+      return result;
     }
 
     final Map<String, String> additionnalArgument = Collections.emptyMap();
 
-    final GenomeMapperIndexer indexer =
-        new GenomeMapperIndexer(bowtie, "", additionnalArgument, 1);
+    final FileGenomeMapperIndexer indexer = new FileGenomeMapperIndexer(bowtie,
+        "", additionnalArgument, 1, storages.getGenomeIndexStorage(),
+        this.tmpDir, Aozan2Logger.getGenericLogger());
 
     indexer.createIndex(genomeDataFile, this.desc, result);
 
@@ -283,7 +291,7 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
 
     timer.stop();
 
-    return result.toFile();
+    return result;
   }
 
   /**
@@ -439,6 +447,8 @@ public class FastqScreenPseudoMapReduce extends PseudoMapReduce {
   public FastqScreenPseudoMapReduce(final File tmpDir, final boolean pairedMode,
       final String mapperName, final String mapperArguments)
       throws AozanException {
+
+    super(Aozan2Logger.getGenericLogger());
 
     requireNonNull(tmpDir, "tmpDir argument cannot be null");
     requireNonNull(mapperName, "mapperName argument cannot be null");

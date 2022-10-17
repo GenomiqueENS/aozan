@@ -1,10 +1,9 @@
 package fr.ens.biologie.genomique.aozan.aozan3;
 
 import static fr.ens.biologie.genomique.aozan.aozan3.Globals.MINIMAL_JAVA_VERSION_REQUIRED;
-import static fr.ens.biologie.genomique.eoulsan.util.SystemUtils.getJavaVersion;
+import static fr.ens.biologie.genomique.kenetre.util.SystemUtils.getJavaVersion;
 import static java.util.Collections.unmodifiableList;
 
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,15 +23,13 @@ import org.apache.commons.cli.ParseException;
 
 import com.google.common.base.Strings;
 
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.aozan3.action.Action;
 import fr.ens.biologie.genomique.aozan.aozan3.action.ActionService;
 import fr.ens.biologie.genomique.aozan.aozan3.action.LegacyAction;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLoggerFactory;
 import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
-import fr.ens.biologie.genomique.eoulsan.EoulsanException;
-import fr.ens.biologie.genomique.eoulsan.EoulsanLogger;
-import fr.ens.biologie.genomique.eoulsan.LocalEoulsanRuntime;
 
 /**
  * This class define the main class.
@@ -431,10 +428,10 @@ public class Main {
     try {
 
       // Disable logging for Eoulsan runtime startup
-      EoulsanLogger.getLogger().setLevel(Level.OFF);
+      Aozan2Logger.getLogger().setLevel(Level.OFF);
 
       // Initialize Eoulsan runtime
-      LocalEoulsanRuntime.initEoulsanRuntimeForExternalApp();
+      // LocalEoulsanRuntime.initEoulsanRuntimeForExternalApp();
 
       // Load configuration file (if needed)
       loadConfigurationFile();
@@ -442,7 +439,7 @@ public class Main {
       // Initialize log
       this.logger = AozanLoggerFactory.newLogger(this.conf, this.logger);
 
-    } catch (Aozan3Exception | IOException | EoulsanException e) {
+    } catch (Aozan3Exception e) {
       Common.errorExit(e, e.getMessage());
     }
 

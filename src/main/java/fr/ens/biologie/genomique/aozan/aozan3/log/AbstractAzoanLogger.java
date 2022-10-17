@@ -2,10 +2,17 @@ package fr.ens.biologie.genomique.aozan.aozan3.log;
 
 import static java.util.Objects.requireNonNull;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
@@ -20,12 +27,26 @@ public abstract class AbstractAzoanLogger implements AozanLogger {
 
   private static final String DEFAULT_LOG_LEVEL = "INFO";
 
+  /** Format of the log. */
+  public static final Formatter LOG_FORMATTER = new Formatter() {
+
+    private final DateFormat df =
+        new SimpleDateFormat("yyyy.MM.dd kk:mm:ss", Locale.US);
+
+    @Override
+    public String format(final LogRecord record) {
+      return record.getLevel()
+          + "\t" + this.df.format(new Date(record.getMillis())) + "\t"
+          + record.getMessage() + "\n";
+    }
+  };
+
   /**
    * Get the Java logger. Compatibility method.
    * @return the Java logger
    */
   public static final Logger getLogger() {
-    return Logger.getLogger(fr.ens.biologie.genomique.eoulsan.Globals.APP_NAME);
+    return Logger.getLogger(Globals.APP_NAME);
   }
 
   @Override
@@ -175,7 +196,7 @@ public abstract class AbstractAzoanLogger implements AozanLogger {
     logger.setLevel(logLevel);
 
     final Handler fh = createHandler(conf);
-    fh.setFormatter(fr.ens.biologie.genomique.eoulsan.Globals.LOG_FORMATTER);
+    fh.setFormatter(LOG_FORMATTER);
 
     logger.setUseParentHandlers(false);
 

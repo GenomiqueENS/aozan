@@ -5,7 +5,7 @@ import static fr.ens.biologie.genomique.aozan.util.StringUtils.stackTraceToStrin
 import java.io.IOException;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.aozan.Common;
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
 
 /**
@@ -44,7 +44,7 @@ public class BlastContaminantHit extends ContaminantHit {
 
     } catch (final IOException | AozanException e) {
 
-      Common.getLogger().warning("Error during find contaminant with blast : "
+      Aozan2Logger.getLogger().warning("Error during find contaminant with blast : "
           + e.getMessage() + "\n" + stackTraceToString(e));
     }
 

@@ -1,6 +1,6 @@
 package fr.ens.biologie.genomique.aozan.illumina;
 
-import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.checkExistingDirectoryFile;
+import static fr.ens.biologie.genomique.kenetre.io.FileUtils.checkExistingDirectoryFile;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -14,7 +14,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
-import fr.ens.biologie.genomique.eoulsan.core.Version;
+import fr.ens.biologie.genomique.kenetre.util.Version;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVReader;
 

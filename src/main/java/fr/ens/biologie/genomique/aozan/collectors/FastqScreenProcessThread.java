@@ -38,12 +38,13 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.fastqscreen.FastqScreen;
 import fr.ens.biologie.genomique.aozan.fastqscreen.FastqScreenResult;
 import fr.ens.biologie.genomique.aozan.io.FastqSample;
-import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
+import fr.ens.biologie.genomique.kenetre.io.FileUtils;
 
 /**
  * The private class define a class for a thread that execute fastqScreen for a
@@ -54,7 +55,7 @@ import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
 class FastqScreenProcessThread extends AbstractFastqProcessThread {
 
   /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   private final File reportDir;
   private final FastqScreen fastqscreen;

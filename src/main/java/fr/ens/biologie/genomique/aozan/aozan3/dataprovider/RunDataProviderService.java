@@ -1,7 +1,6 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprovider;
 
-import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
-import fr.ens.biologie.genomique.eoulsan.util.ServiceNameLoader;
+import fr.ens.biologie.genomique.kenetre.util.ServiceNameLoader;
 
 /**
  * This class define a service to retrieve a RunDataProvider

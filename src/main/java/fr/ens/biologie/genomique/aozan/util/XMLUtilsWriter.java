@@ -49,7 +49,7 @@ import com.google.common.io.Files;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.RunData;
-import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
+import fr.ens.biologie.genomique.kenetre.util.XMLUtils;
 
 /**
  * The class implements common action to create control quality report.

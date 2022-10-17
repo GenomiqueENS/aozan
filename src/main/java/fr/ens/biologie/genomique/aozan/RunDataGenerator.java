@@ -23,7 +23,7 @@
 
 package fr.ens.biologie.genomique.aozan;
 
-import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.toTimeHumanReadable;
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
@@ -51,7 +51,7 @@ import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
 public class RunDataGenerator {
 
   /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   /** Collect done property key. */
   private static final String COLLECT_DONE = "collect.done";

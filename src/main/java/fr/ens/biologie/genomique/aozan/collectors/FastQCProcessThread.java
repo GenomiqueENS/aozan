@@ -35,6 +35,7 @@ import javax.xml.stream.XMLStreamException;
 import com.google.common.collect.Lists;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.io.FastqSample;
 import uk.ac.babraham.FastQC.Modules.ModuleFactory;
@@ -54,7 +55,7 @@ import uk.ac.babraham.FastQC.Sequence.SequenceFormatException;
 class FastQCProcessThread extends AbstractFastqProcessThread {
 
   /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   private final SequenceFile seqFile;
   private final boolean ignoreFilteredSequences;

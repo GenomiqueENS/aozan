@@ -25,6 +25,7 @@ package fr.ens.biologie.genomique.aozan.collectors;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,16 +33,17 @@ import java.util.logging.Logger;
 
 import com.google.common.collect.Lists;
 
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
-import fr.ens.biologie.genomique.eoulsan.util.SystemUtils;
-import fr.ens.biologie.genomique.eoulsan.util.process.DockerImageInstance;
-import fr.ens.biologie.genomique.eoulsan.util.process.FallBackDockerClient;
-import fr.ens.biologie.genomique.eoulsan.util.process.SimpleProcess;
-import fr.ens.biologie.genomique.eoulsan.util.process.SystemSimpleProcess;
+import fr.ens.biologie.genomique.kenetre.util.SystemUtils;
+import fr.ens.biologie.genomique.kenetre.util.process.DockerImageInstance;
+import fr.ens.biologie.genomique.kenetre.util.process.DockerManager;
+import fr.ens.biologie.genomique.kenetre.util.process.DockerManager.ClientType;
+import fr.ens.biologie.genomique.kenetre.util.process.SimpleProcess;
+import fr.ens.biologie.genomique.kenetre.util.process.SystemSimpleProcess;
 
 /**
  * This class define a MultiQC collector.
@@ -59,7 +61,7 @@ public class MultiQCCollector implements Collector {
   private static final String MULTIQC_EXECUTABLE_DOCKER = "";
   private static final String MULTIQC_DOCKER_IMAGE = "ewels/multiqc:v1.12";
 
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   private File fastqDir;
   private File qcDir;
@@ -69,7 +71,6 @@ public class MultiQCCollector implements Collector {
 
   private boolean useDocker;
   private String multiQCPath;
-  private String dockerConnectionString;
 
   @Override
   public String getName() {
@@ -102,10 +103,6 @@ public class MultiQCCollector implements Collector {
         conf.getBoolean(Settings.QC_CONF_MULTIQC_USE_DOCKER_KEY, false);
 
     LOGGER.info("MultiQC, use Docker: " + this.useDocker);
-
-    if (this.useDocker) {
-      this.dockerConnectionString = conf.get(Settings.DOCKER_URI_KEY);
-    }
   }
 
   @Override
@@ -189,11 +186,11 @@ public class MultiQCCollector implements Collector {
 
     if (docker) {
 
-      // TODO The Spotify Docker client in Eoulsan does not seems to work
-      // anymore
-      // Use fallback Docker client
-      DockerImageInstance instance =
-          new FallBackDockerClient().createConnection(this.dockerImage);
+      DockerImageInstance instance = DockerManager
+          .getInstance(ClientType.FALLBACK,
+              URI.create("unix:///var/run/docker.sock"),
+              Aozan2Logger.getGenericLogger())
+          .createImageInstance(this.dockerImage);
 
       instance.pullImageIfNotExists();
 
@@ -240,7 +237,7 @@ public class MultiQCCollector implements Collector {
             this.tmpDir, stdout, stderr, filesUsed.toArray(new File[0]));
 
     if (exitValue > 0) {
-      Common.getLogger().warning(
+      Aozan2Logger.getLogger().warning(
           "FastQC: fail of blastn process, exit value is : " + exitValue);
     }
 

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
-import fr.ens.biologie.genomique.eoulsan.util.StringUtils;
+import fr.ens.biologie.genomique.kenetre.util.StringUtils;
 
 /**
  * This class define an Illumina demultiplexing data processor that use

@@ -23,8 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan.collectors;
 
-import static fr.ens.biologie.genomique.eoulsan.util.XMLUtils.getAttributeValue;
-import static fr.ens.biologie.genomique.eoulsan.util.XMLUtils.getTagValue;
+import static fr.ens.biologie.genomique.kenetre.util.XMLUtils.getAttributeValue;
+import static fr.ens.biologie.genomique.kenetre.util.XMLUtils.getTagValue;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -40,12 +40,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
-import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
+import fr.ens.biologie.genomique.kenetre.util.XMLUtils;
 
 /**
  * This class define a collector for demux statistics data from bcl2fastq
@@ -229,7 +229,7 @@ class FlowcellDemuxSummaryCollector extends DemultiplexingCollector {
     @Override
     public String toString() {
 
-      return Objects.toStringHelper(this).add("yield", this.yield)
+      return MoreObjects.toStringHelper(this).add("yield", this.yield)
           .add("yieldQ30", this.yieldQ30).add("clusterCount", this.clusterCount)
           .add("clusterCount0MismatchBarcode",
               this.clusterCount0MismatchBarcode)

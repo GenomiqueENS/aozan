@@ -11,10 +11,10 @@ import java.util.function.Function;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
-import fr.ens.biologie.genomique.eoulsan.util.process.DockerImageInstance;
-import fr.ens.biologie.genomique.eoulsan.util.process.FallBackDockerClient;
-import fr.ens.biologie.genomique.eoulsan.util.process.SimpleProcess;
-import fr.ens.biologie.genomique.eoulsan.util.process.SystemSimpleProcess;
+import fr.ens.biologie.genomique.kenetre.util.process.DockerImageInstance;
+import fr.ens.biologie.genomique.kenetre.util.process.FallBackDockerClient;
+import fr.ens.biologie.genomique.kenetre.util.process.SimpleProcess;
+import fr.ens.biologie.genomique.kenetre.util.process.SystemSimpleProcess;
 
 /**
  * This class define a class for calling external tool in DataProcessors.

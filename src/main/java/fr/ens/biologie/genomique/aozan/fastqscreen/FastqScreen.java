@@ -23,7 +23,7 @@
 
 package fr.ens.biologie.genomique.aozan.fastqscreen;
 
-import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.toTimeHumanReadable;
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
@@ -35,7 +35,7 @@ import java.util.logging.Logger;
 import com.google.common.base.Stopwatch;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.aozan.Common;
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
@@ -49,7 +49,7 @@ import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
 public class FastqScreen {
 
   /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   private final File tmpDir;
   private final int confThreads;

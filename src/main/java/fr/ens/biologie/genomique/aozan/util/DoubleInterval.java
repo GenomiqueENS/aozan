@@ -23,7 +23,7 @@
 
 package fr.ens.biologie.genomique.aozan.util;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 
@@ -124,7 +124,7 @@ public class DoubleInterval implements Interval {
   @Override
   public String toString() {
 
-    return Objects.toStringHelper(this).add("min", this.min)
+    return MoreObjects.toStringHelper(this).add("min", this.min)
         .add("minInclude", this.minInclude).add("max", this.max)
         .add("maxInclude", this.maxInclude).toString();
   }

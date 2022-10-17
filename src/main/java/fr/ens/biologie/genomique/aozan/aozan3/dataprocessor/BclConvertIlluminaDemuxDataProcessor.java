@@ -10,7 +10,7 @@ import java.util.List;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
-import fr.ens.biologie.genomique.eoulsan.util.StringUtils;
+import fr.ens.biologie.genomique.kenetre.util.StringUtils;
 import fr.ens.biologie.genomique.kenetre.KenetreException;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;

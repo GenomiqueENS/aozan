@@ -46,7 +46,7 @@ import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.io.FastqSample;
 import fr.ens.biologie.genomique.aozan.util.XMLUtilsWriter;
-import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
+import fr.ens.biologie.genomique.kenetre.util.XMLUtils;
 
 /**
  * This class manages results from fastqscreen.
@@ -389,12 +389,12 @@ public class FastqScreenResult {
 
     if (this.resultsPerGenome.isEmpty()) {
       throw new AozanException(
-          "During fastqScreen execution : no genome receive");
+          "During fastqScreen execution: no genome");
     }
 
     if (!this.isComputedPercent) {
       throw new AozanException(
-          "During fastqScreen execution : no value ​for genome");
+          "During fastqScreen execution: no value ​for genome");
     }
 
     final RunData data = new RunData();

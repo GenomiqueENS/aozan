@@ -4,8 +4,8 @@ import static fr.ens.biologie.genomique.aozan.Globals.QC_DATA_EXTENSION;
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.BCL;
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.ILLUMINA_FASTQ;
 import static fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.BclConvertIlluminaDemuxDataProcessor.BCL_CONVERT_FORBIDDEN_DATA_SECTION;
-import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.sizeToHumanReadable;
-import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.sizeToHumanReadable;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.toTimeHumanReadable;
 import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME;
 import static java.util.Objects.requireNonNull;
 

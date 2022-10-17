@@ -34,6 +34,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.MoreObjects;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
@@ -278,7 +279,7 @@ public class EntityStat {
   @Override
   public String toString() {
 
-    return com.google.common.base.Objects.toStringHelper(this).add("genomes", this.genomes)
+    return MoreObjects.toStringHelper(this).add("genomes", this.genomes)
         .add("samples", this.samples).add("lanes", this.lanes)
         .add("statisticsCollector", this.statisticsCollector)
         .add("rawClusterSamples", this.rawClusterSamples)

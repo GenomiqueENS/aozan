@@ -37,7 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -46,9 +46,9 @@ import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput;
 import fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput.Bcl2FastqVersion;
-import fr.ens.biologie.genomique.eoulsan.io.CompressionType;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.io.CompressionType;
 
 /**
  * The class correspond of one entity to treat by AbstractFastqCollector, so a
@@ -625,7 +625,7 @@ public class FastqSample {
   @Override
   public String toString() {
 
-    return Objects.toStringHelper(this).add("read", read).add("lane", lane)
+    return MoreObjects.toStringHelper(this).add("read", read).add("lane", lane)
         .add("sampleName", sampleName).add("projectName", projectName)
         .add("descriptionSample", description).add("index", index)
         .add("undeterminedIndex", undeterminedIndex)
