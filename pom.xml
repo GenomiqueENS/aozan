@@ -150,18 +150,9 @@
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
-      <id>ens</id>
-      <name>ENS repository</name>
-      <!--url>https://maven-repository.dev.java.net/nonav/repository</url-->
-      <url>http://outils.genomique.biologie.ens.fr/maven2</url>
-    </repository>
-    <repository>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>github</id>
-      <name>GitHub GenomiqueENS Apache Maven Packages</name>
-      <url>https://maven.pkg.github.com/GenomiqueENS/Kenetre</url>
+      <id>genomiqueens</id>
+      <name>GenomiqueENS repository</name>
+      <url>https://outils.genomique.biologie.ens.fr/maven2</url>
     </repository>
   </repositories>
 
