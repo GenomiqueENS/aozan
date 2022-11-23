@@ -30,7 +30,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -51,7 +51,6 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import com.google.common.base.Strings;
-import com.google.common.io.Files;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Globals;
@@ -163,11 +162,12 @@ public final class XMLUtilsWriter {
 
     // Create XML file
     if (output.getAbsolutePath().endsWith(".html")) {
-      Files.write(text,
-          new File(output.getAbsolutePath().replace(".html", ".xml")),
-          StandardCharsets.UTF_8);
+      Files.write(
+          new File(output.getAbsolutePath().replace(".html", ".xml")).toPath(),
+          text.getBytes());
+      // (text, , Charset.defaultCharset());
     } else {
-      Files.write(text, output, StandardCharsets.UTF_8);
+      Files.write(output.toPath(), text.getBytes());
     }
   }
 
@@ -284,7 +284,7 @@ public final class XMLUtilsWriter {
     final String text = createHTMLFileFromXSL(doc, isXslFile);
 
     // Create html file
-    Files.write(text, reportHtml, StandardCharsets.UTF_8);
+    Files.write(reportHtml.toPath(), text.getBytes());
   }
 
   /**

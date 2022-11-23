@@ -27,6 +27,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -92,8 +93,8 @@ public class InteropCollectorsTest {
     readCollector.collect(dataTest);
 
     // Read source rundata
-    BufferedReader br = new BufferedReader(
-        new FileReader(new File(path + "/" + dir, runDataFile)));
+    BufferedReader br = new BufferedReader(new FileReader(
+        new File(path + "/" + dir, runDataFile), Charset.defaultCharset()));
     String line;
 
     while ((line = br.readLine()) != null) {

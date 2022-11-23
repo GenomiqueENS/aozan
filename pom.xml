@@ -16,7 +16,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <didyouknow>Did you know that aozan is the breton word for prepare?</didyouknow>
 
-    <java.version>8</java.version>
+    <java.version>11</java.version>
     <htsjdk.version>1.118</htsjdk.version>
     <kenetre.version>0.10</kenetre.version>
     <poi.version>4.1.2</poi.version>
@@ -704,7 +704,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.4</version>
+        <version>3.12.1</version>
         <configuration>
           <templateFile>${basedir}/src/site/site.vm</templateFile>
           <outputEncoding>UTF-8</outputEncoding>
@@ -740,27 +740,6 @@
            </configuration>
         </plugin>
 
-        <!-- PLUG-IN PMD/CPD -->
-        <plugin>
-           <groupId>org.apache.maven.plugins</groupId>
-           <artifactId>maven-pmd-plugin</artifactId>
-           <version>3.10.0</version>
-           <configuration>
-              <!-- PMD options -->
-              <targetJdk>${java.version}</targetJdk>
-              <aggregate>true</aggregate>
-              <format>xml</format>
-              <rulesets>
-                      <ruleset>./pmd-rules.xml</ruleset>
-              </rulesets>
-
-              <!-- CPD options -->
-              <minimumTokens>20</minimumTokens>
-              <ignoreIdentifiers>true</ignoreIdentifiers>
-              <configLocation>./checkstyle.xml</configLocation>
-           </configuration>
-        </plugin>
-      
 		<!-- PLUG-in for static analysis code -->
 		<!-- mvn modernizer:modernizer -->
 		<plugin>
@@ -791,10 +770,21 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-		<version>2.9</version>
+		<version>3.4.1</version>
 		<configuration>
 			<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
 		</configuration>
+                                <reportSets>
+                                        <reportSet>
+                                                <reports>
+                                                        <report>team</report>
+                                                        <report>mailing-lists</report>
+                                                        <report>issue-management</report>
+                                                        <report>licenses</report>
+                                                        <report>scm</report>
+                                                </reports>
+                                        </reportSet>
+                                </reportSets>
       </plugin>
       <plugin>
 		<groupId>org.apache.maven.plugins</groupId>
@@ -804,7 +794,7 @@
 	  
 	  <plugin>
 		<artifactId>maven-javadoc-plugin</artifactId>
-		<version>3.0.1</version>
+		<version>3.4.1</version>
 		<configuration>
 			<encoding>utf-8</encoding>
 			<doctitle>${project.name} ${project.version} API</doctitle>

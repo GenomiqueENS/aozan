@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -523,7 +524,8 @@ public class OverrepresentedSequencesBlast {
 
     // Create input file
     final Map<String, String> mapIds = new HashMap<>();
-    try (FileWriter writer = new FileWriter(inputFastaFile)) {
+    try (FileWriter writer =
+        new FileWriter(inputFastaFile, Charset.defaultCharset())) {
 
       int count = 0;
       for (String sequence : this.submittedSequences) {

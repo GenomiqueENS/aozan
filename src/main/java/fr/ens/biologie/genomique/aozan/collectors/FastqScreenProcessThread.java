@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -37,9 +38,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Aozan2Logger;
-import fr.ens.biologie.genomique.aozan.Common;
+import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.fastqscreen.FastqScreen;
 import fr.ens.biologie.genomique.aozan.fastqscreen.FastqScreenResult;
@@ -205,7 +205,7 @@ class FastqScreenProcessThread extends AbstractFastqProcessThread {
   private void writeCSV(final File file)
       throws AozanException, IOException {
 
-    final Writer br = new FileWriter(file);
+    final Writer br = new FileWriter(file, Charset.defaultCharset());
     br.write(this.resultsFastqscreen.reportToCSV(getFastqSample(),
         this.sampleGenome));
 
