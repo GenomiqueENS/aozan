@@ -19,6 +19,7 @@
     <java.version>8</java.version>
     <htsjdk.version>1.118</htsjdk.version>
     <kenetre.version>0.10</kenetre.version>
+    <poi.version>4.1.2</poi.version>
   </properties>
   
   <organization>
@@ -169,19 +170,19 @@
     <dependency>
         <groupId>org.apache.poi</groupId>
         <artifactId>poi</artifactId>
-        <version>3.12</version>
+        <version>${poi.version}</version>
         <scope>compile</scope>
     </dependency>
     <dependency>
         <groupId>org.apache.poi</groupId>
         <artifactId>poi-ooxml</artifactId>
-        <version>3.12</version>
+        <version>${poi.version}</version>
         <scope>compile</scope>
     </dependency>
     <dependency>
         <groupId>org.apache.poi</groupId>
         <artifactId>poi-ooxml-schemas</artifactId>
-        <version>3.12</version>
+        <version>${poi.version}</version>
         <scope>compile</scope>
     </dependency>
     <dependency>
