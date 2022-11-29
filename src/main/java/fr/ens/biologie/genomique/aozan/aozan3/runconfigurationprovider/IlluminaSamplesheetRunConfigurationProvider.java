@@ -3,7 +3,6 @@ package fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider;
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,8 +29,8 @@ import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
-import fr.ens.biologie.genomique.kenetre.illumina.RunInfo;
 import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.illumina.RunInfo;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetCheck;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
@@ -71,7 +70,7 @@ public class IlluminaSamplesheetRunConfigurationProvider
       }
     }
 
-    SampleSheetReader getReader(Path path) throws FileNotFoundException {
+    SampleSheetReader getReader(Path path) throws IOException {
 
       Objects.requireNonNull(path);
       File file = path.toFile();
