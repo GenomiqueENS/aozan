@@ -33,7 +33,7 @@
       <name>Laurent Jourdren</name>
       <email>aozan 0 biologie ens fr</email>
       <url />
-      <organization>École normale supérieure, IBENS, Genomic Paris Centre</organization>
+      <organization>École normale supérieure, IBENS, GenomiqueENS</organization>
       <organizationUrl>https://www.genomique.biologie.ens.fr/</organizationUrl>
       <roles>
         <role>Lead Developer</role>
@@ -46,7 +46,7 @@
       <name>Sandrine Perrin</name>
       <email>aozan 0 biologie ens fr</email>
       <url />
-      <organization>École normale supérieure, IBENS, Genomic Paris Centre</organization>
+      <organization>École normale supérieure, IBENS, GenomiqueENS</organization>
       <organizationUrl>https://www.genomique.biologie.ens.fr/</organizationUrl>
       <roles>
         <role>Developer</role>
@@ -59,7 +59,7 @@
       <name>Cyril Firmo</name>
       <email>aozan 0 biologie ens fr</email>
       <url />
-      <organization>École normale supérieure, IBENS, Genomic Paris Centre</organization>
+      <organization>École normale supérieure, IBENS, GenomiqueENS</organization>
       <organizationUrl>https://www.genomique.biologie.ens.fr/</organizationUrl>
       <roles>
         <role>Developer</role>
@@ -72,7 +72,7 @@
       <name>Sophie Lemoine</name>
       <email>aozan 0 biologie ens fr</email>
       <url />
-      <organization>École normale supérieure, IBENS, Genomic Paris Centre</organization>
+      <organization>École normale supérieure, IBENS, GenomiqueENS</organization>
       <organizationUrl>https://www.genomique.biologie.ens.fr/</organizationUrl>
       <roles>
         <role>Developer</role>
@@ -85,7 +85,7 @@
       <name>Stéphane Le Crom</name>
       <email>aozan 0 biologie ens fr</email>
       <url />
-      <organization>École normale supérieure, IBENS, Genomic Paris Centre</organization>
+      <organization>École normale supérieure, IBENS, GenomiqueENS</organization>
       <organizationUrl>https://www.genomique.biologie.ens.fr/</organizationUrl>
       <roles>
         <role>Project manager and documentation review</role>
@@ -135,14 +135,14 @@
   </mailingLists>
 
   <scm> 	
-	<url>https://github.com/GenomicParisCentre/aozan</url>
-	<connection>scm:git:git://github.com/GenomicParisCentre/aozan.git</connection>
-	<developerConnection>scm:git:git@github.com:GenomicParisCentre/aozan.git</developerConnection>    
+	<url>https://github.com/GenomiqueENS/aozan</url>
+	<connection>scm:git:git://github.com/GenomiqueENS/aozan.git</connection>
+	<developerConnection>scm:git:git@github.com:GenomiqueENS/aozan.git</developerConnection>
   </scm>
 
   <issueManagement>
     <system>GitHub Issues</system>
-    <url>https://github.com/GenomicParisCentre/aozan/issues</url>
+    <url>https://github.com/GenomiqueENS/aozan/issues</url>
   </issueManagement>
 
   <repositories>
