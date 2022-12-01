@@ -21,12 +21,12 @@ import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.BclConvertIlluminaDe
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.IlluminaSyncDataProcessor;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprovider.IlluminaProcessedRunDataProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprovider.IlluminaRawRunDataProvider;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLoggerFactory;
 import fr.ens.biologie.genomique.aozan.aozan3.recipe.Recipe;
 import fr.ens.biologie.genomique.aozan.aozan3.recipe.Step;
 import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.IlluminaSamplesheetRunConfigurationProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.RunConfigurationProvider;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class define recipes that perform like Aozan 2 steps.
@@ -167,7 +167,7 @@ public class LegacyRecipes {
   }
 
   private static boolean parseCommonConfiguration(Configuration conf,
-      AozanLogger logger, Configuration aozan2Conf) {
+      GenericLogger logger, Configuration aozan2Conf) {
 
     // Check if Aozan is enabled
     if (!aozan2Conf.getBoolean("aozan.enable")) {
@@ -223,7 +223,7 @@ public class LegacyRecipes {
     return true;
   }
 
-  private Recipe createSyncStepRecipe(Configuration conf, AozanLogger logger,
+  private Recipe createSyncStepRecipe(Configuration conf, GenericLogger logger,
       Configuration aozan2Conf) throws Aozan3Exception {
 
     // Check if the sync step is enabled
@@ -270,7 +270,7 @@ public class LegacyRecipes {
     return recipe;
   }
 
-  private Recipe createDemuxStep(Configuration conf, AozanLogger logger,
+  private Recipe createDemuxStep(Configuration conf, GenericLogger logger,
       Configuration aozan2Conf) throws Aozan3Exception {
 
     // Check if the demux step is enabled
@@ -324,7 +324,7 @@ public class LegacyRecipes {
     return recipe;
   }
 
-  private Recipe createQCStep(Configuration conf, AozanLogger logger,
+  private Recipe createQCStep(Configuration conf, GenericLogger logger,
       Configuration aozan2Conf) throws Aozan3Exception {
 
     // Check if the qc step is enabled
@@ -491,8 +491,8 @@ public class LegacyRecipes {
         "The \"" + key + "\" setting has not been defined");
   }
 
-  private static AozanLogger createLogger(Configuration aozan2Conf,
-      AozanLogger currentLogger) throws Aozan3Exception {
+  private static GenericLogger createLogger(Configuration aozan2Conf,
+      GenericLogger currentLogger) throws Aozan3Exception {
 
     if (aozan2Conf.containsKey("aozan.log.path")) {
 
@@ -511,7 +511,7 @@ public class LegacyRecipes {
   // Constructor
   //
 
-  public LegacyRecipes(Configuration conf, AozanLogger logger,
+  public LegacyRecipes(Configuration conf, GenericLogger logger,
       Path aozan2ConfFile) throws Aozan3Exception {
 
     requireNonNull(aozan2ConfFile);

@@ -20,8 +20,8 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
-import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
+import fr.ens.biologie.genomique.kenetre.log.DummyLogger;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class is used to send emails
@@ -48,7 +48,7 @@ public class SendMail {
 
   private final Path lastErrorFile;
 
-  private AozanLogger logger;
+  private GenericLogger logger;
 
   /**
    * Send an email with Aozan header and footer.
@@ -214,7 +214,7 @@ public class SendMail {
    * @return a String with the error email content
    */
   private static String readLastErrorMessage(Path lastErrorFile,
-      AozanLogger logger) {
+      GenericLogger logger) {
 
     try {
       return new String(Files.readAllBytes(lastErrorFile),
@@ -232,7 +232,7 @@ public class SendMail {
    * @param logger logger
    */
   private static void writeLastErrorMessage(Path lastErrorFile, String msg,
-      AozanLogger logger) {
+      GenericLogger logger) {
 
     try {
       Files.write(lastErrorFile, msg.getBytes(StandardCharsets.UTF_8));
@@ -328,12 +328,12 @@ public class SendMail {
    * @param logger the logger to use
    * @throws Aozan3Exception if an error occurs while initialize the provider
    */
-  public SendMail(Configuration conf, AozanLogger logger)
+  public SendMail(Configuration conf, GenericLogger logger)
       throws Aozan3Exception {
 
     requireNonNull(conf);
 
-    this.logger = logger != null ? logger : new DummyAzoanLogger();
+    this.logger = logger != null ? logger : new DummyLogger();
 
     this.printMail = conf.getBoolean("print.mail", false);
     this.sendMail = conf.getBoolean("send.mail", false);

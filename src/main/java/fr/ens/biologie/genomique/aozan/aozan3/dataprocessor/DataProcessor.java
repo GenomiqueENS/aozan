@@ -8,7 +8,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.EmailMessage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This interface defines a data processor
@@ -47,7 +47,7 @@ public interface DataProcessor {
    * @param logger the logger to use
    * @throws Aozan3Exception if an error occurs while initialize the processor
    */
-  void init(Configuration conf, AozanLogger logger) throws Aozan3Exception;
+  void init(Configuration conf, GenericLogger logger) throws Aozan3Exception;
 
   /**
    * Get the input requirements of the processor.

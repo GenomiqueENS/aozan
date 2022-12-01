@@ -19,10 +19,10 @@ import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Common;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.Globals;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.recipe.Recipe;
 import fr.ens.biologie.genomique.aozan.aozan3.recipe.RecipeFinder;
 import fr.ens.biologie.genomique.aozan.aozan3.recipe.RecipeXMLParser;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class define an exec action.
@@ -51,7 +51,7 @@ public class ExecAction implements Action {
 
   @Override
   public void action(Configuration conf, List<String> arguments,
-      AozanLogger logger) {
+      GenericLogger logger) {
 
     final Options options = makeOptions();
     final CommandLineParser parser = new GnuParser();
@@ -217,7 +217,7 @@ public class ExecAction implements Action {
   //
 
   private Recipe loadRecipe(Configuration conf, Configuration cliConf,
-      String recipeName, AozanLogger logger) throws Aozan3Exception {
+      String recipeName, GenericLogger logger) throws Aozan3Exception {
 
     Path recipePath = null;
     String recipesDirectory = conf.get(RECIPES_DIRECTORY_KEY, "").trim();
@@ -258,7 +258,7 @@ public class ExecAction implements Action {
   }
 
   private Recipe loadRecipe(Configuration conf, Configuration cliConf,
-      Path recipePath, AozanLogger logger) throws Aozan3Exception {
+      Path recipePath, GenericLogger logger) throws Aozan3Exception {
 
     RecipeXMLParser parser = new RecipeXMLParser(conf, cliConf, logger);
     return parser.parse(recipePath);

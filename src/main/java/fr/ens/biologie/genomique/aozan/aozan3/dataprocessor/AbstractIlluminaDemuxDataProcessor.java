@@ -1,6 +1,8 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.BCL;
+import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.error;
+import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.info;
 import static fr.ens.biologie.genomique.kenetre.util.StringUtils.sizeToHumanReadable;
 import static fr.ens.biologie.genomique.kenetre.util.StringUtils.toTimeHumanReadable;
 import static java.util.Arrays.asList;
@@ -29,13 +31,13 @@ import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.SimpleDataTypeFilter;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
-import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.util.DiskUtils;
-import fr.ens.biologie.genomique.kenetre.util.StringUtils;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVWriter;
+import fr.ens.biologie.genomique.kenetre.log.DummyLogger;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
+import fr.ens.biologie.genomique.kenetre.util.StringUtils;
 
 /**
  * This class define an abstract Illumina demultiplexing data processor.
@@ -47,7 +49,7 @@ public abstract class AbstractIlluminaDemuxDataProcessor
 
   private static final boolean USE_DOCKER = true;
 
-  private AozanLogger logger = new DummyAzoanLogger();
+  private GenericLogger logger = new DummyLogger();
 
   private DataStorage outputStorage;
   private String dataDescription;
@@ -62,7 +64,7 @@ public abstract class AbstractIlluminaDemuxDataProcessor
   }
 
   @Override
-  public void init(final Configuration conf, final AozanLogger logger)
+  public void init(final Configuration conf, final GenericLogger logger)
       throws Aozan3Exception {
 
     requireNonNull(conf);
@@ -199,9 +201,9 @@ public abstract class AbstractIlluminaDemuxDataProcessor
       // Log disk usage and disk free space
       long outputSize = outputLocation.getDiskUsage();
       long outputFreeSize = outputLocation.getStorage().getUsableSpace();
-      this.logger.info(runId, "output disk free after demux: "
+      info(this.logger, runId, "output disk free after demux: "
           + sizeToHumanReadable(outputFreeSize));
-      this.logger.info(runId,
+      info(this.logger, runId,
           "space used by demux: " + sizeToHumanReadable(outputSize));
 
       // Report URL in email message
@@ -326,8 +328,8 @@ public abstract class AbstractIlluminaDemuxDataProcessor
     // Get temporary directory
     File temporaryDirectory = new File(conf.get("tmp.dir"));
 
-    this.logger.info(runId, getDemuxToolName() + ": " + toolVersion);
-    this.logger.info(runId, "Demultiplexing using the following command line: "
+    info(this.logger, runId, getDemuxToolName() + ": " + toolVersion);
+    info(this.logger, runId, "Demultiplexing using the following command line: "
         + String.join(" ", commandLine));
 
     long startTime = System.currentTimeMillis();
@@ -359,7 +361,7 @@ public abstract class AbstractIlluminaDemuxDataProcessor
           StandardCopyOption.COPY_ATTRIBUTES);
     }
 
-    this.logger.info(runId, "Successful demultiplexing in "
+    info(this.logger, runId, "Successful demultiplexing in "
         + StringUtils.toTimeHumanReadable(endTime - startTime));
   }
 
@@ -372,7 +374,7 @@ public abstract class AbstractIlluminaDemuxDataProcessor
       writer.setVersion(2);
       writer.writer(samplesheet);
     } catch (IOException e) {
-      this.logger.error(runId, "Error while writing Illumina samplesheet: "
+      error(this.logger, runId, "Error while writing Illumina samplesheet: "
           + outputFile + "(" + e.getMessage() + ")");
       throw new IOException(e);
     }

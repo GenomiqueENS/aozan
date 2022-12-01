@@ -23,6 +23,8 @@
 
 package fr.ens.biologie.genomique.aozan;
 
+import static fr.ens.biologie.genomique.kenetre.log.AbstractJavaUtilLoggingLogger.LOG_FORMATTER;
+
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.logging.FileHandler;
@@ -30,8 +32,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-
-import fr.ens.biologie.genomique.aozan.aozan3.log.AbstractAzoanLogger;
 
 /**
  * This class contains common methods like logger initialization.
@@ -99,7 +99,7 @@ public class Common {
     eoulsanLogger.setLevel(logLevel);
 
     final Handler fh = new FileHandler(logPath, true);
-    fh.setFormatter(AbstractAzoanLogger.LOG_FORMATTER);
+    fh.setFormatter(LOG_FORMATTER);
 
     eoulsanLogger.setUseParentHandlers(false);
 

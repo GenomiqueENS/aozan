@@ -2,6 +2,7 @@ package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.Category.RAW;
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.SequencingTechnology.ILLUMINA;
+import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.info;
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
@@ -27,10 +28,10 @@ import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.MultiDataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.PartialDataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.TechnologyDataTypeFilter;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
-import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
 import fr.ens.biologie.genomique.kenetre.illumina.RunInfo;
 import fr.ens.biologie.genomique.kenetre.illumina.RunInfo.Read;
+import fr.ens.biologie.genomique.kenetre.log.DummyLogger;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class define an Illumina run discovering data processor.
@@ -41,7 +42,7 @@ public class DiscoverNewIlluminaRunDataProcessor implements DataProcessor {
 
   public static final String PROCESSOR_NAME = "illumina_discover";
 
-  private AozanLogger logger = new DummyAzoanLogger();
+  private GenericLogger logger = new DummyLogger();
   private boolean initialized;
 
   @Override
@@ -50,7 +51,7 @@ public class DiscoverNewIlluminaRunDataProcessor implements DataProcessor {
   }
 
   @Override
-  public void init(Configuration conf, AozanLogger logger)
+  public void init(Configuration conf, GenericLogger logger)
       throws Aozan3Exception {
 
     requireNonNull(conf);
@@ -102,7 +103,7 @@ public class DiscoverNewIlluminaRunDataProcessor implements DataProcessor {
       // Check if input directory exists
       inputLocation.checkReadableDirectory("input synchronization");
 
-      this.logger.info(inputRunData,
+      info(this.logger,inputRunData,
           "New run discovered "
               + runId + " on sequencer "
               + sequencerNames.getIlluminaSequencerName(runId));

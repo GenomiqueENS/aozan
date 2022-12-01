@@ -1,5 +1,6 @@
 package fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider;
 
+import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.newAozanLogger;
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
@@ -28,7 +29,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.IlluminaRunIdWrapper;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
+import fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger;
 import fr.ens.biologie.genomique.kenetre.KenetreException;
 import fr.ens.biologie.genomique.kenetre.illumina.RunInfo;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
@@ -38,6 +39,7 @@ import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVR
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetReader;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetXLSReader;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetXLSXReader;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * Get the run configuration from an Illumina samplesheet.
@@ -110,7 +112,7 @@ public class IlluminaSamplesheetRunConfigurationProvider
 
   };
 
-  private AozanLogger logger;
+  private Aozan3Logger logger;
 
   private Path samplesheetsPath;
   private String samplesheetPrefix;
@@ -127,7 +129,7 @@ public class IlluminaSamplesheetRunConfigurationProvider
   }
 
   @Override
-  public void init(Configuration conf, AozanLogger logger)
+  public void init(Configuration conf, GenericLogger logger)
       throws Aozan3Exception {
 
     requireNonNull(conf);
@@ -139,7 +141,7 @@ public class IlluminaSamplesheetRunConfigurationProvider
 
     // Set logger
     if (logger != null) {
-      this.logger = logger;
+      this.logger = newAozanLogger(logger);
     }
 
     this.samplesheetsPath = conf.getPath("samplesheet.path");
@@ -260,7 +262,7 @@ public class IlluminaSamplesheetRunConfigurationProvider
           "Load a samplesheet in directory: " + this.samplesheetsPath);
 
       return loadSamplesheet(runId, samplesheetFile, this.sampleSheetFormat,
-          this.logger);
+          this.logger.getLogger());
     }
 
     // Use an external command if defined
@@ -281,17 +283,18 @@ public class IlluminaSamplesheetRunConfigurationProvider
       this.logger.info(runId, "Use existing "
           + samplesheetFileInRunDirectory + " file in run directory");
       return loadSamplesheet(runId, samplesheetFileInRunDirectory,
-          SamplesheetFormat.CSV, this.logger);
+          SamplesheetFormat.CSV, this.logger.getLogger());
     }
 
     throw new Aozan3Exception(runId, "No sample sheet found");
   }
 
   private static SampleSheet loadSamplesheet(final RunId runId,
-      Path samplesheetFile, SamplesheetFormat format, AozanLogger logger)
+      Path samplesheetFile, SamplesheetFormat format, GenericLogger logger)
       throws Aozan3Exception {
 
-    logger.info(runId, "Load samplesheet file: " + samplesheetFile);
+    Aozan3Logger.info(logger, runId,
+        "Load samplesheet file: " + samplesheetFile);
 
     try (SampleSheetReader reader = format.getReader(samplesheetFile)) {
       return reader.read();

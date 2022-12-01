@@ -7,7 +7,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class define an empty run data provider.
@@ -24,7 +24,7 @@ public class EmptyRunDataProvider implements RunDataProvider {
   }
 
   @Override
-  public void init(DataStorage storage, Configuration conf, AozanLogger logger)
+  public void init(DataStorage storage, Configuration conf, GenericLogger logger)
       throws Aozan3Exception {
   }
 

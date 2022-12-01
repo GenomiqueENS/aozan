@@ -27,9 +27,9 @@ import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.aozan3.action.Action;
 import fr.ens.biologie.genomique.aozan.aozan3.action.ActionService;
 import fr.ens.biologie.genomique.aozan.aozan3.action.LegacyAction;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLoggerFactory;
-import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
+import fr.ens.biologie.genomique.kenetre.log.DummyLogger;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class define the main class.
@@ -54,7 +54,7 @@ public class Main {
   private List<String> commandLineSettings;
 
   private final Configuration conf = new Configuration();
-  private AozanLogger logger = new DummyAzoanLogger();
+  private GenericLogger logger = new DummyLogger();
 
   //
   // Getters
@@ -81,7 +81,7 @@ public class Main {
    * Get the logger.
    * @return the logger
    */
-  public AozanLogger getLogger() {
+  public GenericLogger getLogger() {
     return this.logger;
   }
 

@@ -23,7 +23,6 @@ import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Common;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.SendMail;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.kenetre.KenetreException;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.PropertySection;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.Sample;
@@ -32,6 +31,7 @@ import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.TableSection;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVWriter;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetReader;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetXLSReader;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class define a sample sheet convert action.
@@ -60,7 +60,7 @@ public class SampleSheetConvertAction implements Action {
 
   @Override
   public void action(Configuration conf, List<String> arguments,
-      AozanLogger logger) {
+      GenericLogger logger) {
 
     if (arguments.size() != 2) {
       Common.showErrorMessageAndExit(

@@ -19,9 +19,9 @@ import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Common;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.Globals;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.recipe.RecipeFinder;
 import fr.ens.biologie.genomique.aozan.aozan3.recipe.RecipeFinder.RecipePath;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class define an action that list existing recipes.
@@ -52,7 +52,7 @@ public class ListAction implements Action {
 
   @Override
   public void action(Configuration conf, List<String> arguments,
-      AozanLogger logger) {
+      GenericLogger logger) {
 
     final Options options = makeOptions();
     final CommandLineParser parser = new GnuParser();

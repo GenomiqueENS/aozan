@@ -14,11 +14,11 @@ import org.w3c.dom.NodeList;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
-import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.EmptyRunConfigurationProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.RunConfigurationProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.RunConfigurationProviderService;
+import fr.ens.biologie.genomique.kenetre.log.DummyLogger;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class define a recipe XML parser.
@@ -29,7 +29,7 @@ public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
 
   private final Configuration conf;
   private final Configuration cliConf;
-  private AozanLogger logger = new DummyAzoanLogger();
+  private GenericLogger logger = new DummyLogger();
 
   /** Version of the format of the workflow file. */
   private static final String FORMAT_VERSION = "0.1";
@@ -285,7 +285,7 @@ public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
    * @param conf initial configuration
    * @param logger default logger
    */
-  public RecipeXMLParser(Configuration conf, AozanLogger logger) {
+  public RecipeXMLParser(Configuration conf, GenericLogger logger) {
 
     this(conf, new Configuration(), logger);
   }
@@ -298,7 +298,7 @@ public class RecipeXMLParser extends AbstractXMLParser<Recipe> {
    * @param logger default logger
    */
   public RecipeXMLParser(Configuration conf, Configuration cliConf,
-      AozanLogger logger) {
+      GenericLogger logger) {
 
     super(ROOT_TAG_NAME, "recipe", logger);
 

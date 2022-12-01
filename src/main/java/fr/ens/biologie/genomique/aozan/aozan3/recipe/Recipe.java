@@ -27,8 +27,8 @@ import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.InputData;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprovider.RunDataProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprovider.RunDataProviderService;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLoggerFactory;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 import fr.ens.biologie.genomique.kenetre.util.process.DockerManager;
 import fr.ens.biologie.genomique.kenetre.util.process.DockerManager.ClientType;
 
@@ -49,7 +49,7 @@ public class Recipe {
   private final Set<RunDataProvider> inProgressProviders = new HashSet<>();
   private final List<Step> steps = new ArrayList<>();
 
-  private final AozanLogger logger;
+  private final GenericLogger logger;
 
   private boolean initialized;
 
@@ -77,7 +77,7 @@ public class Recipe {
    * Get the logger.
    * @return the logger
    */
-  public AozanLogger getLogger() {
+  public GenericLogger getLogger() {
     return this.logger;
   }
 
@@ -521,7 +521,7 @@ public class Recipe {
    *           sending
    */
   public Recipe(String recipeName, String description, Configuration conf,
-      AozanLogger logger) throws Aozan3Exception {
+      GenericLogger logger) throws Aozan3Exception {
 
     requireNonNull(recipeName);
     requireNonNull(description);

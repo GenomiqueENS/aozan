@@ -1,5 +1,6 @@
 package fr.ens.biologie.genomique.aozan.aozan3.recipe;
 
+import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.newAozanLogger;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Collections;
@@ -21,9 +22,10 @@ import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.DataProcessorService
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.InputData;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.SimpleProcessResult;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
+import fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger;
 import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.EmptyRunConfigurationProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.RunConfigurationProvider;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class define a step of the recipe.
@@ -43,7 +45,7 @@ public class Step {
   private transient DataProcessor processor;
   private boolean initialized;
 
-  private final AozanLogger logger;
+  private final GenericLogger logger;
   private final DataStorageRegistry storages;
 
   /**
@@ -128,19 +130,21 @@ public class Step {
 
     RunData inputRunData = inputData.getLastRunData();
 
-    this.logger.info(inputRunData, "Get run configuration for the run");
+    Aozan3Logger aozanLogger = newAozanLogger(this.logger);
+
+    aozanLogger.info(inputRunData, "Get run configuration for the run");
 
     // Get run configuration
     RunConfiguration runConf =
         this.runConfProvider.getRunConfiguration(inputRunData);
 
-    this.logger.info(inputRunData,
+    aozanLogger.info(inputRunData,
         "Launch processor " + this.processorName + " for the run");
 
     // Launch processor
     ProcessResult result = this.processor.process(inputData, runConf);
 
-    this.logger.info(inputRunData,
+    aozanLogger.info(inputRunData,
         "End of processor " + this.processorName + " for the run");
 
     if (result == null) {
