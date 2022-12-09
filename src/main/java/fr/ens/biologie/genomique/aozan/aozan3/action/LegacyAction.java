@@ -57,6 +57,12 @@ public class LegacyAction implements Action {
       Path confFile = Paths.get(arguments.get(0));
       LegacyRecipes recipes = new LegacyRecipes(conf, logger, confFile);
 
+      // Test if Aozan is enabled
+      if (!recipes.isAozanEnabled()) {
+        // Nothing to do Aozan is disabled
+        return;
+      }
+
       // Lock Aozan
       AozanLock mainLock = new AozanLock(recipes.getMainLockPath());
 

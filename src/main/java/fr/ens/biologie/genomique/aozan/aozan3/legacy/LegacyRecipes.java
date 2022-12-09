@@ -41,10 +41,20 @@ public class LegacyRecipes {
   private Path varPath;
   private Path mainLockPath;
   private Map<Recipe, Path> outputPaths = new HashMap<>();
+  private final boolean aozanEnabled;
 
   //
   // Getters
   //
+
+  /**
+   * Test if Aozan is enabled.
+   * @return true if Aozan is enabled
+   */
+  public boolean isAozanEnabled() {
+
+    return this.aozanEnabled;
+  }
 
   /**
    * Get the path for var files.
@@ -520,8 +530,9 @@ public class LegacyRecipes {
     aozan2Conf.load(aozan2ConfFile, true);
     aozan2Conf = aozan1Compatibility(aozan2Conf);
 
-    if (!parseCommonConfiguration(conf, logger, aozan2Conf)) {
+    this.aozanEnabled = parseCommonConfiguration(conf, logger, aozan2Conf);
 
+    if (!this.aozanEnabled) {
       // Aozan is not enabled, nothing to do
       return;
     }
