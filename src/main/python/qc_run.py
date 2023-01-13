@@ -176,8 +176,7 @@ def qc(run_id, conf):
     # Remove QC data if not demand
     if common.is_conf_value_defined(QC_REPORT_SAVE_RAW_DATA_KEY, 'false', conf):
         try:
-            os.remove(qc_output_dir + '/data-' + run_id + '.txt')
-            # qc.writeRawData(report, qc_output_dir + '/data-' + run_id + '.txt')
+            os.remove(qc_output_dir + '/' + run_id + '.data')
         except AozanException, exp:
             error("Error while removing QC raw data for run " + run_id + ".", exp.getMessage(), conf)
             return False
