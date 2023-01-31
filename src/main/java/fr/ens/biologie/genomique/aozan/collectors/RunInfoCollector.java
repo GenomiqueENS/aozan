@@ -38,12 +38,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.aozan.Common;
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
-import fr.ens.biologie.genomique.aozan.illumina.RunInfo;
-import fr.ens.biologie.genomique.aozan.illumina.RunParameters;
+import fr.ens.biologie.genomique.kenetre.illumina.RunInfo;
+import fr.ens.biologie.genomique.kenetre.illumina.RunParameters;
 
 /**
  * This collector collect data from the RunInfo.xml file, working with all RTA
@@ -53,7 +53,7 @@ import fr.ens.biologie.genomique.aozan.illumina.RunParameters;
  */
 public class RunInfoCollector implements Collector {
 
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   /** The collector name. */
   public static final String COLLECTOR_NAME = "runinfo";

@@ -16,7 +16,7 @@ import org.w3c.dom.NodeList;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class define a XML parser for configuration.
@@ -131,7 +131,7 @@ public class ConfigurationXMLParser extends AbstractXMLParser<Configuration> {
    * @param logger logger to use
    */
   public ConfigurationXMLParser(String rootTagName, String sectionName,
-      Configuration parentConfiguration, AozanLogger logger) {
+      Configuration parentConfiguration, GenericLogger logger) {
 
     super(rootTagName, "configuration", logger);
 

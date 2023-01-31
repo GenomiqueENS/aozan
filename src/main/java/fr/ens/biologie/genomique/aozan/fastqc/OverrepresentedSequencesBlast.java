@@ -24,8 +24,8 @@
 package fr.ens.biologie.genomique.aozan.fastqc;
 
 import static fr.ens.biologie.genomique.aozan.util.StringUtils.stackTraceToString;
-import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.checkExistingFile;
-import static fr.ens.biologie.genomique.eoulsan.util.FileUtils.createTempFile;
+import static fr.ens.biologie.genomique.kenetre.io.FileUtils.checkExistingFile;
+import static fr.ens.biologie.genomique.kenetre.io.FileUtils.createTempFile;
 import static java.util.Objects.requireNonNull;
 
 import java.io.BufferedReader;
@@ -33,8 +33,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,17 +54,17 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.google.common.base.Joiner;
 
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
-import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
-import fr.ens.biologie.genomique.aozan.util.DockerManager;
-import fr.ens.biologie.genomique.eoulsan.util.process.DockerImageInstance;
-import fr.ens.biologie.genomique.eoulsan.util.process.SimpleProcess;
-import fr.ens.biologie.genomique.eoulsan.util.process.SystemSimpleProcess;
+import fr.ens.biologie.genomique.kenetre.util.process.DockerImageInstance;
+import fr.ens.biologie.genomique.kenetre.util.process.DockerManager;
+import fr.ens.biologie.genomique.kenetre.util.process.SimpleProcess;
+import fr.ens.biologie.genomique.kenetre.util.process.SystemSimpleProcess;
 
 /**
  * This class launches blastn on one sequence query and parses xml result file
@@ -76,7 +75,7 @@ import fr.ens.biologie.genomique.eoulsan.util.process.SystemSimpleProcess;
 public class OverrepresentedSequencesBlast {
 
   /** LOGGER. */
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   private static final String SEQUENCES_NOT_USE_FILE =
       "/sequences_nohit_with_blastn.txt";
@@ -525,7 +524,8 @@ public class OverrepresentedSequencesBlast {
 
     // Create input file
     final Map<String, String> mapIds = new HashMap<>();
-    try (FileWriter writer = new FileWriter(inputFastaFile)) {
+    try (FileWriter writer =
+        new FileWriter(inputFastaFile, Charset.defaultCharset())) {
 
       int count = 0;
       for (String sequence : this.submittedSequences) {
@@ -593,9 +593,8 @@ public class OverrepresentedSequencesBlast {
       if (dockerMode) {
 
         DockerImageInstance instance =
-            DockerManager.getInstance(DockerManager.ClientType.FALLBACK,
-                new URI(dockerConnectionString)).createImageInstance(
-                    BLAST_DOCKER_IMAGE + ':' + BLAST_VERSION_DOCKER);
+            DockerManager.getInstance().createImageInstance(
+                BLAST_DOCKER_IMAGE + ':' + BLAST_VERSION_DOCKER);
 
         instance.pullImageIfNotExists();
         process = instance;
@@ -623,9 +622,6 @@ public class OverrepresentedSequencesBlast {
 
     } catch (IOException e) {
       throw new AozanException(e);
-    } catch (URISyntaxException e) {
-      throw new AozanException(
-          "Invalid Docker connection URI: " + dockerConnectionString, e);
     }
   }
 

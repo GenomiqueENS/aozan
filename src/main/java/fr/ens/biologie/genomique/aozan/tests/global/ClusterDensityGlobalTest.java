@@ -58,22 +58,22 @@ public class ClusterDensityGlobalTest extends AbstractGlobalTest {
   @Override
   public TestResult test(RunData data) {
 
-    // Compute error rate per lane
     final int laneCount = data.getLaneCount();
-    final double densityRatio =
-        data.getDouble(READ_DATA_PREFIX + ".read1.density.ratio");
+    final int readCount = data.getReadCount();
 
-    long clusterRawSum = 0;
+    double densitySum = 0;
 
     for (int lane = 1; lane <= laneCount; lane++) {
+      for (int read = 1; read <= readCount; read++) {
 
-      clusterRawSum += data
-          .getLong(READ_DATA_PREFIX + ".read1.lane" + lane + ".clusters.raw");
+        densitySum += data.getDouble(READ_DATA_PREFIX
+            + ".read" + read + ".lane" + lane + ".density.raw");
+      }
     }
 
     try {
-      final long clusterRawMean = clusterRawSum / laneCount;
-      final double density = clusterRawMean * densityRatio / 1000.0;
+
+      final double density = densitySum / (laneCount * readCount) / 1000.0;
 
       if (interval == null)
         return new TestResult(density);
@@ -106,8 +106,9 @@ public class ClusterDensityGlobalTest extends AbstractGlobalTest {
    * Public constructor.
    */
   public ClusterDensityGlobalTest() {
-    
-    super("global.cluster.density", "Cluster Density", "Cluster Density","k/mm2");
+
+    super("global.cluster.density", "Cluster Density", "Cluster Density",
+        "k/mm²");
   }
 
 }

@@ -37,7 +37,7 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import fr.ens.biologie.genomique.eoulsan.core.Version;
+import fr.ens.biologie.genomique.kenetre.util.Version;
 
 /**
  * This class contains Globals constants.

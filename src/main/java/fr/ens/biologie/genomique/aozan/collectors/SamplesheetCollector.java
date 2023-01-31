@@ -23,8 +23,6 @@
 
 package fr.ens.biologie.genomique.aozan.collectors;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -44,10 +42,10 @@ import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeAliases;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
+import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.Sample;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
 
 /**
  * This class define a Bcl2fastq samplesheet collector.
@@ -61,7 +59,7 @@ public class SamplesheetCollector implements Collector {
 
   public static final String SAMPLESHEET_DATA_PREFIX = "samplesheet";
 
-  private File samplesheetFile;
+  private SampleSheet samplesheet;
 
   /**
    * This private class define a pooled sample.
@@ -144,9 +142,9 @@ public class SamplesheetCollector implements Collector {
     }
 
     // Initialize Genome aliases
-    //GenomeAliases.initialize(settings);
+    // GenomeAliases.initialize(settings);
 
-    this.samplesheetFile = qc.getSampleSheetFile();
+    this.samplesheet = qc.getSampleSheet();
   }
 
   @Override
@@ -156,31 +154,22 @@ public class SamplesheetCollector implements Collector {
       return;
     }
 
+    final Multimap<Integer, Integer> samplesInLane = ArrayListMultimap.create();
+    final Set<String> projectNames = new LinkedHashSet<>();
+    final Multimap<String, Integer> projectSamples = ArrayListMultimap.create();
+    final Multimap<PooledSample, Integer> pooledSamples =
+        ArrayListMultimap.create();
+
+    int sampleNumber = 0;
+    final Set<Integer> lanes = new HashSet<>();
+    final Set<Integer> indexedLanes = new HashSet<>();
+
+    // TODO handle empty samplesheet where a sample is create by lane
+    // TODO save pooled samples
+
     try {
-      final Multimap<Integer, Integer> samplesInLane =
-          ArrayListMultimap.create();
-      final Set<String> projectNames = new LinkedHashSet<>();
-      final Multimap<String, Integer> projectSamples =
-          ArrayListMultimap.create();
-      final Multimap<PooledSample, Integer> pooledSamples =
-          ArrayListMultimap.create();
-
-      // Read Bcl2fastq samplesheet
-      final SampleSheet samplesheet;
-      try (SampleSheetCSVReader reader =
-          new SampleSheetCSVReader(this.samplesheetFile)) {
-        samplesheet = reader.read();
-      }
-
-      int sampleNumber = 0;
-      final Set<Integer> lanes = new HashSet<>();
-      final Set<Integer> indexedLanes = new HashSet<>();
-
-      // TODO handle empty samplesheet where a sample is create by lane
-      // TODO save pooled samples
-
       for (final Sample s : SampleSheetUtils
-          .getCheckedDemuxTableSection(samplesheet)) {
+          .getCheckedDemuxTableSection(this.samplesheet)) {
 
         sampleNumber++;
 
@@ -220,8 +209,7 @@ public class SamplesheetCollector implements Collector {
 
         projectSamples.put(project, sampleNumber);
         pooledSamples.put(new PooledSample(project, demuxName, index1, index2,
-            ref, normalizedRef),
-            sampleNumber);
+            ref, normalizedRef), sampleNumber);
         samplesInLane.put(lane, sampleNumber);
 
         // Extract data exist only with first version
@@ -258,66 +246,65 @@ public class SamplesheetCollector implements Collector {
         // List projects in run
         projectNames.add(project);
       }
-
-      // Add undetermined samples
-      final List<String> undeterminedSamples = new ArrayList<>();
-      for (int lane : lanes) {
-
-        if (indexedLanes.contains(lane)) {
-
-          sampleNumber++;
-
-          final String prefix =
-              SAMPLESHEET_DATA_PREFIX + ".sample" + sampleNumber;
-          data.put(prefix + ".id", "undetermined");
-          data.put(prefix + ".lane", lane);
-          data.put(prefix + ".undetermined", true);
-          data.put(prefix + ".ref", "");
-          data.put(prefix + ".normalized.ref", "");
-          data.put(prefix + ".indexed", false);
-          data.put(prefix + ".index", "");
-          data.put(prefix + ".description", "");
-          data.put(prefix + ".project", "");
-
-          data.put(
-              SAMPLESHEET_DATA_PREFIX + ".lane" + lane + ".undetermined.sample",
-              sampleNumber);
-          undeterminedSamples.add(Integer.toString(sampleNumber));
-          samplesInLane.put(lane, sampleNumber);
-        }
-      }
-
-      data.put(SAMPLESHEET_DATA_PREFIX + ".undetermined.samples",
-          Joiner.on(",").join(undeterminedSamples));
-
-      // List samples by lane
-      for (final Map.Entry<Integer, Collection<Integer>> e : samplesInLane
-          .asMap().entrySet()) {
-        data.put(SAMPLESHEET_DATA_PREFIX + ".lane" + e.getKey() + ".samples",
-            Joiner.on(",").join(e.getValue()));
-      }
-
-      // List indexed lanes
-      for (int lane : lanes) {
-        data.put(SAMPLESHEET_DATA_PREFIX + ".lane" + lane + ".indexed",
-            indexedLanes.contains(lane));
-      }
-
-      data.put(SAMPLESHEET_DATA_PREFIX + ".sample.count", sampleNumber);
-
-      // Add all projects name in data
-      data.put(SAMPLESHEET_DATA_PREFIX + ".projects.names",
-          Joiner.on(",").join(projectNames));
-
-      // Add the projects
-      addProjects(data, projectNames, projectSamples);
-
-      // Add pooled samples
-      addPooledSamplesInRunData(data, pooledSamples, undeterminedSamples);
-
-    } catch (final IOException e) {
+    } catch (KenetreException e) {
       throw new AozanException(e);
     }
+
+    // Add undetermined samples
+    final List<String> undeterminedSamples = new ArrayList<>();
+    for (int lane : lanes) {
+
+      if (indexedLanes.contains(lane)) {
+
+        sampleNumber++;
+
+        final String prefix =
+            SAMPLESHEET_DATA_PREFIX + ".sample" + sampleNumber;
+        data.put(prefix + ".id", "undetermined");
+        data.put(prefix + ".lane", lane);
+        data.put(prefix + ".undetermined", true);
+        data.put(prefix + ".ref", "");
+        data.put(prefix + ".normalized.ref", "");
+        data.put(prefix + ".indexed", false);
+        data.put(prefix + ".index", "");
+        data.put(prefix + ".description", "");
+        data.put(prefix + ".project", "");
+
+        data.put(
+            SAMPLESHEET_DATA_PREFIX + ".lane" + lane + ".undetermined.sample",
+            sampleNumber);
+        undeterminedSamples.add(Integer.toString(sampleNumber));
+        samplesInLane.put(lane, sampleNumber);
+      }
+    }
+
+    data.put(SAMPLESHEET_DATA_PREFIX + ".undetermined.samples",
+        Joiner.on(",").join(undeterminedSamples));
+
+    // List samples by lane
+    for (final Map.Entry<Integer, Collection<Integer>> e : samplesInLane.asMap()
+        .entrySet()) {
+      data.put(SAMPLESHEET_DATA_PREFIX + ".lane" + e.getKey() + ".samples",
+          Joiner.on(",").join(e.getValue()));
+    }
+
+    // List indexed lanes
+    for (int lane : lanes) {
+      data.put(SAMPLESHEET_DATA_PREFIX + ".lane" + lane + ".indexed",
+          indexedLanes.contains(lane));
+    }
+
+    data.put(SAMPLESHEET_DATA_PREFIX + ".sample.count", sampleNumber);
+
+    // Add all projects name in data
+    data.put(SAMPLESHEET_DATA_PREFIX + ".projects.names",
+        Joiner.on(",").join(projectNames));
+
+    // Add the projects
+    addProjects(data, projectNames, projectSamples);
+
+    // Add pooled samples
+    addPooledSamplesInRunData(data, pooledSamples, undeterminedSamples);
   }
 
   /**

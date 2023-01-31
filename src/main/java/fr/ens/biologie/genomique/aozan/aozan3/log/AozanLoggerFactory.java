@@ -4,6 +4,12 @@ import static java.util.Objects.requireNonNull;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
+import fr.ens.biologie.genomique.aozan.aozan3.Globals;
+import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.log.DummyLogger;
+import fr.ens.biologie.genomique.kenetre.log.FileLogger;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
+import fr.ens.biologie.genomique.kenetre.log.StandardErrorLogger;
 
 /**
  * This class define a factory for loggers.
@@ -19,32 +25,40 @@ public class AozanLoggerFactory {
    * @return a new AozanLogger object
    * @throws Aozan3Exception if an error occurs while creating the logger
    */
-  public static AozanLogger newLogger(final Configuration conf,
-      final AozanLogger oldLogger) throws Aozan3Exception {
+  public static GenericLogger newLogger(final Configuration conf,
+      final GenericLogger oldLogger) throws Aozan3Exception {
 
     requireNonNull(conf);
     requireNonNull(oldLogger);
 
+    if (!(oldLogger instanceof DummyLogger)) {
+
+      return oldLogger;
+    }
+
     // Disable old logger
-    AozanLogger old = oldLogger != null ? oldLogger : new DummyAzoanLogger();
-    old.flush();
-    old.close();
+    oldLogger.flush();
+    oldLogger.close();
 
     String loggerName = conf.get("aozan.logger", "dummy").toLowerCase().trim();
 
-    switch (loggerName) {
+    try {
+      switch (loggerName) {
 
-    case "dummy":
-      return new DummyAzoanLogger();
+      case "dummy":
+        return new DummyLogger();
 
-    case "stderr":
-      return new StandardErrorAozanLogger(conf);
+      case "stderr":
+        return new StandardErrorLogger(Globals.APP_NAME, conf.toMap());
 
-    case "file":
-      return new FileAzoanLogger(conf);
+      case "file":
+        return new FileLogger(Globals.APP_NAME, conf.toMap());
 
-    default:
-      throw new Aozan3Exception("Unknown logger: " + loggerName);
+      default:
+        throw new Aozan3Exception("Unknown logger: " + loggerName);
+      }
+    } catch (KenetreException e) {
+      throw new Aozan3Exception(e);
     }
 
   }

@@ -114,7 +114,7 @@ public abstract class AbstractSimpleSampleTest extends AbstractSampleTest {
 
     // Key not present in data, case with fastqscreen, a genome specific from a
     // project
-    if (data.get(key) == null) {
+    if (!data.contains(key)) {
       return new TestResult("NA");
     }
 

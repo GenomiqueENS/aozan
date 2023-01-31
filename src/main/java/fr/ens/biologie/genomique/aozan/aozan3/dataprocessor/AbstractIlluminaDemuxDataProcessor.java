@@ -1,8 +1,10 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.BCL;
-import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.sizeToHumanReadable;
-import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.error;
+import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.info;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.sizeToHumanReadable;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.toTimeHumanReadable;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 
@@ -11,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -28,12 +31,13 @@ import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.SimpleDataTypeFilter;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
-import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVWriter;
-import fr.ens.biologie.genomique.eoulsan.util.StringUtils;
+import fr.ens.biologie.genomique.aozan.aozan3.util.DiskUtils;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVWriter;
+import fr.ens.biologie.genomique.kenetre.log.DummyLogger;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
+import fr.ens.biologie.genomique.kenetre.util.StringUtils;
 
 /**
  * This class define an abstract Illumina demultiplexing data processor.
@@ -45,7 +49,7 @@ public abstract class AbstractIlluminaDemuxDataProcessor
 
   private static final boolean USE_DOCKER = true;
 
-  private AozanLogger logger = new DummyAzoanLogger();
+  private GenericLogger logger = new DummyLogger();
 
   private DataStorage outputStorage;
   private String dataDescription;
@@ -60,7 +64,7 @@ public abstract class AbstractIlluminaDemuxDataProcessor
   }
 
   @Override
-  public void init(final Configuration conf, final AozanLogger logger)
+  public void init(final Configuration conf, final GenericLogger logger)
       throws Aozan3Exception {
 
     requireNonNull(conf);
@@ -150,8 +154,8 @@ public abstract class AbstractIlluminaDemuxDataProcessor
         throw new IOException("No samplesheet found");
       }
 
-      SampleSheet samplesheet = SampleSheetUtils
-          .parseCSVSamplesheet(conf.get("illumina.samplesheet"));
+      SampleSheet samplesheet =
+          SampleSheetUtils.deSerialize(conf.get("illumina.samplesheet"));
 
       processSampleSheet(samplesheet);
 
@@ -182,7 +186,11 @@ public abstract class AbstractIlluminaDemuxDataProcessor
         Files.delete(samplesheetPath);
       }
 
-      // TODO chmod on fastq
+      // Chmod on output directory
+      DiskUtils.changeDirectoryMode(outputLocation.getPath(), "u+r,g+r,o+r");
+      if (conf.getBoolean("read.only.output.files", false)) {
+        DiskUtils.changeDirectoryMode(outputLocation.getPath(), "u-w,g-w,o-w");
+      }
 
       // TODO archive stats and samplesheet (2 new data processors)
 
@@ -193,21 +201,23 @@ public abstract class AbstractIlluminaDemuxDataProcessor
       // Log disk usage and disk free space
       long outputSize = outputLocation.getDiskUsage();
       long outputFreeSize = outputLocation.getStorage().getUsableSpace();
-      this.logger.info(runId, "output disk free after demux: "
+      info(this.logger, runId, "output disk free after demux: "
           + sizeToHumanReadable(outputFreeSize));
-      this.logger.info(runId,
+      info(this.logger, runId,
           "space used by demux: " + sizeToHumanReadable(outputSize));
 
       // Report URL in email message
-      String reportLocationMessage = runConf.containsKey("reports.url")
-          ? "\n\nRun reports can be found at following location:\n  "
-              + runConf.get("reports.url") + '/' + runId.getId()
+      String reportLocationMessage = conf.containsKey("reports.url")
+          ? "\nRun reports can be found at following location:\n  "
+              + conf.get("reports.url") + '/' + runId.getId() + "\n"
           : "";
 
-      String emailContent = String.format("Ending demultiplexing "
-          + "for run %s.\n" + "Job finished at %s without error in %s.\n"
-          + "FASTQ files for this run can be found in the following directory: %s\n%s"
-          + "\nFor this task %s has been used and %s GB still free.",
+      String emailContent = String.format(
+          "Ending demultiplexing "
+              + "for run %s.\n" + "Job finished at %s without error in %s.\n\n"
+              + "FASTQ files for this run can be found in the following "
+              + "directory:\n  %s\n%s"
+              + "\nFor this task %s has been used and %s GB still free.",
           runId.getId(), new Date(endTime).toString(),
           toTimeHumanReadable(endTime - startTime), outputLocation.getPath(),
           reportLocationMessage, sizeToHumanReadable(outputSize),
@@ -318,8 +328,8 @@ public abstract class AbstractIlluminaDemuxDataProcessor
     // Get temporary directory
     File temporaryDirectory = new File(conf.get("tmp.dir"));
 
-    this.logger.info(runId, getDemuxToolName() + ": " + toolVersion);
-    this.logger.info(runId, "Demultiplexing using the following command line: "
+    info(this.logger, runId, getDemuxToolName() + ": " + toolVersion);
+    info(this.logger, runId, "Demultiplexing using the following command line: "
         + String.join(" ", commandLine));
 
     long startTime = System.currentTimeMillis();
@@ -343,7 +353,15 @@ public abstract class AbstractIlluminaDemuxDataProcessor
           + getDemuxToolName() + ", exit code is: " + exitValue);
     }
 
-    this.logger.info(runId, "Successful demultiplexing in "
+    // Create a copy of the sample at the root of the output directory
+    Path sampleSheetCopyFile =
+        Paths.get(outputPath.toString(), "SampleSheet.csv");
+    if (!Files.isRegularFile(sampleSheetCopyFile)) {
+      Files.copy(samplesheetPath, sampleSheetCopyFile,
+          StandardCopyOption.COPY_ATTRIBUTES);
+    }
+
+    info(this.logger, runId, "Successful demultiplexing in "
         + StringUtils.toTimeHumanReadable(endTime - startTime));
   }
 
@@ -356,7 +374,7 @@ public abstract class AbstractIlluminaDemuxDataProcessor
       writer.setVersion(2);
       writer.writer(samplesheet);
     } catch (IOException e) {
-      this.logger.error(runId, "Error while writing Illumina samplesheet: "
+      error(this.logger, runId, "Error while writing Illumina samplesheet: "
           + outputFile + "(" + e.getMessage() + ")");
       throw new IOException(e);
     }
@@ -365,12 +383,21 @@ public abstract class AbstractIlluminaDemuxDataProcessor
   protected void addCommandLineArgument(List<String> args,
       RunConfiguration conf, String longArgName) {
 
+    addCommandLineArgument(args, conf, longArgName, null);
+  }
+
+  protected void addCommandLineArgument(List<String> args,
+      RunConfiguration conf, String longArgName, String defaultValue) {
+
     String confKey =
         getConfPrefix() + '.' + longArgName.replace("--", "").replace('-', '.');
 
     if (conf.containsKey(confKey)) {
       args.add(longArgName);
       args.add(conf.get(confKey));
+    } else if (defaultValue != null) {
+      args.add(longArgName);
+      args.add(defaultValue);
     }
 
   }

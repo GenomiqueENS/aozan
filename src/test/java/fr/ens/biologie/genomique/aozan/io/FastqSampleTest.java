@@ -13,9 +13,10 @@ import org.junit.Test;
 
 import fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput;
 import fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput.Bcl2FastqVersion;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.Sample;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVReader;
+
 
 public class FastqSampleTest {
 

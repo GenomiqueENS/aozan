@@ -23,13 +23,16 @@
 
 package fr.ens.biologie.genomique.aozan.fastqscreen;
 
-
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -37,16 +40,16 @@ import java.util.regex.Pattern;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.Settings;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
+import fr.ens.biologie.genomique.aozan.Storages;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
-import fr.ens.biologie.genomique.eoulsan.bio.GenomeDescription;
-import fr.ens.biologie.genomique.eoulsan.data.DataFile;
+import fr.ens.biologie.genomique.kenetre.bio.BadBioEntryException;
+import fr.ens.biologie.genomique.kenetre.bio.GenomeDescription;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.Sample;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
 
 /**
  * This class read the alias genome file. It make correspondence between genome
@@ -58,11 +61,7 @@ import fr.ens.biologie.genomique.eoulsan.data.DataFile;
 public class FastqScreenGenomes {
 
   /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
-
-  /** Splitter. */
-  private static final Splitter COMMA_SPLITTER =
-      Splitter.on(',').trimResults().omitEmptyStrings();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   /** Pattern. */
   private static final Pattern PATTERN = Pattern.compile(".,;:/-_'");
@@ -71,42 +70,35 @@ public class FastqScreenGenomes {
   private final Set<String> sampleGenomes;
 
   /**
-   * Set reference genomes for the samples of a run. Retrieve list of genomes
-   * sample from Bcl2fastq samplesheet file and filtered them compared to alias
-   * genome file. Keep only if it can be create the genome description object.
+   * Set reference genomes for the samples of a run.
    * @return collection valid genomes names can be use for mapping
    * @throws AozanException if an error occurs during updating alias genomes
    *           file
    */
-  private Set<String> initSampleGenomes(
-      final Set<String> genomesReferencesSample) throws AozanException {
+  private static Set<String> initGenomes(final Collection<String> genomeNames)
+      throws AozanException {
 
-    // Identify genomes can be use for mapping
-    final Set<String> genomes = new LinkedHashSet<>();
+    Objects.requireNonNull(genomeNames);
 
-    // Add the contamination genomes to the genomes to use
-    genomes.addAll(this.contaminantGenomes);
+    final Set<String> result = new LinkedHashSet<>();
 
     final GenomeAliases genomeAliases = GenomeAliases.getInstance();
 
-    for (final String genomeName : genomesReferencesSample) {
+    for (final String genomeName : genomeNames) {
 
-      final String newGenomeName = genomeAliases.contains(genomeName)
-          ? genomeAliases.get(genomeName) : genomeName;
-
-      // Retrieve genome description if it exists
-      GenomeDescription gdesc = null;
-      try {
-        gdesc = GenomeDescriptionCreator.getInstance()
-            .createGenomeDescription(new DataFile("genome://" + newGenomeName));
-      } catch (final Exception isIgnored) {
-        // Do nothing
+      if (genomeName == null) {
+        continue;
       }
 
+      final String newGenomeName =
+          genomeAliases.contains(genomeName.toLowerCase())
+              ? genomeAliases.get(genomeName.toLowerCase()) : genomeName;
+
       // Check if a genome is available for mapping
-      if (gdesc != null) {
+      if (genomeExists(newGenomeName)) {
+
         // Genome description exist for the genome
-        genomes.add(newGenomeName);
+        result.add(newGenomeName);
 
         // Add the genome as Alias if not exists
         if (!genomeAliases.contains(genomeName)) {
@@ -118,7 +110,7 @@ public class FastqScreenGenomes {
         if (!genomeAliases.contains(genomeName)) {
           genomeAliases.addUnknownAlias(genomeName);
         } else {
-          genomes.add(genomeAliases.get(genomeName));
+          result.add(genomeAliases.get(genomeName));
         }
 
       }
@@ -127,7 +119,37 @@ public class FastqScreenGenomes {
     // Update new unknown genome aliases
     genomeAliases.saveUnknownAliases();
 
-    return Collections.unmodifiableSet(genomes);
+    return result;
+  }
+
+  /**
+   * Check if a genome name exists.
+   * @param genomeName name of the genome to check
+   * @return true if the genome exists
+   */
+  private static boolean genomeExists(String genomeName) {
+
+    Storages storages = Storages.getInstance();
+
+    if (!storages.isGenomeStorage()) {
+      return false;
+    }
+
+    try {
+
+      File genomeFile = storages.getGenomeStorage().getFile(genomeName);
+
+      if (genomeFile == null) {
+        return false;
+      }
+
+      GenomeDescription gdesc = storages.createGenomeDescription(genomeFile);
+
+      return gdesc != null;
+
+    } catch (BadBioEntryException | IOException e) {
+      return false;
+    }
   }
 
   /**
@@ -136,97 +158,33 @@ public class FastqScreenGenomes {
    * @return collection on genomes reference names for the samples
    */
   private Set<String> createSampleRefsFromSamplesheetFile(
-      final File samplesheetFile) {
+      final SampleSheet samplesheet) {
 
     final Set<String> genomesFromSamplesheet = new HashSet<>();
 
-    if (samplesheetFile.exists() && samplesheetFile.isFile()) {
+    // Retrieve all genome sample included in Bcl2fastq samplesheet file
+    for (final Sample sample : samplesheet) {
 
-      final SampleSheetCSVReader samplesheetReader;
-      final SampleSheet samplesheet;
+      if (sample.isSampleRefField()) {
 
-      try {
-        // Reading Bcl2fastq samplesheet file in format csv
-        samplesheetReader = new SampleSheetCSVReader(samplesheetFile);
-        samplesheet = samplesheetReader.read();
+        String genomeSample = sample.getSampleRef().replaceAll("\"", "");
 
-      } catch (final Exception e) {
-        // Return empty list
-        return Collections.emptySet();
+        // Replace all symbols not letters or numbers by space
+        genomeSample = PATTERN.matcher(genomeSample).replaceAll(" ");
+
+        genomesFromSamplesheet.add(genomeSample.trim());
       }
-
-      // Retrieve all genome sample included in Bcl2fastq samplesheet file
-      for (final Sample sample : samplesheet) {
-
-        if (sample.isSampleRefField()) {
-
-          String genomeSample =
-              sample.getSampleRef().replaceAll("\"", "").toLowerCase();
-
-          // Replace all symbols not letters or numbers by space
-          genomeSample = PATTERN.matcher(genomeSample).replaceAll(" ");
-
-          genomesFromSamplesheet.add(genomeSample.trim());
-        }
-      }
-
-      // TODO
-      LOGGER
-          .warning("FQS-genomeMapper: list genome names found in samplesheet: "
-              + Joiner.on(", ").join(genomesFromSamplesheet));
-
-      return genomesFromSamplesheet;
-
     }
-    // TODO
-    LOGGER.warning("FQS-genomeMapper: no genome name found in samplesheet file "
-        + samplesheetFile.getAbsolutePath());
 
-    // Fail to read the samplesheet file
-    return Collections.emptySet();
+    // TODO
+    LOGGER.warning("FQS-genomeMapper: list genome names found in samplesheet: "
+        + Joiner.on(", ").join(genomesFromSamplesheet));
+
+    return genomesFromSamplesheet;
   }
 
-  /**
-   * Initialization genomes or dataset contaminant define in Aozan
-   * configuration.
-   * @return genomes list
-   * @throws AozanException
-   */
-  private Set<String> initContaminantGenomes(
-      final String contaminantGenomeNames) throws AozanException {
-
-    // Set genomes in configuration file
-    final Set<String> genomes = new HashSet<>();
-
-    if (contaminantGenomeNames == null || contaminantGenomeNames.isEmpty()) {
-      throw new AozanException("FastqScreen : no contaminant genome defined.");
-    }
-
-    for (final String genome : COMMA_SPLITTER.split(contaminantGenomeNames)) {
-      final DataFile genomeFile = new DataFile("genome://" + genome);
-
-      // Retrieve genome description if it exists
-      GenomeDescription gdesc = null;
-      try {
-        gdesc = GenomeDescriptionCreator.getInstance()
-            .createGenomeDescription(genomeFile);
-      } catch (final Exception isIgnored) {
-        // Do nothing
-      }
-      // Check genomes can be use for mapping
-      if (gdesc != null) {
-        genomes.add(genome);
-      }
-    }
-
-    // No genome can be use for mapping
-    if (genomes.isEmpty()) {
-      throw new AozanException(
-          "FastqScreen : no genome contaminant can be use from configuration file: "
-              + contaminantGenomeNames);
-    }
-
-    return Collections.unmodifiableSet(genomes);
+  private static List<String> splitComtaminantString(String s) {
+    return Splitter.on(',').trimResults().omitEmptyStrings().splitToList(s);
   }
 
   /**
@@ -261,12 +219,12 @@ public class FastqScreenGenomes {
     requireNonNull(testConfiguration,
         "testConfiguration argument cannot be null");
 
-    final File samplesheetFile =
-        new File(testConfiguration.get(QC.BCL2FASTQ_SAMPLESHEET_PATH));
+    final SampleSheet samplesheet =
+        testConfiguration.getSampleSheet(QC.SAMPLESHEET);
     final String contaminantGenomeNames =
         testConfiguration.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_KEY);
 
-    return new FastqScreenGenomes(samplesheetFile, contaminantGenomeNames);
+    return new FastqScreenGenomes(samplesheet, contaminantGenomeNames);
   }
 
   //
@@ -275,24 +233,30 @@ public class FastqScreenGenomes {
 
   /**
    * Public constructor.
-   * @param samplesheetFile samplesheet file
+   * @param samplesheet sampleSheet file
    * @param contaminantGenomeNames a string with the list of the contaminant
    *          genomes
    * @throws AozanException if an error occurs while creating the object
    */
-  public FastqScreenGenomes(final File samplesheetFile,
+  public FastqScreenGenomes(final SampleSheet samplesheet,
       final String contaminantGenomeNames) throws AozanException {
 
-    requireNonNull(samplesheetFile, "samplesheetFile argument cannot be null");
+    requireNonNull(samplesheet, "sampleSheet argument cannot be null");
     requireNonNull(contaminantGenomeNames,
         "contaminantGenomeNames argument cannot be null");
 
     // Collect genomes contaminant list
-    this.contaminantGenomes = initContaminantGenomes(contaminantGenomeNames);
+    this.contaminantGenomes =
+        initGenomes(splitComtaminantString(contaminantGenomeNames));
+
+    if (contaminantGenomeNames.isEmpty()) {
+      throw new AozanException("FastqScreen : no contaminant genome defined.");
+    }
 
     // Collect genomes useful to contaminant detection
-    this.sampleGenomes =
-        initSampleGenomes(createSampleRefsFromSamplesheetFile(samplesheetFile));
+    this.sampleGenomes = new LinkedHashSet<>(this.contaminantGenomes);
+    this.sampleGenomes
+        .addAll(initGenomes(createSampleRefsFromSamplesheetFile(samplesheet)));
   }
 
 }

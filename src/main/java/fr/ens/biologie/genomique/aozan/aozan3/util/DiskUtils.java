@@ -3,7 +3,6 @@ package fr.ens.biologie.genomique.aozan.aozan3.util;
 import static java.util.Objects.requireNonNull;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -116,8 +115,6 @@ public class DiskUtils {
     commandLine.add(directory.toAbsolutePath().toString());
 
     ProcessBuilder pb = new ProcessBuilder(commandLine);
-    pb.redirectOutput(new File("/home/jourdren/tmp/chown.out"));
-    pb.redirectError(new File("/home/jourdren/tmp/chown.err"));
 
     try {
       int exitValue = pb.start().waitFor();
@@ -160,8 +157,6 @@ public class DiskUtils {
     commandLine.add(directory.toAbsolutePath().toString());
 
     ProcessBuilder pb = new ProcessBuilder(commandLine);
-    pb.redirectOutput(new File("/home/jourdren/tmp/chmod.out"));
-    pb.redirectError(new File("/home/jourdren/tmp/chmod.err"));
 
     try {
       int exitValue = pb.start().waitFor();

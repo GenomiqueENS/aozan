@@ -32,8 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.AozanRuntimeException;
-import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.Settings;
 import uk.ac.babraham.FastQC.Sequence.Contaminant.Contaminant;
@@ -49,7 +49,7 @@ import uk.ac.babraham.FastQC.Sequence.Contaminant.ContaminantHit;
 public class ContaminantFinder {
 
   /** LOGGER. */
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   private static Contaminant[] contaminants;
 

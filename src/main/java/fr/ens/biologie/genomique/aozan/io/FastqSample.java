@@ -37,7 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -46,9 +46,9 @@ import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput;
 import fr.ens.biologie.genomique.aozan.illumina.Bcl2FastqOutput.Bcl2FastqVersion;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.biologie.genomique.eoulsan.io.CompressionType;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.Sample;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.io.CompressionType;
 
 /**
  * The class correspond of one entity to treat by AbstractFastqCollector, so a
@@ -341,15 +341,6 @@ public class FastqSample {
   }
 
   /**
-   * Get a SampleSheetFile from a QC
-   * @return sampleSheetFile
-   */
-  private static File getSampleSheetFileFromQC(QC qc) {
-    requireNonNull(qc, "qc argument cannot be null");
-    return qc.getSampleSheetFile();
-  }
-
-  /**
    * Return the temporary if exists which correspond to the key.
    * @return File temporary file or null if it not exists
    */
@@ -518,10 +509,10 @@ public class FastqSample {
     switch (version) {
 
     case BCL2FASTQ_2:
+    case BCL_CONVERT:
       return getSampleName();
 
     case BCL2FASTQ_2_15:
-    case BCL_CONVERT:
       return getSampleName().replace("_", "-");
 
     default:
@@ -634,7 +625,7 @@ public class FastqSample {
   @Override
   public String toString() {
 
-    return Objects.toStringHelper(this).add("read", read).add("lane", lane)
+    return MoreObjects.toStringHelper(this).add("read", read).add("lane", lane)
         .add("sampleName", sampleName).add("projectName", projectName)
         .add("descriptionSample", description).add("index", index)
         .add("undeterminedIndex", undeterminedIndex)
@@ -666,14 +657,14 @@ public class FastqSample {
       final String projectName, final String descriptionSample,
       final String index) throws IOException {
 
-    this(getSampleSheetFileFromQC(qc), qc.getFastqDir(), qc.getTmpDir(),
-        qc.getRunId(), sampleId, read, lane, sampleDirname, sampleName,
-        projectName, descriptionSample, index);
+    this(qc.getSampleSheet(), qc.getFastqDir(), qc.getTmpDir(), qc.getRunId(),
+        sampleId, read, lane, sampleDirname, sampleName, projectName,
+        descriptionSample, index);
   }
 
   /**
    * Public constructor corresponding of a technical replica sample.
-   * @param sampleSheetFile samplesheet file
+   * @param sampleSheet the sample sheet
    * @param fastqDir FASTQ directory
    * @param tmpDir temporary directory
    * @param runId the run id
@@ -687,15 +678,15 @@ public class FastqSample {
    * @param index value of index or if doesn't exists, NoIndex
    * @throws IOException if an error occurs while reading bcl2fastq version
    */
-  public FastqSample(final File sampleSheetFile, final File fastqDir,
+  public FastqSample(final SampleSheet sampleSheet, final File fastqDir,
       final File tmpDir, final String runId, final int sampleId, final int read,
       final int lane, final String sampleDirname, final String sampleName,
       final String projectName, final String descriptionSample,
       final String index) throws IOException {
 
-    this(new Bcl2FastqOutput(sampleSheetFile, fastqDir), tmpDir, runId,
-        sampleId, read, lane, sampleDirname, sampleName, projectName,
-        descriptionSample, index, false, true);
+    this(new Bcl2FastqOutput(sampleSheet, fastqDir), tmpDir, runId, sampleId,
+        read, lane, sampleDirname, sampleName, projectName, descriptionSample,
+        index, false, true);
 
   }
 
@@ -731,24 +722,27 @@ public class FastqSample {
   public FastqSample(final QC qc, final int sampleId, final int read,
       final int lane) throws IOException {
 
-    this(getSampleSheetFileFromQC(qc), qc.getFastqDir(), qc.getTmpDir(),
-        qc.getRunId(), sampleId, read, lane);
+    this(qc.getSampleSheet(), qc.getFastqDir(), qc.getTmpDir(), qc.getRunId(),
+        sampleId, read, lane);
   }
 
   /**
    * Public constructor corresponding of a undetermined index sample.
+   * @param sampleSheet the sample sheet
+   * @param fastqDir the FASTQ directory
+   * @param tmpDir the temporary directory
+   * @param runId the runId
    * @param sampleId the sample Id
    * @param read read number
    * @param lane lane number
    * @throws IOException if an error occurs while reading bcl2fastq version
    */
-  public FastqSample(final File sampleSheetFile, final File fastqDir,
+  public FastqSample(final SampleSheet sampleSheet, final File fastqDir,
       final File tmpDir, final String runId, final int sampleId, final int read,
       final int lane) throws IOException {
 
-    this(new Bcl2FastqOutput(sampleSheetFile, fastqDir), tmpDir, runId,
-        sampleId, read, lane, null, "lane" + lane, "", "", NO_INDEX, true,
-        true);
+    this(new Bcl2FastqOutput(sampleSheet, fastqDir), tmpDir, runId, sampleId,
+        read, lane, null, "lane" + lane, "", "", NO_INDEX, true, true);
   }
 
   /**

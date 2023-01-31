@@ -23,7 +23,7 @@
 
 package fr.ens.biologie.genomique.aozan.collectors;
 
-import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.toTimeHumanReadable;
 
 import java.util.concurrent.TimeUnit;
 

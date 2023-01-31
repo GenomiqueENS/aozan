@@ -1,5 +1,6 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
+import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.info;
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
@@ -9,12 +10,12 @@ import java.util.List;
 import java.util.function.Function;
 
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
-import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
-import fr.ens.biologie.genomique.eoulsan.util.process.DockerImageInstance;
-import fr.ens.biologie.genomique.eoulsan.util.process.FallBackDockerClient;
-import fr.ens.biologie.genomique.eoulsan.util.process.SimpleProcess;
-import fr.ens.biologie.genomique.eoulsan.util.process.SystemSimpleProcess;
+import fr.ens.biologie.genomique.kenetre.log.DummyLogger;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
+import fr.ens.biologie.genomique.kenetre.util.process.DockerImageInstance;
+import fr.ens.biologie.genomique.kenetre.util.process.FallBackDockerClient;
+import fr.ens.biologie.genomique.kenetre.util.process.SimpleProcess;
+import fr.ens.biologie.genomique.kenetre.util.process.SystemSimpleProcess;
 
 /**
  * This class define a class for calling external tool in DataProcessors.
@@ -26,7 +27,7 @@ public class ExternalTool {
   private String toolName;
   private boolean dockerMode;
   private String dockerImage;
-  private AozanLogger logger;
+  private GenericLogger logger;
 
   private String toolNameLower() {
 
@@ -45,7 +46,7 @@ public class ExternalTool {
       boolean enableLogging) throws IOException {
 
     if (enableLogging) {
-      this.logger.info(runId,
+      info(this.logger, runId,
           dockerMode
               ? "Use Docker for executing " + this.toolName
               : "Use installed version of " + this.toolName);
@@ -60,7 +61,7 @@ public class ExternalTool {
     }
 
     if (enableLogging) {
-      this.logger.info(runId,
+      info(this.logger, runId,
           "Docker image to use for " + this.toolName + ": " + dockerImage);
     }
 
@@ -146,7 +147,7 @@ public class ExternalTool {
    * @param dockerImage docker image
    */
   ExternalTool(String toolName, boolean dockerMode, String dockerImage,
-      AozanLogger logger) {
+      GenericLogger logger) {
 
     requireNonNull(toolName);
 
@@ -157,7 +158,7 @@ public class ExternalTool {
     this.toolName = toolName;
     this.dockerMode = dockerMode;
     this.dockerImage = dockerImage == null ? "" : dockerImage.trim();
-    this.logger = logger == null ? new DummyAzoanLogger() : logger;
+    this.logger = logger == null ? new DummyLogger() : logger;
   }
 
 }

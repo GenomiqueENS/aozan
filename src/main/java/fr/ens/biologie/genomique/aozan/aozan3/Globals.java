@@ -6,7 +6,7 @@ import java.util.Locale;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-import fr.ens.biologie.genomique.eoulsan.core.Version;
+import fr.ens.biologie.genomique.kenetre.util.Version;
 
 /**
  * This class contains Globals constants.

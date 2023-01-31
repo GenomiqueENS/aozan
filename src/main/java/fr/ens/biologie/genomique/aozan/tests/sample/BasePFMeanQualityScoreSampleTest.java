@@ -61,8 +61,12 @@ public class BasePFMeanQualityScoreSampleTest extends AbstractSampleTest {
 
     try {
       final long qualityScoreSum =
-          data.getLong(prefix + ".pf.quality.score.sum");
-      final long yield = data.getLong(prefix + ".pf.yield");
+          data.getLong(prefix + ".pf.quality.score.sum", 0);
+      final long yield = data.getLong(prefix + ".pf.yield", 0);
+
+      if (yield == 0) {
+        return new TestResult("NA");
+      }
 
       final double mean = (double) qualityScoreSum / (double) yield;
 

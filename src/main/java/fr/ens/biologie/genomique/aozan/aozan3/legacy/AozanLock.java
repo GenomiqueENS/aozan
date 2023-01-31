@@ -57,7 +57,7 @@ public class AozanLock {
       return false;
     }
 
-    if (Files.isRegularFile(Paths.get("/proc/" + loadPid(this.lockFile)))) {
+    if (Files.isDirectory(Paths.get("/proc/" + loadPid(this.lockFile)))) {
       return true;
     }
 

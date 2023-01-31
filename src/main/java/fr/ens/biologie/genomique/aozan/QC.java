@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -49,7 +50,6 @@ import fr.ens.biologie.genomique.aozan.collectors.RunInfoCollector;
 import fr.ens.biologie.genomique.aozan.collectors.SamplesheetCollector;
 import fr.ens.biologie.genomique.aozan.fastqc.RuntimePatchFastQC;
 import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeAliases;
-import fr.ens.biologie.genomique.aozan.fastqscreen.GenomeDescriptionCreator;
 import fr.ens.biologie.genomique.aozan.tests.AozanTest;
 import fr.ens.biologie.genomique.aozan.tests.AozanTestRegistry;
 import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
@@ -58,8 +58,10 @@ import fr.ens.biologie.genomique.aozan.tests.lane.LaneTest;
 import fr.ens.biologie.genomique.aozan.tests.pooledsample.PooledSampleTest;
 import fr.ens.biologie.genomique.aozan.tests.project.ProjectTest;
 import fr.ens.biologie.genomique.aozan.tests.sample.SampleTest;
-import fr.ens.biologie.genomique.eoulsan.EoulsanRuntime;
-import fr.ens.biologie.genomique.eoulsan.data.protocols.DataProtocolService;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVReader;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetReader;
 import uk.ac.babraham.FastQC.FastQCConfig;
 
 /**
@@ -70,14 +72,13 @@ import uk.ac.babraham.FastQC.FastQCConfig;
 public class QC {
 
   /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   /** RTA output directory property key. */
   public static final String RTA_OUTPUT_DIR = "rta.output.dir";
 
-  /** Bcl2fastq samplesheet path property key. */
-  public static final String BCL2FASTQ_SAMPLESHEET_PATH =
-      "casava.samplesheet.path";
+  /** Samplesheet path property key. */
+  public static final String SAMPLESHEET = "samplesheet";
 
   /** Bcl2fastq output directory property key. */
   public static final String BCL2FASTQ_OUTPUT_DIR = "casava.output.dir";
@@ -112,7 +113,7 @@ public class QC {
   private final Map<String, String> globalConf = new LinkedHashMap<>();
 
   private final File tmpDir;
-  private final File sampleSheetFile;
+  private final SampleSheet sampleSheet;
 
   private final CollectorRegistry collectorRegistry = new CollectorRegistry();
 
@@ -156,8 +157,8 @@ public class QC {
    * Get the samplesheet file.
    * @return the samplesheet file
    */
-  public File getSampleSheetFile() {
-    return this.sampleSheetFile;
+  public SampleSheet getSampleSheet() {
+    return this.sampleSheet;
   }
 
   /**
@@ -625,8 +626,8 @@ public class QC {
     }
 
     this.globalConf.put(RTA_OUTPUT_DIR, this.bclDir.getPath());
-    this.globalConf.put(BCL2FASTQ_SAMPLESHEET_PATH,
-        this.sampleSheetFile.getAbsolutePath());
+    this.globalConf.put(SAMPLESHEET,
+        SampleSheetUtils.serialize(this.sampleSheet));
     this.globalConf.put(BCL2FASTQ_OUTPUT_DIR, this.fastqDir.getPath());
     this.globalConf.put(QC_OUTPUT_DIR, this.qcDir.getPath());
     this.globalConf.put(TMP_DIR, this.tmpDir.getAbsolutePath());
@@ -715,9 +716,6 @@ public class QC {
   private void initFastqScreenCollectorRequirements(final Settings settings)
       throws AozanException {
 
-    final fr.ens.biologie.genomique.eoulsan.Settings eoulsanSettings =
-        EoulsanRuntime.getSettings();
-
     final String genomeDescStoragePath =
         settings.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_DESC_PATH_KEY);
 
@@ -750,21 +748,9 @@ public class QC {
           + "the genomes files");
     }
 
-    // Set the values
-    eoulsanSettings.setGenomeDescStoragePath(genomeDescStoragePath);
-    eoulsanSettings
-        .setGenomeMapperIndexStoragePath(genomeMapperIndexStoragePath);
-    eoulsanSettings.setGenomeStoragePath(genomeStoragePath);
-
-    // Set data protocol from Eoulsan not load for Aozan because it needs to add
-    // dependencies
-    DataProtocolService.getInstance().addClassesToNotLoad(Lists.newArrayList(
-        "fr.ens.biologie.genomique.eoulsan.data.protocols.S3DataProtocol",
-        "fr.ens.biologie.genomique.eoulsan.data.protocols.S3NDataProtocol"));
-
-    // Initialize GenomeDescriptionCreator
-    GenomeDescriptionCreator.initialize(
-        settings.get(Settings.QC_CONF_FASTQSCREEN_GENOMES_DESC_PATH_KEY));
+    // Configure storages
+    Storages.init(genomeStoragePath, genomeDescStoragePath,
+        genomeMapperIndexStoragePath, Aozan2Logger.getGenericLogger());
   }
 
   /**
@@ -860,7 +846,7 @@ public class QC {
     return dir;
   }
 
-  private static File getSampleSheetFile(final File fastqDir)
+  private static SampleSheet getSampleSheetFile(final File fastqDir)
       throws AozanException {
 
     final File[] samplesheetFiles = fastqDir.listFiles(new FilenameFilter() {
@@ -872,20 +858,34 @@ public class QC {
       }
     });
 
-    if (samplesheetFiles == null || samplesheetFiles.length == 0) {
+    try {
+      if (samplesheetFiles == null || samplesheetFiles.length == 0) {
 
-      File sampleSheetInReportDir =
-          new File(fastqDir, "/Reports/SampleSheet.csv");
+        File sampleSheetInReportDir =
+            new File(fastqDir, "/Reports/SampleSheet.csv");
 
-      if (sampleSheetInReportDir.exists()) {
-        return sampleSheetInReportDir;
+        if (sampleSheetInReportDir.exists()) {
+
+          try (SampleSheetReader reader =
+              new SampleSheetCSVReader(sampleSheetInReportDir)) {
+            return reader.read();
+          }
+        }
+
+        throw new AozanException(
+            "No Bcl2fastq samplesheet file found in " + fastqDir);
       }
 
-      throw new AozanException(
-          "No Bcl2fastq samplesheet file found in " + fastqDir);
-    }
+      try (SampleSheetReader reader =
+          new SampleSheetCSVReader(samplesheetFiles[0])) {
+        return reader.read();
+      }
 
-    return samplesheetFiles[0];
+    } catch (
+
+    IOException e) {
+      throw new AozanException(e);
+    }
   }
 
   //
@@ -924,16 +924,35 @@ public class QC {
       final String qcDir, final File tmpDir, final String runId)
       throws AozanException {
 
+    this(settings, bclDir, fastqDir, qcDir, tmpDir, runId,
+        getSampleSheetFile(new File(fastqDir)));
+  }
+
+  /**
+   * Public constructor.
+   * @param settings Aozan settings
+   * @param bclDir BCL directory
+   * @param fastqDir fastq directory
+   * @param qcDir the qc dir
+   * @param tmpDir temporary directory
+   * @param runId run id
+   * @throws AozanException if an error occurs while initialize the QC object
+   */
+  public QC(final Settings settings, final String bclDir, final String fastqDir,
+      final String qcDir, final File tmpDir, final String runId,
+      final SampleSheet sampleSheet) throws AozanException {
+
+    Objects.requireNonNull(sampleSheet);
+
     this.settings = settings;
     this.bclDir = checkDir(bclDir);
     this.fastqDir = checkDir(fastqDir);
     this.qcDir = checkDir(qcDir);
     this.runId = runId;
+    this.sampleSheet = sampleSheet;
 
     this.tmpDir = tmpDir == null
         ? new File(System.getProperty("java.io.tmpdir")) : tmpDir;
-
-    this.sampleSheetFile = getSampleSheetFile(this.fastqDir);
 
     // Create the global settings for collectors and tests
     initGlobalConf(settings);

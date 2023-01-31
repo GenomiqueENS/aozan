@@ -25,27 +25,19 @@ package fr.ens.biologie.genomique.aozan.tests.lane;
 
 import static fr.ens.biologie.genomique.aozan.collectors.ReadCollector.READ_DATA_PREFIX;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
-import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.collectors.ReadCollector;
-import fr.ens.biologie.genomique.aozan.tests.AozanTest;
-import fr.ens.biologie.genomique.aozan.tests.TestConfiguration;
-import fr.ens.biologie.genomique.aozan.tests.TestResult;
-import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
 
 /**
  * This class define a lane test on cluster density.
  * @since 0.8
  * @author Laurent Jourdren
  */
-public class ClusterDensityLaneTest extends AbstractLaneTest {
-
-  private final ScoreInterval interval = new ScoreInterval();
+public class ClusterDensityLaneTest extends AbstractSimpleLaneTest {
 
   @Override
   public List<String> getCollectorsNamesRequiered() {
@@ -54,42 +46,22 @@ public class ClusterDensityLaneTest extends AbstractLaneTest {
   }
 
   @Override
-  public TestResult test(final RunData data, final int read,
-      final boolean indexedRead, final int lane) {
+  protected String getKey(int read, boolean indexedRead, int lane) {
 
-    try {
-      final long clusterRaw = data.getLong(
-          READ_DATA_PREFIX + ".read" + read + ".lane" + lane + ".clusters.raw");
-
-      final double densityRatio =
-          data.getDouble(READ_DATA_PREFIX + ".read" + read + ".density.ratio");
-
-      final double density = clusterRaw * densityRatio / 1000.0;
-
-      if (interval == null || indexedRead)
-        return new TestResult(density);
-
-      return new TestResult(this.interval.getScore(density), density);
-
-    } catch (NumberFormatException e) {
-
-      return new TestResult("NA");
-    }
+    return READ_DATA_PREFIX + ".read" + read + ".lane" + lane + ".density.raw";
   }
 
-  //
-  // Other methods
-  //
+  @Override
+  protected Class<?> getValueType() {
+
+    return Double.class;
+  }
 
   @Override
-  public List<AozanTest> configure(final TestConfiguration conf)
-      throws AozanException {
+  protected Number transformValue(final Number value, final RunData data,
+      final int read, final boolean indexedRead, final int lane) {
 
-    if (conf == null)
-      throw new NullPointerException("The conf object is null");
-
-    this.interval.configureDoubleInterval(conf);
-    return Collections.singletonList((AozanTest) this);
+    return value.doubleValue() / 1000.0;
   }
 
   //
@@ -102,6 +74,6 @@ public class ClusterDensityLaneTest extends AbstractLaneTest {
   public ClusterDensityLaneTest() {
 
     super("lane.cluster.density", "Cluster Density", "Cluster Density",
-        "k/mm2");
+        "k/mm²");
   }
 }

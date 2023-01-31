@@ -24,8 +24,8 @@
 package fr.ens.biologie.genomique.aozan.collectors;
 
 import static fr.ens.biologie.genomique.aozan.collectors.ReadCollector.READ_DATA_PREFIX;
-import static fr.ens.biologie.genomique.eoulsan.util.XMLUtils.getAttributeNames;
-import static fr.ens.biologie.genomique.eoulsan.util.XMLUtils.getAttributeValue;
+import static fr.ens.biologie.genomique.kenetre.util.XMLUtils.getAttributeNames;
+import static fr.ens.biologie.genomique.kenetre.util.XMLUtils.getAttributeValue;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,7 +48,7 @@ import com.google.common.collect.ImmutableList;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
-import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
+import fr.ens.biologie.genomique.kenetre.util.XMLUtils;
 
 /**
  * This internal class define a Collector for read?.xml files.

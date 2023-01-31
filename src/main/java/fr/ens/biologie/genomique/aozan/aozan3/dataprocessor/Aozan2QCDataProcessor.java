@@ -3,17 +3,25 @@ package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 import static fr.ens.biologie.genomique.aozan.Globals.QC_DATA_EXTENSION;
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.BCL;
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.ILLUMINA_FASTQ;
-import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.sizeToHumanReadable;
-import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.BclConvertIlluminaDemuxDataProcessor.BCL_CONVERT_FORBIDDEN_DATA_SECTION;
+import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.newAozanLogger;
+import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.newDummyLogger;
+import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.sizeToHumanReadable;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.toTimeHumanReadable;
 import static java.util.Objects.requireNonNull;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
@@ -31,8 +39,12 @@ import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.SimpleDataTypeFilter;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
-import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
+import fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger;
+import fr.ens.biologie.genomique.aozan.aozan3.util.DiskUtils;
+import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class define an Aozan 2 QC data processor.
@@ -45,7 +57,7 @@ public class Aozan2QCDataProcessor implements DataProcessor {
 
   private static final long DEFAULT_MIN_OUTPUT_FREE_SPACE = 10_000_000;
 
-  private AozanLogger logger = new DummyAzoanLogger();
+  private Aozan3Logger logger = newDummyLogger();
 
   private DataStorage outputStorage;
   private String dataDescription;
@@ -59,7 +71,7 @@ public class Aozan2QCDataProcessor implements DataProcessor {
   }
 
   @Override
-  public void init(Configuration conf, AozanLogger logger)
+  public void init(Configuration conf, GenericLogger logger)
       throws Aozan3Exception {
 
     requireNonNull(conf);
@@ -71,7 +83,7 @@ public class Aozan2QCDataProcessor implements DataProcessor {
 
     // Set logger
     if (logger != null) {
-      this.logger = logger;
+      this.logger = newAozanLogger(logger);
     }
 
     final DataStorage outputStorage =
@@ -128,6 +140,21 @@ public class Aozan2QCDataProcessor implements DataProcessor {
 
     try {
 
+      // Check if a samplesheet exists
+      if (!conf.containsKey("illumina.samplesheet")) {
+        throw new IOException("No samplesheet found");
+      }
+
+      SampleSheet samplesheet =
+          SampleSheetUtils.deSerialize(conf.get("illumina.samplesheet"));
+
+      // Merge forbidden section and BCLconvert section
+      if (samplesheet.containsSection(BCLCONVERT_DEMUX_TABLE_NAME)) {
+
+        SampleSheetUtils.mergeBclConvertDataAndForbiddenData(samplesheet,
+            BCL_CONVERT_FORBIDDEN_DATA_SECTION);
+      }
+
       // Check if the input and output storage are equals
       if (this.outputStorage.getPath()
           .equals(fastqRunData.getLocation().getStorage().getPath())) {
@@ -158,8 +185,18 @@ public class Aozan2QCDataProcessor implements DataProcessor {
       long startTime = System.currentTimeMillis();
 
       // Perform QC
-      qc(conf, bclLocation, fastqLocation, outputLocation, runId, writeDataFile,
-          writeXMLFile, writeHTMLFile);
+      qc(conf, bclLocation, fastqLocation, outputLocation, runId, samplesheet,
+          writeDataFile, writeXMLFile, writeHTMLFile);
+
+      // Legacy mode for output
+      if (conf.getBoolean("legacy.output")) {
+        legacyOutput(outputLocation.getPath().toFile(), runId.getId());
+      }
+
+      // Chmod on output directory
+      if (conf.getBoolean("read.only.output.files", false)) {
+        DiskUtils.changeDirectoryMode(outputLocation.getPath(), "u-w,g-w,o-w");
+      }
 
       long endTime = System.currentTimeMillis();
 
@@ -176,15 +213,15 @@ public class Aozan2QCDataProcessor implements DataProcessor {
       // TODO Use absolute path
 
       // Report URL in email message
-      String reportLocationMessage = runConf.containsKey("reports.url")
-          ? "\n\nRun reports can be found at following location:\n  "
-              + runConf.get("reports.url") + '/' + runId.getId()
+      String reportLocationMessage = conf.containsKey("reports.url")
+          ? "\nRun reports can be found at following location:\n  "
+              + conf.get("reports.url") + '/' + runId.getId() + "\n"
           : "";
 
       String emailContent = String.format("Ending quality control for run %s.\n"
           + "Job finished at %s without error in %s.\n"
           + "You will find attached to this message the quality control report.\n\n"
-          + "QC files for this run can be found in the following directory: %s\n%s"
+          + "QC files for this run can be found in the following directory:\n  %s\n%s"
           + "\nFor this task %s has been used and %s GB still free.",
           runId.getId(), new Date(endTime).toString(),
           toTimeHumanReadable(endTime - startTime), outputLocation.getPath(),
@@ -201,15 +238,15 @@ public class Aozan2QCDataProcessor implements DataProcessor {
           fastqRunData.newLocation(outputLocation).newCategory(Category.QC),
           email);
 
-    } catch (IOException | AozanException e) {
+    } catch (IOException | AozanException | KenetreException e) {
       throw new Aozan3Exception(runId, e);
     }
   }
 
   private static void qc(RunConfiguration conf, DataLocation bclLocation,
       DataLocation fastqLocation, DataLocation outputLocation, RunId runId,
-      boolean writeDataFile, boolean writeXMLFile, boolean writeHTMLFile)
-      throws AozanException {
+      SampleSheet sampleSheet, boolean writeDataFile, boolean writeXMLFile,
+      boolean writeHTMLFile) throws AozanException {
 
     requireNonNull(conf);
     requireNonNull(bclLocation);
@@ -230,7 +267,7 @@ public class Aozan2QCDataProcessor implements DataProcessor {
     // TODO Create a constructor with File or Path Object types instead of
     // String for path
     QC qc = new QC(settings, bclDir, fastqDir, qcDir, temporaryDirectory,
-        illuminaRunId);
+        illuminaRunId, sampleSheet);
 
     // Compute report
     QCReport qcReport = qc.computeReport();
@@ -257,6 +294,46 @@ public class Aozan2QCDataProcessor implements DataProcessor {
       // TODO update argument type of the method
       qc.writeReport(qcReport, styleSheetPath.isEmpty() ? null : styleSheetPath,
           htmlFile.toString());
+    }
+  }
+
+  /**
+   * Create output in legacy mode.
+   * @param outputDir QC output directory
+   * @param runId runId
+   * @throws AozanException if an error occurs while creating HTML index file
+   */
+  private static void legacyOutput(File outputDir, String runId)
+      throws AozanException {
+
+    File parentDir = outputDir.getParentFile();
+    File tmpDir = new File(parentDir, outputDir.getName() + ".tmp");
+    File finalDir = new File(outputDir, "qc_" + outputDir.getName());
+    File indexFile = new File(outputDir, "index.html");
+
+    // Rename output directory to a temporary directory
+    outputDir.renameTo(tmpDir);
+
+    // Create a new output directory
+    outputDir.mkdir();
+
+    // Move original directory
+    tmpDir.renameTo(finalDir);
+
+    // Read template
+    String template = new BufferedReader(
+        new InputStreamReader(Aozan2QCDataProcessor.class.getResourceAsStream(
+            "/legacy_template_index_run.html"), StandardCharsets.UTF_8)).lines()
+                .collect(Collectors.joining("\n"));
+
+    // Update template
+    String text = template.replace("$RUN_ID", runId);
+
+    // Write final index file
+    try {
+      Files.write(indexFile.toPath(), text.getBytes(StandardCharsets.UTF_8));
+    } catch (IOException e) {
+      throw new AozanException("Unable to write HTML index file", e);
     }
   }
 

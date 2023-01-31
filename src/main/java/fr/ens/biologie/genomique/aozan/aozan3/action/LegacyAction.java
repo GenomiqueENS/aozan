@@ -15,8 +15,8 @@ import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 import fr.ens.biologie.genomique.aozan.aozan3.legacy.AozanLock;
 import fr.ens.biologie.genomique.aozan.aozan3.legacy.LegacyRecipes;
 import fr.ens.biologie.genomique.aozan.aozan3.legacy.RunIdStorage;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.recipe.Recipe;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class define an legacy action. The legacy action allow to use Aozan 3
@@ -46,7 +46,7 @@ public class LegacyAction implements Action {
 
   @Override
   public void action(Configuration conf, List<String> arguments,
-      AozanLogger logger) {
+      GenericLogger logger) {
 
     if (arguments.isEmpty()) {
       Common.showErrorMessageAndExit(
@@ -56,6 +56,12 @@ public class LegacyAction implements Action {
     try {
       Path confFile = Paths.get(arguments.get(0));
       LegacyRecipes recipes = new LegacyRecipes(conf, logger, confFile);
+
+      // Test if Aozan is enabled
+      if (!recipes.isAozanEnabled()) {
+        // Nothing to do Aozan is disabled
+        return;
+      }
 
       // Lock Aozan
       AozanLock mainLock = new AozanLock(recipes.getMainLockPath());
@@ -115,6 +121,11 @@ public class LegacyAction implements Action {
     if (forbiddenRuns != null) {
       todoRunIds.removeAll(forbiddenRuns);
     }
+
+    // Remove runs in .deny file
+    RunIdStorage denyRunIdStorage = new RunIdStorage(
+        Paths.get(varPath.toString(), recipe.getName() + ".deny"));
+    todoRunIds.removeAll(denyRunIdStorage.load());
 
     // Remove processed runs
     Set<RunId> processed = processedRunIdStorage.load();

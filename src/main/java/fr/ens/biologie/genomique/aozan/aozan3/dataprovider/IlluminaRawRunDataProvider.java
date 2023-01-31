@@ -13,8 +13,8 @@ import fr.ens.biologie.genomique.aozan.aozan3.IlluminaUtils;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunDataFactory;
 import fr.ens.biologie.genomique.aozan.aozan3.SequencerSource;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.util.Utils;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class define a processed data provider for Illumina runs.
@@ -74,7 +74,7 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
   }
 
   @Override
-  public void init(DataStorage storage, Configuration conf, AozanLogger logger)
+  public void init(DataStorage storage, Configuration conf, GenericLogger logger)
       throws Aozan3Exception {
 
     // Check if step has not been already initialized

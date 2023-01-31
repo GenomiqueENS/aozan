@@ -65,6 +65,7 @@
 
         <table>
           <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
+          <tr><td>qc.test.sample.genome.names.enable</td><td>boolean</td><td>False</td><td>Enable genome names test</td></tr>
           <tr><td>qc.test.sample.raw.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable raw clusters count test</td></tr>
           <tr><td>qc.test.sample.raw.cluster.count.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values</td></tr>
           <tr><td>qc.test.sample.pf.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable passing filter count test</td></tr>
@@ -211,7 +212,8 @@
           <tr><td>qc.conf.fastqscreen.mapping.skip.control.lane</td><td>boolean</td><td>True</td><td>Enable contamination detection on control lane</td></tr>
           <tr><td>qc.conf.fastqscreen.mapping.ignore.paired.end.mode</td><td>boolean</td><td>True</td><td>If true for a run paired-end, the detection contamination will be only performed on the first of the two reads. The values for the second read will be the same as first read</td></tr>
           <tr><td>qc.conf.fastqscreen.fastq.max.reads.parsed</td><td>integer</td><td>200000</td><td>Number of reads to use for each mapping. Only the reads with Illumina passing filter will be selected. The selected reads will be written in a dedicated temporary file. If value is set to -1, all reads of the FASTQ files will be used</td></tr>
-          <tr><td>qc.conf.fastqscreen.fastq.reads.pf.used</td> <td>integer</td> <td>30000000</td> <td>The temporary FASTQ files are created by parsing at most this maximum number of reads in the FASTQ file source. If value is set to -1, it browses all the entries of the FASTQ files</td></tr>
+          <tr><td>qc.conf.fastqscreen.fastq.reads.pf.used</td> <td>integer</td> <td>30000000</td><td>The temporary FASTQ files are created by parsing at most this maximum number of reads in the FASTQ file source. If value is set to -1, it browses all the entries of the FASTQ files</td></tr>
+	  <tr><td>qc.conf.fastqscreen.max.read.length</td> <td>integer</td> <td>-1</td><td>The maximun read length to use with FastQ Screen. When enabled, this option will trim the end of the reads if their length is greater than the setting. If value is set to -1, full read length will be used</td></tr>
           <tr><td>qc.conf.fastqscreen.xsl.file</td><td>string</td><td>Not set</td><td>Path to a specific XSL stylesheet file to use for creating the FastQ Screen HTML report</td></tr>
           <tr><td>qc.conf.fastqscreen.process.undetermined.samples</td><td>boolean</td><td>false</td><td>Run FastQ Screen on undetermined indices FASTQ files on all genomes available for the run</td></tr>
         </table>

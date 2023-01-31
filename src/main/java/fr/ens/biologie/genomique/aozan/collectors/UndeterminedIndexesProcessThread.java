@@ -60,14 +60,14 @@ import com.google.common.collect.Multiset;
 import com.google.common.io.Files;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.aozan.Common;
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.io.FastqSample;
 import fr.ens.biologie.genomique.aozan.util.XMLUtilsWriter;
-import fr.ens.biologie.genomique.eoulsan.EoulsanException;
-import fr.ens.biologie.genomique.eoulsan.bio.IlluminaReadId;
-import fr.ens.biologie.genomique.eoulsan.util.XMLUtils;
+import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.bio.IlluminaReadId;
+import fr.ens.biologie.genomique.kenetre.util.XMLUtils;
 import uk.ac.babraham.FastQC.Sequence.Sequence;
 import uk.ac.babraham.FastQC.Sequence.SequenceFactory;
 import uk.ac.babraham.FastQC.Sequence.SequenceFile;
@@ -84,7 +84,7 @@ public class UndeterminedIndexesProcessThread
     extends AbstractFastqProcessThread {
 
   /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   private static final Splitter TAB_SPLITTER =
       Splitter.on("\t").trimResults().omitEmptyStrings();
@@ -532,7 +532,7 @@ public class UndeterminedIndexesProcessThread
           } else {
             irid.parse(seq.getID().substring(1));
           }
-        } catch (final EoulsanException e) {
+        } catch (final KenetreException e) {
 
           // This is not an Illumina id
           return;

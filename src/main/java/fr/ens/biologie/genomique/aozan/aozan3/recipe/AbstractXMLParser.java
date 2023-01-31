@@ -23,8 +23,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
-import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
+import fr.ens.biologie.genomique.kenetre.log.DummyLogger;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class define an abstract class to parse XML recipe files.
@@ -36,7 +36,7 @@ abstract class AbstractXMLParser<E> {
 
   private static final String INCLUDE_ATTR_NAME = "include";
 
-  private final AozanLogger logger;
+  private final GenericLogger logger;
   private final String rootTagName;
   private final String fileType;
 
@@ -48,7 +48,7 @@ abstract class AbstractXMLParser<E> {
    * Get the logger.
    * @return the logger
    */
-  protected AozanLogger getLogger() {
+  protected GenericLogger getLogger() {
     return this.logger;
   }
 
@@ -214,14 +214,14 @@ abstract class AbstractXMLParser<E> {
   //
 
   protected AbstractXMLParser(String rootTagName, String fileType,
-      AozanLogger logger) {
+      GenericLogger logger) {
 
     requireNonNull(rootTagName);
     requireNonNull(fileType);
 
     this.rootTagName = rootTagName;
     this.fileType = fileType;
-    this.logger = logger != null ? logger : new DummyAzoanLogger();
+    this.logger = logger != null ? logger : new DummyLogger();
   }
 
 }

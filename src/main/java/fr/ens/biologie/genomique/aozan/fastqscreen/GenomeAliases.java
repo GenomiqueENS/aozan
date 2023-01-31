@@ -41,7 +41,7 @@ import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.aozan.Common;
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.Settings;
 
@@ -53,7 +53,7 @@ import fr.ens.biologie.genomique.aozan.Settings;
 public class GenomeAliases {
 
   /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   private static GenomeAliases singleton;
 

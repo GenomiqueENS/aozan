@@ -39,12 +39,12 @@ import htsjdk.samtools.SAMRecord;
 import com.google.common.io.Files;
 
 import fr.ens.biologie.genomique.aozan.Globals;
-import fr.ens.biologie.genomique.eoulsan.bio.GenomeDescription;
-import fr.ens.biologie.genomique.eoulsan.bio.SAMUtils;
-import fr.ens.biologie.genomique.eoulsan.bio.alignmentsfilters.MultiReadAlignmentsFilter;
-import fr.ens.biologie.genomique.eoulsan.bio.alignmentsfilters.ReadAlignmentsFilter;
-import fr.ens.biologie.genomique.eoulsan.bio.alignmentsfilters.ReadAlignmentsFilterBuffer;
-import fr.ens.biologie.genomique.eoulsan.bio.alignmentsfilters.RemoveUnmappedReadAlignmentsFilter;
+import fr.ens.biologie.genomique.kenetre.bio.GenomeDescription;
+import fr.ens.biologie.genomique.kenetre.bio.SAMUtils;
+import fr.ens.biologie.genomique.kenetre.bio.alignmentfilter.MultiReadAlignmentFilter;
+import fr.ens.biologie.genomique.kenetre.bio.alignmentfilter.ReadAlignmentFilter;
+import fr.ens.biologie.genomique.kenetre.bio.alignmentfilter.ReadAlignmentFilterBuffer;
+import fr.ens.biologie.genomique.kenetre.bio.alignmentfilter.RemoveUnmappedReadAlignmentFilter;
 
 /**
  * This class ensures alignment fastqScreen treating the output format BAM of
@@ -62,7 +62,7 @@ public class FastqScreenSAMParser {
   private boolean headerParsed = false;
   private final boolean pairedMode;
 
-  private final ReadAlignmentsFilterBuffer buffer;
+  private final ReadAlignmentFilterBuffer buffer;
 
   private int readsprocessed = 0;
 
@@ -202,12 +202,12 @@ public class FastqScreenSAMParser {
         new SAMLineParser(SAMUtils.newSAMFileHeader(genomeDescription));
 
     // object used for the Sam read alignments filter
-    final List<ReadAlignmentsFilter> listFilters = new ArrayList<>();
-    listFilters.add(new RemoveUnmappedReadAlignmentsFilter());
+    final List<ReadAlignmentFilter> listFilters = new ArrayList<>();
+    listFilters.add(new RemoveUnmappedReadAlignmentFilter());
 
-    final ReadAlignmentsFilter filter =
-        new MultiReadAlignmentsFilter(listFilters);
-    this.buffer = new ReadAlignmentsFilterBuffer(filter);
+    final ReadAlignmentFilter filter =
+        new MultiReadAlignmentFilter(listFilters);
+    this.buffer = new ReadAlignmentFilterBuffer(filter);
 
     this.fw = Files.newWriter(mapOutputFile, Globals.DEFAULT_FILE_ENCODING);
   }

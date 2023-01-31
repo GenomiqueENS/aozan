@@ -36,16 +36,17 @@ import java.util.logging.Logger;
 import com.google.common.io.Files;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.Globals;
 import fr.ens.biologie.genomique.aozan.io.FastqSample;
-import fr.ens.biologie.genomique.eoulsan.EoulsanException;
-import fr.ens.biologie.genomique.eoulsan.bio.BadBioEntryException;
-import fr.ens.biologie.genomique.eoulsan.bio.IlluminaReadId;
-import fr.ens.biologie.genomique.eoulsan.bio.ReadSequence;
-import fr.ens.biologie.genomique.eoulsan.bio.io.FastqReader;
-import fr.ens.biologie.genomique.eoulsan.io.CompressionType;
-import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
+import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.bio.BadBioEntryException;
+import fr.ens.biologie.genomique.kenetre.bio.IlluminaReadId;
+import fr.ens.biologie.genomique.kenetre.bio.ReadSequence;
+import fr.ens.biologie.genomique.kenetre.bio.io.FastqReader;
+import fr.ens.biologie.genomique.kenetre.io.CompressionType;
+import fr.ens.biologie.genomique.kenetre.io.FileUtils;
 
 /**
  * The class define a class for a thread that create a temporary partial fastq
@@ -57,10 +58,11 @@ import fr.ens.biologie.genomique.eoulsan.util.FileUtils;
 public class SubsetFastqThread extends AbstractFastqProcessThread {
 
   /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   // count reads pf necessary for create a temporary partial fastq
   private final int countReadsPFtoCopy;
+  private final int maxReadLength;
 
   private final long rawClusterCount;
   private final long pfClusterCountParsed;
@@ -170,7 +172,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
             if (!ill.isFiltered()) {
               if (comptReadsPF % step == 0) {
                 // Write in tmp fastq file
-                fwTmpFastq.write(seq.toFastQ() + '\n');
+                fwTmpFastq.write(trimRead(seq).toFastQ() + '\n');
                 fwTmpFastq.flush();
 
                 if (--countReadsToCopyByFastq <= 0) {
@@ -185,7 +187,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
           // Throw an exception if an error has occurred while reading data
           fastqReader.throwException();
 
-        } catch (final IOException | EoulsanException
+        } catch (final IOException | KenetreException
             | BadBioEntryException e) {
           throw new AozanException(e);
         } finally {
@@ -267,7 +269,7 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
 
             if (comptReadsPF % step == 0) {
               // Write in tmp fastq file
-              fwTmpFastq.write(seq.toFastQ() + '\n');
+              fwTmpFastq.write(trimRead(seq).toFastQ() + '\n');
               fwTmpFastq.flush();
 
               if (--countReadsToCopyByFastq <= 0) {
@@ -346,6 +348,23 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
     }
   }
 
+  /**
+   * Trim reads to write if required in configuration file.
+   * @param read read to trim
+   * @return a trimmed read
+   */
+  private ReadSequence trimRead(ReadSequence read) {
+
+    if (this.maxReadLength < 1 || read.length() < this.maxReadLength) {
+      return read;
+    }
+
+    ReadSequence result = read.subSequence(0, this.maxReadLength);
+    result.setName(read.getName());
+
+    return result;
+  }
+
   //
   // Constructor
   //
@@ -363,8 +382,8 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
    */
   public SubsetFastqThread(final FastqSample fastqSample,
       final long rawClusterCount, final long pfClusterCount,
-      final int numberReadsToCopy, final int maxReadsToParse)
-      throws AozanException {
+      final int numberReadsToCopy, final int maxReadsToParse,
+      final int maxReadLength) throws AozanException {
 
     super(fastqSample);
 
@@ -376,5 +395,6 @@ public class SubsetFastqThread extends AbstractFastqProcessThread {
 
     this.tmpFastqFile =
         new File(fastqSample.getSubsetFastqFile().getPath() + ".tmp");
+    this.maxReadLength = maxReadLength;
   }
 }

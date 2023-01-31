@@ -36,6 +36,9 @@ import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.collectors.interop.ReadsData.ReadData;
 import fr.ens.biologie.genomique.aozan.util.StatisticsUtils;
+import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.illumina.interop.ExtractionMetric;
+import fr.ens.biologie.genomique.kenetre.illumina.interop.ExtractionMetricsReader;
 
 /**
  * This class collects run data by reading the ExtractionMetricsOut.bin in
@@ -68,17 +71,21 @@ public class ExtractionMetricsCollector extends AbstractMetricsCollector {
 
     int keyMap;
 
-    initMetricsMap();
+    initMetricsMap(data.get("run.info.image.channels"));
 
-    // Distribution of metrics between lane and code
-    for (final ExtractionMetrics iim : new ExtractionMetricsReader(
-        getInterOpDir()).readMetrics()) {
+    try {
+      // Distribution of metrics between lane and code
+      for (final ExtractionMetric iim : new ExtractionMetricsReader(
+          getInterOpDir()).readMetrics()) {
 
-      // key : number read, value(pair:first number cycle, last number cycle)
-      keyMap = getKeyMap(iim.getLaneNumber(),
-          getReadFromCycleNumber(iim.getCycleNumber()));
+        // key : number read, value(pair:first number cycle, last number cycle)
+        keyMap = getKeyMap(iim.getLaneNumber(),
+            getReadFromCycleNumber(iim.getCycleNumber()));
 
-      this.intensityMetrics.get(keyMap).addMetric(iim);
+        this.intensityMetrics.get(keyMap).addMetric(iim);
+      }
+    } catch (KenetreException e) {
+      throw new AozanException(e);
     }
 
     // Build runData
@@ -93,7 +100,9 @@ public class ExtractionMetricsCollector extends AbstractMetricsCollector {
   /**
    * Initialize TileMetrics map.
    */
-  private void initMetricsMap() {
+  private void initMetricsMap(String channelImages) {
+
+    int channelIndex = channelImages.toLowerCase().contains("blue") ? 1 : 0;
 
     for (int lane = 1; lane <= getLanesCount(); lane++) {
       for (int read = 1; read <= getReadsCount(); read++) {
@@ -102,7 +111,7 @@ public class ExtractionMetricsCollector extends AbstractMetricsCollector {
         final ReadData readData = getReadData(read);
 
         this.intensityMetrics.put(getKeyMap(lane, read),
-            new ExtractionMetricsPerLane(lane, read, readData));
+            new ExtractionMetricsPerLane(lane, read, channelIndex, readData));
       }
     }
   }
@@ -116,6 +125,10 @@ public class ExtractionMetricsCollector extends AbstractMetricsCollector {
   private int getKeyMap(final int lane, final int read) {
     return lane * 100 + read;
   }
+
+  //
+  // Constructor
+  //
 
   //
   // Inner Class
@@ -147,24 +160,25 @@ public class ExtractionMetricsCollector extends AbstractMetricsCollector {
     private final Map<Long, Number> intensityCycle20ValuesPerTile;
 
     private boolean dataToCompute = true;
+    private final int channelIndex;
 
     /**
      * Save a record from ExtractionMetricsOut.bin file, only for the first and
      * the twentieth cycle.
      * @param iim illumina tile metrics
      */
-    public void addMetric(final ExtractionMetrics iim) {
+    public void addMetric(final ExtractionMetric iim) {
       final int cycle = iim.getCycleNumber();
 
       // here use only the value for base A, like in the Illumina files.
       // TODO Good compute : iim.getAverageIntensities();
       if (cycle == this.firstCycleNumber) {
         this.intensityCycle1ValuesPerTile.put(iim.getTileNumber(),
-            iim.getIntensities()[0]);
+            iim.getIntensities()[channelIndex]);
 
       } else if (cycle == this.twentiethCycleNumber) {
         this.intensityCycle20ValuesPerTile.put(iim.getTileNumber(),
-            iim.getIntensities()[0]);
+            iim.getIntensities()[channelIndex]);
 
       }
     }
@@ -265,10 +279,11 @@ public class ExtractionMetricsCollector extends AbstractMetricsCollector {
      * @param read read number
      */
     ExtractionMetricsPerLane(final int lane, final int read,
-        final ReadData readData) {
+        final int channelIndex, final ReadData readData) {
 
       this.laneNumber = lane;
       this.readNumber = read;
+      this.channelIndex = channelIndex;
 
       this.firstCycleNumber = readData.getFirstCycleNumber();
 

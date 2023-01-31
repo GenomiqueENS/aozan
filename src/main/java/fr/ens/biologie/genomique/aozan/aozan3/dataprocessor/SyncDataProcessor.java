@@ -1,7 +1,8 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
-import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.sizeToHumanReadable;
-import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.info;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.sizeToHumanReadable;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.toTimeHumanReadable;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
@@ -17,7 +18,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.EmailMessage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class define an Illumina synchronization data processor.
@@ -29,11 +30,11 @@ public abstract class SyncDataProcessor implements DataProcessor {
   private DataStorage outputStorage;
   private String dataDescription;
   private boolean partialSync;
-  private AozanLogger logger;
+  private GenericLogger logger;
   private boolean initialized;
 
   @Override
-  public void init(final Configuration conf, final AozanLogger logger)
+  public void init(final Configuration conf, final GenericLogger logger)
       throws Aozan3Exception {
 
     requireNonNull(conf);
@@ -66,8 +67,8 @@ public abstract class SyncDataProcessor implements DataProcessor {
   }
 
   @Override
-  public ProcessResult process(final InputData input,
-      RunConfiguration runConf) throws Aozan3Exception {
+  public ProcessResult process(final InputData input, RunConfiguration runConf)
+      throws Aozan3Exception {
 
     requireNonNull(input);
 
@@ -98,7 +99,8 @@ public abstract class SyncDataProcessor implements DataProcessor {
       inputLocation.checkReadableDirectory("input synchronization");
 
       // Check if final output directory already exists
-      finalLocation.checkIfNotExists("Output synchronization directory already exists");
+      finalLocation
+          .checkIfNotExists("Output synchronization directory already exists");
 
       // Define output directory
       if (this.partialSync) {
@@ -140,9 +142,9 @@ public abstract class SyncDataProcessor implements DataProcessor {
       // Log disk usage and disk free space
       outputSize = outputLocation.getDiskUsage();
       long outputFreeSize = outputLocation.getStorage().getUnallocatedSpace();
-      this.logger.info(runId, "output disk free after demux: "
+      info(this.logger, runId, "output disk free after demux: "
           + sizeToHumanReadable(outputFreeSize));
-      this.logger.info(runId,
+      info(this.logger, runId,
           "space used by demux: " + sizeToHumanReadable(outputSize));
 
       // Report URL in email message

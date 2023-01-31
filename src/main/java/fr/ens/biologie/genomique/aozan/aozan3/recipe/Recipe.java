@@ -3,6 +3,8 @@ package fr.ens.biologie.genomique.aozan.aozan3.recipe;
 import static fr.ens.biologie.genomique.aozan.aozan3.ConfigurationDefaults.DOCKER_URI_KEY;
 import static java.util.Objects.requireNonNull;
 
+import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +15,7 @@ import java.util.Set;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
@@ -24,9 +27,10 @@ import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.InputData;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprovider.RunDataProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprovider.RunDataProviderService;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLoggerFactory;
-import fr.ens.biologie.genomique.eoulsan.EoulsanRuntime;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
+import fr.ens.biologie.genomique.kenetre.util.process.DockerManager;
+import fr.ens.biologie.genomique.kenetre.util.process.DockerManager.ClientType;
 
 /**
  * This class define a recipe.
@@ -45,7 +49,7 @@ public class Recipe {
   private final Set<RunDataProvider> inProgressProviders = new HashSet<>();
   private final List<Step> steps = new ArrayList<>();
 
-  private final AozanLogger logger;
+  private final GenericLogger logger;
 
   private boolean initialized;
 
@@ -73,7 +77,7 @@ public class Recipe {
    * Get the logger.
    * @return the logger
    */
-  public AozanLogger getLogger() {
+  public GenericLogger getLogger() {
     return this.logger;
   }
 
@@ -213,16 +217,16 @@ public class Recipe {
     for (Step step : this.steps) {
       stepNames.add(step.getName() + " [" + step.getProcessorName() + "]");
     }
-    this.logger.info("Recipe \""
+    this.logger.debug("Recipe \""
         + getName() + "\" step(s): " + String.join(", ", stepNames));
 
-    this.logger.info("Initiliaze step(s)");
+    this.logger.debug("Initiliaze step(s)");
 
     for (Step step : this.steps) {
       step.init();
     }
 
-    this.logger.info("Successful initiliazation of step(s)");
+    this.logger.debug("Successful initiliazation of step(s)");
 
     this.initialized = true;
   }
@@ -406,7 +410,7 @@ public class Recipe {
     for (RunDataProvider provider : this.providers) {
 
       this.logger
-          .info("Looks for run in: " + provider.getDataStorage().getPath());
+          .debug("Looks for run in: " + provider.getDataStorage().getPath());
 
       List<RunData> runs = this.inProgressProviders.contains(provider)
           ? provider.listInProgressRunData() : provider.listCompletedRunData();
@@ -517,7 +521,7 @@ public class Recipe {
    *           sending
    */
   public Recipe(String recipeName, String description, Configuration conf,
-      AozanLogger logger) throws Aozan3Exception {
+      GenericLogger logger) throws Aozan3Exception {
 
     requireNonNull(recipeName);
     requireNonNull(description);
@@ -538,8 +542,13 @@ public class Recipe {
 
     // Set Docker URI
     if (conf.containsKey(DOCKER_URI_KEY)) {
-      EoulsanRuntime.getSettings()
-          .setDockerConnectionURI(conf.get(DOCKER_URI_KEY));
+      try {
+
+        DockerManager.getInstance(ClientType.FALLBACK,
+            URI.create(conf.get(DOCKER_URI_KEY)),
+            Aozan2Logger.getGenericLogger());
+      } catch (IOException e) {
+      }
     }
   }
 

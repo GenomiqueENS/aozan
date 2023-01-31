@@ -6,7 +6,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This interface define a run data provider.
@@ -28,7 +28,7 @@ public interface RunDataProvider {
    * @param logger the logger to use
    * @throws Aozan3Exception if an error occurs while initialize the provider
    */
-  public void init(DataStorage storage, Configuration conf, AozanLogger logger)
+  public void init(DataStorage storage, Configuration conf, GenericLogger logger)
       throws Aozan3Exception;
 
   /**

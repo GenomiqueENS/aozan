@@ -3,7 +3,7 @@ package fr.ens.biologie.genomique.aozan.aozan3.action;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.ens.biologie.genomique.eoulsan.util.ServiceNameLoader;
+import fr.ens.biologie.genomique.kenetre.util.ServiceNameLoader;
 
 /**
  * This class define a service to retrieve an Action.

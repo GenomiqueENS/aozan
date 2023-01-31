@@ -17,15 +17,16 @@ import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.DefaultRunIdGenerator;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.Aozan2QCDataProcessor;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.Bcl2FastqIlluminaDemuxDataProcessor;
+import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.BclConvertIlluminaDemuxDataProcessor;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.IlluminaSyncDataProcessor;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprovider.IlluminaProcessedRunDataProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprovider.IlluminaRawRunDataProvider;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
+import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLoggerFactory;
 import fr.ens.biologie.genomique.aozan.aozan3.recipe.Recipe;
 import fr.ens.biologie.genomique.aozan.aozan3.recipe.Step;
-import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.EmptyRunConfigurationProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.IlluminaSamplesheetRunConfigurationProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.runconfigurationprovider.RunConfigurationProvider;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class define recipes that perform like Aozan 2 steps.
@@ -40,10 +41,20 @@ public class LegacyRecipes {
   private Path varPath;
   private Path mainLockPath;
   private Map<Recipe, Path> outputPaths = new HashMap<>();
+  private final boolean aozanEnabled;
 
   //
   // Getters
   //
+
+  /**
+   * Test if Aozan is enabled.
+   * @return true if Aozan is enabled
+   */
+  public boolean isAozanEnabled() {
+
+    return this.aozanEnabled;
+  }
 
   /**
    * Get the path for var files.
@@ -166,7 +177,7 @@ public class LegacyRecipes {
   }
 
   private static boolean parseCommonConfiguration(Configuration conf,
-      AozanLogger logger, Configuration aozan2Conf) {
+      GenericLogger logger, Configuration aozan2Conf) {
 
     // Check if Aozan is enabled
     if (!aozan2Conf.getBoolean("aozan.enable")) {
@@ -176,11 +187,21 @@ public class LegacyRecipes {
     // Mode debug
     // aozan.debug=False
 
+    // Sequencer names
+    for (Map.Entry<String, String> e : aozan2Conf.toMap().entrySet()) {
+
+      String key = e.getKey();
+
+      if (key != null && key.startsWith("sequencer.name.")) {
+        conf.set(e.getKey(), e.getValue());
+      }
+    }
+
     // Enable email sending
     setSetting(conf, aozan2Conf, "send.mail", "send.mail", "False");
 
     // SMTP server name
-    setSetting(conf, aozan2Conf, "smtp.host", "mail.smtp.host");
+    setSetting(conf, aozan2Conf, "smtp.server", "mail.smtp.host");
 
     // SMTP server port
     setSetting(conf, aozan2Conf, "smtp.port", "mail.smtp.port", "25");
@@ -212,12 +233,19 @@ public class LegacyRecipes {
     return true;
   }
 
-  private Recipe createSyncStepRecipe(Configuration conf, AozanLogger logger,
+  private Recipe createSyncStepRecipe(Configuration conf, GenericLogger logger,
       Configuration aozan2Conf) throws Aozan3Exception {
+
+    // Check if the sync step is enabled
+    if (!aozan2Conf.getBoolean("sync.step", true)) {
+      return null;
+    }
 
     Recipe recipe = new Recipe("sync", "Sync step", conf, logger);
 
-    boolean inProgress = aozan2Conf.getBoolean("sync.continuous.sync", false);
+    // boolean inProgress = aozan2Conf.getBoolean("sync.continuous.sync",
+    // false);
+    boolean inProgress = false;
     final String inputStoragePrefix = "nasStorage";
     final String outputStorage = "bclStorage";
 
@@ -252,20 +280,20 @@ public class LegacyRecipes {
     return recipe;
   }
 
-  private Recipe createDemuxStep(Configuration conf, AozanLogger logger,
+  private Recipe createDemuxStep(Configuration conf, GenericLogger logger,
       Configuration aozan2Conf) throws Aozan3Exception {
+
+    // Check if the demux step is enabled
+    if (!aozan2Conf.getBoolean("demux.step", true)) {
+      return null;
+    }
 
     Recipe recipe = new Recipe("demux", "Demux step", conf, logger);
 
-    boolean inProgress = false;
-    final String inputStorageName = "bclStorage";
     final String outputStorageName = "fastqStorage";
 
-    // Set input storages
-    recipe.addStorage(inputStorageName,
-        new DataStorage("local", aozan2Conf.get("bcl.data.path").trim(), null));
-    recipe.addDataProvider(IlluminaRawRunDataProvider.PROVIDER_NAME,
-        inputStorageName, inProgress, conf);
+    // Create input BCL storages
+    createInputBclStorages(conf, recipe, aozan2Conf);
 
     // Set output storage
     Path fastqPath = Paths.get(aozan2Conf.get("fastq.data.path").trim());
@@ -278,49 +306,76 @@ public class LegacyRecipes {
 
     // Define step configuration
     Configuration stepConf = new Configuration();
+    stepConf.setFromOtherConfIfExists(aozan2Conf, "reports.url");
+    stepConf.setFromOtherConfIfExists(aozan2Conf, "read.only.output.files");
 
-    Step demuxStep = new Step(recipe, "demuxstep",
-        Bcl2FastqIlluminaDemuxDataProcessor.PROCESSOR_NAME, outputStorageName,
-        stepConf, runConfProvider, new DefaultRunIdGenerator());
+    // Select the demux tool to use
+    String demuxProcessorName;
+    switch (aozan2Conf.get("demux.tool.name", "bcl2fastq").trim()
+        .toLowerCase()) {
+
+    case "bclconvert":
+      demuxProcessorName = BclConvertIlluminaDemuxDataProcessor.PROCESSOR_NAME;
+      break;
+
+    default:
+    case "bcl2fastq":
+      demuxProcessorName = Bcl2FastqIlluminaDemuxDataProcessor.PROCESSOR_NAME;
+      break;
+
+    }
+
+    Step demuxStep =
+        new Step(recipe, "demuxstep", demuxProcessorName, outputStorageName,
+            stepConf, runConfProvider, new DefaultRunIdGenerator());
 
     recipe.addStep(demuxStep);
 
     return recipe;
   }
 
-  private Recipe createQCStep(Configuration conf, AozanLogger logger,
+  private Recipe createQCStep(Configuration conf, GenericLogger logger,
       Configuration aozan2Conf) throws Aozan3Exception {
+
+    // Check if the qc step is enabled
+    if (!aozan2Conf.getBoolean("qc.step", true)) {
+      return null;
+    }
 
     Recipe recipe = new Recipe("qc", "QC step", conf, logger);
 
     boolean inProgress = false;
-    final String inputStorageName1 = "bclStorage";
-    final String inputStorageName2 = "fastqStorage";
+    final String inputFastqStorageName = "fastqStorage";
     final String outputStorageName = "qcStorage";
 
-    // Set bcl input storage
-    recipe.addStorage(inputStorageName1,
-        new DataStorage("local", aozan2Conf.get("bcl.data.path").trim(), null));
-    recipe.addDataProvider(IlluminaRawRunDataProvider.PROVIDER_NAME,
-        inputStorageName1, inProgress, conf);
+    // Create input BCL storages
+    createInputBclStorages(conf, recipe, aozan2Conf);
 
     // Set fastq input storage
-    recipe.addStorage(inputStorageName2, new DataStorage("local",
+    recipe.addStorage(inputFastqStorageName, new DataStorage("local",
         aozan2Conf.get("fastq.data.path").trim(), null));
     recipe.addDataProvider(IlluminaProcessedRunDataProvider.PROVIDER_NAME,
-        inputStorageName2, inProgress, conf);
+        inputFastqStorageName, inProgress, conf);
 
     // Set output storage
     Path qcPath = Paths.get(aozan2Conf.get("reports.data.path").trim());
     recipe.addStorage(outputStorageName, new DataStorage("local", qcPath));
     this.outputPaths.put(recipe, qcPath);
 
+    // Run configuration provider
+    RunConfigurationProvider runConfProvider =
+        createRunConfProvider(recipe, aozan2Conf);
+
     // Define step configuration
     Configuration stepConf = new Configuration(aozan2Conf);
+    stepConf.set("legacy.output", true);
+    if (aozan2Conf.containsKey("reports.url")) {
+      stepConf.set("reports.url", aozan2Conf.get("reports.url"));
+    }
 
     Step qcStep = new Step(recipe, "qcstep",
         Aozan2QCDataProcessor.PROCESSOR_NAME, outputStorageName, stepConf,
-        new EmptyRunConfigurationProvider(), new DefaultRunIdGenerator());
+        runConfProvider, new DefaultRunIdGenerator());
 
     recipe.addStep(qcStep);
 
@@ -353,6 +408,43 @@ public class LegacyRecipes {
     result.init(stepConf, recipe.getLogger());
 
     return result;
+  }
+
+  /**
+   * Create input BCL storages.
+   * @param conf configuration
+   * @param recipe the recipe
+   * @param aozan2Conf Aozan2 configuration
+   * @throws Aozan3Exception if an error occurs while creating the storages
+   */
+  private static void createInputBclStorages(Configuration conf, Recipe recipe,
+      Configuration aozan2Conf) throws Aozan3Exception {
+
+    boolean inProgress = false;
+    final String inputStorageName = "bclStorage";
+
+    // Set input storages
+    if (aozan2Conf.getBoolean("demux.use.hiseq.output", false)) {
+
+      // Without sync step
+
+      createStorages(recipe, "nasStorage", aozan2Conf.get("hiseq.data.path"));
+
+      // Set input storages as run providers
+      for (String storageName : recipe.getStorages().names()) {
+        recipe.addDataProvider(IlluminaRawRunDataProvider.PROVIDER_NAME,
+            storageName, inProgress, conf);
+      }
+    } else {
+
+      // With sync step
+
+      recipe.addStorage(inputStorageName, new DataStorage("local",
+          aozan2Conf.get("bcl.data.path").trim(), null));
+      recipe.addDataProvider(IlluminaRawRunDataProvider.PROVIDER_NAME,
+          inputStorageName, inProgress, conf);
+    }
+
   }
 
   private static void setSetting(Configuration conf, Configuration aozan2Conf,
@@ -409,11 +501,27 @@ public class LegacyRecipes {
         "The \"" + key + "\" setting has not been defined");
   }
 
+  private static GenericLogger createLogger(Configuration aozan2Conf,
+      GenericLogger currentLogger) throws Aozan3Exception {
+
+    if (aozan2Conf.containsKey("aozan.log.path")) {
+
+      Configuration logConf = new Configuration();
+      logConf.set("aozan.logger", "file");
+      logConf.set("aozan.log", aozan2Conf.get("aozan.log.path"));
+      logConf.set("aozan.log.level", aozan2Conf.get("aozan.log.level", "info"));
+
+      return AozanLoggerFactory.newLogger(logConf, currentLogger);
+    }
+
+    return currentLogger;
+  }
+
   //
   // Constructor
   //
 
-  public LegacyRecipes(Configuration conf, AozanLogger logger,
+  public LegacyRecipes(Configuration conf, GenericLogger logger,
       Path aozan2ConfFile) throws Aozan3Exception {
 
     requireNonNull(aozan2ConfFile);
@@ -422,14 +530,21 @@ public class LegacyRecipes {
     aozan2Conf.load(aozan2ConfFile, true);
     aozan2Conf = aozan1Compatibility(aozan2Conf);
 
-    if (!parseCommonConfiguration(conf, logger, aozan2Conf)) {
+    this.aozanEnabled = parseCommonConfiguration(conf, logger, aozan2Conf);
 
+    if (!this.aozanEnabled) {
       // Aozan is not enabled, nothing to do
       return;
     }
 
+    // Change logger if required in Aozan 2 conf
+    logger = createLogger(aozan2Conf, logger);
+
     // Get the var path
     this.varPath = Paths.get(checkAndGetSetting(aozan2Conf, "aozan.var.path"));
+
+    // Set last error file
+    conf.set("mail.last.error.file", this.varPath + "/lasterror.msg");
 
     // Get the main lock path
     this.mainLockPath =

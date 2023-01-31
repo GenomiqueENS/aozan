@@ -3,7 +3,7 @@ package fr.ens.biologie.genomique.aozan.aozan3.action;
 import java.util.List;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This interface define an action.
@@ -30,7 +30,7 @@ public interface Action {
    * @param arguments arguments of the action
    * @param logger logger
    */
-  void action(Configuration conf, List<String> arguments, AozanLogger logger);
+  void action(Configuration conf, List<String> arguments, GenericLogger logger);
 
   /**
    * Test if the action must be hidden from the list of available actions.

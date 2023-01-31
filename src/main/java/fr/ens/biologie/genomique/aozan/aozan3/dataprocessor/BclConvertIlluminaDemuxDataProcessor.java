@@ -1,5 +1,6 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
+import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME;
 import static java.util.Arrays.asList;
 
 import java.io.IOException;
@@ -7,12 +8,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
-import fr.ens.biologie.genomique.eoulsan.util.StringUtils;
+import fr.ens.biologie.genomique.kenetre.util.StringUtils;
+import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
 
 /**
  * This class define an Illumina demultiplexing data processor that use
@@ -25,9 +26,12 @@ public class BclConvertIlluminaDemuxDataProcessor
 
   public static final String PROCESSOR_NAME = "illumina_bclconvert";
 
-  private static final String DEFAULT_CONVERT_VERSION = "3.8.4";
+  private static final String DEFAULT_CONVERT_VERSION = "3.9.3";
   private static final String DEFAULT_DOCKER_IMAGE =
       "bclconvert:" + DEFAULT_CONVERT_VERSION;
+
+  public static final String BCL_CONVERT_FORBIDDEN_DATA_SECTION =
+      "BCLConvertForbidden_Data";
 
   @Override
   protected String getDemuxToolName() {
@@ -66,6 +70,8 @@ public class BclConvertIlluminaDemuxDataProcessor
     args.add(inputPath.toAbsolutePath().toString());
     args.add("--output-directory");
     args.add(outputPath.toAbsolutePath().toString());
+    addCommandLineArgument(args, runConf, "--bcl-sampleproject-subdirectories",
+        "true");
 
     addCommandLineArgument(args, runConf, "--bcl-num-parallel-tiles");
     addCommandLineArgument(args, runConf, "--bcl-num-conversion-threads");
@@ -91,14 +97,12 @@ public class BclConvertIlluminaDemuxDataProcessor
     for (String line : lines) {
 
       if (line.startsWith(getDemuxToolName())) {
+
         String result = line.substring("bcl-convert Version ".length());
-        int index = result.replace("00.000.000.", "").indexOf('-');
-        if (index != -1) {
+        result = result.replace("00.000.000.", "");
 
-          return result.substring(0, index);
-        }
-
-        return null;
+        int index = result.indexOf('-');
+        return index != -1 ? result.substring(0, index) : result;
       }
     }
 
@@ -116,8 +120,14 @@ public class BclConvertIlluminaDemuxDataProcessor
       throws Aozan3Exception {
 
     try {
-      SampleSheetUtils.removeBclConvertDataForbiddenFields(samplesheet);
-    } catch (AozanException e) {
+
+      if (samplesheet.containsSection(BCLCONVERT_DEMUX_TABLE_NAME)) {
+
+        SampleSheetUtils.moveBclConvertDataForbiddenFieldsInNewSection(
+            samplesheet, BCL_CONVERT_FORBIDDEN_DATA_SECTION);
+      }
+
+    } catch (KenetreException e) {
       throw new Aozan3Exception(e);
     }
   }

@@ -23,7 +23,7 @@
 
 package fr.ens.biologie.genomique.aozan;
 
-import static fr.ens.biologie.genomique.eoulsan.util.StringUtils.toTimeHumanReadable;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.toTimeHumanReadable;
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
@@ -51,7 +51,7 @@ import fr.ens.biologie.genomique.aozan.collectors.CollectorConfiguration;
 public class RunDataGenerator {
 
   /** Logger. */
-  private static final Logger LOGGER = Common.getLogger();
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   /** Collect done property key. */
   private static final String COLLECT_DONE = "collect.done";
@@ -86,8 +86,8 @@ public class RunDataGenerator {
       throw new AozanException("RTA output directory is not set.");
     }
 
-    if (!this.generatorsProperties.containsKey(QC.BCL2FASTQ_SAMPLESHEET_PATH)) {
-      throw new AozanException("Bcl2fastq samplesheet file path is not set.");
+    if (!this.generatorsProperties.containsKey(QC.SAMPLESHEET)) {
+      throw new AozanException("Samplesheet is not set.");
     }
 
     if (!this.generatorsProperties.containsKey(QC.BCL2FASTQ_OUTPUT_DIR)) {

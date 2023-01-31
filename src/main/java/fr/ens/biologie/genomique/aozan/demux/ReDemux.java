@@ -45,17 +45,17 @@ import java.util.regex.Pattern;
 import com.google.common.base.Preconditions;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.Sample;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheet;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.SampleSheetUtils;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetCSVReader;
-import fr.ens.biologie.genomique.aozan.illumina.samplesheet.io.SampleSheetReader;
-import fr.ens.biologie.genomique.eoulsan.EoulsanRuntimeException;
-import fr.ens.biologie.genomique.eoulsan.bio.BadBioEntryException;
-import fr.ens.biologie.genomique.eoulsan.bio.ReadSequence;
-import fr.ens.biologie.genomique.eoulsan.bio.io.FastqReader;
-import fr.ens.biologie.genomique.eoulsan.bio.io.FastqWriter;
-import fr.ens.biologie.genomique.eoulsan.io.CompressionType;
+import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.bio.BadBioEntryException;
+import fr.ens.biologie.genomique.kenetre.bio.ReadSequence;
+import fr.ens.biologie.genomique.kenetre.bio.io.FastqReader;
+import fr.ens.biologie.genomique.kenetre.bio.io.FastqWriter;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.Sample;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVReader;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetReader;
+import fr.ens.biologie.genomique.kenetre.io.CompressionType;
 
 /**
  * This class allow to retrieve index from undetermined indices.
@@ -141,18 +141,23 @@ public class ReDemux {
       final Pattern pattern = Pattern.compile(index);
       Sample sample = null;
 
-      for (Sample s : SampleSheetUtils.getCheckedDemuxTableSection(samplesheet)
-          .getSampleInLane(this.lane)) {
+      try {
+        for (Sample s : SampleSheetUtils
+            .getCheckedDemuxTableSection(samplesheet)
+            .getSampleInLane(this.lane)) {
 
-        if (pattern.matcher(s.getIndex1()).matches()) {
+          if (pattern.matcher(s.getIndex1()).matches()) {
 
-          // Check if the index matches with more than one sample
-          if (sample != null)
-            throw new AozanException(
-                "More than one sample matches with index on lane "
-                    + this.lane + ": " + index);
-          sample = s;
+            // Check if the index matches with more than one sample
+            if (sample != null)
+              throw new AozanException(
+                  "More than one sample matches with index on lane "
+                      + this.lane + ": " + index);
+            sample = s;
+          }
         }
+      } catch (KenetreException e) {
+        throw new AozanException(e);
       }
 
       // Check if the index matches with one sample
@@ -176,22 +181,27 @@ public class ReDemux {
       int bestScore = Integer.MAX_VALUE;
       int bestCoreCount = 0;
 
-      for (Sample s : SampleSheetUtils.getCheckedDemuxTableSection(samplesheet)
-          .getSampleInLane(this.lane)) {
+      try {
+        for (Sample s : SampleSheetUtils
+            .getCheckedDemuxTableSection(samplesheet)
+            .getSampleInLane(this.lane)) {
 
-        final String sampleIndex = s.getIndex1();
+          final String sampleIndex = s.getIndex1();
 
-        // TODO instead call mismatches method from Undetermined Thread
-        final int mismatches = mismatches(index, sampleIndex);
+          // TODO instead call mismatches method from Undetermined Thread
+          final int mismatches = mismatches(index, sampleIndex);
 
-        if (mismatches < bestScore) {
+          if (mismatches < bestScore) {
 
-          bestScore = mismatches;
-          bestCoreCount = 1;
-          sample = s;
-        } else if (mismatches == bestScore) {
-          bestCoreCount++;
+            bestScore = mismatches;
+            bestCoreCount = 1;
+            sample = s;
+          } else if (mismatches == bestScore) {
+            bestCoreCount++;
+          }
         }
+      } catch (KenetreException e) {
+        throw new AozanException(e);
       }
 
       // Check if the index matches with one sample
@@ -224,19 +234,19 @@ public class ReDemux {
     private void reDemux() throws IOException, BadBioEntryException {
 
       if (this.reads.isEmpty()) {
-        throw new EoulsanRuntimeException("No undetermined file found");
+        throw new IOException("No undetermined file found");
       }
 
       for (int i : this.reads) {
 
         if (i < 1) {
-          throw new EoulsanRuntimeException(
+          throw new IOException(
               "The read for the undetermined file cannot be lower than 1 in lane "
                   + this.lane + ": " + i);
         }
 
         if (i > 2) {
-          throw new EoulsanRuntimeException(
+          throw new IOException(
               "The read for the undetermined file cannot be greater than 2 in lane "
                   + this.lane + ": " + i);
         }
@@ -622,8 +632,7 @@ public class ReDemux {
   public ReDemux(final File baseDir, final SampleSheet samplesheet,
       final File outputDir) {
 
-    requireNonNull(samplesheet,
-        "samplesheet argument cannot be null");
+    requireNonNull(samplesheet, "samplesheet argument cannot be null");
     requireNonNull(baseDir, "baseDir argument cannot be null");
     this.sampleSheet = samplesheet;
     this.inputDir = baseDir;
@@ -639,8 +648,7 @@ public class ReDemux {
       final File outputDir) throws FileNotFoundException, IOException,
       AozanException, BadBioEntryException {
 
-    requireNonNull(samplesheetFile,
-        "samplesheetFile cannot be null");
+    requireNonNull(samplesheetFile, "samplesheetFile cannot be null");
     requireNonNull(lanesAndIndex, "laneAndIndex cannot be null");
     requireNonNull(outputDir, "output directory cannot be null");
 
