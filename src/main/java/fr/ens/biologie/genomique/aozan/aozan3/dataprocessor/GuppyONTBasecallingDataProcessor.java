@@ -425,8 +425,8 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
   public static void run(Path inputTar, Path outputPath, String runId,
       String guppyVersion, Path tmpPath, String flowcellType, String kit,
       String barcodeKits, boolean trimBarcodes, String minQscore, String config,
-      boolean fast5Output, boolean keepTemporaryFiles, GenericLogger logger)
-      throws Aozan3Exception {
+      String cudaDevice, boolean fast5Output, boolean keepTemporaryFiles,
+      GenericLogger logger) throws Aozan3Exception {
 
     requireNonNull(inputTar);
     requireNonNull(outputPath);
@@ -437,6 +437,7 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
     requireNonNull(kit);
     requireNonNull(barcodeKits);
     requireNonNull(config);
+    requireNonNull(cudaDevice);
     requireNonNull(logger);
 
     if (runId.trim().isEmpty()) {
@@ -479,6 +480,10 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
     runConf.set("guppy.docker.image",
         "genomicpariscentre/guppy-gpu:" + guppyVersion);
     // runConf.set("guppy.flowcell.sn", "FA035147");
+
+    if (!cudaDevice.trim().isEmpty()) {
+      runConf.set("guppy.cuda.device", cudaDevice.trim());
+    }
 
     if (!config.trim().isEmpty()) {
       runConf.set("guppy.config", config.trim());

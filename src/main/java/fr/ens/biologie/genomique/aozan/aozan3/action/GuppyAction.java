@@ -53,6 +53,7 @@ public class GuppyAction implements Action {
     String config = "";
     String runId = "";
     String guppyVersion = "";
+    String cudaDevice = "";
     boolean trimBarcode = false;
     boolean fast5Output = false;
     boolean keepTemporaryFiles = false;
@@ -103,6 +104,10 @@ public class GuppyAction implements Action {
         config = line.getOptionValue("m");
       }
 
+      if (line.hasOption("d")) {
+        cudaDevice = line.getOptionValue("d");
+      }
+
       if (line.hasOption("o")) {
         fast5Output = true;
       }
@@ -124,7 +129,8 @@ public class GuppyAction implements Action {
 
       GuppyONTBasecallingDataProcessor.run(inputTar, outputDir, runId,
           guppyVersion, tmpPath, flowcell, kit, barcodeKits, trimBarcode,
-          minQscore, config, fast5Output, keepTemporaryFiles, logger);
+          minQscore, config, cudaDevice, fast5Output, keepTemporaryFiles,
+          logger);
 
     } catch (ParseException e) {
       Common.errorExit(e,
@@ -171,6 +177,11 @@ public class GuppyAction implements Action {
     options.addOption(
         OptionBuilder.withLongOpt("config").hasArg().withArgName("configname")
             .withDescription("configuration filename").create('c'));
+
+    // GPU device option
+    options.addOption(
+        OptionBuilder.withLongOpt("device").hasArg().withArgName("cudadevice")
+            .withDescription("Cuda device name").create('d'));
 
     // Run id option
     options.addOption(OptionBuilder.withLongOpt("run-id").hasArg()
