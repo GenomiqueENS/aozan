@@ -14,11 +14,11 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
+import fr.ens.biologie.genomique.aozan.aozan3.Common;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.Globals;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.GuppyONTBasecallingDataProcessor;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
-import fr.ens.biologie.genomique.eoulsan.Common;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
  * This class define an guppy action that will launch Guppy.
@@ -42,7 +42,7 @@ public class GuppyAction implements Action {
 
   @Override
   public void action(Configuration conf, List<String> arguments,
-      AozanLogger logger) {
+      GenericLogger logger) {
 
     final Options options = makeOptions();
     final CommandLineParser parser = new GnuParser();

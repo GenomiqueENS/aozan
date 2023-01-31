@@ -1,6 +1,7 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.FAST5_TAR;
+import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.info;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 
@@ -24,11 +25,11 @@ import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.SimpleDataTypeFilter;
-import fr.ens.biologie.genomique.aozan.aozan3.log.AozanLogger;
-import fr.ens.biologie.genomique.aozan.aozan3.log.DummyAzoanLogger;
 import fr.ens.biologie.genomique.aozan.aozan3.util.CopyAndMergeGuppyOutput;
 import fr.ens.biologie.genomique.aozan.aozan3.util.UnTar;
-import fr.ens.biologie.genomique.eoulsan.util.StringUtils;
+import fr.ens.biologie.genomique.kenetre.log.DummyLogger;
+import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
+import fr.ens.biologie.genomique.kenetre.util.StringUtils;
 
 /**
  * This class implements a Guppy data processor.
@@ -43,7 +44,7 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
 
   private static final boolean USE_DOCKER = true;
 
-  private AozanLogger logger = new DummyAzoanLogger();
+  private GenericLogger logger = new DummyLogger();
 
   private DataStorage outputStorage;
   private String dataDescription;
@@ -56,7 +57,7 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
   }
 
   @Override
-  public void init(Configuration conf, AozanLogger logger)
+  public void init(Configuration conf, GenericLogger logger)
       throws Aozan3Exception {
     requireNonNull(conf);
 
@@ -163,7 +164,7 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
    */
   private static void pipeline(RunId runId, Path inputTarPath, Path outputPath,
       Path tmpPath, final RunConfiguration runConf, boolean keepTemporaryFiles,
-      AozanLogger logger) throws Aozan3Exception {
+      GenericLogger logger) throws Aozan3Exception {
 
     requireNonNull(inputTarPath);
     requireNonNull(outputPath);
@@ -227,7 +228,7 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
    * @throws IOException if an error occurs while executing Guppy
    */
   private static void launchGuppy(RunId runId, Path inputPath, Path outputPath,
-      RunConfiguration runConf, AozanLogger logger)
+      RunConfiguration runConf, GenericLogger logger)
       throws Aozan3Exception, IOException {
 
     // Define external tool
@@ -254,8 +255,8 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
     File stderrFile =
         new File(outputDir, "guppy_output_" + runId.getId() + ".err");
 
-    logger.info(runId, "Guppy: " + toolVersion);
-    logger.info(runId, "Demultiplexing using the following command line: "
+    info(logger, runId, "Guppy: " + toolVersion);
+    info(logger, runId, "Demultiplexing using the following command line: "
         + String.join(" ", commandLine));
 
     System.out.println("Guppy version: " + commandLine);
@@ -274,7 +275,7 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
           "Error while running guppy, exit code is: " + exitValue);
     }
 
-    logger.info(runId, "Successful demultiplexing in "
+    info(logger, runId, "Successful demultiplexing in "
         + StringUtils.toTimeHumanReadable(endTime - startTime));
   }
 
@@ -424,7 +425,7 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
   public static void run(Path inputTar, Path outputPath, String runId,
       String guppyVersion, Path tmpPath, String flowcellType, String kit,
       String barcodeKits, boolean trimBarcodes, String minQscore, String config,
-      boolean fast5Output, boolean keepTemporaryFiles, AozanLogger logger)
+      boolean fast5Output, boolean keepTemporaryFiles, GenericLogger logger)
       throws Aozan3Exception {
 
     requireNonNull(inputTar);
