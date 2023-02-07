@@ -162,9 +162,9 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
    * @param logger Aozan logger
    * @throws Aozan3Exception if an error occurs while executing Guppy
    */
-  private static void pipeline(RunId runId, Path inputTarPath, Path outputPath,
-      Path tmpPath, final RunConfiguration runConf, boolean keepTemporaryFiles,
-      GenericLogger logger) throws Aozan3Exception {
+  private static void tarPipeline(RunId runId, Path inputTarPath,
+      Path outputPath, Path tmpPath, final RunConfiguration runConf,
+      boolean keepTemporaryFiles, GenericLogger logger) throws Aozan3Exception {
 
     requireNonNull(inputTarPath);
     requireNonNull(outputPath);
@@ -173,13 +173,46 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
 
     try {
 
-      System.out.println("### START ###");
-
       // Untar FAST5 files
       System.out.println("* Uncompress FAST5 Tar file");
       Path inputDirPath = Files.createTempDirectory(tmpPath, "raw-fast5-");
       UnTar untar = new UnTar(inputTarPath, inputDirPath);
       untar.execute();
+
+      directoryPipeline(runId, inputDirPath, outputPath, tmpPath, runConf,
+          keepTemporaryFiles, logger);
+
+      // Delete temporary untarred FAST5 tar
+      if (!keepTemporaryFiles) {
+        System.out.println("* Remove uncompressed FAST5 files");
+        deleteDirectory(inputDirPath);
+      }
+
+    } catch (IOException e) {
+      throw new Aozan3Exception(e);
+    }
+  }
+
+  /**
+   * Convienient method to launch guppy outside Aozan workflow.
+   * @param runId run Id
+   * @param inputDirPath input directory with Fast5 files path
+   * @param outputPath output path
+   * @param tmpPath temporary directory path
+   * @param runConf run configuration
+   * @param logger Aozan logger
+   * @throws Aozan3Exception if an error occurs while executing Guppy
+   */
+  private static void directoryPipeline(RunId runId, Path inputDirPath,
+      Path outputPath, Path tmpPath, final RunConfiguration runConf,
+      boolean keepTemporaryFiles, GenericLogger logger) throws Aozan3Exception {
+
+    requireNonNull(inputDirPath);
+    requireNonNull(outputPath);
+    requireNonNull(tmpPath);
+    requireNonNull(runConf);
+
+    try {
 
       // Launch Guppy
       System.out.println("* Launch Guppy");
@@ -198,19 +231,11 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
           runConf.getBoolean("guppy.compress.sequencing.telemetry", false));
       merger.execute();
 
-      // Delete temporary untarred FAST5 tar
-      if (!keepTemporaryFiles) {
-        System.out.println("* Remove uncompressed FAST5 files");
-        deleteDirectory(inputDirPath);
-      }
-
       // Delete unmerged Fastq directory
       if (!keepTemporaryFiles) {
         System.out.println("* Remove unmerged FASTQ directory");
         deleteDirectory(outputDirPath);
       }
-
-      System.out.println("### END ###");
 
     } catch (IOException e) {
       throw new Aozan3Exception(e);
@@ -434,8 +459,9 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
   public static void run(Path inputTar, Path outputPath, String runId,
       String guppyVersion, Path tmpPath, String flowcellType, String kit,
       String barcodeKits, boolean trimBarcodes, String minQscore, String config,
-      String cudaDevice, boolean fast5Output, boolean keepTemporaryFiles,
-      GenericLogger logger) throws Aozan3Exception {
+      String cudaDevice, int gpuRunnersPerDevice, int chunksPerRunner,
+      boolean fast5Output, boolean keepTemporaryFiles, GenericLogger logger)
+      throws Aozan3Exception {
 
     requireNonNull(inputTar);
     requireNonNull(outputPath);
@@ -450,7 +476,12 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
     requireNonNull(logger);
 
     if (runId.trim().isEmpty()) {
-      runId = inputTar.toFile().getName().replace(".tar", "");
+
+      if (Files.isDirectory(inputTar)) {
+        runId = inputTar.toFile().getName();
+      } else {
+        runId = inputTar.toFile().getName().replace(".tar", "");
+      }
     }
 
     if (flowcellType.trim().isEmpty()) {
@@ -479,8 +510,9 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
           "Temporary directory does not exists: " + tmpPath);
     }
 
-    if (!Files.isRegularFile(inputTar)) {
-      throw new Aozan3Exception("Input tar file does not exists: " + inputTar);
+    if (!Files.isRegularFile(inputTar) && !Files.isDirectory(inputTar)) {
+      throw new Aozan3Exception(
+          "Input file/directory does not exists: " + inputTar);
     }
 
     RunConfiguration runConf = new RunConfiguration();
@@ -516,7 +548,6 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
       if (trimBarcodes) {
         runConf.set("guppy.trim.barcodes", "true");
       }
-      // runConf.set("guppy.barcodes", barcodes.trim());
     }
 
     if (!minQscore.trim().isEmpty()) {
@@ -527,8 +558,19 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
       runConf.set("guppy.fast5.output", "true");
     }
 
-    pipeline(new RunId(runId + "-guppy-" + guppyVersion), inputTar, outputPath,
-        tmpPath, runConf, keepTemporaryFiles, logger);
+    System.out.println("### START ###");
+
+    RunId basecallingRunId = new RunId(runId + "-guppy-" + guppyVersion);
+
+    if (Files.isRegularFile(inputTar)) {
+      tarPipeline(basecallingRunId, inputTar, outputPath, tmpPath, runConf,
+          keepTemporaryFiles, logger);
+    } else {
+      directoryPipeline(basecallingRunId, inputTar, outputPath, tmpPath,
+          runConf, keepTemporaryFiles, logger);
+    }
+
+    System.out.println("### END ###");
   }
 
 }
