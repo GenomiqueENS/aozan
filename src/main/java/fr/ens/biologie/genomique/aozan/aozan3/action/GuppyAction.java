@@ -54,6 +54,8 @@ public class GuppyAction implements Action {
     String runId = "";
     String guppyVersion = "";
     String cudaDevice = "";
+    int gpuRunnersPerDevice = -1;
+    int chunksPerRunner = -1;
     boolean trimBarcode = false;
     boolean fast5Output = false;
     boolean keepTemporaryFiles = false;
@@ -108,11 +110,19 @@ public class GuppyAction implements Action {
         cudaDevice = line.getOptionValue("d");
       }
 
+      if (line.hasOption("u")) {
+        gpuRunnersPerDevice = Integer.parseInt(line.getOptionValue("u"));
+      }
+
+      if (line.hasOption("p")) {
+        chunksPerRunner = Integer.parseInt(line.getOptionValue("p"));
+      }
+
       if (line.hasOption("o")) {
         fast5Output = true;
       }
 
-      if (line.hasOption("k")) {
+      if (line.hasOption("e")) {
         keepTemporaryFiles = true;
       }
       args = Arrays.asList(line.getArgs());
@@ -129,8 +139,8 @@ public class GuppyAction implements Action {
 
       GuppyONTBasecallingDataProcessor.run(inputTar, outputDir, runId,
           guppyVersion, tmpPath, flowcell, kit, barcodeKits, trimBarcode,
-          minQscore, config, cudaDevice, fast5Output, keepTemporaryFiles,
-          logger);
+          minQscore, config, cudaDevice, gpuRunnersPerDevice, chunksPerRunner,
+          fast5Output, keepTemporaryFiles, logger);
 
     } catch (ParseException e) {
       Common.errorExit(e,
@@ -182,6 +192,16 @@ public class GuppyAction implements Action {
     options.addOption(
         OptionBuilder.withLongOpt("device").hasArg().withArgName("cudadevice")
             .withDescription("Cuda device name").create('d'));
+
+    // GPU runners
+    options.addOption(OptionBuilder.withLongOpt("gpu-runners-per-device")
+        .hasArg().withArgName("runners")
+        .withDescription("GPU runners per device").create('u'));
+
+    // Chunks per runner
+    options.addOption(OptionBuilder.withLongOpt("chunks-per-runner").hasArg()
+        .withArgName("chunks").withDescription("chunks per runner")
+        .create('p'));
 
     // Run id option
     options.addOption(OptionBuilder.withLongOpt("run-id").hasArg()

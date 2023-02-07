@@ -365,8 +365,16 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
     result.add(runConf.get("guppy.cuda.device", "auto"));
 
     // GPU runner per device
-    result.add("--gpu_runners_per_device");
-    result.add(runConf.get("guppy.gpu.runners.per.device", "2"));
+    if (runConf.containsKey("guppy.gpu.runners.per.device")) {
+      result.add("--gpu_runners_per_device");
+      result.add(runConf.get("guppy.gpu.runners.per.device"));
+    }
+
+    // Chuncks per runner
+    if (runConf.containsKey("guppy.chunks.per.runner")) {
+      result.add("--chunks_per_runner");
+      result.add(runConf.get("guppy.chunks.per.runner"));
+    }
 
     // Caller
     result.add("--num_callers");
@@ -483,6 +491,14 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
 
     if (!cudaDevice.trim().isEmpty()) {
       runConf.set("guppy.cuda.device", cudaDevice.trim());
+    }
+
+    if (gpuRunnersPerDevice > 0) {
+      runConf.set("guppy.gpu.runners.per.device", gpuRunnersPerDevice);
+    }
+
+    if (chunksPerRunner > 0) {
+      runConf.set("guppy.chunks.per.runner", chunksPerRunner);
     }
 
     if (!config.trim().isEmpty()) {
