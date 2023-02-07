@@ -34,7 +34,7 @@ public class CopyAndMergeGuppyOutput {
   // TODO This class must works if input and output path are the same (in place
   // mode)
 
-  private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
+  private static final int DEFAULT_BUFFER_SIZE = 8192;
 
   private Path inputPath;
   private Path outputPath;
@@ -288,14 +288,15 @@ public class CopyAndMergeGuppyOutput {
 
     try (OutputStream os = new FileOutputStream(outputFile.toFile())) {
 
-      OutputStream out = gzip ? new GZIPOutputStream(os) : os;
+      OutputStream out =
+          gzip ? new GZIPOutputStream(os, DEFAULT_BUFFER_SIZE) : os;
 
       for (Path file : inputFiles) {
 
         try (InputStream in = new FileInputStream(file.toFile())) {
 
           if (gzip) {
-            copy(new GZIPInputStream(in), out);
+            copy(new GZIPInputStream(in, DEFAULT_BUFFER_SIZE), out);
             in.close();
           } else {
             copy(in, out);
@@ -319,7 +320,8 @@ public class CopyAndMergeGuppyOutput {
 
     try (OutputStream os = new FileOutputStream(outputFile.toFile())) {
 
-      OutputStream out = gzip ? new GZIPOutputStream(os) : os;
+      OutputStream out =
+          gzip ? new GZIPOutputStream(os, DEFAULT_BUFFER_SIZE) : os;
 
       for (Path file : inputFiles) {
 
@@ -357,7 +359,8 @@ public class CopyAndMergeGuppyOutput {
 
     try (InputStream in = new FileInputStream(inputFile);
         OutputStream out =
-            new GZIPOutputStream(new FileOutputStream(outputFile))) {
+            new GZIPOutputStream(
+            new FileOutputStream(outputFile), DEFAULT_BUFFER_SIZE)) {
       copy(in, out);
     }
 
