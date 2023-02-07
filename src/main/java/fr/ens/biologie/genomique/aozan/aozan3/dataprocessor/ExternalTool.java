@@ -27,6 +27,7 @@ public class ExternalTool {
   private String toolName;
   private boolean dockerMode;
   private String dockerImage;
+  private boolean dockerGpuMode;
   private GenericLogger logger;
 
   private String toolNameLower() {
@@ -65,10 +66,10 @@ public class ExternalTool {
           "Docker image to use for " + this.toolName + ": " + dockerImage);
     }
 
-    // TODO The Spotify Docker client in Eoulsan does not seems to work anymore
     // Use fallback Docker client
-    DockerImageInstance result =
-        new FallBackDockerClient().createConnection(this.dockerImage);
+    FallBackDockerClient client = new FallBackDockerClient();
+    client.enableGpus(this.dockerGpuMode);
+    DockerImageInstance result = client.createConnection(this.dockerImage);
 
     // Pull Docker image if not exists
     result.pullImageIfNotExists();
@@ -137,7 +138,7 @@ public class ExternalTool {
    * @param toolName name of the tool
    */
   ExternalTool(String toolName) {
-    this(toolName, false, null, null);
+    this(toolName, false, null, false, null);
   }
 
   /**
@@ -145,9 +146,11 @@ public class ExternalTool {
    * @param toolName name of the tool
    * @param docker enable docker mode
    * @param dockerImage docker image
+   * @param dockerGpuMode true to enable GPU mode
+   * @param logger logger to use
    */
   ExternalTool(String toolName, boolean dockerMode, String dockerImage,
-      GenericLogger logger) {
+      boolean dockerGpuMode, GenericLogger logger) {
 
     requireNonNull(toolName);
 

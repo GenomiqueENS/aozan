@@ -302,7 +302,7 @@ public abstract class AbstractIlluminaDemuxDataProcessor
     // Define external tool
     ExternalTool tool = new ExternalTool(getDemuxToolName(),
         conf.getBoolean(getConfPrefix() + ".use.docker", false),
-        conf.get(getConfPrefix() + ".docker.image", ""), this.logger);
+        conf.get(getConfPrefix() + ".docker.image", ""), false, this.logger);
 
     // Get demultiplexing tool version
     String toolVersion = tool.getToolVersion(runId, conf.get("tmp.dir"),

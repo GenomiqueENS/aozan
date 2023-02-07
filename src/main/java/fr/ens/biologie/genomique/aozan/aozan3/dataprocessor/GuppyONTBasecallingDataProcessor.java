@@ -234,7 +234,8 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
     // Define external tool
     ExternalTool tool =
         new ExternalTool("guppy", runConf.getBoolean("guppy.use.docker", false),
-            runConf.get("guppy.docker.image", ""), logger);
+            runConf.get("guppy.docker.image", ""),
+            runConf.getBoolean("guppy.use.docker", false), logger);
 
     // Get demultiplexing tool version
     String toolVersion = tool.getToolVersion(runId, runConf.get("tmp.dir"),
@@ -259,7 +260,7 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
     info(logger, runId, "Demultiplexing using the following command line: "
         + String.join(" ", commandLine));
 
-    System.out.println("Guppy version: " + commandLine);
+    System.out.println("Guppy version: " + toolVersion);
     System.out.println("Command line: " + commandLine);
 
     long startTime = System.currentTimeMillis();
