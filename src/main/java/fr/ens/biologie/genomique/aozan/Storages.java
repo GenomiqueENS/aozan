@@ -1,5 +1,6 @@
 package fr.ens.biologie.genomique.aozan;
 
+import static fr.ens.biologie.genomique.kenetre.io.CompressionType.open;
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
@@ -83,7 +84,8 @@ public class Storages {
 
     // Compute the genome description
     if (desc == null) {
-      desc = GenomeDescription.createGenomeDescFromFasta(genomePath);
+      desc = GenomeDescription.createGenomeDescFromFasta(open(genomePath),
+          genomePath.getName());
 
       if (this.genomeDescStorage != null) {
         this.genomeDescStorage.put(genomePath.getAbsolutePath(), desc);
