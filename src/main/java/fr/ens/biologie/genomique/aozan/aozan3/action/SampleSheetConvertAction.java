@@ -148,9 +148,7 @@ public class SampleSheetConvertAction implements Action {
 
     // Fix sample sheet
     try {
-
       replaceUnderscoresByDashesInSampleIds(sampleSheet);
-      removeBclConvertDataForbiddenFields(sampleSheet);
     } catch (KenetreException e) {
       throw new Aozan3Exception(
           "Error while converting sample sheet: " + inputFile);
@@ -168,6 +166,14 @@ public class SampleSheetConvertAction implements Action {
     } catch (KenetreException e) {
       throw new Aozan3Exception("Error while checking sample sheet: "
           + inputFile + "\n" + e.getMessage());
+    }
+
+    // Fix sample sheet
+    try {
+      removeBclConvertDataForbiddenFields(sampleSheet);
+    } catch (KenetreException e) {
+      throw new Aozan3Exception(
+          "Error while converting sample sheet: " + inputFile);
     }
 
     // Write the output sample sheet in CSV format
