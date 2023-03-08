@@ -1,10 +1,18 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprovider;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
@@ -14,6 +22,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunDataFactory;
 import fr.ens.biologie.genomique.aozan.aozan3.SequencerSource;
 import fr.ens.biologie.genomique.aozan.aozan3.util.Utils;
+import fr.ens.biologie.genomique.kenetre.illumina.RunInfo;
 import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
@@ -53,13 +62,11 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
         return false;
       }
 
-      boolean rtaCompleteExists =
-          new File(file, "RunCompletionStatus.xml").isFile();
+      boolean runCompleted = runCompleted(file.toPath());
       boolean tempDirectory = file.getName().endsWith(".tmp");
 
       return this.completedRuns
-          ? rtaCompleteExists && !tempDirectory
-          : !rtaCompleteExists || tempDirectory;
+          ? runCompleted && !tempDirectory : !runCompleted || tempDirectory;
     }
 
     RunDirectoryFileFilter(boolean completedRuns) {
@@ -74,8 +81,8 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
   }
 
   @Override
-  public void init(DataStorage storage, Configuration conf, GenericLogger logger)
-      throws Aozan3Exception {
+  public void init(DataStorage storage, Configuration conf,
+      GenericLogger logger) throws Aozan3Exception {
 
     // Check if step has not been already initialized
     if (this.initialized) {
@@ -152,6 +159,115 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
     }
 
     return Collections.unmodifiableList(result);
+  }
+
+  /**
+   * Test if a run is completed.
+   * @param runDirectory the path to the run directory
+   * @return true if the run is completed
+   */
+  public static boolean runCompleted(Path runDirectory) {
+
+    requireNonNull(runDirectory);
+    File dir = runDirectory.toFile();
+
+    // RTA 3
+    if (new File(dir, "RTA3.cfg").exists()) {
+
+      return fileExists(dir, "CopyComplete.txt", "RTAComplete.txt",
+          "RunCompletionStatus.xml");
+    }
+
+    // RTA 2
+    if (new File(dir, "RunParameter.xml").exists()) {
+
+      return fileExists(dir, "RTAComplete.txt", "RunCompletionStatus.xml")
+          && completeFileExists(dir, "RTARead", "Complete.txt");
+    }
+
+    // RTA 1
+    if (new File(dir, "runParameter.xml").exists()) {
+      return fileExists(dir, "RTAComplete.txt",
+          "ImageAnalysis_Netcopy_complete.txt")
+          && completeFileExists(dir, "Basecalling_Netcopy_complete_Read",
+              ".txt");
+    }
+
+    return false;
+  }
+
+  /**
+   * Check if all the files exists.
+   * @param runDirectory directory where to check files
+   * @param filenames filenames of the files
+   * @return true if all the files exists
+   */
+  private static boolean fileExists(File runDirectory, String... filenames) {
+
+    requireNonNull(runDirectory);
+
+    for (String filename : filenames) {
+
+      if (!new File(runDirectory, filename).isFile()) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Check if a complete files exists
+   * @param runDirectory run directory where to check files
+   * @param prefix prefix of the complete files
+   * @param suffix suffix of the complete files
+   * @return true if the complete files exists
+   */
+  private static boolean completeFileExists(File runDirectory, String prefix,
+      String suffix) {
+
+    requireNonNull(runDirectory);
+    requireNonNull(prefix);
+    requireNonNull(suffix);
+
+    int readCount = readCount(runDirectory);
+
+    if (readCount < 1) {
+      return false;
+    }
+
+    for (int i = 1; i <= readCount; i++) {
+
+      if (!new File(runDirectory, prefix + i + suffix).isFile()) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Get the read count of a run.
+   * @param runDirectory run directory
+   * @return the read count of the run
+   */
+  private static int readCount(File runDirectory) {
+
+    requireNonNull(runDirectory);
+
+    File runInfoFile = new File(runDirectory, "RunInfo.xml");
+    if (!runInfoFile.exists()) {
+      return -1;
+    }
+
+    try {
+      RunInfo runInfo = RunInfo.parse(runInfoFile);
+      return runInfo.getReads().size();
+
+    } catch (ParserConfigurationException | SAXException | IOException e) {
+      return -1;
+    }
+
   }
 
 }
