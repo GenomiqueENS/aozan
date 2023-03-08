@@ -1,5 +1,6 @@
 package fr.ens.biologie.genomique.aozan.aozan3;
 
+import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
@@ -10,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -19,6 +21,8 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import com.google.common.base.Splitter;
 
 import fr.ens.biologie.genomique.kenetre.log.DummyLogger;
 import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
@@ -39,8 +43,8 @@ public class SendMail {
   private final boolean printMail;
   private final Properties properties;
   private final String fromMail;
-  private final String toMail;
-  private final String errorToMail;
+  private final List<String> toMail;
+  private final List<String> errorToMail;
 
   private final String subjectPrefix;
   private final String header;
@@ -145,9 +149,12 @@ public class SendMail {
 
       // Set message attributes
       msg.setFrom(new InternetAddress(this.fromMail));
-      InternetAddress[] address =
-          {new InternetAddress(error ? this.errorToMail : this.toMail)};
-      msg.setRecipients(Message.RecipientType.TO, address);
+
+      // Set recipients
+      for (String email : error ? this.errorToMail : this.toMail) {
+        msg.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
+      }
+
       msg.setSubject(subject);
       msg.setSentDate(new Date());
 
@@ -318,6 +325,21 @@ public class SendMail {
     }
   }
 
+  /**
+   * Convert an email string to an email list.
+   * @param emails a list of email in a string separated by commas
+   * @return a list of email
+   */
+  private List<String> toEmailList(String emails) {
+
+    if (emails == null) {
+      return emptyList();
+    }
+
+    return Splitter.on(',').trimResults().omitEmptyStrings()
+        .splitToList(emails);
+  }
+
   //
   // Constructor
   //
@@ -339,8 +361,9 @@ public class SendMail {
     this.sendMail = conf.getBoolean("send.mail", false);
 
     this.fromMail = conf.get("mail.from", "");
-    this.toMail = conf.get("mail.to", "");
-    this.errorToMail = conf.get("mail.error.to", this.toMail);
+    this.toMail = toEmailList(conf.get("mail.to", ""));
+    this.errorToMail =
+        toEmailList(conf.get("mail.error.to", conf.get("mail.to", "")));
 
     this.subjectPrefix =
         conf.get("mail.subject.prefix", DEFAULT_SUBJECT_PREFIX);
