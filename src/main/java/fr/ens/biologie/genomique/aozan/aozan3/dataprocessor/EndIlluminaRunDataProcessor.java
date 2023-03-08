@@ -2,7 +2,6 @@ package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.Category.RAW;
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.SequencingTechnology.ILLUMINA;
-import static fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.DiscoverNewIlluminaRunDataProcessor.runInfoToString;
 import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.info;
 import static fr.ens.biologie.genomique.kenetre.util.StringUtils.sizeToHumanReadable;
 import static java.lang.String.format;
@@ -20,10 +19,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
-
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataLocation;
@@ -39,7 +34,6 @@ import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.MultiDataTypeFilter
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.PartialDataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.TechnologyDataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.util.Tar;
-import fr.ens.biologie.genomique.kenetre.illumina.RunInfo;
 import fr.ens.biologie.genomique.kenetre.log.DummyLogger;
 import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
@@ -59,6 +53,7 @@ public class EndIlluminaRunDataProcessor implements DataProcessor {
   private GenericLogger logger = new DummyLogger();
 
   private DataStorage outputStorage;
+  private String dataDescription;
   private boolean initialized;
 
   @Override
@@ -93,6 +88,7 @@ public class EndIlluminaRunDataProcessor implements DataProcessor {
     }
 
     this.outputStorage = outputStorage;
+    this.dataDescription = conf.get("data.description", "no description");
 
     this.initialized = true;
   }
@@ -138,11 +134,16 @@ public class EndIlluminaRunDataProcessor implements DataProcessor {
     Path outputDir = outputLocation.getPath();
 
     try {
-      RunInfo runInfo =
-          RunInfo.parse(new File(inputPath.toFile(), "RunInfo.xml"));
 
       // Check if input directory exists
       inputLocation.checkReadableDirectory("input synchronization");
+
+      // Check if final output directory already exists
+      outputLocation
+          .checkIfNotExists(this.dataDescription + " output already exists");
+
+      // Create output directory
+      Files.createDirectories(outputLocation.getPath());
 
       //
       // Create sequencer log tar file
@@ -183,22 +184,19 @@ public class EndIlluminaRunDataProcessor implements DataProcessor {
               + runId.getId() + " on "
               + sequencerNames.getIlluminaSequencerName(runId));
 
-      String emailContent = format(
-          "You will find below the parameters " + "of the run %s.\n\n%s\n",
-          runId.getId(), runInfoToString(runInfo));
+      String emailContent = format("A new run (%s) is finished on %s at %s.\n",
+          runId.getId(), sequencerName, new Date(endTime).toString())
+          + format("Data for this run can be found at: %s\n\n", outputDir)
+          + format("For this task %.2f GB has been used and %.2f GB still free",
+              1.0 * outputSize / GIGA, 1.0 * outputFreeSize / GIGA);
 
       // Create success message
-      EmailMessage email = new EmailMessage(
-          format("A new run (%s) is finished on %s at %s.\n", runId.getId(),
-              sequencerName, new Date(endTime).toString())
-              + format("Data for this run can be found at: %s\n\n", outputDir)
-              + format(
-                  "For this task %.2f GB has been used and %.2f GB still free",
-                  1.0 * outputSize / GIGA, 1.0 * outputFreeSize / GIGA),
-          emailContent);
+      EmailMessage email = new EmailMessage("Ending run "
+          + runId.getId() + " on "
+          + sequencerNames.getIlluminaSequencerName(runId), emailContent);
 
       return new SimpleProcessResult(inputRunData, email);
-    } catch (IOException | ParserConfigurationException | SAXException e) {
+    } catch (IOException e) {
       throw new Aozan3Exception(inputRunData.getRunId(), e);
     }
   }
