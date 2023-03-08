@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -165,6 +167,12 @@ public class Aozan2QCDataProcessor implements DataProcessor {
       // Check if input directory exists
       fastqLocation.checkReadableDirectory("fastq input is not readable");
 
+      // Legacy mode for output
+      if (conf.getBoolean("legacy.output")) {
+        outputLocation = new DataLocation(outputLocation.getStorage(), Paths
+            .get(outputLocation.getPath().toString(), "qc_" + runId.getId()));
+      }
+
       // Check if final output directory already exists
       outputLocation
           .checkIfNotExists(this.dataDescription + " output already exists");
@@ -188,9 +196,9 @@ public class Aozan2QCDataProcessor implements DataProcessor {
       qc(conf, bclLocation, fastqLocation, outputLocation, runId, samplesheet,
           writeDataFile, writeXMLFile, writeHTMLFile);
 
-      // Legacy mode for output
+      // Create index.html at run of run directory in legacy mode
       if (conf.getBoolean("legacy.output")) {
-        legacyOutput(outputLocation.getPath().toFile(), runId.getId());
+        createIndexRun(outputLocation.getPath(), runId.getId());
       }
 
       // Chmod on output directory
@@ -298,27 +306,15 @@ public class Aozan2QCDataProcessor implements DataProcessor {
   }
 
   /**
-   * Create output in legacy mode.
-   * @param outputDir QC output directory
-   * @param runId runId
+   * Create index.html file in legacy mode.
+   * @param outputDir output directory
+   * @param runId run id
    * @throws AozanException if an error occurs while creating HTML index file
    */
-  private static void legacyOutput(File outputDir, String runId)
+  private static void createIndexRun(Path outputDir, String runId)
       throws AozanException {
 
-    File parentDir = outputDir.getParentFile();
-    File tmpDir = new File(parentDir, outputDir.getName() + ".tmp");
-    File finalDir = new File(outputDir, "qc_" + outputDir.getName());
-    File indexFile = new File(outputDir, "index.html");
-
-    // Rename output directory to a temporary directory
-    outputDir.renameTo(tmpDir);
-
-    // Create a new output directory
-    outputDir.mkdir();
-
-    // Move original directory
-    tmpDir.renameTo(finalDir);
+    File indexFile = new File(outputDir.toFile().getParentFile(), "index.html");
 
     // Read template
     String template = new BufferedReader(
