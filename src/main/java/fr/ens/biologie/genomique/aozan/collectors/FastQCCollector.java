@@ -24,7 +24,9 @@
 package fr.ens.biologie.genomique.aozan.collectors;
 
 import java.io.File;
+import java.util.logging.Logger;
 
+import fr.ens.biologie.genomique.aozan.Aozan2Logger;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Common;
 import fr.ens.biologie.genomique.aozan.QC;
@@ -39,6 +41,9 @@ import fr.ens.biologie.genomique.aozan.io.FastqSample;
  * @author Laurent Jourdren
  */
 public class FastQCCollector extends AbstractFastqCollector {
+
+  /** Logger. */
+  private static final Logger LOGGER = Aozan2Logger.getLogger();
 
   /** The collector name. */
   public static final String COLLECTOR_NAME = "fastqc";
@@ -103,6 +108,23 @@ public class FastQCCollector extends AbstractFastqCollector {
     // Create the thread object
     return new FastQCProcessThread(fastqSample, INGORE_FILTERED_SEQUENCES,
         reportDir, this.keepZipReportFile);
+  }
+
+  @Override
+  public void clear() {
+
+    OverrepresentedSequencesBlast instance =
+        OverrepresentedSequencesBlast.getInstance();
+
+    int blastSubmittedSequenceCount = instance.getSubmittedSequenceCount();
+    int blastAnalyzedSequenceCount = instance.getAnalyzedSequenceCount();
+
+    instance.clear();
+
+    LOGGER.info("Sequences submitted to blast: " + blastSubmittedSequenceCount);
+    LOGGER.info("Sequences analyzed by blast: " + blastAnalyzedSequenceCount);
+
+    super.clear();
   }
 
   //

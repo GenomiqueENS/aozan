@@ -440,6 +440,37 @@ public class OverrepresentedSequencesBlast {
   }
 
   /**
+   * Get the number of submitted sequences
+   * @return the number of submitted sequences
+   */
+  public int getSubmittedSequenceCount() {
+
+    synchronized (this.submittedSequences) {
+      return this.submittedSequences.size();
+    }
+  }
+
+  /**
+   * Get the number of analyzed sequences
+   * @return the number of analyzed sequences
+   */
+  public int getAnalyzedSequenceCount() {
+
+    return this.sequencesAlreadyAnalysis.size();
+  }
+
+  /**
+   * Clear sequences.
+   */
+  public void clear() {
+
+    synchronized (this.submittedSequences) {
+      this.submittedSequences.clear();
+      this.sequencesAlreadyAnalysis.clear();
+    }
+  }
+
+  /**
    * Get the blast result of a sequence
    * @param sequence the sequence to blast
    * @return the result as BlastResultHit object
