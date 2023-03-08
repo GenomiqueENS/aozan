@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
+import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataLocation;
@@ -33,6 +34,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.MultiDataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.PartialDataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.TechnologyDataTypeFilter;
+import fr.ens.biologie.genomique.aozan.aozan3.legacy.IndexGenerator;
 import fr.ens.biologie.genomique.aozan.aozan3.util.Tar;
 import fr.ens.biologie.genomique.kenetre.log.DummyLogger;
 import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
@@ -167,6 +169,10 @@ public class EndIlluminaRunDataProcessor implements DataProcessor {
               "First_Base_Report.htm", "Config", "Recipe", "RTALogs",
               "RTAConfiguration.xml", "RunCompletionStatus.xml", "RTA3.cfg"));
 
+      // Create index.html at run of run directory in legacy mode
+      IndexGenerator.createIndexRun(outputLocation.getPath(), runId.getId(),
+          Arrays.asList("hiseq.step"));
+
       // Log disk usage and disk free space
       long outputSize = outputLocation.getDiskUsage();
       long outputFreeSize = outputLocation.getStorage().getUsableSpace();
@@ -196,7 +202,7 @@ public class EndIlluminaRunDataProcessor implements DataProcessor {
           + sequencerNames.getIlluminaSequencerName(runId), emailContent);
 
       return new SimpleProcessResult(inputRunData, email);
-    } catch (IOException e) {
+    } catch (IOException | AozanException e) {
       throw new Aozan3Exception(inputRunData.getRunId(), e);
     }
   }

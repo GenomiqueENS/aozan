@@ -11,19 +11,14 @@ import static fr.ens.biologie.genomique.kenetre.util.StringUtils.sizeToHumanRead
 import static fr.ens.biologie.genomique.kenetre.util.StringUtils.toTimeHumanReadable;
 import static java.util.Objects.requireNonNull;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
@@ -41,6 +36,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.SimpleDataTypeFilter;
+import fr.ens.biologie.genomique.aozan.aozan3.legacy.IndexGenerator;
 import fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger;
 import fr.ens.biologie.genomique.aozan.aozan3.util.DiskUtils;
 import fr.ens.biologie.genomique.kenetre.KenetreException;
@@ -198,7 +194,10 @@ public class Aozan2QCDataProcessor implements DataProcessor {
 
       // Create index.html at run of run directory in legacy mode
       if (conf.getBoolean("legacy.output")) {
-        createIndexRun(outputLocation.getPath(), runId.getId());
+
+        IndexGenerator.createIndexRun(outputLocation.getPath().getParent(),
+            runId.getId(),
+            Arrays.asList("hiseq.step", "demux.step", "qc.step"));
       }
 
       // Chmod on output directory
@@ -302,34 +301,6 @@ public class Aozan2QCDataProcessor implements DataProcessor {
       // TODO update argument type of the method
       qc.writeReport(qcReport, styleSheetPath.isEmpty() ? null : styleSheetPath,
           htmlFile.toString());
-    }
-  }
-
-  /**
-   * Create index.html file in legacy mode.
-   * @param outputDir output directory
-   * @param runId run id
-   * @throws AozanException if an error occurs while creating HTML index file
-   */
-  private static void createIndexRun(Path outputDir, String runId)
-      throws AozanException {
-
-    File indexFile = new File(outputDir.toFile().getParentFile(), "index.html");
-
-    // Read template
-    String template = new BufferedReader(
-        new InputStreamReader(Aozan2QCDataProcessor.class.getResourceAsStream(
-            "/legacy_template_index_run.html"), StandardCharsets.UTF_8)).lines()
-                .collect(Collectors.joining("\n"));
-
-    // Update template
-    String text = template.replace("$RUN_ID", runId);
-
-    // Write final index file
-    try {
-      Files.write(indexFile.toPath(), text.getBytes(StandardCharsets.UTF_8));
-    } catch (IOException e) {
-      throw new AozanException("Unable to write HTML index file", e);
     }
   }
 
