@@ -18,6 +18,8 @@ import fr.ens.biologie.genomique.aozan.aozan3.DefaultRunIdGenerator;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.Aozan2QCDataProcessor;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.Bcl2FastqIlluminaDemuxDataProcessor;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.BclConvertIlluminaDemuxDataProcessor;
+import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.DiscoverNewIlluminaRunDataProcessor;
+import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.EndIlluminaRunDataProcessor;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.IlluminaSyncDataProcessor;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprovider.IlluminaProcessedRunDataProvider;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprovider.IlluminaRawRunDataProvider;
@@ -35,12 +37,14 @@ import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
  */
 public class LegacyRecipes {
 
+  private Recipe newRunStepRecipe;
+  private Recipe endRunStepRecipe;
   private Recipe syncStepRecipe;
   private Recipe demuxStepRecipe;
   private Recipe qcStepRecipe;
   private Path varPath;
   private Path mainLockPath;
-  private Map<Recipe, Path> outputPaths = new HashMap<>();
+  private Map<Recipe, Path> lockPaths = new HashMap<>();
   private final boolean aozanEnabled;
 
   //
@@ -75,6 +79,24 @@ public class LegacyRecipes {
   }
 
   /**
+   * Get the new run step recipe.
+   * @return the new run step recipe or null is not enabled
+   */
+  public Recipe getNewRunStepRecipe() {
+
+    return this.newRunStepRecipe;
+  }
+
+  /**
+   * Get the new run step recipe.
+   * @return the new run step recipe or null is not enabled
+   */
+  public Recipe getEndRunStepRecipe() {
+
+    return this.endRunStepRecipe;
+  }
+
+  /**
    * Get the synchronization step recipe.
    * @return the synchronization step recipe or null is not enable
    */
@@ -85,7 +107,7 @@ public class LegacyRecipes {
 
   /**
    * Get the demux step recipe.
-   * @return the demux step recipe or null is not enable
+   * @return the demux step recipe or null is not enabled
    */
   public Recipe getDemuxStepRecipe() {
 
@@ -94,7 +116,7 @@ public class LegacyRecipes {
 
   /**
    * Get the QC step recipe.
-   * @return the QC step recipe or null is not enable
+   * @return the QC step recipe or null is not enabled
    */
   public Recipe getQCStepRecipe() {
 
@@ -102,19 +124,15 @@ public class LegacyRecipes {
   }
 
   /**
-   * Get the output path of a recipe.
+   * Get the path where creating locks of a recipe.
    * @param recipe the recipe
-   * @return the output path of the recipe
+   * @return the lock directory path of the recipe
    */
-  public Path getOutputPath(Recipe recipe) {
+  public Path getLockDirectory(Recipe recipe) {
 
     Objects.requireNonNull(recipe);
 
-    if (!this.outputPaths.containsKey(recipe)) {
-      throw new IllegalArgumentException("Unknown recipe: " + recipe.getName());
-    }
-
-    return this.outputPaths.get(recipe);
+    return this.lockPaths.get(recipe);
   }
 
   //
@@ -202,6 +220,7 @@ public class LegacyRecipes {
 
     // SMTP server name
     setSetting(conf, aozan2Conf, "smtp.server", "mail.smtp.host");
+    setSetting(conf, aozan2Conf, "mail.smtp.host", "mail.smtp.host");
 
     // SMTP server port
     setSetting(conf, aozan2Conf, "smtp.port", "mail.smtp.port", "25");
@@ -233,6 +252,95 @@ public class LegacyRecipes {
     return true;
   }
 
+  private Recipe createNewRunStepRecipe(Configuration conf,
+      GenericLogger logger, Configuration aozan2Conf) throws Aozan3Exception {
+
+    // Check if the sync step is enabled
+    if (!aozan2Conf.getBoolean("first.base.report.step", true)) {
+      return null;
+    }
+
+    Recipe recipe = new Recipe("newrun", "New run step", conf, logger);
+
+    boolean inProgress = true;
+    final String inputStoragePrefix = "nasStorage";
+    final String outputStorageName = "nullStorage";
+
+    // Set input storages
+    createStorages(recipe, inputStoragePrefix,
+        aozan2Conf.get("hiseq.data.path"));
+
+    // Set input storages as run providers
+    for (String storageName : recipe.getStorages().names()) {
+      recipe.addDataProvider(IlluminaRawRunDataProvider.PROVIDER_NAME,
+          storageName, inProgress, conf);
+    }
+
+    // Set output storage
+    recipe.addStorage(outputStorageName,
+        new DataStorage("local", Paths.get("/dev/null")));
+
+    // Run configuration provider
+    RunConfigurationProvider runConfProvider =
+        createRunConfProvider(recipe, aozan2Conf);
+
+    // Define step configuration
+    Configuration stepConf = new Configuration();
+
+    Step syncStep = new Step(recipe, "newrunstep",
+        DiscoverNewIlluminaRunDataProcessor.PROCESSOR_NAME, outputStorageName,
+        stepConf, runConfProvider, new DefaultRunIdGenerator());
+
+    recipe.addStep(syncStep);
+
+    return recipe;
+  }
+
+  private Recipe createEndRunStepRecipe(Configuration conf,
+      GenericLogger logger, Configuration aozan2Conf) throws Aozan3Exception {
+
+    // Check if the sync step is enabled
+    if (!aozan2Conf.getBoolean("hiseq.step", true)) {
+      return null;
+    }
+
+    Recipe recipe = new Recipe("endrun", "End run step", conf, logger);
+
+    boolean inProgress = false;
+    final String inputStoragePrefix = "nasStorage";
+    final String outputStorageName = "qcStorage";
+
+    // Set input storages
+    createStorages(recipe, inputStoragePrefix,
+        aozan2Conf.get("hiseq.data.path"));
+
+    // Set input storages as run providers
+    for (String storageName : recipe.getStorages().names()) {
+      recipe.addDataProvider(IlluminaRawRunDataProvider.PROVIDER_NAME,
+          storageName, inProgress, conf);
+    }
+
+    // Set output storage
+    Path qcPath = Paths.get(aozan2Conf.get("reports.data.path").trim());
+    recipe.addStorage(outputStorageName, new DataStorage("local", qcPath));
+    this.lockPaths.put(recipe, qcPath);
+
+    // Run configuration provider
+    RunConfigurationProvider runConfProvider =
+        createRunConfProvider(recipe, aozan2Conf);
+
+    // Define step configuration
+    Configuration stepConf = new Configuration();
+
+    Step syncStep = new Step(recipe, "endrunstep",
+        EndIlluminaRunDataProcessor.PROCESSOR_NAME, outputStorageName, stepConf,
+        runConfProvider, new DefaultRunIdGenerator());
+
+    recipe.addStep(syncStep);
+
+    return recipe;
+  }
+
   private Recipe createSyncStepRecipe(Configuration conf, GenericLogger logger,
       Configuration aozan2Conf) throws Aozan3Exception {
 
@@ -262,7 +370,7 @@ public class LegacyRecipes {
     // Set output storage
     Path bclPath = Paths.get(aozan2Conf.get("bcl.data.path").trim());
     recipe.addStorage(outputStorage, new DataStorage("local", bclPath));
-    this.outputPaths.put(recipe, bclPath);
+    this.lockPaths.put(recipe, bclPath);
 
     // Run configuration provider
     RunConfigurationProvider runConfProvider =
@@ -298,7 +406,7 @@ public class LegacyRecipes {
     // Set output storage
     Path fastqPath = Paths.get(aozan2Conf.get("fastq.data.path").trim());
     recipe.addStorage(outputStorageName, new DataStorage("local", fastqPath));
-    this.outputPaths.put(recipe, fastqPath);
+    this.lockPaths.put(recipe, fastqPath);
 
     // Run configuration provider
     RunConfigurationProvider runConfProvider =
@@ -360,7 +468,7 @@ public class LegacyRecipes {
     // Set output storage
     Path qcPath = Paths.get(aozan2Conf.get("reports.data.path").trim());
     recipe.addStorage(outputStorageName, new DataStorage("local", qcPath));
-    this.outputPaths.put(recipe, qcPath);
+    this.lockPaths.put(recipe, qcPath);
 
     // Run configuration provider
     RunConfigurationProvider runConfProvider =
@@ -552,6 +660,8 @@ public class LegacyRecipes {
 
     // TODO Check removed steps
 
+    this.newRunStepRecipe = createNewRunStepRecipe(conf, logger, aozan2Conf);
+    this.endRunStepRecipe = createEndRunStepRecipe(conf, logger, aozan2Conf);
     this.syncStepRecipe = createSyncStepRecipe(conf, logger, aozan2Conf);
     this.demuxStepRecipe = createDemuxStep(conf, logger, aozan2Conf);
     this.qcStepRecipe = createQCStep(conf, logger, aozan2Conf);

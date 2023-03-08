@@ -74,6 +74,12 @@ public class LegacyAction implements Action {
       // Create Aozan lock
       mainLock.createLock();
 
+      // Perform new run discovering
+      execute(recipes, recipes.getNewRunStepRecipe(), recipes.getVarPath());
+
+      // Perform end of run discovering
+      execute(recipes, recipes.getEndRunStepRecipe(), recipes.getVarPath());
+
       // Perform synchronization
       execute(recipes, recipes.getSyncStepRecipe(), recipes.getVarPath());
 
@@ -109,7 +115,7 @@ public class LegacyAction implements Action {
     }
 
     // Get output path of the recipe
-    Path outputPath = recipes.getOutputPath(recipe);
+    Path lockDirectory = recipes.getLockDirectory(recipe);
 
     RunIdStorage processedRunIdStorage = new RunIdStorage(
         Paths.get(varPath.toString(), recipe.getName() + ".done"));
@@ -132,14 +138,17 @@ public class LegacyAction implements Action {
     todoRunIds.removeAll(processed);
 
     // Remove locked runs
-    Set<RunId> lockedRunIds = new HashSet<>();
-    for (RunId runId : todoRunIds) {
-      Path lockPath = Paths.get(outputPath.toString(), runId.getId() + ".lock");
-      if (Files.isRegularFile(lockPath)) {
-        lockedRunIds.add(runId);
+    if (lockDirectory != null) {
+      Set<RunId> lockedRunIds = new HashSet<>();
+      for (RunId runId : todoRunIds) {
+        Path lockPath =
+            Paths.get(lockDirectory.toString(), runId.getId() + ".lock");
+        if (Files.isRegularFile(lockPath)) {
+          lockedRunIds.add(runId);
+        }
       }
+      todoRunIds.removeAll(lockedRunIds);
     }
-    todoRunIds.removeAll(lockedRunIds);
 
     // Nothing to do
     if (todoRunIds.isEmpty()) {
@@ -156,10 +165,11 @@ public class LegacyAction implements Action {
     RunId runId = todoRunIds.iterator().next();
 
     // Define lock path
-    Path lockPath = Paths.get(outputPath.toString(), runId.getId() + ".lock");
+    Path lockPath = lockDirectory != null
+        ? Paths.get(lockDirectory.toString(), runId.getId() + ".lock") : null;
 
     // Lock the step, if a lock already exists, there is nothing to do
-    if (!lockStep(lockPath, recipe.getName())) {
+    if (lockPath != null && !lockStep(lockPath, recipe.getName())) {
       return;
     }
 
@@ -171,7 +181,9 @@ public class LegacyAction implements Action {
     }
 
     // Unlock the step
-    unlockStep(lockPath);
+    if (lockPath != null) {
+      unlockStep(lockPath);
+    }
 
     // Search for new runs to process
     execute(recipes, recipe, varPath, forbiddenRuns);
