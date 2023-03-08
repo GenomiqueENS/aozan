@@ -94,7 +94,13 @@ public class DiscoverNewIlluminaRunDataProcessor implements DataProcessor {
 
     RunId runId = inputRunData.getRunId();
     DataLocation inputLocation = inputRunData.getLocation();
+
+    // Sequencer name
     SequencerNames sequencerNames = new SequencerNames(conf);
+    String sequencerName = sequencerNames.getIlluminaSequencerName(runId);
+    if (sequencerName == null) {
+      sequencerName = "unknown sequencer";
+    }
 
     try {
       RunInfo runInfo = RunInfo
@@ -103,18 +109,16 @@ public class DiscoverNewIlluminaRunDataProcessor implements DataProcessor {
       // Check if input directory exists
       inputLocation.checkReadableDirectory("input synchronization");
 
-      info(this.logger,inputRunData,
-          "New run discovered "
-              + runId + " on sequencer "
-              + sequencerNames.getIlluminaSequencerName(runId));
+      info(this.logger, inputRunData, "New run discovered "
+          + runId.getId() + " on sequencer " + sequencerName);
 
-      String emailContent = String.format("You will find below the parameters "
-          + "of the run %s.\n\n" + "Informations about this run:\n" + "%s\n",
+      String emailContent = String.format(
+          "You will find below the parameters " + "of the run %s.\n\n" + "%s",
           runId.getId(), runInfoToString(runInfo));
 
       // Create success message
       EmailMessage email = new EmailMessage("New run "
-          + estimatedRunType(runInfo) + " " + runId + " on "
+          + estimatedRunType(runInfo) + " " + runId.getId() + " on "
           + inputRunData.getSource(), emailContent);
 
       return new SimpleProcessResult(inputRunData, email);
