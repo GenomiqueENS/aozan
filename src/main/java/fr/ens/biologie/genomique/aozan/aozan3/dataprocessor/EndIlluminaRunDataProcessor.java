@@ -4,11 +4,20 @@ import static fr.ens.biologie.genomique.aozan.aozan3.DataType.Category.RAW;
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.SequencingTechnology.ILLUMINA;
 import static fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.DiscoverNewIlluminaRunDataProcessor.runInfoToString;
 import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.info;
+import static fr.ens.biologie.genomique.kenetre.util.StringUtils.sizeToHumanReadable;
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -18,6 +27,7 @@ import org.xml.sax.SAXException;
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataLocation;
+import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.EmailMessage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
@@ -28,6 +38,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.MultiDataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.PartialDataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.TechnologyDataTypeFilter;
+import fr.ens.biologie.genomique.aozan.aozan3.util.Tar;
 import fr.ens.biologie.genomique.kenetre.illumina.RunInfo;
 import fr.ens.biologie.genomique.kenetre.log.DummyLogger;
 import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
@@ -39,9 +50,15 @@ import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
  */
 public class EndIlluminaRunDataProcessor implements DataProcessor {
 
-  public static final String PROCESSOR_NAME = "illumina_discover";
+  public static final String PROCESSOR_NAME = "illumina_end_run";
+
+  private static String SEQUENCER_LOG_PREFIX = "hiseq_log_";
+  private static String REPORT_PREFIX = "report_";
+  private static long GIGA = 1024 * 1024 * 1024;
 
   private GenericLogger logger = new DummyLogger();
+
+  private DataStorage outputStorage;
   private boolean initialized;
 
   @Override
@@ -64,6 +81,18 @@ public class EndIlluminaRunDataProcessor implements DataProcessor {
     if (logger != null) {
       this.logger = logger;
     }
+
+    final DataStorage outputStorage =
+        DataStorage.deSerializeFromJson(conf.get("output.storage"));
+
+    // Check if directory is writable
+    if (!outputStorage.isWritable()) {
+      throw new Aozan3Exception(
+          "The output demultiplexing directory is not writable: "
+              + outputStorage);
+    }
+
+    this.outputStorage = outputStorage;
 
     this.initialized = true;
   }
@@ -93,31 +122,148 @@ public class EndIlluminaRunDataProcessor implements DataProcessor {
 
     RunId runId = inputRunData.getRunId();
     DataLocation inputLocation = inputRunData.getLocation();
+    Path inputPath = inputLocation.getPath();
+
+    long endTime = runEndTime(inputLocation.getPath());
+
+    // Sequencer name
     SequencerNames sequencerNames = new SequencerNames(conf);
+    String sequencerName = sequencerNames.getIlluminaSequencerName(runId);
+    if (sequencerName == null) {
+      sequencerName = "unknown sequencer";
+    }
+
+    DataLocation outputLocation =
+        this.outputStorage.newDataLocation(runId.getId());
+    Path outputDir = outputLocation.getPath();
 
     try {
-      RunInfo runInfo = RunInfo
-          .parse(new File(inputLocation.getPath().toFile(), "RunInfo.xml"));
+      RunInfo runInfo =
+          RunInfo.parse(new File(inputPath.toFile(), "RunInfo.xml"));
 
       // Check if input directory exists
       inputLocation.checkReadableDirectory("input synchronization");
 
-      info(this.logger, inputRunData, "Ending run detection "
-          + runId + " on " + sequencerNames.getIlluminaSequencerName(runId));
+      //
+      // Create sequencer log tar file
+      //
 
-      String emailContent = String.format("You will find below the parameters "
-          + "of the run %s.\n\n" + "Informations about this run:\n" + "%s\n",
+      Path hiseqLogArchiveFile = Paths.get(outputDir.toString(),
+          SEQUENCER_LOG_PREFIX + runId.getId() + ".tar.bz2");
+
+      createTar(hiseqLogArchiveFile, inputPath, Arrays.asList("InterOp",
+          "RunInfo.xml", "runParameters.xml", "RunParameters.xml", "*.csv"));
+
+      //
+      // Create sequencer report tar file
+      //
+
+      Path reportArchiveFile = Paths.get(outputDir.toString(),
+          REPORT_PREFIX + runId.getId() + ".tar.bz2");
+
+      createTar(reportArchiveFile, inputPath,
+          Arrays.asList("Data/Status_Files", "Data/reports", "Data/Status.htm",
+              "First_Base_Report.htm", "Config", "Recipe", "RTALogs",
+              "RTAConfiguration.xml", "RunCompletionStatus.xml", "RTA3.cfg"));
+
+      // Log disk usage and disk free space
+      long outputSize = outputLocation.getDiskUsage();
+      long outputFreeSize = outputLocation.getStorage().getUsableSpace();
+      info(this.logger, runId, "output disk free after demux: "
+          + sizeToHumanReadable(outputFreeSize));
+      info(this.logger, runId,
+          "space used by demux: " + sizeToHumanReadable(outputSize));
+
+      //
+      // Create email
+      //
+
+      info(this.logger, inputRunData,
+          "Ending run detection "
+              + runId.getId() + " on "
+              + sequencerNames.getIlluminaSequencerName(runId));
+
+      String emailContent = format(
+          "You will find below the parameters " + "of the run %s.\n\n%s\n",
           runId.getId(), runInfoToString(runInfo));
 
       // Create success message
       EmailMessage email = new EmailMessage(
-          "Ending run " + runId + " on " + inputRunData.getSource(),
+          format("A new run (%s) is finished on %s at %s.\n", runId.getId(),
+              sequencerName, new Date(endTime).toString())
+              + format("Data for this run can be found at: %s\n\n", outputDir)
+              + format(
+                  "For this task %.2f GB has been used and %.2f GB still free",
+                  1.0 * outputSize / GIGA, 1.0 * outputFreeSize / GIGA),
           emailContent);
 
       return new SimpleProcessResult(inputRunData, email);
     } catch (IOException | ParserConfigurationException | SAXException e) {
       throw new Aozan3Exception(inputRunData.getRunId(), e);
     }
+  }
+
+  /**
+   * Create tar file.
+   * @param outputFile output tar file
+   * @param runDir run directory
+   * @param filenames filenames of the file to put in the tar archive
+   * @throws IOException if an error occurs while creating the tar file
+   * @throws Aozan3Exception if an error occurs while creating the tar file
+   */
+  private static void createTar(Path outputFile, Path runDir,
+      Collection<String> filenames) throws IOException, Aozan3Exception {
+
+    requireNonNull(outputFile);
+    requireNonNull(runDir);
+    requireNonNull(filenames);
+
+    Tar tar = new Tar(runDir, outputFile);
+    for (String f : filenames) {
+
+      // Handle sub directories
+      int lastIndex = f.lastIndexOf('/');
+      Path dir = lastIndex != -1
+          ? Paths.get(runDir.toString(), f.substring(0, lastIndex)) : runDir;
+      String filename = lastIndex != -1 ? f.substring(lastIndex + 1) : f;
+
+      try (DirectoryStream<Path> stream =
+          Files.newDirectoryStream(dir, filename)) {
+
+        for (Path p : stream) {
+          tar.addIncludePattern(runDir.relativize(p).toString());
+        }
+      }
+    }
+
+    tar.execute();
+  }
+
+  /**
+   * Get the run end time.
+   * @param runDir run directory
+   * @return run end time since epoch
+   */
+  private long runEndTime(Path runDir) {
+
+    requireNonNull(runDir);
+
+    long result = 0L;
+
+    File dir = runDir.toFile();
+    for (String filename : dir.list()) {
+
+      File f = new File(dir, filename);
+      if (!f.isFile()) {
+        continue;
+      }
+
+      if (f.lastModified() > result) {
+        result = f.lastModified();
+      }
+    }
+
+    return result;
   }
 
 }
