@@ -2,6 +2,7 @@ package fr.ens.biologie.genomique.aozan.aozan3.util;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,6 +24,7 @@ public class Tar {
   private Path outputArchive;
   private Compression compression = Compression.AUTO;
   private List<String> exclude = new ArrayList<>();
+  private List<String> include = new ArrayList<>();
 
   /**
    * Get tar compression.
@@ -68,6 +70,30 @@ public class Tar {
   }
 
   /**
+   * Add a pattern to exclude.
+   * @param pattern pattern to exclude
+   */
+  public void addIncludePattern(String pattern) {
+
+    requireNonNull(pattern);
+
+    if (pattern.trim().isEmpty()) {
+      throw new IllegalArgumentException("pattern argument is empty");
+    }
+
+    this.include.add(pattern);
+  }
+
+  /**
+   * Get the list of patterns to include.
+   * @return the list of patterns to include
+   */
+  public List<String> getIncludePatterns() {
+
+    return Collections.unmodifiableList(this.include);
+  }
+
+  /**
    * Execute tar.
    * @throws Aozan3Exception if an error occurs while untarring data
    */
@@ -87,11 +113,19 @@ public class Tar {
     commandLine.add("-cf");
     commandLine.add(this.outputArchive.toString());
 
-    commandLine.add(this.inputDirectoryPath.getFileName().toString());
+    if (this.include.isEmpty()) {
+      commandLine.add(this.inputDirectoryPath.getFileName().toString());
+    } else {
+      for (String p : this.include) {
+        commandLine.add(this.inputDirectoryPath.getFileName().toString()
+            + File.separator + p);
+      }
+    }
 
     ProcessBuilder pb = new ProcessBuilder(commandLine);
     pb.directory(this.inputDirectoryPath.getParent().toFile());
     pb.environment().put("LANG", "C");
+    pb.inheritIO();
 
     try {
       int exitValue = pb.start().waitFor();
