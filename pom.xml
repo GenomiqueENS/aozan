@@ -18,7 +18,7 @@
 
     <java.version>11</java.version>
     <htsjdk.version>1.118</htsjdk.version>
-    <kenetre.version>0.16</kenetre.version>
+    <kenetre.version>0.17</kenetre.version>
     <poi.version>4.1.2</poi.version>
   </properties>
   
