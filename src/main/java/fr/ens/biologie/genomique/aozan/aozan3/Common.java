@@ -35,12 +35,35 @@ public class Common {
   public static void errorExit(final Throwable e, final String message,
       final boolean logMessage) {
 
+    errorExit(e, message, logMessage, 1);
+  }
+
+  /**
+   * Print error message to the user and exits the application.
+   * @param e Exception
+   * @param message message to show to the use
+   */
+  public static void errorExit(final Throwable e, final String message,
+      int exitCode) {
+
+    errorExit(e, message, true, exitCode);
+  }
+
+  /**
+   * Print error message to the user and exits the application.
+   * @param e Exception
+   * @param message message to show to the use
+   * @param logMessage true if message must be logged
+   */
+  public static void errorExit(final Throwable e, final String message,
+      final boolean logMessage, int exitCode) {
+
     System.err.println("\n=== " + Globals.APP_NAME + " Error ===");
     System.err.println(message);
 
     printStackTrace(e);
 
-    exit(1);
+    exit(exitCode);
   }
 
   /**

@@ -55,6 +55,7 @@ public class Main {
 
   private final Configuration conf = new Configuration();
   private GenericLogger logger = new DummyLogger();
+  private int errorExitCode = 0;
 
   //
   // Getters
@@ -184,6 +185,15 @@ public class Main {
     return unmodifiableList(this.actionArgs);
   }
 
+  /**
+   * Get the exit code to use when an error occurs.
+   * @return Returns the exit code to use when an error occurs
+   */
+  public int getErrorExitCode() {
+
+    return this.errorExitCode;
+  }
+
   //
   // Parsing methods
   //
@@ -221,15 +231,18 @@ public class Main {
     // Create Options object
     final Options options = new Options();
 
-    options.addOption("version", false, "show version of the software");
+    options.addOption("v", "version", false, "show version of the software");
     options.addOption("about", false,
         "display information about this software");
     options.addOption("h", "help", false, "display this help");
-    options.addOption("license", false,
+    options.addOption("l", "license", false,
         "display information about the license of this software");
+    options.addOption("e", "exit-code", false,
+        "return a non zero exit code if an error occurs");
 
     options.addOption(OptionBuilder.withArgName("file").hasArg()
-        .withDescription("configuration file to use").create("conf"));
+        .withDescription("configuration file to use").withLongOpt("conf")
+        .create('c'));
 
     options.addOption(OptionBuilder.withArgName("property=value").hasArg()
         .withDescription("set a configuration setting. This "
@@ -307,6 +320,13 @@ public class Main {
 
         this.commandLineSettings = Arrays.asList(line.getOptionValues('s'));
         argsOptions += 2 * this.commandLineSettings.size();
+      }
+
+      // Exit code option
+      if (line.hasOption('e')) {
+
+        argsOptions++;
+        this.errorExitCode = 1;
       }
 
       // Shell script options
@@ -489,7 +509,7 @@ public class Main {
       main.getLogger().info("End of " + action.getName() + " action");
 
     } catch (Throwable e) {
-      Common.errorExit(e, e.getMessage());
+      Common.errorExit(e, e.getMessage(), main.getErrorExitCode());
     }
   }
 
