@@ -369,7 +369,7 @@ public class IlluminaSamplesheetRunConfigurationProvider
 
         List<String> fields = splitter.splitToList(line);
         if (fields.size() == 2) {
-          this.indexSequences.put(fields.get(0), fields.get(1));
+          this.indexSequences.put(fields.get(0).toLowerCase(), fields.get(1));
         }
 
       }
