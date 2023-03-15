@@ -287,11 +287,11 @@ public class LegacyRecipes {
     // Define step configuration
     Configuration stepConf = new Configuration();
 
-    Step syncStep = new Step(recipe, "newrunstep",
+    Step newRunStep = new Step(recipe, "newrunstep",
         DiscoverNewIlluminaRunDataProcessor.PROCESSOR_NAME, outputStorageName,
         stepConf, runConfProvider, new DefaultRunIdGenerator());
 
-    recipe.addStep(syncStep);
+    recipe.addStep(newRunStep);
 
     return recipe;
   }
