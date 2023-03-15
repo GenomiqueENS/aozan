@@ -1034,7 +1034,7 @@ public class RunData {
         results[i] = Long.parseLong(values[i].trim());
       } catch (NumberFormatException e) {
         throw new AozanRuntimeException(
-            "DataRun getInt throw NumberFormatException on this key "
+            "DataRun getLongArray throw NumberFormatException on this key "
                 + key + " (value is " + value + ")");
       }
     }
@@ -1107,7 +1107,7 @@ public class RunData {
 
     if (value == null) {
       throw new AozanRuntimeException(
-          "DataRun getInt throw NullPointerException on this key " + key);
+          "DataRun getFloat throw NullPointerException on this key " + key);
     }
 
     try {
@@ -1145,7 +1145,7 @@ public class RunData {
 
     if (value == null) {
       throw new AozanRuntimeException(
-          "DataRun getInt throw NullPointerException on this key " + key);
+          "DataRun getDouble throw NullPointerException on this key " + key);
     }
 
     try {
