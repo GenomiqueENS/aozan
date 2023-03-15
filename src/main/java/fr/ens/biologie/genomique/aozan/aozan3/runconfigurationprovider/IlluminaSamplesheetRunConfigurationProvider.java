@@ -31,6 +31,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 import fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger;
 import fr.ens.biologie.genomique.kenetre.KenetreException;
+import fr.ens.biologie.genomique.kenetre.illumina.DemultiplexingStats;
 import fr.ens.biologie.genomique.kenetre.illumina.RunInfo;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetCheck;
@@ -187,9 +188,6 @@ public class IlluminaSamplesheetRunConfigurationProvider
     int runNumber = illuminaRunId.getRunNumber();
     String instrumentNumber = illuminaRunId.getInstrumentSerialNumber();
 
-    // Load RunInfo object
-    RunInfo runInfo = loadRunInfo(runData);
-
     String samplesheetFilename = String.format("%s_%s_%04d",
         this.samplesheetPrefix, instrumentNumber, runNumber);
 
@@ -207,11 +205,11 @@ public class IlluminaSamplesheetRunConfigurationProvider
 
     // Update samplesheet
     this.logger.info(runData.getRunId(), "Update samplesheet");
-    updateSamplesheet(samplesheet, runId, runInfo.getFlowCellLaneCount(),
+    updateSamplesheet(samplesheet, runId, getFlowCellLaneCount(runData),
         this.allowUnderscoresInSampleIds);
 
     // Check samplesheet
-    checkSamplesheet(samplesheet, runId, runInfo.getFlowCell());
+    checkSamplesheet(samplesheet, runId, illuminaRunId.getFlowCellId());
 
     // Save samplesheet in Run configuration
     result.set("illumina.samplesheet",
@@ -224,21 +222,60 @@ public class IlluminaSamplesheetRunConfigurationProvider
   // RunInfo and SampleSheet loading methods
   //
 
-  private RunInfo loadRunInfo(final RunData runData) throws Aozan3Exception {
+  private int getFlowCellLaneCount(final RunData runData)
+      throws Aozan3Exception {
 
+    RunId runId = runData.getRunId();
     File dataDir = runData.getLocation().getPath().toFile();
-    File runInfoFile = new File(dataDir, "RunInfo.xml");
 
-    // For BclConvert output
-    if (!runInfoFile.exists()) {
-      runInfoFile = new File(new File(dataDir, "Reports"), "RunInfo.xml");
+    // Raw data
+    File runInfoFile = new File(dataDir, "RunInfo.xml");
+    if (runInfoFile.exists()) {
+      return getFlowCellLaneCountFromRunInfo(runInfoFile, runId);
     }
 
+    // BCLConvert
+    runInfoFile = new File(dataDir, "Reports/RunInfo.xml");
+    if (runInfoFile.exists()) {
+      return getFlowCellLaneCountFromRunInfo(runInfoFile, runId);
+    }
+
+    // Bcl2fastq 2
+    File demuxStatFile = new File(dataDir, "Stats/DemultiplexingStats.xml");
+    if (demuxStatFile.exists()) {
+
+      try {
+        DemultiplexingStats demuxStats = new DemultiplexingStats(demuxStatFile);
+
+        int laneCount = -1;
+        for (DemultiplexingStats.Entry e : demuxStats.entries()) {
+          laneCount = Math.max(laneCount, e.getLaneNumber());
+        }
+
+        if (laneCount > 0) {
+          return laneCount;
+        }
+
+      } catch (IOException e) {
+        this.logger.error(runId,
+            "Unable to load DemultiplexingStats.xml file: " + runInfoFile);
+        throw new Aozan3Exception(
+            "Unable to load DemultiplexingStats.xml file: " + runInfoFile, e);
+      }
+    }
+
+    throw new Aozan3Exception(
+        "Unable to find flowcell lane count for run: " + runId);
+  }
+
+  private int getFlowCellLaneCountFromRunInfo(final File runInfoFile,
+      RunId runId) throws Aozan3Exception {
+
     try {
-      return RunInfo.parse(runInfoFile);
+      return RunInfo.parse(runInfoFile).getFlowCellLaneCount();
     } catch (ParserConfigurationException | SAXException | IOException e) {
 
-      this.logger.error(runData.getRunId(),
+      this.logger.error(runId,
           "Unable to load RunInfo.xml file: " + runInfoFile);
       throw new Aozan3Exception(
           "Unable to load RunInfo.xml file: " + runInfoFile, e);
