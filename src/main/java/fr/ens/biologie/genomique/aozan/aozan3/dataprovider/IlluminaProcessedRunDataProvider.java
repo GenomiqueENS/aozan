@@ -3,6 +3,7 @@ package fr.ens.biologie.genomique.aozan.aozan3.dataprovider;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -73,8 +74,8 @@ public class IlluminaProcessedRunDataProvider implements RunDataProvider {
   }
 
   @Override
-  public void init(DataStorage storage, Configuration conf, GenericLogger logger)
-      throws Aozan3Exception {
+  public void init(DataStorage storage, Configuration conf,
+      GenericLogger logger) throws Aozan3Exception {
 
     // Check if step has not been already initialized
     if (this.initialized) {
@@ -135,10 +136,12 @@ public class IlluminaProcessedRunDataProvider implements RunDataProvider {
 
   private static boolean isFastqFilesInDirectory(File dir) {
 
-    try (Stream<Path> walk = Files.walk(dir.toPath())) {
+    try (Stream<Path> walk =
+        Files.walk(dir.toPath(), FileVisitOption.FOLLOW_LINKS)) {
 
       long count = walk.map(x -> x.toString())
-          .filter(f -> f.endsWith(".fastq.gz")).count();
+          .filter(f -> f.endsWith(".fastq.gz") || f.endsWith(".fastq.bz2"))
+          .count();
 
       return count > 0 ? true : false;
 
