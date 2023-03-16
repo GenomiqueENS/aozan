@@ -15,6 +15,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.DefaultRunIdGenerator;
+import fr.ens.biologie.genomique.aozan.aozan3.SendMail;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.Aozan2QCDataProcessor;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.Bcl2FastqIlluminaDemuxDataProcessor;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.BclConvertIlluminaDemuxDataProcessor;
@@ -42,6 +43,7 @@ public class LegacyRecipes {
   private Recipe syncStepRecipe;
   private Recipe demuxStepRecipe;
   private Recipe qcStepRecipe;
+  private SendMail sendMail;
   private Path varPath;
   private Path mainLockPath;
   private Map<Recipe, Path> lockPaths = new HashMap<>();
@@ -133,6 +135,15 @@ public class LegacyRecipes {
     Objects.requireNonNull(recipe);
 
     return this.lockPaths.get(recipe);
+  }
+
+  /**
+   * Return SendMail object.
+   * @return the SendMail object
+   */
+  public SendMail getSendMail() {
+
+    return this.sendMail;
   }
 
   //
@@ -665,6 +676,7 @@ public class LegacyRecipes {
     this.syncStepRecipe = createSyncStepRecipe(conf, logger, aozan2Conf);
     this.demuxStepRecipe = createDemuxStep(conf, logger, aozan2Conf);
     this.qcStepRecipe = createQCStep(conf, logger, aozan2Conf);
+    this.sendMail = new SendMail(aozan2Conf, logger);
   }
 
 }

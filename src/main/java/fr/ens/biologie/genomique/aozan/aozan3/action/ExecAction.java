@@ -125,6 +125,7 @@ public class ExecAction implements Action {
       }
 
     } catch (Aozan3Exception e) {
+      logger.error(e);
       Common.errorExit(e, "Error while executing "
           + Globals.APP_NAME_LOWER_CASE + ": " + e.getMessage());
     }

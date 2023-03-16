@@ -12,6 +12,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Common;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
+import fr.ens.biologie.genomique.aozan.aozan3.SendMail;
 import fr.ens.biologie.genomique.aozan.aozan3.legacy.AozanLock;
 import fr.ens.biologie.genomique.aozan.aozan3.legacy.LegacyRecipes;
 import fr.ens.biologie.genomique.aozan.aozan3.legacy.RunIdStorage;
@@ -53,9 +54,11 @@ public class LegacyAction implements Action {
           "Argument missing for " + ACTION_NAME + " action.");
     }
 
+    SendMail sendMail = null;
     try {
       Path confFile = Paths.get(arguments.get(0));
       LegacyRecipes recipes = new LegacyRecipes(conf, logger, confFile);
+      sendMail = recipes.getSendMail();
 
       // Test if Aozan is enabled
       if (!recipes.isAozanEnabled()) {
@@ -93,6 +96,10 @@ public class LegacyAction implements Action {
       mainLock.unlock();
 
     } catch (Aozan3Exception e) {
+      logger.error(e, true);
+      if (sendMail != null) {
+        sendMail.sendMail(e);
+      }
       Common.errorExit(e,
           "Error while parsing command line arguments: " + e.getMessage());
     }
