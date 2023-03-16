@@ -47,6 +47,7 @@ public class LegacyRecipes {
   private Path varPath;
   private Path mainLockPath;
   private Map<Recipe, Path> lockPaths = new HashMap<>();
+  private Map<Recipe, String> recipeDoneFilename = new HashMap<>();
   private final boolean aozanEnabled;
 
   //
@@ -135,6 +136,22 @@ public class LegacyRecipes {
     Objects.requireNonNull(recipe);
 
     return this.lockPaths.get(recipe);
+  }
+
+  /**
+   * Get the done filename for a recipe.
+   * @param recipe the recipe
+   * @return the done filename
+   */
+  public String getRecipeDoneDenyFilename(Recipe recipe) {
+
+    Objects.requireNonNull(recipe);
+
+    if (!this.recipeDoneFilename.containsKey(recipe)) {
+      return recipe.getName();
+    }
+
+    return this.recipeDoneFilename.get(recipe);
   }
 
   /**
@@ -316,6 +333,7 @@ public class LegacyRecipes {
     }
 
     Recipe recipe = new Recipe("endrun", "End run step", conf, logger);
+    this.recipeDoneFilename.put(recipe, "hiseq");
 
     boolean inProgress = false;
     final String inputStoragePrefix = "nasStorage";

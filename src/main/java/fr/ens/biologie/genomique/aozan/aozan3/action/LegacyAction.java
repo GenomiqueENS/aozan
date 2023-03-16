@@ -1,5 +1,7 @@
 package fr.ens.biologie.genomique.aozan.aozan3.action;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -124,8 +126,8 @@ public class LegacyAction implements Action {
     // Get output path of the recipe
     Path lockDirectory = recipes.getLockDirectory(recipe);
 
-    RunIdStorage processedRunIdStorage = new RunIdStorage(
-        Paths.get(varPath.toString(), recipe.getName() + ".done"));
+    RunIdStorage processedRunIdStorage =
+        runStorage(recipes, varPath, recipe, ".done");
 
     // Run to process
     Set<RunId> todoRunIds = new HashSet<>(recipe.availableRuns());
@@ -136,8 +138,8 @@ public class LegacyAction implements Action {
     }
 
     // Remove runs in .deny file
-    RunIdStorage denyRunIdStorage = new RunIdStorage(
-        Paths.get(varPath.toString(), recipe.getName() + ".deny"));
+    RunIdStorage denyRunIdStorage =
+        runStorage(recipes, varPath, recipe, ".deny");
     todoRunIds.removeAll(denyRunIdStorage.load());
 
     // Remove processed runs
@@ -194,6 +196,33 @@ public class LegacyAction implements Action {
 
     // Search for new runs to process
     execute(recipes, recipe, varPath, forbiddenRuns);
+  }
+
+  /**
+   * Create a RunIdStorage.
+   * @param recipes recipes
+   * @param directory directory for the storage
+   * @param recipe recipe
+   * @param suffix suffic of the storage file
+   * @return a RunIdStorage object
+   */
+  private static RunIdStorage runStorage(LegacyRecipes recipes, Path directory,
+      Recipe recipe, String suffix) {
+
+    requireNonNull(directory);
+    requireNonNull(recipe);
+    requireNonNull(suffix);
+
+    Path file = Paths.get(directory.toString(),
+        recipes.getRecipeDoneDenyFilename(recipe) + suffix);
+
+    if (Files.exists(file)) {
+      return new RunIdStorage(file);
+    }
+
+    file = Paths.get(directory.toString(), recipe.getName() + suffix);
+
+    return new RunIdStorage(file);
   }
 
   /**
