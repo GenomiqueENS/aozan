@@ -38,7 +38,8 @@ import fr.ens.biologie.genomique.aozan.util.ScoreInterval;
  * @since 0.8
  * @author Laurent Jourdren
  */
-public abstract class AbstractSimpleSampleTest extends AbstractPooledSampleTest {
+public abstract class AbstractSimpleSampleTest
+    extends AbstractPooledSampleTest {
 
   private final ScoreInterval interval = new ScoreInterval();
 
@@ -99,6 +100,10 @@ public abstract class AbstractSimpleSampleTest extends AbstractPooledSampleTest 
 
     if (key == null) {
       return null;
+    }
+
+    if (!data.contains(key)) {
+      return new TestResult("NA");
     }
 
     final Class<?> clazz = getValueType();

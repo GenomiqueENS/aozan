@@ -109,6 +109,10 @@ public abstract class AbstractSimpleLaneTest extends AbstractLaneTest {
       return null;
     }
 
+    if (!data.contains(key)) {
+      return new TestResult("NA");
+    }
+
     final Class<?> clazz = getValueType();
     final String msg;
     final Number value;

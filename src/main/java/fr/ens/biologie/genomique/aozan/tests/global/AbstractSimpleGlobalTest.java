@@ -104,6 +104,10 @@ public abstract class AbstractSimpleGlobalTest extends AbstractGlobalTest {
     final String msg;
     final Number value;
 
+    if (!data.contains(key)) {
+      return new TestResult("NA");
+    }
+
     try {
 
       if (clazz == Integer.class) {

@@ -101,6 +101,10 @@ public abstract class AbstractSimpleProjectTest extends AbstractProjectTest {
       return null;
     }
 
+    if (!data.contains(key)) {
+      return new TestResult("NA");
+    }
+
     final Class<?> clazz = getValueType();
     final String msg;
     final Number value;
