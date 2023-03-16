@@ -311,7 +311,8 @@ public class IlluminaSamplesheetRunConfigurationProvider
     }
 
     Path samplesheetFileInRunDirectory =
-        searchSamplesheetInRunDir(runData.getLocation().getPath());
+        searchSamplesheetInRunDir(runData.getLocation().getPath(),
+            Arrays.asList("samplesheet", this.samplesheetPrefix));
 
     // Test if a samplesheet file exists in run directory
     if (samplesheetFileInRunDirectory != null
@@ -455,14 +456,21 @@ public class IlluminaSamplesheetRunConfigurationProvider
     }
   }
 
-  private static Path searchSamplesheetInRunDir(Path runPath) {
+  private static Path searchSamplesheetInRunDir(Path runPath,
+      List<String> prefixes) {
 
     File[] files = runPath.toFile().listFiles(new FilenameFilter() {
 
       @Override
       public boolean accept(File dir, String name) {
-        return name.toLowerCase().startsWith("samplesheet")
-            && name.endsWith(".csv");
+
+        for (String prefix : prefixes) {
+          if (name.toLowerCase().startsWith(prefix) && name.endsWith(".csv")) {
+            return true;
+          }
+        }
+
+        return false;
       }
     });
 
