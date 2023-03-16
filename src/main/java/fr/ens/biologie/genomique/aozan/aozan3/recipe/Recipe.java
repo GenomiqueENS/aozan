@@ -235,21 +235,17 @@ public class Recipe {
    * Use the recipe to process run provided by the run data provider
    * @throws Aozan3Exception if an error occurs while executing the recipe
    */
-  public void execute() {
+  public void execute() throws Aozan3Exception {
 
-    try {
-      List<InputData> runs = runDataToProcess();
+    List<InputData> runs = runDataToProcess();
 
-      if (runs.isEmpty()) {
-        this.logger.info("No run to process found");
-      } else {
-        this.logger.info("Found " + runs.size() + " runs to process");
-      }
-
-      process(runs);
-    } catch (Aozan3Exception e) {
-      exitAozan(e);
+    if (runs.isEmpty()) {
+      this.logger.info("No run to process found");
+    } else {
+      this.logger.info("Found " + runs.size() + " runs to process");
     }
+
+    process(runs);
   }
 
   /**
@@ -257,7 +253,7 @@ public class Recipe {
    * @param runId the run identifier
    * @throws Aozan3Exception if an error occurs while executing the recipe
    */
-  public boolean execute(String runId) {
+  public boolean execute(String runId) throws Aozan3Exception {
 
     requireNonNull(runId);
 
@@ -267,19 +263,13 @@ public class Recipe {
   /**
    * Execute a list of run Ids.
    * @param runIds a list of run ids
+   * @throws Aozan3Exception if an error occurs while executing the recipe
    */
-  public Set<RunId> execute(List<String> runIds) {
+  public Set<RunId> execute(List<String> runIds) throws Aozan3Exception {
 
     requireNonNull(runIds);
 
-    try {
-      return process(runDataToProcess(runIds));
-    } catch (Aozan3Exception e) {
-      exitAozan(e);
-    }
-
-    // Non reachable code
-    return null;
+    return process(runDataToProcess(runIds));
   }
 
   /**
@@ -445,17 +435,6 @@ public class Recipe {
     }
 
     return result;
-  }
-
-  /**
-   * Exit Aozan with an error.
-   * @param t exception
-   */
-  private void exitAozan(Throwable t) {
-
-    this.logger.error(t);
-    this.sendMail.sendMail(t);
-    System.exit(1);
   }
 
   /**
