@@ -4,6 +4,8 @@ import static fr.ens.biologie.genomique.aozan.Globals.QC_DATA_EXTENSION;
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.BCL;
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.ILLUMINA_FASTQ;
 import static fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.BclConvertIlluminaDemuxDataProcessor.BCL_CONVERT_FORBIDDEN_DATA_SECTION;
+import static fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.EndIlluminaRunDataProcessor.createTar;
+import static fr.ens.biologie.genomique.aozan.aozan3.legacy.IndexGenerator.createIndexRun;
 import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.newAozanLogger;
 import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.newDummyLogger;
 import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME;
@@ -14,6 +16,7 @@ import static java.util.Objects.requireNonNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Date;
@@ -36,7 +39,6 @@ import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.SimpleDataTypeFilter;
-import fr.ens.biologie.genomique.aozan.aozan3.legacy.IndexGenerator;
 import fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger;
 import fr.ens.biologie.genomique.aozan.aozan3.util.DiskUtils;
 import fr.ens.biologie.genomique.kenetre.KenetreException;
@@ -54,6 +56,7 @@ public class Aozan2QCDataProcessor implements DataProcessor {
   public static final String PROCESSOR_NAME = "aozan2qc";
 
   private static final long DEFAULT_MIN_OUTPUT_FREE_SPACE = 10_000_000;
+  private static final String DEMUX_REPORT_PREFIX = "basecall_stats_";
 
   private Aozan3Logger logger = newDummyLogger();
 
@@ -176,6 +179,22 @@ public class Aozan2QCDataProcessor implements DataProcessor {
       // Create output directory
       Files.createDirectories(outputLocation.getPath());
 
+      // Create demux log in legacy mode
+      if (conf.getBoolean("legacy.output")) {
+
+        // Generate tar archive with demultiplexing reports and logs
+        Path logDir = outputLocation.getPath().getParent();
+
+        Path reportArchiveFile = Paths.get(logDir.toString(),
+            DEMUX_REPORT_PREFIX + runId.getId() + ".tar.bz2");
+
+        createTar(reportArchiveFile, fastqLocation.getPath(),
+            Arrays.asList("Reports", "Stats", "InterOp", "Logs", "*.csv"));
+
+        createIndexRun(logDir, runId.getId(),
+            Arrays.asList("hiseq.step", "demux.step"));
+      }
+
       // Check if enough disk space
       long requiredSize =
           conf.getLong("min.output.free.space", DEFAULT_MIN_OUTPUT_FREE_SPACE);
@@ -195,8 +214,7 @@ public class Aozan2QCDataProcessor implements DataProcessor {
       // Create index.html at run of run directory in legacy mode
       if (conf.getBoolean("legacy.output")) {
 
-        IndexGenerator.createIndexRun(outputLocation.getPath().getParent(),
-            runId.getId(),
+        createIndexRun(outputLocation.getPath().getParent(), runId.getId(),
             Arrays.asList("hiseq.step", "demux.step", "qc.step"));
       }
 
