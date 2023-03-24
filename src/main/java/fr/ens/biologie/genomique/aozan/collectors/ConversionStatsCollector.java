@@ -142,7 +142,7 @@ class ConversionStatsCollector extends DemultiplexingCollector {
       projectName = project.getAttribute("name");
 
       for (final Element sample : getElementsByTagName(project, "Sample")) {
-        sampleName = sample.getAttribute("name");
+        sampleName = sample.getAttribute("name").replace('_', '-');
 
         for (final Element barcode : getElementsByTagName(sample, "Barcode")) {
           barcodeSeq = barcode.getAttribute("name");
