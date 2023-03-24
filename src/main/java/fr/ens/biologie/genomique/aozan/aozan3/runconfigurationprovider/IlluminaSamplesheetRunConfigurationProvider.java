@@ -473,6 +473,13 @@ public class IlluminaSamplesheetRunConfigurationProvider
       String flowCellId) throws Aozan3Exception {
 
     try {
+
+      // Do nothing if there is no sample
+      if (SampleSheetUtils.getCheckedDemuxTableSection(samplesheet)
+          .size() == 0) {
+        return;
+      }
+
       // Check values of samplesheet file
       List<String> samplesheetWarnings =
           SampleSheetCheck.checkSampleSheet(samplesheet, flowCellId);
