@@ -33,9 +33,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ArrayListMultimap;
@@ -433,6 +437,7 @@ public class FastqSample {
 
     final Bcl2FastqVersion version = this.bcl2fastqOutput.getVersion();
     final SampleSheet sampleSheet = this.bcl2fastqOutput.getSampleSheet();
+    final File fastqDir = getFastqSampleParentDir();
 
     switch (version) {
 
@@ -461,7 +466,7 @@ public class FastqSample {
           "sample sheet on version 2 instance not initialize.");
 
       // Build sample name on fastq file according to version used
-      final String fastqSampleName = buildFastqSampleName();
+      final String fastqSampleName = buildFastqSampleName(fastqDir);
       return String.format("%s_S%d%s", fastqSampleName,
           extractSamplePositionInSampleSheetLane(sampleSheet),
           getConstantFastqSuffix(getLane(), read));
@@ -502,7 +507,18 @@ public class FastqSample {
 
   }
 
-  private String buildFastqSampleName() {
+  private String buildFastqSampleName(File fastqDir) {
+
+    Set<String> sampleNames = sampleNameInFastqDir(fastqDir);
+
+    Map<String, String> conversions = new HashMap<>();
+    for (String e : sampleNames) {
+      conversions.put(e.replace('_', '-'), e);
+    }
+
+    if (conversions.containsKey(getSampleName())) {
+      return conversions.get(getSampleName());
+    }
 
     final Bcl2FastqVersion version = this.bcl2fastqOutput.getVersion();
 
@@ -519,6 +535,33 @@ public class FastqSample {
       throw new IllegalStateException(
           "Unhandled Bcl2FastqVersion enum value: " + version);
     }
+  }
+
+  /**
+   * Get the sample names in a FASTQ directory.
+   * @param fastqDir the path to the FASTQ
+   * @return a set with the sample names
+   */
+  private static Set<String> sampleNameInFastqDir(File fastqDir) {
+
+    String regex = "^(.+)_S\\d+_L\\d+_R\\d_\\d\\d\\d\\.fastq\\.(gz|bz2)$";
+
+    if (fastqDir == null || !fastqDir.isDirectory()) {
+      return Collections.emptySet();
+    }
+
+    Pattern pattern = Pattern.compile(regex);
+
+    Set<String> result = new HashSet<>();
+    for (File f : fastqDir.listFiles()) {
+
+      Matcher matcher = pattern.matcher(f.getName());
+      if (matcher.find()) {
+        result.add(matcher.group(1));
+      }
+    }
+
+    return result;
   }
 
   /**
