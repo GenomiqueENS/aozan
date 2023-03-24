@@ -188,8 +188,11 @@ public class Aozan2QCDataProcessor implements DataProcessor {
         Path reportArchiveFile = Paths.get(logDir.toString(),
             DEMUX_REPORT_PREFIX + runId.getId() + ".tar.bz2");
 
-        createTar(reportArchiveFile, fastqLocation.getPath(),
-            Arrays.asList("Reports", "Stats", "InterOp", "Logs", "*.csv"));
+        // Do nothing if report archive file already exists
+        if (!Files.isRegularFile(reportArchiveFile)) {
+          createTar(reportArchiveFile, fastqLocation.getPath(),
+              Arrays.asList("Reports", "Stats", "InterOp", "Logs", "*.csv"));
+        }
 
         createIndexRun(logDir, runId.getId(),
             Arrays.asList("hiseq.step", "demux.step"));
