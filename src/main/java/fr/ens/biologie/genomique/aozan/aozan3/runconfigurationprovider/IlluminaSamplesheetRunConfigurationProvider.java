@@ -122,6 +122,7 @@ public class IlluminaSamplesheetRunConfigurationProvider
   private SamplesheetFormat sampleSheetFormat;
   private String samplesheetCreationCommand;
   private boolean allowUnderscoresInSampleIds;
+  private boolean searchInRunDirectoryFirst;
   private boolean initialized;
 
   @Override
@@ -154,6 +155,8 @@ public class IlluminaSamplesheetRunConfigurationProvider
         conf.get("samplesheet.generator.command", "");
     this.allowUnderscoresInSampleIds =
         conf.getBoolean("samplesheet.allow.underscores.in.sample.ids", false);
+    this.searchInRunDirectoryFirst =
+        conf.getBoolean("samplesheet.search.in.run.dir.first", false);
 
     // Load index sequences
     if (conf.containsKey("index.sequences")) {
@@ -192,7 +195,8 @@ public class IlluminaSamplesheetRunConfigurationProvider
         this.samplesheetPrefix, instrumentNumber, runNumber);
 
     // Load samplesheet
-    SampleSheet samplesheet = loadSamplesheet(runData, samplesheetFilename);
+    SampleSheet samplesheet = loadSamplesheet(runData, samplesheetFilename,
+        this.searchInRunDirectoryFirst);
 
     // Get the number of mismatches if defined in samplesheet
     int mismatches = getBcl2fastqMismatches(samplesheet, runId);
@@ -283,10 +287,19 @@ public class IlluminaSamplesheetRunConfigurationProvider
   }
 
   private SampleSheet loadSamplesheet(final RunData runData,
-      final String samplesheetFilename) throws Aozan3Exception {
+      final String samplesheetFilename, boolean searchInRunDirFirst)
+      throws Aozan3Exception {
 
     requireNonNull(runData);
     requireNonNull(samplesheetFilename);
+
+    if (searchInRunDirFirst) {
+
+      SampleSheet result = sampleSheetInRunDirectory(runData);
+      if (result != null) {
+        return result;
+      }
+    }
 
     RunId runId = runData.getRunId();
     Path samplesheetFile = Paths.get(samplesheetsPath.toString(),
@@ -310,6 +323,21 @@ public class IlluminaSamplesheetRunConfigurationProvider
       return loadSampleSheetFromCommand(runId, this.samplesheetCreationCommand);
     }
 
+    // Test if a samplesheet file exists in run directory
+    SampleSheet result = sampleSheetInRunDirectory(runData);
+    if (result != null) {
+      return result;
+    }
+
+    throw new Aozan3Exception(runId, "No sample sheet found");
+  }
+
+  private SampleSheet sampleSheetInRunDirectory(final RunData runData)
+      throws Aozan3Exception {
+
+    requireNonNull(runData);
+    RunId runId = runData.getRunId();
+
     Path samplesheetFileInRunDirectory =
         searchSamplesheetInRunDir(runData.getLocation().getPath(),
             Arrays.asList("samplesheet", this.samplesheetPrefix));
@@ -324,7 +352,7 @@ public class IlluminaSamplesheetRunConfigurationProvider
           SamplesheetFormat.CSV, this.logger.getLogger());
     }
 
-    throw new Aozan3Exception(runId, "No sample sheet found");
+    return null;
   }
 
   private static SampleSheet loadSamplesheet(final RunId runId,

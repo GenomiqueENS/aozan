@@ -501,7 +501,7 @@ public class LegacyRecipes {
 
     // Run configuration provider
     RunConfigurationProvider runConfProvider =
-        createRunConfProvider(recipe, aozan2Conf);
+        createRunConfProvider(recipe, aozan2Conf, true);
 
     // Define step configuration
     Configuration stepConf = new Configuration(aozan2Conf);
@@ -526,6 +526,13 @@ public class LegacyRecipes {
   private static RunConfigurationProvider createRunConfProvider(Recipe recipe,
       Configuration aozan2Conf) throws Aozan3Exception {
 
+    return createRunConfProvider(recipe, aozan2Conf, false);
+  }
+
+  private static RunConfigurationProvider createRunConfProvider(Recipe recipe,
+      Configuration aozan2Conf, boolean searchSamplesheetInRunDirFirst)
+      throws Aozan3Exception {
+
     // Run configuration provider
     RunConfigurationProvider result =
         new IlluminaSamplesheetRunConfigurationProvider();
@@ -541,6 +548,12 @@ public class LegacyRecipes {
     setSetting(stepConf, aozan2Conf, "bcl2fastq.samplesheet.generator.command",
         "samplesheet.generator.command");
     setSetting(stepConf, aozan2Conf, "index.sequences", "index.sequences");
+
+    // For the QC step, first search samplesheet in the FASTQ output
+    // directory
+    if (searchSamplesheetInRunDirFirst) {
+      stepConf.set("samplesheet.search.in.run.dir.first", true);
+    }
 
     result.init(stepConf, recipe.getLogger());
 
