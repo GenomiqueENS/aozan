@@ -749,8 +749,10 @@ public class QC {
     }
 
     // Configure storages
-    Storages.init(genomeStoragePath, genomeDescStoragePath,
-        genomeMapperIndexStoragePath, Aozan2Logger.getGenericLogger());
+    if (!Storages.isInstance()) {
+      Storages.init(genomeStoragePath, genomeDescStoragePath,
+          genomeMapperIndexStoragePath, Aozan2Logger.getGenericLogger());
+    }
   }
 
   /**

@@ -16,24 +16,42 @@ import fr.ens.biologie.genomique.kenetre.storage.FileStorage;
 import fr.ens.biologie.genomique.kenetre.storage.GenomeDescStorage;
 import fr.ens.biologie.genomique.kenetre.storage.GenomeIndexStorage;
 
+/**
+ * This class define storage for FastQ Screen.
+ * @author Laurent Jourdren
+ * @since 3.0
+ */
 public class Storages {
 
+  private static final Object syncObject = new Object();
   private static Storages instance = null;
 
   private final GenomeDescStorage genomeDescStorage;
   private final GenomeIndexStorage genomeIndexStorage;
   private final FileStorage genomeStorage;
 
+  /**
+   * Test if a genome description storage exists.
+   * @return true if a genome description storage exists
+   */
   public boolean isGenomeDescStorage() {
 
     return this.genomeDescStorage != null;
   }
 
+  /**
+   * Test if a genome index storage exists.
+   * @return true if a genome index storage exists
+   */
   public boolean isGenomeIndexStorage() {
 
     return this.genomeIndexStorage != null;
   }
 
+  /**
+   * Test if a genome storage exists.
+   * @return true if a genome storage exists
+   */
   public boolean isGenomeStorage() {
 
     return this.genomeStorage != null;
@@ -99,34 +117,66 @@ public class Storages {
   // Static methods
   //
 
-  public static synchronized void init(String genomeStoragePath,
+  /**
+   * Test if the instance of the singleton has been initialized.
+   * @return true if the instance of the singleton has been initialized
+   */
+  public static boolean isInstance() {
+
+    synchronized (syncObject) {
+
+      return instance != null;
+    }
+  }
+
+  /**
+   * Initialize the singleton.
+   * @param genomeStoragePath path of the genomes storage
+   * @param genomeDescStoragePath path of the genome descriptions storage
+   * @param genomeMapperIndexStoragePath the genome indexes storage
+   * @param logger the logger for the storage
+   */
+
+  public static void init(String genomeStoragePath,
       String genomeDescStoragePath, String genomeMapperIndexStoragePath,
       GenericLogger logger) {
 
-    if (instance != null) {
-      throw new IllegalStateException("Storages has been already initialized");
+    synchronized (syncObject) {
+
+      if (instance != null) {
+        throw new IllegalStateException(
+            "Storages has been already initialized");
+      }
+
+      File genomeStorageFile =
+          genomeStoragePath != null ? new File(genomeStoragePath) : null;
+
+      File genomeDescStorageFile = genomeDescStoragePath != null
+          ? new File(genomeDescStoragePath) : null;
+
+      File genomeMapperIndexStorageFile = genomeMapperIndexStoragePath != null
+          ? new File(genomeMapperIndexStoragePath) : null;
+
+      instance = new Storages(genomeStorageFile, genomeDescStorageFile,
+          genomeMapperIndexStorageFile, logger);
     }
-
-    File genomeStorageFile =
-        genomeStoragePath != null ? new File(genomeStoragePath) : null;
-
-    File genomeDescStorageFile =
-        genomeDescStoragePath != null ? new File(genomeDescStoragePath) : null;
-
-    File genomeMapperIndexStorageFile = genomeMapperIndexStoragePath != null
-        ? new File(genomeMapperIndexStoragePath) : null;
-
-    instance = new Storages(genomeStorageFile, genomeDescStorageFile,
-        genomeMapperIndexStorageFile, logger);
   }
 
-  public static synchronized Storages getInstance() {
+  /**
+   * Get the instance of the singleton.
+   * @return the instance of the singleton or an exception if the instance has
+   *         not been initialized
+   */
+  public static Storages getInstance() {
 
-    if (instance == null) {
-      throw new IllegalStateException("Storages has not been initialized");
+    synchronized (syncObject) {
+
+      if (instance == null) {
+        throw new IllegalStateException("Storages has not been initialized");
+      }
+
+      return instance;
     }
-
-    return instance;
   }
 
   //
