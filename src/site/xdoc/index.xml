@@ -74,15 +74,33 @@
         <tr><td>&lt;1.18.64</td><td>HiSeq 1000, HiSeq 1500, HiSeq 2000, HiSeq 2500, MiSeq</td><td>Supported and tested (HiSeq 1000 and HiSeq 1500)</td></tr>
         <tr><td>1.18.64 and 2.1.x&nbsp;-&nbsp;2.6.x</td><td>NextSeq 500, HiSeq X, HiSeq 1000, HiSeq 1500, HiSeq 2000, HiSeq 2500</td><td>Supported and tested (NextSeq 500 and HiSeq 1500)</td></tr>
         <tr><td>2.7.x</td><td>HiSeq 3000, HiSeq 4000, HiSeq X, MiniSeq</td><td>Supported and tested (HiSeq 3000)</td></tr>
+        <tr><td>3.7.x or above</td><td>NextSeq 1000 and NextSeq 2000</td><td>Supported and tested (NextSeq 2000)</td></tr>
       </table>
     </section>
 
 
-    <section name="Sample sheet validator">
+    <!--section name="Sample sheet validator">
       <p>We also provide a <a href="http://outils.genomique.biologie.ens.fr/samplesheetvalidator/" target="_blank">Bcl2fastq samplesheet validator</a> to help the users in checking their run samplesheet.
       This tool uses only html and javascript. <u>Not a single  data is sent</u> to our servers when you use this tool.</p>
-    </section>
+    </section-->
 
+
+    <section name="What's new in Aozan 3?">
+
+      <subsection name="Support for NextSeq 1000/2000">
+        <p>Aozan now support NextSeq 1000/2000 sequencers and RTA 3.x.</p>
+      </subsection>
+
+      <subsection name="Support for BCL Convert">
+        <p>Aozan now support BCL Convert in addition of bcl2fastq.</p>
+      </subsection>
+
+      <subsection name="Major code rewriting">
+        <p>Aozan 3 is now a full Java application. All the existing Python code has been rewitten in Java.
+        With this major code rewrite, Aozan will be able to support other sequencing technologies.</p>
+      </subsection>
+
+    </section>
 
     <section name="What's new in Aozan 2.2?">
 
