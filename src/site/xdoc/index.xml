@@ -204,6 +204,7 @@
       <subsection name="New built-in step to automatically recompress all your fastq files.">
         <p>Aozan has now a new built-in step which recompresses FASTQ files (compressed or not with gzip) into bzip2 files.
         bzip2 files are more compressed than gzip files and thus take less disk space.</p>
+        <p><b>Warning</b>: The recompression step has been removed in Aozan 3.</p>
       </subsection>
 
       <subsection name="Define denied runs and prioritized runs">

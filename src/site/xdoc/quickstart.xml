@@ -75,7 +75,7 @@
 
       <p>Aozan is not an interactive tool, it communicates with users through mails.
          It is launched regularly (usually every hour) through a cron job.
-         There are 6 steps in Aozan. Once the end of a run has been discovered, synchronization, demultiplexing, recompression and quality control will be automatically executed.
+         There are 5 steps in Aozan. Once the end of a run has been discovered, synchronization, demultiplexing and quality control will be automatically executed.
          However, if the end of another run is discovered at the end of this last 4 steps, the synchronization of the new run will be launched before resuming the end of the analysis of the previous run.</p>
 
       <p>The 6 native steps of Aozan are:</p>
@@ -84,7 +84,6 @@
         <li><a href="end-run-discovering.html">End run discovering step</a></li>
         <li><a href="synchronization.html">Synchronization step (Optional)</a></li>
         <li><a href="demultiplexing.html">Demultiplexing step</a></li>
-        <li><a href="recompression.html">Recompression step (Optional)</a></li>
         <li><a href="quality-control.html">Quality control step</a></li>
       </ol>
     </section>
@@ -351,7 +350,6 @@ $ sudo mkdir -p /mnt/hiseq01_f /mnt/hiseq01_g &amp;&amp; \
       <li><b>hiseq.deny</b> : list of the run ids to not process (user created file);</li>
       <li><b>sync.done</b> : list of the run ids processed by the synchronization step;</li>
       <li><b>sync.deny</b> : list of the run ids processed by the synchronization step;</li>
-      <li><b>recompress.done</b> : list of the run ids processed by the recompression step;</li>
       <li><b>demux.done</b> : list of the run ids processed by the demuliplexing step;</li>
       <li><b>qc.done</b> : list of the run ids processed by the quality control step;</li>
     </ul>

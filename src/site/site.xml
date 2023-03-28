@@ -71,7 +71,6 @@
 				<item name="End run discovering" href="/end-run-discovering.html"/>
 				<item name="Synchronization" href="/synchronization.html"/>
 				<item name="Demultiplexing" href="/demultiplexing.html"/>
-				<item name="Recompression" href="/recompression.html"/>
 
 				<item name="Quality Control" href="/quality-control.html" collapse="true">
 					<item name="Global tests" href="/qc-global-tests.html"/>

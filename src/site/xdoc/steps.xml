@@ -61,13 +61,6 @@
       </li>
       <p/>
 
-      <li><a href="recompression.html">Recompress FASTQ files</a> (Optional step)
-        <ul><li>Recompress in bzip2 format</li>
-            <li>Save disk space</li></ul>
-      </li>
-
-      <p/>
-
       <li><a href="demultiplexing.html">Demultiplexing</a>
         <ul>
                   <li>Demultiplexing is performed by Bcl2fastq 2.x</li>
