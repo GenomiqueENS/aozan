@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.kenetre.util.StringUtils;
 
@@ -60,7 +61,7 @@ public class Bcl2FastqIlluminaDemuxDataProcessor
     // Get parameter values
     String finalCommandPath = runConf.get("bcl2fastq.path", "bcl2fastq");
 
-    int threadCount = runConf.getInt("bcl2fastq.threads",
+    int threadCount = runConf.getInt(Settings.DEMUX_THREADS_KEY,
         Runtime.getRuntime().availableProcessors());
 
     if (!runConf.containsKey("bcl2fastq.processing.threads")) {
@@ -68,7 +69,7 @@ public class Bcl2FastqIlluminaDemuxDataProcessor
     }
 
     int mismatchCount =
-        runConf.getInt("illumina.demux.allowed.mismatches", DEFAULT_MISMATCHES);
+        runConf.getInt(Settings.BCL2FASTQ_MISMATCHES_KEY, DEFAULT_MISMATCHES);
     int bcl2fastqMinorVersion =
         Integer.parseInt(bcl2fastqVersion.split("\\.")[1]);
 

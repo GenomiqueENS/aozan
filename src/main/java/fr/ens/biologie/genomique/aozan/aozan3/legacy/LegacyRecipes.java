@@ -180,17 +180,13 @@ public class LegacyRecipes {
 
     table.put("lock.file", "aozan.lock.file");
 
-    table.put("casava.design.format",
-        Settings.BCL2FASTQ_SAMPLESHEET_FORMAT_KEY);
-    table.put("casava.samplesheet.format",
-        Settings.BCL2FASTQ_SAMPLESHEET_FORMAT_KEY);
-    table.put("casava.design.prefix.filename",
-        Settings.BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY);
+    table.put("casava.design.format", Settings.SAMPLESHEET_FORMAT_KEY);
+    table.put("casava.samplesheet.format", Settings.SAMPLESHEET_FORMAT_KEY);
+    table.put("casava.design.prefix.filename", Settings.SAMPLESHEET_PREFIX_KEY);
     table.put("casava.samplesheet.prefix.filename",
-        Settings.BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY);
-    table.put("casava.designs.path", Settings.BCL2FASTQ_SAMPLESHEETS_PATH_KEY);
-    table.put("casava.samplesheets.path",
-        Settings.BCL2FASTQ_SAMPLESHEETS_PATH_KEY);
+        Settings.SAMPLESHEET_PREFIX_KEY);
+    table.put("casava.designs.path", Settings.SAMPLESHEET_PATH_KEY);
+    table.put("casava.samplesheets.path", Settings.SAMPLESHEET_PATH_KEY);
 
     table.put("casava.adapter.fasta.file.path",
         Settings.BCL2FASTQ_ADAPTER_FASTA_FILE_PATH_KEY);
@@ -204,14 +200,44 @@ public class LegacyRecipes {
     table.put("casava.mismatches", Settings.BCL2FASTQ_MISMATCHES_KEY);
     table.put("casava.path", Settings.BCL2FASTQ_PATH_KEY);
 
-    table.put("casava.threads", Settings.BCL2FASTQ_THREADS_KEY);
+    table.put("casava.threads", Settings.DEMUX_THREADS_KEY);
     table.put("casava.with.failed.reads",
         Settings.BCL2FASTQ_WITH_FAILED_READS_KEY);
     table.put("casava.design.generator.command",
-        Settings.BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY);
+        Settings.SAMPLESHEET_GENERATOR_COMMAND_KEY);
     table.put("casava.samplesheet.generator.command",
-        Settings.BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY);
+        Settings.SAMPLESHEET_GENERATOR_COMMAND_KEY);
     table.put("demux.use.docker.enable", Settings.BCL2FASTQ_USE_DOCKER_KEY);
+
+    for (Map.Entry<String, String> e : conf.toMap().entrySet()) {
+      String key =
+          table.containsKey(e.getKey()) ? table.get(e.getKey()) : e.getKey();
+      result.set(key, e.getValue());
+    }
+
+    return result;
+  }
+
+  /**
+   * Convert Aozan 2 settings key names to aozan 3 key names.
+   * @param conf aozan 3 configuration
+   * @return a Configuration object with Aozan 3 setting key names
+   */
+  private Configuration aozan2Compatibility(Configuration conf) {
+
+    Configuration result = new Configuration();
+
+    Map<String, String> table = new HashMap<>();
+
+    table.put("bcl2fastq.samplesheet.path", Settings.SAMPLESHEET_PATH_KEY);
+    table.put("bcl2fastq.samplesheet.prefix.filename",
+        Settings.SAMPLESHEET_PREFIX_KEY);
+    table.put("bcl2fastq.samplesheet.format", Settings.SAMPLESHEET_FORMAT_KEY);
+    table.put("bcl2fastq.samplesheet.generator.command",
+        Settings.SAMPLESHEET_GENERATOR_COMMAND_KEY);
+    table.put("bcl2fastq.use.docker", Settings.BCL2FASTQ_USE_DOCKER_KEY);
+
+    table.put("bcl2fastq.threads", Settings.DEMUX_THREADS_KEY);
 
     for (Map.Entry<String, String> e : conf.toMap().entrySet()) {
       String key =
@@ -678,7 +704,7 @@ public class LegacyRecipes {
 
     Configuration aozan2Conf = new Configuration();
     aozan2Conf.load(aozan2ConfFile, true);
-    aozan2Conf = aozan1Compatibility(aozan2Conf);
+    aozan2Conf = aozan2Compatibility(aozan1Compatibility(aozan2Conf));
 
     this.aozanEnabled = parseCommonConfiguration(conf, logger, aozan2Conf);
 

@@ -22,6 +22,7 @@ import org.xml.sax.SAXException;
 
 import com.google.common.base.Splitter;
 
+import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataType.SequencingTechnology;
@@ -146,21 +147,21 @@ public class IlluminaSamplesheetRunConfigurationProvider
       this.logger = newAozanLogger(logger);
     }
 
-    this.samplesheetsPath = conf.getPath("samplesheet.path");
-    this.sampleSheetFormat = SamplesheetFormat
-        .parse(conf.get("samplesheet.format", DEFAULT_SAMPLESHEET_FORMAT));
+    this.samplesheetsPath = conf.getPath(Settings.SAMPLESHEET_PATH_KEY);
+    this.sampleSheetFormat = SamplesheetFormat.parse(
+        conf.get(Settings.SAMPLESHEET_FORMAT_KEY, DEFAULT_SAMPLESHEET_FORMAT));
     this.samplesheetPrefix =
-        conf.get("samplesheet.prefix.filename", DEFAULT_SAMPLESHEET_PREFIX);
+        conf.get(Settings.SAMPLESHEET_PREFIX_KEY, DEFAULT_SAMPLESHEET_PREFIX);
     this.samplesheetCreationCommand =
-        conf.get("samplesheet.generator.command", "");
+        conf.get(Settings.SAMPLESHEET_GENERATOR_COMMAND_KEY, "");
     this.allowUnderscoresInSampleIds =
         conf.getBoolean("samplesheet.allow.underscores.in.sample.ids", false);
     this.searchInRunDirectoryFirst =
         conf.getBoolean("samplesheet.search.in.run.dir.first", false);
 
     // Load index sequences
-    if (conf.containsKey("index.sequences")) {
-      loadIndexSequences(conf.getPath("index.sequences"));
+    if (conf.containsKey(Settings.INDEX_SEQUENCES_KEY)) {
+      loadIndexSequences(conf.getPath(Settings.INDEX_SEQUENCES_KEY));
     }
 
     this.initialized = true;

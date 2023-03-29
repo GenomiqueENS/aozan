@@ -55,20 +55,21 @@
         <table>
           <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
           <tr><td>demux.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
+          <tr><td>demux.tool</td><td>string</td><td>bcl2fastq</td><td>Tool to use for demultiplexing (available values: bcl2fastq or bclconvert)</td></tr>
           <tr><td>demux.use.hiseq.output</td><td>boolean</td><td>False</td><td>If this parameter is set to true and if the synchronization step is not enabled, this step will use directly the sequencer output for demultiplexage step</td></tr>
           <tr><td>demux.space.factor</td><td>double</td><td>0.7</td><td>Factor to use to get the estimation of the amount of space needed in the fastq directory for the run based on the amount of space used in the bcl directory by the run data</td></tr>
           <tr><td>index.sequences</td><td>string</td><td>Not set</td><td>Path to a file containing aliases for adapter sequence indexes. <a href="./data/index-sequences.aliases" target="_blank">See an example</a></td></tr>
-          <tr><td>demux.archive.samplesheets</td><td>boolean</td><td>True</td><td>Archive Bcl2fastq samplesheets</td></tr>
-          <tr><td>bcl2fastq.adapter.fasta.file.path</td><td>string</td><td>Not set</td><td>Adapter sequence file to use when bcl2fastq is launched</td></tr>
-          <tr><td>bcl2fastq.samplesheet.format</td><td>string</td><td>xls</td><td>Bcl2fastq samplesheet format ("csv", "xls", "xlsx", or "command")</td></tr>
-          <tr><td>bcl2fastq.samplesheet.prefix.filename</td><td>string</td><td>samplesheet</td><td>Prefix for Bcl2fastq samplesheet file</td></tr>
-          <tr><td>bcl2fastq.samplesheet.generator.command</td><td>String</td><td>Not set</td><td>Command to execute to generate the Bcl2fastq samplesheet in CSV format when the parameter <b>bcl2fastq.samplesheet.format</b> is set to "command"</td></tr>
-          <tr><td>bcl2fastq.samplesheet.path</td><td>string</td><td>Not set</td><td>Path to CSV/XLS/XLSX samplesheet files.</td></tr>
+          <tr><td>samplesheet.format</td><td>string</td><td>xls</td><td>Bcl2fastq samplesheet format ("csv", "xls", "xlsx", or "command")</td></tr>
+          <tr><td>samplesheet.prefix</td><td>string</td><td>samplesheet</td><td>Prefix for Bcl2fastq samplesheet file</td></tr>
+          <tr><td>samplesheet.generator.command</td><td>String</td><td>Not set</td><td>Command to execute to generate the Bcl2fastq samplesheet in CSV format when the parameter <b>bcl2fastq.samplesheet.format</b> is set to "command"</td></tr>
+          <tr><td>samplesheet.path</td><td>string</td><td>Not set</td><td>Path to CSV/XLS/XLSX samplesheet files.</td></tr>
           <tr><td>bcl2fastq.mismatches</td><td>integer</td><td>0</td><td>Number of mismatches allowed in adapter indexes. This value is overrided by the <b>MismatchCount</b> setting in the samplesheet</td></tr>
+          <tr><td>bcl2fastq.adapter.fasta.file.path</td><td>string</td><td>Not set</td><td>Adapter sequence file to use when bcl2fastq is launched</td></tr>
           <tr><td>bcl2fastq.path</td><td>string</td><td>/usr/local/bcl2fastq</td><td>Path to Bcl2fastq binary</td></tr>
           <tr><td>bcl2fastq.with.failed.reads</td><td>boolean</td><td>True</td><td>Add the reads that do not pass Illumina filter in the FASTQ files</td></tr>
           <tr><td>bcl2fastq.additionnal.arguments</td><td>string</td><td>Not set</td><td>Additional arguments for Bcl2fastq</td></tr>
           <tr><td>bcl2fastq.threads</td><td>integer</td><td>Number of computer cores</td><td>Number of threads to use for demultiplexing</td></tr>
+          <tr><td>bclconvert.path</td><td>string</td><td>/usr/bin/bcl-convert</td><td>Path to BCL Convert binary</td></tr>
         </table>
 
       <h4>Configuring Bcl2fastq barcode mismatches in the samplesheet</h4>
@@ -77,7 +78,7 @@
       This value will override the <tt>bcl2fastq.mismatches</tt> value set in the Aozan configuration file.</p>
 
 
-      <h4>Configuration required to run bcl2fastq with Docker images.</h4>
+      <h4>Configuration required to run bcl2fastq or BCL Convert with Docker images.</h4>
 
       <p>This Aozan version can run Docker image for demultiplexing step.
       On our platform, we build a new image for each bcl2fastq new version.
@@ -86,6 +87,9 @@
       <table>
         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
         <tr><td>bcl2fastq.use.docker</td><td>boolean</td><td>True</td><td>Enable to use Docker container to run bcl2fastq for demultiplexing.</td></tr>
+        <tr><td>bcl2fastq.docker.image</td><td>string</td><td>Not set</td><td>Docker image to use for bcl2fastq.</td></tr>
+        <tr><td>bclconvert.use.docker</td><td>boolean</td><td>True</td><td>Enable to use Docker container to run BCL Convert for demultiplexing.</td></tr>
+        <tr><td>bclconvert.docker.image</td><td>string</td><td>Not set</td><td>Docker image to use for BCL Convert.</td></tr>
         <tr><td>docker.uri</td><td>string</td><td>unix:///var/run/docker.sock</td><td>Docker deamon URI.</td></tr>
       </table>
 

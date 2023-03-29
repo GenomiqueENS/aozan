@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataLocation;

@@ -84,22 +84,22 @@ public final class Settings {
   /** Bcl2fastq path. */
   public static final String BCL2FASTQ_PATH_KEY = "bcl2fastq.path";
   /** Bcl2fastq samplesheet format. */
-  public static final String BCL2FASTQ_SAMPLESHEET_FORMAT_KEY =
-      "bcl2fastq.samplesheet.format";
+  public static final String SAMPLESHEET_FORMAT_KEY =
+      "samplesheet.format";
   /** Bcl2fastq samplesheet prefix filename. */
-  public static final String BCL2FASTQ_SAMPLESHEET_PREFIX_FILENAME_KEY =
-      "bcl2fastq.samplesheet.prefix.filename";
+  public static final String SAMPLESHEET_PREFIX_KEY =
+      "samplesheet.prefix";
   /** Bcl2fastq samplesheet path. */
-  public static final String BCL2FASTQ_SAMPLESHEETS_PATH_KEY =
-      "bcl2fastq.samplesheet.path";
+  public static final String SAMPLESHEET_PATH_KEY =
+      "samplesheet.path";
   /** Bcl2fastq threads. */
-  public static final String BCL2FASTQ_THREADS_KEY = "bcl2fastq.threads";
+  public static final String DEMUX_THREADS_KEY = "demux.threads";
   /** Bcl2fastq with failed reads. */
   public static final String BCL2FASTQ_WITH_FAILED_READS_KEY =
       "bcl2fastq.with.failed.reads";
   /** Bcl2fastq samplesheet generator command. */
-  public static final String BCL2FASTQ_SAMPLESHEET_GENERATOR_COMMAND_KEY =
-      "bcl2fastq.samplesheet.generator.command";
+  public static final String SAMPLESHEET_GENERATOR_COMMAND_KEY =
+      "samplesheet.generator.command";
   /** Set available use container docker. */
   public static final String BCL2FASTQ_USE_DOCKER_KEY = "bcl2fastq.use.docker";
 
