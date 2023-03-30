@@ -239,6 +239,9 @@ public class LegacyRecipes {
 
     table.put("bcl2fastq.threads", Settings.DEMUX_THREADS_KEY);
 
+    table.put("smtp.server", Settings.SMTP_SERVER_KEY);
+    table.put("smtp.port", Settings.SMTP_PORT_KEY);
+
     for (Map.Entry<String, String> e : conf.toMap().entrySet()) {
       String key =
           table.containsKey(e.getKey()) ? table.get(e.getKey()) : e.getKey();
@@ -273,25 +276,11 @@ public class LegacyRecipes {
     setSetting(conf, aozan2Conf, "send.mail", "send.mail", "False");
 
     // SMTP server name
-    setSetting(conf, aozan2Conf, "smtp.server", "mail.smtp.host");
+    setSetting(conf, aozan2Conf, "mail.smtp.host", "mail.smtp.host");
     setSetting(conf, aozan2Conf, "mail.smtp.host", "mail.smtp.host");
 
     // SMTP server port
-    setSetting(conf, aozan2Conf, "smtp.port", "mail.smtp.port", "25");
-
-    // Use StartTLS to connect to the SMTP server
-    setSetting(conf, aozan2Conf, "smtp.use.starttls",
-        "mail.smtp.starttls.enable", "False");
-
-    // Use SSL to connect to the SMTP server
-    setSetting(conf, aozan2Conf, "smtp.use.ssl", "mail.smtp.ssl.enable",
-        "False");
-
-    // Login to use for the connection to the SMTP server
-    // #smtp.login=yourlogin
-
-    // Password to use for the connection to the SMTP server
-    // #smtp.password=yourpassword
+    setSetting(conf, aozan2Conf, "mail.smtp.port", "mail.smtp.port", "25");
 
     // From field of email
     setSetting(conf, aozan2Conf, "mail.from", "mail.from", "");

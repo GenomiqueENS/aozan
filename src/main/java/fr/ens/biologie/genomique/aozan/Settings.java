@@ -172,9 +172,9 @@ public final class Settings {
   /** Send mail. */
   public static final String SEND_MAIL_KEY = "send.mail";
   /** SMTP server. */
-  public static final String SMTP_SERVER_KEY = "smtp.server";
+  public static final String SMTP_SERVER_KEY = "mail.smtp.host";
   /** SMTP port. */
-  public static final String SMTP_PORT_KEY = "smtp.port";
+  public static final String SMTP_PORT_KEY = "mail.smtp.port";
   /** SMTP use starttls. */
   public static final String SMTP_USE_STARTTLS_KEY = "smtp.use.starttls";
   /** SMTP use SSL. */
