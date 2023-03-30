@@ -554,11 +554,11 @@ public class LegacyRecipes {
 
     // Set run configuration provider conf
     Configuration stepConf = new Configuration();
-    setSetting(stepConf, aozan2Conf, "samplesheet.path");
-    setSetting(stepConf, aozan2Conf, "samplesheet.format", "samplesheet.format",
-        "xls");
-    setSetting(stepConf, aozan2Conf, "samplesheet.prefix.filename",
-        "samplesheet.prefix.filename", "samplesheet");
+    setSetting(stepConf, aozan2Conf, Settings.SAMPLESHEET_PATH_KEY);
+    setSetting(stepConf, aozan2Conf, Settings.SAMPLESHEET_FORMAT_KEY,
+        Settings.SAMPLESHEET_FORMAT_KEY, "xls");
+    setSetting(stepConf, aozan2Conf, Settings.SAMPLESHEET_PREFIX_KEY,
+        Settings.SAMPLESHEET_PREFIX_KEY, "samplesheet");
     setSetting(stepConf, aozan2Conf, "samplesheet.generator.command");
     setSetting(stepConf, aozan2Conf, "index.sequences");
 
