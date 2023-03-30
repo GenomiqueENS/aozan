@@ -378,11 +378,14 @@ public class QC {
   public void writeRawData(final QCReport report, final File outputFile)
       throws AozanException {
 
+    RunData data = new RunData(report.getData());
+    data.removeIfExists("aozan.info.conf.samplesheet");
+
     try {
       final Writer writer =
           Files.newWriter(outputFile, Globals.DEFAULT_FILE_ENCODING);
 
-      writer.write(report.getData().toString());
+      writer.write(data.toString());
 
       writer.close();
     } catch (final IOException e) {

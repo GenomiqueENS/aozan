@@ -1323,6 +1323,32 @@ public class RunData {
   }
 
   /**
+   * Remove a key from the Rundata.
+   * @param key key name
+   */
+  public void remove(final String key) {
+
+    requireNonNull(key);
+
+    if (!this.map.containsKey(key)) {
+      throw new IllegalArgumentException("Key does not exists: " + key);
+    }
+
+    this.map.remove(key.toLowerCase().trim());
+  }
+
+  /**
+   * Remove a key from the Rundata if the key exists.
+   * @param key key name
+   */
+  public void removeIfExists(final String key) {
+
+    if (contains(key)) {
+      remove(key);
+    }
+  }
+
+  /**
    * Get the number of entries in RunData.
    * @return the number of entries
    */
@@ -1446,6 +1472,14 @@ public class RunData {
    * Public constructor.
    */
   public RunData() {
+  }
+
+  /**
+   * Public constructor.
+   * @param data Data to add
+   */
+  public RunData(final RunData data) {
+    put(data);
   }
 
   /**
