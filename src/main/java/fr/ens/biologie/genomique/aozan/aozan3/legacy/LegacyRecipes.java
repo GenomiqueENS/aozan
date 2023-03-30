@@ -554,15 +554,13 @@ public class LegacyRecipes {
 
     // Set run configuration provider conf
     Configuration stepConf = new Configuration();
-    setSetting(stepConf, aozan2Conf, "bcl2fastq.samplesheet.path",
-        "samplesheet.path");
-    setSetting(stepConf, aozan2Conf, "bcl2fastq.samplesheet.format",
-        "samplesheet.format", "xls");
-    setSetting(stepConf, aozan2Conf, "bcl2fastq.samplesheet.prefix.filename",
+    setSetting(stepConf, aozan2Conf, "samplesheet.path");
+    setSetting(stepConf, aozan2Conf, "samplesheet.format", "samplesheet.format",
+        "xls");
+    setSetting(stepConf, aozan2Conf, "samplesheet.prefix.filename",
         "samplesheet.prefix.filename", "samplesheet");
-    setSetting(stepConf, aozan2Conf, "bcl2fastq.samplesheet.generator.command",
-        "samplesheet.generator.command");
-    setSetting(stepConf, aozan2Conf, "index.sequences", "index.sequences");
+    setSetting(stepConf, aozan2Conf, "samplesheet.generator.command");
+    setSetting(stepConf, aozan2Conf, "index.sequences");
 
     // For the QC step, first search samplesheet in the FASTQ output
     // directory
@@ -610,6 +608,12 @@ public class LegacyRecipes {
           inputStorageName, inProgress, conf);
     }
 
+  }
+
+  private static void setSetting(Configuration conf, Configuration aozan2Conf,
+      String key) {
+
+    setSetting(conf, aozan2Conf, key, key, null);
   }
 
   private static void setSetting(Configuration conf, Configuration aozan2Conf,
