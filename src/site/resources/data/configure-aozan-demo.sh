@@ -35,8 +35,8 @@ fi
 # Check if wget is installed
 command -v wget >/dev/null 2>&1 || { echo >&2 "ERROR: This script requires wget but it is not installed.  Aborting."; exit 1; }
 
-# Check Java 7 is installed
-command -v java >/dev/null 2>&1 || { echo >&2 "ERROR: Aozan requires Java 7 or latter but it is not installed.  Aborting."; exit 1; }
+# Check Java is installed
+command -v java >/dev/null 2>&1 || { echo >&2 "ERROR: Aozan requires Java 11 or latter but it is not installed.  Aborting."; exit 1; }
 
 # Check bcl2fastq 2 is installed
 command -v bcl2fastq >/dev/null 2>&1
@@ -236,12 +236,12 @@ echo "* Update configuration file"
 
 # Email configuration
 if [ "$EMAIL_ENABLED" -eq 0 ]; then
-    sed -i "s/send.mail=True/send.mail=False/" "$AOZAN_DIR"/conf/aozan.conf
+    sed -i "s#send.mail=True#send.mail=False#" "$AOZAN_DIR"/conf/aozan.conf
 else
-    sed -i "s/smtp.server=smtp.example.com/smtp.server=$SMTP_SERVER_NAME/" "$AOZAN_DIR"/conf/aozan.conf
-    sed -i "s/mail.from=aozan@example.com/mail.from=$USER_EMAIL/" "$AOZAN_DIR"/conf/aozan.conf
-    sed -i "s/mail.to=me@example.com/mail.to=$USER_EMAIL/" "$AOZAN_DIR"/conf/aozan.conf
-    sed -i "s/mail.error.to=aozan-errors@example.com/mail.error.to=$USER_EMAIL/" "$AOZAN_DIR"/conf/aozan.conf
+    sed -i "s#mail.smtp.host=smtp.example.com#mail.smtp.host=$SMTP_SERVER_NAME#" "$AOZAN_DIR"/conf/aozan.conf
+    sed -i "s#mail.from=aozan@example.com#mail.from=$USER_EMAIL#" "$AOZAN_DIR"/conf/aozan.conf
+    sed -i "s#mail.to=me@example.com#mail.to=$USER_EMAIL#" "$AOZAN_DIR"/conf/aozan.conf
+    sed -i "s#mail.error.to=aozan-errors@example.com#mail.error.to=$USER_EMAIL#" "$AOZAN_DIR"/conf/aozan.conf
 fi
 
 # Aozan configuration files directory
@@ -263,7 +263,7 @@ sed -i "s#fastq.data.path=/path/to/fastq#fastq.data.path=$AOZAN_DIR/fastq#" "$AO
 sed -i "s#reports.data.path=/path/to/runs#reports.data.path=$AOZAN_DIR/runs#" "$AOZAN_DIR"/conf/aozan.conf
 
 # Where store Bcl2fastq samplesheet files in XLS or CSV format
-sed -i "s#bcl2fastq.samplesheet.path=/path/to/samplesheets#bcl2fastq.samplesheet.path=$AOZAN_DIR/samplesheets#" "$AOZAN_DIR"/conf/aozan.conf
+sed -i "s#samplesheet.path=/path/to/samplesheets#samplesheet.path=$AOZAN_DIR/samplesheets#" "$AOZAN_DIR"/conf/aozan.conf
 
 # File that contains alias for barcodes
 sed -i "s#index.sequences=/path/to/aozan/resources/indexes-sequences.txt#index.sequences=$AOZAN_DIR/conf/index-sequences.aliases#" "$AOZAN_DIR"/conf/aozan.conf
@@ -273,6 +273,9 @@ sed -i "s#tmp.path=/tmp#tmp.path=$AOZAN_DIR/tmp#" "$AOZAN_DIR"/conf/aozan.conf
 
 # Lock file path
 sed -i "s#aozan.lock.file=/var/lock/aozan.lock#aozan.lock.file=$AOZAN_DIR/var/aozan.lock#" "$AOZAN_DIR"/conf/aozan.conf
+
+# Demultiplexing tool to use
+sed -i "s#demux.tool.name=bclconvert#demux.tool.name=bcl2fastq#" "$AOZAN_DIR"/conf/aozan.conf
 
 
 # Path to a specific contaminants list, replace list per default
@@ -335,7 +338,8 @@ sed -i "s#qc.test.project.fastqscreen.report.enable=True#qc.test.project.fastqsc
 fi
 
 if [ "$DOCKER_INSTALLED" -eq 1 ]; then
-    sed -i "s#demux.use.docker.enable=False#demux.use.docker.enable=True#" "$AOZAN_DIR"/conf/aozan.conf
+    sed -i "s#bcl2fastq.use.docker=False#bcl2fastq.use.docker=True#" "$AOZAN_DIR"/conf/aozan.conf
+    sed -i "s#bclconvert.use.docker=False#bclconvert.use.docker=True#" "$AOZAN_DIR"/conf/aozan.conf
     sed -i "s#qc.conf.fastqc.blast.use.docker=False#qc.conf.fastqc.blast.use.docker=True#" "$AOZAN_DIR"/conf/aozan.conf
 fi
 

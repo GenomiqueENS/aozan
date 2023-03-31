@@ -58,7 +58,8 @@
 
         <section name="Create a demo configuration">
 
-            <p>To simply the launch of an Aozan demo, we now provide a <a href="data/configure-aozan-demo.sh">shell script</a>, that allow to create all directories required by Aozan and a valid configuration file. This script can also download all the files required by the demo (raw data and reference data).</p>
+	<p>To simply the launch of an Aozan demo, we now provide a <a href="data/configure-aozan-demo.sh">shell script</a>, that allow to create all directories required by Aozan and a valid configuration file. This script can also download all the files required by the demo (raw data and reference data).
+        This script use <b>bcl2fastq</b>, if you want to use <b>BCL Convert</b>, just replace set <tt>bclconvert</tt> for the <tt>demux.tool.name</tt> key in the Aozan configuration file.</p>
             <p>You can perform a full Aozan demo computation using the following command lines:</p>
             <ul>
                 <li>Download the script.
