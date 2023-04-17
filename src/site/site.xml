@@ -48,8 +48,8 @@
 
 		<menu name="About Aozan">
 			<item name="What is Aozan ?" href="/index.html" />
-			<item name="License" href="/license.html" />
-			<item name="People behind Aozan" href="/team-list.html" />
+			<item name="License" href="/licenses.html" />
+			<item name="People behind Aozan" href="/team.html" />
 			<item name="How to cite Aozan" href="/howtocite.html" />
 		</menu>
 
@@ -83,7 +83,7 @@
 			</item>
 
 			<item name="Known bugs" href="/bugs.html" />
-			<item name="Mailing list" href="/mail-lists.html" />
+			<item name="Mailing list" href="/mailing-lists.html" />
 		</menu>
 
 		<menu name="Development">
@@ -92,7 +92,7 @@
 			<item name="Downloading sources" href="/download-src.html" />
 			<item name="Compiling" href="/compiling.html"/>
 			<!-- item name="Developer Wiki" href="https://github.com/GenomicParisCentre/aozan/wiki" /-->
-			<item name="Aozan on GitHub" href="https://github.com/GenomicParisCentre/aozan" />
+			<item name="Aozan on GitHub" href="https://github.com/GenomiqueENS/aozan" />
 			<item name="Javadoc" href="/apidocs/index.html" />            
 		</menu>
 
