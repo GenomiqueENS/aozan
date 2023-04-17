@@ -66,10 +66,7 @@ public class SequencerSourceFactory {
 
   /**
    * Create a new Illumina sequencer source.
-   * @param id sequencer identifier
    * @param model sequencer model
-   * @param serialModel sequencer serial model
-   * @param description sequencer description
    * @return a new SequencerSource object
    */
   public static SequencerSource newIlluminaSequencerSource(

@@ -32,7 +32,7 @@ public class PartialDataTypeFilter implements DataTypeFilter {
 
   /**
    * Consctructor.
-   * @param requiredCategory required DataType
+   * @param partial partial data
    */
   public PartialDataTypeFilter(boolean partial) {
 

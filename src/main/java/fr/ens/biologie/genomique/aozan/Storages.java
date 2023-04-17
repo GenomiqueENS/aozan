@@ -83,8 +83,7 @@ public class Storages {
 
   /**
    * Create a GenomeDescription object from a Fasta file.
-   * @param genomeFile file used for create index
-   * @return genomeDescription description of the genome
+   * @param genomePath genome path
    * @throws BadBioEntryException if an error occurs during create genome
    *           description object
    * @throws IOException if an error occurs during access genome file

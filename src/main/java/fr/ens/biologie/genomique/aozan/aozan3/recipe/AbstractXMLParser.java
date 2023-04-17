@@ -66,7 +66,7 @@ abstract class AbstractXMLParser<E> {
 
   /**
    * Parse XML as an input stream.
-   * @param is input stream
+   * @param path file path
    * @return a list of Step
    * @throws Aozan3Exception if an error occurs while parsing the file
    */

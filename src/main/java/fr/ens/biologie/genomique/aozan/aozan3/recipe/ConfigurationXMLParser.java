@@ -126,8 +126,9 @@ public class ConfigurationXMLParser extends AbstractXMLParser<Configuration> {
 
   /**
    * Constructor.
+   * @param rootTagName root tag name
    * @param sectionName name of the section in the recipe file
-   * @param parentConf parent configuration
+   * @param parentConfiguration parent configuration
    * @param logger logger to use
    */
   public ConfigurationXMLParser(String rootTagName, String sectionName,

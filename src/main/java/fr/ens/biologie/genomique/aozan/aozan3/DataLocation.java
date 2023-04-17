@@ -286,7 +286,7 @@ public class DataLocation {
 
   /**
    * Check if the data location is a readable file.
-   * @param directoryType message in the exception
+   * @param fileType message in the exception
    * @throws IOException if the data location is not is a readable file
    */
   public void checkReadableFile(String fileType) throws IOException {
@@ -298,7 +298,7 @@ public class DataLocation {
 
   /**
    * Check if the data location is a writable file.
-   * @param directoryType message in the exception
+   * @param fileType message in the exception
    * @throws IOException if the data location is not is a writable file
    */
   public void checkWritableFile(String fileType) throws IOException {

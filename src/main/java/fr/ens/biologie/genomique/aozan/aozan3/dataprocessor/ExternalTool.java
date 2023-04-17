@@ -38,7 +38,6 @@ public class ExternalTool {
   /**
    * Create a new process.
    * @param runId run id for logging
-   * @param runConf run configuration
    * @param enableLogging enable logging
    * @return a new SimpleProcess
    * @throws IOException if an error occurs while creating the process
@@ -80,7 +79,6 @@ public class ExternalTool {
   /**
    * Get the tool executable version.
    * @param runId the run Id
-   * @param runConf run configuration
    * @param parseStdErr parse stderr instead of stdout
    * @return a string with the tool version
    * @throws IOException if an error occurs while getting tool version

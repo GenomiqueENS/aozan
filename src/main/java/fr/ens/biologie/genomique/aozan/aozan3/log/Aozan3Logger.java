@@ -131,7 +131,7 @@ public class Aozan3Logger {
 
   /**
    * Log a debug message.
-   * @param RunData run data
+   * @param runData run data
    * @param message message to log
    */
   public void debug(RunData runData, String message) {
@@ -141,7 +141,7 @@ public class Aozan3Logger {
 
   /**
    * Log an info message.
-   * @param RunData run data
+   * @param runData run data
    * @param message message to log
    */
   public void info(RunData runData, String message) {
@@ -151,7 +151,7 @@ public class Aozan3Logger {
 
   /**
    * Log a warning message.
-   * @param RunData run data
+   * @param runData run data
    * @param message message to log
    */
   public void warn(RunData runData, String message) {
@@ -161,7 +161,7 @@ public class Aozan3Logger {
 
   /**
    * Log an error message.
-   * @param RunData run data
+   * @param runData run data
    * @param message message to log
    */
   public void error(RunData runData, String message) {
@@ -171,7 +171,7 @@ public class Aozan3Logger {
 
   /**
    * Log an error message.
-   * @param RunData run data
+   * @param runData run data
    * @param exception exception to log
    */
   public void error(RunData runData, Throwable exception) {
@@ -239,7 +239,7 @@ public class Aozan3Logger {
   /**
    * Log a debug message.
    * @param logger the logger to use
-   * @param RunData run data
+   * @param runData run data
    * @param message message to log
    */
   public static void debug(GenericLogger logger, RunData runData,
@@ -254,7 +254,7 @@ public class Aozan3Logger {
   /**
    * Log an info message.
    * @param logger the logger to use
-   * @param RunData run data
+   * @param runData run data
    * @param message message to log
    */
   public static void info(GenericLogger logger, RunData runData,
@@ -269,7 +269,7 @@ public class Aozan3Logger {
   /**
    * Log a warning message.
    * @param logger the logger to use
-   * @param RunData run data
+   * @param runData run data
    * @param message message to log
    */
   public static void warn(GenericLogger logger, RunData runData,
@@ -284,7 +284,7 @@ public class Aozan3Logger {
   /**
    * Log an error message.
    * @param logger the logger to use
-   * @param RunData run data
+   * @param runData run data
    * @param message message to log
    */
   public static void error(GenericLogger logger, RunData runData,
@@ -299,7 +299,7 @@ public class Aozan3Logger {
   /**
    * Log an error message.
    * @param logger the logger to use
-   * @param RunData run data
+   * @param runData run data
    * @param exception exception to log
    */
   public static void error(GenericLogger logger, RunData runData,

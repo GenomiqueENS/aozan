@@ -136,7 +136,6 @@ public class DataStorage {
    * Check if there is enough space on the storage for a required amount of disk
    * space.
    * @param size the required amount of disk space
-   * @param errorMessage error message
    * @throws IOException if there is enough space on the storage for the
    *           required amount of disk space
    */

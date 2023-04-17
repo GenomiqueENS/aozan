@@ -85,7 +85,7 @@ public class DiskUtils {
   /**
    * Recursively change the owner of a directory.
    * @param directory the directory
-   * @param owner the new owner of the directory
+   * @param user the new user of the directory
    * @param group the new group of the directory
    * @throws IOException if an error occurs while changing the owner of the
    *           directory

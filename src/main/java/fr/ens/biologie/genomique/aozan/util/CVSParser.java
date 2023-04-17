@@ -102,7 +102,7 @@ public class CVSParser implements Iterable<CSVLineParser> {
 
   /**
    * Constructor.
-   * @param header header of the CSV file
+   * @param lines lines to parse
    */
   public CVSParser(List<String> lines) {
     this(lines, ',');
@@ -110,7 +110,7 @@ public class CVSParser implements Iterable<CSVLineParser> {
 
   /**
    * Constructor.
-   * @param header header of the CSV file
+   * @param lines lines to parse
    * @param separator separator char
    */
   public CVSParser(List<String> lines, char separator) {

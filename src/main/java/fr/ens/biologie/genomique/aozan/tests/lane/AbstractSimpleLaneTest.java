@@ -166,7 +166,7 @@ public abstract class AbstractSimpleLaneTest extends AbstractLaneTest {
   }
 
   /**
-   * Test if indexed read test must return a score >=0.
+   * Test if indexed read test must return a score &gt;=0.
    * @return if indexed read must return a score
    */
   protected boolean testIndexedRead() {

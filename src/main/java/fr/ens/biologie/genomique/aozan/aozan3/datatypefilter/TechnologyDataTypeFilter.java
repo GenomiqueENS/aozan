@@ -33,7 +33,7 @@ public class TechnologyDataTypeFilter implements DataTypeFilter {
 
   /**
    * Constructor.
-   * @param requiredCategory required DataType
+   * @param technology required DataType
    */
   public TechnologyDataTypeFilter(SequencingTechnology technology) {
 

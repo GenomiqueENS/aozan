@@ -100,7 +100,6 @@ public class DefaultRunIdGenerator implements RunIdGenerator {
 
   /**
    * Constructor.
-   * @param expr expression to use to create the new run id
    */
   public DefaultRunIdGenerator() {
     this.expr = DEFAULT_EXPR;

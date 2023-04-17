@@ -112,8 +112,8 @@ public class RunData {
   //
 
   /**
-   * Create a new RunType object from the current object with a new type.
-   * @param type the new type
+   * Create a new RunType object from the current object with a new category.
+   * @param category the new category
    * @return a new RunType object
    */
   public RunData newCategory(final Category category) {
@@ -122,8 +122,8 @@ public class RunData {
   }
 
   /**
-   * Create a new RunType object from the current object with a new type.
-   * @param type the new type
+   * Create a new RunType object from the current object with a new technology.
+   * @param technology the new technology
    * @return a new RunType object
    */
   public RunData newTechnology(final SequencingTechnology technology) {

@@ -113,7 +113,7 @@ public class DataType {
 
   /**
    * Create a new RunType object from the current object with a new type.
-   * @param type the new type
+   * @param category the category
    * @return a new RunType object
    */
   public DataType newCategory(final Category category) {
@@ -125,7 +125,7 @@ public class DataType {
 
   /**
    * Create a new RunType object from the current object with a new type.
-   * @param type the new type
+   * @param technology the technology
    * @return a new RunType object
    */
   public DataType newTechnology(final SequencingTechnology technology) {

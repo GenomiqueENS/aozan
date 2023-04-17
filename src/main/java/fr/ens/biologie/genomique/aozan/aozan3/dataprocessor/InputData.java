@@ -39,7 +39,7 @@ public class InputData {
 
   /**
    * Add a run data.
-   * @param runData run data to add
+   * @param collection run data to add
    */
   public void add(Collection<RunData> collection) {
 
@@ -159,7 +159,7 @@ public class InputData {
 
   /**
    * Get a RunData from its data type.
-   * @param dataType the data type of the run data
+   * @param category the data category of the run data
    * @return a RunData object
    * @throws NoSuchElementException if the element does not exists
    */
