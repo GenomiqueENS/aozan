@@ -99,11 +99,11 @@ public class Globals {
       + ", " + Globals.APP_BUILD_NUMBER + ")"
       + " is a pipeline for post sequencing processing.\n"
       + "This version has been built on " + APP_BUILD_DATE + ".\n\n"
-      + "Authors:\n" + "  Laurent Jourdren <jourdren@biologie.ens.fr>\n"
-      + "  Sandrine Perrin <sperrin@biologie.ens.fr>\n" + "Contacts:\n"
-      + "  Mail: " + APP_NAME_LOWER_CASE + "@biologie.ens.fr\n"
+      + "Authors:\n" + "  Laurent Jourdren <jourdren@bio.ens.psl.eu>\n"
+      + "  Sandrine Perrin <sperrin@bio.ens.psl.eu>\n" + "Contacts:\n"
+      + "  Mail: " + APP_NAME_LOWER_CASE + "@bio.ens.psl.eu\n"
       + "  Google group: http://groups.google.com/group/" + APP_NAME_LOWER_CASE
-      + "\n" + "Copyright " + COPYRIGHT_DATE + " IBENS genomic platform\n"
+      + "\n" + "Copyright " + COPYRIGHT_DATE + " IBENS genomics core facility\n"
       + LICENSE_TXT + "\n";
 
   //
