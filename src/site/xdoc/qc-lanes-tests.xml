@@ -106,7 +106,7 @@
          <tr><td>qc.test.lane.q30.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
 	 <tr><td>qc.test.lane.occupancy.percent.enable</td><td>boolean</td><td>False</td><td>Enable lane occupancy percent test</td></tr>
-         <tr><td>qc.test.lane.occupancy.percent.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
+         <tr><td>qc.test.lane.occupancy.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
        </table>
 
        <p>An example of table built with lanes quality tests.</p>

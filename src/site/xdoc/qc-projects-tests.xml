@@ -73,18 +73,14 @@
         <tr><td>qc.test.project.pf.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable project project passing filter cluster count</td></tr>
         <tr><td>qc.test.project.pf.cluster.count.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values</td></tr>
         
-        <!--tr><td>qc.test.recoverablerawcluster.enable</td><td>integer</td><td>False</td><td>Enable recoverable raw cluster in samples test</td></tr-->
-
         <tr><td>qc.test.project.recoverable.raw.cluster.percent.enable</td><td>boolean</td><td>False</td><td>Enable project recoverable raw cluster percent test</td></tr>
         <tr><td>qc.test.project.recoverable.raw.cluster.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
-        <!--tr><td>qc.test.recoverablepfcluster.enable</td><td>integer</td><td>False</td><td>Enable recoverable passing filter cluster in samples test</td></tr-->
-
         <tr><td>qc.test.project.recoverable.pf.cluster.percent.enable</td><td>boolean</td><td>False</td><td>Enable project recoverable passing filter cluster percent test</td></tr>
-        <tr><td>qc.test.project.recoverable.pf.cluster.percent.enable</td><td>double interval</td><td>False</td><td>Interval for valid values</td></tr>
+        <tr><td>qc.test.project.recoverable.pf.cluster.percent.interval</td><td>double interval</td><td>False</td><td>Interval for valid values</td></tr>
 
         <tr><td>qc.test.project.fastqscreen.sample.overcontamination.count.enable</td><td>boolean</td><td>False</td><td>Enable project FastQ Screen sample overcontamination count test</td></tr>
-        <tr><td>qc.test.project.fastqscreen.sample.overcontamination.count.enable</td><td>integer interval</td><td>False</td><td>Integer for valid values</td></tr>
+        <tr><td>qc.test.project.fastqscreen.sample.overcontamination.count.interval</td><td>integer interval</td><td>False</td><td>Integer for valid values</td></tr>
 
         <tr><td>qc.test.project.fastqscreen.report.enable</td><td>link</td><td>False</td><td>Enable link to detection contamination project report compilation samples data</td></tr>
 

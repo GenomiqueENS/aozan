@@ -47,7 +47,10 @@
           <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
 
           <tr><td>qc.test.global.base.count.enable</td><td>boolean</td><td>False</td><td>Enable global base count test</td></tr>
+          <tr><td>qc.test.global.base.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
+
           <tr><td>qc.test.global.non.indexed.base.count.enable</td><td>boolean</td><td>False</td><td>Enable global non indexed global base count test</td></tr>
+          <tr><td>qc.test.global.non.indexed.base.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.raw.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable global raw cluster count test</td></tr>
           <tr><td>qc.test.global.raw.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
@@ -102,12 +105,6 @@
 
           <tr><td>qc.test.global.project.count.enable</td><td>boolean</td><td>False</td><td>Enable global project count test</td></tr>
           <tr><td>qc.test.global.project.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
-
-          <tr><td>qc.test.global.sample.count.enable</td><td>boolean</td><td>False</td><td>Enable global sample count test</td></tr>
-          <tr><td>qc.test.global.sample.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
-
-          <tr><td>qc.test.global.sample.count.enable</td><td>boolean</td><td>False</td><td>Enable global sample count test</td></tr>
-          <tr><td>qc.test.global.sample.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
           <tr><td>qc.test.global.sample.count.enable</td><td>boolean</td><td>False</td><td>Enable global sample count test</td></tr>
           <tr><td>qc.test.global.sample.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>

@@ -64,7 +64,6 @@
         <tr><td>qc.test.pooledsample.pf.cluster.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
         <tr><td>qc.test.pooledsample.q30.percent.enable</td><td>boolean</td><td>False</td> <td>Enable Q30 percent test</td></tr>
         <tr><td>qc.test.pooledsample.q30.percent.interval</td><td>interval</td><td>Not set</td> <td>Interval for valid values</td></tr>
-        <!--tr><td>qc.test.samplestats.samplestatsmeanqualityscorepf.enable</td><td>boolean</td><td>False</td> <td>Enable samplestatsmeanqualityscorepf test</td></tr-->
         <tr><td>qc.test.pooledsample.pf.percent.enable</td><td>boolean</td><td>False</td> <td>Enable passing filter percent test</td></tr>
         <tr><td>qc.test.pooledsample.pf.percent.interval</td><td>interval</td><td>Not setFalse</td> <td>Interval for valid values</td></tr>
         <tr><td>qc.test.pooledsample.in.run.percent.enable</td><td>boolean</td><td>False</td> <td>Enable in run percent test</td></tr>
@@ -80,10 +79,16 @@
       <table>
         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>Description</th></tr>
         <tr><td>qc.test.pooledsample.raw.cluster.recovery.count.enable</td><td>boolean</td><td>False</td> <td>Enable recoverable raw cluster in samples statistics test</td></tr>
+        <tr><td>qc.test.pooledsample.raw.cluster.recovery.count.interval</td><td>integer interval</td><td>Not set</td><td>Interval for valid values</td></tr>
+
         <tr><td>qc.test.pooledsample.recoverable.raw.cluster.percent.enable</td><td>boolean</td><td>False</td> <td>Enable recoverable raw cluster percent in samples statistics test</td></tr>
+        <tr><td>qc.test.pooledsample.recoverable.raw.cluster.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
 
         <tr><td>qc.test.pooledsample.pf.cluster.recovery.count.enable</td><td>boolean</td><td>False</td> <td>Enable recoverable passing filter cluster in samples statistics test</td></tr>
-        <tr><td>qc.test.pooledsample.recoverable.pf.cluster.percent.enable</td><td>boolean</td><td>False</td> <td>Enable recoverable passing filter cluster percent in samples statistics test</td></tr>
+        <tr><td>qc.test.pooledsample.pf.cluster.recovery.count.interval</td><td>interger interval</td><td>Not set</td><td>Interval for valid values</td></tr>
+
+        <tr><td>qc.test.pooledsample.recoverable.pf.cluster.percent.enable</td><td>boolean</td><td>False</td><td>Enable recoverable passing filter cluster percent in samples statistics test</td></tr>
+        <tr><td>qc.test.pooledsample.recoverable.pf.cluster.percent.interval</td><td>double interval</td><td>Not set</td><td>Interval for valid values</td></tr>
       </table>
 
       <p>The following tests are only available, if at least one test on <a href="qc-samples-tests.html#contamination">contamination detection with FastQ Screen</a> is enabled.</p>
@@ -96,8 +101,6 @@
         <tr><td>qc.test.pooledsample.fastqscreen.mapped.except.ref.percent.enable</td><td>boolean</td><td>False</td><td>Enable the percent of reads mapped at least one reference genomes, except on genome sample test</td></tr>
         <tr><td>qc.test.pooledsample.fastqscreen.mapped.percent.enable</td><td>boolean</td><td>False</td><td>Enable the percent of reads mapped at least one reference genomes, except on genome sample test</td></tr>
         <tr><td>qc.test.pooledsample.fastqscreen.mapped.except.ref.percent.interval</td><td>interval</td><td>Not set</td><td>Interval for valid values</td></tr>
-        <tr><td>qc.test.pooledsample.fastqscreen.mapped.percent.enable</td><td>boolean</td><td>False</td><td>Enable the percent of reads mapped for each reference genome test</td></tr>
-        <tr><td>qc.test.pooledsample.fastqscreen.report.enable</td><td>link</td><td>False</td><td>Enable link to detection contamination project report compilation samples data</td></tr>
       </table>
 
 

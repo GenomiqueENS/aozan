@@ -74,15 +74,15 @@
           <tr><td>qc.test.sample.pf.percent.interval</td><td>double interval</td><td>False</td><td>Interval for valid values</td></tr>
           <tr><td>qc.test.sample.in.lane.percent.enable</td><td>boolean</td><td>False</td><td>Enable in lane percent test</td></tr>
           <tr><td>qc.test.sample.in.lane.percent.distance</td><td>double</td><td>0.05</td><td>Interval for valid values of in lane percent tet. The interval is set according to the theoretical percent (1.0/sampleCount)</td></tr>
-          <tr><td>qc.test.sample.q30.percent.sample.enable</td><td>boolean</td><td>False</td><td>Enable Q30 percent test</td></tr>
-          <tr><td>qc.test.sample.q30.percent.sample.interval</td><td>double interval</td><td>False</td><td>Interval for valid values</td></tr>
-          <tr><td>qc.test.sample.base.pf.mean.quality.score.sample.enable</td><td>boolean</td><td>False</td><td>Enable base passing filter mean quality sample test</td></tr>
-          <tr><td>qc.test.sample.base.pf.mean.quality.score.sample.interval</td><td>double interval</td><td>False</td><td>Interval for valid values</td></tr>
-          <tr><td>qc.test.sample.recoverable.raw.cluster.count.sample.enable</td><td>boolean</td><td>False</td><td>Enable recoverable raw cluster count sample test: compute raw cluster count that can be recovered from the undetermined FASTQ file with more one mismatch that has been used in the demultiplexing step. </td></tr>
-          <tr><td>qc.test.sample.recoverable.raw.cluster.count.sample.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values</td></tr>
-          <tr><td>qc.test.sample.recoverable.pf.cluster.count.sample.enable</td><td>boolean</td><td>False</td><td>Enable recoverable passing filter cluster sample test: compute passing filter cluster count that can be recovered from undetermined FASTQ file with more one mismatch that has been used in the demultiplexing step. </td></tr>
-          <tr><td>qc.test.sample.recoverable.pf.cluster.count.sample.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values</td></tr>
-          <tr><td>qc.test.sample.cluster.recovery.report.sample.enable</td><td>boolean</td><td>False</td><td>Enable recovery report</td></tr>
+          <tr><td>qc.test.sample.q30.percent.enable</td><td>boolean</td><td>False</td><td>Enable Q30 percent test</td></tr>
+          <tr><td>qc.test.sample.q30.percent.interval</td><td>double interval</td><td>False</td><td>Interval for valid values</td></tr>
+          <tr><td>qc.test.sample.base.pf.mean.quality.score.enable</td><td>boolean</td><td>False</td><td>Enable base passing filter mean quality sample test</td></tr>
+          <tr><td>qc.test.sample.base.pf.mean.quality.score.interval</td><td>double interval</td><td>False</td><td>Interval for valid values</td></tr>
+          <tr><td>qc.test.sample.recoverable.raw.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable recoverable raw cluster count sample test: compute raw cluster count that can be recovered from the undetermined FASTQ file with more one mismatch that has been used in the demultiplexing step. </td></tr>
+          <tr><td>qc.test.sample.recoverable.raw.cluster.count.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values</td></tr>
+          <tr><td>qc.test.sample.recoverable.pf.cluster.count.enable</td><td>boolean</td><td>False</td><td>Enable recoverable passing filter cluster sample test: compute passing filter cluster count that can be recovered from undetermined FASTQ file with more one mismatch that has been used in the demultiplexing step. </td></tr>
+          <tr><td>qc.test.sample.recoverable.pf.cluster.count.interval</td><td>integer interval</td><td>False</td><td>Interval for valid values</td></tr>
+          <tr><td>qc.test.sample.cluster.recovery.report.enable</td><td>boolean</td><td>False</td><td>Enable recovery report</td></tr>
         </table>
         <p>The explanation to construct intervals is <a href="#syntax_interval">here.</a></p>
       </subsection>
