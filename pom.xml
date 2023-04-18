@@ -448,6 +448,7 @@
                 <buildnumber file="${basedir}/build.num"/>
                 <tstamp>
                   <format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss z" />
+                  <format property="YEAR" pattern="yyyy" />
                 </tstamp>
 
 <!-- execute git describe -->
