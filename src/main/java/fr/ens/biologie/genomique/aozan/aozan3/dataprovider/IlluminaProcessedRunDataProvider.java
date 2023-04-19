@@ -2,14 +2,9 @@ package fr.ens.biologie.genomique.aozan.aozan3.dataprovider;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
-import java.nio.file.FileVisitOption;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
@@ -136,19 +131,57 @@ public class IlluminaProcessedRunDataProvider implements RunDataProvider {
 
   private static boolean isFastqFilesInDirectory(File dir) {
 
-    try (Stream<Path> walk =
-        Files.walk(dir.toPath(), FileVisitOption.FOLLOW_LINKS)) {
+    return isFastqFilesInDirectory(dir, 0);
+  }
 
-      long count = walk.map(x -> x.toString())
-          .filter(f -> f.endsWith(".fastq.gz") || f.endsWith(".fastq.bz2"))
-          .count();
+  private static boolean isFastqFilesInDirectory(File dir, int depth) {
 
-      return count > 0 ? true : false;
-
-    } catch (IOException e) {
+    if (dir == null || !dir.isDirectory()) {
       return false;
     }
 
+    List<String> subdirs = new ArrayList<>();
+
+    for (String f : dir.list()) {
+
+      if (new File(dir, f).isDirectory()) {
+        subdirs.add(f);
+      } else if (f.endsWith(".fastq.gz") || f.endsWith(".fastq.bz2")) {
+        return true;
+      }
+    }
+
+    if (depth < 2) {
+
+      for (String d : subdirs) {
+
+        switch (d) {
+
+        // Avoid unnecessary walk in some directories
+        case "Reports":
+        case "Stats":
+        case "InterOp":
+        case "Temp":
+        case "Logs":
+          continue;
+
+        default:
+
+          if (d.startsWith("Basecall_Stats_")) {
+            continue;
+          }
+
+          if (isFastqFilesInDirectory(new File(dir, d), depth + 1)) {
+            return true;
+          }
+
+          break;
+        }
+
+      }
+    }
+
+    return false;
   }
 
   private List<RunData> listRuns(boolean completedRuns) {
