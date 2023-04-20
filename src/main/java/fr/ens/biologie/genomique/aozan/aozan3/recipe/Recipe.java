@@ -279,13 +279,23 @@ public class Recipe {
    */
   public Set<RunId> availableRuns() throws Aozan3Exception {
 
+    return availableRuns(Collections.emptySet());
+  }
+
+  /**
+   * Get available runs.
+   * @param excludedRunIds run ids to exclude from the result
+   * @return a set with available runs.
+   * @throws Aozan3Exception if an error occurs while getting the available runs
+   */
+  public Set<RunId> availableRuns(Collection<RunId> excludedRunIds)
+      throws Aozan3Exception {
+
     Set<RunId> result = new HashSet<>();
 
-    for (InputData inputData : runDataToProcess()) {
+    for (RunData r : availableRunData(excludedRunIds)) {
 
-      for (RunData runData : inputData.entries()) {
-        result.add(runData.getRunId());
-      }
+      result.add(r.getRunId());
     }
 
     return result;
@@ -375,7 +385,31 @@ public class Recipe {
   }
 
   /**
-   * Create the list of the run data to process
+   * Create the list of the run data to process.
+   * @param excludedRunIds run ids to exclude
+   * @return a list of RunData object
+   */
+  private List<RunData> availableRunData(Collection<RunId> excludedRunIds) {
+
+    requireNonNull(excludedRunIds);
+
+    List<RunData> result = new ArrayList<>();
+
+    for (RunDataProvider provider : this.providers) {
+
+      this.logger
+          .debug("Looks for run in: " + provider.getDataStorage().getPath());
+
+      result.addAll(this.inProgressProviders.contains(provider)
+          ? provider.listInProgressRunData(excludedRunIds)
+          : provider.listCompletedRunData(excludedRunIds));
+    }
+
+    return result;
+  }
+
+  /**
+   * Create the list of the run data to process.
    * @return a list of RunData object
    * @throws Aozan3Exception if a run identifier does not exists
    */
@@ -397,19 +431,9 @@ public class Recipe {
     Multimap<String, RunData> map = ArrayListMultimap.create();
     List<InputData> result = new ArrayList<>();
 
-    for (RunDataProvider provider : this.providers) {
-
-      this.logger
-          .debug("Looks for run in: " + provider.getDataStorage().getPath());
-
-      List<RunData> runs = this.inProgressProviders.contains(provider)
-          ? provider.listInProgressRunData() : provider.listCompletedRunData();
-
-      for (RunData r : runs) {
-
-        String runId = r.getRunId().getId();
-        map.put(runId, r);
-      }
+    for (RunData r : availableRunData(Collections.emptySet())) {
+      String runId = r.getRunId().getId();
+      map.put(runId, r);
     }
 
     if (runIds == null) {

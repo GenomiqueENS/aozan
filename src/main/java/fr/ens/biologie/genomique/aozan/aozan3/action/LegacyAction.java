@@ -117,34 +117,34 @@ public class LegacyAction implements Action {
   }
 
   private static void execute(LegacyRecipes recipes, Recipe recipe,
-      Path varPath, Set<RunId> forbiddenRuns) throws Aozan3Exception {
+      Path varPath, Set<RunId> excludedRunIds) throws Aozan3Exception {
 
     if (recipe == null) {
       return;
     }
 
+    boolean initializedRecipe = true;
+    if (excludedRunIds == null) {
+      excludedRunIds = new HashSet<>();
+      initializedRecipe = false;
+    }
+
     // Get output path of the recipe
     Path lockDirectory = recipes.getLockDirectory(recipe);
 
+    // Remove deny run ids
+    excludedRunIds.addAll(runStorage(recipes, varPath, recipe, ".deny").load());
+
+    // Remove done run ids
     RunIdStorage processedRunIdStorage =
         runStorage(recipes, varPath, recipe, ".done");
+    excludedRunIds.addAll(processedRunIdStorage.load());
 
     // Run to process
-    Set<RunId> todoRunIds = new HashSet<>(recipe.availableRuns());
+    Set<RunId> todoRunIds = new HashSet<>(recipe.availableRuns(excludedRunIds));
 
-    // Remove forbidden runs
-    if (forbiddenRuns != null) {
-      todoRunIds.removeAll(forbiddenRuns);
-    }
-
-    // Remove runs in .deny file
-    RunIdStorage denyRunIdStorage =
-        runStorage(recipes, varPath, recipe, ".deny");
-    todoRunIds.removeAll(denyRunIdStorage.load());
-
-    // Remove processed runs
-    Set<RunId> processed = processedRunIdStorage.load();
-    todoRunIds.removeAll(processed);
+    // Remove excluded run ids if run provider does not handle excluded run ids
+    todoRunIds.removeAll(excludedRunIds);
 
     // Remove locked runs
     if (lockDirectory != null) {
@@ -165,9 +165,8 @@ public class LegacyAction implements Action {
     }
 
     // Initialize recipe
-    if (forbiddenRuns == null) {
+    if (!initializedRecipe) {
       recipe.init();
-      forbiddenRuns = new HashSet<>();
     }
 
     // Get the first run
@@ -186,7 +185,7 @@ public class LegacyAction implements Action {
     if (recipe.execute(runId.getId())) {
       processedRunIdStorage.add(runId);
     } else {
-      forbiddenRuns.add(runId);
+      excludedRunIds.add(runId);
     }
 
     // Unlock the step
@@ -195,7 +194,7 @@ public class LegacyAction implements Action {
     }
 
     // Search for new runs to process
-    execute(recipes, recipe, varPath, forbiddenRuns);
+    execute(recipes, recipe, varPath, excludedRunIds);
   }
 
   /**

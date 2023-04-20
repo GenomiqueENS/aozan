@@ -1,5 +1,6 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprovider;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
+import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
@@ -24,8 +26,8 @@ public class EmptyRunDataProvider implements RunDataProvider {
   }
 
   @Override
-  public void init(DataStorage storage, Configuration conf, GenericLogger logger)
-      throws Aozan3Exception {
+  public void init(DataStorage storage, Configuration conf,
+      GenericLogger logger) throws Aozan3Exception {
   }
 
   @Override
@@ -34,12 +36,12 @@ public class EmptyRunDataProvider implements RunDataProvider {
   }
 
   @Override
-  public List<RunData> listInProgressRunData() {
+  public List<RunData> listInProgressRunData(Collection<RunId> excludedRuns) {
     return Collections.emptyList();
   }
 
   @Override
-  public List<RunData> listCompletedRunData() {
+  public List<RunData> listCompletedRunData(Collection<RunId> excludedRuns) {
     return Collections.emptyList();
   }
 

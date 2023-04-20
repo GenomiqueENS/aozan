@@ -3,14 +3,18 @@ package fr.ens.biologie.genomique.aozan.aozan3.dataprovider;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunDataFactory;
+import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 import fr.ens.biologie.genomique.aozan.aozan3.SequencerSource;
 import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
@@ -30,9 +34,15 @@ public class IlluminaProcessedRunDataProvider implements RunDataProvider {
   private static final class RunDirectoryFileFilter implements FileFilter {
 
     private final boolean completedDemux;
+    private final Set<String> excludedRunIds;
 
     @Override
     public boolean accept(final File file) {
+
+      // Do not accept excluded run ids
+      if (this.excludedRunIds.contains(file.getName())) {
+        return false;
+      }
 
       // File must be a directory
       if (!file.isDirectory()) {
@@ -57,7 +67,8 @@ public class IlluminaProcessedRunDataProvider implements RunDataProvider {
       return true;
     }
 
-    RunDirectoryFileFilter(boolean completedDemux) {
+    RunDirectoryFileFilter(Set<String> excludedRunIds, boolean completedDemux) {
+      this.excludedRunIds = excludedRunIds;
       this.completedDemux = completedDemux;
     }
 
@@ -92,19 +103,19 @@ public class IlluminaProcessedRunDataProvider implements RunDataProvider {
   }
 
   @Override
-  public List<RunData> listInProgressRunData() {
+  public List<RunData> listInProgressRunData(Collection<RunId> excludedRuns) {
 
     checkInitialization();
 
-    return listRuns(false);
+    return listRuns(excludedRuns, false);
   }
 
   @Override
-  public List<RunData> listCompletedRunData() {
+  public List<RunData> listCompletedRunData(Collection<RunId> excludedRuns) {
 
     checkInitialization();
 
-    return listRuns(true);
+    return listRuns(excludedRuns, true);
   }
 
   @Override
@@ -184,12 +195,21 @@ public class IlluminaProcessedRunDataProvider implements RunDataProvider {
     return false;
   }
 
-  private List<RunData> listRuns(boolean completedRuns) {
+  private List<RunData> listRuns(Collection<RunId> excludedRuns,
+      boolean completedRuns) {
+
+    Set<String> excludedRunIds = new HashSet<>();
+
+    if (excludedRuns != null) {
+      for (RunId r : excludedRuns) {
+        excludedRunIds.add(r.getId());
+      }
+    }
 
     List<RunData> result = new ArrayList<>();
 
     File[] runDirectories = this.storage.getPath().toFile()
-        .listFiles(new RunDirectoryFileFilter(completedRuns));
+        .listFiles(new RunDirectoryFileFilter(excludedRunIds, completedRuns));
 
     if (runDirectories != null) {
       for (File f : runDirectories) {
