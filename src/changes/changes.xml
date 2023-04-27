@@ -955,5 +955,66 @@
 			</action>
 		</release>
 	
+		<release version="3.0" description="Aozan 3.0 release"  date="TBD">
+			<action dev="jourdren" type="add">
+                                 Rewrite all the Python code in Java.
+			</action>
+			<action dev="jourdren" type="add">
+                                 Add support of NextSeq 1000/2000.
+			</action>
+			<action dev="jourdren" type="add">
+                                 Add support of BCL convert in addition to Bcl2fastq.
+			</action>
+			<action dev="jourdren" type="add">
+                                 Aozan can execute actions. If no action name is defined on command line, Aozan 3.x will work as Aozan 2.x.
+			</action>
+			<action dev="jourdren" type="add">
+                                 A new configuration setting allow to trim reads to a maximal length when launching Fastq Screen collector.
+			</action>
+			<action dev="jourdren" type="add">
+                                 Add new tests: OccupancyPercentGlobalTest and GenomeNamesSampleTest.
+			</action>
+			<action dev="jourdren" type="add">
+                                 Add PrimaryAnalysisMetricsCollector and a new global test for loading concentration percent.
+			</action>
+			<action dev="jourdren" type="update">
+                                 Now depends on the kenetre libraries instead of Eoulsan. Some Aozan code (e.g. InterOP files parsing) has been moved to Kenetre.
+			</action>
+			<action dev="jourdren" type="update">
+                                 Aozan now requires Java 11 at runtime and for compilation.
+			</action>
+			<action dev="jourdren" type="update">
+                                 Replace "Genomic Paris Centre" by "GenomiqueENS" as the IBENS genomics core facility has changed its name.
+			</action>
+			<action dev="jourdren" type="update">
+                                 Aozan now requires Apache POI 4.1.2 instead of 3.12.
+			</action>
+			<action dev="jourdren" type="update">
+                                 If execute MultiQC in Docker mode, now use the MultiQC 1.12 Docker image by default.
+			</action>
+			<action dev="jourdren" type="update">
+                                 Update DemultiplexStatsCollector to handle both Demultiplex_Stats.csv and Quality_Metrics.csv file with BCL-Convert >=3.9.
+			</action>
+			<action dev="jourdren" type="update">
+                                 In IlluminaSamplesheetRunConfigurationProvider, now replace underscores in sample ids by dashes. This option is enabled by default. The "samplesheet.allow.underscores.in.sample.ids" allow to disable it.
+			</action>
+			<action dev="jourdren" type="update">
+                                 Now before launching BCL convert, move forbidden fields of the BCLConvert_Data section of the samplesheet in an other section. In Aozan2QC step, if this other section exists, merge the section in the original section.
+			</action>
+			<action dev="jourdren" type="update">
+                                 Aozan 2 QC Now use FastQC 11.9.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 In Fastq Screen TSV output file, the name of the last column was missing. Update column names in this file to names used in the latest versions of Fastq screen.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 In OverrepresentedSequencesBlast class, fix issue that enable blast even if blast command is not available.
+			</action>
+			<action dev="jourdren" type="fix">
+                                 In OverrepresentedSequencesBlast, now use a the SAX API instead of the DOM API to parse blast XML result file. When a large XML output file is produced, an OutOfMemoryError error could occurs.
+			</action>
+
+		</release>
+
 		</body>
 </document>
