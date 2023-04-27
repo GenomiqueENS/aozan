@@ -48,7 +48,7 @@
 
 		<menu name="About Aozan">
 			<item name="What is Aozan ?" href="/index.html" />
-			<item name="License" href="/licenses.html" />
+			<item name="Licenses" href="/licenses.html" />
 			<item name="People behind Aozan" href="/team.html" />
 			<item name="How to cite Aozan" href="/howtocite.html" />
 		</menu>
@@ -57,7 +57,7 @@
 			<item name="Downloading" href="/download.html" />
 			<item name="Installing" href="/installing.html" />
 			<item name="Release Notes" href="/changes-report.html" />
-			<item name="Samplesheet validator" href="http://outils.genomique.biologie.ens.fr/samplesheetvalidator" target="_blank"/>
+			<item name="Samplesheet validator" href="https://outils.genomique.biologie.ens.fr/samplesheetvalidator" target="_blank"/>
 			<item name="Quality report example" href="./qc_demo/160617_NB500892_0097_AH7N2TAFXX.html" target="_blank"/>
 		</menu>
 

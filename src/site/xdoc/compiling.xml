@@ -34,7 +34,7 @@
 
     <section name="How to compile Aozan">
 
-      <p>To build Aozan, you need a <a href="http://java.sun.com/j2se/">Java 2 Standard Edition SDK</a> greater or equal to 7 and <a href="http://maven.apache.org">Maven</a> 3.2.x.</p>
+      <p>To build Aozan, you need a <a href="http://java.sun.com/j2se/">Java Development Kit (JDK)</a> greater or equal to 11 and <a href="http://maven.apache.org">Maven</a> 3.6.x.</p>
 
       <p>The following command lines will work whatever your operating system is and whatever the "<code>$</code>" character representing the command line prompt is.</p>
       <p>To compile Aozan, the default memory amount allocated by Maven is not enough.

@@ -42,6 +42,7 @@
         <li><a href="#requirements">Requirements</a></li>
         <ul>
           <li><a href="#bcl2fastq2">Installing bcl2fastq2</a></li>
+          <li><a href="#bclconvert">Installing BCL Convert</a></li>
           <li><a href="#docker">Installing docker (optional)</a></li>
           <li><a href="#blastall">Installing ncbi-blast+ (optional)</a></li>
         </ul>
@@ -105,14 +106,15 @@
 
       <p>To run Aozan, you need to install the following software:</p>
       <ul>
-        <li>Java 7 or above (tested with Oracle JRE and OpenJDK)</li>
-        <li>bcl2fastq 2 (tested with bcl2fastq 2.17.1.14 and 2.18.0.12)</li>
+        <li>Java 11 or above (tested with OpenJDK)</li>
+        <li>bcl2fastq 2 (tested with bcl2fastq 2.17.1.14 and 2.18.0.12), not required if BCL Convert is used for demultiplexing</li>
+        <li>BCL Convert (tested with BCL Convert 3.9.3 and 4.0.3), not required if bcl2fastq is used for demultiplexing</li>
         <li>rsync 3.0.x or later</li>
       </ul>
 
-      <p>On Debian/Ubuntu, you can install requirements (except Bcl2fastq) using the 'apt-get' command, here is an example:</p>
+      <p>On Debian/Ubuntu, you can install requirements (except Bcl2fastq and BCL Convert) using the 'apt-get' command, here is an example:</p>
 <source>
-$ sudo apt-get install openjdk-7-jre-headless rsync
+$ sudo apt-get install openjdk-11-jre-headless rsync
 </source>
 
 
@@ -130,11 +132,11 @@ $ wget http://support.illumina.com/content/dam/illumina-support/documents/downlo
 
 # Install
 $ unzip bcl2fastq2-*.zip
-$ yum -y --nogpgcheck localinstall /tmp/bcl2fastq2-*.rpm
+$ sudo yum -y --nogpgcheck localinstall /tmp/bcl2fastq2-*.rpm
 
 # Patch a punctual error to search css file for create the final report html
 $ cd /usr/local/bin
-$ ln -s ../share/
+$ sudo ln -s ../share/
 
 # Install requiered dependencies
 $ yum install -y zip.x86_64
@@ -145,7 +147,32 @@ $ yum install -y zip.x86_64
 $ cd /tmp
 $ wget http://support.illumina.com/content/dam/illumina-support/documents/downloads/software/bcl2fastq/bcl2fastq2-v2-18-0-12-linux-x86-64.zip
 $ unzip bcl2fastq2-*.zip
-$ alien -i bcl2fastq2-*.rpm
+$ sudo alien -i bcl2fastq2-*.rpm
+</source>
+
+      </subsection>
+
+      <a name="bclconvert"/>
+      <subsection name="Installing BCL Convert">
+        <p>The BCL Convert software is a tool which handle bcl conversion and demultiplexing of bcl files.
+        BCL Convert can be downloaded on the Illumina website
+        <a href="https://emea.support.illumina.com/sequencing/sequencing_software/bcl-convert/downloads.html">here</a>.</p>
+
+
+        <p>On CentOS, you can install Bcl2fastq using the following commands:</p>
+        <source>
+$ cd /tmp
+$ wget https://webdata.illumina.com/downloads/software/bcl-convert/bcl-convert-4.0.3-2.el7.x86_64.rpm
+
+# Install
+$ sudo yum --assumeyes install bcl-convert-4.0.3-2.el7.x86_64.rpm
+</source>
+
+        <p>As BCL Convert is just one binary in a RPM package, you can also use the RPM package on Debian/Ubuntu using the following commands:</p>
+        <source>
+$ cd /tmp
+$ wget https://webdata.illumina.com/downloads/software/bcl-convert/bcl-convert-4.0.3-2.el7.x86_64.rpm
+$ sudo alien -i bcl-convert-4.0.3-2.el7.x86_64.rpm
 </source>
 
       </subsection>

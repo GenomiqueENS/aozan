@@ -52,11 +52,6 @@
 
       <ul>
         <li>
-          <p>Example on HiSeq 1500 (RTA 1.x) run with First base report</p>
-          <img src="images/mail_firstbasereport_450px.png" alt="example email on HiSeq 1500 run with First base report" />
-          <p/>
-        </li>
-        <li>
           <p>Example on NextSeq 500 (RTA 2.x) run</p>
           <img src="images/mail_newrun_nextseq.png" alt="example email on NextSeq 500 run without First base report" />
         </li>
