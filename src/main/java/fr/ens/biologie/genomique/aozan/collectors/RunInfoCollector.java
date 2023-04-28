@@ -23,8 +23,15 @@
 
 package fr.ens.biologie.genomique.aozan.collectors;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -37,8 +44,8 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
-import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.Aozan2Logger;
+import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.Settings;
@@ -133,7 +140,7 @@ public class RunInfoCollector implements Collector {
       data.put(PREFIX + ".flow.cell.tile.count",
           runInfo.getFlowCellTileCount());
 
-      data.put(PREFIX + ".date", runInfo.getDate());
+      data.put(PREFIX + ".date", dateToYYMMDD(runInfo.getDate()));
 
       // Value specific on RTA version 1.X otherwise value is -1
       data.put(PREFIX + ".flow.cell.lane.per.section",
@@ -236,6 +243,33 @@ public class RunInfoCollector implements Collector {
     File result = new File(parentFile, "runParameters.xml");
 
     return result.exists() ? result : new File(parentFile, "RunParameters.xml");
+  }
+
+  /**
+   * Convert a date in ISO format to original Illumina date format.
+   * @param s Date in a String to convert
+   * @return a String with the date in the old format
+   */
+  private static String dateToYYMMDD(String s) {
+
+    requireNonNull(s);
+
+    if (!s.endsWith("Z")) {
+      return s;
+    }
+
+    try {
+      DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+      Date d = df1.parse(s);
+      Calendar calendar = Calendar.getInstance();
+      calendar.setTime(d);
+      return String.format("%02d%02d%02d", calendar.get(Calendar.YEAR) - 2000,
+          calendar.get(Calendar.MONTH) + 1,
+          calendar.get(Calendar.DAY_OF_MONTH));
+    } catch (ParseException e) {
+      return s;
+    }
+
   }
 
 }
