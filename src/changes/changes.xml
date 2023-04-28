@@ -955,7 +955,7 @@
 			</action>
 		</release>
 	
-		<release version="3.0" description="Aozan 3.0 release"  date="TBD">
+		<release version="3.0" description="Aozan 3.0 release"  date="2023-04-28">
 			<action dev="jourdren" type="add">
                                  Rewrite all the Python code in Java.
 			</action>

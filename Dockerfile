@@ -2,19 +2,19 @@
 # Dockerfile to build aozan container images
 ############################################################
 
-# Use Centos 6 as base
-FROM centos:6
+# Use Centos 7 as base
+FROM centos:7
 
 # File Author / Maintainer
 MAINTAINER Laurent Jourdren <jourdren@biologie.ens.fr>
 
 # Install Aozan public version
-ADD https://github.com/GenomicParisCentre/aozan/releases/download/v2.2.1/aozan-2.2.1.tar.gz /tmp/
+ADD https://github.com/GenomiqueENS/aozan/releases/download/v3.0/aozan-3.0.tar.gz /tmp/
 
 RUN cd /usr/local && \
     tar xzf /tmp/aozan-*.tar.gz && \
     ln -s /usr/local/aozan*/aozan.sh /usr/local/bin && \
-    yum install -y java-1.7.0-openjdk.x86_64 \
+    yum install -y java-11-openjdk-headless.x86_64 \
                    tar \
                    rsync.x86_64 \
                    bzip2.x86_64 \
