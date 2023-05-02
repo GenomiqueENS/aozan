@@ -26,7 +26,7 @@ public class BclConvertIlluminaDemuxDataProcessor
 
   public static final String PROCESSOR_NAME = "illumina_bclconvert";
 
-  private static final String DEFAULT_CONVERT_VERSION = "4.0.3";
+  private static final String DEFAULT_CONVERT_VERSION = "4.1.5";
   private static final String DEFAULT_DOCKER_IMAGE =
       "bclconvert:" + DEFAULT_CONVERT_VERSION;
 
