@@ -162,7 +162,14 @@ public class SendMail {
       msg.setText(textContent);
 
       // Send the message
-      Transport.send(msg);
+      // Transport.send(msg);
+      Transport tr = session.getTransport("smtp");
+      tr.connect(this.properties.getProperty("mail.smtp.host"),
+          this.properties.getProperty("mail.smtp.login"),
+          this.properties.getProperty("mail.smtp.password"));
+      msg.saveChanges();
+      tr.sendMessage(msg, msg.getAllRecipients());
+      tr.close();
 
     } catch (MessagingException mex) {
       this.logger.warn("Error while sending mail: " + mex.getMessage());

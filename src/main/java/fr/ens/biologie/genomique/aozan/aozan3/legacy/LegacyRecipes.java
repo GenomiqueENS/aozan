@@ -239,8 +239,13 @@ public class LegacyRecipes {
 
     table.put("bcl2fastq.threads", Settings.DEMUX_THREADS_KEY);
 
-    table.put("smtp.server", Settings.SMTP_SERVER_KEY);
-    table.put("smtp.port", Settings.SMTP_PORT_KEY);
+    table.put("smtp.server", "mail.smtp.host");
+    table.put("smtp.port", "mail.smtp.port");
+    table.put("smtp.use.starttls", "mail.smtp.starttls.enable");
+    table.put("smtp.use.ssl", "mail.smtp.ssl.enable");
+
+    table.put("smtp.login", "mail.smtp.login");
+    table.put("smtp.password", "mail.smtp.password");
 
     for (Map.Entry<String, String> e : conf.toMap().entrySet()) {
       String key =
