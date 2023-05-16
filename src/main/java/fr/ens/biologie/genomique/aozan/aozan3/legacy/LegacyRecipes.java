@@ -1,5 +1,6 @@
 package fr.ens.biologie.genomique.aozan.aozan3.legacy;
 
+import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 
 import java.nio.file.Path;
@@ -264,9 +265,6 @@ public class LegacyRecipes {
       return false;
     }
 
-    // Mode debug
-    // aozan.debug=False
-
     // Sequencer names
     for (Map.Entry<String, String> e : aozan2Conf.toMap().entrySet()) {
 
@@ -280,22 +278,17 @@ public class LegacyRecipes {
     // Enable email sending
     setSetting(conf, aozan2Conf, "send.mail", "send.mail", "False");
 
-    // SMTP server name
-    setSetting(conf, aozan2Conf, "mail.smtp.host", "mail.smtp.host");
-    setSetting(conf, aozan2Conf, "mail.smtp.host", "mail.smtp.host");
+    // Set email source and destinations
+    for (String key : asList("mail.from", "mail.to", "mail.error.to")) {
+      setSetting(conf, aozan2Conf, key, key);
+    }
 
-    // SMTP server port
-    setSetting(conf, aozan2Conf, "mail.smtp.port", "mail.smtp.port", "25");
-
-    // From field of email
-    setSetting(conf, aozan2Conf, "mail.from", "mail.from", "");
-
-    // To field of email
-    // mail.to=me@example.com
-    setSetting(conf, aozan2Conf, "mail.to", "mail.to", "");
-
-    // Email recipient when an error occurs during Aozan (Optional)
-    // mail.error.to=aozan-errors@example.com
+    // Set SMTP configuration
+    for (String key : aozan2Conf.toMap().keySet()) {
+      if (key.startsWith("mail.smtp.")) {
+        setSetting(conf, aozan2Conf, key, key);
+      }
+    }
 
     return true;
   }

@@ -272,7 +272,11 @@ public class SendMail {
       if (key != null && key.startsWith(prefix)) {
         result.setProperty(key, e.getValue());
       }
+    }
 
+    // Set default SMTP port if not set
+    if (!result.containsKey("mail.smtp.port")) {
+      result.setProperty("mail.smtp.port", "25");
     }
 
     return result;
