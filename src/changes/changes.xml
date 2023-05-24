@@ -1013,7 +1013,12 @@
 			<action dev="jourdren" type="fix">
                                  In OverrepresentedSequencesBlast, now use a the SAX API instead of the DOM API to parse blast XML result file. When a large XML output file is produced, an OutOfMemoryError error could occurs.
 			</action>
+		</release>
 
+		<release version="3.0.1" description="Aozan 3.0.1 release"  date="2023-05-24">
+			<action dev="jourdren" type="fix">
+                                 Fix SMTP configuration with StartTTLS, SSL and login/password.
+			</action>
 		</release>
 
 		</body>
