@@ -48,7 +48,7 @@ import fr.ens.biologie.genomique.kenetre.util.StringUtils;
 public abstract class AbstractIlluminaDemuxDataProcessor
     implements DataProcessor {
 
-  private static final boolean USE_DOCKER = true;
+  private static final boolean USE_DOCKER = false;
 
   private GenericLogger logger = new DummyLogger();
 
