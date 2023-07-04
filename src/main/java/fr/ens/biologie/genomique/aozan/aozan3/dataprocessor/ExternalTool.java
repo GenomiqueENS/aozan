@@ -47,7 +47,7 @@ public class ExternalTool {
 
     if (enableLogging) {
       info(this.logger, runId,
-          dockerMode
+          this.dockerMode
               ? "Use Docker for executing " + this.toolName
               : "Use installed version of " + this.toolName);
     }
