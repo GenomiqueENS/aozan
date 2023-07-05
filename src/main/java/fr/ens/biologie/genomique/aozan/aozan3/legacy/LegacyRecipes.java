@@ -290,8 +290,12 @@ public class LegacyRecipes {
       }
     }
 
-    // bcl2fastq path
-    setSetting(conf, aozan2Conf, "bcl2fastq.path", "bcl2fastq.path");
+    // bcl2fastq configuration
+    for (String key : aozan2Conf.toMap().keySet()) {
+      if (key.startsWith("bcl2fastq.")) {
+        setSetting(conf, aozan2Conf, key, key);
+      }
+    }
 
     // Set bcl-convert configuration
     for (String key : aozan2Conf.toMap().keySet()) {
