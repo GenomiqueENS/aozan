@@ -1021,5 +1021,11 @@
 			</action>
 		</release>
 
+		<release version="3.0.2" description="Aozan 3.0.2 release"  date="2023-07-07">
+			<action dev="jourdren" type="fix">
+                                 Fix issue for demultiplexing without using Docker.
+			</action>
+		</release>
+
 		</body>
 </document>
