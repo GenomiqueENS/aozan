@@ -158,6 +158,7 @@ public class ExternalTool {
 
     this.toolName = toolName;
     this.dockerMode = dockerMode;
+    this.dockerGpuMode = dockerGpuMode;
     this.dockerImage = dockerImage == null ? "" : dockerImage.trim();
     this.logger = logger == null ? new DummyLogger() : logger;
   }
