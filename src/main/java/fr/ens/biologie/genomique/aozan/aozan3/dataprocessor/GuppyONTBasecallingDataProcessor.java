@@ -23,9 +23,11 @@ import fr.ens.biologie.genomique.aozan.aozan3.DataType;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
+import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.ExternalTool.ExecutionUser;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.DataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.datatypefilter.SimpleDataTypeFilter;
 import fr.ens.biologie.genomique.aozan.aozan3.util.CopyAndMergeGuppyOutput;
+import fr.ens.biologie.genomique.aozan.aozan3.util.DiskUtils;
 import fr.ens.biologie.genomique.aozan.aozan3.util.UnTar;
 import fr.ens.biologie.genomique.kenetre.log.DummyLogger;
 import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
@@ -216,7 +218,12 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
 
       // Launch Guppy
       System.out.println("* Launch Guppy");
+
+      // Create a temporary directory writable by all users
       Path outputDirPath = Files.createTempDirectory(tmpPath, "fastq-");
+      DiskUtils.changeDirectoryMode(outputDirPath, "777");
+
+      // Launch Guppy
       launchGuppy(runId, inputDirPath, outputDirPath, runConf, logger);
 
       // Copy and merge FAST5 files to the output directory
@@ -260,7 +267,8 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
     ExternalTool tool =
         new ExternalTool("guppy", runConf.getBoolean("guppy.use.docker", false),
             runConf.get("guppy.docker.image", ""),
-            runConf.getBoolean("guppy.use.docker", false), logger);
+            runConf.getBoolean("guppy.use.docker", false), ExecutionUser.NOBODY,
+            logger);
 
     // Get demultiplexing tool version
     String toolVersion = tool.getToolVersion(runId, runConf.get("tmp.dir"),
@@ -427,13 +435,13 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
       return null;
     }
 
-    String firstLine = lines.get(0);
-
-    if (!firstLine.contains("Version ")) {
-      return null;
+    for (String line : lines) {
+      if (line.contains("Guppy") && line.contains("Version")) {
+        return line.substring("Version ".length());
+      }
     }
 
-    return firstLine.substring("Version ".length());
+    return null;
   }
 
   /**
