@@ -24,10 +24,15 @@ import fr.ens.biologie.genomique.kenetre.util.process.SystemSimpleProcess;
  */
 public class ExternalTool {
 
+  enum ExecutionUser {
+    ROOT, USER, NOBODY
+  };
+
   private String toolName;
   private boolean dockerMode;
   private String dockerImage;
   private boolean dockerGpuMode;
+  private ExecutionUser user = ExecutionUser.USER;
   private GenericLogger logger;
 
   private String toolNameLower() {
@@ -68,6 +73,18 @@ public class ExternalTool {
     // Use fallback Docker client
     FallBackDockerClient client = new FallBackDockerClient();
     client.enableGpus(this.dockerGpuMode);
+
+    switch (this.user) {
+    case ROOT:
+      client.useRootUser();
+      break;
+    case NOBODY:
+      client.useNobodyUser();
+      break;
+    default:
+      break;
+    }
+
     DockerImageInstance result = client.createConnection(this.dockerImage);
 
     // Pull Docker image if not exists
@@ -149,6 +166,19 @@ public class ExternalTool {
    */
   ExternalTool(String toolName, boolean dockerMode, String dockerImage,
       boolean dockerGpuMode, GenericLogger logger) {
+    this(toolName, dockerMode, dockerImage, dockerGpuMode, null, logger);
+  }
+
+  /**
+   * Constructor.
+   * @param toolName name of the tool
+   * @param docker enable docker mode
+   * @param dockerImage docker image
+   * @param dockerGpuMode true to enable GPU mode
+   * @param logger logger to use
+   */
+  ExternalTool(String toolName, boolean dockerMode, String dockerImage,
+      boolean dockerGpuMode, ExecutionUser user, GenericLogger logger) {
 
     requireNonNull(toolName);
 
@@ -160,6 +190,7 @@ public class ExternalTool {
     this.dockerMode = dockerMode;
     this.dockerGpuMode = dockerGpuMode;
     this.dockerImage = dockerImage == null ? "" : dockerImage.trim();
+    this.user = user != null ? user : ExecutionUser.USER;
     this.logger = logger == null ? new DummyLogger() : logger;
   }
 
