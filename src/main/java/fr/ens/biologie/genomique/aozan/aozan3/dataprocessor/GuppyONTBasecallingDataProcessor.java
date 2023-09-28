@@ -180,6 +180,7 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
       Path inputDirPath = Files.createTempDirectory(tmpPath, "raw-fast5-");
       UnTar untar = new UnTar(inputTarPath, inputDirPath);
       untar.execute();
+      DiskUtils.changeDirectoryMode(inputDirPath, "777");
 
       directoryPipeline(runId, inputDirPath, outputPath, tmpPath, runConf,
           keepTemporaryFiles, logger);
