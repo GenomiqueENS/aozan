@@ -490,7 +490,7 @@ def create_bcl2fastq_command_line(run_id, command_path, input_run_data_path, fas
     if common.is_conf_key_exists(BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY, conf):
         additional_args = conf[BCL2FASTQ_ADDITIONNAL_ARGUMENTS_KEY]
         additional_args = re.sub('\\s+', ' ', additional_args).strip()
-        args.extends(additional_args.split(' '))
+        args.extend(additional_args.split(' '))
 
     # Retrieve output in file
     args.extend(['>', quote(tmp_path + '/bcl2fastq_output_' + run_id + '.out')])
