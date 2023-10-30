@@ -204,26 +204,28 @@ public class CopyAndMergeGuppyOutput {
     }
 
     // For each FASTQ file
-    for (Path subDir : fastqFiles.keySet()) {
+    if (fastqFiles != null) {
+      for (Path subDir : fastqFiles.keySet()) {
 
-      boolean gzip = false;
-      List<Path> inputFiles = new ArrayList<>(fastqFiles.get(subDir));
-      inputFiles.sort(new PathTimeComparator());
+        boolean gzip = false;
+        List<Path> inputFiles = new ArrayList<>(fastqFiles.get(subDir));
+        inputFiles.sort(new PathTimeComparator());
 
-      // Test if files are gzipped
-      if (inputFiles.get(0).toFile().getName().endsWith(".gz")) {
-        gzip = true;
+        // Test if files are gzipped
+        if (inputFiles.get(0).toFile().getName().endsWith(".gz")) {
+          gzip = true;
+        }
+
+        Path outputDir =
+            this.outputPath.resolve(this.inputPath.relativize(subDir));
+        Path outputFile =
+            Paths.get(outputDir.toString() + (gzip ? ".fastq.gz" : ".fastq"));
+
+        concatenateFASTQ(outputFile, inputFiles, gzip);
+
+        // Remove empty directory
+        Files.delete(outputDir);
       }
-
-      Path outputDir =
-          this.outputPath.resolve(this.inputPath.relativize(subDir));
-      Path outputFile =
-          Paths.get(outputDir.toString() + (gzip ? ".fastq.gz" : ".fastq"));
-
-      concatenateFASTQ(outputFile, inputFiles, gzip);
-
-      // Remove empty directory
-      Files.delete(outputDir);
     }
 
     concatenateLogs(
@@ -259,7 +261,7 @@ public class CopyAndMergeGuppyOutput {
 
     try {
 
-      if (filesToGzip.contains(filename)) {
+      if (filesToGzip.contains(filename) || filename.endsWith(".fastq")) {
         compress(source, dest);
       } else {
         Files.copy(source, dest, StandardCopyOption.REPLACE_EXISTING,
@@ -358,8 +360,7 @@ public class CopyAndMergeGuppyOutput {
     File outputFile = new File(dest.toString() + ".gz");
 
     try (InputStream in = new FileInputStream(inputFile);
-        OutputStream out =
-            new GZIPOutputStream(
+        OutputStream out = new GZIPOutputStream(
             new FileOutputStream(outputFile), DEFAULT_BUFFER_SIZE)) {
       copy(in, out);
     }

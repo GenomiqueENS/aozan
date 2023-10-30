@@ -3,3 +3,4 @@ fr.ens.biologie.genomique.aozan.aozan3.action.ListAction
 fr.ens.biologie.genomique.aozan.aozan3.action.LegacyAction
 fr.ens.biologie.genomique.aozan.aozan3.action.SampleSheetConvertAction
 fr.ens.biologie.genomique.aozan.aozan3.action.GuppyAction
+fr.ens.biologie.genomique.aozan.aozan3.action.DoradoAction
