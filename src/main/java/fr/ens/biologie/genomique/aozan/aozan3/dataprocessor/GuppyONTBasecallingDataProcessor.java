@@ -155,7 +155,7 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
   }
 
   /**
-   * Convienient method to launch guppy outside Aozan workflow.
+   * Convenient method to launch Guppy outside Aozan workflow.
    * @param runId run Id
    * @param inputTarPath input tar with Fast5 files path
    * @param outputPath output path
@@ -197,7 +197,7 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
   }
 
   /**
-   * Convienient method to launch guppy outside Aozan workflow.
+   * Convenient method to launch Guppy outside Aozan workflow.
    * @param runId run Id
    * @param inputDirPath input directory with Fast5 files path
    * @param outputPath output path
@@ -231,12 +231,14 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
       Path mergedFastqPath = Paths.get(outputPath.toString(), runId.getId());
       CopyAndMergeGuppyOutput merger =
           new CopyAndMergeGuppyOutput(outputDirPath, mergedFastqPath);
-      merger.setFastqMerging(runConf.getBoolean("guppy.merge.fastq", true));
-      merger.setLogMerging(runConf.getBoolean("guppy.merge.logs", true));
-      merger.setCompressSequencingSummary(
-          runConf.getBoolean("guppy.compress.sequencing.summary", false));
-      merger.setCompressTelemetry(
-          runConf.getBoolean("guppy.compress.sequencing.telemetry", false));
+      merger.setFastqMerging(
+          runConf.getBoolean(CONF_PREFIX + ".merge.fastq", true));
+      merger
+          .setLogMerging(runConf.getBoolean(CONF_PREFIX + ".merge.logs", true));
+      merger.setCompressSequencingSummary(runConf
+          .getBoolean(CONF_PREFIX + ".compress.sequencing.summary", false));
+      merger.setCompressTelemetry(runConf
+          .getBoolean(CONF_PREFIX + ".compress.sequencing.telemetry", false));
       merger.execute();
 
       // Delete unmerged Fastq directory
@@ -265,15 +267,16 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
       throws Aozan3Exception, IOException {
 
     // Define external tool
-    ExternalTool tool =
-        new ExternalTool("guppy", runConf.getBoolean("guppy.use.docker", false),
-            runConf.get("guppy.docker.image", ""),
-            runConf.getBoolean("guppy.use.docker", false), ExecutionUser.NOBODY,
-            logger);
+    ExternalTool tool = new ExternalTool("guppy",
+        runConf.getBoolean(CONF_PREFIX + ".use.docker", false),
+        runConf.get(CONF_PREFIX + ".docker.image", ""),
+        runConf.getBoolean(CONF_PREFIX + ".use.docker", false),
+        ExecutionUser.NOBODY, logger);
 
     // Get demultiplexing tool version
     String toolVersion = tool.getToolVersion(runId, runConf.get("tmp.dir"),
-        asList(runConf.get("guppy.path", "guppy_basecaller"), "--version"),
+        asList(runConf.get(CONF_PREFIX + ".path", "guppy_basecaller"),
+            "--version"),
         false, GuppyONTBasecallingDataProcessor::parseGuppyVersion);
 
     // TODO get guppy version
@@ -319,7 +322,7 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
    * @param inputPath input path
    * @param outputPath output path
    * @param runConf run configuration
-   * @return a list with gGuppy arguments
+   * @return a list with Guppy arguments
    * @throws Aozan3Exception if configuration is invalid
    */
   private static List<String> createGuppyCommandLine(Path inputPath,
@@ -330,19 +333,20 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
     requireNonNull(runConf);
 
     // TODO move this
-    if (!runConf.containsKey("guppy.config")) {
-      if (!runConf.containsKey("guppy.kit")) {
+    if (!runConf.containsKey(CONF_PREFIX + ".config")) {
+      if (!runConf.containsKey(CONF_PREFIX + ".kit")) {
         throw new Aozan3Exception("Kit missing in configuration");
       }
 
       // TODO move this
-      if (!runConf.containsKey("guppy.flowcell")) {
+      if (!runConf.containsKey(CONF_PREFIX + ".flowcell")) {
         throw new Aozan3Exception("Flowcell missing in configuration");
       }
     }
 
     // Get parameter values
-    String finalCommandPath = runConf.get("guppy.path", "guppy_basecaller");
+    String finalCommandPath =
+        runConf.get(CONF_PREFIX + ".path", "guppy_basecaller");
 
     //  List arg
     List<String> result = new ArrayList<>();
@@ -367,56 +371,56 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
     }
 
     // Config
-    if (runConf.containsKey("guppy.config")) {
+    if (runConf.containsKey(CONF_PREFIX + ".config")) {
       result.add("--config");
-      result.add(runConf.get("guppy.config"));
+      result.add(runConf.get(CONF_PREFIX + ".config"));
     } else {
       // Kit
       result.add("--kit");
-      result.add(runConf.get("guppy.kit"));
+      result.add(runConf.get(CONF_PREFIX + ".kit"));
 
       // Flowcell
       result.add("--flowcell");
-      result.add(runConf.get("guppy.flowcell"));
+      result.add(runConf.get(CONF_PREFIX + ".flowcell"));
     }
 
     // Barcodes
-    if (runConf.containsKey("guppy.barcode.kits")) {
+    if (runConf.containsKey(CONF_PREFIX + ".barcode.kits")) {
       result.add("--barcode_kits");
-      result.add(runConf.get("guppy.barcode.kits"));
+      result.add(runConf.get(CONF_PREFIX + ".barcode.kits"));
 
-      if (runConf.getBoolean("guppy.trim.barcodes", false)) {
+      if (runConf.getBoolean(CONF_PREFIX + ".trim.barcodes", false)) {
         result.add("--trim_barcode");
       }
     }
 
-    if (runConf.containsKey("guppy.min.qscore")) {
+    if (runConf.containsKey(CONF_PREFIX + ".min.qscore")) {
       result.add("--min_qscore");
-      result.add(runConf.get("guppy.min.qscore"));
+      result.add(runConf.get(CONF_PREFIX + ".min.qscore"));
     }
 
     // Cuda device
     result.add("--device");
-    result.add(runConf.get("guppy.cuda.device", "auto"));
+    result.add(runConf.get(CONF_PREFIX + ".cuda.device", "auto"));
 
     // GPU runner per device
-    if (runConf.containsKey("guppy.gpu.runners.per.device")) {
+    if (runConf.containsKey(CONF_PREFIX + ".gpu.runners.per.device")) {
       result.add("--gpu_runners_per_device");
-      result.add(runConf.get("guppy.gpu.runners.per.device"));
+      result.add(runConf.get(CONF_PREFIX + ".gpu.runners.per.device"));
     }
 
     // Chuncks per runner
-    if (runConf.containsKey("guppy.chunks.per.runner")) {
+    if (runConf.containsKey(CONF_PREFIX + ".chunks.per.runner")) {
       result.add("--chunks_per_runner");
-      result.add(runConf.get("guppy.chunks.per.runner"));
+      result.add(runConf.get(CONF_PREFIX + ".chunks.per.runner"));
     }
 
     // Caller
     result.add("--num_callers");
-    result.add(runConf.get("guppy.num.callers", "4"));
+    result.add(runConf.get(CONF_PREFIX + ".num.callers", "4"));
 
     result.add("--records_per_fastq");
-    result.add(runConf.get("guppy.records.per.fastq", "4000"));
+    result.add(runConf.get(CONF_PREFIX + ".records.per.fastq", "4000"));
 
     result.add("--disable_pings");
 
@@ -426,7 +430,7 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
   }
 
   /**
-   * Parse guppy version from Guppy output.
+   * Parse Guppy version from Guppy output.
    * @param lines lines to parse
    * @return a String with the Guppy version
    */
@@ -526,45 +530,45 @@ public class GuppyONTBasecallingDataProcessor implements DataProcessor {
 
     RunConfiguration runConf = new RunConfiguration();
     runConf.set("tmp.dir", tmpPath.toString());
-    runConf.set("guppy.use.docker", "true");
-    runConf.set("guppy.docker.image",
+    runConf.set(CONF_PREFIX + ".use.docker", "true");
+    runConf.set(CONF_PREFIX + ".docker.image",
         "genomicpariscentre/guppy-gpu:" + guppyVersion);
     // runConf.set("guppy.flowcell.sn", "FA035147");
 
     if (!cudaDevice.trim().isEmpty()) {
-      runConf.set("guppy.cuda.device", cudaDevice.trim());
+      runConf.set(CONF_PREFIX + ".cuda.device", cudaDevice.trim());
     }
 
     if (gpuRunnersPerDevice > 0) {
-      runConf.set("guppy.gpu.runners.per.device", gpuRunnersPerDevice);
+      runConf.set(CONF_PREFIX + ".gpu.runners.per.device", gpuRunnersPerDevice);
     }
 
     if (chunksPerRunner > 0) {
-      runConf.set("guppy.chunks.per.runner", chunksPerRunner);
+      runConf.set(CONF_PREFIX + ".chunks.per.runner", chunksPerRunner);
     }
 
     if (!config.trim().isEmpty()) {
-      runConf.set("guppy.config", config.trim());
+      runConf.set(CONF_PREFIX + ".config", config.trim());
     } else {
-      runConf.set("guppy.kit", kit.trim());
-      runConf.set("guppy.flowcell", flowcellType.trim());
+      runConf.set(CONF_PREFIX + ".kit", kit.trim());
+      runConf.set(CONF_PREFIX + ".flowcell", flowcellType.trim());
     }
 
     if (!barcodeKits.trim().isEmpty()) {
-      runConf.set("guppy.barcoding", "true");
-      runConf.set("guppy.barcode.kits", barcodeKits.trim());
+      runConf.set(CONF_PREFIX + ".barcoding", "true");
+      runConf.set(CONF_PREFIX + ".barcode.kits", barcodeKits.trim());
 
       if (trimBarcodes) {
-        runConf.set("guppy.trim.barcodes", "true");
+        runConf.set(CONF_PREFIX + ".trim.barcodes", "true");
       }
     }
 
     if (!minQscore.trim().isEmpty()) {
-      runConf.set("guppy.min.qscore", minQscore);
+      runConf.set(CONF_PREFIX + ".min.qscore", minQscore);
     }
 
     if (fast5Output) {
-      runConf.set("guppy.fast5.output", "true");
+      runConf.set(CONF_PREFIX + ".fast5.output", "true");
     }
 
     System.out.println("### START ###");
