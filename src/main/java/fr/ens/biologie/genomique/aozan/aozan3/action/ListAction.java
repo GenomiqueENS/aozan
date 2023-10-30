@@ -47,7 +47,7 @@ public class ListAction implements Action {
 
   @Override
   public boolean isHidden() {
-    return false;
+    return true;
   }
 
   @Override
