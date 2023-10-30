@@ -49,10 +49,12 @@ public class AozanLoggerFactory {
         return new DummyLogger();
 
       case "stderr":
-        return new StandardErrorLogger(Globals.APP_NAME, conf.toMap());
+        return new StandardErrorLogger(Globals.APP_NAME,
+            aozanLogConfToKenetreLogConf(conf).toMap());
 
       case "file":
-        return new FileLogger(Globals.APP_NAME, conf.toMap());
+        return new FileLogger(Globals.APP_NAME,
+            aozanLogConfToKenetreLogConf(conf).toMap());
 
       default:
         throw new Aozan3Exception("Unknown logger: " + loggerName);
@@ -61,6 +63,22 @@ public class AozanLoggerFactory {
       throw new Aozan3Exception(e);
     }
 
+  }
+
+  private static final Configuration aozanLogConfToKenetreLogConf(
+      Configuration aozanConf) {
+
+    Configuration result = new Configuration();
+
+    if (aozanConf.containsKey("aozan.log")) {
+      result.set("log.file", aozanConf.get("aozan.log"));
+    }
+
+    if (aozanConf.containsKey("aozan.log.level")) {
+      result.set("log.level", aozanConf.get("aozan.log.level"));
+    }
+
+    return result;
   }
 
   //
