@@ -58,6 +58,7 @@ import fr.ens.biologie.genomique.aozan.tests.lane.LaneTest;
 import fr.ens.biologie.genomique.aozan.tests.pooledsample.PooledSampleTest;
 import fr.ens.biologie.genomique.aozan.tests.project.ProjectTest;
 import fr.ens.biologie.genomique.aozan.tests.sample.SampleTest;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.PropertySection;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVReader;
@@ -560,8 +561,10 @@ public class QC {
         "fastqc.unzip");
 
     // Patch FastQC classes
-    RuntimePatchFastQC.runPatchFastQC(Boolean
-        .valueOf(settings.get(Settings.QC_CONF_FASTQC_BLAST_ENABLE_KEY)));
+    boolean blastEnabledInConf =
+        Boolean.valueOf(settings.get(Settings.QC_CONF_FASTQC_BLAST_ENABLE_KEY));
+    RuntimePatchFastQC
+        .runPatchFastQC(!isBlastDisabledInSampleSheet() && blastEnabledInConf);
 
     // Initialize FastQCConfig
     FastQCConfig.getInstance();
@@ -754,6 +757,38 @@ public class QC {
     IOException e) {
       throw new AozanException(e);
     }
+  }
+
+  private boolean isBlastDisabledInSampleSheet() {
+
+    // this.globalConf.put(SAMPLESHEET,
+    // SampleSheetUtils.serialize(this.sampleSheet));
+
+    String s = this.globalConf.get(SAMPLESHEET);
+    if (s == null) {
+      return false;
+    }
+
+    try {
+      return isBlastDisabledInSampleSheet(SampleSheetUtils.deSerialize(s));
+    } catch (IOException e) {
+      return false;
+    }
+  }
+
+  private static boolean isBlastDisabledInSampleSheet(SampleSheet samplesheet) {
+
+    if (samplesheet == null) {
+      return false;
+    }
+
+    if (samplesheet.containsPropertySection("Aozan")) {
+      PropertySection aozanSection = samplesheet.getPropertySection("Aozan");
+
+      return Boolean.parseBoolean(aozanSection.get("disable.blast", "false"));
+    }
+
+    return false;
   }
 
   //
