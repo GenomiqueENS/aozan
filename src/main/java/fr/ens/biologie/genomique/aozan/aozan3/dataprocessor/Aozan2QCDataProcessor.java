@@ -26,6 +26,7 @@ import java.util.Set;
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.QCReport;
+import fr.ens.biologie.genomique.aozan.QCReportExporter;
 import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
@@ -299,28 +300,29 @@ public class Aozan2QCDataProcessor implements DataProcessor {
 
     // Compute report
     QCReport qcReport = qc.computeReport();
+    QCReportExporter exporter = new QCReportExporter(qcReport);
+
+    File outputDirectory = outputLocation.getPath().toFile();
 
     // Write data file
     if (writeDataFile) {
-      File dataFile = new File(outputLocation.getPath().toFile(),
-          illuminaRunId + QC_DATA_EXTENSION);
-      qc.writeRawData(qcReport, dataFile);
+      File dataFile =
+          new File(outputDirectory, illuminaRunId + QC_DATA_EXTENSION);
+      exporter.writeRawData(dataFile);
     }
 
     // Write XML report
     if (writeXMLFile) {
-      File xmlFile =
-          new File(outputLocation.getPath().toFile(), illuminaRunId + ".xml");
-      qc.writeXMLReport(qcReport, xmlFile);
+      File xmlFile = new File(outputDirectory, illuminaRunId + ".xml");
+      exporter.writeXMLReport(xmlFile);
     }
 
     // Write HTML report
     if (writeHTMLFile) {
-      File htmlFile =
-          new File(outputLocation.getPath().toFile(), illuminaRunId + ".html");
+      File htmlFile = new File(outputDirectory, illuminaRunId + ".html");
 
       // TODO update argument type of the method
-      qc.writeReport(qcReport, styleSheetPath.isEmpty() ? null : styleSheetPath,
+      exporter.writeReport(styleSheetPath.isEmpty() ? null : styleSheetPath,
           htmlFile.toString());
     }
   }

@@ -84,9 +84,7 @@ public class QCReport {
    * Generate the QC report for global tests.
    * @param parentElement parent Element
    */
-  private void doGlobalTests(final Element parentElement) {
-
-    final Document doc = this.doc;
+  private void doGlobalTests(final Document doc, final Element parentElement) {
 
     final Element root = doc.createElement("GlobalReport");
     parentElement.appendChild(root);
@@ -122,9 +120,8 @@ public class QCReport {
    * Generate the QC report for lane tests.
    * @param parentElement parent Element
    */
-  private void doLanesTests(final Element parentElement) {
+  private void doLanesTests(final Document doc, final Element parentElement) {
 
-    final Document doc = this.doc;
     final int readCount = this.data.getReadCount();
     final int laneCount = this.data.getLaneCount();
 
@@ -180,9 +177,8 @@ public class QCReport {
     }
   }
 
-  private void doProjectsStatsTests(final Element parentElement) {
-
-    final Document doc = this.doc;
+  private void doProjectsStatsTests(final Document doc,
+      final Element parentElement) {
 
     // Sort pooled samples
     final List<Integer> projectIds = this.data.getProjects();
@@ -226,14 +222,13 @@ public class QCReport {
     }
   }
 
-  private void doSamplesStatsTests(final Element parentElement) {
+  private void doSamplesStatsTests(final Document doc,
+      final Element parentElement) {
 
     // Check needed to add this tests
     if (this.data.getProjectCount() > 1) {
       return;
     }
-
-    final Document doc = this.doc;
 
     final Element root = doc.createElement("SamplesStatsReport");
     parentElement.appendChild(root);
@@ -288,9 +283,8 @@ public class QCReport {
    * Generate the QC report for projects data.
    * @param parentElement parent Element
    */
-  private void addElementForFilter(final Element parentElement) {
-
-    final Document doc = this.doc;
+  private void addElementForFilter(final Document doc,
+      final Element parentElement) {
 
     final List<String> elements = new ArrayList<>();
     String filterType;
@@ -361,9 +355,8 @@ public class QCReport {
    * Generate the QC report for samples tests.
    * @param parentElement parent Element
    */
-  private void doSamplesTests(final Element parentElement) {
+  private void doSamplesTests(final Document doc, final Element parentElement) {
 
-    final Document doc = this.doc;
     final int readCount = this.data.getReadCount();
     final int laneCount = this.data.getLaneCount();
 
@@ -432,19 +425,19 @@ public class QCReport {
               indexString = "NoIndex";
             }
           }
-          addSample(readElement, read, readSample, sampleId, lane, sampleName,
-              desc, projectName, indexString);
+          addSample(doc, readElement, read, readSample, sampleId, lane,
+              sampleName, desc, projectName, indexString);
         }
       }
     }
   }
 
-  private void addSample(final Element readElement, final int read,
-      final int readSample, final int sampleId, final int lane,
+  private void addSample(final Document doc, final Element readElement,
+      final int read, final int readSample, final int sampleId, final int lane,
       final String sampleName, final String desc, final String projectName,
       final String index) {
 
-    final Element sampleElement = this.doc.createElement("Sample");
+    final Element sampleElement = doc.createElement("Sample");
     sampleElement.setAttribute("id", "" + sampleId);
     sampleElement.setAttribute("name",
         sampleName == null ? "undetermined" : sampleName);
@@ -461,7 +454,7 @@ public class QCReport {
       final TestResult result =
           test.test(this.data, read, readSample, sampleId);
 
-      final Element testElement = this.doc.createElement("Test");
+      final Element testElement = doc.createElement("Test");
       testElement.setAttribute("name", test.getName());
       testElement.setAttribute("score", Integer.toString(result.getScore()));
       testElement.setAttribute("type", result.getType());
@@ -476,15 +469,11 @@ public class QCReport {
    */
   private void doTests() throws AozanException {
 
-    if (this.doc != null) {
-      return;
-    }
-
     try {
 
       final DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
       final DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-      final Document doc = this.doc = docBuilder.newDocument();
+      final Document doc = docBuilder.newDocument();
 
       // Create the root element and add it to the document
       final Element root = doc.createElement("QCReport");
@@ -495,76 +484,40 @@ public class QCReport {
       XMLUtilsWriter.buildXMLCommonTagHeader(doc, root, this.data);
 
       if (!this.globalTests.isEmpty()) {
-        doGlobalTests(root);
+        doGlobalTests(doc, root);
       }
 
       if (!this.laneTests.isEmpty()) {
-        doLanesTests(root);
+        doLanesTests(doc, root);
       }
 
       if (!this.projectStatsTests.isEmpty()) {
-        doProjectsStatsTests(root);
+        doProjectsStatsTests(doc, root);
       }
 
       if (!this.samplesStatsTests.isEmpty()) {
-        doSamplesStatsTests(root);
+        doSamplesStatsTests(doc, root);
       }
 
       if (!this.sampleTests.isEmpty()) {
-        addElementForFilter(root);
-        doSamplesTests(root);
+        addElementForFilter(doc, root);
+        doSamplesTests(doc, root);
       }
+
+      this.doc = doc;
+
     } catch (final ParserConfigurationException e) {
       throw new AozanException(e);
     }
   }
 
-  /**
-   * Create the QC report as an XML String.
-   * @return a String with the report in XML
-   * @throws AozanException if an error occurs while creating the report
-   */
-  public String toXML() throws AozanException, IOException {
+  public Document toDocument() throws AozanException {
 
-    doTests();
-
-    return XMLUtilsWriter.createXMLFileContent(this.doc);
-
-  }
-
-  /**
-   * Export the QC report. The XML report is transformed using an XSL style
-   * sheet.
-   * @param XSLFile XSL file
-   * @return the QC report as a String
-   * @throws AozanException if an error occurs while creating the report
-   */
-  public String export(final File XSLFile) throws AozanException {
-
-    try {
-      return export(new FileInputStream(XSLFile));
-    } catch (final FileNotFoundException e) {
-      throw new AozanException(e);
-    }
-  }
-
-  /**
-   * Export the QC report. The XML report is transformed using an XSL style
-   * sheet.
-   * @param is XSL file as input stream
-   * @return the QC report as a String
-   * @throws AozanException if an error occurs while creating the report
-   */
-  public String export(final InputStream is) throws AozanException {
-
-    if (is == null) {
-      throw new NullPointerException(
-          "The input stream for the XSL stylesheet is null.");
+    if (this.doc == null) {
+      doTests();
     }
 
-    doTests();
-
-    return XMLUtilsWriter.createHTMLFileFromXSL(this.doc, is);
+    return this.doc;
   }
 
   /**
