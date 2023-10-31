@@ -21,7 +21,10 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import com.google.common.base.Splitter;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
 import fr.ens.biologie.genomique.aozan.QC;
@@ -321,10 +324,28 @@ public class Aozan2QCDataProcessor implements DataProcessor {
     if (writeHTMLFile) {
       File htmlFile = new File(outputDirectory, illuminaRunId + ".html");
 
-      // TODO update argument type of the method
       exporter.writeReport(styleSheetPath.isEmpty() ? null : styleSheetPath,
           htmlFile.toString());
+
+      if (settings.containsKey("qc.conf.tests.to.remove.in.basic.report")) {
+
+        List<String> testToRemove =
+            Splitter.on(',').trimResults().omitEmptyStrings().splitToList(
+                settings.get("qc.report.tests.to.remove.in.basic.report"));
+
+        QCReport basicReport = new QCReport(qcReport);
+        basicReport.filterTests(testToRemove);
+        QCReportExporter basicExporter = new QCReportExporter(basicReport);
+
+        File basicHtmlFile =
+            new File(outputDirectory, illuminaRunId + "-basic.html");
+
+        basicExporter.writeReport(
+            styleSheetPath.isEmpty() ? null : styleSheetPath,
+            basicHtmlFile.toString());
+      }
     }
+
   }
 
 }

@@ -23,12 +23,10 @@
 
 package fr.ens.biologie.genomique.aozan;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -47,6 +45,8 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Sets;
 
 import fr.ens.biologie.genomique.aozan.collectors.stats.SampleStatisticsCollector;
+import fr.ens.biologie.genomique.aozan.tests.AozanTest;
+import fr.ens.biologie.genomique.aozan.tests.AozanTestRegistry;
 import fr.ens.biologie.genomique.aozan.tests.TestResult;
 import fr.ens.biologie.genomique.aozan.tests.global.GlobalTest;
 import fr.ens.biologie.genomique.aozan.tests.lane.LaneTest;
@@ -71,6 +71,10 @@ public class QCReport {
   private final List<SampleTest> sampleTests = new ArrayList<>();
   private Document doc;
 
+  //
+  // Getters
+  //
+
   /**
    * Get the data.
    * @return the RunData object
@@ -79,6 +83,24 @@ public class QCReport {
 
     return this.data;
   }
+
+  /**
+   * Get Report as a XML Document.
+   * @return a XML document
+   * @throws AozanException if an error occurs while creating the report.
+   */
+  public Document toDocument() throws AozanException {
+
+    if (this.doc == null) {
+      doTests();
+    }
+
+    return this.doc;
+  }
+
+  //
+  // Report computation methods
+  //
 
   /**
    * Generate the QC report for global tests.
@@ -511,15 +533,6 @@ public class QCReport {
     }
   }
 
-  public Document toDocument() throws AozanException {
-
-    if (this.doc == null) {
-      doTests();
-    }
-
-    return this.doc;
-  }
-
   /**
    * Collect lanes number for each project name to run.
    * @param typeFilter filter type
@@ -596,6 +609,77 @@ public class QCReport {
   }
 
   //
+  // Filtering methods
+  //
+
+  /**
+   * Filter test entry in the report
+   * @param testNames name of the tests to remove
+   */
+  public void filterTests(Collection<String> testNamesToRemove) {
+
+    requireNonNull(testNamesToRemove);
+    this.doc = null;
+
+    final AozanTestRegistry registry = new AozanTestRegistry();
+
+    for (String tn : testNamesToRemove) {
+
+      final String testFullName = tn.substring(QC.TEST_KEY_PREFIX.length());
+      final AozanTest test = registry.get(testFullName);
+
+      if (test != null) {
+
+        // Filter global tests
+        if (test instanceof GlobalTest) {
+          for (GlobalTest t : new ArrayList<>(this.globalTests)) {
+            if (test.getName().equals(t.getName())) {
+              this.globalTests.remove(t);
+            }
+          }
+        }
+
+        // Filter lane tests
+        if (test instanceof LaneTest) {
+          for (LaneTest t : new ArrayList<>(this.laneTests)) {
+            if (test.getName().equals(t.getName())) {
+              this.laneTests.remove(t);
+            }
+          }
+        }
+
+        // Filter project tests
+        if (test instanceof ProjectTest) {
+          for (ProjectTest t : new ArrayList<>(this.projectStatsTests)) {
+            if (test.getName().equals(t.getName())) {
+              this.projectStatsTests.remove(t);
+            }
+          }
+        }
+
+        // Filter pooled sample tests
+        if (test instanceof PooledSampleTest) {
+          for (PooledSampleTest t : new ArrayList<>(this.samplesStatsTests)) {
+            if (test.getName().equals(t.getName())) {
+              this.samplesStatsTests.remove(t);
+            }
+          }
+        }
+
+        // Filter sample tests
+        if (test instanceof SampleTest) {
+          for (SampleTest t : new ArrayList<>(this.sampleTests)) {
+            if (test.getName().equals(t.getName())) {
+              this.sampleTests.remove(t);
+            }
+          }
+        }
+      }
+    }
+
+  }
+
+  //
   // Constructor
   //
 
@@ -636,4 +720,20 @@ public class QCReport {
     }
   }
 
+  /**
+   * Copy constructor.
+   * @param report report to copy
+   */
+  public QCReport(QCReport report) {
+
+    requireNonNull(report);
+
+    this.data = new RunData(report.data);
+    this.globalTests.addAll(report.globalTests);
+    this.laneTests.addAll(report.laneTests);
+    this.projectStatsTests.addAll(report.projectStatsTests);
+    this.samplesStatsTests.addAll(report.samplesStatsTests);
+    this.sampleTests.addAll(report.sampleTests);
+    this.doc = null;
+  }
 }
