@@ -21,7 +21,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.DoradoONTBasecalling
 import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
- * This class define an guppy action that will launch Dorado.
+ * This class define an "dorado" action that will launch Dorado.
  * @author Laurent Jourdren
  * @since 3.1
  */
@@ -50,7 +50,7 @@ public class DoradoAction implements Action {
     String flowcell = "";
     String kit = "";
     String barcodeKits = "";
-    String config = "";
+    String modelName = "";
     String runId = "";
     String doradoVersion = "";
     String cudaDevice = "";
@@ -98,11 +98,11 @@ public class DoradoAction implements Action {
       }
 
       if (line.hasOption("c")) {
-        config = line.getOptionValue("c");
+        modelName = line.getOptionValue("c");
       }
 
       if (line.hasOption("m")) {
-        config = line.getOptionValue("m");
+        minQscore = line.getOptionValue("m");
       }
 
       if (line.hasOption("d")) {
@@ -133,7 +133,7 @@ public class DoradoAction implements Action {
 
       DoradoONTBasecallingDataProcessor.run(inputTar, outputDir, modelsPath,
           runId, doradoVersion, tmpPath, flowcell, kit, barcodeKits,
-          trimBarcode, minQscore, config, cudaDevice, batchSize, chunkSize,
+          trimBarcode, minQscore, modelName, cudaDevice, batchSize, chunkSize,
           keepTemporaryFiles, logger);
 
     } catch (ParseException e) {
@@ -165,12 +165,12 @@ public class DoradoAction implements Action {
     // create Options object
     final Options options = new Options();
 
-    // Guppy version option
+    // Dorado version option
     options.addOption(OptionBuilder.withLongOpt("dorado-version").hasArg()
         .withArgName("version").withDescription("dorado version").create('g'));
 
     // Flowcell option
-    options.addOption(OptionBuilder.withLongOpt("flow-cell-type").hasArg()
+    options.addOption(OptionBuilder.withLongOpt("flowcell").hasArg()
         .withArgName("type").withDescription("flow cell type").create('f'));
 
     // Kit option
@@ -200,8 +200,8 @@ public class DoradoAction implements Action {
         .withArgName("id").withDescription("run id").create('r'));
 
     // Barcode kits option
-    options.addOption(OptionBuilder.withLongOpt("barcode-kits").hasArg()
-        .withArgName("kits").withDescription("barcode kits").create('b'));
+    options.addOption(OptionBuilder.withLongOpt("barcode-kit").hasArg()
+        .withArgName("kits").withDescription("barcode kit").create('b'));
 
     // Trim barcode option
     options.addOption("t", "trim-barcodes", false, "trim barcodes");

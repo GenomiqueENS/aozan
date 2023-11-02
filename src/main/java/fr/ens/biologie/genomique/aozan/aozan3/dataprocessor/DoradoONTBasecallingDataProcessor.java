@@ -340,7 +340,7 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
 
     if (exitValue != 0) {
       throw new IOException(
-          "Error while running guppy, exit code is: " + exitValue);
+          "Error while running dorado, exit code is: " + exitValue);
     }
 
     info(logger, runId, "Successful demultiplexing in "
@@ -395,7 +395,7 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
 
     if (exitValue != 0) {
       throw new IOException(
-          "Error while running guppy, exit code is: " + exitValue);
+          "Error while running dorado, exit code is: " + exitValue);
     }
 
     info(logger, runId, "Successful creating summary in "
@@ -452,7 +452,7 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
 
     if (exitValue != 0) {
       throw new IOException(
-          "Error while running guppy, exit code is: " + exitValue);
+          "Error while running dorado, exit code is: " + exitValue);
     }
 
     info(logger, runId, "Successful creating summary in "
@@ -735,7 +735,6 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
     runConf.set(CONF_PREFIX + ".use.docker", "true");
     runConf.set(CONF_PREFIX + ".docker.image",
         DEFAULT_DORADO_DOCKER_REPO + ':' + doradoVersion);
-    // runConf.set("guppy.flowcell.sn", "FA035147");
 
     if (!cudaDevice.trim().isEmpty()) {
       runConf.set(CONF_PREFIX + ".cuda.device", cudaDevice.trim());
@@ -750,7 +749,8 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
     }
 
     if (!model.trim().isEmpty()) {
-      runConf.set(CONF_PREFIX + ".config", model.trim());
+      runConf.set(CONF_PREFIX + ".model.path",
+          new File(modelsPath.toFile(), model.trim()).toString());
     } else {
       runConf.set(CONF_PREFIX + ".kit", kit.trim());
       runConf.set(CONF_PREFIX + ".flowcell", flowcellType.trim());
