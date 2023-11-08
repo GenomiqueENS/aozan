@@ -954,6 +954,12 @@
                                  The genome alias file was not updated when an unknown genome name was added.
 			</action>
 		</release>
+
+		<release version="2.2.2" description="Aozan 2.2.2 release"  date="2023-11-08">
+			<action dev="jourdren" type="fix">
+                                 In demux_run.py, fix typo when parsing additional arguments for bcl2fastq.
+			</action>
+		</release>
 	
 		</body>
 </document>
