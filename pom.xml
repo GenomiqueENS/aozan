@@ -312,6 +312,13 @@
 
        <dependency>
          <groupId>fr.ens.biologie.genomique</groupId>
+         <artifactId>kenetre-nanopore</artifactId>
+	 <version>${kenetre.version}</version>
+         <scope>compile</scope>
+       </dependency>
+
+       <dependency>
+         <groupId>fr.ens.biologie.genomique</groupId>
          <artifactId>kenetre-bio</artifactId>
 	 <version>${kenetre.version}</version>
          <scope>compile</scope>
