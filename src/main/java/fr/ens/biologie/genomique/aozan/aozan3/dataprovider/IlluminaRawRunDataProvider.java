@@ -201,12 +201,14 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
     // RTA 2
     if (new File(dir, "RunParameters.xml").exists()) {
 
-      return fileExists(dir, "RTAComplete.txt", "RunCompletionStatus.xml")
-          && completeFileExists(dir, "RTARead", "Complete.txt");
+      if (fileExists(dir, "RTAComplete.txt", "RunCompletionStatus.xml")
+          && completeFileExists(dir, "RTARead", "Complete.txt")) {
+            return true
+          }
     }
 
     // RTA 1
-    if (new File(dir, "runParameters.xml").exists()) {
+    if (new File(dir, "runParameters.xml").exists() || new File(dir, "RunParameters.xml").exists()) {
 
       return fileExists(dir, "RTAComplete.txt",
           "ImageAnalysis_Netcopy_complete.txt")
