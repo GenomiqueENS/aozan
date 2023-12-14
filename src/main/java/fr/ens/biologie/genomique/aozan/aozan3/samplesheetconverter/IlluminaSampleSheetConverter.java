@@ -34,6 +34,7 @@ public class IlluminaSampleSheetConverter extends AbstractSampleSheetConverter {
 
   private SampleSheet sampleSheet;
 
+  @Override
   protected void loadSampleSheet() throws Aozan3Exception {
 
     // Read the input sample sheet
@@ -46,6 +47,7 @@ public class IlluminaSampleSheetConverter extends AbstractSampleSheetConverter {
 
   }
 
+  @Override
   protected void fixSampleSheet(List<String> warnings) throws Aozan3Exception {
 
     // Fix bad column names
@@ -63,6 +65,7 @@ public class IlluminaSampleSheetConverter extends AbstractSampleSheetConverter {
     warnings.addAll(fixBCLConvertSettings(sampleSheet));
   }
 
+  @Override
   protected void checkSampleSheet(List<String> warnings)
       throws Aozan3Exception {
 
@@ -80,6 +83,7 @@ public class IlluminaSampleSheetConverter extends AbstractSampleSheetConverter {
     }
   }
 
+  @Override
   protected void saveSampleSheet() throws Aozan3Exception {
 
     // Fix sample sheet
@@ -209,6 +213,15 @@ public class IlluminaSampleSheetConverter extends AbstractSampleSheetConverter {
     return warnings;
   }
 
+  //
+  // Constructor
+  //
+
+  /**
+   * Abstract constructor.
+   * @param inputFile input file
+   * @param outputDir output directory
+   */
   public IlluminaSampleSheetConverter(File inputFile, File outputDir) {
 
     super(inputFile, outputDir);
