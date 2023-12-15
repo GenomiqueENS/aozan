@@ -198,6 +198,12 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
           "RunCompletionStatus.xml");
     }
 
+    // RTA for MiSeq
+    if (new File(dir, "RunParameters.xml").exists()) {
+      return fileExists(dir, "CopyComplete.txt", "RTAComplete.txt",
+          "RunCompletionStatus.xml");
+    }
+
     // RTA 2
     if (new File(dir, "RunParameters.xml").exists()) {
 
