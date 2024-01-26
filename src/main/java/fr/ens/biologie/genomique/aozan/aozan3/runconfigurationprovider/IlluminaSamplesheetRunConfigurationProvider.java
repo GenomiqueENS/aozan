@@ -192,11 +192,14 @@ public class IlluminaSamplesheetRunConfigurationProvider
     int runNumber = illuminaRunId.getRunNumber();
     String instrumentNumber = illuminaRunId.getInstrumentSerialNumber();
 
-    String samplesheetFilename = String.format("%s_%s_%04d",
-        this.samplesheetPrefix, instrumentNumber, runNumber);
+    List<String> samplesheetFilenames = Arrays.asList(
+        String.format("%s_%s_%04d", this.samplesheetPrefix, instrumentNumber,
+            runNumber),
+        String.format("%s_%s_%d", this.samplesheetPrefix, instrumentNumber,
+            runNumber));
 
     // Load samplesheet
-    SampleSheet samplesheet = loadSamplesheet(runData, samplesheetFilename,
+    SampleSheet samplesheet = loadSamplesheet(runData, samplesheetFilenames,
         this.searchInRunDirectoryFirst);
 
     // Get the number of mismatches if defined in samplesheet
@@ -288,11 +291,11 @@ public class IlluminaSamplesheetRunConfigurationProvider
   }
 
   private SampleSheet loadSamplesheet(final RunData runData,
-      final String samplesheetFilename, boolean searchInRunDirFirst)
+      final List<String> samplesheetFilenames, boolean searchInRunDirFirst)
       throws Aozan3Exception {
 
     requireNonNull(runData);
-    requireNonNull(samplesheetFilename);
+    requireNonNull(samplesheetFilenames);
 
     if (searchInRunDirFirst) {
 
@@ -303,17 +306,29 @@ public class IlluminaSamplesheetRunConfigurationProvider
     }
 
     RunId runId = runData.getRunId();
-    Path samplesheetFile = Paths.get(samplesheetsPath.toString(),
-        samplesheetFilename + this.sampleSheetFormat.getExtension());
+
+    if (samplesheetFilenames.isEmpty()) {
+      throw new Aozan3Exception(runId, "No samplesheet name defined");
+    }
 
     // If a sample sheet exists a dedicated directory
-    if (Files.isRegularFile(samplesheetFile)) {
+    for (String samplesheetFilename : samplesheetFilenames) {
 
-      this.logger.info(runId,
-          "Load a samplesheet in directory: " + this.samplesheetsPath);
+      Path samplesheetFile = Paths.get(samplesheetsPath.toString(),
+          samplesheetFilename + this.sampleSheetFormat.getExtension());
 
-      return loadSamplesheet(runId, samplesheetFile, this.sampleSheetFormat,
-          this.logger.getLogger());
+      this.logger.debug(runId,
+          "Try to load a samplesheet in dedicated directory: "
+              + samplesheetFile);
+
+      if (Files.isRegularFile(samplesheetFile)) {
+
+        this.logger.info(runId,
+            "Load a samplesheet in directory: " + this.samplesheetsPath);
+
+        return loadSamplesheet(runId, samplesheetFile, this.sampleSheetFormat,
+            this.logger.getLogger());
+      }
     }
 
     // Use an external command if defined
