@@ -1,13 +1,14 @@
 package fr.ens.biologie.genomique.aozan.aozan3.action;
 
+import static org.apache.commons.cli.Option.builder;
+
 import java.io.File;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -51,7 +52,7 @@ public class SampleSheetConvertAction implements Action {
       GenericLogger logger) {
 
     final Options options = makeOptions();
-    final CommandLineParser parser = new GnuParser();
+    final CommandLineParser parser = new DefaultParser();
     boolean nanopore = false;
 
     CommandLine line = null;
@@ -137,10 +138,9 @@ public class SampleSheetConvertAction implements Action {
     options.addOption("h", "help", false, "display this help");
 
     // Description option
-    options.addOption(OptionBuilder.withArgName("type").hasArg()
-        .withDescription(
-            "sequencing type (Illumina or Nanopore, default: Illumina)")
-        .withLongOpt("sequencing-type").create('t'));
+    options.addOption(builder("t").argName("type").hasArg()
+        .desc("sequencing type (Illumina or Nanopore, default: Illumina)")
+        .longOpt("sequencing-type").build());
 
     return options;
   }

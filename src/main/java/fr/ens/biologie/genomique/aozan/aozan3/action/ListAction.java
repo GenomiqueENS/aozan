@@ -1,15 +1,15 @@
 package fr.ens.biologie.genomique.aozan.aozan3.action;
 
 import static fr.ens.biologie.genomique.aozan.aozan3.ConfigurationDefaults.RECIPES_DIRECTORY_KEY;
+import static org.apache.commons.cli.Option.builder;
 
 import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -55,7 +55,7 @@ public class ListAction implements Action {
       GenericLogger logger) {
 
     final Options options = makeOptions();
-    final CommandLineParser parser = new GnuParser();
+    final CommandLineParser parser = new DefaultParser();
 
     int argsOptions = 0;
 
@@ -136,9 +136,8 @@ public class ListAction implements Action {
     options.addOption("h", "help", false, "display this help");
 
     // Description option
-    options.addOption(OptionBuilder.withArgName("recipes-directory").hasArg()
-        .withDescription("recipes directory").withLongOpt("directory")
-        .create('d'));
+    options.addOption(builder("d").argName("recipes-directory").hasArg()
+        .desc("recipes directory").longOpt("directory").build());
 
     return options;
   }

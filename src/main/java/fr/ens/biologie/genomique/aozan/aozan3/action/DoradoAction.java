@@ -1,5 +1,7 @@
 package fr.ens.biologie.genomique.aozan.aozan3.action;
 
+import static org.apache.commons.cli.Option.builder;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -7,9 +9,8 @@ import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -45,7 +46,7 @@ public class DoradoAction implements Action {
       GenericLogger logger) {
 
     final Options options = makeOptions();
-    final CommandLineParser parser = new GnuParser();
+    final CommandLineParser parser = new DefaultParser();
 
     String flowcell = "";
     String kit = "";
@@ -166,42 +167,40 @@ public class DoradoAction implements Action {
     final Options options = new Options();
 
     // Dorado version option
-    options.addOption(OptionBuilder.withLongOpt("dorado-version").hasArg()
-        .withArgName("version").withDescription("dorado version").create('g'));
+    options.addOption(builder("g").longOpt("dorado-version").hasArg()
+        .argName("version").desc("dorado version").build());
 
     // Flowcell option
-    options.addOption(OptionBuilder.withLongOpt("flowcell").hasArg()
-        .withArgName("type").withDescription("flow cell type").create('f'));
+    options.addOption(builder("f").longOpt("flowcell").hasArg().argName("type")
+        .desc("flow cell type").build());
 
     // Kit option
-    options.addOption(OptionBuilder.withLongOpt("kit").hasArg()
-        .withArgName("kitname").withDescription("kit name").create('k'));
+    options.addOption(builder("k").longOpt("kit").hasArg().argName("kitname")
+        .desc("kit name").build());
 
     // Config option
-    options.addOption(
-        OptionBuilder.withLongOpt("config").hasArg().withArgName("configname")
-            .withDescription("configuration filename").create('c'));
+    options.addOption(builder("c").longOpt("config").hasArg()
+        .argName("configname").desc("configuration filename").build());
 
     // GPU device option
-    options.addOption(
-        OptionBuilder.withLongOpt("device").hasArg().withArgName("cudadevice")
-            .withDescription("Cuda device name").create('d'));
+    options.addOption(builder("d").longOpt("device").hasArg()
+        .argName("cudadevice").desc("Cuda device name").build());
 
     // Batch size
-    options.addOption(OptionBuilder.withLongOpt("batch-size").hasArg()
-        .withArgName("size").withDescription("batch size").create('u'));
+    options.addOption(builder("u").longOpt("batch-size").hasArg()
+        .argName("size").desc("batch size").build());
 
     // Chunks size
-    options.addOption(OptionBuilder.withLongOpt("chunk-size").hasArg()
-        .withArgName("chunks").withDescription("chunk size").create('p'));
+    options.addOption(builder("p").longOpt("chunk-size").hasArg()
+        .argName("chunks").desc("chunk size").build());
 
     // Run id option
-    options.addOption(OptionBuilder.withLongOpt("run-id").hasArg()
-        .withArgName("id").withDescription("run id").create('r'));
+    options.addOption(builder("r").longOpt("run-id").hasArg().argName("id")
+        .desc("run id").build());
 
     // Barcode kits option
-    options.addOption(OptionBuilder.withLongOpt("barcode-kit").hasArg()
-        .withArgName("kits").withDescription("barcode kit").create('b'));
+    options.addOption(builder("").longOpt("barcode-kit").hasArg()
+        .argName("kits").desc("barcode kit").build());
 
     // Trim barcode option
     options.addOption("t", "trim-barcodes", false, "trim barcodes");
@@ -210,9 +209,8 @@ public class DoradoAction implements Action {
     options.addOption("e", "keep-temporary-files", false, "Fast5 output");
 
     // Barcode kits option
-    options.addOption(
-        OptionBuilder.withLongOpt("min-qscore").hasArg().withArgName("value")
-            .withDescription("minimal qscore for pass reads").create('m'));
+    options.addOption(builder("m").longOpt("min-qscore").hasArg()
+        .argName("value").desc("minimal qscore for pass reads").build());
 
     // Help option
     options.addOption("h", "help", false, "display this help");

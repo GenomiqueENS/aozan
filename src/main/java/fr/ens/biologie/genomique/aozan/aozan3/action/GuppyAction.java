@@ -1,5 +1,7 @@
 package fr.ens.biologie.genomique.aozan.aozan3.action;
 
+import static org.apache.commons.cli.Option.builder;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -7,9 +9,8 @@ import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -45,7 +46,7 @@ public class GuppyAction implements Action {
       GenericLogger logger) {
 
     final Options options = makeOptions();
-    final CommandLineParser parser = new GnuParser();
+    final CommandLineParser parser = new DefaultParser();
 
     String flowcell = "";
     String kit = "";
@@ -172,44 +173,40 @@ public class GuppyAction implements Action {
     final Options options = new Options();
 
     // Guppy version option
-    options.addOption(OptionBuilder.withLongOpt("guppy-version").hasArg()
-        .withArgName("version").withDescription("guppy version").create('g'));
+    options.addOption(builder("g").longOpt("guppy-version").hasArg()
+        .argName("version").desc("guppy version").build());
 
     // Flowcell option
-    options.addOption(OptionBuilder.withLongOpt("flow-cell-type").hasArg()
-        .withArgName("type").withDescription("flow cell type").create('f'));
+    options.addOption(builder("f").longOpt("flow-cell-type").hasArg()
+        .argName("type").desc("flow cell type").build());
 
     // Kit option
-    options.addOption(OptionBuilder.withLongOpt("kit").hasArg()
-        .withArgName("kitname").withDescription("kit name").create('k'));
+    options.addOption(builder("k").longOpt("kit").hasArg().argName("kitname")
+        .desc("kit name").build());
 
     // Config option
-    options.addOption(
-        OptionBuilder.withLongOpt("config").hasArg().withArgName("configname")
-            .withDescription("configuration filename").create('c'));
+    options.addOption(builder("c").longOpt("config").hasArg()
+        .argName("configname").desc("configuration filename").build());
 
     // GPU device option
-    options.addOption(
-        OptionBuilder.withLongOpt("device").hasArg().withArgName("cudadevice")
-            .withDescription("Cuda device name").create('d'));
+    options.addOption(builder("d").longOpt("device").hasArg()
+        .argName("cudadevice").desc("Cuda device name").build());
 
     // GPU runners
-    options.addOption(OptionBuilder.withLongOpt("gpu-runners-per-device")
-        .hasArg().withArgName("runners")
-        .withDescription("GPU runners per device").create('u'));
+    options.addOption(builder("u").longOpt("gpu-runners-per-device").hasArg()
+        .argName("runners").desc("GPU runners per device").build());
 
     // Chunks per runner
-    options.addOption(OptionBuilder.withLongOpt("chunks-per-runner").hasArg()
-        .withArgName("chunks").withDescription("chunks per runner")
-        .create('p'));
+    options.addOption(builder("p").longOpt("chunks-per-runner").hasArg()
+        .argName("chunks").desc("chunks per runner").build());
 
     // Run id option
-    options.addOption(OptionBuilder.withLongOpt("run-id").hasArg()
-        .withArgName("id").withDescription("run id").create('r'));
+    options.addOption(builder("r").longOpt("run-id").hasArg().argName("id")
+        .desc("run id").build());
 
     // Barcode kits option
-    options.addOption(OptionBuilder.withLongOpt("barcode-kits").hasArg()
-        .withArgName("kits").withDescription("barcode kits").create('b'));
+    options.addOption(builder("b").longOpt("barcode-kits").hasArg()
+        .argName("kits").desc("barcode kits").build());
 
     // Trim barcode option
     options.addOption("t", "trim-barcodes", false, "trim barcodes");
@@ -221,9 +218,8 @@ public class GuppyAction implements Action {
     options.addOption("e", "keep-temporary-files", false, "Fast5 output");
 
     // Barcode kits option
-    options.addOption(
-        OptionBuilder.withLongOpt("min-qscore").hasArg().withArgName("value")
-            .withDescription("minimal qscore for pass reads").create('m'));
+    options.addOption(builder("m").longOpt("min-qscore").hasArg()
+        .argName("value").desc("minimal qscore for pass reads").build());
 
     // Help option
     options.addOption("h", "help", false, "display this help");

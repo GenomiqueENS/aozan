@@ -3,6 +3,7 @@ package fr.ens.biologie.genomique.aozan.aozan3;
 import static fr.ens.biologie.genomique.aozan.aozan3.Globals.MINIMAL_JAVA_VERSION_REQUIRED;
 import static fr.ens.biologie.genomique.kenetre.util.SystemUtils.getJavaVersion;
 import static java.util.Collections.unmodifiableList;
+import static org.apache.commons.cli.Option.builder;
 
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
@@ -15,9 +16,8 @@ import java.util.logging.Level;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -240,33 +240,30 @@ public class Main {
     options.addOption("e", "exit-code", false,
         "return a non zero exit code if an error occurs");
 
-    options.addOption(OptionBuilder.withArgName("file").hasArg()
-        .withDescription("configuration file to use").withLongOpt("conf")
-        .create('c'));
+    options.addOption(builder("c").argName("file").hasArg()
+        .desc("configuration file to use").longOpt("conf").build());
 
-    options.addOption(OptionBuilder.withArgName("property=value").hasArg()
-        .withDescription("set a configuration setting. This "
+    options.addOption(builder("s").argName("property=value").hasArg()
+        .desc("set a configuration setting. This "
             + "option can be used several times")
-        .create('s'));
+        .build());
 
     // Application shell script options
-    options.addOption(OptionBuilder.withArgName("path").hasArg()
-        .withDescription("JAVA_HOME path").create('j'));
+    options.addOption(
+        builder("j").argName("path").hasArg().desc("JAVA_HOME path").build());
 
-    options.addOption(OptionBuilder.withArgName("size").hasArg()
-        .withDescription("maximal memory usage for JVM in MB (4096 by default)")
-        .create('m'));
+    options.addOption(builder("m").argName("size").hasArg()
+        .desc("maximal memory usage for JVM in MB (4096 by default)").build());
 
-    options.addOption(OptionBuilder.withArgName("args").hasArg()
-        .withDescription("JVM arguments (-server by default)").create('J'));
+    options.addOption(builder("J").argName("args").hasArg()
+        .desc("JVM arguments (-server by default)").build());
 
-    options.addOption(OptionBuilder.withArgName("path").hasArg()
-        .withDescription("JVM working directory").create('w'));
+    options.addOption(builder("w").argName("path").hasArg()
+        .desc("JVM working directory").build());
 
-    options.addOption(OptionBuilder.withArgName("classpath").hasArg()
-        .withDescription(
-            "additional classpath for " + Globals.APP_NAME + " plugins")
-        .create('p'));
+    options.addOption(builder("p").argName("classpath").hasArg()
+        .desc("additional classpath for " + Globals.APP_NAME + " plugins")
+        .build());
 
     return options;
   }
@@ -278,7 +275,7 @@ public class Main {
   private int parseCommandLine() {
 
     final Options options = makeOptions();
-    final CommandLineParser parser = new GnuParser();
+    final CommandLineParser parser = new DefaultParser();
     final String[] argsArray = this.args.toArray(new String[0]);
 
     int argsOptions = 0;
