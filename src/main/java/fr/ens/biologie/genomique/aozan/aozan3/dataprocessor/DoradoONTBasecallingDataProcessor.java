@@ -33,6 +33,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.util.UnTar;
 import fr.ens.biologie.genomique.kenetre.log.DummyLogger;
 import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 import fr.ens.biologie.genomique.kenetre.util.StringUtils;
+import fr.ens.biologie.genomique.kenetre.util.Version;
 
 /**
  * This class implements a Dorado data processor.
@@ -45,7 +46,8 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
   private static final String CONF_PREFIX = "dorado";
   private static final String DEFAULT_DORADO_DOCKER_REPO =
       "genomicpariscentre/dorado";
-  private static final String DEFAULT_DORADO_VERSION = "0.4.1";
+  private static final String DEFAULT_DORADO_VERSION = "0.5.3";
+  private static final String DEFAULT_MODEL_SELECTION_COMPLEX = "sup";
 
   private static final boolean USE_DOCKER = true;
 
@@ -506,7 +508,13 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
       result.add(runConf.get(CONF_PREFIX + ".min.qscore"));
     }
 
-    result.add(getModelPath(modelsPath, runConf).toString());
+    if (new Version(runConf.get(CONF_PREFIX + ".dorado.version"))
+        .greaterThanOrEqualTo(new Version("0.5.0"))) {
+      result.add(runConf.get(CONF_PREFIX + ".model.selection.complex",
+          getModelPath(modelsPath, runConf).toString()));
+    } else {
+      result.add(getModelPath(modelsPath, runConf).toString());
+    }
 
     // Batch size
     if (runConf.containsKey(CONF_PREFIX + ".batch.size")) {
@@ -733,6 +741,7 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
     RunConfiguration runConf = new RunConfiguration();
     runConf.set("tmp.dir", tmpPath.toString());
     runConf.set(CONF_PREFIX + ".use.docker", "true");
+    runConf.set(CONF_PREFIX + ".dorado.version", doradoVersion);
     runConf.set(CONF_PREFIX + ".docker.image",
         DEFAULT_DORADO_DOCKER_REPO + ':' + doradoVersion);
 
@@ -767,6 +776,13 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
 
     if (!minQscore.trim().isEmpty()) {
       runConf.set(CONF_PREFIX + ".min.qscore", minQscore);
+    }
+
+    if (new Version(doradoVersion).greaterThanOrEqualTo(new Version("0.5.0"))
+        && !runConf.containsKey(CONF_PREFIX + ".model.selection.complex")) {
+
+      runConf.set(CONF_PREFIX + ".model.selection.complex",
+          DEFAULT_MODEL_SELECTION_COMPLEX);
     }
 
     System.out.println("### START ###");
