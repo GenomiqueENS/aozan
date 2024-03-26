@@ -123,6 +123,7 @@ public class IlluminaSamplesheetRunConfigurationProvider
   private SamplesheetFormat sampleSheetFormat;
   private String samplesheetCreationCommand;
   private boolean allowUnderscoresInSampleIds;
+  private boolean allowSampleIdMaxLength;
   private boolean searchInRunDirectoryFirst;
   private boolean initialized;
 
@@ -156,6 +157,8 @@ public class IlluminaSamplesheetRunConfigurationProvider
         conf.get(Settings.SAMPLESHEET_GENERATOR_COMMAND_KEY, "");
     this.allowUnderscoresInSampleIds =
         conf.getBoolean("samplesheet.allow.underscores.in.sample.ids", false);
+    this.allowSampleIdMaxLength =
+        conf.getBoolean("samplesheet.allow.sample.ids.max.length", true);
     this.searchInRunDirectoryFirst =
         conf.getBoolean("samplesheet.search.in.run.dir.first", false);
 
@@ -496,9 +499,14 @@ public class IlluminaSamplesheetRunConfigurationProvider
         return;
       }
 
+      // Create checker
+      SampleSheetCheck checker = new SampleSheetCheck();
+      checker.setSampleIdMaxLength(this.allowSampleIdMaxLength);
+      checker.setAllowUnderscoreInSampleID(this.allowUnderscoresInSampleIds);
+
       // Check values of samplesheet file
       List<String> samplesheetWarnings =
-          SampleSheetCheck.checkSampleSheet(samplesheet, flowCellId);
+          checker.checkSampleSheet(samplesheet, flowCellId);
 
       this.logger.warn(runId, "Bcl2fastq samplesheet warnings: "
           + String.join(" ", samplesheetWarnings));

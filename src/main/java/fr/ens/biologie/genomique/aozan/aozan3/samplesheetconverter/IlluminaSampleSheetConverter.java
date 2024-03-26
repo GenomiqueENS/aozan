@@ -19,6 +19,7 @@ import fr.ens.biologie.genomique.kenetre.KenetreException;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.PropertySection;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.Sample;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetCheck;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.TableSection;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVWriter;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetReader;
@@ -72,9 +73,8 @@ public class IlluminaSampleSheetConverter extends AbstractSampleSheetConverter {
     // Check the samplesheet
     try {
 
-      warnings.addAll(
-          fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetCheck
-              .checkSampleSheet(sampleSheet));
+      SampleSheetCheck checker = new SampleSheetCheck();
+      warnings.addAll(checker.checkSampleSheet(sampleSheet));
       checkSettingsSections(sampleSheet);
 
     } catch (KenetreException e) {
