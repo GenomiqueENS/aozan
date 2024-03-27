@@ -1,0 +1,4 @@
+A new run (${run_id}) is finished on ${sequencer_name} at ${end_date}.
+Data for this run can be found at: ${output_directory}
+
+For this task ${output_size} has been used and ${disk_free} still free

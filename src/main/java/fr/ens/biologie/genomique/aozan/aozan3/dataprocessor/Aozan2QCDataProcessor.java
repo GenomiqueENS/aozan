@@ -10,7 +10,6 @@ import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.newAozanLo
 import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.newDummyLogger;
 import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME;
 import static fr.ens.biologie.genomique.kenetre.util.StringUtils.sizeToHumanReadable;
-import static fr.ens.biologie.genomique.kenetre.util.StringUtils.toTimeHumanReadable;
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
@@ -19,9 +18,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Splitter;
@@ -37,7 +36,6 @@ import fr.ens.biologie.genomique.aozan.aozan3.DataLocation;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.DataType;
 import fr.ens.biologie.genomique.aozan.aozan3.DataType.Category;
-import fr.ens.biologie.genomique.aozan.aozan3.EmailMessage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
@@ -244,27 +242,14 @@ public class Aozan2QCDataProcessor implements DataProcessor {
       // TODO add http link to the report
       // TODO Use absolute path
 
-      // Report URL in email message
-      String reportLocationMessage = conf.containsKey("reports.url")
-          ? "\nRun reports can be found at following location:\n  "
-              + conf.get("reports.url") + '/' + runId.getId() + "\n"
-          : "";
-
-      String emailContent = String.format("Ending quality control for run %s.\n"
-          + "Job finished at %s without error in %s.\n"
-          + "You will find attached to this message the quality control report.\n\n"
-          + "QC files for this run can be found in the following directory:\n  %s\n%s"
-          + "\nFor this task %s has been used and %s GB still free.",
-          runId.getId(), new Date(endTime).toString(),
-          toTimeHumanReadable(endTime - startTime), outputLocation.getPath(),
-          reportLocationMessage, sizeToHumanReadable(outputSize),
-          sizeToHumanReadable(outputFreeSize));
-
-      // Create success message
-      EmailMessage email = new EmailMessage(
-          "Ending QC for run "
-              + runId.getId() + " on " + fastqRunData.getSource(),
-          emailContent);
+      // Load email template
+      var emailTemplate = new DataProcessorTemplateEmailMessage(conf,
+          "qc.email.template", "/emails/end-qc.email.template");
+      var subject = "Ending QC for run "
+          + runId.getId() + " on " + fastqRunData.getSource();
+      var email = emailTemplate.endDataProcessorEmail(subject, runId,
+          outputLocation.getPath(), startTime, endTime, outputSize,
+          outputFreeSize, Map.of("reports_url", conf.get("reports.url")));
 
       return new SimpleProcessResult(
           fastqRunData.newLocation(outputLocation).newCategory(Category.QC),

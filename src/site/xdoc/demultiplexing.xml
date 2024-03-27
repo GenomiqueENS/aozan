@@ -55,6 +55,7 @@
         <table>
           <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
           <tr><td>demux.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
+          <tr><td>demux.step.end.email.template</td><td>string</td><td>Not set</td><td>Path of the email template for the end of the demultiplexing step.</td></tr>
           <tr><td>demux.tool</td><td>string</td><td>bcl2fastq</td><td>Tool to use for demultiplexing (available values: bcl2fastq or bclconvert)</td></tr>
           <tr><td>demux.use.hiseq.output</td><td>boolean</td><td>False</td><td>If this parameter is set to true and if the synchronization step is not enabled, this step will use directly the sequencer output for demultiplexage step</td></tr>
           <tr><td>demux.space.factor</td><td>double</td><td>0.7</td><td>Factor to use to get the estimation of the amount of space needed in the fastq directory for the run based on the amount of space used in the bcl directory by the run data</td></tr>

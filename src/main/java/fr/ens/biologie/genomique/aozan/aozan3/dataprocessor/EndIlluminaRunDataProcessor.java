@@ -4,7 +4,6 @@ import static fr.ens.biologie.genomique.aozan.aozan3.DataType.Category.RAW;
 import static fr.ens.biologie.genomique.aozan.aozan3.DataType.SequencingTechnology.ILLUMINA;
 import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.info;
 import static fr.ens.biologie.genomique.kenetre.util.StringUtils.sizeToHumanReadable;
-import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
@@ -16,7 +15,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
+import java.util.Map;
 import java.util.Set;
 
 import fr.ens.biologie.genomique.aozan.AozanException;
@@ -24,7 +23,6 @@ import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataLocation;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
-import fr.ens.biologie.genomique.aozan.aozan3.EmailMessage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
@@ -50,7 +48,6 @@ public class EndIlluminaRunDataProcessor implements DataProcessor {
 
   private static String SEQUENCER_LOG_PREFIX = "hiseq_log_";
   private static String REPORT_PREFIX = "report_";
-  private static long GIGA = 1024 * 1024 * 1024;
 
   private GenericLogger logger = new DummyLogger();
 
@@ -190,16 +187,17 @@ public class EndIlluminaRunDataProcessor implements DataProcessor {
               + runId.getId() + " on "
               + sequencerNames.getIlluminaSequencerName(runId));
 
-      String emailContent = format("A new run (%s) is finished on %s at %s.\n",
-          runId.getId(), sequencerName, new Date(endTime).toString())
-          + format("Data for this run can be found at: %s\n\n", outputDir)
-          + format("For this task %.2f GB has been used and %.2f GB still free",
-              1.0 * outputSize / GIGA, 1.0 * outputFreeSize / GIGA);
+      // Load email template
+      var emailTemplate = new DataProcessorTemplateEmailMessage(conf,
+          "hiseq.end.email.template", "/emails/end-hiseq.email.template");
 
-      // Create success message
-      EmailMessage email = new EmailMessage("Ending run "
+      // Create email content
+      var subject = "Ending run "
           + runId.getId() + " on "
-          + sequencerNames.getIlluminaSequencerName(runId), emailContent);
+          + sequencerNames.getIlluminaSequencerName(runId);
+      var email = emailTemplate.endDataProcessorEmail(subject, runId,
+          outputLocation.getPath(), 0, endTime, outputSize, outputFreeSize,
+          Map.of("sequencer_name", sequencerName));
 
       return new SimpleProcessResult(inputRunData, email);
     } catch (IOException | AozanException e) {

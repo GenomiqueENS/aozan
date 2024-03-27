@@ -5,8 +5,6 @@ import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,21 +32,12 @@ import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
  */
 public class SendMail {
 
-  private static final String DEFAULT_SUBJECT_PREFIX = "[Aozan] ";
-  private static final String DEFAULT_MAIL_HEADER =
-      "THIS IS AN AUTOMATED MESSAGE.\n\n";
-  private static final String DEFAULT_MAIL_FOOTER = "\n\nThe Aozan team.\n";
-
   private final boolean sendMail;
   private final boolean printMail;
   private final Properties properties;
   private final String fromMail;
   private final List<String> toMail;
   private final List<String> errorToMail;
-
-  private final String subjectPrefix;
-  private final String header;
-  private final String footer;
 
   private final Path lastErrorFile;
 
@@ -67,46 +56,35 @@ public class SendMail {
       return;
     }
 
-    sendMail(this.subjectPrefix + email.getSubject(),
-        this.header + email.getContent() + this.footer);
-  }
+    if (email.isErrorMessage()) {
 
-  /**
-   * Send an email with the content of an exception
-   * @param t the exception
-   */
-  public void sendMail(Throwable t) {
+      if (this.lastErrorFile != null) {
 
-    requireNonNull(t);
+        String text = email.getSubject() + '\n' + email.getContent();
 
-    String subject =
-        this.subjectPrefix + "Error: " + t.getMessage().replace('\n', ' ');
+        if (Files.isRegularFile(this.lastErrorFile)) {
 
-    String errorMessage = errorMessage(t);
+          // Read last error message
+          String lastText =
+              readLastErrorMessage(this.lastErrorFile, this.logger);
 
-    if (this.lastErrorFile != null) {
+          // Check if the error message has changed
+          if (!text.equals(lastText)) {
+            sendMail(email.getSubject(), email.getContent(), true);
+            writeLastErrorMessage(this.lastErrorFile, text, this.logger);
+          }
 
-      String text = subject + '\n' + errorMessage;
-
-      if (Files.isRegularFile(this.lastErrorFile)) {
-
-        // Read last error message
-        String lastText = readLastErrorMessage(this.lastErrorFile, this.logger);
-
-        // Check if the error message has changed
-        if (!text.equals(lastText)) {
-          sendMail(subject, errorMessage, true);
+        } else {
+          // Write new error message
+          sendMail(email.getSubject(), email.getContent(), true);
           writeLastErrorMessage(this.lastErrorFile, text, this.logger);
         }
 
       } else {
-        // Write new error message
-        sendMail(subject, errorMessage, true);
-        writeLastErrorMessage(this.lastErrorFile, text, this.logger);
+        sendMail(email.getSubject(), email.getContent(), true);
       }
-
     } else {
-      sendMail(subject, errorMessage, true);
+      sendMail(email.getSubject(), email.getContent());
     }
   }
 
@@ -193,33 +171,6 @@ public class SendMail {
   //
   // Other methods
   //
-
-  /**
-   * Create error message content.
-   * @param t exception
-   * @return a String with the error message content
-   */
-  private String errorMessage(Throwable t) {
-
-    requireNonNull(t);
-
-    StringBuilder sb = new StringBuilder();
-    sb.append(this.header);
-
-    sb.append("An exception has occured while executing Aozan: ");
-    sb.append(t.getMessage());
-    sb.append("\nStacktrace:\n");
-
-    // StackTrace
-    StringWriter sw = new StringWriter();
-    PrintWriter pw = new PrintWriter(sw);
-    t.printStackTrace(pw);
-    sb.append(sw);
-
-    sb.append(this.footer);
-
-    return sb.toString();
-  }
 
   /**
    * Read last error message content.
@@ -375,11 +326,6 @@ public class SendMail {
     this.toMail = toEmailList(conf.get("mail.to", ""));
     this.errorToMail =
         toEmailList(conf.get("mail.error.to", conf.get("mail.to", "")));
-
-    this.subjectPrefix =
-        conf.get("mail.subject.prefix", DEFAULT_SUBJECT_PREFIX);
-    this.header = conf.get("mail.header", DEFAULT_MAIL_HEADER);
-    this.footer = conf.get("mail.footer", DEFAULT_MAIL_FOOTER);
 
     this.properties = createJavaMailSMTPProperties(conf);
 

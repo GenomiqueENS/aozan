@@ -1,0 +1,13 @@
+Ending quality control for run ${run_id}.
+Job finished at ${end_date} without error in ${duration}.
+You will find attached to this message the quality control report.
+
+QC files for this run can be found in the following directory:
+  ${output_directory}
+
+# if-set $url_report
+Run reports can be found at following location:
+  ${reports_url}/${run_id}
+
+#fi
+For this task 7.97 MiB has been used and 445.59 GiB GB still free.

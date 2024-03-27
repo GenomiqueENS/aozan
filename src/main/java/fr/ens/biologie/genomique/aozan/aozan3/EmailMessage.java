@@ -10,6 +10,7 @@ import java.util.Objects;
 public class EmailMessage {
 
   private final boolean noMessage;
+  private final boolean errorMessage;
   private final long id;
   private final String subject;
   private final String content;
@@ -46,6 +47,14 @@ public class EmailMessage {
     return this.noMessage;
   }
 
+  /**
+   * Test if the message is an error message.
+   * @return true if the message is an error message
+   */
+  public boolean isErrorMessage() {
+    return this.errorMessage;
+  }
+
   //
   // Static constructor
   //
@@ -72,6 +81,7 @@ public class EmailMessage {
     this.id = 0L;
     this.subject = "";
     this.content = "";
+    this.errorMessage = false;
   }
 
   /**
@@ -92,6 +102,18 @@ public class EmailMessage {
    */
   public EmailMessage(long id, String subject, String content) {
 
+    this(id, subject, content, false);
+  }
+
+  /**
+   * Constructor.
+   * @param id id of the email
+   * @param subject subject of the message
+   * @param content content of the message
+   */
+  public EmailMessage(long id, String subject, String content,
+      boolean errorMessage) {
+
     Objects.requireNonNull(subject);
     Objects.requireNonNull(content);
 
@@ -99,6 +121,7 @@ public class EmailMessage {
     this.id = id;
     this.subject = subject;
     this.content = content;
+    this.errorMessage = errorMessage;
   }
 
 }

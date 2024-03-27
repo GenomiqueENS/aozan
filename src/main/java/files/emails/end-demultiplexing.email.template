@@ -1,0 +1,12 @@
+Ending demultiplexing for run ${run_id}.
+Job finished at ${current_date} without error in ${duration}.
+
+FASTQ files for this run can be found in the following directory:
+  ${output_directory}
+
+# if-set $url_report
+Run reports can be found at following location:
+  ${reports_url}/${run_id}
+
+#fi
+For this task ${output_size} has been used and ${disk_free} GB still free.

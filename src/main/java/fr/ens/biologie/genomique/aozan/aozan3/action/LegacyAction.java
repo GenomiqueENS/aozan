@@ -1,5 +1,6 @@
 package fr.ens.biologie.genomique.aozan.aozan3.action;
 
+import static fr.ens.biologie.genomique.aozan.aozan3.TemplateEmailMessage.errorMessage;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
@@ -100,7 +101,7 @@ public class LegacyAction implements Action {
     } catch (Aozan3Exception e) {
       logger.error(e, true);
       if (sendMail != null) {
-        sendMail.sendMail(e);
+        sendMail.sendMail(errorMessage(conf, e));
       }
       Common.errorExit(e,
           "Error while parsing command line arguments: " + e.getMessage());

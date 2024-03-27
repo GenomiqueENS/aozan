@@ -2,13 +2,12 @@ package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
 import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.info;
 import static fr.ens.biologie.genomique.kenetre.util.StringUtils.sizeToHumanReadable;
-import static fr.ens.biologie.genomique.kenetre.util.StringUtils.toTimeHumanReadable;
 import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Date;
+import java.util.Collections;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
@@ -147,26 +146,16 @@ public abstract class SyncDataProcessor implements DataProcessor {
       info(this.logger, runId,
           "space used by demux: " + sizeToHumanReadable(outputSize));
 
-      // Report URL in email message
-      String reportLocationMessage = runConf.containsKey("reports.url")
-          ? "\n\nRun reports can be found at following location:\n "
-              + runConf.get("reports.url") + '/' + runId.getId()
-          : "";
+      // Load email template
+      var emailTemplate = new DataProcessorTemplateEmailMessage(runConf,
+          "sync.end.email.template", "/emails/end-sync.email.template");
 
-      String emailContent = String.format("Ending synchronization "
-          + "for run %s.\n" + "Job finished at %s without error in %s.\n"
-          + "Run output files for this run can be found in the following directory: %s\n%s"
-          + "\nFor this task %s has been used and %s GB still free.",
-          runId.getId(), new Date(endTime).toString(),
-          toTimeHumanReadable(endTime - startTime), outputLocation.getPath(),
-          reportLocationMessage, sizeToHumanReadable(outputSize),
-          sizeToHumanReadable(outputFreeSize));
-
-      // Create success message
-      EmailMessage email = new EmailMessage(
-          "Ending demultiplexing for run "
-              + runId.getId() + " on " + inputRunData.getSource(),
-          emailContent);
+      // Create email content
+      var subject = "Ending synchronization for run "
+          + runId.getId() + " on " + inputRunData.getSource();
+      var email = emailTemplate.endDataProcessorEmail(subject, runId,
+          outputLocation.getPath(), startTime, endTime, outputSize,
+          outputFreeSize, Collections.emptyMap());
 
       return new SimpleProcessResult(
           inputRunData.newLocation(outputLocation).setPartialData(false),

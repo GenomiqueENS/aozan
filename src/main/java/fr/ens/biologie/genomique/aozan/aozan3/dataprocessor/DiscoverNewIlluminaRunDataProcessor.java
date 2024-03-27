@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -18,7 +19,6 @@ import org.xml.sax.SAXException;
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataLocation;
-import fr.ens.biologie.genomique.aozan.aozan3.EmailMessage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
@@ -112,14 +112,17 @@ public class DiscoverNewIlluminaRunDataProcessor implements DataProcessor {
       info(this.logger, inputRunData, "New run discovered "
           + runId.getId() + " on sequencer " + sequencerName);
 
-      String emailContent = String.format(
-          "You will find below the parameters " + "of the run %s.\n\n" + "%s",
-          runId.getId(), runInfoToString(runInfo));
+      // Load email template
+      var emailTemplate = new DataProcessorTemplateEmailMessage(conf,
+          "discover.illumina.email.template",
+          "/emails/illumina-discover-new-run.email.template");
 
-      // Create success message
-      EmailMessage email = new EmailMessage("New run "
+      // Create email content
+      var subject = "New run "
           + estimatedRunType(runInfo) + " " + runId.getId() + " on "
-          + inputRunData.getSource(), emailContent);
+          + inputRunData.getSource();
+      var email = emailTemplate.endDataProcessorEmail(subject, runId, null, 0,
+          0, 0, 0, Map.of("run_parameters", runInfoToString(runInfo)));
 
       return new SimpleProcessResult(inputRunData, email);
     } catch (IOException | ParserConfigurationException | SAXException e) {

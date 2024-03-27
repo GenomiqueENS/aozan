@@ -45,6 +45,7 @@
       <table>
         <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
         <tr><td>first.base.report.step</td><td>boolean</td><td>True</td><td>Enable the step</td></tr>
+        <tr><td>first.base.report.step.end.email.template</td><td>String</td><td>Not set</td><td>Path of the email template for the end of the new run discovering step.</td></tr>
       </table>
 
       <p>Example of emails sent for the new run discovering step</p>

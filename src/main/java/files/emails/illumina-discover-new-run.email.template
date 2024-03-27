@@ -1,0 +1,4 @@
+You will find below the parameters of the run ${run_id}.
+
+Informations about this run:
+${run_parameters}

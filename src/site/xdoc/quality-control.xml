@@ -59,6 +59,7 @@
         <table>
           <tr><th>Aozan property</th><th>Type</th><th>Default value</th><th>description</th></tr>
           <tr><td>qc.step</td><td>boolean</td><td>True</td><td>Enable the step. <b>If True, at least one test must be enabled, otherwise no data will be collected for the QC report.</b></td></tr>
+          <tr><td>qc.step.end.email.template</td><td>string</td><td>Not set</td><td>Path of the email template for the end of the qc step.</td></tr>
           <tr><td>qc.report.save.raw.data</td><td>boolean</td><td>False</td><td>Save raw data generated for the tests</td></tr>
           <tr><td>qc.report.save.report.data</td><td>boolean</td><td>False</td><td>Save report data in XML format (before applying the stylesheet)</td></tr>
           <tr><td>qc.report.stylesheet</td><td>string</td><td>Not set</td><td>Path to the XSL stylesheet to use </td></tr>

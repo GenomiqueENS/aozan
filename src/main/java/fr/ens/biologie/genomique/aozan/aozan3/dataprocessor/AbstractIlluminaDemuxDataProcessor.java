@@ -4,7 +4,6 @@ import static fr.ens.biologie.genomique.aozan.aozan3.DataType.BCL;
 import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.error;
 import static fr.ens.biologie.genomique.aozan.aozan3.log.Aozan3Logger.info;
 import static fr.ens.biologie.genomique.kenetre.util.StringUtils.sizeToHumanReadable;
-import static fr.ens.biologie.genomique.kenetre.util.StringUtils.toTimeHumanReadable;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 
@@ -15,18 +14,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import fr.ens.biologie.genomique.aozan.Settings;
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataLocation;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.DataType;
 import fr.ens.biologie.genomique.aozan.aozan3.DataType.Category;
-import fr.ens.biologie.genomique.aozan.aozan3.EmailMessage;
 import fr.ens.biologie.genomique.aozan.aozan3.RunConfiguration;
 import fr.ens.biologie.genomique.aozan.aozan3.RunData;
 import fr.ens.biologie.genomique.aozan.aozan3.RunId;
@@ -207,28 +204,17 @@ public abstract class AbstractIlluminaDemuxDataProcessor
       info(this.logger, runId,
           "space used by demux: " + sizeToHumanReadable(outputSize));
 
-      // Report URL in email message
-      String reportLocationMessage = conf.containsKey("reports.url")
-          ? "\nRun reports can be found at following location:\n  "
-              + conf.get("reports.url") + '/' + runId.getId() + "\n"
-          : "";
+      // Load email template
+      var emailTemplate = new DataProcessorTemplateEmailMessage(conf,
+          "demux.end.email.template",
+          "/emails/end-demultiplexing.email.template");
 
-      String emailContent = String.format(
-          "Ending demultiplexing "
-              + "for run %s.\n" + "Job finished at %s without error in %s.\n\n"
-              + "FASTQ files for this run can be found in the following "
-              + "directory:\n  %s\n%s"
-              + "\nFor this task %s has been used and %s GB still free.",
-          runId.getId(), new Date(endTime).toString(),
-          toTimeHumanReadable(endTime - startTime), outputLocation.getPath(),
-          reportLocationMessage, sizeToHumanReadable(outputSize),
-          sizeToHumanReadable(outputFreeSize));
-
-      // Create success message
-      EmailMessage email = new EmailMessage(
-          "Ending demultiplexing for run "
-              + runId.getId() + " on " + inputRunData.getSource(),
-          emailContent);
+      // Create email content
+      var subject = "Ending demultiplexing for run "
+          + runId.getId() + " on " + inputRunData.getSource();
+      var email = emailTemplate.endDataProcessorEmail(subject, runId,
+          outputLocation.getPath(), startTime, endTime, outputSize,
+          outputFreeSize, Map.of("reports_url", conf.get("reports.url")));
 
       return new SimpleProcessResult(inputRunData.newLocation(outputLocation)
           .newCategory(Category.PROCESSED), email);

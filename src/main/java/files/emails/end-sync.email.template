@@ -1,0 +1,10 @@
+Ending synchronization for run ${run_id}.
+Job finished at ${end_date} without error in ${duration}.
+Run output files for this run can be found in the following directory: ${output_directory}
+
+# if-set $url_report
+Run reports can be found at following location:
+  ${url_report}
+
+#fi
+For this task ${output_size} has been used and ${disk_free} still free.
