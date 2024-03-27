@@ -279,7 +279,8 @@ public class LegacyRecipes {
     setSetting(conf, aozan2Conf, "send.mail", "send.mail", "False");
 
     // Set email source and destinations
-    for (String key : asList("mail.from", "mail.to", "mail.error.to")) {
+    for (String key : asList("mail.from", "mail.to", "mail.error.to",
+        "mail.header", "mail.footer")) {
       setSetting(conf, aozan2Conf, key, key);
     }
 
