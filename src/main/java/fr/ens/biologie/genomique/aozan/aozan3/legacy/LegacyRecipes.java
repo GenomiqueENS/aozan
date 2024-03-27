@@ -16,6 +16,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
 import fr.ens.biologie.genomique.aozan.aozan3.DefaultRunIdGenerator;
+import fr.ens.biologie.genomique.aozan.aozan3.Globals;
 import fr.ens.biologie.genomique.aozan.aozan3.SendMail;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.Aozan2QCDataProcessor;
 import fr.ens.biologie.genomique.aozan.aozan3.dataprocessor.Bcl2FastqIlluminaDemuxDataProcessor;
@@ -49,6 +50,8 @@ public class LegacyRecipes {
   private Path mainLockPath;
   private Map<Recipe, Path> lockPaths = new HashMap<>();
   private Map<Recipe, String> recipeDoneFilename = new HashMap<>();
+  private final GenericLogger logger;
+  private final boolean logAozanStartStop;
   private final boolean aozanEnabled;
 
   //
@@ -309,14 +312,14 @@ public class LegacyRecipes {
   }
 
   private Recipe createNewRunStepRecipe(Configuration conf,
-      GenericLogger logger, Configuration aozan2Conf) throws Aozan3Exception {
+      Configuration aozan2Conf) throws Aozan3Exception {
 
     // Check if the sync step is enabled
     if (!aozan2Conf.getBoolean("first.base.report.step", true)) {
       return null;
     }
 
-    Recipe recipe = new Recipe("newrun", "New run step", conf, logger);
+    Recipe recipe = new Recipe("newrun", "New run step", conf, this.logger);
 
     boolean inProgress = true;
     final String inputStoragePrefix = "nasStorage";
@@ -353,14 +356,14 @@ public class LegacyRecipes {
   }
 
   private Recipe createEndRunStepRecipe(Configuration conf,
-      GenericLogger logger, Configuration aozan2Conf) throws Aozan3Exception {
+      Configuration aozan2Conf) throws Aozan3Exception {
 
     // Check if the sync step is enabled
     if (!aozan2Conf.getBoolean("hiseq.step", true)) {
       return null;
     }
 
-    Recipe recipe = new Recipe("endrun", "End run step", conf, logger);
+    Recipe recipe = new Recipe("endrun", "End run step", conf, this.logger);
     this.recipeDoneFilename.put(recipe, "hiseq");
 
     boolean inProgress = false;
@@ -398,7 +401,7 @@ public class LegacyRecipes {
     return recipe;
   }
 
-  private Recipe createSyncStepRecipe(Configuration conf, GenericLogger logger,
+  private Recipe createSyncStepRecipe(Configuration conf,
       Configuration aozan2Conf) throws Aozan3Exception {
 
     // Check if the sync step is enabled
@@ -406,7 +409,7 @@ public class LegacyRecipes {
       return null;
     }
 
-    Recipe recipe = new Recipe("sync", "Sync step", conf, logger);
+    Recipe recipe = new Recipe("sync", "Sync step", conf, this.logger);
 
     // boolean inProgress = aozan2Conf.getBoolean("sync.continuous.sync",
     // false);
@@ -445,15 +448,15 @@ public class LegacyRecipes {
     return recipe;
   }
 
-  private Recipe createDemuxStep(Configuration conf, GenericLogger logger,
-      Configuration aozan2Conf) throws Aozan3Exception {
+  private Recipe createDemuxStep(Configuration conf, Configuration aozan2Conf)
+      throws Aozan3Exception {
 
     // Check if the demux step is enabled
     if (!aozan2Conf.getBoolean("demux.step", true)) {
       return null;
     }
 
-    Recipe recipe = new Recipe("demux", "Demux step", conf, logger);
+    Recipe recipe = new Recipe("demux", "Demux step", conf, this.logger);
 
     final String outputStorageName = "fastqStorage";
 
@@ -499,15 +502,15 @@ public class LegacyRecipes {
     return recipe;
   }
 
-  private Recipe createQCStep(Configuration conf, GenericLogger logger,
-      Configuration aozan2Conf) throws Aozan3Exception {
+  private Recipe createQCStep(Configuration conf, Configuration aozan2Conf)
+      throws Aozan3Exception {
 
     // Check if the qc step is enabled
     if (!aozan2Conf.getBoolean("qc.step", true)) {
       return null;
     }
 
-    Recipe recipe = new Recipe("qc", "QC step", conf, logger);
+    Recipe recipe = new Recipe("qc", "QC step", conf, this.logger);
 
     boolean inProgress = false;
     final String inputFastqStorageName = "fastqStorage";
@@ -545,6 +548,26 @@ public class LegacyRecipes {
     recipe.addStep(qcStep);
 
     return recipe;
+  }
+
+  /**
+   * Log the start of the application.
+   */
+  public void logAozanStart() {
+
+    if (this.logAozanStartStop) {
+      this.logger.info("Start " + Globals.WELCOME_MSG);
+    }
+  }
+
+  /**
+   * Log the end of the application.
+   */
+  public void logAozanStop() {
+
+    if (this.logAozanStartStop) {
+      this.logger.info("End of " + Globals.APP_NAME);
+    }
   }
 
   //
@@ -715,12 +738,20 @@ public class LegacyRecipes {
     this.aozanEnabled = parseCommonConfiguration(conf, logger, aozan2Conf);
 
     if (!this.aozanEnabled) {
+
+      this.logger = null;
+      this.logAozanStartStop = false;
+
       // Aozan is not enabled, nothing to do
       return;
     }
 
     // Change logger if required in Aozan 2 conf
-    logger = createLogger(aozan2Conf, logger);
+    this.logger = createLogger(aozan2Conf, logger);
+
+    // Enable the startup and the showdown of Aozan
+    this.logAozanStartStop =
+        aozan2Conf.getBoolean("aozan.log.start.stop", false);
 
     // Get the var path
     this.varPath = Paths.get(checkAndGetSetting(aozan2Conf, "aozan.var.path"));
@@ -734,12 +765,12 @@ public class LegacyRecipes {
 
     // TODO Check removed steps
 
-    this.newRunStepRecipe = createNewRunStepRecipe(conf, logger, aozan2Conf);
-    this.endRunStepRecipe = createEndRunStepRecipe(conf, logger, aozan2Conf);
-    this.syncStepRecipe = createSyncStepRecipe(conf, logger, aozan2Conf);
-    this.demuxStepRecipe = createDemuxStep(conf, logger, aozan2Conf);
-    this.qcStepRecipe = createQCStep(conf, logger, aozan2Conf);
-    this.sendMail = new SendMail(aozan2Conf, logger);
+    this.newRunStepRecipe = createNewRunStepRecipe(conf, aozan2Conf);
+    this.endRunStepRecipe = createEndRunStepRecipe(conf, aozan2Conf);
+    this.syncStepRecipe = createSyncStepRecipe(conf, aozan2Conf);
+    this.demuxStepRecipe = createDemuxStep(conf, aozan2Conf);
+    this.qcStepRecipe = createQCStep(conf, aozan2Conf);
+    this.sendMail = new SendMail(aozan2Conf, this.logger);
   }
 
 }

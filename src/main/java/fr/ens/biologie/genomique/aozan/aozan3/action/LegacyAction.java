@@ -58,9 +58,10 @@ public class LegacyAction implements Action {
     }
 
     SendMail sendMail = null;
+    LegacyRecipes recipes = null;
     try {
       Path confFile = Paths.get(arguments.get(0));
-      LegacyRecipes recipes = new LegacyRecipes(conf, logger, confFile);
+      recipes = new LegacyRecipes(conf, logger, confFile);
       sendMail = recipes.getSendMail();
 
       // Test if Aozan is enabled
@@ -79,6 +80,9 @@ public class LegacyAction implements Action {
 
       // Create Aozan lock
       mainLock.createLock();
+
+      // Log Aozan start
+      recipes.logAozanStart();
 
       // Perform new run discovering
       execute(recipes, recipes.getNewRunStepRecipe(), recipes.getVarPath());
@@ -105,6 +109,10 @@ public class LegacyAction implements Action {
       }
       Common.errorExit(e,
           "Error while parsing command line arguments: " + e.getMessage());
+    } finally {
+      if (recipes != null) {
+        recipes.logAozanStop();
+      }
     }
   }
 
