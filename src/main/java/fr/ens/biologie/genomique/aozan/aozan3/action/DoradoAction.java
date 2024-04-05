@@ -74,51 +74,51 @@ public class DoradoAction implements Action {
       }
 
       // Trim barcodes option
-      if (line.hasOption("t")) {
+      if (line.hasOption("trim-barcodes")) {
         trimBarcode = true;
       }
 
-      if (line.hasOption("f")) {
-        flowcell = line.getOptionValue("f");
+      if (line.hasOption("flowcell")) {
+        flowcell = line.getOptionValue("flowcell");
       }
 
-      if (line.hasOption("k")) {
-        kit = line.getOptionValue("k");
+      if (line.hasOption("kit")) {
+        kit = line.getOptionValue("kit");
       }
 
-      if (line.hasOption("b")) {
-        barcodeKits = line.getOptionValue("b");
+      if (line.hasOption("barcode-kit")) {
+        barcodeKits = line.getOptionValue("barcode-kit");
       }
 
-      if (line.hasOption("r")) {
-        runId = line.getOptionValue("r");
+      if (line.hasOption("run-id")) {
+        runId = line.getOptionValue("run-id");
       }
 
-      if (line.hasOption("g")) {
-        doradoVersion = line.getOptionValue("g");
+      if (line.hasOption("dorado-version")) {
+        doradoVersion = line.getOptionValue("dorado-version");
       }
 
-      if (line.hasOption("c")) {
-        modelName = line.getOptionValue("c");
+      if (line.hasOption("config")) {
+        modelName = line.getOptionValue("config");
       }
 
-      if (line.hasOption("m")) {
-        minQscore = line.getOptionValue("m");
+      if (line.hasOption("min-qscore")) {
+        minQscore = line.getOptionValue("min-qscore");
       }
 
-      if (line.hasOption("d")) {
-        cudaDevice = line.getOptionValue("d");
+      if (line.hasOption("device")) {
+        cudaDevice = line.getOptionValue("device");
       }
 
-      if (line.hasOption("u")) {
-        batchSize = Integer.parseInt(line.getOptionValue("u"));
+      if (line.hasOption("batch-size")) {
+        batchSize = Integer.parseInt(line.getOptionValue("batch-size"));
       }
 
-      if (line.hasOption("p")) {
-        chunkSize = Integer.parseInt(line.getOptionValue("p"));
+      if (line.hasOption("chunk-size")) {
+        chunkSize = Integer.parseInt(line.getOptionValue("chunk-size"));
       }
 
-      if (line.hasOption("e")) {
+      if (line.hasOption("keep-temporary-files")) {
         keepTemporaryFiles = true;
       }
       args = Arrays.asList(line.getArgs());
