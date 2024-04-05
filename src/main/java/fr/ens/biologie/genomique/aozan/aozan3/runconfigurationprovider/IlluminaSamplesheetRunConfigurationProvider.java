@@ -35,7 +35,7 @@ import fr.ens.biologie.genomique.kenetre.KenetreException;
 import fr.ens.biologie.genomique.kenetre.illumina.DemultiplexingStats;
 import fr.ens.biologie.genomique.kenetre.illumina.RunInfo;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet;
-import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetCheck;
+import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetChecker;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetCSVReader;
 import fr.ens.biologie.genomique.kenetre.illumina.samplesheet.io.SampleSheetReader;
@@ -500,7 +500,7 @@ public class IlluminaSamplesheetRunConfigurationProvider
       }
 
       // Create checker
-      SampleSheetCheck checker = new SampleSheetCheck();
+      SampleSheetChecker checker = new SampleSheetChecker();
       checker.setSampleIdMaxLength(this.allowSampleIdMaxLength);
       checker.setAllowUnderscoreInSampleID(this.allowUnderscoresInSampleIds);
 
