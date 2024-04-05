@@ -46,7 +46,7 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
   private static final String CONF_PREFIX = "dorado";
   private static final String DEFAULT_DORADO_DOCKER_REPO =
       "genomicpariscentre/dorado";
-  private static final String DEFAULT_DORADO_VERSION = "0.5.3";
+  private static final String DEFAULT_DORADO_VERSION = "0.6.0";
   private static final String DEFAULT_MODEL_SELECTION_COMPLEX = "sup";
 
   private static final boolean USE_DOCKER = true;
@@ -503,11 +503,13 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
       }
     }
 
+    // Min qscore
     if (runConf.containsKey(CONF_PREFIX + ".min.qscore")) {
       result.add("--min_qscore");
       result.add(runConf.get(CONF_PREFIX + ".min.qscore"));
     }
 
+    // Model selection complex
     if (new Version(runConf.get(CONF_PREFIX + ".dorado.version"))
         .greaterThanOrEqualTo(new Version("0.5.0"))) {
       result.add(runConf.get(CONF_PREFIX + ".model.selection.complex",
@@ -633,7 +635,7 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
     }
 
     if (!lines.isEmpty()) {
-      return lines.get(0);
+      return lines.get(lines.size() - 1);
     }
 
     return null;
