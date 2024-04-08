@@ -2,6 +2,7 @@ package fr.ens.biologie.genomique.aozan.aozan3.dataprocessor;
 
 import static fr.ens.biologie.genomique.kenetre.util.StringUtils.sizeToHumanReadable;
 import static fr.ens.biologie.genomique.kenetre.util.StringUtils.toTimeHumanReadable;
+import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -39,14 +40,20 @@ public class DataProcessorTemplateEmailMessage extends TemplateEmailMessage {
       Path outputDirectory, long startTime, long endTime, long outputSize,
       long diskFree, Map<String, String> variables) throws Aozan3Exception {
 
-    Map<String, String> map = new HashMap<>(variables);
+    requireNonNull(runId);
+
+    Map<String, String> map =
+        variables != null ? new HashMap<>(variables) : new HashMap<>();
 
     map.put("run_id", runId.getId());
     map.put("current_date", new Date(System.currentTimeMillis()).toString());
     map.put("start_date", new Date(startTime).toString());
     map.put("end_date", new Date(endTime).toString());
     map.put("duration", toTimeHumanReadable(endTime - startTime));
-    map.put("output_directory", outputDirectory.toString());
+
+    if (outputDirectory != null) {
+      map.put("output_directory", outputDirectory.toString());
+    }
     map.put("output_size", sizeToHumanReadable(outputSize));
     map.put("disk_free", sizeToHumanReadable(diskFree));
 
