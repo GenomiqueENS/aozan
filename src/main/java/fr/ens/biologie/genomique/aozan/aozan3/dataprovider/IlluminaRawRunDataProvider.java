@@ -1,5 +1,6 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprovider;
 
+import static com.google.common.base.Strings.nullToEmpty;
 import static java.util.Objects.requireNonNull;
 
 import java.io.File;
@@ -17,6 +18,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import com.google.common.base.Strings;
+
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
 import fr.ens.biologie.genomique.aozan.aozan3.DataStorage;
@@ -27,6 +30,7 @@ import fr.ens.biologie.genomique.aozan.aozan3.RunId;
 import fr.ens.biologie.genomique.aozan.aozan3.SequencerSource;
 import fr.ens.biologie.genomique.aozan.aozan3.util.Utils;
 import fr.ens.biologie.genomique.kenetre.illumina.RunInfo;
+import fr.ens.biologie.genomique.kenetre.illumina.RunParameters;
 import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
 
 /**
@@ -198,17 +202,26 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
           "RunCompletionStatus.xml");
     }
 
-    // RTA for MiSeq
-    if (new File(dir, "RunParameters.xml").exists()) {
-      return fileExists(dir, "CopyComplete.txt", "RTAComplete.txt",
-          "RunCompletionStatus.xml");
-    }
-
-    // RTA 2
+    // RTA 2 or MiSeq
     if (new File(dir, "RunParameters.xml").exists()) {
 
-      return fileExists(dir, "RTAComplete.txt", "RunCompletionStatus.xml")
-          && completeFileExists(dir, "RTARead", "Complete.txt");
+      try {
+        var rp = RunParameters.parse(new File(dir, "RunParameters.xml"));
+
+        if ("miseq"
+            .equals(nullToEmpty(rp.getSequencerFamily()).toLowerCase())) {
+          return runMiSeqCompleted(rp, dir);
+        } else {
+
+          // Other cases with RTA 2
+          return fileExists(dir, "RTAComplete.txt", "RunCompletionStatus.xml")
+              && completeFileExists(dir, "RTARead", "Complete.txt");
+
+        }
+
+      } catch (ParserConfigurationException | SAXException | IOException e) {
+        return false;
+      }
     }
 
     // RTA 1
@@ -221,6 +234,38 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
     }
 
     return false;
+  }
+
+  /**
+   * Test if a MiSeq run is completed.
+   * @param rp run parameters object
+   * @param runDirectory the path to the run directory
+   * @return true if the run is completed
+   */
+  private static boolean runMiSeqCompleted(RunParameters rp,
+      File runDirectory) {
+
+    requireNonNull(rp);
+    requireNonNull(runDirectory);
+
+    // Common files
+    if (!(fileExists(runDirectory, "RTAComplete.txt",
+        "Basecalling_Netcopy_complete.txt")
+        && completeFileExists(runDirectory, "Basecalling_Netcopy_complete_Read",
+            ".txt"))) {
+      return false;
+    }
+
+    switch (Strings.emptyToNull(rp.getRunParametersVersion()).toLowerCase()) {
+
+    case "miseq_1_1":
+      return true;
+
+    case "miseq_1_3":
+    default:
+      return fileExists(runDirectory, "RunCompletionStatus.xml");
+    }
+
   }
 
   /**
