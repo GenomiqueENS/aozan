@@ -208,9 +208,6 @@ public class DiscoverNewIlluminaRunDataProcessor implements DataProcessor {
       }
     }
 
-    sb.append("Informations about this run:\n");
-    // description_run += "\t- Sequencer: " + common.get_instrument_name(run_id,
-    // conf) + ".\n"
     sb.append("\t- "
         + runInfo.getFlowCellLaneCount() + " lanes with "
         + runInfo.getAlignToPhix().size() + " aligned to Phix.\n");
