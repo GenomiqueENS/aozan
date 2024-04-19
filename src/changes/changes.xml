@@ -1047,13 +1047,16 @@
                                  Exec and list action are now hidden util there are not stable.
 			</action>
 			<action dev="jourdren" type="update">
-                                 Aozan now use Kenetre 0.23 has dependency.
+                                 Aozan now use Kenetre 0.25 has dependency.
 			</action>
 			<action dev="jourdren" type="update">
                                  When using BCL Convert in Docker mode, set default version to 4.2.7.
 			</action>
 			<action dev="jourdren" type="update">
                                  Since NextSeq Software 1.7.0 in PrimaryAnalysisMetrics.csv file, the "Average %Q30" metric has been renamed to "≥ Q30". Aozan has been updated to handle this.
+			</action>
+			<action dev="jourdren" type="update">
+                                 Now allow samplesheets with name like samplesheet_SERIALNUMBER_0086.xls or samplesheet_SERIALNUMBER_86.xls.
 			</action>
 			<action dev="jourdren" type="fix">
                                  Some MiSeq outputs were not handled by Aozan.
@@ -1066,6 +1069,10 @@
 			</action>
 			<action dev="jourdren" type="fix">
                                  Existing BOM character at the beginning of Illumina samplesheets in CVS format are now handled.
+			</action>
+		</release>
+			<action dev="jourdren" type="fix">
+                                 Fix MiSeq run discovery.
 			</action>
 		</release>
 
