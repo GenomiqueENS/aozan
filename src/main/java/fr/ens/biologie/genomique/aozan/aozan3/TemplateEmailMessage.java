@@ -11,6 +11,7 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -278,6 +279,31 @@ public class TemplateEmailMessage {
     return s.substring(beginIndex, endIndex);
   }
 
+  /**
+   * Clean variable values to be used in the template.
+   * @param map map with the variables
+   * @return a map without null values
+   */
+  private static final Map<String, String> variablesCleaning(
+      Map<String, String> map) {
+
+    if (map == null) {
+      return Collections.emptyMap();
+    }
+
+    Map<String, String> result = new HashMap<>(map.size());
+
+    for (Map.Entry<String, String> e : map.entrySet()) {
+
+      if (e.getValue() != null) {
+        result.put(e.getKey(), e.getValue());
+      }
+
+    }
+
+    return result;
+  }
+
   //
   // Email generation methods
   //
@@ -305,6 +331,7 @@ public class TemplateEmailMessage {
       Map<String, String> variables) throws Aozan3Exception {
 
     StringBuilder sb = new StringBuilder();
+    variables = variablesCleaning(variables);
 
     if (!this.header.isBlank()) {
       sb.append(this.header);
@@ -312,8 +339,7 @@ public class TemplateEmailMessage {
     }
 
     sb.append(evaluateExpressions(
-        preprocessor(this.template == null ? "" : this.template,
-            variables == null ? Collections.emptyMap() : variables),
+        preprocessor(this.template != null ? this.template : "", variables),
         variables));
 
     if (!this.footer.isBlank()) {

@@ -214,7 +214,7 @@ public abstract class AbstractIlluminaDemuxDataProcessor
           + runId.getId() + " on " + inputRunData.getSource();
       var email = emailTemplate.endDataProcessorEmail(subject, runId,
           outputLocation.getPath(), startTime, endTime, outputSize,
-          outputFreeSize, Map.of("reports_url", conf.get("reports.url")));
+          outputFreeSize, Map.of("reports_url", conf.get("reports.url", null)));
 
       return new SimpleProcessResult(inputRunData.newLocation(outputLocation)
           .newCategory(Category.PROCESSED), email);
