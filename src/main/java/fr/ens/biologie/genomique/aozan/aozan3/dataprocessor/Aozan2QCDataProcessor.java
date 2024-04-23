@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -249,7 +250,10 @@ public class Aozan2QCDataProcessor implements DataProcessor {
           + runId.getId() + " on " + fastqRunData.getSource();
       var email = emailTemplate.endDataProcessorEmail(subject, runId,
           outputLocation.getPath(), startTime, endTime, outputSize,
-          outputFreeSize, Map.of("reports_url", conf.get("reports.url")));
+          outputFreeSize,
+          conf.containsKey("reports_url")
+              ? Map.of("reports_url", conf.get("reports.url"))
+              : Collections.emptyMap());
 
       return new SimpleProcessResult(
           fastqRunData.newLocation(outputLocation).newCategory(Category.QC),
