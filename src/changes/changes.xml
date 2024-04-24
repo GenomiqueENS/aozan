@@ -1070,7 +1070,6 @@
 			<action dev="jourdren" type="fix">
                                  Existing BOM character at the beginning of Illumina samplesheets in CVS format are now handled.
 			</action>
-		</release>
 			<action dev="jourdren" type="fix">
                                  Fix MiSeq run discovery.
 			</action>
