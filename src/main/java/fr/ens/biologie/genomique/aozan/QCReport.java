@@ -614,7 +614,7 @@ public class QCReport {
 
   /**
    * Filter test entry in the report
-   * @param testNames name of the tests to remove
+   * @param testNamesToRemove name of the tests to remove
    */
   public void filterTests(Collection<String> testNamesToRemove) {
 

@@ -90,8 +90,7 @@ public class QCReportExporter {
 
   /**
    * Write the XML in a file.
-   * @param report the QCReport object
-   * @param outputFile the XML file
+   * @param outputFile the output file
    * @throws AozanException if an error occurs while creating the report
    */
   public void writeXMLReport(File outputFile) throws AozanException {
