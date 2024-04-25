@@ -1027,7 +1027,7 @@
 			</action>
 		</release>
 
-		<release version="3.1" description="Aozan 3.1 release"  date="TBD">
+		<release version="3.1" description="Aozan 3.1 release"  date="2024-04-25">
 			<action dev="jourdren" type="add">
                                  Blast can be disabled for the "Overrepresented sequences" of the FastQC report if an "Aozan" section with a "disable.blast" is set to true in the samplesheet of the run.
 			</action>
