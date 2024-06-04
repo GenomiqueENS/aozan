@@ -513,7 +513,7 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
     if (new Version(runConf.get(CONF_PREFIX + ".dorado.version"))
         .greaterThanOrEqualTo(new Version("0.5.0"))) {
       result.add(runConf.get(CONF_PREFIX + ".model.selection.complex",
-          getModelPath(modelsPath, runConf).toString()));
+          DEFAULT_MODEL_SELECTION_COMPLEX));
     } else {
       result.add(getModelPath(modelsPath, runConf).toString());
     }
