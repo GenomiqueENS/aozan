@@ -505,7 +505,7 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
 
     // Min qscore
     if (runConf.containsKey(CONF_PREFIX + ".min.qscore")) {
-      result.add("--min_qscore");
+      result.add("--min-qscore");
       result.add(runConf.get(CONF_PREFIX + ".min.qscore"));
     }
 
