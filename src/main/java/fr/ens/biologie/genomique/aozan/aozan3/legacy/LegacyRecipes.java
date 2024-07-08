@@ -597,6 +597,9 @@ public class LegacyRecipes {
         Settings.SAMPLESHEET_PREFIX_KEY, "samplesheet");
     setSetting(stepConf, aozan2Conf, "samplesheet.generator.command");
     setSetting(stepConf, aozan2Conf, "index.sequences");
+    setSetting(stepConf, aozan2Conf,
+        "samplesheet.allow.underscores.in.sample.ids");
+    setSetting(stepConf, aozan2Conf, "samplesheet.allow.sample.ids.max.length");
 
     // For the QC step, first search samplesheet in the FASTQ output
     // directory
