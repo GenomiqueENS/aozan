@@ -46,7 +46,7 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
   private static final String CONF_PREFIX = "dorado";
   private static final String DEFAULT_DORADO_DOCKER_REPO =
       "genomicpariscentre/dorado";
-  private static final String DEFAULT_DORADO_VERSION = "0.6.0";
+  private static final String DEFAULT_DORADO_VERSION = "0.7.2";
   private static final String DEFAULT_MODEL_SELECTION_COMPLEX = "sup";
 
   private static final boolean USE_DOCKER = true;
