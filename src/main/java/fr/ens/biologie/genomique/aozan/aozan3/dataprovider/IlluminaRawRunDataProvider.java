@@ -1,10 +1,13 @@
 package fr.ens.biologie.genomique.aozan.aozan3.dataprovider;
 
 import static com.google.common.base.Strings.nullToEmpty;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -195,37 +198,46 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
     requireNonNull(runDirectory);
     File dir = runDirectory.toFile();
 
-    // RTA 3
-    if (new File(dir, "RTA3.cfg").exists()) {
+    // RTA >= 2 or MiSeq
+    File runParameterFile = new File(dir, "RunParameters.xml");
+    if (runParameterFile.exists()) {
 
-      return fileExists(dir, "CopyComplete.txt", "RTAComplete.txt",
-          "RunCompletionStatus.xml");
-    }
+      switch (getRTAVersionFast(runParameterFile)) {
 
-    // RTA 2 or MiSeq
-    if (new File(dir, "RunParameters.xml").exists()) {
+      // RTA 2 or MiSeq
+      case 2:
+        try {
+          var rp = RunParameters.parse(runParameterFile);
 
-      try {
-        var rp = RunParameters.parse(new File(dir, "RunParameters.xml"));
+          if ("miseq"
+              .equals(nullToEmpty(rp.getSequencerFamily()).toLowerCase())) {
+            return runMiSeqCompleted(rp, dir);
+          } else {
 
-        if ("miseq"
-            .equals(nullToEmpty(rp.getSequencerFamily()).toLowerCase())) {
-          return runMiSeqCompleted(rp, dir);
-        } else {
+            // Other cases with RTA 2
+            return fileExists(dir, "RTAComplete.txt", "RunCompletionStatus.xml")
+                && completeFileExists(dir, "RTARead", "Complete.txt");
 
-          // Other cases with RTA 2
-          return fileExists(dir, "RTAComplete.txt", "RunCompletionStatus.xml")
-              && completeFileExists(dir, "RTARead", "Complete.txt");
+          }
 
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+          return false;
         }
 
-      } catch (ParserConfigurationException | SAXException | IOException e) {
-        return false;
+        // RTA 3 or RTA 4
+      case 3:
+      case 4:
+        return fileExists(dir, "CopyComplete.txt", "RTAComplete.txt",
+            "RunCompletionStatus.xml");
+      default:
+        break;
       }
+
     }
 
     // RTA 1
-    if (new File(dir, "runParameters.xml").exists()) {
+    runParameterFile = new File(dir, "runParameters.xml");
+    if (runParameterFile.exists()) {
 
       return fileExists(dir, "RTAComplete.txt",
           "ImageAnalysis_Netcopy_complete.txt")
@@ -339,6 +351,34 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
     } catch (ParserConfigurationException | SAXException | IOException e) {
       return -1;
     }
+
+  }
+
+  /**
+   * Get the RTA version from a run parameter file.
+   * @param rtaFile the run parameter version
+   * @return the RTA major version or -1 if cannot be found
+   */
+  private static int getRTAVersionFast(File rtaFile) {
+
+    try (BufferedReader reader =
+        new BufferedReader(new FileReader(rtaFile, UTF_8))) {
+
+      String line = null;
+      while ((line = reader.readLine()) != null) {
+
+        int found = line.toLowerCase().indexOf("<rtaversion>");
+        if (found > -1
+            && line.length() > (found + "<rtaversion>".length() + 1)) {
+          return line.charAt(found + "<rtaversion>".length()) - 48;
+        }
+      }
+
+    } catch (IOException e) {
+      return -1;
+    }
+
+    return -1;
 
   }
 
