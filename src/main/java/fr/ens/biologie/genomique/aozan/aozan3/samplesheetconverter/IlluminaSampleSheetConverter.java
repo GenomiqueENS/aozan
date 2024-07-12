@@ -1,9 +1,14 @@
 package fr.ens.biologie.genomique.aozan.aozan3.samplesheetconverter;
 
+import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.Sample.INDEX1_FIELD_NAME;
+import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.Sample.INDEX2_FIELD_NAME;
+import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.Sample.LANE_FIELD_NAME;
+import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.Sample.SAMPLE_ID_FIELD_NAME;
 import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet.BCL2FASTQ_DEMUX_TABLE_NAME;
 import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheet.BCLCONVERT_DEMUX_TABLE_NAME;
 import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils.removeBclConvertDataForbiddenFields;
 import static fr.ens.biologie.genomique.kenetre.illumina.samplesheet.SampleSheetUtils.replaceUnderscoresByDashesInSampleIds;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
@@ -88,7 +93,8 @@ public class IlluminaSampleSheetConverter extends AbstractSampleSheetConverter {
 
     // Fix sample sheet
     try {
-      removeBclConvertDataForbiddenFields(sampleSheet);
+      removeBclConvertDataForbiddenFields(sampleSheet, asList(LANE_FIELD_NAME,
+          SAMPLE_ID_FIELD_NAME, INDEX1_FIELD_NAME, INDEX2_FIELD_NAME));
     } catch (KenetreException e) {
       throw new Aozan3Exception(
           "Error while converting sample sheet: " + inputFile);
