@@ -193,7 +193,7 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
    * @param runDirectory the path to the run directory
    * @return true if the run is completed
    */
-  public static boolean runCompleted(Path runDirectory) {
+  private static boolean runCompleted(Path runDirectory) {
 
     requireNonNull(runDirectory);
     File dir = runDirectory.toFile();
@@ -202,29 +202,33 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
     File runParameterFile = new File(dir, "RunParameters.xml");
     if (runParameterFile.exists()) {
 
-      switch (getRTAVersionFast(runParameterFile)) {
+      int rtaVersion = getRTAVersionFast(runParameterFile);
 
-      // RTA 2 or MiSeq
-      case 2:
+      switch (rtaVersion) {
+
+      // MiSeq
+      case 1:
         try {
           var rp = RunParameters.parse(runParameterFile);
 
           if ("miseq"
               .equals(nullToEmpty(rp.getSequencerFamily()).toLowerCase())) {
             return runMiSeqCompleted(rp, dir);
-          } else {
-
-            // Other cases with RTA 2
-            return fileExists(dir, "RTAComplete.txt", "RunCompletionStatus.xml")
-                && completeFileExists(dir, "RTARead", "Complete.txt");
-
           }
+
+          // Case not handled
+          return false;
 
         } catch (ParserConfigurationException | SAXException | IOException e) {
           return false;
         }
 
-        // RTA 3 or RTA 4
+      // RTA 2
+      case 2:
+        return fileExists(dir, "RTAComplete.txt", "RunCompletionStatus.xml")
+            && completeFileExists(dir, "RTARead", "Complete.txt");
+
+      // RTA 3 or RTA 4
       case 3:
       case 4:
         return fileExists(dir, "CopyComplete.txt", "RTAComplete.txt",
@@ -245,6 +249,7 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
               ".txt");
     }
 
+    // No parameter file
     return false;
   }
 
@@ -379,7 +384,6 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
     }
 
     return -1;
-
   }
 
 }
