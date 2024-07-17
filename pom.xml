@@ -4,7 +4,7 @@
 
   <groupId>fr.ens.biologie.genomique</groupId>
   <artifactId>aozan</artifactId>
-  <version>3.1.1</version>
+  <version>3.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Aozan</name>
