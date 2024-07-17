@@ -1075,7 +1075,7 @@
 			</action>
 		</release>
 
-		<release version="3.1.1" description="Aozan 3.1 release"  date="TBD">
+		<release version="3.1.1" description="Aozan 3.1.1 release"  date="2024-07-17">
 			<action dev="jourdren" type="update">
                                  Aozan now use Kenetre 0.27 has dependency.
 			</action>
