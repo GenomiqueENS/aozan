@@ -10,4 +10,4 @@ Run reports can be found at following location:
   ${reports_url}/${run_id}
 
 #fi
-For this task 7.97 MiB has been used and 445.59 GiB GB still free.
+For this task ${output_size} has been used and ${disk_free} still free.
