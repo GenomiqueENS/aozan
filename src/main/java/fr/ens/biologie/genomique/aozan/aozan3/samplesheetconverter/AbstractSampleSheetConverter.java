@@ -180,6 +180,7 @@ public abstract class AbstractSampleSheetConverter {
     try (Writer writer = new FileWriter(outputFile, Charset.defaultCharset())) {
 
       writer.write(text);
+      writer.write('\n');
 
     } catch (IOException e) {
     }
