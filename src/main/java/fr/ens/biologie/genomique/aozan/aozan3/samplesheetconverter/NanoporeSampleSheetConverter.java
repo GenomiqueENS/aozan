@@ -6,6 +6,7 @@ import java.util.List;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.io.SampleSheetReader;
+import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.io.SampleSheetWriter;
 import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.io.SampleSheetXLSReader;
 import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.io.SampleSheetCSVWriter;
 import fr.ens.biologie.genomique.kenetre.KenetreException;
@@ -26,7 +27,7 @@ public class NanoporeSampleSheetConverter extends AbstractSampleSheetConverter {
   protected void loadSampleSheet() throws Aozan3Exception {
 
     // Read the input sample sheet
-    try (SampleSheetReader reader = new SampleSheetXLSReader(this.inputFile)) {
+    try (SampleSheetReader reader = new SampleSheetXLSReader(super.inputFile)) {
       reader.addAllowedFields("sample_ref", "project");
       this.sampleSheet = reader.read();
     } catch (IOException e) {
@@ -45,9 +46,19 @@ public class NanoporeSampleSheetConverter extends AbstractSampleSheetConverter {
   protected void checkSampleSheet(List<String> warnings)
       throws Aozan3Exception {
 
+    String experimentId = this.sampleSheet.getExperimentId();
+    String basename = super.inputFile.getName().replace(".xls", "");
+
+    // Check if filename is the same as the experiement id
+    if (experimentId != null
+        && !experimentId.isBlank() && !basename.equals(experimentId)) {
+      throw new Aozan3Exception("Invalid \"experiment id\", expected \""
+          + basename + "\", found \"" + experimentId + "\".");
+    }
+
     SampleSheetChecker checker = new SampleSheetChecker();
     try {
-      checker.check(this.sampleSheet);
+      warnings.addAll(checker.check(this.sampleSheet));
     } catch (KenetreException e) {
       throw new Aozan3Exception(e);
     }
@@ -58,8 +69,8 @@ public class NanoporeSampleSheetConverter extends AbstractSampleSheetConverter {
   protected void saveSampleSheet() throws Aozan3Exception {
 
     // Write the output sample sheet in CSV format
-    try (SampleSheetCSVWriter writer = new SampleSheetCSVWriter(outputFile)) {
-      writer.writer(sampleSheet);
+    try (SampleSheetWriter writer = new SampleSheetCSVWriter(this.outputFile)) {
+      writer.writer(this.sampleSheet);
     } catch (IOException e) {
       throw new Aozan3Exception(
           "Error while writing sample sheet: " + inputFile);
