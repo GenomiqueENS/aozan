@@ -27,6 +27,7 @@ public class NanoporeSampleSheetConverter extends AbstractSampleSheetConverter {
 
     // Read the input sample sheet
     try (SampleSheetReader reader = new SampleSheetXLSReader(this.inputFile)) {
+      reader.addAllowedFields("sample_ref", "project");
       this.sampleSheet = reader.read();
     } catch (IOException e) {
       throw new Aozan3Exception("Error while reading sample sheet: "
@@ -78,16 +79,6 @@ public class NanoporeSampleSheetConverter extends AbstractSampleSheetConverter {
   public NanoporeSampleSheetConverter(File inputFile, File outputDir) {
 
     super(inputFile, outputDir);
-  }
-
-  public static void main(String[] args) throws Aozan3Exception {
-
-    NanoporeSampleSheetConverter converter = new NanoporeSampleSheetConverter(
-        new File(
-            "/home/jourdren/shares-net/sequencages/nanopore/samplesheets/20241111_MonProjetD_A2024.xls"),
-        new File("/tmp"));
-
-    converter.convert();
   }
 
 }
