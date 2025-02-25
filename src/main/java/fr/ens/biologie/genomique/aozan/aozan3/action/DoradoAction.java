@@ -14,6 +14,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import com.google.common.base.Splitter;
+
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
 import fr.ens.biologie.genomique.aozan.aozan3.Common;
 import fr.ens.biologie.genomique.aozan.aozan3.Configuration;
@@ -47,19 +49,11 @@ public class DoradoAction implements Action {
 
     final Options options = makeOptions();
     final CommandLineParser parser = new DefaultParser();
+    final Configuration doradoConf = new Configuration();
 
-    String flowcell = "";
-    String kit = "";
-    String barcodeKits = "";
-    String modelName = "";
     String runId = "";
-    String doradoVersion = "";
     String cudaDevice = "";
-    int batchSize = -1;
-    int chunkSize = -1;
-    boolean trimBarcode = false;
     boolean keepTemporaryFiles = false;
-    String minQscore = "";
     List<String> args = null;
 
     try {
@@ -73,49 +67,28 @@ public class DoradoAction implements Action {
         help(options);
       }
 
-      // Trim barcodes option
-      if (line.hasOption("trim-barcodes")) {
-        trimBarcode = true;
-      }
+      // Set the configuration settings
+      if (line.hasOption('s')) {
 
-      if (line.hasOption("flowcell")) {
-        flowcell = line.getOptionValue("flowcell");
-      }
+        List<String> settings = Arrays.asList(line.getOptionValues('s'));
 
-      if (line.hasOption("kit")) {
-        kit = line.getOptionValue("kit");
-      }
+        Splitter splitter = Splitter.on('=').trimResults();
+        for (String s : settings) {
+          List<String> elements = splitter.splitToList(s);
+          if (elements.size() != 2) {
+            throw new ParseException("Invalid setting format: " + s);
+          }
+          doradoConf.set(elements.get(0).trim(), elements.get(1).trim());
+        }
 
-      if (line.hasOption("barcode-kit")) {
-        barcodeKits = line.getOptionValue("barcode-kit");
       }
 
       if (line.hasOption("run-id")) {
         runId = line.getOptionValue("run-id");
       }
 
-      if (line.hasOption("dorado-version")) {
-        doradoVersion = line.getOptionValue("dorado-version");
-      }
-
-      if (line.hasOption("config")) {
-        modelName = line.getOptionValue("config");
-      }
-
-      if (line.hasOption("min-qscore")) {
-        minQscore = line.getOptionValue("min-qscore");
-      }
-
       if (line.hasOption("device")) {
         cudaDevice = line.getOptionValue("device");
-      }
-
-      if (line.hasOption("batch-size")) {
-        batchSize = Integer.parseInt(line.getOptionValue("batch-size"));
-      }
-
-      if (line.hasOption("chunk-size")) {
-        chunkSize = Integer.parseInt(line.getOptionValue("chunk-size"));
       }
 
       if (line.hasOption("keep-temporary-files")) {
@@ -123,19 +96,16 @@ public class DoradoAction implements Action {
       }
       args = Arrays.asList(line.getArgs());
 
-      if (args.size() < 4) {
+      if (args.size() < 3) {
         help(options);
       }
 
       final Path inputTar = Paths.get(args.get(0));
       final Path outputDir = Paths.get(args.get(1));
-      final Path modelsPath = Paths.get(args.get(2));
-      final Path tmpPath = Paths.get(args.get(3));
+      final Path tmpPath = Paths.get(args.get(2));
 
-      DoradoONTBasecallingDataProcessor.run(inputTar, outputDir, modelsPath,
-          runId, doradoVersion, tmpPath, flowcell, kit, barcodeKits,
-          trimBarcode, minQscore, modelName, cudaDevice, batchSize, chunkSize,
-          keepTemporaryFiles, logger);
+      DoradoONTBasecallingDataProcessor.run(inputTar, outputDir, runId, tmpPath,
+          cudaDevice, keepTemporaryFiles, doradoConf, logger);
 
     } catch (ParseException e) {
       Common.errorExit(e,
@@ -166,51 +136,22 @@ public class DoradoAction implements Action {
     // create Options object
     final Options options = new Options();
 
-    // Dorado version option
-    options.addOption(builder("g").longOpt("dorado-version").hasArg()
-        .argName("version").desc("dorado version").build());
-
-    // Flowcell option
-    options.addOption(builder("f").longOpt("flowcell").hasArg().argName("type")
-        .desc("flow cell type").build());
-
-    // Kit option
-    options.addOption(builder("k").longOpt("kit").hasArg().argName("kitname")
-        .desc("kit name").build());
-
-    // Config option
-    options.addOption(builder("c").longOpt("config").hasArg()
-        .argName("configname").desc("configuration filename").build());
+    // Define setting
+    options.addOption(builder("s").longOpt("setting").hasArg()
+        .argName("property=value").desc("set a configuration setting. This "
+            + "option can be used several times")
+        .build());
 
     // GPU device option
     options.addOption(builder("d").longOpt("device").hasArg()
         .argName("cudadevice").desc("Cuda device name").build());
 
-    // Batch size
-    options.addOption(builder("u").longOpt("batch-size").hasArg()
-        .argName("size").desc("batch size").build());
-
-    // Chunks size
-    options.addOption(builder("p").longOpt("chunk-size").hasArg()
-        .argName("chunks").desc("chunk size").build());
-
     // Run id option
     options.addOption(builder("r").longOpt("run-id").hasArg().argName("id")
         .desc("run id").build());
 
-    // Barcode kits option
-    options.addOption(builder("").longOpt("barcode-kit").hasArg()
-        .argName("kits").desc("barcode kit").build());
-
-    // Trim barcode option
-    options.addOption("t", "trim-barcodes", false, "trim barcodes");
-
     // Fast5 output
     options.addOption("e", "keep-temporary-files", false, "Fast5 output");
-
-    // Barcode kits option
-    options.addOption(builder("m").longOpt("min-qscore").hasArg()
-        .argName("value").desc("minimal qscore for pass reads").build());
 
     // Help option
     options.addOption("h", "help", false, "display this help");

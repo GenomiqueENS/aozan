@@ -32,6 +32,11 @@ import fr.ens.biologie.genomique.aozan.aozan3.util.DiskUtils;
 import fr.ens.biologie.genomique.aozan.aozan3.util.UnTar;
 import fr.ens.biologie.genomique.kenetre.log.DummyLogger;
 import fr.ens.biologie.genomique.kenetre.log.GenericLogger;
+import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.SampleSheet;
+import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.io.SampleSheetCSVReader;
+import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.io.SampleSheetCSVWriter;
+import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.io.SampleSheetReader;
+import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.io.SampleSheetWriter;
 import fr.ens.biologie.genomique.kenetre.util.StringUtils;
 import fr.ens.biologie.genomique.kenetre.util.Version;
 
@@ -183,9 +188,8 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
    * @throws Aozan3Exception if an error occurs while executing Dorado
    */
   private static void tarPipeline(RunId runId, Path inputTarPath,
-      Path outputPath, Path tmpPath, Path modelsPath,
-      final RunConfiguration runConf, boolean keepTemporaryFiles,
-      GenericLogger logger) throws Aozan3Exception {
+      Path outputPath, Path tmpPath, final RunConfiguration runConf,
+      boolean keepTemporaryFiles, GenericLogger logger) throws Aozan3Exception {
 
     requireNonNull(inputTarPath);
     requireNonNull(outputPath);
@@ -201,8 +205,8 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
       untar.execute();
       DiskUtils.changeDirectoryMode(inputDirPath, "777");
 
-      directoryPipeline(runId, inputDirPath, outputPath, tmpPath, modelsPath,
-          runConf, keepTemporaryFiles, logger);
+      directoryPipeline(runId, inputDirPath, outputPath, tmpPath, runConf,
+          keepTemporaryFiles, logger);
 
       // Delete temporary untarred FAST5 tar
       if (!keepTemporaryFiles) {
@@ -228,13 +232,11 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
    * @throws Aozan3Exception if an error occurs while executing Dorado
    */
   private static void directoryPipeline(RunId runId, Path inputDirPath,
-      Path outputPath, Path tmpPath, Path modelsPath,
-      final RunConfiguration runConf, boolean keepTemporaryFiles,
-      GenericLogger logger) throws Aozan3Exception {
+      Path outputPath, Path tmpPath, final RunConfiguration runConf,
+      boolean keepTemporaryFiles, GenericLogger logger) throws Aozan3Exception {
 
     requireNonNull(inputDirPath);
     requireNonNull(outputPath);
-    requireNonNull(modelsPath);
     requireNonNull(tmpPath);
     requireNonNull(runConf);
 
@@ -253,9 +255,20 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
           Paths.get(outputDirPath.toString(), "sequencing_summary.txt");
       Path fastqPath = Paths.get(outputDirPath.toString(), "fastq");
 
+      // Create tempoary sample sheet if needed
+      if (runConf.containsKey(CONF_PREFIX + ".sample.sheet.path")) {
+
+        Path inputSampleSheet =
+            runConf.getPath(CONF_PREFIX + ".sample.sheet.path");
+        Path outputSampleSheet =
+            generateStrictSampleSheet(inputSampleSheet, outputDirPath);
+        runConf.set(CONF_PREFIX + ".sample.sheet.path",
+            outputSampleSheet.toString());
+      }
+
       // Launch Dorado
       launchDoradoBasecaller(runId, outputDirPath, inputDirPath, bamPath,
-          modelsPath, runConf, logger);
+          runConf, logger);
 
       // Launch Summary
       launchDoradoSummary(runId, outputDirPath, bamPath, summaryPath, runConf,
@@ -293,6 +306,7 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
    * @param workingPath working directory
    * @param inputPath input path
    * @param bamPath output BAM file path
+   * @param sampleSheetPath sample sheet path
    * @param modelsPath model path
    * @param runConf run configuration
    * @param logger Aozan logger
@@ -300,7 +314,7 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
    * @throws IOException if an error occurs while executing Dorado
    */
   private static void launchDoradoBasecaller(RunId runId, Path workingPath,
-      Path inputPath, Path bamPath, Path modelsPath, RunConfiguration runConf,
+      Path inputPath, Path bamPath, RunConfiguration runConf,
       GenericLogger logger) throws Aozan3Exception, IOException {
 
     // Define external tool
@@ -315,10 +329,6 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
         asList(runConf.get(CONF_PREFIX + ".path", "dorado"), "-v"), true,
         DoradoONTBasecallingDataProcessor::parseDoradoVersion);
 
-    // Create command line
-    List<String> commandLine =
-        createDoradoBasecallerCommandLine(inputPath, modelsPath, runConf);
-
     File outputDir = workingPath.toFile();
 
     // define stdout and stderr files
@@ -326,6 +336,15 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
     File stderrFile =
         new File(outputDir, "dorado_ballercaller_" + runId.getId() + ".err");
     File devnullFile = new File("/dev/null");
+    File modelsDir = runConf
+        .getPath(CONF_PREFIX + ".models.path", devnullFile.toPath()).toFile();
+    File sampleSheetFile = runConf
+        .getPath(CONF_PREFIX + ".sample.sheet.path", devnullFile.toPath())
+        .toFile();
+
+    // Create command line
+    List<String> commandLine = createDoradoBasecallerCommandLine(inputPath,
+        modelsDir.toPath(), runConf);
 
     info(logger, runId, "Dorado: " + toolVersion);
     info(logger, runId, "Demultiplexing using the following command line: "
@@ -335,8 +354,8 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
 
     final int exitValue = tool.newSimpleProcess(runId, true).execute(
         commandAsBash(commandLine, stdoutFile, stderrFile), outputDir,
-        outputDir, devnullFile, devnullFile, inputPath.toFile(), outputDir,
-        modelsPath.toFile());
+        outputDir, devnullFile, devnullFile, inputPath.toFile(),
+        sampleSheetFile, outputDir, modelsDir);
 
     long endTime = System.currentTimeMillis();
 
@@ -410,6 +429,7 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
    * @param workingPath working directory
    * @param bamPath input BAM file path
    * @param fastqDirPath FASTQ output dir path
+   * @param sampleSheetPath sample sheet path
    * @param runConf run configuration
    * @param logger Aozan logger
    * @throws Aozan3Exception if run configuration is invalid
@@ -427,10 +447,17 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
         ExecutionUser.NOBODY, logger);
 
     // Create command line
-    List<String> commandLine =
-        Arrays.asList(runConf.get(CONF_PREFIX + ".path", "dorado"), "demux",
-            "--no-classify", "--emit-fastq", "--output-dir",
-            fastqDirPath.toString(), bamPath.toString());
+    List<String> commandLine = new ArrayList<>();
+    commandLine.addAll(Arrays.asList(
+        runConf.get(CONF_PREFIX + ".path", "dorado"), "demux", "--no-classify",
+        "--emit-fastq", "--output-dir", fastqDirPath.toString()));
+
+    if (runConf.containsKey(CONF_PREFIX + ".sample.sheet.path")) {
+      commandLine.add("--sample-sheet");
+      commandLine.add(runConf.get(CONF_PREFIX + ".sample.sheet.path"));
+    }
+
+    commandLine.add(bamPath.toString());
 
     File outputDir = workingPath.toFile();
 
@@ -440,6 +467,9 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
     File stderrFile =
         new File(outputDir, "dorado_demux_" + runId.getId() + ".err");
     File devnullFile = new File("/dev/null");
+    File sampleSheetFile = runConf
+        .getPath(CONF_PREFIX + ".sample.sheet.path", devnullFile.toPath())
+        .toFile();
 
     info(logger, runId, "Demultiplexing using the following command line: "
         + String.join(" ", commandLine));
@@ -448,7 +478,8 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
 
     final int exitValue = tool.newSimpleProcess(runId, true).execute(
         commandAsBash(commandLine, stdoutFile, stderrFile), outputDir,
-        outputDir, devnullFile, devnullFile, bamPath.toFile(), outputDir);
+        outputDir, devnullFile, devnullFile, bamPath.toFile(), sampleSheetFile,
+        outputDir);
 
     long endTime = System.currentTimeMillis();
 
@@ -494,13 +525,19 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
     result.add("--recursive");
 
     // Barcodes
-    if (runConf.containsKey(CONF_PREFIX + ".barcode.kits")) {
+    if (runConf.containsKey(CONF_PREFIX + ".kit.name")) {
       result.add("--kit-name");
-      result.add(runConf.get(CONF_PREFIX + ".barcode.kits"));
+      result.add(runConf.get(CONF_PREFIX + ".kit.name"));
 
       if (!runConf.getBoolean(CONF_PREFIX + ".trim.barcodes", true)) {
         result.add("--no-trim");
       }
+
+      if (runConf.containsKey(CONF_PREFIX + ".sample.sheet.path")) {
+        result.add("--sample-sheet");
+        result.add(runConf.get(CONF_PREFIX + ".sample.sheet.path"));
+      }
+
     }
 
     // Min qscore
@@ -530,6 +567,12 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
       result.add(runConf.get(CONF_PREFIX + ".chunk.size"));
     }
 
+    // PolyA estimation
+    if (runConf.containsKey(CONF_PREFIX + ".estimate.poly.a")) {
+      result.add("--estimate-poly-a");
+      result.add(runConf.get(CONF_PREFIX + ".estimate.poly.a"));
+    }
+
     result.add(inputPath.toString());
 
     return result;
@@ -552,8 +595,8 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
 
     if (!runConf.containsKey(CONF_PREFIX + ".model.path")) {
 
-      if (!runConf.containsKey(CONF_PREFIX + ".flowcell")) {
-        throw new Aozan3Exception("Flowcell missing in configuration");
+      if (!runConf.containsKey(CONF_PREFIX + ".flow.cell")) {
+        throw new Aozan3Exception("Flow cell missing in configuration");
       }
 
       if (!runConf.containsKey(CONF_PREFIX + ".kit")) {
@@ -561,7 +604,7 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
       }
 
       String analyte = "dna";
-      String flowCellRef = runConf.get(CONF_PREFIX + ".flowcell");
+      String flowCellRef = runConf.get(CONF_PREFIX + ".flow.cell");
       String kit = runConf.get(CONF_PREFIX + ".kit");
       String speed = runConf.get(CONF_PREFIX + ".speed", "");
       String modelType = "sup";
@@ -657,14 +700,48 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
         .forEach(File::delete);
   }
 
+  private static Path generateStrictSampleSheet(Path inputSampleSheet,
+      Path outputDirectory) throws Aozan3Exception {
+
+    SampleSheet sampleSheet;
+
+    // Read the input sample sheet
+    try (
+        SampleSheetReader reader = new SampleSheetCSVReader(inputSampleSheet)) {
+      reader.addAllowedFields("sample_ref", "project");
+      sampleSheet = reader.read();
+    } catch (IOException e) {
+      throw new Aozan3Exception("Error while reading sample sheet: "
+          + inputSampleSheet + " caused by: " + e.getMessage());
+    }
+
+    // Remove non standard fields
+    sampleSheet.removeOtherFields();
+    sampleSheet.removeBarcodeDescription();
+
+    File outputSampleSheet =
+        new File(outputDirectory.toFile(), "samplesheet.csv");
+
+    try (SampleSheetWriter writer =
+        new SampleSheetCSVWriter(outputSampleSheet)) {
+      writer.writer(sampleSheet);
+    } catch (IOException e) {
+      throw new Aozan3Exception("Error while writing temporary sample sheet: "
+          + inputSampleSheet + " caused by: " + e.getMessage());
+    }
+
+    return outputSampleSheet.toPath();
+  }
+
   //
-  // main
+  // Main
   //
 
   /**
    * @param inputTar input tar file
    * @param outputPath output directory
    * @param modelsPath directory with models for Dorado
+   * @param sampleSheetPath sample sheet path
    * @param runId run Id
    * @param doradoVersion dorado version
    * @param tmpPath tempoary directory
@@ -681,23 +758,16 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
    * @param logger logger to use
    * @throws Aozan3Exception if an error occurs while executing the basecalling
    */
-  public static void run(Path inputTar, Path outputPath, Path modelsPath,
-      String runId, String doradoVersion, Path tmpPath, String flowcellType,
-      String kit, String barcodeKits, boolean trimBarcodes, String minQscore,
-      String model, String cudaDevice, int batchSize, int chunkSize,
-      boolean keepTemporaryFiles, GenericLogger logger) throws Aozan3Exception {
+  public static void run(Path inputTar, Path outputPath, String runId,
+      Path tmpPath, String cudaDevice, boolean keepTemporaryFiles,
+      Configuration doradoConf, GenericLogger logger) throws Aozan3Exception {
 
     requireNonNull(inputTar);
     requireNonNull(outputPath);
-    requireNonNull(modelsPath);
     requireNonNull(runId);
-    requireNonNull(doradoVersion);
     requireNonNull(tmpPath);
-    requireNonNull(flowcellType);
-    requireNonNull(kit);
-    requireNonNull(barcodeKits);
-    requireNonNull(model);
     requireNonNull(cudaDevice);
+    requireNonNull(doradoConf);
     requireNonNull(logger);
 
     if (runId.trim().isEmpty()) {
@@ -709,20 +779,8 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
       }
     }
 
-    if (flowcellType.trim().isEmpty()) {
-      flowcellType = "FLO-MIN106";
-    }
-
-    if (kit.trim().isEmpty()) {
-      flowcellType = "SQK-PBK004";
-    }
-
     if (runId.trim().isEmpty()) {
       throw new IllegalArgumentException("runId cannot be empty");
-    }
-
-    if (doradoVersion.trim().isEmpty()) {
-      doradoVersion = DEFAULT_DORADO_VERSION;
     }
 
     if (!Files.isDirectory(outputPath)) {
@@ -741,6 +799,11 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
     }
 
     RunConfiguration runConf = new RunConfiguration();
+    runConf.set(doradoConf);
+
+    String doradoVersion =
+        runConf.get(CONF_PREFIX + ".version", DEFAULT_DORADO_VERSION);
+
     runConf.set("tmp.dir", tmpPath.toString());
     runConf.set(CONF_PREFIX + ".use.docker", "true");
     runConf.set(CONF_PREFIX + ".dorado.version", doradoVersion);
@@ -751,33 +814,17 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
       runConf.set(CONF_PREFIX + ".cuda.device", cudaDevice.trim());
     }
 
-    if (batchSize > 0) {
-      runConf.set(CONF_PREFIX + ".batch.size", batchSize);
-    }
+    if (runConf.containsKey(CONF_PREFIX + ".model")) {
 
-    if (chunkSize > 0) {
-      runConf.set(CONF_PREFIX + ".chunk.size", chunkSize);
-    }
-
-    if (!model.trim().isEmpty()) {
-      runConf.set(CONF_PREFIX + ".model.path",
-          new File(modelsPath.toFile(), model.trim()).toString());
-    } else {
-      runConf.set(CONF_PREFIX + ".kit", kit.trim());
-      runConf.set(CONF_PREFIX + ".flowcell", flowcellType.trim());
-    }
-
-    if (!barcodeKits.trim().isEmpty()) {
-      runConf.set(CONF_PREFIX + ".barcoding", "true");
-      runConf.set(CONF_PREFIX + ".barcode.kits", barcodeKits.trim());
-
-      if (trimBarcodes) {
-        runConf.set(CONF_PREFIX + ".trim.barcodes", "true");
+      if (!runConf.containsKey(CONF_PREFIX + ".models.path")) {
+        throw new Aozan3Exception(
+            "The directory for the models has not been set ("
+                + CONF_PREFIX + ".models.path).");
       }
-    }
+      runConf.set(CONF_PREFIX + ".model.path",
+          new File(runConf.get(CONF_PREFIX + ".models.path"),
+              runConf.get(CONF_PREFIX + ".model")).toString());
 
-    if (!minQscore.trim().isEmpty()) {
-      runConf.set(CONF_PREFIX + ".min.qscore", minQscore);
     }
 
     if (new Version(doradoVersion).greaterThanOrEqualTo(new Version("0.5.0"))
@@ -789,14 +836,14 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
 
     System.out.println("### START ###");
 
-    RunId basecallingRunId = new RunId(runId + "-dorado-" + doradoVersion);
+    RunId basecallingRunId = new RunId(runId);
 
     if (Files.isRegularFile(inputTar)) {
-      tarPipeline(basecallingRunId, inputTar, outputPath, tmpPath, modelsPath,
-          runConf, keepTemporaryFiles, logger);
+      tarPipeline(basecallingRunId, inputTar, outputPath, tmpPath, runConf,
+          keepTemporaryFiles, logger);
     } else {
       directoryPipeline(basecallingRunId, inputTar, outputPath, tmpPath,
-          modelsPath, runConf, keepTemporaryFiles, logger);
+          runConf, keepTemporaryFiles, logger);
     }
 
     System.out.println("### END ###");
