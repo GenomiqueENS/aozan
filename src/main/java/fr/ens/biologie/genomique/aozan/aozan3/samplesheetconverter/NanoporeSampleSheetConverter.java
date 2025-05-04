@@ -2,16 +2,20 @@ package fr.ens.biologie.genomique.aozan.aozan3.samplesheetconverter;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import fr.ens.biologie.genomique.aozan.aozan3.Aozan3Exception;
-import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.io.SampleSheetReader;
-import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.io.SampleSheetWriter;
-import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.io.SampleSheetXLSReader;
-import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.io.SampleSheetCSVWriter;
 import fr.ens.biologie.genomique.kenetre.KenetreException;
 import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.SampleSheet;
 import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.SampleSheetChecker;
+import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.io.SampleSheetCSVWriter;
+import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.io.SampleSheetReader;
+import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.io.SampleSheetWriter;
+import fr.ens.biologie.genomique.kenetre.nanopore.samplesheet.io.SampleSheetXLSReader;
 
 /**
  * This class define a converter between a Nanopore samplesheet in XLS format to
@@ -57,9 +61,19 @@ public class NanoporeSampleSheetConverter extends AbstractSampleSheetConverter {
     }
 
     SampleSheetChecker checker = new SampleSheetChecker();
+
     try {
+      // Load additional Nanopore product codes
+      checker.addKnownExpansionKits(
+          loadNanoporeProductCodes("nanopore.expansion.kits.path"));
+      checker.addKnownFlowCellProductCodes(
+          loadNanoporeProductCodes("nanopore.flow.cell.product.codes.path"));
+      checker.addKnownSequencingKits(
+          loadNanoporeProductCodes("nanopore.sequencing.kits.path"));
+
+      // Check sample sheet
       warnings.addAll(checker.check(this.sampleSheet));
-    } catch (KenetreException e) {
+    } catch (IOException | KenetreException e) {
       throw new Aozan3Exception(e);
     }
 
@@ -79,6 +93,40 @@ public class NanoporeSampleSheetConverter extends AbstractSampleSheetConverter {
   }
 
   //
+  // Private methods
+  //
+
+  /**
+   * Load Nanopore product codes from a file
+   * @param javaPropertyName Java property
+   * @return a list with the product codes
+   * @throws IOException if an error occurs while reading the file with product
+   *           codes
+   */
+  private List<String> loadNanoporeProductCodes(String javaPropertyName)
+      throws IOException {
+
+    List<String> result = new ArrayList<>();
+
+    String value = System.getProperty(javaPropertyName);
+    if (value == null) {
+      return Collections.emptyList();
+    }
+
+    for (String line : Files.readAllLines(Paths.get(value))) {
+
+      line = line.trim();
+      if (line.isEmpty() || line.startsWith("#")) {
+        continue;
+      }
+
+      result.add(line);
+    }
+
+    return result;
+  }
+
+  //
   // Constructor
   //
 
@@ -90,6 +138,17 @@ public class NanoporeSampleSheetConverter extends AbstractSampleSheetConverter {
   public NanoporeSampleSheetConverter(File inputFile, File outputDir) {
 
     super(inputFile, outputDir);
+  }
+
+  // TODO Warning for duplicate alias
+
+  public static void main(String[] args) throws Aozan3Exception {
+
+    NanoporeSampleSheetConverter converter = new NanoporeSampleSheetConverter(
+        new File("/home/jourdren/Bureau/xls/bidon.xls"), new File("/tmp"));
+    converter.convert();
+    System.out.println("OK.");
+
   }
 
 }
