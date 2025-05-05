@@ -255,15 +255,21 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
           Paths.get(outputDirPath.toString(), "sequencing_summary.txt");
       Path fastqPath = Paths.get(outputDirPath.toString(), "fastq");
 
-      // Create tempoary sample sheet if needed
+      // Create temporary sample sheet if needed
       if (runConf.containsKey(CONF_PREFIX + ".sample.sheet.path")) {
 
         Path inputSampleSheet =
             runConf.getPath(CONF_PREFIX + ".sample.sheet.path");
         Path outputSampleSheet =
             generateStrictSampleSheet(inputSampleSheet, outputDirPath);
-        runConf.set(CONF_PREFIX + ".sample.sheet.path",
-            outputSampleSheet.toString());
+
+        // Sample sheet is not generated if there is no barcode
+        if (outputSampleSheet == null) {
+          runConf.remove(CONF_PREFIX + ".sample.sheet.path");
+        } else {
+          runConf.set(CONF_PREFIX + ".sample.sheet.path",
+              outputSampleSheet.toString());
+        }
       }
 
       // Launch Dorado
@@ -525,7 +531,8 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
     result.add("--recursive");
 
     // Barcodes
-    if (runConf.containsKey(CONF_PREFIX + ".kit.name")) {
+    if (runConf.containsKey(CONF_PREFIX + ".kit.name")
+        && !runConf.get(CONF_PREFIX + ".kit.name").startsWith("SQK-RNA")) {
       result.add("--kit-name");
       result.add(runConf.get(CONF_PREFIX + ".kit.name"));
 
@@ -718,6 +725,11 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
     // Remove non standard fields
     sampleSheet.removeOtherFields();
     sampleSheet.removeBarcodeDescription();
+
+    // Do not generate a sample sheet if there is no barcode
+    if (sampleSheet.getBarcodes().isEmpty()) {
+      return null;
+    }
 
     File outputSampleSheet =
         new File(outputDirectory.toFile(), "samplesheet.csv");
