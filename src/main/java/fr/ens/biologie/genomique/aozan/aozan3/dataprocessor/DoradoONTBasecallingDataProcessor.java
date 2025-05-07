@@ -262,14 +262,8 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
             runConf.getPath(CONF_PREFIX + ".sample.sheet.path");
         Path outputSampleSheet =
             generateStrictSampleSheet(inputSampleSheet, outputDirPath);
-
-        // Sample sheet is not generated if there is no barcode
-        if (outputSampleSheet == null) {
-          runConf.remove(CONF_PREFIX + ".sample.sheet.path");
-        } else {
-          runConf.set(CONF_PREFIX + ".sample.sheet.path",
-              outputSampleSheet.toString());
-        }
+        runConf.set(CONF_PREFIX + ".sample.sheet.path",
+            outputSampleSheet.toString());
       }
 
       // Launch Dorado
@@ -725,11 +719,6 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
     // Remove non standard fields
     sampleSheet.removeOtherFields();
     sampleSheet.removeBarcodeDescription();
-
-    // Do not generate a sample sheet if there is no barcode
-    if (sampleSheet.getBarcodes().isEmpty()) {
-      return null;
-    }
 
     File outputSampleSheet =
         new File(outputDirectory.toFile(), "samplesheet.csv");
