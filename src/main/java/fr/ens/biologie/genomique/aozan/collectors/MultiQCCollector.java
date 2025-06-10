@@ -165,7 +165,7 @@ public class MultiQCCollector implements Collector {
 
     // MultiQC options
     result.add("--title");
-    result.add("Project " + projectName + " report");
+    result.add("'Project " + projectName + " report'");
     result.add("--filename");
     result.add(multiQCReportFile.getAbsolutePath());
 
