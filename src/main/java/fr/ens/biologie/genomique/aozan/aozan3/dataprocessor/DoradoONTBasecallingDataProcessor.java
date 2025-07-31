@@ -264,6 +264,8 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
             generateStrictSampleSheet(inputSampleSheet, outputDirPath);
         runConf.set(CONF_PREFIX + ".sample.sheet.path",
             outputSampleSheet.toString());
+        runConf.set(CONF_PREFIX + ".sample.sheet.with.barcodes",
+            isBarcodeInSampleSheet(outputSampleSheet));
       }
 
       // Launch Dorado
@@ -452,7 +454,9 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
         runConf.get(CONF_PREFIX + ".path", "dorado"), "demux", "--no-classify",
         "--emit-fastq", "--output-dir", fastqDirPath.toString()));
 
-    if (runConf.containsKey(CONF_PREFIX + ".sample.sheet.path")) {
+    if (runConf.containsKey(CONF_PREFIX + ".sample.sheet.path")
+        && runConf.getBoolean(CONF_PREFIX + ".sample.sheet.with.barcodes",
+            false)) {
       commandLine.add("--sample-sheet");
       commandLine.add(runConf.get(CONF_PREFIX + ".sample.sheet.path"));
     }
@@ -732,6 +736,22 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
     }
 
     return outputSampleSheet.toPath();
+  }
+
+  private static boolean isBarcodeInSampleSheet(Path sampleSheetPath)
+      throws Aozan3Exception {
+
+    SampleSheet sampleSheet;
+
+    // Read the input sample sheet
+    try (SampleSheetReader reader = new SampleSheetCSVReader(sampleSheetPath)) {
+      sampleSheet = reader.read();
+    } catch (IOException e) {
+      throw new Aozan3Exception("Error while reading sample sheet: "
+          + sampleSheetPath + " caused by: " + e.getMessage());
+    }
+
+    return sampleSheet.isBarcode();
   }
 
   //
