@@ -273,7 +273,7 @@ public class IlluminaRawRunDataProvider implements RunDataProvider {
       return false;
     }
 
-    switch (Strings.emptyToNull(rp.getRunParametersVersion()).toLowerCase()) {
+    switch (Strings.nullToEmpty(rp.getRunParametersVersion()).toLowerCase()) {
 
     case "miseq_1_1":
       return true;
