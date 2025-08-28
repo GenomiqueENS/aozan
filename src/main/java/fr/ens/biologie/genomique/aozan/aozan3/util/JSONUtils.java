@@ -1,15 +1,17 @@
 package fr.ens.biologie.genomique.aozan.aozan3.util;
 
-import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 /**
  * This class contains some utility methods for JSON serialization.
@@ -18,26 +20,21 @@ import com.google.gson.stream.JsonWriter;
  */
 public final class JSONUtils {
 
-  private static final TypeAdapter<Path> PATH_TYPE_ADAPTER =
-      new TypeAdapter<Path>() {
+  public static class PathTypeAdapter
+      implements JsonSerializer<Path>, JsonDeserializer<Path> {
 
-        @Override
-        public Path read(JsonReader in) throws IOException {
+    @Override
+    public JsonElement serialize(final Path path, final Type typeOfSrc,
+        final JsonSerializationContext context) {
+      return new JsonPrimitive(path.toString());
+    }
 
-          if (in.peek() == JsonToken.NULL) {
-            in.nextNull();
-            return null;
-          }
-          String nextString = in.nextString();
-          return "null".equals(nextString) ? null : Paths.get(nextString);
-        }
-
-        @Override
-        public void write(JsonWriter out, Path value) throws IOException {
-          out.value(value == null ? null : value.toString());
-        }
-
-      };
+    @Override
+    public Path deserialize(final JsonElement json, final Type typeOfT,
+        final JsonDeserializationContext context) throws JsonParseException {
+      return Path.of(json.getAsString());
+    }
+  }
 
   /**
    * Create a new Gson object with all required adapters for serialization of
@@ -47,7 +44,7 @@ public final class JSONUtils {
   public static Gson newGson() {
 
     GsonBuilder builder = new GsonBuilder();
-    builder.registerTypeAdapter(Path.class, PATH_TYPE_ADAPTER);
+    builder.registerTypeHierarchyAdapter(Path.class, new PathTypeAdapter());
     return builder.create();
   }
 
