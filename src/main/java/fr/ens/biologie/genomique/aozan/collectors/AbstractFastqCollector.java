@@ -52,6 +52,7 @@ import fr.ens.biologie.genomique.aozan.QC;
 import fr.ens.biologie.genomique.aozan.RunData;
 import fr.ens.biologie.genomique.aozan.io.FastqSample;
 import fr.ens.biologie.genomique.aozan.io.FastqSampleUtils;
+import fr.ens.biologie.genomique.kenetre.util.Utils;
 
 /**
  * The abstract class define commons methods for the Collectors which treats
@@ -497,11 +498,7 @@ public abstract class AbstractFastqCollector implements Collector {
     // Wait until all samples are processed
     do {
 
-      try {
-        Thread.sleep(CHECKING_DELAY_MS);
-      } catch (final InterruptedException e) {
-        // LOGGER.warning("InterruptedException: " + e.getMessage());
-      }
+      Utils.silentSleep(CHECKING_DELAY_MS);
 
       samplesNotProcessed = 0;
 
