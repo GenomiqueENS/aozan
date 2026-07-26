@@ -761,21 +761,11 @@ public class DoradoONTBasecallingDataProcessor implements DataProcessor {
   /**
    * @param inputTar input tar file
    * @param outputPath output directory
-   * @param modelsPath directory with models for Dorado
-   * @param sampleSheetPath sample sheet path
    * @param runId run Id
-   * @param doradoVersion dorado version
    * @param tmpPath tempoary directory
-   * @param flowcellType flowcell type
-   * @param kit kit type
-   * @param barcodeKits barcode kit used
-   * @param trimBarcodes true if barcode must be trimmed
-   * @param minQscore minimal Q score
-   * @param model model to use
    * @param cudaDevice CUDA device
-   * @param batchSize batch size
-   * @param chunkSize chunk size
    * @param keepTemporaryFiles true to keep temporary files
+   * @param doradoConf Dorado configuration
    * @param logger logger to use
    * @throws Aozan3Exception if an error occurs while executing the basecalling
    */
