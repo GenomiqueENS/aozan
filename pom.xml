@@ -760,13 +760,9 @@
 
         <!-- PLUG-IN Findbugs -->
         <plugin>
-           <groupId>org.codehaus.mojo</groupId>
-           <artifactId>findbugs-maven-plugin</artifactId>
-           <version>3.0.1</version>
-           <configuration>
-              <effort>Max</effort>
-              <xmlOutput>true</xmlOutput>
-           </configuration>
+           <groupId>com.github.spotbugs</groupId>
+           <artifactId>spotbugs-maven-plugin</artifactId>
+           <version>4.7.2.1</version>
         </plugin>
 
 		<!-- PLUG-in for static analysis code -->
@@ -774,7 +770,7 @@
 		<plugin>
 		  <groupId>org.gaul</groupId>
 		  <artifactId>modernizer-maven-plugin</artifactId>
-		  <version>2.4.0</version>
+		  <version>3.1.0</version>
                   <executions>
                     <execution>
                      <id>modernizer</id>
