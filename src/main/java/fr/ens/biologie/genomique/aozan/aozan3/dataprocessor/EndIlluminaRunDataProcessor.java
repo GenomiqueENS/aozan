@@ -213,7 +213,7 @@ public class EndIlluminaRunDataProcessor implements DataProcessor {
    * @throws IOException if an error occurs while creating the tar file
    * @throws Aozan3Exception if an error occurs while creating the tar file
    */
-  static void createTar(Path outputFile, Path runDir,
+  public static void createTar(Path outputFile, Path runDir,
       Collection<String> filenames) throws IOException, Aozan3Exception {
 
     requireNonNull(outputFile);
