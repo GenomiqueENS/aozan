@@ -157,6 +157,10 @@ public abstract class AbstractIlluminaDemuxDataProcessor
 
       processSampleSheet(samplesheet);
 
+      // Check if a project field exists in sample sheet
+      conf.set("illumina.samplesheet.with.project.field",
+          samplesheet.getDemuxSection().isProjectSampleField());
+
       final Path samplesheetPath;
 
       // Create output directory before demux if required
