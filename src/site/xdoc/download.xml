@@ -84,7 +84,7 @@
       </tr>
       <tr>
           <td>Java Runtime Environment</td>
-          <td>11 or above.
+          <td>17 or above.
               You can check your installed jre version typing: <source>$ java -version</source></td>
         </tr>
         <tr>

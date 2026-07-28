@@ -106,7 +106,7 @@
 
       <p>To run Aozan, you need to install the following software:</p>
       <ul>
-        <li>Java 11 or above (tested with OpenJDK)</li>
+        <li>Java 17 or above (tested with OpenJDK)</li>
         <li>bcl2fastq 2 (tested with bcl2fastq 2.17.1.14 and 2.18.0.12), not required if BCL Convert is used for demultiplexing</li>
         <li>BCL Convert (tested with BCL Convert 3.9.3 and 4.0.3), not required if bcl2fastq is used for demultiplexing</li>
         <li>rsync 3.0.x or later</li>
@@ -114,7 +114,7 @@
 
       <p>On Debian/Ubuntu, you can install requirements (except Bcl2fastq and BCL Convert) using the 'apt-get' command, here is an example:</p>
 <source>
-$ sudo apt-get install openjdk-11-jre-headless rsync
+$ sudo apt-get install openjdk-17-jre-headless rsync
 </source>
 
 
