@@ -324,9 +324,18 @@ public abstract class AbstractIlluminaDemuxDataProcessor
 
     long startTime = System.currentTimeMillis();
 
+    Map<String, String> uLimitsMap = null;
+
+    // Define uLimit if required
+    if (conf.containsKey(getConfPrefix() + ".docker.limit.nofile")) {
+      uLimitsMap = Map.of("nofile",
+          "" + conf.getInt(getConfPrefix() + ".docker.limit.nofile"));
+    }
+
     final int exitValue = tool.newSimpleProcess(runId, true).execute(
-        commandLine, workingDirectory, temporaryDirectory, stdoutFile,
-        stderrFile, inputPath.toFile(), workingDirectory, temporaryDirectory);
+        commandLine, workingDirectory, null, uLimitsMap, temporaryDirectory,
+        stdoutFile, stderrFile, false, inputPath.toFile(), workingDirectory,
+        temporaryDirectory);
 
     long endTime = System.currentTimeMillis();
 
