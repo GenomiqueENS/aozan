@@ -326,6 +326,21 @@ public class Configuration {
     }
   }
 
+  /**
+   * Remove a key from the configuration
+   * @param key the key to remove
+   */
+  public void remove(String key) {
+
+    requireNonNull(key);
+
+    if (!containsKey(key)) {
+      throw new NoSuchElementException(key);
+    }
+
+    this.conf.remove(key);
+  }
+
   //
   // Other
   //
