@@ -8,10 +8,9 @@ FROM centos:7
 # File Author / Maintainer
 MAINTAINER Laurent Jourdren <jourdren@biologie.ens.fr>
 
-# Install Aozan public version
-ADD https://github.com/GenomiqueENS/aozan/releases/download/v3.2/aozan-3.2.tar.gz /tmp/
-
-RUN cd /usr/local && \
+RUN cd /tmp && \
+    wget --quiet https://github.com/GenomiqueENS/aozan/releases/download/v3.2.1/aozan-3.2.1.tar.gz && \
+    cd /usr/local && \
     tar xzf /tmp/aozan-*.tar.gz && \
     ln -s /usr/local/aozan*/aozan.sh /usr/local/bin && \
     yum install -y java-11-openjdk-headless.x86_64 \

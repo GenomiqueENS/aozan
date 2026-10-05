@@ -1120,5 +1120,14 @@
 			</action>
 		</release>
 
+		<release version="3.2.1" description="Aozan 3.2.1 release"  date="2026-10-05">
+			<action dev="jourdren" type="fix">
+                                 The "--sample-sheet" option of BCL Convert is now only enabled when a project column exists in sample sheet.
+			</action>
+			<action dev="jourdren" type="fix">
+				Now set uLimit for the number of maximal open file descriptors to use in docker mode by setting the "bcl2fastq.docker.limit.nofile" or "bclconvert.docker.limit.nofile" Aozan properties.
+			</action>
+		</release>
+
 		</body>
 </document>
